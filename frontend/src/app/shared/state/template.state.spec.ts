@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, TemplatesService, TemplatesState } from '@app/shared/internal';
 import { createTemplate } from './../services/templates.service.spec';
@@ -48,7 +47,7 @@ describe('TemplatesState', () => {
             templatesService.setup(x => x.getTemplates())
                 .returns(() => throwError(() => 'Service Error'));
 
-            templatesState.load().pipe(onErrorResumeNext()).subscribe();
+            templatesState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(templatesState.snapshot.isLoading).toBeFalsy();
         });

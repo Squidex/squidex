@@ -1,14 +1,7 @@
 <sqx-form-error [bubble]="true" [closeable]="true" [error]="(contentForm.error | async)"></sqx-form-error>
 
 <sqx-list-view>
-    <ng-container topHeader>
-        
-        <div *ngIf="isNew && showIdInput">
-            <input class="form-control" placeholder="{{ 'contents.idPlaceholder' | sqxTranslate }}" 
-                [ngModel]="contentId"    
-                (ngModelChange)="contentIdChange.emit($event)" />
-        </div>
-        
+    <ng-container topHeader>        
         <div class="alert alert-danger" *ngIf="!contentVersion && isDeleted">
             {{ 'contents.deleted' | sqxTranslate }}
         </div>

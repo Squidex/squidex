@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { EMPTY, Observable, ReplaySubject, throwError } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, share, switchMap } from 'rxjs/operators';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { EMPTY, Observable, of, onErrorResumeNextWith, ReplaySubject, throwError } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, share, switchMap, tap } from 'rxjs/operators';
 import { DialogService } from './../services/dialog.service';
 import { Version, versioned, Versioned } from './version';
 
@@ -55,9 +54,9 @@ export function shareMapSubscribed<T, R = T>(dialogs: DialogService, project: (v
 export function debounceTimeSafe<T>(duration: number) {
     return function mapOperation(source: Observable<T>) {
         if (duration > 0) {
-            return source.pipe(debounceTime(duration), onErrorResumeNext());
+            return source.pipe(debounceTime(duration), onErrorResumeNextWith());
         } else {
-            return source.pipe(onErrorResumeNext());
+            return source.pipe(onErrorResumeNextWith());
         }
     };
 }
@@ -69,22 +68,27 @@ export function defined<T>() {
 }
 
 export function switchSafe<T, R>(project: (source: T) => Observable<R>) {
-    return function mapOperation(source: Observable<T>) {
-        return source.pipe(
-            switchMap(x => {
-                try {
-                    return project(x).pipe(catchError(_ => EMPTY));
-                } catch {
-                    return EMPTY;
-                }
-            }));
-    };
+    return switchMap<T, Observable<R>>(x => {
+        try {
+            return project(x).pipe(catchError(_ => EMPTY));
+        } catch {
+            return EMPTY;
+        }
+    });
 }
 
-export function ofForever<T>(...values: ReadonlyArray<T>) {
-    return new Observable<T>(s => {
-        for (const value of values) {
-            s.next(value);
+export function switchMapCached<R>(project: (source: string) => Observable<R>) {
+    const cache: { [key: string]: R } = {};
+
+    return switchMap<string, Observable<R>>(x => {
+        const cached = cache[x];
+
+        if (cached) {
+            return of(cached);
         }
+
+        return project(x).pipe(tap(result => {
+            cache[x] = result;
+        }));
     });
 }

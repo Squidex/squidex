@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { AppLanguagesPayload, AppLanguagesService, DialogService, LanguageDto, LanguagesService, LanguagesState, versioned } from '@app/shared/internal';
 import { createLanguages } from './../services/app-languages.service.spec';
@@ -79,7 +78,7 @@ describe('LanguagesState', () => {
             languagesService.setup(x => x.getLanguages(app))
                 .returns(() => throwError(() => 'Service Error'));
 
-            languagesState.load().pipe(onErrorResumeNext()).subscribe();
+            languagesState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(languagesState.snapshot.isLoading).toBeFalsy();
         });

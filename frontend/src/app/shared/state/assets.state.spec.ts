@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ErrorDto } from '@app/framework';
 import { AssetsService, AssetsState, DialogService, MathHelper, versioned } from '@app/shared/internal';
@@ -205,8 +204,8 @@ describe('AssetsState', () => {
             assetsState.load(true).subscribe();
         });
 
-        it('should add asset to snapshot if created', () => {
-            const newAsset = createAsset(5, ['new']);
+        it('should add asset to snapshot', () => {
+            const newAsset = createAsset(3, ['new']);
 
             assetsState.addAsset(newAsset);
 
@@ -214,8 +213,17 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.total).toBe(201);
         });
 
+        it('should not add asset to snapshot if it already exist', () => {
+            const newAsset = createAsset(1, ['new']);
+
+            assetsState.addAsset(newAsset);
+
+            expect(assetsState.snapshot.assets).toEqual([asset1, asset2]);
+            expect(assetsState.snapshot.total).toBe(200);
+        });
+
         it('should truncate assets if page size reached', () => {
-            const newAsset = createAsset(5, ['new']);
+            const newAsset = createAsset(3, ['new']);
 
             assetsState.page({ page: 0, pageSize: 2 }).subscribe();
             assetsState.addAsset(newAsset);
@@ -225,7 +233,7 @@ describe('AssetsState', () => {
         });
 
         it('should not add asset to snapshot if parent id is not the same', () => {
-            const newAsset = createAsset(5, ['new'], '_new', 'other-parent');
+            const newAsset = createAsset(3, ['new'], '_new', 'other-parent');
 
             assetsState.addAsset(newAsset);
 
@@ -238,6 +246,24 @@ describe('AssetsState', () => {
             assetsState.addAsset(createAsset(6, ['new']));
 
             expect(assetsState.snapshot.tagsAvailable).toEqual({ tag1: 1, tag2: 1, shared: 2, new: 2 });
+        });
+
+        it('should replace asset in snapshot', () => {
+            const newAsset = createAsset(2, ['new']);
+
+            assetsState.replaceAsset(newAsset);
+
+            expect(assetsState.snapshot.assets).toEqual([asset1, newAsset]);
+            expect(assetsState.snapshot.total).toBe(200);
+        });
+
+        it('should not replace asset in snapshot if it does not exist', () => {
+            const newAsset = createAsset(3, ['new']);
+
+            assetsState.replaceAsset(newAsset);
+
+            expect(assetsState.snapshot.assets).toEqual([asset1, asset2]);
+            expect(assetsState.snapshot.total).toBe(200);
         });
 
         it('should add asset folder if created', () => {
@@ -292,21 +318,37 @@ describe('AssetsState', () => {
         });
 
         it('should remove asset from snapshot if moved to other folder', () => {
+            const updated = createAsset(1, ['new'], '_new');
+
             const request = { parentId: 'newParent' };
 
-            assetsService.setup(x => x.putAssetItemParent(app, asset1, It.isValue(request), asset1.version))
-                .returns(() => of(versioned(newVersion)));
+            assetsService.setup(x => x.putAssetParent(app, asset1, It.isValue(request), asset1.version))
+                .returns(() => of(updated));
 
             assetsState.moveAsset(asset1, request.parentId).subscribe();
 
             expect(assetsState.snapshot.assets.length).toBe(1);
-            expect(assetsState.snapshot.total).toBe(200);
+            expect(assetsState.snapshot.total).toBe(199);
         });
 
-        it('should not do anything if moving asset to current parent', () => {
+        it('should add asset to snapshot if moved to current folder', () => {
+            const asset3 = createAsset(3, undefined, undefined, 'oldParent');
+
+            const request = { parentId: assetsState.snapshot.parentId };
+
+            assetsService.setup(x => x.putAssetParent(app, asset3, It.isValue(request), asset3.version))
+                .returns(() => of(asset3));
+
+            assetsState.moveAsset(asset3, request.parentId).subscribe();
+
+            expect(assetsState.snapshot.assets).toEqual([asset3, asset1, asset2]);
+            expect(assetsState.snapshot.total).toBe(201);
+        });
+
+        it('should not do anything if moving asset to same parent', () => {
             const request = { parentId: MathHelper.EMPTY_GUID };
 
-            assetsState.moveAsset(asset1, request.parentId).pipe(onErrorResumeNext()).subscribe();
+            assetsState.moveAsset(asset1, request.parentId).pipe(onErrorResumeNextWith()).subscribe();
 
             expect(assetsState.snapshot.assets.length).toBe(2);
             expect(assetsState.snapshot.total).toBe(200);
@@ -315,30 +357,45 @@ describe('AssetsState', () => {
         it('should move asset back to snapshot if moving via api failed', () => {
             const request = { parentId: 'newParent' };
 
-            assetsService.setup(x => x.putAssetItemParent(app, asset1, It.isValue(request), asset1.version))
+            assetsService.setup(x => x.putAssetParent(app, asset1, It.isValue(request), asset1.version))
                 .returns(() => throwError(() => 'Service Error'));
 
-            assetsState.moveAsset(asset1, request.parentId).pipe(onErrorResumeNext()).subscribe();
+            assetsState.moveAsset(asset1, request.parentId).pipe(onErrorResumeNextWith()).subscribe();
 
             expect(assetsState.snapshot.assets.length).toBe(2);
             expect(assetsState.snapshot.total).toBe(200);
         });
 
         it('should remove asset folder from snapshot if moved to other folder', () => {
+            const updated = createAssetFolder(1, '_new');
+
             const request = { parentId: 'newParent' };
 
-            assetsService.setup(x => x.putAssetItemParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
-                .returns(() => of(versioned(newVersion)));
+            assetsService.setup(x => x.putAssetFolderParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
+                .returns(() => of(updated));
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).subscribe();
 
             expect(assetsState.snapshot.folders).toEqual([assetFolder2]);
         });
 
+        it('should add asset folder to snapshot if moved to current folder', () => {
+            const assetFolder3 = createAssetFolder(3, undefined, 'oldParent');
+
+            const request = { parentId: assetsState.snapshot.parentId };
+
+            assetsService.setup(x => x.putAssetFolderParent(app, assetFolder3, It.isValue(request), assetFolder3.version))
+                .returns(() => of(assetFolder3));
+
+            assetsState.moveAssetFolder(assetFolder3, request.parentId).subscribe();
+
+            expect(assetsState.snapshot.folders).toEqual([assetFolder1, assetFolder2, assetFolder3]);
+        });
+
         it('should not do anything if moving asset folder to itself', () => {
             const request = { parentId: assetFolder1.id };
 
-            assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNext()).subscribe();
+            assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNextWith()).subscribe();
 
             expect(assetsState.snapshot.assets.length).toBe(2);
         });
@@ -346,7 +403,7 @@ describe('AssetsState', () => {
         it('should not do anything if moving asset folder to current parent', () => {
             const request = { parentId: MathHelper.EMPTY_GUID };
 
-            assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNext()).subscribe();
+            assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNextWith()).subscribe();
 
             expect(assetsState.snapshot.assets.length).toBe(2);
         });
@@ -354,10 +411,10 @@ describe('AssetsState', () => {
         it('should move asset folder back to snapshot if moving via api failed', () => {
             const request = { parentId: 'newParent' };
 
-            assetsService.setup(x => x.putAssetItemParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
+            assetsService.setup(x => x.putAssetFolderParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
                 .returns(() => throwError(() => 'Service Error'));
 
-            assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNext()).subscribe();
+            assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNextWith()).subscribe();
 
             expect(assetsState.snapshot.assets.length).toBe(2);
         });
@@ -397,7 +454,7 @@ describe('AssetsState', () => {
             dialogs.setup(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAnyString()))
                 .returns(() => of(false));
 
-            assetsState.deleteAsset(asset1).pipe(onErrorResumeNext()).subscribe();
+            assetsState.deleteAsset(asset1).pipe(onErrorResumeNextWith()).subscribe();
 
             expect(assetsState.snapshot.assets.length).toBe(2);
         });

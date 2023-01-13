@@ -36,7 +36,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-autocomplete',
+    selector: 'sqx-autocomplete[itemsSource]',
     styleUrls: ['./autocomplete.component.scss'],
     templateUrl: './autocomplete.component.html',
     providers: [
@@ -49,10 +49,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     private timer: any;
 
     @Input()
-    public source!: AutocompleteSource;
-
-    @Input()
-    public inputName = 'autocompletion';
+    public itemsSource!: AutocompleteSource;
 
     @Input()
     public inputStyle?: 'underlined' | 'empty';
@@ -139,12 +136,12 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         this.own(
             merge(inputStream, this.modalStream).pipe(
                 switchMap(query => {
-                    if (!this.source) {
+                    if (!this.itemsSource) {
                         return of([]);
                     } else {
                         this.setLoading(true);
 
-                        return this.source.find(query).pipe(
+                        return this.itemsSource.find(query).pipe(
                             finalize(() => {
                                 this.setLoading(false);
                             }),

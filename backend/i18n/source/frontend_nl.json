@@ -500,7 +500,7 @@
   "contributors.import.run": "Bijdrager toevoegen",
   "contributors.import.run2": "Importeren",
   "contributors.importButton": "Voeg veel bijdragers tegelijk toe",
-  "contributors.importHintg": "Groot team?",
+  "contributors.importHint": "Groot team?",
   "contributors.importTitle": "Bijdragers importeren",
   "contributors.loadFailed": "Laden van bijdragers is mislukt. Laad opnieuw.",
   "contributors.planHint": "Uw plan staat maximaal {maxContributors} bijdragers toe.",

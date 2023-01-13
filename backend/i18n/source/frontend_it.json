@@ -431,7 +431,7 @@
   "contributors.import.run": "Aggiungi Collaboratori",
   "contributors.import.run2": "Importa",
   "contributors.importButton": "Aggiungi più collaboratori contemporaneamente",
-  "contributors.importHintg": "Team numeroso?",
+  "contributors.importHint": "Team numeroso?",
   "contributors.importTitle": "Importa collaboratori",
   "contributors.loadFailed": "Non è stato possibile caricare contributors. Per favore ricarica.",
   "contributors.planHint": "Il tuo piano prevede un numero massimo di {maxContributors} collaboratori.",

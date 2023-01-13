@@ -200,17 +200,61 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     }
 
     public addAsset(asset: AssetDto) {
-        if (asset.parentId !== this.snapshot.parentId || this.snapshot.assets.find(x => x.id === asset.id)) {
+        if (asset.parentId !== this.snapshot.parentId) {
+            return;
+        }
+
+        const existing = this.snapshot.assets.find(x => x.id === asset.id);
+
+        if (existing) {
             return;
         }
 
         this.next(s => {
             const assets = [asset, ...s.assets].slice(0, s.pageSize);
 
-            const tags = updateTags(s, asset);
+            const tags = updateTags(s, asset, existing);
 
             return { ...s, assets, total: s.total + 1, ...tags };
-        }, 'Asset Created');
+        }, 'Asset Added');
+    }
+
+    public replaceAsset(asset: AssetDto) {
+        if (asset.parentId !== this.snapshot.parentId) {
+            return;
+        }
+
+        const existing = this.snapshot.assets.find(x => x.id === asset.id);
+
+        if (!existing) {
+            return;
+        }
+
+        this.next(s => {
+            const assets = s.assets.replacedBy('id', asset);
+
+            const tags = updateTags(s, asset, existing);
+
+            return { ...s, assets, ...tags };
+        }, 'Asset Replaced');
+    }
+
+    public addFolder(folder: AssetFolderDto) {
+        if (folder.parentId !== this.snapshot.parentId) {
+            return;
+        }
+
+        const existing = this.snapshot.folders.find(x => x.id === folder.id);
+
+        if (existing) {
+            return;
+        }
+
+        this.next(s => {
+            const folders = [folder, ...s.folders].sortByString(x => x.folderName);
+
+            return { ...s, folders };
+        }, 'Asset Folder Added');
     }
 
     public createAssetFolder(folderName: string) {
@@ -260,19 +304,29 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        this.next(s => {
-            const assets = s.assets.filter(x => x.id !== asset.id);
+        const moveIn = parentId === this.snapshot.parentId;
 
-            return { ...s, assets };
-        }, 'Asset Moving Started');
-
-        return this.assetsService.putAssetItemParent(this.appName, asset, { parentId }, asset.version).pipe(
-            catchError(error => {
-                this.next(s => {
+        function moveOutOrIn(state: AssetsState, asset: AssetDto, moveIn: boolean, name: string) {
+            if (moveIn) {
+                state.next(s => {
                     const assets = [asset, ...s.assets];
 
-                    return { ...s, assets };
-                }, 'Asset Moving Failed');
+                    return { ...s, assets, total: s.total + 1 };
+                }, name);
+            } else {
+                state.next(s => {
+                    const assets = s.assets.filter(x => x.id !== asset.id);
+
+                    return { ...s, assets, total: s.total - 1 };
+                }, name);
+            }
+        }
+
+        moveOutOrIn(this, asset, moveIn, 'Asset Moving');
+
+        return this.assetsService.putAssetParent(this.appName, asset, { parentId }, asset.version).pipe(
+            catchError(error => {
+                moveOutOrIn(this, asset, !moveIn, 'Asset Moving reverted.');
 
                 return throwError(() => error);
             }),
@@ -284,19 +338,29 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        this.next(s => {
-            const folders = s.folders.filter(x => x.id !== folder.id);
+        const moveIn = parentId === this.snapshot.parentId;
 
-            return { ...s, folders };
-        }, 'Folder Moving Started');
-
-        return this.assetsService.putAssetItemParent(this.appName, folder, { parentId }, folder.version).pipe(
-            catchError(error => {
-                this.next(s => {
-                    const folders = [...s.folders, folder].sortByString(x => x.folderName);
+        function moveOutOrIn(state: AssetsState, folder: AssetFolderDto, moveIn: boolean, name: string) {
+            if (moveIn) {
+                state.next(s => {
+                    const folders = [folder, ...s.folders].sortByString(x => x.folderName);
 
                     return { ...s, folders };
-                }, 'Folder Moving Done');
+                }, name);
+            } else {
+                state.next(s => {
+                    const folders = s.folders.filter(x => x.id !== folder.id);
+
+                    return { ...s, folders };
+                }, name);
+            }
+        }
+
+        moveOutOrIn(this, folder, moveIn, 'Asset Folder Moving');
+
+        return this.assetsService.putAssetFolderParent(this.appName, folder, { parentId }, folder.version).pipe(
+            catchError(error => {
+                moveOutOrIn(this, folder, !moveIn, 'Asset Folder Moving reverted.');
 
                 return throwError(() => error);
             }),

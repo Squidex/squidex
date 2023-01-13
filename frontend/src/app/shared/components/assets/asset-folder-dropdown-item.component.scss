@@ -1,6 +1,10 @@
 @import 'mixins';
 @import 'vars';
 
+.name {
+    cursor: default;
+}
+
 .loader {
     font-size: 60%;
     flex-grow: 0;

@@ -43,6 +43,9 @@ export class ModalDirective implements OnDestroy {
     @Input('sqxModalCloseAlways')
     public closeAlways = false;
 
+    @Input('sqxModalIsDialog')
+    public isDialog = false;
+
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,
@@ -115,7 +118,7 @@ export class ModalDirective implements OnDestroy {
     }
 
     private subscribeToView() {
-        if (Types.is(this.currentModel, DialogModel)) {
+        if (Types.is(this.currentModel, DialogModel) || this.isDialog) {
             return;
         }
 

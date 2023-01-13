@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { TeamPlansService, TeamPlansState } from '@app/features/teams/internal';
 import { DialogService, PlanDto, PlanLockedReason, versioned } from '@app/shared';
@@ -84,7 +83,7 @@ describe('TeamPlansState', () => {
             plansService.setup(x => x.getPlans(team))
                 .returns(() => throwError(() => 'Service Error'));
 
-            plansState.load().pipe(onErrorResumeNext()).subscribe();
+            plansState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(plansState.snapshot.isLoading).toBeFalsy();
         });
@@ -119,7 +118,7 @@ describe('TeamPlansState', () => {
             plansService.setup(x => x.putPlan(team, It.isAny(), version))
                 .returns(() => of(versioned(newVersion, result)));
 
-            plansState.change('free').pipe(onErrorResumeNext()).subscribe();
+            plansState.change('free').pipe(onErrorResumeNextWith()).subscribe();
 
             expect(plansState.snapshot.plans).toEqual([
                 { isSelected: true, isYearlySelected: false, plan: oldPlans.plans[0] },
@@ -133,7 +132,7 @@ describe('TeamPlansState', () => {
             plansService.setup(x => x.putPlan(team, It.isAny(), version))
                 .returns(() => of(versioned(newVersion, { redirectUri: '' })));
 
-            plansState.change('id2_yearly').pipe(onErrorResumeNext()).subscribe();
+            plansState.change('id2_yearly').pipe(onErrorResumeNextWith()).subscribe();
 
             expect(plansState.snapshot.plans).toEqual([
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },

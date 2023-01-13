@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ClientsPayload, ClientsService, ClientsState, DialogService, versioned } from '@app/shared/internal';
 import { createClients } from './../services/clients.service.spec';
@@ -56,7 +55,7 @@ describe('ClientsState', () => {
             clientsService.setup(x => x.getClients(app))
                 .returns(() => throwError(() => 'Service Error'));
 
-            clientsState.load().pipe(onErrorResumeNext()).subscribe();
+            clientsState.load().pipe(onErrorResumeNextWith()).subscribe();
 
             expect(clientsState.snapshot.isLoading).toBeFalsy();
         });

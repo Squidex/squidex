@@ -26,7 +26,7 @@
                     <div class="overlay-background"></div>
                     
                     <div class="overlay-menu">
-                        <a class="file-edit ms-2" (click)="edit()" *ngIf="!isDisabled">
+                        <a class="file-edit ms-2" (click)="emitEdit()" *ngIf="!isDisabled">
                             <i class="icon-pencil"></i>
                         </a>
 
@@ -81,10 +81,10 @@
                 <sqx-progress-bar mode="Circle" [value]="snapshot.progress"></sqx-progress-bar>
             </div>
         </div>
-        <div class="card-footer" (dblclick)="edit()">
+        <div class="card-footer" (dblclick)="emitEdit()">
             <ng-container *ngIf="asset">
                 <div>
-                    <div class="file-name truncate editable" (click)="edit()">
+                    <div class="file-name truncate editable" (click)="emitEdit()">
                         <i class="icon-lock" *ngIf="asset?.isProtected"></i>
 
                         {{asset.fileName}}
@@ -124,7 +124,7 @@
             <table class="table-fixed">
                 <tr>
                     <td class="col-name">
-                        <div class="file-name truncate editable" (click)="edit()">
+                        <div class="file-name truncate editable" (click)="emitEdit()">
                             <i class="icon-lock" *ngIf="asset?.isProtected"></i>
                             
                             {{asset.fileName}}
@@ -185,11 +185,3 @@
         </div>
     </div>
 </ng-template>
-
-<ng-container *ngIf="asset">
-    <ng-container *sqxModal="editDialog">
-        <sqx-asset-dialog [allTags]="allTags" 
-            [asset]="asset" (changed)="setAsset($event)" (complete)="editDialog.hide()">
-        </sqx-asset-dialog>
-    </ng-container>
-</ng-container>

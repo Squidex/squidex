@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { lastValueFrom, NEVER, of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { lastValueFrom, NEVER, Observable, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
-import { AssetsService, AssetsState, AssetUploaderState, DialogService, ofForever } from '@app/shared/internal';
+import { AssetsService, AssetUploaderState, DialogService } from '@app/shared/internal';
 import { createAsset } from './../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -49,22 +48,6 @@ describe('AssetUploaderState', () => {
         expect(upload.progress).toBe(1);
     });
 
-    it('should upload file with folder id from asset state', () => {
-        const assetsState = Mock.ofType<AssetsState>();
-
-        assetsState.setup(x => x.parentId)
-            .returns(() => 'parent1');
-
-        const file: File = <any>{ name: 'my-file' };
-
-        assetsService.setup(x => x.postAssetFile(app, file, 'parent1'))
-            .returns(() => NEVER).verifiable();
-
-        assetUploader.uploadFile(file, assetsState.object).subscribe();
-
-        expect().nothing();
-    });
-
     it('should update progress if uploading file makes progress', () => {
         const file: File = <any>{ name: 'my-file' };
 
@@ -85,7 +68,7 @@ describe('AssetUploaderState', () => {
         assetsService.setup(x => x.postAssetFile(app, file, undefined))
             .returns(() => throwError(() => 'Service Error')).verifiable();
 
-        assetUploader.uploadFile(file).pipe(onErrorResumeNext()).subscribe();
+        assetUploader.uploadFile(file).pipe(onErrorResumeNextWith()).subscribe();
 
         const upload = assetUploader.snapshot.uploads[0];
 
@@ -142,7 +125,7 @@ describe('AssetUploaderState', () => {
         assetsService.setup(x => x.putAssetFile(app, asset, file, asset.version))
             .returns(() => throwError(() => 'Service Error')).verifiable();
 
-        assetUploader.uploadAsset(asset, file).pipe(onErrorResumeNext()).subscribe();
+        assetUploader.uploadAsset(asset, file).pipe(onErrorResumeNextWith()).subscribe();
 
         const upload = assetUploader.snapshot.uploads[0];
 
@@ -167,3 +150,11 @@ describe('AssetUploaderState', () => {
         expect(uploadedAsset!).toEqual(updated);
     });
 });
+
+function ofForever<T>(...values: ReadonlyArray<T>) {
+    return new Observable<T>(s => {
+        for (const value of values) {
+            s.next(value);
+        }
+    });
+}

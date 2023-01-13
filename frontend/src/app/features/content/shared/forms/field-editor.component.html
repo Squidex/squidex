@@ -221,7 +221,7 @@
 				<ng-container *ngSwitchCase="'Tags'">
                     <ng-container [ngSwitch]="field.rawProperties.editor">
                         <ng-container *ngSwitchCase="'Tags'">
-                            <sqx-tag-editor [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" [suggestions]="field.rawProperties.allowedValues"></sqx-tag-editor>
+                            <sqx-tag-editor [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" [itemsSource]="field.rawProperties.allowedValues"></sqx-tag-editor>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Checkboxes'">
                             <sqx-checkbox-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues"></sqx-checkbox-group>

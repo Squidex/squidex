@@ -22,7 +22,8 @@
 
         <div class="col-9">
             <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" formControlName="schemaIds" 
-                [converter]="(schemasSource.converter | async)!" [suggestions]="(schemasSource.converter | async)?.suggestions">
+                [itemConverter]="(schemasSource.converter | async)!" 
+                [itemsSource]="(schemasSource.converter | async)?.suggestions">
             </sqx-tag-editor>
         </div>
     </div>

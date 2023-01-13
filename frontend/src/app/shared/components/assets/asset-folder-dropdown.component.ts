@@ -113,6 +113,8 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<any, 
 
             this.dropdown.hide();
         }
+
+        this.detectChanges();
     }
 
     private resetSelected(node: AssetFolderDropdowNode) {

@@ -119,7 +119,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
             images_upload_handler: (blob: any, success: (url: string) => void, failure: (message: string) => void) => {
                 const file = new File([blob.blob()], blob.filename(), { lastModified: new Date().getTime() });
 
-                self.assetUploader.uploadFile(file, undefined, this.folderId)
+                self.assetUploader.uploadFile(file, this.folderId)
                     .subscribe({
                         next: asset => {
                             if (Types.is(asset, AssetDto)) {
@@ -292,7 +292,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
             this.tinyEditor.setContent(content);
         };
 
-        this.assetUploader.uploadFile(file, undefined, this.folderId)
+        this.assetUploader.uploadFile(file, this.folderId)
             .subscribe({
                 next: asset => {
                     if (Types.is(asset, AssetDto)) {

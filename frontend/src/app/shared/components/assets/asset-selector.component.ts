@@ -55,6 +55,10 @@ export class AssetSelectorComponent extends StatefulComponent<State> implements 
         this.assetsState.load(true);
     }
 
+    public reloadTotal() {
+        this.assetsState.load(true, false);
+    }
+
     public search(query: Query) {
         this.assetsState.search(query);
     }

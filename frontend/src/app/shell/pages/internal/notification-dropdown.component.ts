@@ -6,8 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { timer } from 'rxjs';
-import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
+import { onErrorResumeNextWith, timer } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 import { AuthService, CommentDto, CommentsService, CommentsState, DialogService, LocalStoreService, ModalModel, ResourceOwner, Settings } from '@app/shared';
 
 @Component({
@@ -69,7 +69,7 @@ export class NotificationDropdownComponent extends ResourceOwner implements OnIn
                     this.changeDetector.detectChanges();
                 })));
 
-        this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load(true).pipe(onErrorResumeNext()))));
+        this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load(true).pipe(onErrorResumeNextWith()))));
     }
 
     public trackByComment(_index: number, comment: CommentDto) {

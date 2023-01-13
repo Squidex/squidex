@@ -6,11 +6,10 @@
  */
 
 import { Injectable } from '@angular/core';
-import { map, Observable, shareReplay, Subject, takeUntil } from 'rxjs';
+import { Observable, shareReplay, Subject, takeUntil } from 'rxjs';
 import { DialogService, MathHelper, State, Types } from '@app/framework';
 import { AssetDto, AssetsService } from './../services/assets.service';
 import { AppsState } from './apps.state';
-import { AssetsState } from './assets.state';
 
 export interface Upload {
     // Unique id.
@@ -67,18 +66,10 @@ export class AssetUploaderState extends State<Snapshot> {
         }, 'Stopped');
     }
 
-    public uploadFile(file: File, target?: AssetsState, parentId?: string): Observable<AssetDto | number> {
-        const stream = this.assetsService.postAssetFile(this.appName, file, parentId ?? target?.parentId);
+    public uploadFile(file: File, parentId?: string): Observable<AssetDto | number> {
+        const stream = this.assetsService.postAssetFile(this.appName, file, parentId);
 
-        return this.upload(stream, MathHelper.guid(), file.name, asset => {
-            if (asset.isDuplicate) {
-                this.dialogs.notifyError('i18n:assets.duplicateFile');
-            } else if (target) {
-                target.addAsset(asset);
-            }
-
-            return asset;
-        });
+        return this.upload(stream, MathHelper.guid(), file.name);
     }
 
     public uploadAsset(asset: AssetDto, file: Blob): Observable<AssetDto | number> {
@@ -87,26 +78,19 @@ export class AssetUploaderState extends State<Snapshot> {
         return this.upload(stream, asset.id, file['name'] || asset.fileName);
     }
 
-    private upload(source: Observable<number | AssetDto>, id: string, name: string, complete?: ((completion: AssetDto) => AssetDto)) {
+    private upload(source: Observable<number | AssetDto>, id: string, name: string) {
         let upload = { id, name, progress: 1, status: 'Running', cancel: new Subject() };
 
         this.addUpload(upload);
 
-        const stream = source.pipe(takeUntil(upload.cancel),
-            map(event => {
-                if (Types.isNumber(event)) {
-                    return event;
-                } else if (complete) {
-                    return complete(event);
-                } else {
-                    return event;
-                }
-            }), shareReplay());
+        const stream = source.pipe(takeUntil(upload.cancel), shareReplay());
 
         stream.subscribe({
             next: event => {
                 if (Types.isNumber(event)) {
                     upload = this.update(upload, { progress: event });
+                } else if (event.isDuplicate) {
+                    this.dialogs.notifyError('i18n:assets.duplicateFile');
                 }
             },
             error: () => {

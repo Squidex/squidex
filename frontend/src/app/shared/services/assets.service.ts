@@ -374,12 +374,27 @@ export class AssetsService {
             pretifyError('i18n:assets.updateFolderFailed'));
     }
 
-    public putAssetItemParent(appName: string, resource: Resource, dto: MoveAssetItemDto, version: Version): Observable<Versioned<any>> {
+    public putAssetParent(appName: string, resource: Resource, dto: MoveAssetItemDto, version: Version): Observable<AssetDto> {
         const link = resource._links['move'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ payload }) => {
+                return parseAsset(payload.body);
+            }),
+            pretifyError('i18n:assets.moveFailed'));
+    }
+
+    public putAssetFolderParent(appName: string, resource: Resource, dto: MoveAssetItemDto, version: Version): Observable<AssetFolderDto> {
+        const link = resource._links['move'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ payload }) => {
+                return parseAssetFolder(payload.body);
+            }),
             pretifyError('i18n:assets.moveFailed'));
     }
 

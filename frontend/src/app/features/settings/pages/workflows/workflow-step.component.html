@@ -95,12 +95,12 @@
                     <sqx-tag-editor 
                         [allowDuplicates]="false"
                         [disabled]="!!disabled" 
+                        [itemsSource]="roles" placeholder="{{ 'common.role' | sqxTranslate }}"
                         [ngModelOptions]="onBlur" 
                         [ngModel]="step.noUpdateRoles"
                         (ngModelChange)="changeNoUpdateRoles($event)"
-                        [singleLine]="true"
-                        [suggestions]="roles" placeholder="{{ 'common.role' | sqxTranslate }}"
-                        [styleDashed]="true">
+                        [styleDashed]="true"
+                        [styleScrollable]="true">
                     </sqx-tag-editor>
                 </div>
                 <div class="col col-button"></div>

@@ -50,7 +50,7 @@ export class ClientComponent implements OnChanges {
     }
 
     public updateApiCallsLimit() {
-        this.clientsState.update(this.client, { apiCallsLimit: this.client.apiCallsLimit });
+        this.clientsState.update(this.client, { apiCallsLimit: this.apiCallsLimit });
     }
 
     public rename(name: string) {

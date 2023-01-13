@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AppsState, AssetsState, AssetUploaderState, ModalModel, Upload } from '@app/shared/internal';
+import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-uploader',
@@ -26,7 +26,14 @@ export class AssetUploaderComponent {
 
     public addFiles(files: ReadonlyArray<File>) {
         for (const file of files) {
-            this.assetUploader.uploadFile(file, this.assetsState);
+            this.assetUploader.uploadFile(file)
+                .subscribe({
+                    next: assetOrProgress => {
+                        if (!Types.isNumber(assetOrProgress)) {
+                            this.assetsState.addAsset(assetOrProgress);
+                        }
+                    },
+                });
         }
 
         this.modalMenu.show();

@@ -4,13 +4,12 @@
             [dropdownStyles]="{ width: '30rem' }"
             [dropdownPosition]="'bottom-right'"
             icon="search"
-            inputName="searchMenu" 
             (ngModelChange)="selectResult($event)"
             [ngModel]="searchResult"
             placeholder="{{ 'search.quickNavPlaceholder' | sqxTranslate }}"
             shortcut="q"
             shortcutAction="none"
-            [source]="searchSource">
+            [itemsSource]="searchSource">
             <ng-template let-result="$implicit">
                 <div class="row g-0">
                     <div class="col-auto pe-4">

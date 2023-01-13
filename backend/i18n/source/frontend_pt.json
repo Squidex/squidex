@@ -524,7 +524,7 @@
   "contributors.import.run": "Adicionar Contribuintes",
   "contributors.import.run2": "Importação",
   "contributors.importButton": "Adicionar muitos contribuintes ao mesmo tempo",
-  "contributors.importHintg": "Uma grande equipa?",
+  "contributors.importHint": "Uma grande equipa?",
   "contributors.importTitle": "Contribuintes de importação",
   "contributors.loadFailed": "Falhou em carregar os contribuintes. Por favor, recarregue.",
   "contributors.planHint": "O seu plano permite até contribuintes {maxContributors} .",

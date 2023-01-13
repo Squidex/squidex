@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { AuthService, Profile, UserDto, UsersProviderService, UsersService } from '@app/shared/internal';
 
@@ -86,7 +85,7 @@ describe('UsersProviderService', () => {
 
         let resultingUser: UserDto;
 
-        usersProviderService.getUser('123').pipe(onErrorResumeNext()).subscribe(result => {
+        usersProviderService.getUser('123').pipe(onErrorResumeNextWith()).subscribe(result => {
             resultingUser = result;
         }).unsubscribe();
 

@@ -30,6 +30,9 @@ interface State {
     // The assets to render.
     assets: ReadonlyArray<AssetDto>;
 
+    // The asset to edit.
+    editAsset?: AssetDto;
+
     // True when showing the assets as list.
     isListView: boolean;
 
@@ -107,9 +110,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         this.own(
             this.messageBus.of(AssetUpdated)
                 .subscribe(event => {
-                    if (event.source !== this) {
-                        this.setAssets(this.snapshot.assets.replacedBy('id', event.asset));
-                    }
+                    this.setAssets(this.snapshot.assets.replacedBy('id', event.asset));
                 }));
     }
 
@@ -177,6 +178,14 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
 
     public changeView(isListView: boolean) {
         this.next({ isListView });
+    }
+
+    public editStart(asset: AssetDto) {
+        this.next({ editAsset: asset });
+    }
+
+    public editDone() {
+        this.next({ editAsset: undefined });
     }
 
     private updateValue() {

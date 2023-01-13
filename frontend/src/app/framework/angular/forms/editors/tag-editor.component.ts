@@ -19,13 +19,13 @@ interface State {
     hasFocus: boolean;
 
     // The suggested item.
-    suggestedItems: ReadonlyArray<TagValue>;
+    itemsList: ReadonlyArray<TagValue>;
 
     // The index of the selected suggested items.
-    suggestedIndex: number;
+    itemsIndex: number;
 
     // All available tag values.
-    items: ReadonlyArray<TagValue>;
+    tags: ReadonlyArray<TagValue>;
 }
 
 @Component({
@@ -58,7 +58,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public blur = new EventEmitter();
 
     @Input()
-    public converter = StringConverter.INSTANCE;
+    public itemConverter = StringConverter.INSTANCE;
 
     @Input()
     public undefinedWhenEmpty?: boolean | null = true;
@@ -73,12 +73,6 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public allowDuplicates?: boolean | null = true;
 
     @Input()
-    public itemSeparator?: boolean | null;
-
-    @Input()
-    public singleLine?: boolean | null;
-
-    @Input()
     public readonly?: boolean | null;
 
     @Input()
@@ -88,19 +82,22 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public styleBlank?: boolean | null;
 
     @Input()
-    public placeholder = 'i18n:common.tagAdd';
+    public styleScrollable?: boolean | null;
 
     @Input()
-    public inputName = 'tag-editor';
+    public placeholder = 'i18n:common.tagAdd';
 
     @Input()
     public dropdownWidth = '18rem';
 
     @Input()
-    public suggestionsLoading?: boolean | null;
+    public itemSeparator?: boolean | null;
 
     @Input()
-    public suggestionsEmptyText = 'i18n:common.empty';
+    public itemsSourceLoading?: boolean | null;
+
+    @Input()
+    public itemsSourceEmptyText = 'i18n:common.empty';
 
     @Input()
     public set disabled(value: boolean | undefined | null) {
@@ -108,32 +105,32 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     @Input()
-    public set suggestions(value: ReadonlyArray<string | TagValue> | undefined | null) {
-        this.suggestionsSorted = getTagValues(value);
+    public set itemsSource(value: ReadonlyArray<string | TagValue> | undefined | null) {
+        this.itemsSorted = getTagValues(value);
 
         if (this.addInput.value) {
             const query = this.addInput.value;
 
-            const items = this.suggestionsSorted.filter(s => s.lowerCaseName.includes(query) && !this.snapshot.items.find(x => x.id === s.id));
+            const items = this.itemsSorted.filter(s => s.lowerCaseName.includes(query) && !this.snapshot.tags.find(x => x.id === s.id));
 
             this.next({
-                suggestedIndex: -1,
-                suggestedItems: items || [],
+                itemsIndex: -1,
+                itemsList: items || [],
             });
         }
     }
 
-    public suggestionsSorted: ReadonlyArray<TagValue> = [];
-    public suggestionsModal = new ModalModel();
+    public itemsSorted: ReadonlyArray<TagValue> = [];
+    public itemsModal = new ModalModel();
 
     public addInput = new UntypedFormControl();
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
             hasFocus: false,
-            suggestedItems: [],
-            suggestedIndex: 0,
-            items: [],
+            itemsList: [],
+            itemsIndex: 0,
+            tags: [],
         });
 
         this.textMeasurer = new TextMeasurer(() => this.inputElement);
@@ -175,16 +172,16 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                     map(query => {
                         if (!query) {
                             return [];
-                        } else if (Types.isArray(this.suggestionsSorted)) {
-                            return this.suggestionsSorted.filter(s => s.lowerCaseName.includes(query) && !this.snapshot.items.find(x => x.id === s.id));
+                        } else if (Types.isArray(this.itemsSorted)) {
+                            return this.itemsSorted.filter(s => s.lowerCaseName.includes(query) && !this.snapshot.tags.find(x => x.id === s.id));
                         } else {
                             return [];
                         }
                     }))
                 .subscribe(suggestedItems => {
                     this.next({
-                        suggestedIndex: -1,
-                        suggestedItems,
+                        itemsIndex: -1,
+                        itemsList: suggestedItems,
                     });
                 }));
     }
@@ -199,12 +196,12 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
         const items: any[] = [];
 
-        if (this.converter && Types.isArray(obj)) {
+        if (this.itemConverter && Types.isArray(obj)) {
             for (const value of obj) {
                 if (Types.is(value, TagValue)) {
                     items.push(value);
                 } else {
-                    const converted = this.converter.convertValue(value);
+                    const converted = this.itemConverter.convertValue(value);
 
                     if (converted) {
                         items.push(converted);
@@ -213,7 +210,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             }
         }
 
-        this.next({ items });
+        this.next({ tags: items });
     }
 
     public onDisabled(isDisabled: boolean) {
@@ -240,7 +237,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public remove(index: number) {
-        this.updateItems(this.snapshot.items.filter((_, i) => i !== index), true);
+        this.updateItems(this.snapshot.tags.filter((_, i) => i !== index), true);
     }
 
     public resetSize() {
@@ -261,7 +258,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
         this.inputElement.nativeElement.style.width = `${width + 5}px`;
 
-        if (this.singleLine) {
+        if (this.styleScrollable) {
             setTimeout(() => {
                 this.formElement.nativeElement.scrollLeft = this.formElement.nativeElement.scrollWidth;
             }, 0);
@@ -275,11 +272,11 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             const value = this.addInput.value as string;
 
             if (!value || value.length === 0) {
-                this.updateItems(this.snapshot.items.slice(0, this.snapshot.items.length - 1), false);
+                this.updateItems(this.snapshot.tags.slice(0, this.snapshot.tags.length - 1), false);
 
                 return false;
             }
-        } else if (Keys.isEscape(event) && this.suggestionsModal.isOpen) {
+        } else if (Keys.isEscape(event) && this.itemsModal.isOpen) {
             this.closeModal();
             return false;
         } else if (Keys.isUp(event)) {
@@ -289,8 +286,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             this.selectNextIndex();
             return false;
         } else if (Keys.isEnter(event)) {
-            if (this.snapshot.suggestedIndex >= 0) {
-                if (this.selectValue(this.snapshot.suggestedItems[this.snapshot.suggestedIndex])) {
+            if (this.snapshot.itemsIndex >= 0) {
+                if (this.selectValue(this.snapshot.itemsList[this.snapshot.itemsIndex])) {
                     return false;
                 }
             } else if (this.acceptEnter) {
@@ -311,14 +308,14 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         let tagValue: TagValue | null;
 
         if (Types.isString(value)) {
-            tagValue = this.converter.convertInput(value);
+            tagValue = this.itemConverter.convertInput(value);
         } else {
             tagValue = value;
         }
 
         if (tagValue) {
             if (this.allowDuplicates || !this.isSelected(tagValue)) {
-                this.updateItems([...this.snapshot.items, tagValue], true);
+                this.updateItems([...this.snapshot.tags, tagValue], true);
             }
 
             this.resetForm();
@@ -331,18 +328,18 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public toggleValue(isSelected: boolean, tagValue: TagValue) {
         if (isSelected) {
-            this.updateItems([...this.snapshot.items, tagValue], true);
+            this.updateItems([...this.snapshot.tags, tagValue], true);
         } else {
-            this.updateItems(this.snapshot.items.filter(x => x.id !== tagValue.id), true);
+            this.updateItems(this.snapshot.tags.filter(x => x.id !== tagValue.id), true);
         }
     }
 
     public selectPrevIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex - 1);
+        this.selectIndex(this.snapshot.itemsIndex - 1);
     }
 
     public selectNextIndex() {
-        this.selectIndex(this.snapshot.suggestedIndex + 1);
+        this.selectIndex(this.snapshot.itemsIndex + 1);
     }
 
     public selectIndex(suggestedIndex: number) {
@@ -350,11 +347,11 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             suggestedIndex = 0;
         }
 
-        if (suggestedIndex >= this.snapshot.suggestedItems.length) {
-            suggestedIndex = this.snapshot.suggestedItems.length - 1;
+        if (suggestedIndex >= this.snapshot.itemsList.length) {
+            suggestedIndex = this.snapshot.itemsList.length - 1;
         }
 
-        this.next({ suggestedIndex });
+        this.next({ itemsIndex: suggestedIndex });
     }
 
     public resetFocus(): any {
@@ -362,7 +359,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     private resetAutocompletion() {
-        this.next({ suggestedItems: [], suggestedIndex: -1 });
+        this.next({ itemsList: [], itemsIndex: -1 });
     }
 
     private resetForm() {
@@ -370,22 +367,22 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public isSelected(tagValue: TagValue) {
-        return this.snapshot.items.find(x => x.id === tagValue.id);
+        return this.snapshot.tags.find(x => x.id === tagValue.id);
     }
 
     public closeModal() {
-        if (this.suggestionsModal.isOpen) {
+        if (this.itemsModal.isOpen) {
             this.close.emit();
 
-            this.suggestionsModal.hide();
+            this.itemsModal.hide();
         }
     }
 
     public openModal() {
-        if (!this.suggestionsModal.isOpen) {
+        if (!this.itemsModal.isOpen) {
             this.open.emit();
 
-            this.suggestionsModal.show();
+            this.itemsModal.show();
         }
     }
 
@@ -412,7 +409,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public onCopy(event: ClipboardEvent) {
         if (!this.hasSelection()) {
             if (event.clipboardData) {
-                event.clipboardData.setData('text/plain', this.snapshot.items.map(x => x.name).join(','));
+                event.clipboardData.setData('text/plain', this.snapshot.tags.map(x => x.name).join(','));
             }
 
             event.preventDefault();
@@ -426,10 +423,10 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             if (value) {
                 this.resetForm();
 
-                const values = [...this.snapshot.items];
+                const values = [...this.snapshot.tags];
 
                 for (const part of value.split(',')) {
-                    const converted = this.converter.convertInput(part);
+                    const converted = this.itemConverter.convertInput(part);
 
                     if (converted) {
                         values.push(converted);
@@ -451,7 +448,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     private updateItems(items: ReadonlyArray<TagValue>, touched: boolean) {
-        this.next({ items });
+        this.next({ tags: items });
 
         if (items.length === 0 && this.undefinedWhenEmpty) {
             this.callChange(undefined);
