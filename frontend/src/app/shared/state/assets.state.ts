@@ -200,21 +200,53 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     }
 
     public addAsset(asset: AssetDto) {
-        if (asset.parentId !== this.snapshot.parentId || this.snapshot.assets.find(x => x.id === asset.id)) {
+        if (asset.parentId !== this.snapshot.parentId) {
+            return;
+        }
+
+        const existing = this.snapshot.assets.find(x => x.id === asset.id);
+
+        if (existing) {
             return;
         }
 
         this.next(s => {
             const assets = [asset, ...s.assets].slice(0, s.pageSize);
 
-            const tags = updateTags(s, asset);
+            const tags = updateTags(s, asset, existing);
 
             return { ...s, assets, total: s.total + 1, ...tags };
         }, 'Asset Added');
     }
 
+    public replaceAsset(asset: AssetDto) {
+        if (asset.parentId !== this.snapshot.parentId) {
+            return;
+        }
+
+        const existing = this.snapshot.assets.find(x => x.id === asset.id);
+
+        if (!existing) {
+            return;
+        }
+
+        this.next(s => {
+            const assets = s.assets.replacedBy('id', asset);
+
+            const tags = updateTags(s, asset, existing);
+
+            return { ...s, assets, ...tags };
+        }, 'Asset Replaced');
+    }
+
     public addFolder(folder: AssetFolderDto) {
-        if (folder.parentId !== this.snapshot.parentId || this.snapshot.folders.find(x => x.id === folder.id)) {
+        if (folder.parentId !== this.snapshot.parentId) {
+            return;
+        }
+
+        const existing = this.snapshot.folders.find(x => x.id === folder.id);
+
+        if (existing) {
             return;
         }
 
@@ -223,20 +255,6 @@ export abstract class AssetsStateBase extends State<Snapshot> {
 
             return { ...s, folders };
         }, 'Asset Folder Added');
-    }
-
-    public replaceAsset(asset: AssetDto) {
-        if (asset.parentId !== this.snapshot.parentId || this.snapshot.assets.find(x => x.id === asset.id)) {
-            return;
-        }
-
-        this.next(s => {
-            const assets = s.assets.replacedBy('id', asset);
-
-            const tags = updateTags(s, asset);
-
-            return { ...s, assets, total: s.total + 1, ...tags };
-        }, 'Asset Replaced');
     }
 
     public createAssetFolder(folderName: string) {

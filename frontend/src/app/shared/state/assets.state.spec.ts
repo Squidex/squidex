@@ -204,8 +204,8 @@ describe('AssetsState', () => {
             assetsState.load(true).subscribe();
         });
 
-        it('should add asset to snapshot if created', () => {
-            const newAsset = createAsset(5, ['new']);
+        it('should add asset to snapshot', () => {
+            const newAsset = createAsset(3, ['new']);
 
             assetsState.addAsset(newAsset);
 
@@ -213,8 +213,17 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.total).toBe(201);
         });
 
+        it('should not add asset to snapshot if it already exist', () => {
+            const newAsset = createAsset(1, ['new']);
+
+            assetsState.addAsset(newAsset);
+
+            expect(assetsState.snapshot.assets).toEqual([asset1, asset2]);
+            expect(assetsState.snapshot.total).toBe(200);
+        });
+
         it('should truncate assets if page size reached', () => {
-            const newAsset = createAsset(5, ['new']);
+            const newAsset = createAsset(3, ['new']);
 
             assetsState.page({ page: 0, pageSize: 2 }).subscribe();
             assetsState.addAsset(newAsset);
@@ -224,7 +233,7 @@ describe('AssetsState', () => {
         });
 
         it('should not add asset to snapshot if parent id is not the same', () => {
-            const newAsset = createAsset(5, ['new'], '_new', 'other-parent');
+            const newAsset = createAsset(3, ['new'], '_new', 'other-parent');
 
             assetsState.addAsset(newAsset);
 
@@ -237,6 +246,24 @@ describe('AssetsState', () => {
             assetsState.addAsset(createAsset(6, ['new']));
 
             expect(assetsState.snapshot.tagsAvailable).toEqual({ tag1: 1, tag2: 1, shared: 2, new: 2 });
+        });
+
+        it('should replace asset in snapshot', () => {
+            const newAsset = createAsset(2, ['new']);
+
+            assetsState.replaceAsset(newAsset);
+
+            expect(assetsState.snapshot.assets).toEqual([asset1, newAsset]);
+            expect(assetsState.snapshot.total).toBe(200);
+        });
+
+        it('should not replace asset in snapshot if it does not exist', () => {
+            const newAsset = createAsset(3, ['new']);
+
+            assetsState.replaceAsset(newAsset);
+
+            expect(assetsState.snapshot.assets).toEqual([asset1, asset2]);
+            expect(assetsState.snapshot.total).toBe(200);
         });
 
         it('should add asset folder if created', () => {
