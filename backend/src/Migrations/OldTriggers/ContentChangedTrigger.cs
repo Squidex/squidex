@@ -16,7 +16,7 @@ namespace Migrations.OldTriggers;
 [TypeName(nameof(ContentChangedTrigger))]
 public sealed record ContentChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
 {
-    public ReadonlyList<ContentChangedTriggerSchema> Schemas { get; set; }
+    public ReadonlyList<ContentChangedTriggerSchema>? Schemas { get; set; }
 
     public bool HandleAll { get; set; }
 
@@ -27,7 +27,7 @@ public sealed record ContentChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
 
     public RuleTrigger Migrate()
     {
-        var schemas = Schemas.Select(x => x.Migrate()).ToReadonlyList();
+        var schemas = Schemas?.Select(x => x.Migrate()).ToReadonlyList();
 
         return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
     }

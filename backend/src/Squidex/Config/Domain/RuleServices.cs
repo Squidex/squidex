@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Migrations.OldTriggers;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Extensions;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Core.Templates;
@@ -77,6 +79,9 @@ public static class RuleServices
 
         services.AddSingletonAs<EventJsonSchemaGenerator>()
             .AsSelf();
+
+        services.AddSingletonAs(c => new AssemblyTypeProvider<RuleTrigger>(typeof(ContentChangedTrigger).Assembly, "triggerType"))
+            .As<ITypeProvider>();
 
         services.AddSingletonAs<RuleTypeProvider>()
             .As<ITypeProvider>().AsSelf();
