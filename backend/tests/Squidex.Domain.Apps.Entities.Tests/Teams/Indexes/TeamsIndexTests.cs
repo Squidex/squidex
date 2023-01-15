@@ -75,7 +75,7 @@ public class TeamsIndexTests : GivenContext
 
     private static ITeamEntity SetupTeam(long version)
     {
-        var team = Mocks.Team(DomainId.NewGuid());
+        var team = Mocks.Team(DomainId.NewGuid(), "my-team");
 
         A.CallTo(() => team.Version)
             .Returns(version);

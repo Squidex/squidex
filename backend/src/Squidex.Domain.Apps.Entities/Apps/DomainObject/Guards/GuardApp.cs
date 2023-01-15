@@ -7,10 +7,14 @@
 
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared;
+using Squidex.Shared.Identity;
 using Squidex.Text;
+using System.Security.Claims;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 
@@ -136,7 +140,7 @@ public static class GuardApp
 
             var team = await appProvider.GetTeamAsync(command.TeamId.Value, ct);
 
-            if (team == null || !team.Contributors.ContainsKey(command.Actor.Identifier))
+            if (team == null || (!IsContributor(team, command.Actor) && !HasTransferPermission(command.User)))
             {
                 e(T.Get("apps.transfer.teamNotFound"));
             }
@@ -146,6 +150,23 @@ public static class GuardApp
                 e(T.Get("apps.transfer.planAssigned"));
             }
         });
+
+        static bool IsContributor(ITeamEntity team, RefToken actor)
+        {
+            return team.Contributors.ContainsKey(actor.Identifier);
+        }
+
+        static bool HasTransferPermission(ClaimsPrincipal? user)
+        {
+            var permissions = user?.Claims.Permissions();
+
+            if (permissions == null)
+            {
+                return false;
+            }
+
+            return permissions.Allows(PermissionIds.Transfer);
+        }
     }
 
     public static void CanChangePlan(ChangePlan command, IAppEntity app, IBillingPlans billingPlans)

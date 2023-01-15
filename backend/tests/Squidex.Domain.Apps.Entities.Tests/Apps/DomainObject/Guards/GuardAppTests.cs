@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
@@ -22,7 +23,6 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IUserResolver users = A.Fake<IUserResolver>();
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
-    private readonly RefToken actor = RefToken.User("42");
 
     public GuardAppTests()
     {
@@ -34,6 +34,9 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
 
         A.CallTo(() => billingPlans.GetPlan("basic"))
             .Returns(new Plan());
+
+        A.CallTo(() => Team.Contributors)
+            .Returns(Contributors.Empty.Assign(User.Identifier, Role.Owner));
     }
 
     [Fact]
@@ -143,11 +146,21 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
     }
 
     [Fact]
+    public async Task CanTransfer_should_not_throw_exception_if_user_has_transfer_permission()
+    {
+        var admin = Mocks.ApiUser(permission: PermissionIds.Transfer);
+
+        var command = new TransferToTeam { TeamId = TeamId, Actor = User, User = admin };
+
+        await GuardApp.CanTransfer(command, App, AppProvider, default);
+    }
+
+    [Fact]
     public async Task CanTransfer_should_throw_exception_if_team_does_not_exist()
     {
         Team = null!;
 
-        var command = new TransferToTeam { TeamId = TeamId, Actor = actor };
+        var command = new TransferToTeam { TeamId = TeamId, Actor = User };
 
         await ValidationAssert.ThrowsAsync(() => GuardApp.CanTransfer(command, App, AppProvider, default),
             new ValidationError("The team does not exist."));
@@ -156,7 +169,9 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
     [Fact]
     public async Task CanTransfer_should_throw_exception_if_actor_is_not_part_of_team()
     {
-        var command = new TransferToTeam { TeamId = TeamId, Actor = actor };
+        var nonContributor = RefToken.User("Other");
+
+        var command = new TransferToTeam { TeamId = TeamId, Actor = nonContributor };
 
         await ValidationAssert.ThrowsAsync(() => GuardApp.CanTransfer(command, App, AppProvider, default),
             new ValidationError("The team does not exist."));

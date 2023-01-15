@@ -54,43 +54,58 @@ public static class Mocks
         return schema;
     }
 
-    public static ITeamEntity Team(DomainId teamId, string teamName = "my-team", string contributor = "user")
+    public static ITeamEntity Team(DomainId teamId, string teamName)
     {
         var team = A.Fake<ITeamEntity>();
 
         A.CallTo(() => team.Id).Returns(teamId);
         A.CallTo(() => team.UniqueId).Returns(teamId);
         A.CallTo(() => team.Name).Returns(teamName);
-        A.CallTo(() => team.Contributors).Returns(Contributors.Empty.Assign(contributor, Role.Owner));
 
         return team;
     }
 
-    public static ClaimsPrincipal ApiUser(string? role = null)
+    public static ClaimsPrincipal ApiUser(string? role = null, params string[] permissions)
     {
-        return CreateUser(role, "api");
+        return CreateUser(false, role, permissions);
+    }
+
+    public static ClaimsPrincipal ApiUser(string? role = null, string? permission = null)
+    {
+        return CreateUser(false, role, permission);
+    }
+
+    public static ClaimsPrincipal FrontendUser(string? role = null, params string[] permissions)
+    {
+        return CreateUser(true, role, permissions);
     }
 
     public static ClaimsPrincipal FrontendUser(string? role = null, string? permission = null)
     {
-        return CreateUser(role, DefaultClients.Frontend, permission);
+        return CreateUser(true, role, permission);
     }
 
-    private static ClaimsPrincipal CreateUser(string? role, string client, string? permission = null)
+    public static ClaimsPrincipal CreateUser(bool isFrontend, string? role, params string?[] permissions)
     {
         var claimsIdentity = new ClaimsIdentity();
         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-        claimsIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, client));
+        if (isFrontend)
+        {
+            claimsIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
+        }
 
         if (role != null)
         {
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
         }
 
-        if (permission != null)
+        foreach (var permission in permissions)
         {
-            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+            if (permission != null)
+            {
+                claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+            }
         }
 
         return claimsPrincipal;

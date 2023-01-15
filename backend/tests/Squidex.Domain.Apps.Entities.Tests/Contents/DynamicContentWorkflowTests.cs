@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -38,7 +39,7 @@ public class DynamicContentWorkflowTests : GivenContext
                     new Dictionary<Status, WorkflowTransition>
                     {
                         [Status.Archived] = WorkflowTransition.Always,
-                        [Status.Published] = WorkflowTransition.When("data.field.iv === 2", "Editor")
+                        [Status.Published] = WorkflowTransition.When("data.field.iv === 2", Role.Editor)
                     }.ToReadonlyDictionary(),
                     StatusColors.Draft),
             [Status.Published] =
@@ -48,7 +49,7 @@ public class DynamicContentWorkflowTests : GivenContext
                         [Status.Archived] = WorkflowTransition.Always,
                         [Status.Draft] = WorkflowTransition.Always
                     }.ToReadonlyDictionary(),
-                    StatusColors.Published, NoUpdate.When("data.field.iv === 2", "Owner", "Editor"))
+                    StatusColors.Published, NoUpdate.When("data.field.iv === 2", Role.Owner, Role.Editor))
         }.ToReadonlyDictionary());
 
     public DynamicContentWorkflowTests()
@@ -120,7 +121,7 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_allow_publish_on_create()
     {
-        var actual = await sut.CanPublishInitialAsync(Schema, Mocks.FrontendUser("Editor"));
+        var actual = await sut.CanPublishInitialAsync(Schema, Mocks.FrontendUser(Role.Editor));
 
         Assert.True(actual);
     }
@@ -128,7 +129,7 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_not_allow_publish_on_create_if_role_not_allowed()
     {
-        var actual = await sut.CanPublishInitialAsync(Schema, Mocks.FrontendUser("Developer"));
+        var actual = await sut.CanPublishInitialAsync(Schema, Mocks.FrontendUser(Role.Developer));
 
         Assert.False(actual);
     }
@@ -138,7 +139,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Draft, 2);
 
-        var actual = await sut.CanMoveToAsync(Schema, content.Status, Status.Published, content.Data, Mocks.FrontendUser("Editor"));
+        var actual = await sut.CanMoveToAsync(Schema, content.Status, Status.Published, content.Data, Mocks.FrontendUser(Role.Editor));
 
         Assert.True(actual);
     }
@@ -148,7 +149,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Draft, 2);
 
-        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
+        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Editor));
 
         Assert.True(actual);
     }
@@ -158,7 +159,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Draft, 2);
 
-        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Developer"));
+        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Developer));
 
         Assert.False(actual);
     }
@@ -168,7 +169,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Draft, 2);
 
-        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
+        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Editor));
 
         Assert.True(actual);
     }
@@ -178,7 +179,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Draft, 4);
 
-        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser("Editor"));
+        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Editor));
 
         Assert.False(actual);
     }
@@ -188,7 +189,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Published, 2);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
+        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Developer));
 
         Assert.True(actual);
     }
@@ -198,7 +199,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Published, 2);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
+        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Developer));
 
         Assert.True(actual);
     }
@@ -208,7 +209,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Archived, 2);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Developer"));
+        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Developer));
 
         Assert.False(actual);
     }
@@ -218,7 +219,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Published, 2);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
+        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Owner));
 
         Assert.False(actual);
     }
@@ -228,7 +229,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Published, 1);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
+        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Owner));
 
         Assert.True(actual);
     }
@@ -238,7 +239,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Published, 2);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Editor"));
+        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Editor));
 
         Assert.False(actual);
     }
@@ -248,7 +249,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var content = CreateContent(Status.Published, 1);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser("Owner"));
+        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Owner));
 
         Assert.True(actual);
     }
@@ -263,7 +264,7 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Archived, StatusColors.Archived)
         };
 
-        var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Developer"));
+        var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser(Role.Developer));
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -278,7 +279,7 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Archived, StatusColors.Archived)
         };
 
-        var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Editor"));
+        var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser(Role.Editor));
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -294,7 +295,7 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Published, StatusColors.Published)
         };
 
-        var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser("Editor"));
+        var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser(Role.Editor));
 
         actual.Should().BeEquivalentTo(expected);
     }

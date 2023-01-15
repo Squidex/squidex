@@ -30,9 +30,7 @@ public static class SecurityExtensions
             throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
         }
 
-        var permission = PermissionIds.ForApp(permissionId, context.App.Name, context.Schema.SchemaDef.Name);
-
-        if (!permissions.Allows(permission))
+        if (!permissions.Allows(permissionId, context.App.Name, context.Schema.SchemaDef.Name))
         {
             throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
         }

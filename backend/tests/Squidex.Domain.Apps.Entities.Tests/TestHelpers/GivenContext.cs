@@ -5,14 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
-using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers;
 
@@ -26,6 +22,8 @@ public abstract class GivenContext
     private Context? contextFrontend;
 
     public DomainId TeamId { get; } = DomainId.NewGuid();
+
+    public string TeamName { get; } = "my-team";
 
     public NamedId<DomainId> AppId { get; } = NamedId.Of(DomainId.NewGuid(), "my-app");
 
@@ -70,31 +68,27 @@ public abstract class GivenContext
 
     protected GivenContext()
     {
-        App = Mocks.App(AppId, Language.EN, Language.DE);
+        Team = Mocks.Team(TeamId, TeamName);
 
-        Team = Mocks.Team(TeamId, "my-team", User.Identifier);
+        App = Mocks.App(AppId,
+            Language.EN,
+            Language.DE);
 
         Schema = Mocks.Schema(AppId, SchemaId);
     }
 
+    public Context CreateContext(params string[] permissions)
+    {
+        var principal = Mocks.CreateUser(false, null, permissions);
+
+        return new Context(principal, App);
+    }
+
     public Context CreateContext(bool isFrontend, params string[] permissions)
     {
-        var claimsIdentity = new ClaimsIdentity();
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+        var principal = Mocks.CreateUser(isFrontend, null, permissions);
 
-        claimsIdentity.AddClaim(new Claim(OpenIdClaims.Subject, User.Identifier));
-
-        if (isFrontend)
-        {
-            claimsIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
-        }
-
-        foreach (var permission in permissions)
-        {
-            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
-        }
-
-        return new Context(claimsPrincipal, App);
+        return new Context(principal, App);
     }
 
     private static IContextProvider CreateContextProvider(Context context)

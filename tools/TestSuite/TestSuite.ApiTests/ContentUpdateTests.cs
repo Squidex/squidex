@@ -1225,4 +1225,40 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
             }
         }
     }
+
+    [Fact]
+    public async Task Should_create_content_with_custom_id_and_delete_it()
+    {
+        var id = "author-12345–fragment-text";
+
+        // STEP 1: Create a new item with a custom id.
+        var options = new ContentCreateOptions { Id = id, Publish = true };
+
+        var content = await _.Contents.CreateAsync(new TestEntityData
+        {
+            Number = 1
+        }, options);
+
+        Assert.Equal(id, content.Id);
+
+
+        // STEP 2: Delete with bulk update.
+        await _.Contents.BulkUpdateAsync(new BulkUpdate
+        {
+            Jobs = new List<BulkUpdateJob>
+            {
+                new BulkUpdateJob
+                {
+                    Type = BulkUpdateType.Delete,
+                    Id = id
+                }
+            }
+        });
+
+
+        // STEP 3: Retrieve all items and ensure that the deleted item does not exist.
+        var updated = await _.Contents.GetAsync();
+
+        Assert.DoesNotContain(updated.Items, x => x.Id == id);
+    }
 }

@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -46,6 +47,9 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     public AppDomainObjectTests()
     {
         user = UserMocks.User(contributorId);
+
+        A.CallTo(() => Team.Contributors)
+            .Returns(Contributors.Empty.Assign(User.Identifier, Role.Owner));
 
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, CancellationToken))
             .Returns(user);

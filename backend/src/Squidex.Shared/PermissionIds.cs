@@ -42,6 +42,9 @@ namespace Squidex.Shared
         // Team
         public const string Team = "squidex.teams.{team}";
 
+        // Team Transfer
+        public const string Transfer = "squidex.transfer";
+
         // Team General
         public const string TeamAdmin = "squidex.teams.{team}.*";
         public const string TeamUpdate = "squidex.teams.{team}.update";

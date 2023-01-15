@@ -99,6 +99,7 @@
   "assets.metadata": "Metadados",
   "assets.metadataAdd": "Adicionar metadados",
   "assets.move": "Move",
+  "assets.moved": "Asset has been moved.",
   "assets.moveFailed": "Falha ao mover ficheiro. Por favor, recarregue.",
   "assets.protected": "Protegido",
   "assets.protectedHint": "Os ativos são públicos por defeito. Todos com o link podem descarregar o ficheiro. Se fizer um ficheiro protegido, apenas utilizadores autenticados (normalmente um cliente) podem descarregar o ficheiro.",

@@ -7,7 +7,7 @@ export const environment = {
     production: false,
     textLogger: true,
     textResolver: () => {
-        const culture = window['options']?.more?.culture || 'en';
+        const culture = window['options']?.culture || 'en';
 
         return require(`./../../../backend/i18n/frontend_${culture}.json`);
     },
