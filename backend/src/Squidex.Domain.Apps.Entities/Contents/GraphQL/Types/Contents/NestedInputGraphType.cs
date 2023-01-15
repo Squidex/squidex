@@ -22,16 +22,18 @@ internal sealed class NestedInputGraphType : InputObjectGraphType
         {
             var resolvedType = builder.GetInputGraphType(nestedFieldInfo);
 
-            if (resolvedType != null)
+            if (resolvedType == null)
             {
-                AddField(new FieldType
-                {
-                    Name = nestedFieldInfo.FieldName,
-                    ResolvedType = resolvedType,
-                    Resolver = null,
-                    Description = nestedFieldInfo.Field.RawProperties.Hints
-                }).WithSourceName(nestedFieldInfo);
+                continue;
             }
+
+            AddField(new FieldType
+            {
+                Name = nestedFieldInfo.FieldName,
+                ResolvedType = resolvedType,
+                Resolver = null,
+                Description = nestedFieldInfo.Field.RawProperties.Hints
+            }).WithSourceName(nestedFieldInfo);
         }
 
         Description = $"The structure of the {fieldInfo.DisplayName} nested schema.";

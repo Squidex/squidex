@@ -25,36 +25,38 @@ internal sealed class DataInputGraphType : InputObjectGraphType
         {
             var resolvedType = builder.GetInputGraphType(fieldInfo);
 
-            if (resolvedType != null)
+            if (resolvedType == null)
             {
-                var fieldGraphType = new InputObjectGraphType
-                {
-                    // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-                    Name = fieldInfo.LocalizedInputType
-                };
-
-                var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
-
-                foreach (var partitionKey in partitioning.AllKeys)
-                {
-                    fieldGraphType.AddField(new FieldType
-                    {
-                        Name = partitionKey.EscapePartition(),
-                        ResolvedType = resolvedType,
-                        Resolver = null,
-                        Description = fieldInfo.Field.RawProperties.Hints
-                    }).WithSourceName(partitionKey);
-                }
-
-                fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content input type.";
-
-                AddField(new FieldType
-                {
-                    Name = fieldInfo.FieldName,
-                    ResolvedType = fieldGraphType,
-                    Resolver = null
-                }).WithSourceName(fieldInfo);
+                continue;
             }
+
+            var fieldGraphType = new InputObjectGraphType
+            {
+                // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+                Name = fieldInfo.LocalizedInputType
+            };
+
+            var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
+
+            foreach (var partitionKey in partitioning.AllKeys)
+            {
+                fieldGraphType.AddField(new FieldType
+                {
+                    Name = partitionKey.EscapePartition(),
+                    ResolvedType = resolvedType,
+                    Resolver = null,
+                    Description = fieldInfo.Field.RawProperties.Hints
+                }).WithSourceName(partitionKey);
+            }
+
+            fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content input type.";
+
+            AddField(new FieldType
+            {
+                Name = fieldInfo.FieldName,
+                ResolvedType = fieldGraphType,
+                Resolver = null
+            }).WithSourceName(fieldInfo);
         }
 
         Description = $"The structure of the {schemaInfo.DisplayName} data input type.";

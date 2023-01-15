@@ -147,9 +147,9 @@ internal sealed class Builder
         return fieldInfo.Field.Accept(fieldInputVisitor, fieldInfo);
     }
 
-    public IObjectGraphType GetContentResultType(SchemaInfo schemaId)
+    public IObjectGraphType? GetContentResultType(SchemaInfo schemaId)
     {
-        return contentResultTypes.GetValueOrDefault(schemaId)!;
+        return contentResultTypes.GetValueOrDefault(schemaId);
     }
 
     public IObjectGraphType? GetContentType(DomainId schemaId)
@@ -157,9 +157,9 @@ internal sealed class Builder
         return contentTypes.FirstOrDefault(x => x.Key.Schema.Id == schemaId).Value;
     }
 
-    public IObjectGraphType GetContentType(SchemaInfo schemaId)
+    public IObjectGraphType? GetContentType(SchemaInfo schemaId)
     {
-        return contentTypes.GetValueOrDefault(schemaId)!;
+        return contentTypes.GetValueOrDefault(schemaId);
     }
 
     public IObjectGraphType? GetComponentType(DomainId schemaId)

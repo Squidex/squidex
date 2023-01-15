@@ -22,6 +22,11 @@ internal sealed class ApplicationQueries : ObjectGraphType
         {
             var contentType = builder.GetContentType(schemaInfo);
 
+            if (contentType == null)
+            {
+                continue;
+            }
+
             AddContentFind(schemaInfo, contentType);
             AddContentQueries(builder, schemaInfo, contentType);
         }
@@ -52,13 +57,18 @@ internal sealed class ApplicationQueries : ObjectGraphType
             Description = $"Query {schemaInfo.DisplayName} content items."
         }).WithSchemaId(schemaInfo);
 
-        var resultType = builder.GetContentResultType(schemaInfo);
+        var contentResultTyp = builder.GetContentResultType(schemaInfo);
+
+        if (contentResultTyp == null)
+        {
+            return;
+        }
 
         AddField(new FieldType
         {
             Name = $"query{schemaInfo.TypeName}ContentsWithTotal",
             Arguments = ContentActions.QueryOrReferencing.Arguments,
-            ResolvedType = resultType,
+            ResolvedType = contentResultTyp,
             Resolver = ContentActions.QueryOrReferencing.QueryWithTotal,
             Description = $"Query {schemaInfo.DisplayName} content items with total count."
         }).WithSchemaId(schemaInfo);
