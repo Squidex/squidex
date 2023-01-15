@@ -50,22 +50,24 @@ public sealed class CachingManager : IRequestCache
 
         public void AddDependency(string key, long version)
         {
-            if (!string.IsNullOrWhiteSpace(key))
+            if (string.IsNullOrWhiteSpace(key))
             {
-                slimLock.EnterWriteLock();
-                try
-                {
-                    keys.Add(key);
+                return;
+            }
 
-                    hasher.AppendData(Encoding.Default.GetBytes(key));
-                    hasher.AppendData(BitConverter.GetBytes(version));
+            slimLock.EnterWriteLock();
+            try
+            {
+                keys.Add(key);
 
-                    hasDependency = true;
-                }
-                finally
-                {
-                    slimLock.ExitWriteLock();
-                }
+                hasher.AppendData(Encoding.Default.GetBytes(key));
+                hasher.AppendData(BitConverter.GetBytes(version));
+
+                hasDependency = true;
+            }
+            finally
+            {
+                slimLock.ExitWriteLock();
             }
         }
 
@@ -73,19 +75,21 @@ public sealed class CachingManager : IRequestCache
         {
             var formatted = value?.ToString();
 
-            if (formatted != null)
+            if (formatted == null)
             {
-                slimLock.EnterWriteLock();
-                try
-                {
-                    hasher.AppendData(Encoding.Default.GetBytes(formatted));
+                return;
+            }
 
-                    hasDependency = true;
-                }
-                finally
-                {
-                    slimLock.ExitWriteLock();
-                }
+            slimLock.EnterWriteLock();
+            try
+            {
+                hasher.AppendData(Encoding.Default.GetBytes(formatted));
+
+                hasDependency = true;
+            }
+            finally
+            {
+                slimLock.ExitWriteLock();
             }
         }
 
@@ -100,82 +104,92 @@ public sealed class CachingManager : IRequestCache
             // Set to finish before we start to ensure that we do not call it again in case of an error.
             isFinished = true;
 
-            if (hasDependency && !response.Headers.ContainsKey(HeaderNames.ETag))
+            slimLock.EnterWriteLock();
+            try
             {
-                using (Telemetry.Activities.StartActivity("CalculateEtag"))
+                if (hasDependency && !response.Headers.ContainsKey(HeaderNames.ETag))
                 {
-                    var cacheBuffer = hasher.GetHashAndReset();
-                    var cacheString = cacheBuffer.ToHexString();
-
-                    response.Headers.Add(HeaderNames.ETag, cacheString);
-                }
-            }
-
-            if (keys.Count > 0 && maxKeysSize > 0)
-            {
-                var stringBuilder = stringBuilderPool.Get();
-                try
-                {
-                    foreach (var key in keys)
+                    using (Telemetry.Activities.StartActivity("CalculateEtag"))
                     {
-                        var encoded = Uri.EscapeDataString(key);
+                        var cacheBuffer = hasher.GetHashAndReset();
+                        var cacheString = cacheBuffer.ToHexString();
 
-                        if (stringBuilder.Length == 0)
-                        {
-                            if (stringBuilder.Length + encoded.Length > maxKeysSize)
-                            {
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if (stringBuilder.Length + encoded.Length + 1 > maxKeysSize)
-                            {
-                                break;
-                            }
-
-                            stringBuilder.Append(' ');
-                        }
-
-                        stringBuilder.Append(encoded);
-                    }
-
-                    if (stringBuilder.Length > 0)
-                    {
-                        response.Headers["Surrogate-Key"] = stringBuilder.ToString();
+                        response.Headers.Add(HeaderNames.ETag, cacheString);
                     }
                 }
-                finally
+
+                if (keys.Count > 0 && maxKeysSize > 0)
                 {
-                    stringBuilderPool.Return(stringBuilder);
+                    var stringBuilder = stringBuilderPool.Get();
+                    try
+                    {
+                        foreach (var key in keys)
+                        {
+                            var encoded = Uri.EscapeDataString(key);
+
+                            if (stringBuilder.Length == 0)
+                            {
+                                if (stringBuilder.Length + encoded.Length > maxKeysSize)
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (stringBuilder.Length + encoded.Length + 1 > maxKeysSize)
+                                {
+                                    break;
+                                }
+
+                                stringBuilder.Append(' ');
+                            }
+
+                            stringBuilder.Append(encoded);
+                        }
+
+                        if (stringBuilder.Length > 0)
+                        {
+                            response.Headers["Surrogate-Key"] = stringBuilder.ToString();
+                        }
+                    }
+                    finally
+                    {
+                        stringBuilderPool.Return(stringBuilder);
+                    }
+                }
+
+                if (headers.Count > 0)
+                {
+                    response.Headers[HeaderNames.Vary] = new StringValues(headers.ToArray());
                 }
             }
-
-            if (headers.Count > 0)
+            finally
             {
-                response.Headers[HeaderNames.Vary] = new StringValues(headers.ToArray());
+                slimLock.ExitWriteLock();
             }
         }
 
         public void AddHeader(string header, StringValues values)
         {
-            if (!string.IsNullOrWhiteSpace(header))
+            if (string.IsNullOrWhiteSpace(header))
             {
-                try
-                {
-                    slimLock.EnterWriteLock();
+                return;
+            }
 
-                    headers.Add(header);
-                }
-                finally
-                {
-                    slimLock.ExitWriteLock();
-                }
+            try
+            {
+                slimLock.EnterWriteLock();
 
-                foreach (var value in values)
-                {
-                    AddDependency(value);
-                }
+                headers.Add(header);
+            }
+            finally
+            {
+                slimLock.ExitWriteLock();
+            }
+
+            foreach (var value in values)
+            {
+                AddDependency(value);
             }
         }
     }
