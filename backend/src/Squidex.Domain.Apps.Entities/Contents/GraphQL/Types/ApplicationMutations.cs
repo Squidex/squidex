@@ -7,6 +7,7 @@
 
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
@@ -26,8 +27,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
 
             var contentType = builder.GetContentType(schemaInfo);
 
-            // We cannot check before if all fields can be resolved. This might not be the case, e.g. if a reference is empty.
-            if (contentType == null || contentType.Fields.Count == 0)
+            if (contentType == null)
             {
                 continue;
             }
@@ -38,7 +38,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
             {
                 Name = $"create{schemaInfo.TypeName}Content",
                 Arguments = ContentActions.Create.Arguments(inputType),
-                ResolvedType = nonNullContentType,
+                ResolvedType = contentType,
                 Resolver = ContentActions.Create.Resolver,
                 Description = $"Creates an {schemaInfo.DisplayName} content."
             }).WithSchemaNamedId(schemaInfo);
@@ -47,7 +47,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
             {
                 Name = $"update{schemaInfo.TypeName}Content",
                 Arguments = ContentActions.Update.Arguments(inputType),
-                ResolvedType = nonNullContentType,
+                ResolvedType = contentType,
                 Resolver = ContentActions.Update.Resolver,
                 Description = $"Update an {schemaInfo.DisplayName} content by id."
             }).WithSchemaNamedId(schemaInfo);
@@ -56,7 +56,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
             {
                 Name = $"upsert{schemaInfo.TypeName}Content",
                 Arguments = ContentActions.Upsert.Arguments(inputType),
-                ResolvedType = nonNullContentType,
+                ResolvedType = contentType,
                 Resolver = ContentActions.Upsert.Resolver,
                 Description = $"Upsert an {schemaInfo.DisplayName} content by id."
             }).WithSchemaNamedId(schemaInfo);
@@ -65,9 +65,37 @@ internal sealed class ApplicationMutations : ObjectGraphType
             {
                 Name = $"patch{schemaInfo.TypeName}Content",
                 Arguments = ContentActions.Patch.Arguments(inputType),
-                ResolvedType = nonNullContentType,
+                ResolvedType = contentType,
                 Resolver = ContentActions.Patch.Resolver,
                 Description = $"Patch an {schemaInfo.DisplayName} content by id."
+            }).WithSchemaNamedId(schemaInfo);
+
+            AddField(new FieldType
+            {
+                Name = $"change{schemaInfo.TypeName}Content",
+                Arguments = ContentActions.ChangeStatus.Arguments,
+                ResolvedType = contentType,
+                Resolver = ContentActions.ChangeStatus.Resolver,
+                Description = $"Change a {schemaInfo.DisplayName} content."
+            }).WithSchemaNamedId(schemaInfo);
+
+            AddField(new FieldType
+            {
+                Name = $"delete{schemaInfo.TypeName}Content",
+                Arguments = ContentActions.Delete.Arguments,
+                ResolvedType = EntitySavedGraphType.NonNull,
+                Resolver = ContentActions.Delete.Resolver,
+                Description = $"Delete an {schemaInfo.DisplayName} content."
+            }).WithSchemaNamedId(schemaInfo);
+
+            AddField(new FieldType
+            {
+                Name = $"publish{schemaInfo.TypeName}Content",
+                Arguments = ContentActions.ChangeStatus.Arguments,
+                ResolvedType = contentType,
+                Resolver = ContentActions.ChangeStatus.Resolver,
+                Description = $"Publish a {schemaInfo.DisplayName} content.",
+                DeprecationReason = $"Use 'change{schemaInfo.TypeName}Content' instead"
             }).WithSchemaNamedId(schemaInfo);
         }
 

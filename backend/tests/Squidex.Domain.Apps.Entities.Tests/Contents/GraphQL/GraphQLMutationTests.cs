@@ -64,7 +64,10 @@ public class GraphQLMutationTests : GraphQLTestBase
                     }
                 }
             },
-            data = (object?)null
+            data = new
+            {
+                createMySchemaContent = (object?)null
+            }
         };
 
         AssertResult(expected, actual);
@@ -215,7 +218,10 @@ public class GraphQLMutationTests : GraphQLTestBase
                     }
                 }
             },
-            data = (object?)null
+            data = new
+            {
+                updateMySchemaContent = (object?)null
+            }
         };
 
         AssertResult(expected, actual);
@@ -329,7 +335,10 @@ public class GraphQLMutationTests : GraphQLTestBase
                     }
                 }
             },
-            data = (object?)null
+            data = new
+            {
+                upsertMySchemaContent = (object?)null
+            }
         };
 
         AssertResult(expected, actual);
@@ -445,7 +454,10 @@ public class GraphQLMutationTests : GraphQLTestBase
                     }
                 }
             },
-            data = (object?)null
+            data = new
+            {
+                patchMySchemaContent = (object?)null
+            }
         };
 
         AssertResult(expected, actual);
@@ -559,7 +571,10 @@ public class GraphQLMutationTests : GraphQLTestBase
                     }
                 }
             },
-            data = (object?)null
+            data = new
+            {
+                changeMySchemaContent = (object?)null
+            }
         };
 
         AssertResult(expected, actual);
