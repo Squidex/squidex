@@ -249,12 +249,14 @@ public class BackgroundUsageTrackerTests
 
         using var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
-        while (sut.PendingJobs > 0)
+        while (sut.HasPendingJobs)
         {
             tcs.Token.ThrowIfCancellationRequested();
 
             await Task.Delay(20, tcs.Token);
         }
+
+        sut.Dispose();
     }
 
     private static Counters Counters(double? a = null, double? b = null)

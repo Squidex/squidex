@@ -121,12 +121,14 @@ public class BackgroundRequestLogStoreTests
 
         using var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(5000));
 
-        while (sut.PendingJobs > 0)
+        while (sut.HasPendingJobs)
         {
             tcs.Token.ThrowIfCancellationRequested();
 
             await Task.Delay(20, tcs.Token);
         }
+
+        sut.Dispose();
     }
 
     private static IEnumerable<Request> Batch(string from, string to)

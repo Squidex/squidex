@@ -19,8 +19,9 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
     private readonly CompletionTimer logTimer;
     private readonly RequestLogStoreOptions options;
     private readonly ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
+    private bool isUpdating;
 
-    public int PendingJobs => jobs.Count;
+    public bool HasPendingJobs => !jobs.IsEmpty || isUpdating;
 
     public bool IsEnabled => options.StoreEnabled;
 
@@ -63,6 +64,7 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
             return;
         }
 
+        isUpdating = true;
         try
         {
             var batch = new List<Request>(options.BatchSize);
@@ -86,6 +88,10 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
         catch (Exception ex)
         {
             log.LogError(ex, "Failed to track usage in background.");
+        }
+        finally
+        {
+            isUpdating = false;
         }
     }
 

@@ -18,8 +18,9 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     private readonly ILogger<BackgroundUsageTracker> log;
     private readonly CompletionTimer usageTimer;
     private ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>();
+    private bool isUpdating;
 
-    public int PendingJobs => jobs.Count;
+    public bool HasPendingJobs => !jobs.IsEmpty || isUpdating;
 
     public string FallbackCategory => "*";
 
@@ -52,34 +53,40 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     {
         try
         {
+            isUpdating = true;
+
             var localUsages = Interlocked.Exchange(ref jobs, new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>());
 
             if (!localUsages.IsEmpty)
             {
-                var updates = new UsageUpdate[localUsages.Count];
+                var updateBatch = new UsageUpdate[localUsages.Count];
                 var updateIndex = 0;
 
                 foreach (var (key, value) in localUsages)
                 {
-                    if (updateIndex >= updates.Length)
+                    if (updateIndex >= updateBatch.Length)
                     {
                         break;
                     }
 
-                    updates[updateIndex].Key = key.Key;
-                    updates[updateIndex].Category = key.Category;
-                    updates[updateIndex].Counters = value;
-                    updates[updateIndex].Date = key.Date;
+                    updateBatch[updateIndex].Key = key.Key;
+                    updateBatch[updateIndex].Category = key.Category;
+                    updateBatch[updateIndex].Counters = value;
+                    updateBatch[updateIndex].Date = key.Date;
 
                     updateIndex++;
                 }
 
-                await usageRepository.TrackUsagesAsync(updates, ct);
+                await usageRepository.TrackUsagesAsync(updateBatch, ct);
             }
         }
         catch (Exception ex)
         {
             log.LogError(ex, "Failed to track usage in background.");
+        }
+        finally
+        {
+            isUpdating = false;
         }
     }
 
