@@ -148,16 +148,18 @@ public sealed class ContentFieldObject : ObjectInstance
 
     private void EnsurePropertiesInitialized()
     {
-        if (valueProperties == null)
+        if (valueProperties != null)
         {
-            valueProperties = new Dictionary<string, PropertyDescriptor>(fieldData?.Count ?? 0);
+            return;
+        }
 
-            if (fieldData != null)
+        valueProperties = new Dictionary<string, PropertyDescriptor>(fieldData?.Count ?? 0, StringComparer.OrdinalIgnoreCase);
+
+        if (fieldData != null)
+        {
+            foreach (var (key, value) in fieldData)
             {
-                foreach (var (key, value) in fieldData)
-                {
-                    valueProperties.Add(key, new ContentFieldProperty(this, value));
-                }
+                valueProperties[key] = new ContentFieldProperty(this, value);
             }
         }
     }
