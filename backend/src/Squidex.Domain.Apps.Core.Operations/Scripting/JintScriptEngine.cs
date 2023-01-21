@@ -133,7 +133,7 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
         var engine = new Engine(engineOptions =>
         {
-            engineOptions.AddObjectConverter(DefaultConverter.Instance);
+            engineOptions.AddObjectConverter(JintObjectConverter.Instance);
             engineOptions.SetReferencesResolver(NullPropagation.Instance);
             engineOptions.Strict();
 

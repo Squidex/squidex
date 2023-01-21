@@ -7,7 +7,7 @@
 
 using System.Security.Claims;
 using Jint;
-using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 

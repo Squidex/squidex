@@ -16,14 +16,24 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 
 public static class JsonMapper
 {
+    private class JsonObjectInstance : ObjectInstance
+    {
+        public JsonObjectInstance(Engine engine)
+            : base(engine)
+        {
+        }
+    }
+
     public static JsValue Map(JsonValue value, Engine engine)
     {
         switch (value.Value)
         {
             case null:
                 return JsValue.Null;
-            case bool b:
-                return new JsBoolean(b);
+            case true:
+                return JsBoolean.True;
+            case false:
+                return JsBoolean.False;
             case double n:
                 return new JsNumber(n);
             case string s:
@@ -52,11 +62,11 @@ public static class JsonMapper
 
     private static JsValue FromObject(JsonObject obj, Engine engine)
     {
-        var target = new ObjectInstance(engine);
+        var target = new JsonObjectInstance(engine);
 
         foreach (var (key, value) in obj)
         {
-            target.FastAddProperty(key, Map(value, engine), true, true, true);
+            target.Set(key, Map(value, engine));
         }
 
         return target;

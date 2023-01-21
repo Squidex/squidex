@@ -27,7 +27,7 @@ internal sealed class WritableContext : ObjectInstance
 
             if (value != null)
             {
-                FastAddProperty(property, FromObject(engine, value), true, true, true);
+                Set(property, FromObject(engine, value));
             }
         }
     }

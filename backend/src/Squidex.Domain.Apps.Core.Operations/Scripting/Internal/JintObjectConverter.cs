@@ -16,13 +16,13 @@ using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Core.Scripting;
+namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
-public sealed class DefaultConverter : IObjectConverter
+public sealed class JintObjectConverter : IObjectConverter
 {
-    public static readonly DefaultConverter Instance = new DefaultConverter();
+    public static readonly JintObjectConverter Instance = new JintObjectConverter();
 
-    private DefaultConverter()
+    private JintObjectConverter()
     {
     }
 

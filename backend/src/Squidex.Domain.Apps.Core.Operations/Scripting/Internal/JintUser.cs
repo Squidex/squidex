@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Core.Scripting;
+namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
 public static class JintUser
 {

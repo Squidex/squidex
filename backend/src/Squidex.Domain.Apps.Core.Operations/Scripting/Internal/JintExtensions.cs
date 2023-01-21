@@ -9,7 +9,7 @@ using Jint;
 using Jint.Native;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Scripting;
+namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
 public static class JintExtensions
 {
