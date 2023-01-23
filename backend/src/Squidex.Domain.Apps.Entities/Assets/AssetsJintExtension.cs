@@ -181,14 +181,14 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
                 if (componentY?.IsNumber() == true)
                 {
-                    options.ComponentX = (int)componentX.AsNumber();
+                    options.ComponentX = (int)componentY.AsNumber();
                 }
 
-                var assetThumbnailGenerator = serviceProvider.GetRequiredService<IAssetThumbnailGenerator>();
+                var assetGenerator = serviceProvider.GetRequiredService<IAssetThumbnailGenerator>();
                 var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
                 try
                 {
-                    var hash = await asset.GetBlurHashAsync(options, assetFileStore, assetThumbnailGenerator, ct);
+                    var hash = await asset.GetBlurHashAsync(options, assetFileStore, assetGenerator, ct);
 
                     scheduler.Run(callback, JsValue.FromObject(context.Engine, hash));
                 }

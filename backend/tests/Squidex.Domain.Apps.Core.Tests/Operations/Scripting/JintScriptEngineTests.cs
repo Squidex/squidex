@@ -489,6 +489,40 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     }
 
     [Fact]
+    public void Should_allow_null_vars()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = null
+        };
+
+        const string script = @"
+                return value;
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Null, actual);
+    }
+
+    [Fact]
+    public void Should_not_allow_to_overwrite_initial_var()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = 13
+        };
+
+        const string script = @"
+                ctx.value = ctx.value * 2;
+            ";
+
+        sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(13, vars["value"]);
+    }
+
+    [Fact]
     public void Should_share_vars_between_executions()
     {
         var vars = new ScriptVars
@@ -497,11 +531,11 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         };
 
         const string script1 = @"
-                ctx.value = ctx.value * 2;
+                ctx.shared = ctx.value * 2;
             ";
 
         const string script2 = @"
-                return ctx.value + 2;
+                return ctx.shared + 2;
             ";
 
         sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
@@ -543,30 +577,22 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         };
 
         const string script1 = @"
-                ctx.obj = { number: ctx.value * 2 };
+                ctx.shared = { number: ctx.value * 2 };
             ";
 
         const string script2 = @"
-                ctx.data.test = { iv: ctx.obj.number + 2 };
+                ctx.data.test = { iv: ctx.shared.number + 2 };
                 replace();
             ";
 
-#pragma warning disable MA0042 // Do not use blocking calls in an async method
-        sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
-#pragma warning restore MA0042 // Do not use blocking calls in an async method
+        await sut.ExecuteAsync(vars, script1, new ScriptOptions { AsContext = true });
 
         var vars2 = new DataScriptVars
         {
             ["data"] = new ContentData()
         };
 
-        foreach (var (key, value) in vars)
-        {
-            if (!vars2.ContainsKey(key))
-            {
-                vars2[key] = value;
-            }
-        }
+        vars2.CopyFrom(vars);
 
         var actual = await sut.TransformAsync(vars2, script2, new ScriptOptions { AsContext = true });
 

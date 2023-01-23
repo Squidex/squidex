@@ -11,12 +11,19 @@ namespace Squidex.Domain.Apps.Core.Scripting;
 
 public class ScriptVars : ScriptContext
 {
+    public object? this[string key]
+    {
+        get
+        {
+            TryGetValue(key, out var result);
+            return result;
+        }
+        set => Set(key, value, true);
+    }
+
     public void SetValue(object? value, [CallerMemberName] string? key = null)
     {
-        if (key != null)
-        {
-            this[key] = value;
-        }
+        Set(key, value, true);
     }
 
     public T GetValue<T>([CallerMemberName] string? key = null)

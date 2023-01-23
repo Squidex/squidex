@@ -76,7 +76,7 @@ public class ScriptContentTests : GivenContext
                 A<DataScriptVars>.That.Matches(x =>
                     Equals(x["contentId"], content.Id) &&
                     Equals(x["data"], oldData) &&
-                    Equals(x["AppId"], AppId.Id) &&
+                    Equals(x["appId"], AppId.Id) &&
                     Equals(x["appName"], AppId.Name) &&
                     Equals(x["user"], ApiContext.UserPrincipal)),
                 "my-query",

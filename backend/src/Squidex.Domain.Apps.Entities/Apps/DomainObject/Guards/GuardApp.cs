@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams;
@@ -14,7 +15,6 @@ using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Text;
-using System.Security.Claims;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 

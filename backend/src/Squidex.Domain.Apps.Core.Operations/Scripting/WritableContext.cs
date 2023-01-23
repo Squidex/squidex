@@ -8,7 +8,6 @@
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
-using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
@@ -21,14 +20,9 @@ internal sealed class WritableContext : ObjectInstance
     {
         this.vars = vars;
 
-        foreach (var (key, value) in vars)
+        foreach (var (key, item) in vars)
         {
-            var property = key.ToCamelCase();
-
-            if (value != null)
-            {
-                Set(property, FromObject(engine, value));
-            }
+            base.Set(key, FromObject(engine, item.Value), this);
         }
     }
 
@@ -36,7 +30,7 @@ internal sealed class WritableContext : ObjectInstance
     {
         var propertyName = property.AsString();
 
-        vars[propertyName] = value.ToObject();
+        vars.Set(propertyName, value.ToObject());
 
         return base.Set(property, value, receiver);
     }
