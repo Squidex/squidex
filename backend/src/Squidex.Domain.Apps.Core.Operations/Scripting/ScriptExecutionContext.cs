@@ -7,7 +7,6 @@
 
 using Jint;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
@@ -117,30 +116,20 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
     {
         var engine = Engine;
 
+        CopyFrom(vars);
+
         if (options.AsContext)
         {
             var contextInstance = new WritableContext(engine, vars);
-
-            foreach (var (key, value) in vars.Where(x => x.Value != null))
-            {
-                this[key.ToCamelCase()] = value;
-            }
 
             engine.SetValue("ctx", contextInstance);
             engine.SetValue("context", contextInstance);
         }
         else
         {
-            foreach (var (key, value) in vars)
+            foreach (var (key, item) in vars)
             {
-                var property = key.ToCamelCase();
-
-                if (value != null)
-                {
-                    engine.SetValue(property, value);
-
-                    this[property] = value;
-                }
+                engine.SetValue(key, item.Value!);
             }
         }
 

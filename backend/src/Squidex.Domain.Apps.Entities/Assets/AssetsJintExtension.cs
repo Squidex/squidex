@@ -15,6 +15,7 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
@@ -180,14 +181,14 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
                 if (componentY?.IsNumber() == true)
                 {
-                    options.ComponentX = (int)componentX.AsNumber();
+                    options.ComponentX = (int)componentY.AsNumber();
                 }
 
-                var assetThumbnailGenerator = serviceProvider.GetRequiredService<IAssetThumbnailGenerator>();
+                var assetGenerator = serviceProvider.GetRequiredService<IAssetThumbnailGenerator>();
                 var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
                 try
                 {
-                    var hash = await asset.GetBlurHashAsync(options, assetFileStore, assetThumbnailGenerator, ct);
+                    var hash = await asset.GetBlurHashAsync(options, assetFileStore, assetGenerator, ct);
 
                     scheduler.Run(callback, JsValue.FromObject(context.Engine, hash));
                 }

@@ -14,10 +14,6 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 internal sealed class Parser
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
-    private static readonly ParserOptions DefaultParserOptions = new ParserOptions
-    {
-        AdaptRegexp = true, Tolerant = true
-    };
 
     private readonly IMemoryCache cache;
 
@@ -34,9 +30,7 @@ internal sealed class Parser
         {
             entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
-            var parser = new JavaScriptParser(script, DefaultParserOptions);
-
-            return parser.ParseScript();
+            return new JavaScriptParser().ParseScript(script);
         })!;
     }
 }

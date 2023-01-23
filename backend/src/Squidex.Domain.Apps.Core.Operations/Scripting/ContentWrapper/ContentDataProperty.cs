@@ -18,7 +18,7 @@ public sealed class ContentDataProperty : CustomProperty
     private ContentFieldObject? contentField;
     private JsValue value;
 
-    protected override JsValue CustomValue
+    protected override JsValue? CustomValue
     {
         get
         {

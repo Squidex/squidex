@@ -82,13 +82,7 @@ public sealed class ScriptAsset : IAssetEnricherStep
             }
         };
 
-        foreach (var (key, value) in sharedVars)
-        {
-            if (!vars.ContainsKey(key))
-            {
-                vars[key] = value;
-            }
-        }
+        vars.CopyFrom(sharedVars);
 
         var options = new ScriptOptions
         {
