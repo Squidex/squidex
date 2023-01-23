@@ -156,6 +156,12 @@ namespace Squidex.Shared
         public const string AppAssetsUpdate = "squidex.apps.{app}.assets.update";
         public const string AppAssetsDelete = "squidex.apps.{app}.assets.delete";
 
+        // App Asset Folders
+        public const string AppAssetFolders = "squidex.apps.{app}.assets.folders";
+        public const string AppAssetFoldersCreate = "squidex.apps.{app}.assets.folders.create";
+        public const string AppAssetFoldersUpdate = "squidex.apps.{app}.assets.folders.update";
+        public const string AppAssetFoldersDelete = "squidex.apps.{app}.assets.folders.delete";
+
         // App Asset Scripts
         public const string AppAssetScripts = "squidex.apps.{app}.asset-scripts";
         public const string AppAssetSScriptsRead = "squidex.apps.{app}.asset-scripts.read";

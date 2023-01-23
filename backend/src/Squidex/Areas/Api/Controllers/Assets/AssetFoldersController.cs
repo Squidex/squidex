@@ -77,7 +77,7 @@ public sealed class AssetFoldersController : ApiController
     [Route("apps/{app}/assets/folders", Order = -1)]
     [ProducesResponseType(typeof(AssetFolderDto), StatusCodes.Status201Created)]
     [AssetRequestSizeLimit]
-    [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpdate)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppAssetFoldersCreate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PostAssetFolder(string app, [FromBody] CreateAssetFolderDto request)
     {
@@ -101,7 +101,7 @@ public sealed class AssetFoldersController : ApiController
     [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
     [ProducesResponseType(typeof(AssetFolderDto), StatusCodes.Status200OK)]
     [AssetRequestSizeLimit]
-    [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpdate)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppAssetFoldersUpdate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PutAssetFolder(string app, DomainId id, [FromBody] RenameAssetFolderDto request)
     {
@@ -125,7 +125,7 @@ public sealed class AssetFoldersController : ApiController
     [Route("apps/{app}/assets/folders/{id}/parent", Order = -1)]
     [ProducesResponseType(typeof(AssetFolderDto), StatusCodes.Status200OK)]
     [AssetRequestSizeLimit]
-    [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpdate)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppAssetFoldersUpdate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PutAssetFolderParent(string app, DomainId id, [FromBody] MoveAssetFolderDto request)
     {
@@ -146,7 +146,7 @@ public sealed class AssetFoldersController : ApiController
     [HttpDelete]
     [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpdate)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppAssetFoldersDelete)]
     [ApiCosts(1)]
     public async Task<IActionResult> DeleteAssetFolder(string app, DomainId id)
     {
