@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Infrastructure;
+using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Entities.Teams.Indexes;
 
@@ -22,8 +23,10 @@ public sealed class TeamsIndex : ITeamsIndex
     public async Task<ITeamEntity?> GetTeamAsync(DomainId id,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("TeamsIndex/GetTeamAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("TeamsIndex/GetTeamAsync"))
         {
+            activity?.SetTag("teamId", id);
+
             var team = await teamRepository.FindAsync(id, ct);
 
             return IsValid(team) ? team : null;
@@ -33,8 +36,10 @@ public sealed class TeamsIndex : ITeamsIndex
     public async Task<List<ITeamEntity>> GetTeamsAsync(string userId,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("TeamsIndex/GetTeamsAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("TeamsIndex/GetTeamsAsync"))
         {
+            activity?.SetTag("userId", userId);
+
             var teams = await teamRepository.QueryAllAsync(userId, ct);
 
             return teams.Where(IsValid).ToList();

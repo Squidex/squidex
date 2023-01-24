@@ -85,6 +85,8 @@ public sealed class AppImageController : ApiController
 #pragma warning disable MA0040 // Flow the cancellation token
         using var activity = Telemetry.Activities.StartActivity("Resize");
 
+        activity?.SetTag("fileType", mimeType);
+
         await using var assetOriginal = new TempAssetFile(resizedAsset, mimeType, 0);
         await using var assetResized = new TempAssetFile(resizedAsset, mimeType, 0);
 
@@ -102,7 +104,7 @@ public sealed class AppImageController : ApiController
             }
         }
 
-        using (Telemetry.Activities.StartActivity("Resize"))
+        using (Telemetry.Activities.StartActivity("Compute"))
         {
             try
             {

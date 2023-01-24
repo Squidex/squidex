@@ -8,6 +8,7 @@
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
+using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
@@ -39,8 +40,10 @@ public sealed class AssetQueryService : IAssetQueryService
     public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId appId, DomainId id,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("AssetQueryService/FindAssetFolderAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/FindAssetFolderAsync"))
         {
+            activity?.SetTag("assetId", id);
+
             var result = new List<IAssetFolderEntity>();
 
             while (id != DomainId.Empty)
@@ -65,8 +68,10 @@ public sealed class AssetQueryService : IAssetQueryService
     public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(DomainId appId, DomainId parentId,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAssetFoldersAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/QueryAssetFoldersAsync"))
         {
+            activity?.SetTag("folderId", parentId);
+
             var assetFolders = await QueryFoldersCoreAsync(appId, parentId, ct);
 
             return assetFolders;
@@ -76,8 +81,10 @@ public sealed class AssetQueryService : IAssetQueryService
     public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAssetFoldersAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/QueryAssetFoldersAsync"))
         {
+            activity?.SetTag("folderId", parentId);
+
             var assetFolders = await QueryFoldersCoreAsync(context, parentId, ct);
 
             return assetFolders;
@@ -89,8 +96,12 @@ public sealed class AssetQueryService : IAssetQueryService
     {
         Guard.NotNull(context);
 
-        using (Telemetry.Activities.StartActivity("AssetQueryService/FindByHashAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/FindByHashAsync"))
         {
+            activity?.SetTag("fileHash", hash);
+            activity?.SetTag("fileName", fileName);
+            activity?.SetTag("fileSize", fileSize);
+
             var asset = await FindByHashCoreAsync(context, hash, fileName, fileSize, ct);
 
             if (asset == null)
@@ -107,8 +118,10 @@ public sealed class AssetQueryService : IAssetQueryService
     {
         Guard.NotNull(context);
 
-        using (Telemetry.Activities.StartActivity("AssetQueryService/FindBySlugAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/FindBySlugAsync"))
         {
+            activity?.SetTag("slug", slug);
+
             var asset = await FindBySlugCoreAsync(context, slug, ct);
 
             if (asset == null)
@@ -125,8 +138,10 @@ public sealed class AssetQueryService : IAssetQueryService
     {
         Guard.NotNull(context);
 
-        using (Telemetry.Activities.StartActivity("AssetQueryService/FindGlobalAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/FindGlobalAsync"))
         {
+            activity?.SetTag("assetId", id);
+
             var asset = await FindCoreAsync(id, ct);
 
             if (asset == null)
@@ -143,8 +158,10 @@ public sealed class AssetQueryService : IAssetQueryService
     {
         Guard.NotNull(context);
 
-        using (Telemetry.Activities.StartActivity("AssetQueryService/FindAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/FindAsync"))
         {
+            activity?.SetTag("assetId", id);
+
             IAssetEntity? asset;
 
             if (version > EtagVersion.Empty)

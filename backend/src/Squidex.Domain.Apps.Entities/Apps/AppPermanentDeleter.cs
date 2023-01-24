@@ -68,41 +68,39 @@ public sealed class AppPermanentDeleter : IEventConsumer
 
     private async Task OnAppContributorRemoved(AppContributorRemoved appContributorRemoved)
     {
-        using (Telemetry.Activities.StartActivity("RemoveContributorFromSystem"))
-        {
-            var appId = appContributorRemoved.AppId.Id;
+        using var activity = Telemetry.Activities.StartActivity("RemoveContributorFromSystem");
 
-            foreach (var deleter in deleters)
+        var appId = appContributorRemoved.AppId.Id;
+
+        foreach (var deleter in deleters)
+        {
+            using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
             {
-                using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
-                {
-                    await deleter.DeleteContributorAsync(appId, appContributorRemoved.ContributorId, default);
-                }
+                await deleter.DeleteContributorAsync(appId, appContributorRemoved.ContributorId, default);
             }
         }
     }
 
     private async Task OnArchiveAsync(AppDeleted appArchived)
     {
-        using (Telemetry.Activities.StartActivity("RemoveAppFromSystem"))
+        using var activity = Telemetry.Activities.StartActivity("RemoveAppFromSystem");
+
+        // Bypass our normal app resolve process, so that we can also retrieve the deleted app.
+        var app = factory.Create<AppDomainObject>(appArchived.AppId.Id);
+
+        await app.EnsureLoadedAsync();
+
+        // If the app does not exist, the version is lower than zero.
+        if (app.Version < 0)
         {
-            // Bypass our normal app resolve process, so that we can also retrieve the deleted app.
-            var app = factory.Create<AppDomainObject>(appArchived.AppId.Id);
+            return;
+        }
 
-            await app.EnsureLoadedAsync();
-
-            // If the app does not exist, the version is lower than zero.
-            if (app.Version < 0)
+        foreach (var deleter in deleters)
+        {
+            using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
             {
-                return;
-            }
-
-            foreach (var deleter in deleters)
-            {
-                using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
-                {
-                    await deleter.DeleteAppAsync(app.Snapshot, default);
-                }
+                await deleter.DeleteAppAsync(app.Snapshot, default);
             }
         }
     }

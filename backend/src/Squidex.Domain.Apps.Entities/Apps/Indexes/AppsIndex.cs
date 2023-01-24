@@ -61,8 +61,10 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
     public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("AppsIndex/GetAppsForUserAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppsForUserAsync"))
         {
+            activity?.SetTag("userId", userId);
+
             var apps = await appRepository.QueryAllAsync(userId, permissions.ToAppNames(), ct);
 
             foreach (var app in apps.Where(IsValid))
@@ -77,8 +79,10 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
     public async Task<List<IAppEntity>> GetAppsForTeamAsync(DomainId teamId,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("AppsIndex/GetAppsForTeamAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppsForTeamAsync"))
         {
+            activity?.SetTag("teamId", teamId);
+
             var apps = await appRepository.QueryAllAsync(teamId, ct);
 
             foreach (var app in apps.Where(IsValid))
@@ -93,8 +97,10 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
     public async Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("AppsIndex/GetAppByNameAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppByNameAsync"))
         {
+            activity?.SetTag("appName", name);
+
             if (canCache)
             {
                 if (appCache.TryGetValue(GetCacheKey(name), out var v) && v is IAppEntity cacheApp)
@@ -122,8 +128,10 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
     public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("AppsIndex/GetAppAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppAsync"))
         {
+            activity?.SetTag("appId", appId);
+
             if (canCache)
             {
                 if (appCache.TryGetValue(GetCacheKey(appId), out var cached) && cached is IAppEntity cachedApp)

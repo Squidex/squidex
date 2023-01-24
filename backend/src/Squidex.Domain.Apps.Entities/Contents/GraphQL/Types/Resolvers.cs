@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using GraphQL;
+using GraphQL.Execution;
 using GraphQL.Resolvers;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Infrastructure;
@@ -21,22 +22,42 @@ public static class Resolvers
 {
     public static IFieldResolver Sync<TSource, T>(Func<TSource, T> resolver)
     {
-        return new FuncFieldResolver<TSource, T>(x => resolver(x.Source));
+        return new FuncFieldResolver<TSource, T>(c => resolver(c.Source));
     }
 
     public static IFieldResolver Sync<TSource, T>(Func<TSource, IResolveFieldContext, GraphQLExecutionContext, T> resolver)
     {
-        return new FuncFieldResolver<TSource, T>(x => resolver(x.Source, x, (GraphQLExecutionContext)x.UserContext));
+        return new FuncFieldResolver<TSource, T>(c => resolver(c.Source, c, (GraphQLExecutionContext)c.UserContext));
     }
 
     public static IFieldResolver Async<TSource, T>(Func<TSource, ValueTask<T?>> resolver)
     {
-        return new FuncFieldResolver<TSource, T>(x => resolver(x.Source));
+        return new FuncFieldResolver<TSource, T>(c => resolver(c.Source));
     }
 
     public static IFieldResolver Async<TSource, T>(Func<TSource, IResolveFieldContext, GraphQLExecutionContext, ValueTask<T?>> resolver)
     {
-        return new FuncFieldResolver<TSource, T>(x => resolver(x.Source, x, (GraphQLExecutionContext)x.UserContext));
+        return new FuncFieldResolver<TSource, T>(async c =>
+        {
+            using (var activity = Telemetry.Activities.StartActivity($"gql/{c.FieldDefinition.Name}"))
+            {
+                activity?.SetTag("/gql/fieldName", c.FieldDefinition.Name);
+                activity?.SetTag("/gql/fieldType", c.FieldDefinition.ResolvedType?.ToString());
+
+                if (activity != null && c.Arguments != null)
+                {
+                    foreach (var (key, value) in c.Arguments)
+                    {
+                        if (value.Source == ArgumentSource.Literal)
+                        {
+                            activity.SetTag($"arg/{key}", value);
+                        }
+                    }
+                }
+
+                return await resolver(c.Source, c, (GraphQLExecutionContext)c.UserContext);
+            }
+        });
     }
 
     public static IFieldResolver Command(string permissionId, Func<IResolveFieldContext, ICommand> action)

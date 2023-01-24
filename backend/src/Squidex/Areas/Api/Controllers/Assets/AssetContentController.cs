@@ -154,10 +154,7 @@ public sealed class AssetContentController : ApiController
 
                 if (request.Force)
                 {
-                    using (Telemetry.Activities.StartActivity("Resize"))
-                    {
-                        await ResizeAsync(asset, suffix, body, resizeOptions, true, ct);
-                    }
+                    await ResizeAsync(asset, suffix, body, resizeOptions, true, ct);
                 }
                 else
                 {
@@ -205,6 +202,9 @@ public sealed class AssetContentController : ApiController
 #pragma warning disable MA0040 // Flow the cancellation token
         using var activity = Telemetry.Activities.StartActivity("Resize");
 
+        activity?.SetTag("fileType", asset.MimeType);
+        activity?.SetTag("fileSize", asset.FileSize);
+
         await using var assetOriginal = new TempAssetFile(asset.FileName, asset.MimeType, 0);
         await using var assetResized = new TempAssetFile(asset.FileName, asset.MimeType, 0);
 
@@ -216,7 +216,7 @@ public sealed class AssetContentController : ApiController
             }
         }
 
-        using (Telemetry.Activities.StartActivity("Resize"))
+        using (Telemetry.Activities.StartActivity("Compute"))
         {
             try
             {

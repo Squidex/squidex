@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -46,8 +47,11 @@ public sealed class ContentQueryService : IContentQueryService
     {
         Guard.NotNull(context);
 
-        using (Telemetry.Activities.StartActivity("ContentQueryService/FindAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("ContentQueryService/FindAsync"))
         {
+            activity?.SetTag("schemaName", schemaIdOrName);
+            activity?.SetTag("contentId", id);
+
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
 
             IContentEntity? content;
@@ -80,8 +84,10 @@ public sealed class ContentQueryService : IContentQueryService
     {
         Guard.NotNull(context);
 
-        using (Telemetry.Activities.StartActivity("ContentQueryService/QueryAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("ContentQueryService/QueryAsync"))
         {
+            activity?.SetTag("schemaName", schemaIdOrName);
+
             if (q == null)
             {
                 return ResultList.Empty<IEnrichedContentEntity>();

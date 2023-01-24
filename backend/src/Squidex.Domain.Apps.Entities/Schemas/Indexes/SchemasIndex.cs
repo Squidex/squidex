@@ -13,6 +13,8 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes;
 
@@ -34,8 +36,10 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
     public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemasAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("SchemasIndex/GetSchemasAsync"))
         {
+            activity?.SetTag("appId", appId);
+
             var schemas = await schemaRepository.QueryAllAsync(appId, ct);
 
             foreach (var schema in schemas.Where(IsValid))
@@ -50,8 +54,11 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
     public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaByNameAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaByNameAsync"))
         {
+            activity?.SetTag("appId", appId);
+            activity?.SetTag("schemaName", name);
+
             var cacheKey = GetCacheKey(appId, name);
 
             if (canCache)
@@ -81,8 +88,11 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
     public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache,
         CancellationToken ct = default)
     {
-        using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaAsync"))
         {
+            activity?.SetTag("appId", appId);
+            activity?.SetTag("schemaId", id);
+
             var cacheKey = GetCacheKey(appId, id);
 
             if (canCache)
