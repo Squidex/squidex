@@ -29,7 +29,7 @@ pipeline {
     string(name: 'dbname', description: 'The current mongodb to use (like: homer-squidex-staging or homer-squidex-staging-v2upgrade)', defaultValue: 'none')
     choice(name: 'cluster', choices: ['staging', 'production'], description: 'The Kubernetes Cluster to deploy to') //The names don't quite match but we handle it in a map
     choice(name: 'namespace', choices: ['content-v2', 'content-v1'], description: 'The environment to deploy squidex to')
-    choice(name: 'logging-level', choices: ['warning', 'informational', 'debug'], description: 'Logging level to set Squidex to')
+    choice(name: 'logginglevel', choices: ['warning', 'informational', 'debug'], description: 'Logging level to set Squidex to')
    }
   stages {
     stage('Checkout') {
@@ -81,7 +81,7 @@ pipeline {
         script {
           replicas = 1 //Initially the deployment should just be a single pod
           mongoLogin = sh(returnStdout: true, script:"aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region=us-east-1 | jq -r '.\"${environment}_${namespace}_login\"'").trim()
-          helmArgs = "--set loggingLevel=${params.logging-level} --set replicaCount=${replicas} --set imageTag=${tag} --set version=${squidex_version} --set mongoconnectionstring=${mongoLogin} --set mongourl=${mongo_url}"
+          helmArgs = "--set loggingLevel=${params.logginglevel} --set replicaCount=${replicas} --set imageTag=${tag} --set version=${squidex_version} --set mongoconnectionstring=${mongoLogin} --set mongourl=${mongo_url}"
           homerKubernetes.processConfigData(helm_data_file, namespace, cluster, helmArgs, "./squidex")
         }
       }
