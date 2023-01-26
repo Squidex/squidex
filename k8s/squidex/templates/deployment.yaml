@@ -73,8 +73,12 @@ spec:
               value: "52428800"
             - name: LOGGING__HUMAN
               value: "false"
-            - name: ORLEANS__CLUSTERING
-              value: "MongoDB"
+            - name: LOGGING__LEVEL
+              value: {{ .Values.loggingLevel }}
+            - name: IDENTITY__PRIVACYURL
+              value: "https://squidex.io/privacy"
+            - name: IDENTITY__SHOWPII
+              value: "true"
             - name: EVENTSTORE__MONGODB__CONFIGURATION
               valueFrom:
                 configMapKeyRef:
