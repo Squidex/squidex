@@ -38,6 +38,8 @@
     </div>
     <div class="col">
         <form id="pictureForm" class="profile-picture-form" asp-controller="Profile" asp-action="UploadPicture" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
             <span class="btn btn-secondary" id="pictureButton">
                 <span>@T.Get("users.profile.uploadPicture")</span>
 
@@ -48,6 +50,8 @@
 </div>
 
 <form class="profile-form profile-section" asp-controller="Profile" asp-action="UpdateProfile" method="post">
+    @Html.AntiForgeryToken()
+
     <div class="form-group">
         <label for="email">@T.Get("common.email")</label>
 
@@ -101,6 +105,8 @@
                         @if (Model!.ExternalLogins.Count > 1 || Model!.HasPassword)
                         {
                             <form asp-controller="Profile" asp-action="RemoveLogin" method="post">
+                                @Html.AntiForgeryToken()
+
                                 <input type="hidden" value="@login.LoginProvider" name="LoginProvider" />
                                 <input type="hidden" value="@login.ProviderKey" name="ProviderKey" />
 
@@ -115,6 +121,8 @@
         </table>
 
         <form asp-controller="Profile" asp-action="AddLogin" method="post">
+            @Html.AntiForgeryToken()
+
             @foreach (var provider in Model!.ExternalProviders.Where(x => Model!.ExternalLogins.All(y => x.AuthenticationScheme != y.LoginProvider)))
             {
                 var schema = provider.AuthenticationScheme.ToLowerInvariant();
@@ -134,9 +142,11 @@
     <div class="profile-section">
         <h2>@T.Get("users.profile.passwordTitle")</h2>
 
-       @if (Model!.HasPassword)
+        @if (Model!.HasPassword)
         {
             <form class="profile-form" asp-controller="Profile" asp-action="ChangePassword" method="post">
+                @Html.AntiForgeryToken()
+
                 <div class="form-group">
                     <label for="oldPassword">@T.Get("common.oldPassword")</label>
 
@@ -169,6 +179,8 @@
         else
         {
             <form class="profile-form" asp-controller="Profile" asp-action="SetPassword" method="post">
+                @Html.AntiForgeryToken()
+
                 <div class="form-group">
                     <label for="password">@T.Get("common.password")</label>
 
@@ -217,6 +229,8 @@
             <label for="generate">&nbsp;</label>
 
             <form class="profile-form" asp-controller="Profile" asp-action="GenerateClientSecret" method="post">
+                @Html.AntiForgeryToken()
+
                 <button type="submit" class="btn btn-success btn-block" id="generate">@T.Get("users.profile.generateClient")</button>
             </form>
         </div>
@@ -231,6 +245,8 @@
     <small class="form-text text-muted mt-2 mb-2">@T.Get("users.profile.propertiesHint")</small>
 
     <form class="profile-form" asp-controller="Profile" asp-action="UpdateProperties" method="post">
+        @Html.AntiForgeryToken()
+
         <div class="mb-2" id="properties">
             @for (var i = 0; i < Model!.Properties.Count; i++)
             {

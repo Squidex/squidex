@@ -82,7 +82,7 @@
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.statusColor">
         <ng-container *ngIf="content.newStatus; else singleStatus">
-            <span class="text-nowrap">
+            <span class="text-nowrap truncate">
                 <sqx-content-status
                     [status]="content.status"
                     [statusColor]="content.statusColor">

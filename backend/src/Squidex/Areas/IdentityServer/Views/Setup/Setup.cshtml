@@ -160,6 +160,8 @@
         }
 
         <form class="profile-form" asp-controller="Setup" asp-action="Setup" method="post">
+            @Html.AntiForgeryToken()
+
             <div class="form-group">
                 <label for="email">@T.Get("common.email")</label>
 

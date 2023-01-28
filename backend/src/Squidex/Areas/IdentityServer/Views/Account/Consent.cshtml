@@ -12,6 +12,8 @@
 }
 
 <form asp-controller="Account" asp-action="Consent" asp-route-returnurl="@Model!.ReturnUrl" method="post">
+    @Html.AntiForgeryToken()
+
     <h2>@T.Get("users.consent.headline")</h2>
         
     <label for="consentToAutomatedEmails">

@@ -19,6 +19,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account;
 
+[AutoValidateAntiforgeryToken]
 public sealed class AccountController : IdentityServerController
 {
     private readonly IUserService userService;

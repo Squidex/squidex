@@ -36,7 +36,7 @@ export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | 
         case META_FIELDS.statusNext:
             return 240;
         case META_FIELDS.statusColor:
-            return 50;
+            return 80;
         case META_FIELDS.version:
             return 80;
         default:

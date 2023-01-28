@@ -25,6 +25,7 @@ using Squidex.Web;
 namespace Squidex.Areas.IdentityServer.Controllers.Profile;
 
 [Authorize]
+[AutoValidateAntiforgeryToken]
 public sealed class ProfileController : IdentityServerController
 {
     private readonly IUserPictureStore userPictureStore;

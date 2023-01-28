@@ -31,6 +31,8 @@
     </div>
 
     <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model!.ReturnUrl" method="post">
+        @Html.AntiForgeryToken()
+
         @foreach (var provider in Model!.ExternalProviders)
         {
             var schema = provider.AuthenticationScheme.ToLowerInvariant();
@@ -60,6 +62,8 @@
             }
 
             <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl" method="post">
+                @Html.AntiForgeryToken()
+
                 <div class="form-group">
                     <input type="email" class="form-control" name="email" id="email" placeholder="@T.Get("users.login.emailPlaceholder")" />
                 </div>

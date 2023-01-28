@@ -21,6 +21,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Setup;
 
+[AutoValidateAntiforgeryToken]
 public class SetupController : IdentityServerController
 {
     private readonly IAssetStore assetStore;
