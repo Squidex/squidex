@@ -35,9 +35,6 @@ public static class WebServices
         services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
             .AsSelf();
 
-        services.AddSingletonAs<GraphQLRunner>()
-            .AsSelf();
-
         services.AddSingletonAs<FileCallbackResultExecutor>()
             .AsSelf();
 
