@@ -22,15 +22,17 @@ namespace Squidex.Areas.Api.Controllers.Contents;
 public sealed class ContentsSharedController : ApiController
 {
     private readonly IContentQueryService contentQuery;
-    private readonly IContentWorkflow contentWorkflow;
+    private readonly IContentWorkflow contentWorkflow; private readonly GraphQLRunner graphQLRunner;
 
     public ContentsSharedController(ICommandBus commandBus,
         IContentQueryService contentQuery,
-        IContentWorkflow contentWorkflow)
+        IContentWorkflow contentWorkflow,
+        GraphQLRunner graphQLRunner)
         : base(commandBus)
     {
         this.contentQuery = contentQuery;
         this.contentWorkflow = contentWorkflow;
+        this.graphQLRunner = graphQLRunner;
     }
 
     /// <summary>
@@ -46,14 +48,9 @@ public sealed class ContentsSharedController : ApiController
     [Route("content/{app}/graphql/batch")]
     [ApiPermissionOrAnonymous]
     [ApiCosts(2)]
-    public IActionResult GetGraphQL(string app)
+    public Task GetGraphQL(string app)
     {
-        var options = new GraphQLHttpMiddlewareOptions
-        {
-            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
-        };
-
-        return new GraphQLExecutionActionResult<DummySchema>(options);
+        return graphQLRunner.InvokeAsync(HttpContext);
     }
 
     /// <summary>

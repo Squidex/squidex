@@ -207,6 +207,7 @@ public sealed class AccountController : IdentityServerController
 
     [HttpPost]
     [Route("account/external/")]
+    [IgnoreAntiforgeryToken]
     public IActionResult External(string provider, string? returnUrl = null)
     {
         var challengeRedirectUrl = Url.Action(nameof(ExternalCallback), new { returnUrl });

@@ -17,6 +17,7 @@ using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Pipeline.Plugins;
@@ -32,6 +33,9 @@ public static class WebServices
     public static void AddSquidexMvcWithPlugins(this IServiceCollection services, IConfiguration config)
     {
         services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
+            .AsSelf();
+
+        services.AddSingletonAs<GraphQLRunner>()
             .AsSelf();
 
         services.AddSingletonAs<FileCallbackResultExecutor>()
