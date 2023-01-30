@@ -61,6 +61,28 @@ public class CachingFilterTests
         Assert.Equal(304, ((StatusCodeResult)executedContext.Result!).StatusCode);
     }
 
+    [Theory]
+    [InlineData("13", "13")]
+    [InlineData("13", "W/13")]
+    [InlineData("W/13", "13")]
+    [InlineData("W/13", "W/13")]
+    public async Task Should_not_return_304_for_same_etags_when_disabled_via_metadata(string ifNoneMatch, string etag)
+    {
+        executingContext.ActionDescriptor.EndpointMetadata = new List<object>
+        {
+            new IgnoreCacheFilterAttribute()
+        };
+
+        httpContext.Request.Method = HttpMethods.Get;
+        httpContext.Request.Headers[HeaderNames.IfNoneMatch] = ifNoneMatch;
+
+        httpContext.Response.Headers[HeaderNames.ETag] = etag;
+
+        await sut.OnActionExecutionAsync(executingContext, Next());
+
+        Assert.Equal(200, ((StatusCodeResult)executedContext.Result!).StatusCode);
+    }
+
     [Fact]
     public async Task Should_return_304_for_same_etags_from_cache_manager()
     {

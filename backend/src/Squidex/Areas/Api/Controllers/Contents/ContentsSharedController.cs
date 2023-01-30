@@ -15,6 +15,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
 using Squidex.Web.GraphQL;
+using Squidex.Web.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Contents;
 
@@ -46,7 +47,7 @@ public sealed class ContentsSharedController : ApiController
     [Route("content/{app}/graphql/batch")]
     [ApiPermissionOrAnonymous]
     [ApiCosts(2)]
-    [IgnoreCac]
+    [IgnoreCacheFilter]
     public IActionResult GetGraphQL(string app)
     {
         var options = new GraphQLHttpMiddlewareOptions

@@ -7,6 +7,7 @@
 
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
+using System.Net.Http.Json;
 using TestSuite.Model;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -223,5 +224,40 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Order();
 
         Assert.Equal(new[] { "Sachsen" }, stateNames);
+    }
+
+    [Fact]
+    public async Task Should_return_correct_vary_headers()
+    {
+        var query = new
+        {
+            query = @"
+                {
+                    cities: queryCitiesContents {
+                        states: referencingStatesContents(filter: ""data/name/iv eq 'Sachsen'"") {
+                            data: flatData {
+                                name
+                            }
+                        }
+                    }
+                }"
+        };
+
+        var rawClient = _.ClientManager.CreateHttpClient();
+
+        var response = await rawClient.PostAsJsonAsync($"/api/content/{_.AppName}/graphql", query);
+
+        Assert.Equal(new string[]
+        {
+            "Auth-State",
+            "X-Flatten",
+            "X-Languages",
+            "X-NoCleanup",
+            "X-NoEnrichment",
+            "X-NoResolveLanguages",
+            "X-Resolve-Urls",
+            "X-ResolveFlow",
+            "X-Unpublished"
+        }, response.Headers.Vary.Order().ToArray());
     }
 }
