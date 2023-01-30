@@ -59,6 +59,8 @@ public sealed class MyIdentityOptions
 
     public bool OidcGetClaimsFromUserInfoEndpoint { get; set; }
 
+    public bool OidcOverridePermissionsWithCustomClaimsOnLogin { get; set; }
+
     public bool AdminRecreate { get; set; }
 
     public bool AllowPasswordAuth { get; set; }
