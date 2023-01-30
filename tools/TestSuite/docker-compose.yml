@@ -100,7 +100,7 @@ services:
       - internal
 
   squidex_proxy1:
-    image: squidex/caddy-proxy
+    image: squidex/caddy-proxy:2.6.2
     ports:
       - "8080:8080"
     environment:
@@ -114,7 +114,7 @@ services:
     restart: unless-stopped
 
   squidex_proxy2:
-    image: squidex/caddy-proxy-path
+    image: squidex/caddy-proxy-path:2.6.2
     ports:
       - "8081:8081"
     environment:
@@ -128,7 +128,7 @@ services:
     restart: unless-stopped
 
   squidex_proxy3:
-    image: squidex/caddy-proxy-path
+    image: squidex/caddy-proxy-path:2.6.2
     ports:
       - "8082:8082"
     environment:
