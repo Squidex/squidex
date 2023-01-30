@@ -7,6 +7,7 @@
 
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
+using Squidex.ClientLibrary.Utils;
 using System.Net.Http.Json;
 using TestSuite.Model;
 
@@ -227,25 +228,43 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
     }
 
     [Fact]
+    public async Task Should_query_correct_content_type_for_graphql()
+    {
+        var query = new
+        {
+            query = @"
+                {
+                    queryCitiesContents {
+                        id
+                    }
+                }"
+        };
+
+        var httpClient = _.ClientManager.CreateHttpClient();
+
+        // Create the request manually to check the content type.
+        var response = await httpClient.PostAsync(_.ClientManager.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent());
+
+        Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+    }
+
+    [Fact]
     public async Task Should_return_correct_vary_headers()
     {
         var query = new
         {
             query = @"
                 {
-                    cities: queryCitiesContents {
-                        states: referencingStatesContents(filter: ""data/name/iv eq 'Sachsen'"") {
-                            data: flatData {
-                                name
-                            }
-                        }
+                    queryCitiesContents {
+                        id
                     }
                 }"
         };
 
-        var rawClient = _.ClientManager.CreateHttpClient();
+        var httpClient = _.ClientManager.CreateHttpClient();
 
-        var response = await rawClient.PostAsJsonAsync($"/api/content/{_.AppName}/graphql", query);
+        // Create the request manually to check the headers.
+        var response = await httpClient.PostAsJsonAsync($"api/content/{_.AppName}/graphql", query);
 
         Assert.Equal(new string[]
         {

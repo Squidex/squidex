@@ -218,18 +218,17 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
     {
         var url = $"{_.ClientManager.GenerateImageUrl(imageId)}?width={width}&height={height}";
 
-        using (var httpClient = _.ClientManager.CreateHttpClient())
+        var httpClient = _.ClientManager.CreateHttpClient();
+
+        var response = await httpClient.GetAsync(url);
+
+        await using (var stream = await response.Content.ReadAsStreamAsync())
         {
-            var response = await httpClient.GetAsync(url);
+            var buffer = new MemoryStream();
 
-            await using (var stream = await response.Content.ReadAsStreamAsync())
-            {
-                var buffer = new MemoryStream();
+            await stream.CopyToAsync(buffer);
 
-                await stream.CopyToAsync(buffer);
-
-                return buffer.Length;
-            }
+            return buffer.Length;
         }
     }
 
@@ -237,18 +236,17 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
     {
         var url = $"{_.ClientManager.GenerateImageUrl(imageId)}?format={format}";
 
-        using (var httpClient = _.ClientManager.CreateHttpClient())
+        var httpClient = _.ClientManager.CreateHttpClient();
+
+        var response = await httpClient.GetAsync(url);
+
+        await using (var stream = await response.Content.ReadAsStreamAsync())
         {
-            var response = await httpClient.GetAsync(url);
+            var buffer = new MemoryStream();
 
-            await using (var stream = await response.Content.ReadAsStreamAsync())
-            {
-                var buffer = new MemoryStream();
+            await stream.CopyToAsync(buffer);
 
-                await stream.CopyToAsync(buffer);
-
-                return (buffer.Length, response.Content.Headers.ContentType.ToString());
-            }
+            return (buffer.Length, response.Content.Headers.ContentType.ToString());
         }
     }
 }

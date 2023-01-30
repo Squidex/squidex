@@ -115,16 +115,15 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
     {
         var url = $"{_.ClientManager.Options.Url}api/content/{_.AppName}/{_.SchemaName}/{id}";
 
-        using (var httpClient = _.ClientManager.CreateHttpClient())
+        var httpClient = _.ClientManager.CreateHttpClient();
+
+        foreach (var (key, value) in headers)
         {
-            foreach (var (key, value) in headers)
-            {
-                httpClient.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
-            }
-
-            var response = await httpClient.GetAsync(url);
-
-            return (response.Headers.GetValues("ETag").FirstOrDefault(), response.Headers.Vary.ToString());
+            httpClient.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
         }
+
+        var response = await httpClient.GetAsync(url);
+
+        return (response.Headers.GetValues("ETag").FirstOrDefault(), response.Headers.Vary.ToString());
     }
 }
