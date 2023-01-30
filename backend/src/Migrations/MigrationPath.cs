@@ -70,8 +70,8 @@ public sealed class MigrationPath : IMigrationPath
 
             // Version 12: Introduce roles.
             // Version 24: Improve a naming in the languages config.
-            // Version 26: Introduce full deletion.
-            if (version < 26)
+            // Version 25: Introduce full deletion.
+            if (version < 25)
             {
                 yield return serviceProvider.GetRequiredService<RebuildApps>();
                 yield return serviceProvider.GetRequiredService<RebuildSchemas>();
