@@ -25,17 +25,21 @@ public sealed class CachingFilter : IAsyncActionFilter
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var httpContext = context.HttpContext;
+        if (IgnoreFilter(context))
+        {
+            await next();
+            return;
+        }
 
-        cachingManager.Start(httpContext);
+        cachingManager.Start(context.HttpContext);
 
         var resultContext = await next();
 
-        cachingManager.Finish(httpContext);
+        cachingManager.Finish(context.HttpContext);
 
-        if (httpContext.Response.HasStarted == false &&
-            httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag) &&
-            IsCacheable(httpContext, etag))
+        if (context.HttpContext.Response.HasStarted == false &&
+            context.HttpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag) &&
+            IsCacheable(context.HttpContext, etag))
         {
             resultContext.Result = new StatusCodeResult(304);
         }
@@ -54,5 +58,10 @@ public sealed class CachingFilter : IAsyncActionFilter
         }
 
         return ETagUtils.IsSameEtag(noneMatchValue, etag);
+    }
+
+    private static bool IgnoreFilter(ActionExecutingContext context)
+    {
+        return context.ActionDescriptor.EndpointMetadata.Any(x => x is IgnoreCacheFilterAttribute);
     }
 }

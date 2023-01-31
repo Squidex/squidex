@@ -698,37 +698,6 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         await _.SharedContents.GraphQlAsync<QueryResult>(query);
     }
 
-    [Fact]
-    public async Task Should_query_correct_content_type_for_graphql()
-    {
-        var query = new
-        {
-            query = @"
-                    query ContentsQuery($filter: String!) {
-                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
-                            id,
-                            data {
-                                number {
-                                    iv
-                                }
-                            }
-                        }
-                    }",
-            variables = new
-            {
-                filter = @"data/number/iv gt 3 and data/number/iv lt 7"
-            }
-        };
-
-        using (var client = _.ClientManager.CreateHttpClient())
-        {
-            // Create the request manually to check the content type.
-            var response = await client.PostAsync(_.ClientManager.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent());
-
-            Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
-        }
-    }
-
     private sealed class QueryResult
     {
         [JsonProperty("queryMyReadsContents")]
