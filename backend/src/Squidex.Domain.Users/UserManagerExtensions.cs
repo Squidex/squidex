@@ -117,11 +117,11 @@ internal static class UserManagerExtensions
 
         if (values.Properties != null)
         {
-            RemoveClaims(x => x.Type.StartsWith(SquidexClaimTypes.CustomPrefix, StringComparison.OrdinalIgnoreCase));
+            RemoveClaims(x => x.Type.StartsWith(SquidexClaimTypes.Custom, StringComparison.OrdinalIgnoreCase));
 
             foreach (var (name, value) in values.Properties)
             {
-                AddClaim($"{SquidexClaimTypes.CustomPrefix}:{name}", value);
+                AddClaim(SquidexClaimTypes.Custom, $"{name}={value}");
             }
         }
 

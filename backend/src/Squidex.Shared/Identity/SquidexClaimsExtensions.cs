@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Shared.Identity
@@ -17,6 +18,9 @@ namespace Squidex.Shared.Identity
     public static class SquidexClaimsExtensions
     {
         private const string ClientPrefix = "client_";
+
+        private static readonly Regex KeyValueAppClaim = new Regex("(?<App>[\\S]+),(?<Key>[^=]+)=(?<Value>.+)", RegexOptions.Compiled);
+        private static readonly Regex KeyValueClaim = new Regex("(?<Key>[^=]+)=(?<Value>.+)", RegexOptions.Compiled);
 
         public static PermissionSet Permissions(this IEnumerable<Claim> user)
         {
@@ -106,7 +110,7 @@ namespace Squidex.Shared.Identity
 
         public static IEnumerable<(string Name, string Value)> GetCustomProperties(this IEnumerable<Claim> user)
         {
-            var prefix = SquidexClaimTypes.CustomPrefix;
+            var prefix = $"{SquidexClaimTypes.Custom}:";
 
             foreach (var claim in user)
             {
@@ -114,16 +118,25 @@ namespace Squidex.Shared.Identity
 
                 if (type.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    var name = type[(prefix.Length + 1)..].ToString();
+                    var name = type[prefix.Length..].ToString();
 
-                    yield return (name, claim.Value);
+                    yield return (name.Trim(), claim.Value.Trim());
+                }
+                else if (type.Equals(SquidexClaimTypes.Custom, StringComparison.OrdinalIgnoreCase))
+                {
+                    var match = KeyValueClaim.Match(claim.Value);
+
+                    if (match.Success)
+                    {
+                        yield return (match.Groups["Key"].Value.Trim(), match.Groups["Value"].Value.Trim());
+                    }
                 }
             }
         }
 
         public static IEnumerable<(string Name, string Value)> GetUIProperties(this IEnumerable<Claim> user, string app)
         {
-            var prefix = $"{SquidexClaimTypes.UIPrefix}:{app}";
+            var prefix = $"{SquidexClaimTypes.UIProperty}:{app}:";
 
             foreach (var claim in user)
             {
@@ -131,9 +144,23 @@ namespace Squidex.Shared.Identity
 
                 if (type.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    var name = type[(prefix.Length + 1)..].ToString();
+                    var name = type[prefix.Length..].ToString();
 
-                    yield return (name, claim.Value);
+                    yield return (name.Trim(), claim.Value.Trim());
+                }
+                else if (type.Equals(SquidexClaimTypes.UIProperty, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!claim.Value.StartsWith(app, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var match = KeyValueAppClaim.Match(claim.Value);
+
+                    if (match.Success)
+                    {
+                        yield return (match.Groups["Key"].Value.Trim(), match.Groups["Value"].Value.Trim());
+                    }
                 }
             }
         }

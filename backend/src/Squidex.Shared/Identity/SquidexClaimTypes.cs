@@ -15,7 +15,7 @@ namespace Squidex.Shared.Identity
 
         public const string ConsentForEmails = "urn:squidex:consent:emails";
 
-        public const string CustomPrefix = "urn:squidex:custom";
+        public const string Custom = "urn:squidex:custom";
 
         public const string DisplayName = "urn:squidex:name";
 
@@ -33,6 +33,6 @@ namespace Squidex.Shared.Identity
 
         public const string TotalApps = "urn:squidex:internal:totalApps";
 
-        public const string UIPrefix = "urn:squidex:custom";
+        public const string UIProperty = "urn:squidex:ui";
     }
 }
