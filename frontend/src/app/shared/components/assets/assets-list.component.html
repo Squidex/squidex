@@ -44,7 +44,6 @@
                     cdkDrag
                     [cdkDragData]="assetFolder"
                     [cdkDragDisabled]="isDisabled || !assetFolder.canMove"
-                    [isDisabled]="isDisabled"
                     (navigate)="assetsState.navigate($event.id)" (delete)="deleteAssetFolder($event)">
                 </sqx-asset-folder>
             </div>
