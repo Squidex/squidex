@@ -32,7 +32,6 @@ public sealed class CommentsController : ApiController
         : base(commandBus)
     {
         this.commentsLoader = commentsLoader;
-
         this.watchingService = watchingService;
     }
 

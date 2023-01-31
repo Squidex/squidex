@@ -20,7 +20,7 @@ public sealed class WatchingService : IWatchingService
     {
         private static readonly Duration Timeout = Duration.FromMinutes(1);
 
-        public Dictionary<string, Instant> Users { get; } = new Dictionary<string, Instant>();
+        public Dictionary<string, Instant> Users { get; set; } = new Dictionary<string, Instant>();
 
         public (bool, string[]) Add(string watcherId, IClock clock)
         {
