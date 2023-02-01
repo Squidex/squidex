@@ -99,7 +99,7 @@ jobs:
       - name: Publish - Check Tag
         id: normal-version
         run: |
-          if [[ ${{ env.GITHUB_REF_SLUG }} =~ ^[0-9]+\.[0-9]+$ ]]; then
+          if [[ ${{ env.GITHUB_REF_SLUG }} =~ ^[0-9]+\.[0-9]+(\.[0-9]+){0,2}$ ]]; then
               echo "STABLE_VERSION=true" >> $GITHUB_ENV
           fi
 
@@ -117,13 +117,13 @@ jobs:
     
       - name: Publish - Push Tags
         run: |
-          docker tag squidex-local squidex/squidex:${{ env.GITHUB_REF_SLUG }}
-          docker tag squidex-local squidex/squidex:${{ steps.version.outputs._0 }}
+          docker push squidex/squidex:${{ env.GITHUB_REF_SLUG }}
+          docker push squidex/squidex:${{ steps.version.outputs._0 }}
     
-      - name: Publish - Push Latest
+      - name: Publish - Push Tags Latest
         if: env.STABLE_VERSION == 'true'
         run: |
-          docker tag squidex-local squidex/squidex:latest
+          docker push squidex/squidex:latest
 
       - name: Release - Make directories
         run: sudo mkdir /build /release
