@@ -116,11 +116,14 @@ jobs:
           docker tag squidex-local squidex/squidex:${{ steps.version.outputs._0 }}
     
       - name: Publish - Push Tags
+        run: |
+          docker tag squidex-local squidex/squidex:${{ env.GITHUB_REF_SLUG }}
+          docker tag squidex-local squidex/squidex:${{ steps.version.outputs._0 }}
+    
+      - name: Publish - Push Latest
         if: env.STABLE_VERSION == 'true'
         run: |
           docker tag squidex-local squidex/squidex:latest
-          docker tag squidex-local squidex/squidex:${{ env.GITHUB_REF_SLUG }}
-          docker tag squidex-local squidex/squidex:${{ steps.version.outputs._0 }}
 
       - name: Release - Make directories
         run: sudo mkdir /build /release
