@@ -4,7 +4,56 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [7.3.0] - 2022-18-11
+## [7.4.0] - 2023-02-01
+
+### Fixed
+
+* **Comments**: Fixes the small component, that shows who is currently visiting the page.
+* **Contents**: Do not cancel count query when the count is calculated in the background.
+* **General**: Fixes a race condition in the caching manager.
+* **Scripting**: Fixed a minor bug in scripting when override content.
+* **UI**: Several styling fixes.
+
+### Changed
+
+* **Assets**: Do not show the asset folder icon in the normal view (only when searching).
+* **Contents**: Also respect timeout when parsing queries.
+* **Contents**: Eliminate stop words before searching.
+* **Contents**: Fixes to OpenAPI type mapping.
+* **Contents**: Show a big alert when viewing a deleted content item in the UI.
+* **Contents**: Show a summary line for components.
+* **Identity**: Improve how custom claims are resolved.
+* **Monitoring**: Improved the open telemetry span tracking and added new fields like app name and schema name.
+* **Monitoring**: Update of stackdriver monitoring.
+* **Scripting**: Update of Jint scripting engine.
+* **Tests**: Severall improvements to improve stability of tests.
+* **UI**: Simplified the permission form.
+* **UI**: Update of angular to version 15.
+
+### Added
+
+* **Assets**: Added a link to the asset dialog to show all referenced content items.
+* **Assets**: Added scripting to asset queries.
+* **Assets**: Easier option to move an asset to a folder via the asset dialog.
+* **Assets**: New permission for asset folders.
+* **General**: Added portugesian translation.
+* **GraphQL**: Added open telemetry to all asynchronous resolvers.
+* **Identity**: Added an option to override all claims on login, e.g. when using a third party identity provider.
+* **Monitoring**: Added zipkin support for OTLP.
+* **UI**: Add access token to preview URL.
+* **UI**: Collapsible fields in schema editor.
+* **UI**: Option to change the name of a schema category.
+* **UI**: Several improvements for smaller screens with new layout.
+* **UI**: Show a dialog when loading an old file, because the angular UI was updated in the background.
+* **UI**: Typescript definitions for editor SDK.
+
+### Security
+
+* **Identity**: Add anti forgery tokens to all login and profile pages to prevent CSRF attacks.
+* **UI**: Correctly encode HTML entities in markddown rendering to avoid HTML injection.
+* **UI**: Correctly encode HTML entities in the rendering of the Squid graphics.
+
+## [7.3.0] - 2022-20-11
 
 This version is all about the Update to .NET 7. If you host Squidex with Containers, e.g. with Docker Compose, Kubernetes or Managed Containers nothing changes. But if you host Squidex yourself in IIS or Linux, you have to ensure that you use the latest runtime.
 
