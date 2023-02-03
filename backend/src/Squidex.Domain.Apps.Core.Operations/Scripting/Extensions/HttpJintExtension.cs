@@ -53,7 +53,7 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
         describe(JsonType.Function, "patchJSON(url, body, callback, headers?)",
             Resources.ScriptingPatchJson);
 
-        describe(JsonType.Function, "deleteJSON(url, body, callback, headers?)",
+        describe(JsonType.Function, "deleteJSON(url, callback, headers?)",
             Resources.ScriptingDeleteJson);
     }
 
@@ -81,11 +81,6 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
     {
         context.Schedule(async (scheduler, ct) =>
         {
-            if (callback == null)
-            {
-                throw new JavaScriptException("Callback cannot be null.");
-            }
-
             if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
             {
                 throw new JavaScriptException("URL is not valid.");
@@ -100,7 +95,10 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
 
             var responseObject = await ParseResponseasync(context, response, ct);
 
-            scheduler.Run(callback, responseObject);
+            if (callback != null)
+            {
+                scheduler.Run(callback, responseObject);
+            }
         });
     }
 

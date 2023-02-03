@@ -140,23 +140,29 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
 
     void IScheduler.Run(Action? action)
     {
-        if (IsCompleted || action == null)
+        lock (Engine)
         {
-            return;
-        }
+            if (IsCompleted || action == null)
+            {
+                return;
+            }
 
-        Engine.ResetConstraints();
-        action();
+            Engine.ResetConstraints();
+            action();
+        }
     }
 
     void IScheduler.Run<TArg>(Action<TArg>? action, TArg argument)
     {
-        if (IsCompleted || action == null)
+        lock (Engine)
         {
-            return;
-        }
+            if (IsCompleted || action == null)
+            {
+                return;
+            }
 
-        Engine.ResetConstraints();
-        action(argument);
+            Engine.ResetConstraints();
+            action(argument);
+        }
     }
 }

@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
@@ -47,6 +48,7 @@ public static class SerializationServices
         options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new GeoJsonConverterFactory());
         options.Converters.Add(new PolymorphicConverter<IEvent>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<EnrichedEvent>(typeRegistry));
         options.Converters.Add(new PolymorphicConverter<FieldProperties>(typeRegistry));
         options.Converters.Add(new PolymorphicConverter<FieldPropertiesDto>(typeRegistry));
         options.Converters.Add(new PolymorphicConverter<RuleAction>(typeRegistry));
@@ -94,6 +96,9 @@ public static class SerializationServices
 
         services.AddSingleton<ITypeProvider>(
             new AssemblyTypeProvider<RuleTriggerDto>("triggerType"));
+
+        services.AddSingleton<ITypeProvider>(
+            new AssemblyTypeProvider<EnrichedEvent>());
 
         services.AddSingletonAs<FieldTypeProvider>()
             .As<ITypeProvider>();

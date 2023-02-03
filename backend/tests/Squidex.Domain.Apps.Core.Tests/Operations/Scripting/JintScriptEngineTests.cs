@@ -7,6 +7,7 @@
 
 using System.Net;
 using System.Security.Claims;
+using Jint.Native;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
@@ -39,7 +40,8 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
             new DateTimeJintExtension(),
             new HttpJintExtension(httpClientFactory),
             new StringJintExtension(),
-            new StringWordsJintExtension()
+            new StringWordsJintExtension(),
+            new AsyncExtension(),
         };
 
         var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
@@ -59,6 +61,23 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 TimeoutExecution = TimeSpan.FromSeconds(10)
             }),
             extensions);
+    }
+
+    private sealed class AsyncExtension : IJintExtension
+    {
+        private delegate void Delay(Action callback);
+
+        public void ExtendAsync(ScriptExecutionContext context)
+        {
+            context.Engine.SetValue("setTimeout", new Delay(callback =>
+            {
+                context.Schedule(async (scheduler, ct) =>
+                {
+                    await Task.Delay(5, ct);
+                    scheduler.Run(callback);
+                });
+            }));
+        }
     }
 
     [Fact]
@@ -597,5 +616,28 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         var actual = await sut.TransformAsync(vars2, script2, new ScriptOptions { AsContext = true });
 
         Assert.Equal(JsonValue.Create(28), actual["test"]!["iv"]);
+    }
+
+    [Fact]
+    public async Task Should_not_run_callbacks_in_parallel()
+    {
+        var vars = new DataScriptVars
+        {
+            ["value"] = 13
+        };
+
+        const string script1 = @"
+                var x = ctx.value;
+                for (var i = 0; i < 100; i++) {
+                    setTimeout(function () {
+                        x++;
+                        ctx.shared = x;
+                    });
+                }
+            ";
+
+        await sut.ExecuteAsync(vars, script1, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(113.0, vars["shared"]);
     }
 }

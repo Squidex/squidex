@@ -84,6 +84,53 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     }
 
     [Fact]
+    public async Task Should_run_scripting_rule_on_content_change()
+    {
+        // STEP 0: Create app.
+        await CreateAppAsync();
+
+
+        // STEP 1: Start webhook session
+        var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
+
+
+        // STEP 2: Create rule
+        var createRule = new CreateRuleDto
+        {
+            Action = new ScriptRuleActionDto
+            {
+                Script = $@"
+                    postJSON('{url}', {{ schemaName: event.schemaId.Name }})
+                "
+            },
+            Trigger = new ContentChangedRuleTriggerDto
+            {
+                HandleAll = true
+            }
+        };
+
+        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+
+
+        // STEP 3: Create test content
+        await CreateContentAsync();
+
+        // Get requests.
+        var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
+        var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
+
+        Assert.NotNull(request);
+
+
+        // STEP 4: Get events
+        var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
+        var eventsRule = await _.Rules.GetEventsAsync(appName);
+
+        Assert.Single(eventsAll.Items);
+        Assert.Single(eventsRule.Items);
+    }
+
+    [Fact]
     public async Task Should_run_rules_on_asset_change()
     {
         // STEP 0: Create app.

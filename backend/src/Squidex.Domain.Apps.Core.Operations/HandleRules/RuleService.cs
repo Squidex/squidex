@@ -357,7 +357,6 @@ public sealed class RuleService : IRuleService
         var actionWatch = ValueStopwatch.StartNew();
 
         Result result;
-
         try
         {
             var actionType = typeRegistry.GetType<RuleAction>(actionName);
