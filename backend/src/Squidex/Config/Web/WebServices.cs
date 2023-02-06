@@ -17,7 +17,6 @@ using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
-using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Pipeline.Plugins;

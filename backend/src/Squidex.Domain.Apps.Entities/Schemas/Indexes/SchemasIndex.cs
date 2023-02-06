@@ -13,8 +13,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using System.Diagnostics;
-using System.Xml.Linq;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes;
 

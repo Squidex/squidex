@@ -7,7 +7,6 @@
 
 using System.Net;
 using System.Security.Claims;
-using Jint.Native;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
@@ -75,6 +74,15 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 {
                     await Task.Delay(1, ct);
                     scheduler.Run(callback);
+                });
+            }));
+
+            context.Engine.SetValue("setSyncTimeout", new Delay(callback =>
+            {
+                context.Schedule((scheduler, ct) =>
+                {
+                    scheduler.Run(callback);
+                    return Task.CompletedTask;
                 });
             }));
         }
@@ -628,7 +636,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 ["value"] = 13
             };
 
-            const string script1 = @"
+            const string script = @"
                 var x = ctx.value;
                 for (var i = 0; i < 100; i++) {
                     setTimeout(function () {
@@ -638,7 +646,35 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 }
             ";
 
-            await sut.ExecuteAsync(vars, script1, new ScriptOptions { AsContext = true });
+            await sut.ExecuteAsync(vars, script, new ScriptOptions { AsContext = true });
+
+            Assert.Equal(113.0, vars["shared"]);
+        }
+    }
+
+    [Fact]
+    public async Task Should_not_run_nested_callbacks_in_parallel()
+    {
+        for (var i = 0; i < 10; i++)
+        {
+            var vars = new DataScriptVars
+            {
+                ["value"] = 13
+            };
+
+            const string script = @"
+                var x = ctx.value;
+                for (var i = 0; i < 100; i++) {
+                    setSyncTimeout(function () {
+                        setSyncTimeout(function () {
+                            x++;
+                            ctx.shared = x;
+                        });
+                    });
+                }
+            ";
+
+            await sut.ExecuteAsync(vars, script, new ScriptOptions { AsContext = true });
 
             Assert.Equal(113.0, vars["shared"]);
         }

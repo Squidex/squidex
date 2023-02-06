@@ -8,7 +8,6 @@
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
-using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 

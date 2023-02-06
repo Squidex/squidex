@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Infrastructure;
-using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Entities.Teams.Indexes;
 

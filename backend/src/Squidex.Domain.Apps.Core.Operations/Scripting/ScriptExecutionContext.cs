@@ -86,23 +86,21 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
             return;
         }
 
-        slimLock.EnterWriteLock();
-        try
+        lock (Engine)
         {
-            TryStart();
+            try
+            {
+                TryStart();
 
-            Engine.ResetConstraints();
-            action();
+                Engine.ResetConstraints();
+                action();
 
-            TryComplete(default!);
-        }
-        catch (Exception ex)
-        {
-            TryFail(ex);
-        }
-        finally
-        {
-            slimLock.ExitWriteLock();
+                TryComplete(default!);
+            }
+            catch (Exception ex)
+            {
+                TryFail(ex);
+            }
         }
     }
 
@@ -113,23 +111,21 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
             return;
         }
 
-        slimLock.EnterWriteLock();
-        try
+        lock (Engine)
         {
-            TryStart();
+            try
+            {
+                TryStart();
 
-            Engine.ResetConstraints();
-            action(argument);
+                Engine.ResetConstraints();
+                action(argument);
 
-            TryComplete(default!);
-        }
-        catch (Exception ex)
-        {
-            TryFail(ex);
-        }
-        finally
-        {
-            slimLock.ExitWriteLock();
+                TryComplete(default!);
+            }
+            catch (Exception ex)
+            {
+                TryFail(ex);
+            }
         }
     }
 

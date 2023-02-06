@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Entities.Contents.Validation;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Web.GraphQL;
 
 namespace Squidex.Config.Domain;
 

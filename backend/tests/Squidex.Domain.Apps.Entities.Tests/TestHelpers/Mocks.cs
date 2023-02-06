@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
