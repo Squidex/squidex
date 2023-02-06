@@ -34,4 +34,54 @@ public static class JintExtensions
 
         return ids;
     }
+
+    internal static ScriptExecutionContext<T> ExtendAsync<T>(this ScriptExecutionContext<T> context, 
+        IEnumerable<IJintExtension> extensions)
+    {
+        foreach (var extension in extensions)
+        {
+            extension.ExtendAsync(context);
+        }
+
+        return context;
+    }
+
+    internal static ScriptExecutionContext<T> Extend<T>(this ScriptExecutionContext<T> context, 
+        IEnumerable<IJintExtension> extensions)
+    {
+        foreach (var extension in extensions)
+        {
+            extension.Extend(context);
+        }
+
+        return context;
+    }
+
+    internal static ScriptExecutionContext<T> Extend<T>(this ScriptExecutionContext<T> context, 
+        ScriptVars vars, 
+        ScriptOptions options)
+    {
+        var engine = context.Engine;
+
+        context.CopyFrom(vars);
+
+        if (options.AsContext)
+        {
+            var contextInstance = new WritableContext(engine, vars);
+
+            engine.SetValue("ctx", contextInstance);
+            engine.SetValue("context", contextInstance);
+        }
+        else
+        {
+            foreach (var (key, item) in vars)
+            {
+                engine.SetValue(key, item.Value!);
+            }
+        }
+
+        engine.SetValue("async", true);
+
+        return context;
+    }
 }

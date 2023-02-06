@@ -73,7 +73,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
             {
                 context.Schedule(async (scheduler, ct) =>
                 {
-                    await Task.Delay(5, ct);
+                    await Task.Delay(1, ct);
                     scheduler.Run(callback);
                 });
             }));
@@ -621,12 +621,14 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     [Fact]
     public async Task Should_not_run_callbacks_in_parallel()
     {
-        var vars = new DataScriptVars
+        for (var i = 0; i < 10; i++)
         {
-            ["value"] = 13
-        };
+            var vars = new DataScriptVars
+            {
+                ["value"] = 13
+            };
 
-        const string script1 = @"
+            const string script1 = @"
                 var x = ctx.value;
                 for (var i = 0; i < 100; i++) {
                     setTimeout(function () {
@@ -636,8 +638,9 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 }
             ";
 
-        await sut.ExecuteAsync(vars, script1, new ScriptOptions { AsContext = true });
+            await sut.ExecuteAsync(vars, script1, new ScriptOptions { AsContext = true });
 
-        Assert.Equal(113.0, vars["shared"]);
+            Assert.Equal(113.0, vars["shared"]);
+        }
     }
 }

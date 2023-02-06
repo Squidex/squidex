@@ -73,7 +73,6 @@ public class ApiPermissionAttribute : AuthorizeAttribute, IAsyncActionFilter
             if (!hasPermission)
             {
                 context.Result = new StatusCodeResult(403);
-
                 return Task.CompletedTask;
             }
         }

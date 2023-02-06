@@ -7,6 +7,7 @@
 
 using Jint;
 using Squidex.Infrastructure.Tasks;
+using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
@@ -22,20 +23,12 @@ public abstract class ScriptExecutionContext : ScriptContext
     public abstract void Schedule(Func<IScheduler, CancellationToken, Task> action);
 }
 
-#pragma warning disable MA0048 // File name must match type name
-public interface IScheduler
-#pragma warning restore MA0048 // File name must match type name
-{
-    void Run(Action? action);
-
-    void Run<T>(Action<T>? action, T argument);
-}
-
 public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, IScheduler
 {
-    private readonly TaskCompletionSource<T?> tcs = new TaskCompletionSource<T?>();
+    private readonly TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
     private readonly CancellationToken cancellationToken;
-    private int pendingTasks;
+    private readonly ReaderWriterLockSlim slimLock = new ReaderWriterLockSlim();
+    private int pendingTasks = 1;
 
     public bool IsCompleted
     {
@@ -48,12 +41,9 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         this.cancellationToken = cancellationToken;
     }
 
-    public Task<T?> CompleteAsync()
+    public Task<T> CompleteAsync()
     {
-        if (pendingTasks <= 0)
-        {
-            tcs.TrySetResult(default);
-        }
+        TryComplete(default!);
 
         return tcs.Task.WithCancellation(cancellationToken);
     }
@@ -74,95 +64,103 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         {
             try
             {
-                Interlocked.Increment(ref pendingTasks);
+                TryStart();
 
                 await action(this, cancellationToken);
 
-                if (Interlocked.Decrement(ref pendingTasks) <= 0)
-                {
-                    tcs.TrySetResult(default);
-                }
+                TryComplete(default!);
             }
             catch (Exception ex)
             {
-                tcs.TrySetException(ex);
+                TryFail(ex);
             }
         }
 
         ScheduleAsync().Forget();
     }
 
-    public ScriptExecutionContext<T> ExtendAsync(IEnumerable<IJintExtension> extensions)
-    {
-        foreach (var extension in extensions)
-        {
-            extension.ExtendAsync(this);
-        }
-
-        return this;
-    }
-
-    public ScriptExecutionContext<T> Extend(IEnumerable<IJintExtension> extensions)
-    {
-        foreach (var extension in extensions)
-        {
-            extension.Extend(this);
-        }
-
-        return this;
-    }
-
-    public ScriptExecutionContext<T> Extend(ScriptVars vars, ScriptOptions options)
-    {
-        var engine = Engine;
-
-        CopyFrom(vars);
-
-        if (options.AsContext)
-        {
-            var contextInstance = new WritableContext(engine, vars);
-
-            engine.SetValue("ctx", contextInstance);
-            engine.SetValue("context", contextInstance);
-        }
-        else
-        {
-            foreach (var (key, item) in vars)
-            {
-                engine.SetValue(key, item.Value!);
-            }
-        }
-
-        engine.SetValue("async", true);
-
-        return this;
-    }
-
     void IScheduler.Run(Action? action)
     {
-        lock (Engine)
+        if (IsCompleted || action == null)
         {
-            if (IsCompleted || action == null)
-            {
-                return;
-            }
+            return;
+        }
+
+        slimLock.EnterWriteLock();
+        try
+        {
+            TryStart();
 
             Engine.ResetConstraints();
             action();
+
+            TryComplete(default!);
+        }
+        catch (Exception ex)
+        {
+            TryFail(ex);
+        }
+        finally
+        {
+            slimLock.ExitWriteLock();
         }
     }
 
     void IScheduler.Run<TArg>(Action<TArg>? action, TArg argument)
     {
-        lock (Engine)
+        if (IsCompleted || action == null)
         {
-            if (IsCompleted || action == null)
-            {
-                return;
-            }
+            return;
+        }
+
+        slimLock.EnterWriteLock();
+        try
+        {
+            TryStart();
 
             Engine.ResetConstraints();
             action(argument);
+
+            TryComplete(default!);
+        }
+        catch (Exception ex)
+        {
+            TryFail(ex);
+        }
+        finally
+        {
+            slimLock.ExitWriteLock();
         }
     }
+
+    private void TryFail(Exception exception)
+    {
+        tcs.TrySetException(exception);
+    }
+
+    private void TryStart()
+    {
+        Interlocked.Increment(ref pendingTasks);
+
+        Debug.WriteLine(pendingTasks);
+    }
+
+    private void TryComplete(T result)
+    {
+        if (Interlocked.Decrement(ref pendingTasks) <= 0)
+        {
+            tcs.TrySetResult(result);
+        }
+
+        Debug.WriteLine(pendingTasks);
+    }
+}
+
+#pragma warning disable MA0048 // File name must match type name
+public interface IScheduler
+#pragma warning restore MA0048 // File name must match type name
+{
+    void Run(Action? action);
+
+    void Run<T>(Action<T>? action, T argument);
 }

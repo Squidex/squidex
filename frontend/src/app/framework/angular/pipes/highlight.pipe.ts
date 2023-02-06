@@ -6,7 +6,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { Types } from '@app/framework/internal';
+import { escapeHTML, Types } from '@app/framework/internal';
 
 @Pipe({
     name: 'sqxHighlight',
@@ -14,6 +14,8 @@ import { Types } from '@app/framework/internal';
 })
 export class HighlightPipe implements PipeTransform {
     public transform(text: string, highlight: string | RegExp | undefined | null): string {
+        text = escapeHTML(text);
+
         if (!highlight) {
             return text;
         }
@@ -22,6 +24,8 @@ export class HighlightPipe implements PipeTransform {
             highlight = new RegExp(highlight, 'i');
         }
 
-        return text.replace(highlight, s => `<b>${s}</b>`);
+        const result = text.replace(highlight, s => `<b>${s}</b>`);
+
+        return result;
     }
 }
