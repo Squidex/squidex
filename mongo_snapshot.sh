@@ -28,7 +28,7 @@ then
 fi
 
 #get cluster version
-export cluster_version=`atlas clusters describe $cluster --projectId ${project} | grep $2 | awk '{print $3}' | grep -o '^[^.]*\.[0-9]*'`
+export cluster_version=`atlas clusters describe $origin --projectId ${project} | grep $2 | awk '{print $3}' | grep -o '^[^.]*\.[0-9]*'`
 
 #creating snapshot of current cluster to use to build the new cluster
 export snapshot=`atlas backups snapshots create $origin --desc test-upgrade-backup --projectId ${project} | awk -F\' '{print $2}'`
