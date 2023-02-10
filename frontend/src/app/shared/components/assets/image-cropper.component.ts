@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import Cropper from 'cropperjs';
 import { Types } from '@app/framework';
 
@@ -15,7 +15,7 @@ import { Types } from '@app/framework';
     templateUrl: './image-cropper.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ImageCropperComponent implements AfterViewInit, OnDestroy, OnChanges {
+export class ImageCropperComponent implements AfterViewInit, OnDestroy {
     private cropper: Cropper | null = null;
     private data?: Cropper.Data;
 

@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiUrlConfig, ResourceOwner, Types } from '@app/framework/internal';
-import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto } from '@app/shared';
+import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-extension[content][contentSchema]',
@@ -16,7 +16,7 @@ import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto } from 
     templateUrl: './content-extension.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentExtensionComponent extends ResourceOwner implements OnChanges {
+export class ContentExtensionComponent extends ResourceOwner {
     private readonly context: any;
     private isInitialized = false;
 
@@ -50,13 +50,13 @@ export class ContentExtensionComponent extends ResourceOwner implements OnChange
         };
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['contentSchema']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.contentSchema) {
             this.context['schemaName'] = this.contentSchema?.name;
             this.context['schemaId'] = this.contentSchema?.id;
         }
 
-        if (changes['content']) {
+        if (changes.content) {
             this.sendContent();
         }
     }

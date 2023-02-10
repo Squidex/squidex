@@ -139,7 +139,7 @@ public sealed class ContentDataObject : ObjectInstance
 
             foreach (var (key, value) in contentData)
             {
-                fieldProperties.Add(key, new ContentDataProperty(this, new ContentFieldObject(this, value, false)));
+                fieldProperties[key] = new ContentDataProperty(this, new ContentFieldObject(this, value, false));
             }
         }
     }

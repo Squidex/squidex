@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ContentsDto } from '@app/shared';
-import { ContentDto, getContentValue, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent, Types, value$ } from '@app/shared/internal';
+import { ContentDto, getContentValue, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent, TypedSimpleChanges, Types, value$ } from '@app/shared/internal';
 
 export const SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceDropdownComponent), multi: true,
@@ -39,7 +39,7 @@ const NO_EMIT = { emitEvent: false };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
+export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
     private readonly contents: ContentDto[] = [];
     private isOpenedBefore = false;
     private isLoadingFailed = false;
@@ -96,14 +96,14 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
                 }));
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['schemaId']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.schemaId) {
             this.contents.clear();
 
             this.resetState();
         }
 
-        if (changes['language'] || changes['schemaId']) {
+        if (changes.language || changes.schemaId) {
             this.resetContentNames(true);
         }
     }

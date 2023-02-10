@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { map, Observable, shareReplay } from 'rxjs';
 import { AppsState, ClientsState, TemplateDetailsDto, TemplateDto, TemplatesService } from '@app/shared';
 
@@ -15,7 +15,7 @@ import { AppsState, ClientsState, TemplateDetailsDto, TemplateDto, TemplatesServ
     templateUrl: './template.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TemplateComponent implements OnChanges {
+export class TemplateComponent {
     @Input()
     public template!: TemplateDto;
 

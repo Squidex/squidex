@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DialogModel, DialogService, disabled$, StatefulComponent, Types, value$ } from '@app/framework';
+import { DialogModel, DialogService, disabled$, StatefulComponent, TypedSimpleChanges, Types, value$ } from '@app/framework';
 import { AppLanguageDto, AppsState, AssetDto, computeEditorUrl, ContentDto } from '@app/shared';
 
 interface State {
@@ -22,7 +22,7 @@ interface State {
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IFrameEditorComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
+export class IFrameEditorComponent extends StatefulComponent<State> implements  OnDestroy {
     private value: any;
     private isInitialized = false;
     private isDisabled = false;
@@ -99,24 +99,24 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         this.toggleFullscreen(false);
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['formValue']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.formValue) {
             this.sendFormValue();
         }
 
-        if (changes['formIndex']) {
+        if (changes.formIndex) {
             this.sendMoved();
         }
 
-        if (changes['expanded']) {
+        if (changes.isExpanded) {
             this.sendExpanded();
         }
 
-        if (changes['language']) {
+        if (changes.language) {
             this.sendLanguage();
         }
 
-        if (changes['formControlBinding']) {
+        if (changes.formControlBinding) {
             this.unsubscribeAll();
 
             const control = this.formControlBinding;

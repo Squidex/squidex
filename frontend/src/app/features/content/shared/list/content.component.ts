@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, SchemaDto, TableField, TableSettings } from '@app/shared';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, SchemaDto, TableField, TableSettings, TypedSimpleChanges } from '@app/shared';
 
 /* tslint:disable: component-selector */
 
@@ -16,7 +16,7 @@ import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, M
     templateUrl: './content.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentComponent implements OnChanges {
+export class ContentComponent {
     @Output()
     public clone = new EventEmitter();
 
@@ -74,12 +74,12 @@ export class ContentComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['content']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.content) {
             this.patchAllowed = this.content.canUpdate;
         }
 
-        if (this.patchAllowed && (changes['listFields'] || changes['language'])) {
+        if (this.patchAllowed && (changes.tableFields || changes.language)) {
             this.patchForm = new PatchContentForm(this.tableFields, this.language);
         }
     }

@@ -32,4 +32,23 @@
     .ace_gutter {
         background: $color-border !important;
     }
+
+    .ace_scroller {
+        box-shadow: none !important;
+    }
+
+    .form-control {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        align-items: center;
+
+        .editor {
+            flex-grow: 1;
+        }
+
+        span {
+            height: 1.5rem;
+        }
+    }
 }

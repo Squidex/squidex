@@ -3,7 +3,7 @@
 
     <sqx-field [field]="$any(fieldGroup.separator)" [languages]="languages" [parent]="parent" [plain]="true" [schema]="schema" [settings]="settings">
         <div class="d-flex align-items-center">
-            <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+            <ng-content></ng-content>
     
             <button type="button" class="btn btn-sm btn-text-secondary ms-2" (click)="toggle()">
                 <i [class.icon-caret-right]="snapshot.isCollapsed" [class.icon-caret-down]="!snapshot.isCollapsed"></i> 

@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, Types, valueProjection$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -17,7 +17,7 @@ import { ComponentSectionComponent } from './component-section.component';
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArrayItemComponent implements OnChanges {
+export class ArrayItemComponent {
     @Output()
     public itemRemove = new EventEmitter();
 
@@ -81,8 +81,8 @@ export class ArrayItemComponent implements OnChanges {
         return this.formModel.collapsedChanges;
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['formModel']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.formModel) {
             this.isInvalidForm = invalid$(this.formModel.form);
 
             if (Types.is(this.formModel, ComponentForm)) {
@@ -94,7 +94,7 @@ export class ArrayItemComponent implements OnChanges {
             this.title = valueProjection$(this.formModel.form, () => getTitle(this.formModel));
         }
 
-        if (changes['formModel'] || changes['isCollapsedInitial']) {
+        if (changes.formModel || changes.isCollapsedInitial) {
             if (this.isCollapsedInitial && this.formModel.collapsed === null) {
                 this.collapse();
             }

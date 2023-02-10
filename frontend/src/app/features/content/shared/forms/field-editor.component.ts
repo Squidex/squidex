@@ -5,17 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoValue$, MathHelper, Types } from '@app/shared';
+import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoValue$, MathHelper, TypedSimpleChanges, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-editor[form][formContext][formLevel][formModel][isComparing][language][languages]',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',
 })
-export class FieldEditorComponent implements OnChanges {
+export class FieldEditorComponent {
     public readonly uniqueId = MathHelper.guid();
 
     @Output()
@@ -65,8 +65,8 @@ export class FieldEditorComponent implements OnChanges {
         return this.formModel.form;
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['formModel']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.formModel) {
             this.isEmpty = hasNoValue$(this.formModel.form);
         }
     }

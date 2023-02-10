@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
@@ -13,7 +13,7 @@ import { SchemaDto, SchemasState } from '@app/shared';
     styleUrls: ['./schema-ui-form.component.scss'],
     templateUrl: './schema-ui-form.component.html',
 })
-export class SchemaUIFormComponent implements OnChanges {
+export class SchemaUIFormComponent {
     @Input()
     public schema!: SchemaDto;
 

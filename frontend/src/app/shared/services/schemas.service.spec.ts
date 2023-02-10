@@ -593,6 +593,24 @@ describe('SchemasService', () => {
             expect(completions!).toEqual([]);
         }));
 
+    it('should make get request to get field rules completions',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+            let completions: SchemaCompletions;
+
+            schemasService.getCompletions('my-app', 'my-schema').subscribe(result => {
+                completions = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/completion/field-rules');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush([]);
+
+            expect(completions!).toEqual([]);
+        }));
+
     function schemaPropertiesResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 

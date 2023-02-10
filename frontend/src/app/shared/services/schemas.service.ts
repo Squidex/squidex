@@ -749,6 +749,12 @@ export class SchemasService {
         return this.http.get<SchemaCompletions>(url);
     }
 
+    public getFieldRulesCompletions(appName: string, schemaName: string): Observable<SchemaCompletions> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion/field-rules`);
+
+        return this.http.get<SchemaCompletions>(url);
+    }
+
     public getFilters(appName: string, schemaName: string): Observable<QueryModel> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/filters`);
 

@@ -174,6 +174,27 @@ public class ScriptingCompleterTests
     }
 
     [Fact]
+    public void Should_describe_field_rule()
+    {
+        var actual = sut.FieldRule(dataSchema);
+
+        AssertCompletion(actual,
+            new[]
+            {
+                "data",
+                "data['my-field']",
+                "data['my-field'].iv",
+                "itemData",
+                "itemData['my-field']",
+                "user",
+                "user.displayName",
+                "user.email",
+                "user.id",
+                "user.role",
+            });
+    }
+
+    [Fact]
     public void Should_describe_asset_trigger()
     {
         var actual = sut.AssetTrigger();

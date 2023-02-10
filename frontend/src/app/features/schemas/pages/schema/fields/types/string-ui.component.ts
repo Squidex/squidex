@@ -5,17 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FieldDto, ResourceOwner, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, valueProjection$ } from '@app/shared';
+import { FieldDto, ResourceOwner, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, valueProjection$, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui[field][fieldForm][properties]',
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',
 })
-export class StringUIComponent extends ResourceOwner implements OnChanges {
+export class StringUIComponent extends ResourceOwner {
     public readonly editors = STRING_FIELD_EDITORS;
 
     @Input()
@@ -37,8 +37,8 @@ export class StringUIComponent extends ResourceOwner implements OnChanges {
         super();
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldForm']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.fieldForm) {
             this.unsubscribeAll();
 
             const editor = this.fieldForm.controls['editor'];

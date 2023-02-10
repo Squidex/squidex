@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FilterableField, FilterComparison, FilterFieldUI, getFilterUI, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
 import { ContributorsState } from '@app/shared/state/contributors.state';
 
@@ -15,7 +15,7 @@ import { ContributorsState } from '@app/shared/state/contributors.state';
     templateUrl: './filter-comparison.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FilterComparisonComponent implements OnChanges {
+export class FilterComparisonComponent {
     @Output()
     public change = new EventEmitter();
 

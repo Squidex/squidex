@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
 import { merge } from 'rxjs';
 import { LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
@@ -23,7 +23,7 @@ interface State {
     templateUrl: './control-errors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ControlErrorsComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
+export class ControlErrorsComponent extends StatefulComponent<State> implements  OnDestroy {
     private controlDisplayName = '';
     private control: AbstractControl | null = null;
 

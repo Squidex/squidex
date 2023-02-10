@@ -5,15 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, FieldDto, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState } from '@app/shared';
+import { Component, Input } from '@angular/core';
+import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, FieldDto, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-field[field][languages][schema][settings]',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
 })
-export class FieldComponent implements OnChanges {
+export class FieldComponent {
     @Input()
     public field!: NestedFieldDto | RootFieldDto;
 
@@ -50,8 +50,8 @@ export class FieldComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['field']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.field) {
             this.isEditable = this.field.canUpdate;
 
             this.editForm = new EditFieldForm(this.field.properties);

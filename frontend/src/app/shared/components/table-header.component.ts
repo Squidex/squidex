@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
@@ -14,7 +14,7 @@ import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
     templateUrl: './table-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TableHeaderComponent implements OnChanges {
+export class TableHeaderComponent {
     @Output()
     public queryChange = new EventEmitter<Query>();
 

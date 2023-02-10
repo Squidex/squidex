@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from '@app/shared/internal';
 
 @Component({
@@ -14,7 +14,7 @@ import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from
     templateUrl: './api-calls-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ApiCallsCardComponent implements OnChanges {
+export class ApiCallsCardComponent {
     @Input()
     public app: AppDto | undefined | null;
 

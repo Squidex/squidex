@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
 import * as ProgressBar from 'progressbar.js';
+import { TypedSimpleChanges } from './../helpers';
 
 @Component({
     selector: 'sqx-progress-bar',
@@ -18,7 +19,7 @@ import * as ProgressBar from 'progressbar.js';
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProgressBarComponent implements OnChanges, OnInit {
+export class ProgressBarComponent implements  OnInit {
     private progressBar: any;
 
     @Input()
@@ -72,7 +73,7 @@ export class ProgressBarComponent implements OnChanges, OnInit {
         this.updateValue();
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (this.progressBar && changes.value) {
             this.updateValue();
         }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ErrorDto, MathHelper, SchemaTagSource, WorkflowDto, WorkflowsState, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues } from '@app/shared';
 
 @Component({
@@ -13,7 +13,7 @@ import { ErrorDto, MathHelper, SchemaTagSource, WorkflowDto, WorkflowsState, Wor
     styleUrls: ['./workflow.component.scss'],
     templateUrl: './workflow.component.html',
 })
-export class WorkflowComponent implements OnChanges {
+export class WorkflowComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
     @Input()

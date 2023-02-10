@@ -27,7 +27,7 @@
         <i class="icon-caret-down"></i>
     </div>
 
-    <ng-container *sqxModal="snapshot.itemsList.length > 0">
+    <ng-container *sqxModal="snapshot.suggestedItems.length > 0">
         <sqx-dropdown-menu class="control-dropdown" 
             [sqxAnchoredTo]="form"
             [adjustWidth]="true"
@@ -35,12 +35,12 @@
             [scrollY]="true" 
             [style.minWidth]="dropdownWidth"
             position="bottom-left" #container>
-            <div *ngFor="let item of snapshot.itemsList; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
-                [class.active]="i === snapshot.itemsIndex"
+            <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
+                [class.active]="i === snapshot.suggestedIndex"
                 [class.separated]="itemSeparator"
                 (mousedown)="selectValue(item)" 
                 (mouseover)="selectIndex(i)"
-                [sqxScrollActive]="i === snapshot.itemsIndex"
+                [sqxScrollActive]="i === snapshot.suggestedIndex"
                 [sqxScrollContainer]="container.nativeElement">
                 <ng-container>{{item}}</ng-container>
             </div>

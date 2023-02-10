@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
-import { ResourceLoaderService, UIOptions } from '@app/framework';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, Renderer2, ViewChild } from '@angular/core';
+import { ResourceLoaderService, TypedSimpleChanges, UIOptions } from '@app/framework';
 import { AuthService } from '@app/shared/internal';
 
 @Component({
@@ -15,7 +15,7 @@ import { AuthService } from '@app/shared/internal';
     templateUrl: './notifo.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class NotifoComponent implements AfterViewInit, OnDestroy {
     private readonly notifoApiUrl: string;
     private readonly notifoApiKey: string | undefined;
 
@@ -81,12 +81,12 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
         }
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
         const notifo = window['notifo'];
 
         const element = this.element?.nativeElement;
 
-        if (notifo && changes['topic'] && element) {
+        if (notifo && changes.topic && element) {
             notifo.push(['hide-topic', element]);
             notifo.push(['show-topic', element, this.topic, { style: 'bell' }]);
         }

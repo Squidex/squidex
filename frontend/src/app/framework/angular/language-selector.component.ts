@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ModalModel, RelativePosition } from '@app/framework/internal';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
@@ -16,7 +16,7 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
     templateUrl: './language-selector.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LanguageSelectorComponent implements OnChanges, OnInit {
+export class LanguageSelectorComponent implements  OnInit {
     @Output()
     public languageChange = new EventEmitter<any>();
 

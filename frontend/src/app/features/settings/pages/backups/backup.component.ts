@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ApiUrlConfig, BackupDto, BackupsState, Duration } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ApiUrlConfig, BackupDto, BackupsState, Duration, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-backup[backup]',
@@ -14,7 +14,7 @@ import { ApiUrlConfig, BackupDto, BackupsState, Duration } from '@app/shared';
     templateUrl: './backup.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BackupComponent implements OnChanges {
+export class BackupComponent {
     @Input()
     public backup!: BackupDto;
 
@@ -26,8 +26,8 @@ export class BackupComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['backup']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.backup) {
             this.duration = Duration.create(this.backup.started, this.backup.stopped!).toString();
         }
     }

@@ -345,6 +345,12 @@
   <data name="EventType" xml:space="preserve">
     <value>The type of the event, e.g. 'Created' or 'Updated'.</value>
   </data>
+  <data name="ItemData" xml:space="preserve">
+    <value>The current item, if the field is part of an array.</value>
+  </data>
+  <data name="ItemDataField" xml:space="preserve">
+    <value>The current item, if the field is part of an array.</value>
+  </data>
   <data name="JsonPath" xml:space="preserve">
     <value>The path to the json value.</value>
   </data>
@@ -407,6 +413,9 @@
   </data>
   <data name="User" xml:space="preserve">
     <value>Information about the current user.</value>
+  </data>
+  <data name="UserAppRole" xml:space="preserve">
+    <value>The role of the user within the current app.</value>
   </data>
   <data name="UserClaims" xml:space="preserve">
     <value>The additional properties of this user.</value>

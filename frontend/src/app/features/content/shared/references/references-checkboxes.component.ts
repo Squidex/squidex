@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
-import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, UIOptions } from '@app/shared/internal';
+import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, TypedSimpleChanges, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR: any = {
@@ -30,7 +30,7 @@ const NO_EMIT = { emitEvent: false };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
+export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     private readonly itemCount: number;
     private contentItems: ReadonlyArray<ContentDto> | null = null;
 
@@ -75,8 +75,8 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
                 }));
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['schemaId']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.schemaId) {
             this.resetState();
 
             if (this.isValid) {

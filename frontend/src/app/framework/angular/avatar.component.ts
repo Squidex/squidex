@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { picasso } from '@app/framework/internal';
+import { TypedSimpleChanges } from './helpers';
 
 @Component({
     selector: 'sqx-avatar',
@@ -14,7 +15,7 @@ import { picasso } from '@app/framework/internal';
     templateUrl: './avatar.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AvatarComponent implements OnChanges {
+export class AvatarComponent {
     @Input()
     public identifier: string | undefined | null;
 
@@ -29,16 +30,16 @@ export class AvatarComponent implements OnChanges {
 
     public actualImage: string | undefined | null;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['image']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.image) {
             this.actualImage = this.image;
         }
 
-        if (changes['image'] || changes['identifier']) {
+        if (changes.image || changes.identifier) {
             this.updateSource();
         }
 
-        if (changes['size']) {
+        if (changes.size) {
             this.imageSize = `${this.size}px`;
         }
     }

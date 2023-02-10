@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { AppsState, EditSchemaScriptsForm, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 
@@ -14,7 +14,7 @@ import { AppsState, EditSchemaScriptsForm, SchemaCompletions, SchemaDto, Schemas
     styleUrls: ['./schema-scripts-form.component.scss'],
     templateUrl: './schema-scripts-form.component.html',
 })
-export class SchemaScriptsFormComponent implements OnChanges {
+export class SchemaScriptsFormComponent {
     @Input()
     public schema!: SchemaDto;
 

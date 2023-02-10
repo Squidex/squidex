@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, Types } from '@app/shared/internal';
+import { AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/shared/internal';
 
 export const SQX_REFERENCE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceInputComponent), multi: true,
@@ -30,7 +30,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReferenceInputComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
+export class ReferenceInputComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
     @Input()
     public schemaIds?: ReadonlyArray<string>;
 
@@ -58,8 +58,8 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
         super(changeDetector, {});
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['language']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.language) {
             this.selectContent(this.snapshot.selectedContent);
         }
     }

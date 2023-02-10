@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { ResourceLoaderService, WorkflowDto } from '@app/shared';
 
 declare const vis: any;
@@ -15,7 +15,7 @@ declare const vis: any;
     styleUrls: ['./workflow-diagram.component.scss'],
     templateUrl: './workflow-diagram.component.html',
 })
-export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy, OnChanges {
+export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
     private network: any;
 
     @ViewChild('chartContainer', { static: false })

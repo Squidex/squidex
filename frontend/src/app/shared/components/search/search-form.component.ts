@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, StatusInfo, Types } from '@app/shared/internal';
+import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, StatusInfo, TypedSimpleChanges, Types } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-search-form',
@@ -15,7 +15,7 @@ import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, Query
     templateUrl: './search-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SearchFormComponent implements OnChanges {
+export class SearchFormComponent {
     private previousQuery?: Query | null;
 
     @Output()
@@ -61,12 +61,12 @@ export class SearchFormComponent implements OnChanges {
 
     public hasFilter = false;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['query'] || changes['queries']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.query || changes.queries) {
             this.updateSaveKey();
         }
 
-        if (changes['query']) {
+        if (changes.query) {
             this.previousQuery = Types.clone(this.query);
 
             this.hasFilter = hasFilter(this.query);

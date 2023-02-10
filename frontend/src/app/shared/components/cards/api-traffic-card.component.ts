@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared/internal';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { CallsUsageDto, ChartHelpers, ChartOptions, TypedSimpleChanges } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-api-traffic-card[usage]',
@@ -14,7 +14,7 @@ import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared/internal'
     templateUrl: './api-traffic-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ApiTrafficCardComponent implements OnChanges {
+export class ApiTrafficCardComponent {
     @Input()
     public usage?: CallsUsageDto;
 
@@ -31,8 +31,8 @@ export class ApiTrafficCardComponent implements OnChanges {
         return this.isStacked ? ChartOptions.Stacked : ChartOptions.Default;
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (this.usage && changes['usage']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (this.usage && changes.usage) {
             const labels = ChartHelpers.createLabelsFromSet(this.usage.details);
 
             this.chartData = {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/internal';
 
 @Component({
@@ -14,7 +14,7 @@ import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/
     templateUrl: './asset-uploads-count-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AssetUploadsCountCardComponent implements OnChanges {
+export class AssetUploadsCountCardComponent {
     @Input()
     public usage?: ReadonlyArray<StorageUsagePerDateDto>;
 

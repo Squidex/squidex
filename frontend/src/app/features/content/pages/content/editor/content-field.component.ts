@@ -5,16 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, disabled$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
+import { AppLanguageDto, AppsState, changed$, disabled$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-field[form][formContext][formLevel][formModel][language][languages][schema]',
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html',
 })
-export class ContentFieldComponent implements OnChanges {
+export class ContentFieldComponent {
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
 
@@ -74,15 +74,15 @@ export class ContentFieldComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
         this.showAllControls = this.localStore.getBoolean(this.showAllControlsKey());
 
-        if (changes['formModel'] && this.formModel) {
+        if (changes.formModel && this.formModel) {
             this.isInvalid = invalid$(this.formModel.form);
             this.isDisabled = disabled$(this.formModel.form);
         }
 
-        if ((changes['formModel'] || changes['formModelCompare']) && this.formModelCompare) {
+        if ((changes.formModel || changes.formModelCompare) && this.formModelCompare) {
             this.isDifferent = changed$(this.formModel.form, this.formModelCompare.form);
         }
     }

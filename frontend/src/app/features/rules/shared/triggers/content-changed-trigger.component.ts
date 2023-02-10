@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { SchemaDto, TriggerForm } from '@app/shared';
 
 export interface TriggerSchemaForm {
@@ -19,7 +19,7 @@ export interface TriggerSchemaForm {
     styleUrls: ['./content-changed-trigger.component.scss'],
     templateUrl: './content-changed-trigger.component.html',
 })
-export class ContentChangedTriggerComponent implements OnChanges {
+export class ContentChangedTriggerComponent {
     @Input()
     public schemas?: ReadonlyArray<SchemaDto> | null;
 

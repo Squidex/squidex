@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app/shared/internal';
 
 const ITEM_HEIGHT = 2.5;
@@ -17,7 +17,7 @@ const ITEM_HEIGHT = 2.5;
     templateUrl: './schema-category.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SchemaCategoryComponent implements OnChanges {
+export class SchemaCategoryComponent {
     @Output()
     public remove = new EventEmitter<string>();
 

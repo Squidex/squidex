@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { SchemaDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
 
 @Component({
@@ -13,7 +13,7 @@ import { SchemaDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
     styleUrls: ['./schema-export-form.component.scss'],
     templateUrl: './schema-export-form.component.html',
 })
-export class SchemaExportFormComponent implements OnChanges {
+export class SchemaExportFormComponent {
     @Input()
     public schema!: SchemaDto;
 

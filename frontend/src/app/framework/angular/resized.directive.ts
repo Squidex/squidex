@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, NgZone, OnChanges, OnDestroy, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, Output } from '@angular/core';
 import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxResized], [sqxResizeCondition]',
 })
-export class ResizedDirective extends ResourceOwner implements OnDestroy, OnChanges, ResizeListener {
+export class ResizedDirective extends ResourceOwner implements OnDestroy, ResizeListener {
     private condition: ((rect: DOMRect) => boolean) | undefined;
     private conditionValue = false;
 

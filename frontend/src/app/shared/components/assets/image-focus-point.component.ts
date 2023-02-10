@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { FocusedImage, FocusPicker } from 'image-focus';
 import { Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto } from '@app/shared/services/assets.service';
@@ -16,7 +16,7 @@ import { AnnotateAssetDto, AssetDto } from '@app/shared/services/assets.service'
     templateUrl: './image-focus-point.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ImageFocusPointComponent implements AfterViewInit, OnDestroy, OnChanges {
+export class ImageFocusPointComponent implements AfterViewInit, OnDestroy {
     private readonly previewImages: FocusedImage[] = [];
     private focusPicker: FocusPicker | null = null;
     private x = 0;

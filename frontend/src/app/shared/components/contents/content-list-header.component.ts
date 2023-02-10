@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { LanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shared/internal';
 
 @Component({
@@ -14,7 +14,7 @@ import { LanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shar
     templateUrl: './content-list-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentListHeaderComponent implements OnChanges {
+export class ContentListHeaderComponent {
     public readonly metaFields = META_FIELDS;
 
     @Input()

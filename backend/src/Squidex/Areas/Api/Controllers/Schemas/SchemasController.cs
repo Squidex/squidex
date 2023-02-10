@@ -335,6 +335,19 @@ public sealed class SchemasController : ApiController
     }
 
     [HttpGet]
+    [Route("apps/{app}/schemas/{schema}/completion/field-rules")]
+    [ApiPermissionOrAnonymous]
+    [ApiCosts(1)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> GetScriptFieldRulesCompletion(string app, string schema,
+        [FromServices] ScriptingCompleter completer)
+    {
+        var completion = completer.FieldRule(await BuildModel());
+
+        return Ok(completion);
+    }
+
+    [HttpGet]
     [Route("apps/{app}/schemas/{schema}/filters")]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
