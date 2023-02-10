@@ -29,7 +29,7 @@ pipeline {
     string(name: 'dbname', description: 'The current mongodb to use (like: homer-squidex-staging or homer-squidex-staging-v2upgrade)', defaultValue: 'none')
     choice(name: 'cluster', choices: ['staging', 'production'], description: 'The Kubernetes Cluster to deploy to') //The names don't quite match but we handle it in a map
     choice(name: 'namespace', choices: ['content-v2', 'content-v1'], description: 'The environment to deploy squidex to')
-    choice(name: 'logginglevel', choices: ['warning', 'informational', 'debug'], description: 'Logging level to set Squidex to')
+    choice(name: 'logginglevel', choices: ['WARNING', 'INFORMATION', 'DEBUG'], description: 'Logging level to set Squidex to')
    }
   stages {
     stage('Checkout') {
