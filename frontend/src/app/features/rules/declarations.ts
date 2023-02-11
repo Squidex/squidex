@@ -20,6 +20,7 @@ export * from './shared/rule-icon.component';
 export * from './shared/pipes';
 export * from './shared/triggers/asset-changed-trigger.component';
 export * from './shared/triggers/comment-trigger.component';
+export * from './shared/triggers/content-changed-schema.component';
 export * from './shared/triggers/content-changed-trigger.component';
 export * from './shared/triggers/schema-changed-trigger.component';
 export * from './shared/triggers/usage-trigger.component';

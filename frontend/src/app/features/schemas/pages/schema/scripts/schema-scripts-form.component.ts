@@ -38,7 +38,7 @@ export class SchemaScriptsFormComponent {
         this.editForm.load(this.schema.scripts);
         this.editForm.setEnabled(this.isEditable);
 
-        this.schemaCompletions = this.schemasService.getCompletions(this.appsState.appName, this.schema.name).pipe(shareReplay(1));
+        this.schemaCompletions = this.schemasService.getContentScriptsCompletion(this.appsState.appName, this.schema.name).pipe(shareReplay(1));
     }
 
     public selectField(field: string) {

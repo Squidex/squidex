@@ -33,7 +33,7 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
     }
 
     public ngOnInit() {
-        this.fieldCompletions = this.schemasService.getFieldRulesCompletions(this.schemasState.appName, this.schema.name).pipe(shareReplay(1));
+        this.fieldCompletions = this.schemasService.getFieldRulesCompletion(this.schemasState.appName, this.schema.name).pipe(shareReplay(1));
     }
 
     public ngOnChanges() {

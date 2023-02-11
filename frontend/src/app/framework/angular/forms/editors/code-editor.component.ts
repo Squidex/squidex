@@ -68,9 +68,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     @Input()
-    public set completion(value: ReadonlyArray<{ path: string; description: string; type: string }> | undefined | null) {
+    public set completion(value: ReadonlyArray<{ path: string; description: string; type: string; allowedValues?: string[] }> | undefined | null) {
         if (value) {
-            this.completions = value.map(({ path, description, type }) => ({ value: path, name: path, description, meta: type?.toLowerCase(), path }));
+            this.completions = value.map(({ path, description, type, allowedValues }) => ({ value: path, name: path, description, meta: type?.toLowerCase(), path, allowedValues }));
         } else {
             this.completions = [];
         }
@@ -168,6 +168,16 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
                         getDocTooltip: (item: any) => {
                             if (item.path && item.description) {
                                 item.docHTML = `<b>${item.value}</b><hr></hr>${item.description}`;
+
+                                if (item.allowedValues) {
+                                    item.docHTML += '<div class="mt-2 mb-2">Allowed Values:<ul>';
+
+                                    for (const value of item.allowedValues) {
+                                        item.docHTML += `<li><code>${value}</code></li>`;
+                                    }
+
+                                    item.docHTML += '</ul></div>';
+                                }
                             }
                         },
                         // eslint-disable-next-line no-useless-escape

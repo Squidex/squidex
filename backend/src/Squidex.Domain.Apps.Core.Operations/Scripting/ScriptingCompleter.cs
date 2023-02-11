@@ -222,7 +222,6 @@ public sealed class ScriptingCompleter
 
                 AddString("role",
                     FieldDescriptions.UserAppRole);
-
             });
 
             AddObject("data", FieldDescriptions.ContentData, () =>
@@ -257,7 +256,13 @@ public sealed class ScriptingCompleter
             {
                 var propertyType = Nullable.GetUnderlyingType(propertyTypeOrNullable) ?? propertyTypeOrNullable;
 
-                if (propertyType.IsEnum ||
+                if (propertyType.IsEnum)
+                {
+                    var allowedValues = Enum.GetValues(propertyType).OfType<object>().Select(x => x.ToString()).Order().ToArray();
+
+                    Add(JsonType.String, name, description, allowedValues);
+                }
+                else if (
                     propertyType == typeof(string) ||
                     propertyType == typeof(DomainId) ||
                     propertyType == typeof(Instant) ||
@@ -448,7 +453,7 @@ public sealed class ScriptingCompleter
             Add(JsonType.String, name, description);
         }
 
-        private void Add(JsonType type, string? name, string? description)
+        private void Add(JsonType type, string? name, string? description, string[]? allowedValues = null)
         {
             var parts = name?.Split('.') ?? Array.Empty<string>();
 
@@ -464,7 +469,10 @@ public sealed class ScriptingCompleter
 
             var path = string.Concat(prefixes.Reverse());
 
-            result[path] = new ScriptingValue(path, type, description);
+            result[path] = new ScriptingValue(path, type, description)
+            {
+                AllowedValues = allowedValues
+            };
 
             for (int i = 0; i < parts.Length; i++)
             {

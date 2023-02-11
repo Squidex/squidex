@@ -6,7 +6,7 @@
  */
 
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, ValidatorsEx } from '@app/framework';
+import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
 import { RuleElementDto } from './../services/rules.service';
 
 export class ActionForm extends Form<any, UntypedFormGroup> {
@@ -58,7 +58,7 @@ export class TriggerForm extends Form<any, UntypedFormGroup> {
                     handleAll: new UntypedFormControl(false,
                         Validators.nullValidator,
                     ),
-                    schemas: new UntypedFormControl(undefined,
+                    schemas: new TemplatedFormArray(ContentChangedSchemaTemplate.INSTANCE,
                         Validators.nullValidator,
                     ),
                 });
@@ -87,5 +87,21 @@ export class TriggerForm extends Form<any, UntypedFormGroup> {
         value.triggerType = this.triggerType;
 
         return value;
+    }
+}
+
+
+class ContentChangedSchemaTemplate {
+    public static readonly INSTANCE = new ContentChangedSchemaTemplate();
+
+    public createControl(_: any) {
+        return new ExtendedFormGroup({
+            schemaId: new UntypedFormControl('',
+                Validators.required,
+            ),
+            condition: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
+        });
     }
 }

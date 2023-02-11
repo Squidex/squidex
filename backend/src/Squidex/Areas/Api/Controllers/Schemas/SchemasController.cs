@@ -309,7 +309,7 @@ public sealed class SchemasController : ApiController
     }
 
     [HttpGet]
-    [Route("apps/{app}/schemas/{schema}/completion")]
+    [Route("apps/{app}/schemas/{schema}/completion/content-scripts")]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -322,7 +322,7 @@ public sealed class SchemasController : ApiController
     }
 
     [HttpGet]
-    [Route("apps/{app}/schemas/{schema}/completion/triggers")]
+    [Route("apps/{app}/schemas/{schema}/completion/content-triggers")]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]

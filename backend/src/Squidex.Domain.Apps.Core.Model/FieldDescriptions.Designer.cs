@@ -736,7 +736,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type of the event, e.g. &apos;Created&apos; or &apos;Updated&apos;..
+        ///   Looks up a localized string similar to The type of the event..
         /// </summary>
         public static string EventType {
             get {

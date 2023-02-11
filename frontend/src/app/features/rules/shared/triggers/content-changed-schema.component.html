@@ -1,0 +1,29 @@
+<div class="row gx-2" [formGroup]="form">
+    <div class="col col-3">
+        <sqx-control-errors for="action"></sqx-control-errors>
+
+        <select class="form-select schemas-control" formControlName="schemaId">
+            <option *ngFor="let schema of schemas; trackBy: trackBySchema" [ngValue]="schema.id">{{schema.displayName}}</option>
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <div class="label text-muted">{{ 'schemas.rules.when' | sqxTranslate }}</div>
+    </div>
+
+    <div class="col">
+        <sqx-control-errors for="condition"></sqx-control-errors>
+
+        <sqx-code-editor [singleLine]="true" formControlName="condition" [completion]="completions | async"></sqx-code-editor>
+    </div>
+
+    <div class="col-auto">
+        <button type="button" class="btn btn-text-danger" [disabled]="form.disabled"
+            (sqxConfirmClick)="remove.emit()"
+            confirmTitle="i18n:rules.deleteContentChangedSchemaTitle"
+            confirmText="i18n:rules.deleteContentChangedSchemaText"
+            confirmRememberKey="deleteContentChangedSchema">
+            <i class="icon-bin2"></i>
+        </button>
+    </div>
+</div>

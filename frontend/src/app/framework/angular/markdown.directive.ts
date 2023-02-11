@@ -46,7 +46,7 @@ export class MarkdownDirective {
             html = renderMarkdown(markdown, this.inline);
         }
 
-        const hasHtml = html.indexOf('<') >= 0;
+        const hasHtml = html.indexOf('<') >= 0 || html.indexOf('&') >= 0;
 
         if (hasHtml) {
             this.renderer.setProperty(this.element.nativeElement, 'innerHTML', html);

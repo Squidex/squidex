@@ -1,6 +1,10 @@
 @import 'mixins';
 @import 'vars';
 
+sqx-code-editor {
+    flex-grow: 1;
+}
+
 .input-group-apppend {
     z-index: 1;
 

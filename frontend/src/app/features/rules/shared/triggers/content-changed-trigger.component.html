@@ -1,55 +1,28 @@
 <ng-container *ngIf="!triggerForm.form.controls.handleAll.value">
-    <table class="table table-middle table-sm table-fixed table-borderless">
-        <colgroup>
-            <col style="width: 40%;">
-            <col style="width: 60%;">
-            <col style="width: 40px;">
-        </colgroup>
+    <div class="mb-2" *ngFor="let form of schemasForm.controls; let i = index">
+        <sqx-content-changed-schema [schemas]="schemas" [form]="$any(form)" (remove)="remove(i)"></sqx-content-changed-schema>
+    </div>
 
-        <tr>
-            <td>
-                <label>{{ 'common.schema' | sqxTranslate }}</label>
-            </td>
-            <td>
-                <label>{{ 'common.condition' | sqxTranslate }}</label>
-            </td>
-            <th></th>
-        </tr>
+    <div class="form-group row gx-2 align-items-center">
+        <div class="col-3">
+            <div class="form-control preview">{{ 'common.schema' | sqxTranslate }}</div>
+        </div>
 
-        <tr *ngFor="let triggerSchema of triggerSchemas">
-            <td>
-                <span class="truncate">{{triggerSchema.schema.displayName}}</span>
-            </td>
-            <td class="text-center">
-                <input class="form-control code" placeholder="{{ 'rules.conditionHint' | sqxTranslate }}" 
-                    [disabled]="triggerForm.form.disabled" 
-                    [ngModelOptions]="{ updateOn: 'blur' }" 
-                    [ngModel]="triggerSchema.condition" 
-                    (ngModelChange)="updateCondition(triggerSchema.schema, $event)">
-            </td>
-            <td class="text-center">
-                <button type="button" class="btn btn-text-secondary" (click)="removeSchema(triggerSchema)" [disabled]="triggerForm.form.disabled">
-                    <i class="icon-close"></i>
-                </button>
-            </td>
-        </tr>
-    </table>
+        <div class="col-auto">
+            <div class="label text-muted">{{ 'schemas.rules.when' | sqxTranslate }}</div>
+        </div>
 
-    <div class="section" *ngIf="schemasToAdd.length > 0">
-        <form class="row g-2" (ngSubmit)="addSchema()">
-            <div class="col">
-                <select class="form-select schemas-control" [disabled]="triggerForm.form.disabled" [(ngModel)]="schemaToAdd" name="schema">
-                    <option *ngFor="let schema of schemasToAdd; trackBy: trackBySchema" [ngValue]="schema">{{schema.displayName}}</option>
-                </select>
-            </div>
+        <div class="col">
+            <div class="form-control preview">{{ 'schemas.rules.condition' | sqxTranslate }}</div>
+        </div>
 
-            <div class="col-auto">
-                <button type="submit" class="btn btn-success" [disabled]="triggerForm.form.disabled">{{ 'rules.addSchema' | sqxTranslate }}</button>
-            </div>
-        </form>
+        <div class="col-auto">
+            <button type="button" class="btn btn-success" (click)="add()">
+                <i class="icon-add"></i>
+            </button>
+        </div>
     </div>
     
-
     <div class="help">
         <h4>{{ 'common.conditions' | sqxTranslate }}</h4>
     

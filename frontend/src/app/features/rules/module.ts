@@ -8,7 +8,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HelpComponent, RuleMustExistGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AssetChangedTriggerComponent, CommentTriggerComponent, ContentChangedTriggerComponent, GenericActionComponent, RuleClassPipe, RuleComponent, RuleElementComponent, RuleEventsPageComponent, RuleIconComponent, RuleSimulatorPageComponent, RulesPageComponent, RuleTransitionComponent, SchemaChangedTriggerComponent, SimulatedRuleEventStatusPipe, UsageTriggerComponent } from './declarations';
+import { AssetChangedTriggerComponent, CommentTriggerComponent, ContentChangedSchemaComponent, ContentChangedTriggerComponent, GenericActionComponent, RuleClassPipe, RuleComponent, RuleElementComponent, RuleEventsPageComponent, RuleIconComponent, RuleSimulatorPageComponent, RulesPageComponent, RuleTransitionComponent, SchemaChangedTriggerComponent, SimulatedRuleEventStatusPipe, UsageTriggerComponent } from './declarations';
 import { RuleEventComponent } from './pages/events/rule-event.component';
 import { RulePageComponent } from './pages/rule/rule-page.component';
 import { SimulatedRuleEventComponent } from './pages/simulator/simulated-rule-event.component';
@@ -68,6 +68,7 @@ const routes: Routes = [
     declarations: [
         AssetChangedTriggerComponent,
         CommentTriggerComponent,
+        ContentChangedSchemaComponent,
         ContentChangedTriggerComponent,
         FormattableInputComponent,
         GenericActionComponent,
