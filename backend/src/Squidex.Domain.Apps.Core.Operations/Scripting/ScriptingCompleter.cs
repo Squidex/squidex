@@ -258,7 +258,7 @@ public sealed class ScriptingCompleter
 
                 if (propertyType.IsEnum)
                 {
-                    var allowedValues = Enum.GetValues(propertyType).OfType<object>().Select(x => x.ToString()).Order().ToArray();
+                    var allowedValues = Enum.GetValues(propertyType).OfType<object>().Select(x => x.ToString()!).Order().ToArray();
 
                     Add(JsonType.String, name, description, allowedValues);
                 }

@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics;
 using Jint;
 using Squidex.Infrastructure.Tasks;
-using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 

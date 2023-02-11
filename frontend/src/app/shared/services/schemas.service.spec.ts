@@ -579,7 +579,7 @@ describe('SchemasService', () => {
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
             let completions: SchemaCompletions;
 
-            schemasService.getContentTriggerCompletion('my-app', 'my-schema').subscribe(result => {
+            schemasService.getContentScriptsCompletion('my-app', 'my-schema').subscribe(result => {
                 completions = result;
             });
 
