@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ConfigurePreviewUrlsForm, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
@@ -13,7 +13,7 @@ import { ConfigurePreviewUrlsForm, SchemaDto, SchemasState } from '@app/shared';
     styleUrls: ['./schema-preview-urls-form.component.scss'],
     templateUrl: './schema-preview-urls-form.component.html',
 })
-export class SchemaPreviewUrlsFormComponent implements OnChanges {
+export class SchemaPreviewUrlsFormComponent {
     @Input()
     public schema!: SchemaDto;
 

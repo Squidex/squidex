@@ -5,12 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, EmbeddedViewRef, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { TypedSimpleChanges } from './helpers';
 
 @Directive({
     selector: '[sqxTemplateWrapper]',
 })
-export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
+export class TemplateWrapperDirective implements OnDestroy, OnInit {
     @Input()
     public item: any;
 
@@ -48,7 +49,7 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
         this.view = this.viewContainer.createEmbeddedView(this.templateRef, data);
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (this.view) {
             if (changes.item) {
                 this.view.context.$implicit = this.item;

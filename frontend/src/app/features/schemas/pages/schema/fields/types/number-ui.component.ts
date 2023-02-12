@@ -5,17 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FieldDto, FloatConverter, NUMBER_FIELD_EDITORS, NumberFieldPropertiesDto, ResourceOwner, valueProjection$ } from '@app/shared';
+import { FieldDto, FloatConverter, NUMBER_FIELD_EDITORS, NumberFieldPropertiesDto, ResourceOwner, valueProjection$, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-ui[field][fieldForm][properties]',
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html',
 })
-export class NumberUIComponent extends ResourceOwner implements OnChanges {
+export class NumberUIComponent extends ResourceOwner {
     public readonly converter = FloatConverter.INSTANCE;
     public readonly editors = NUMBER_FIELD_EDITORS;
 
@@ -31,8 +31,8 @@ export class NumberUIComponent extends ResourceOwner implements OnChanges {
     public hideAllowedValues?: Observable<boolean>;
     public hideInlineEditable?: Observable<boolean>;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldForm']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.fieldForm) {
             this.unsubscribeAll();
 
             const editor = this.fieldForm.controls['editor'];

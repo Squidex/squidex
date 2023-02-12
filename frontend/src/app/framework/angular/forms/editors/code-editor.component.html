@@ -1,1 +1,4 @@
-<div class="editor" [class.no-border]="borderless" #editor></div>
+<div [class.form-control]="singleLine">
+    <span></span>
+    <div class="editor" [class.no-border]="borderless || singleLine" #editor></div>
+</div>

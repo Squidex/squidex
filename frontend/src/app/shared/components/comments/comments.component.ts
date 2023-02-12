@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
 import { MentionConfig } from 'angular-mentions';
 import { timer } from 'rxjs';
@@ -18,7 +18,7 @@ import { CommentComponent } from './comment.component';
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
 })
-export class CommentsComponent extends ResourceOwner implements OnChanges {
+export class CommentsComponent extends ResourceOwner {
     @ViewChild('commentsList', { static: false })
     public commentsList!: ElementRef<HTMLDivElement>;
 

@@ -6,11 +6,11 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { VirtualScrollerComponent } from 'ngx-virtual-scroller';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, Types } from '@app/shared';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, TypedSimpleChanges, Types } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
@@ -19,7 +19,7 @@ import { ArrayItemComponent } from './array-item.component';
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArrayEditorComponent implements OnChanges {
+export class ArrayEditorComponent {
     @Input()
     public form!: EditContentForm;
 
@@ -71,8 +71,8 @@ export class ArrayEditorComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['formModel']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.formModel) {
             const maxItems = this.formModel.field.properties['maxItems'] || Number.MAX_VALUE;
 
             if (Types.is(this.formModel.field.properties, ComponentsFieldPropertiesDto)) {
@@ -90,7 +90,7 @@ export class ArrayEditorComponent implements OnChanges {
             }));
         }
 
-        if (changes['formModel'] || changes['formLevel']) {
+        if (changes.formModel || changes.formLevel) {
             this.isCollapsedInitial = this.localStore.getBoolean(this.isCollapsedKey()) || this.formLevel > 0;
         }
     }

@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
 import { ResourceLoaderService, StatefulControlComponent, Types } from '@app/framework/internal';
+import { TypedSimpleChanges } from './../../helpers';
 import { FocusComponent } from './../forms-helper';
 
 declare const ace: any;
@@ -26,8 +27,9 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodeEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, FocusComponent, OnChanges {
+export class CodeEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, FocusComponent {
     private aceEditor: any;
+    private aceTools: any;
     private valueChanged = new Subject();
     private value = '';
     private modelist: any;
@@ -52,6 +54,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public maxLines: number | undefined;
 
     @Input()
+    public singleLine = false;
+
+    @Input()
     public wordWrap = false;
 
     @Input()
@@ -63,9 +68,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     @Input()
-    public set completion(value: ReadonlyArray<{ path: string; description: string }> | undefined | null) {
+    public set completion(value: ReadonlyArray<{ path: string; description: string; type: string; allowedValues?: string[] }> | undefined | null) {
         if (value) {
-            this.completions = value.map(({ path, description }) => ({ value: path, name: path, meta: 'context', description }));
+            this.completions = value.map(({ path, description, type, allowedValues }) => ({ value: path, name: path, description, meta: type?.toLowerCase(), path, allowedValues }));
         } else {
             this.completions = [];
         }
@@ -77,16 +82,16 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
         super(changeDetector, {});
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['valueFile'] || changes['mode']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.valueFile || changes.mode) {
             this.setMode();
         }
 
-        if (changes['height'] || changes['maxLines']) {
-            this.setHeight();
+        if (changes.height || changes.maxLines || changes.singleLine) {
+            this.setOptions();
         }
 
-        if (changes['wordWrap']) {
+        if (changes.wordWrap) {
             this.setWordWrap();
         }
     }
@@ -114,15 +119,19 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     public onDisabled(isDisabled: boolean) {
-        if (this.aceEditor) {
-            this.aceEditor.setReadOnly(isDisabled);
+        if (!this.aceEditor) {
+            return;
         }
+
+        this.aceEditor.setReadOnly(isDisabled);
     }
 
     public focus() {
-        if (this.aceEditor) {
-            this.aceEditor.focus();
+        if (!this.aceEditor) {
+            return;
         }
+
+        this.aceEditor.focus();
     }
 
     public ngAfterViewInit() {
@@ -136,39 +145,39 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             this.resourceLoader.loadLocalScript('dependencies/ace/ext/modelist.js'),
             this.resourceLoader.loadLocalScript('dependencies/ace/ext/language_tools.js'),
         ]).then(() => {
-            this.aceEditor = ace.edit(this.editor.nativeElement);
-
             this.modelist = ace.require('ace/ext/modelist');
 
-            this.aceEditor.setReadOnly(this.snapshot.isDisabled);
+            this.aceEditor = ace.edit(this.editor.nativeElement);
             this.aceEditor.setFontSize(14);
-
-            this.onDisabled(this.snapshot.isDisabled);
+            this.aceTools = ace.require('ace/ext/language_tools');
 
             this.setValue(this.value);
             this.setMode();
-            this.setHeight();
+            this.setOptions();
             this.setWordWrap();
+            this.onDisabled(this.snapshot.isDisabled);
 
-            const langTools = ace.require('ace/ext/language_tools');
-
-            if (langTools) {
-                this.aceEditor.setOptions({
-                    enableBasicAutocompletion: true,
-                    enableSnippets: true,
-                    enableLiveAutocompletion: true,
-                });
-
+            if (this.aceTools) {
                 const previous = this.aceEditor.completers;
 
                 this.aceEditor.completers = [
-                    previous[0], {
+                    previous?.[0], {
                         getCompletions: (editor: any, session: any, pos: any, prefix: any, callback: any) => {
                             callback(null, this.completions);
                         },
                         getDocTooltip: (item: any) => {
-                            if (item.meta === 'context' && item.description) {
+                            if (item.path && item.description) {
                                 item.docHTML = `<b>${item.value}</b><hr></hr>${item.description}`;
+
+                                if (item.allowedValues) {
+                                    item.docHTML += '<div class="mt-2 mb-2">Allowed Values:<ul>';
+
+                                    for (const value of item.allowedValues) {
+                                        item.docHTML += `<li><code>${value}</code></li>`;
+                                    }
+
+                                    item.docHTML += '</ul></div>';
+                                }
                             }
                         },
                         // eslint-disable-next-line no-useless-escape
@@ -176,7 +185,6 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
                     },
                 ];
             }
-
             this.aceEditor.on('blur', () => {
                 this.changeValue();
 
@@ -185,6 +193,12 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
 
             this.aceEditor.on('change', () => {
                 this.valueChanged.next(true);
+            });
+
+            this.aceEditor.on('paste', (event: any) => {
+                if (this.singleLine) {
+                    event.text = event.text.replace(/[\r\n]+/g, ' ');
+                }
             });
 
             this.detach();
@@ -219,39 +233,61 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     private setWordWrap() {
-        if (this.aceEditor) {
-            this.aceEditor.getSession().setUseWrapMode(this.wordWrap);
+        if (!this.aceEditor || this.singleLine) {
+            return;
         }
+
+        this.aceEditor.getSession().setUseWrapMode(this.wordWrap);
     }
 
     private setMode() {
-        if (this.aceEditor) {
-            if (this.valueFile && this.modelist) {
-                const mode = this.modelist.getModeForPath(this.valueFile).mode;
+        if (!this.aceEditor) {
+            return;
+        }
 
-                this.aceEditor.getSession().setMode(mode);
-            } else {
-                this.aceEditor.getSession().setMode(this.mode);
-            }
+        if (this.valueFile && this.modelist) {
+            const mode = this.modelist.getModeForPath(this.valueFile).mode;
+
+            this.aceEditor.getSession().setMode(mode);
+        } else {
+            this.aceEditor.getSession().setMode(this.mode);
         }
     }
 
-    private setHeight() {
-        if (this.aceEditor && this.editor?.nativeElement) {
+    private setOptions() {
+        if (!this.aceEditor) {
+            return;
+        }
+
+        let maxLines = undefined;
+        let minLines = undefined;
+
+        if (!this.singleLine) {
             if (Types.isNumber(this.height)) {
                 const lines = this.height / 15;
 
-                this.aceEditor.setOptions({
-                    minLines: lines,
-                    maxLines: lines,
-                });
+                maxLines = lines;
+                minLines = lines;
             } else if (this.height === 'auto') {
-                this.aceEditor.setOptions({
-                    minLines: 3,
-                    maxLines: this.maxLines || 500,
-                });
+                maxLines = this.maxLines || 500;
+                minLines = Math.min(3, maxLines);
             }
+        } else {
+            maxLines = 1;
+            minLines = 1;
         }
+
+        this.aceEditor.setOptions({
+            autoScrollEditorIntoView: this.singleLine,
+            enableBasicAutocompletion: !!this.aceTools,
+            enableLiveAutocompletion: !!this.aceTools,
+            enableSnippets: !!this.aceTools && !this.singleLine,
+            highlightActiveLine: !this.singleLine,
+            maxLines,
+            minLines,
+            printMargin: !this.singleLine,
+            showGutter: !this.singleLine,
+        });
     }
 
     private setValue(value: string) {

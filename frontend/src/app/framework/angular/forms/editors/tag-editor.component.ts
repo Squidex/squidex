@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
+import { TypedSimpleChanges } from './../../helpers';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
@@ -18,11 +19,11 @@ interface State {
     // True, when the item has the focus.
     hasFocus: boolean;
 
-    // The suggested item.
-    itemsList: ReadonlyArray<TagValue>;
+    // The suggested items.
+    suggestedItems: ReadonlyArray<any>;
 
-    // The index of the selected suggested items.
-    itemsIndex: number;
+    // The selected suggest item index.
+    suggestedIndex: number;
 
     // All available tag values.
     tags: ReadonlyArray<TagValue>;
@@ -37,7 +38,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnChanges, OnInit {
+export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnInit {
     private readonly textMeasurer: TextMeasurer;
     private latestValue: any;
     private latestInput?: string;
@@ -114,8 +115,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             const items = this.itemsSorted.filter(s => s.lowerCaseName.includes(query) && !this.snapshot.tags.find(x => x.id === s.id));
 
             this.next({
-                itemsIndex: -1,
-                itemsList: items || [],
+                suggestedIndex: -1,
+                suggestedItems: items || [],
             });
         }
     }
@@ -128,8 +129,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
             hasFocus: false,
-            itemsList: [],
-            itemsIndex: 0,
+            suggestedIndex: 0,
+            suggestedItems: [],
             tags: [],
         });
 
@@ -140,8 +141,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         this.resetSize();
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['converter']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.itemConverter) {
             this.writeValue(this.latestValue, true);
         }
     }
@@ -180,8 +181,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                     }))
                 .subscribe(suggestedItems => {
                     this.next({
-                        itemsIndex: -1,
-                        itemsList: suggestedItems,
+                        suggestedIndex: -1,
+                        suggestedItems,
                     });
                 }));
     }
@@ -194,23 +195,23 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             this.resetSize();
         }
 
-        const items: any[] = [];
+        const tags: any[] = [];
 
         if (this.itemConverter && Types.isArray(obj)) {
             for (const value of obj) {
                 if (Types.is(value, TagValue)) {
-                    items.push(value);
+                    tags.push(value);
                 } else {
                     const converted = this.itemConverter.convertValue(value);
 
                     if (converted) {
-                        items.push(converted);
+                        tags.push(converted);
                     }
                 }
             }
         }
 
-        this.next({ tags: items });
+        this.next({ tags });
     }
 
     public onDisabled(isDisabled: boolean) {
@@ -286,8 +287,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             this.selectNextIndex();
             return false;
         } else if (Keys.isEnter(event)) {
-            if (this.snapshot.itemsIndex >= 0) {
-                if (this.selectValue(this.snapshot.itemsList[this.snapshot.itemsIndex])) {
+            if (this.snapshot.suggestedIndex >= 0) {
+                if (this.selectValue(this.snapshot.suggestedItems[this.snapshot.suggestedIndex])) {
                     return false;
                 }
             } else if (this.acceptEnter) {
@@ -335,11 +336,11 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public selectPrevIndex() {
-        this.selectIndex(this.snapshot.itemsIndex - 1);
+        this.selectIndex(this.snapshot.suggestedIndex - 1);
     }
 
     public selectNextIndex() {
-        this.selectIndex(this.snapshot.itemsIndex + 1);
+        this.selectIndex(this.snapshot.suggestedIndex + 1);
     }
 
     public selectIndex(suggestedIndex: number) {
@@ -347,11 +348,11 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             suggestedIndex = 0;
         }
 
-        if (suggestedIndex >= this.snapshot.itemsList.length) {
-            suggestedIndex = this.snapshot.itemsList.length - 1;
+        if (suggestedIndex >= this.snapshot.suggestedItems.length) {
+            suggestedIndex = this.snapshot.suggestedItems.length - 1;
         }
 
-        this.next({ itemsIndex: suggestedIndex });
+        this.next({ suggestedIndex });
     }
 
     public resetFocus(): any {
@@ -359,7 +360,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     private resetAutocompletion() {
-        this.next({ itemsList: [], itemsIndex: -1 });
+        this.next({ suggestedItems: [], suggestedIndex: -1 });
     }
 
     private resetForm() {
@@ -447,13 +448,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         return s && e && (e - s) > 0;
     }
 
-    private updateItems(items: ReadonlyArray<TagValue>, touched: boolean) {
-        this.next({ tags: items });
+    private updateItems(tags: ReadonlyArray<TagValue>, touched: boolean) {
+        this.next({ tags });
 
-        if (items.length === 0 && this.undefinedWhenEmpty) {
+        if (tags.length === 0 && this.undefinedWhenEmpty) {
             this.callChange(undefined);
         } else {
-            this.callChange(items.map(x => x.value));
+            this.callChange(tags.map(x => x.value));
         }
 
         if (touched) {

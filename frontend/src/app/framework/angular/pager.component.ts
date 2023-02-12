@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { PagingInfo } from './../state';
 
 export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
@@ -16,7 +16,7 @@ export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
     templateUrl: './pager.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PagerComponent implements OnChanges {
+export class PagerComponent {
     @Output()
     public loadTotal = new EventEmitter();
 

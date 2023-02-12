@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { ContentDto, HistoryEventDto } from '@app/shared';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ContentDto, HistoryEventDto, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-event[content][event]',
@@ -14,7 +14,7 @@ import { ContentDto, HistoryEventDto } from '@app/shared';
     templateUrl: './content-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentEventComponent implements OnChanges {
+export class ContentEventComponent {
     @Output()
     public dataLoad = new EventEmitter();
 
@@ -29,8 +29,8 @@ export class ContentEventComponent implements OnChanges {
 
     public canLoadOrCompare = false;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['event']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.event) {
             this.canLoadOrCompare =
                 (this.event.eventType === 'ContentUpdatedEvent' ||
                 this.event.eventType === 'ContentCreatedEventV2') &&

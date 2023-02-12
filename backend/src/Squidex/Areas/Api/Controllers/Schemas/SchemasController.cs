@@ -309,7 +309,7 @@ public sealed class SchemasController : ApiController
     }
 
     [HttpGet]
-    [Route("apps/{app}/schemas/{schema}/completion")]
+    [Route("apps/{app}/schemas/{schema}/completion/content-scripts")]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -322,7 +322,7 @@ public sealed class SchemasController : ApiController
     }
 
     [HttpGet]
-    [Route("apps/{app}/schemas/{schema}/completion/triggers")]
+    [Route("apps/{app}/schemas/{schema}/completion/content-triggers")]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -330,6 +330,19 @@ public sealed class SchemasController : ApiController
         [FromServices] ScriptingCompleter completer)
     {
         var completion = completer.ContentTrigger(await BuildModel());
+
+        return Ok(completion);
+    }
+
+    [HttpGet]
+    [Route("apps/{app}/schemas/{schema}/completion/field-rules")]
+    [ApiPermissionOrAnonymous]
+    [ApiCosts(1)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> GetScriptFieldRulesCompletion(string app, string schema,
+        [FromServices] ScriptingCompleter completer)
+    {
+        var completion = completer.FieldRule(await BuildModel());
 
         return Ok(completion);
     }

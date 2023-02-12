@@ -5,15 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, FieldForm, ModalModel } from '@app/shared';
+import { Component, Input } from '@angular/core';
+import { AppLanguageDto, FieldForm, ModalModel, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-copy-button[formModel][languages]',
     styleUrls: ['./field-copy-button.component.scss'],
     templateUrl: './field-copy-button.component.html',
 })
-export class FieldCopyButtonComponent implements OnChanges {
+export class FieldCopyButtonComponent {
     @Input()
     public formModel!: FieldForm;
 
@@ -31,8 +31,8 @@ export class FieldCopyButtonComponent implements OnChanges {
         return this.formModel.field.isLocalizable && this.languages.length > 1;
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['languages']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.languages) {
             this.setCopySource(this.languages[0]?.iso2Code);
         }
     }

@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostBinding, Input, NgZone, OnChanges, OnInit, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, HostBinding, Input, NgZone, OnInit, Renderer2 } from '@angular/core';
 import { ResourceOwner } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxImageUrl]',
 })
-export class ImageUrlDirective extends ResourceOwner implements OnChanges, OnInit {
+export class ImageUrlDirective extends ResourceOwner implements  OnInit {
     @Input('sqxImageUrl') @HostBinding('attr.src')
     public imageUrl!: string;
 

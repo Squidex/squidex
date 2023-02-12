@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 
@@ -30,7 +30,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> implements AfterViewInit, AfterViewChecked, OnChanges {
+export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> implements AfterViewInit, AfterViewChecked {
     private readonly textMeasurer: TextMeasurer;
     private childrenWidth = 0;
     private checkedValuesRaw: any;

@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State, ToolbarService } from '@app/shared';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State, ToolbarService, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-references[content][language][languages]',
@@ -17,7 +17,7 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, 
         Router2State, ComponentContentsState,
     ],
 })
-export class ContentReferencesComponent implements OnChanges, OnInit, OnDestroy {
+export class ContentReferencesComponent implements OnInit, OnDestroy {
     @Input()
     public content!: ContentDto;
 
@@ -56,8 +56,8 @@ export class ContentReferencesComponent implements OnChanges, OnInit, OnDestroy 
         });
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['content'] || changes['mode']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.content || changes.mode) {
             this.contentsState.schema = { name: this.content.schemaName };
 
             const initial =

@@ -5,17 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { BooleanFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@app/shared';
+import { BooleanFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-validation[field][fieldForm][languages][properties]',
     styleUrls: ['boolean-validation.component.scss'],
     templateUrl: 'boolean-validation.component.html',
 })
-export class BooleanValidationComponent implements OnChanges {
+export class BooleanValidationComponent {
     @Input()
     public fieldForm!: UntypedFormGroup;
 
@@ -33,8 +33,8 @@ export class BooleanValidationComponent implements OnChanges {
 
     public showDefaultValue?: Observable<boolean>;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldForm']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.fieldForm) {
             this.showDefaultValue =
                 hasNoValue$(this.fieldForm.controls['isRequired']);
         }

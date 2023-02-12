@@ -575,15 +575,51 @@ describe('SchemasService', () => {
             req.flush({});
         }));
 
-    it('should make get request to get completions',
+    it('should make get request to get content scripts completions',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
             let completions: SchemaCompletions;
 
-            schemasService.getCompletions('my-app', 'my-schema').subscribe(result => {
+            schemasService.getContentScriptsCompletion('my-app', 'my-schema').subscribe(result => {
                 completions = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/completion');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/completion/content-scripts');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush([]);
+
+            expect(completions!).toEqual([]);
+        }));
+
+    it('should make get request to get content trigger completions',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+            let completions: SchemaCompletions;
+
+            schemasService.getContentTriggerCompletion('my-app', 'my-schema').subscribe(result => {
+                completions = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/completion/content-triggers');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush([]);
+
+            expect(completions!).toEqual([]);
+        }));
+
+    it('should make get request to get field rules completions',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+            let completions: SchemaCompletions;
+
+            schemasService.getFieldRulesCompletion('my-app', 'my-schema').subscribe(result => {
+                completions = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/completion/field-rules');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();

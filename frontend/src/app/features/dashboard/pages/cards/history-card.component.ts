@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppDto, HistoryEventDto, HistoryService } from '@app/shared';
 
@@ -15,7 +15,7 @@ import { AppDto, HistoryEventDto, HistoryService } from '@app/shared';
     templateUrl: './history-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HistoryCardComponent implements OnChanges {
+export class HistoryCardComponent {
     @Input()
     public app!: AppDto;
 

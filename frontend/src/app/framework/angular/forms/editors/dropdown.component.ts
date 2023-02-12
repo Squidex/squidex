@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, TemplateRef } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
+import { TypedSimpleChanges } from './../../helpers';
 
 export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
@@ -37,7 +38,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnChanges, OnInit {
+export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnInit {
     private value: any;
 
     @Output()
@@ -127,8 +128,8 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
                 }));
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['items']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.items) {
             this.items = this.items || [];
 
             this.next({ suggestedItems: this.items });

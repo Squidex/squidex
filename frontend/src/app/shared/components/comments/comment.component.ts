@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 import { MentionConfig } from 'angular-mentions';
 import { CommentDto, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
 
@@ -19,7 +19,7 @@ interface State {
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommentComponent extends StatefulComponent<State> implements OnChanges {
+export class CommentComponent extends StatefulComponent<State> {
     @Input()
     public canFollow?: boolean | null;
 

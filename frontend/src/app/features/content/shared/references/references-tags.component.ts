@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { Types } from '@app/framework';
+import { TypedSimpleChanges, Types } from '@app/framework';
 import { ContentDto, ContentsDto, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
@@ -35,7 +35,7 @@ const NO_EMIT = { emitEvent: false };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
+export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     private readonly contents: ContentDto[] = [];
     private isOpenedBefore = false;
     private isLoadingFailed = false;
@@ -81,14 +81,14 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
                 }));
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['schemaId']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.schemaId) {
             this.contents.clear();
 
             this.resetState();
         }
 
-        if (changes['language'] || changes['schemaId']) {
+        if (changes.language || changes.schemaId) {
             this.resetConverterState(true);
         }
     }

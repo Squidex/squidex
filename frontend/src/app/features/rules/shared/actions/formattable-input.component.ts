@@ -35,7 +35,7 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
     public type: 'Text' | 'Code' = 'Text';
 
     @Input()
-    public completion: ReadonlyArray<{ path: string; description: string }> | undefined | null;
+    public completion: ReadonlyArray<{ path: string; description: string; type: string }> | undefined | null;
 
     @ViewChild(DefaultValueAccessor)
     public inputEditor!: DefaultValueAccessor;

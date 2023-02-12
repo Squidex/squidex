@@ -8,22 +8,22 @@
 import { ContentDto, getContentValue, LanguageDto, LocalizerService, TagConverter, TagValue } from '@app/shared/internal';
 
 export class ReferencesTagsConverter implements TagConverter {
-    public suggestions: ReadonlyArray<TagValue> = [];
+    public tags: ReadonlyArray<TagValue> = [];
 
     constructor(language: LanguageDto, contents: ReadonlyArray<ContentDto>,
         private readonly localizer: LocalizerService,
     ) {
-        this.suggestions = this.createTags(language, contents);
+        this.tags = this.createTags(language, contents);
     }
 
     public convertInput(input: string) {
-        const result = this.suggestions.find(x => x.name === input);
+        const result = this.tags.find(x => x.name === input);
 
         return result || null;
     }
 
     public convertValue(value: any) {
-        const result = this.suggestions.find(x => x.id === value);
+        const result = this.tags.find(x => x.id === value);
 
         return result || null;
     }

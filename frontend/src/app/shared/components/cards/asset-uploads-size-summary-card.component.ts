@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CurrentStorageDto } from '@app/shared/internal';
 
 @Component({
@@ -14,7 +14,7 @@ import { CurrentStorageDto } from '@app/shared/internal';
     templateUrl: './asset-uploads-size-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AssetUploadsSizeSummaryCardComponent implements OnChanges {
+export class AssetUploadsSizeSummaryCardComponent {
     @Input()
     public usage?: CurrentStorageDto;
 

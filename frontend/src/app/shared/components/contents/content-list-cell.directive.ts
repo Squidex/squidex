@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, Input, OnChanges, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, Input, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
 import { ResourceOwner } from '@app/framework';
 import { ContentDto, FieldSizes, META_FIELDS, TableField, TableSettings } from '@app/shared/internal';
 
@@ -63,7 +63,7 @@ export class ContentsColumnsPipe implements PipeTransform {
 @Directive({
     selector: '[sqxContentListWidth]',
 })
-export class ContentListWidthDirective extends ResourceOwner implements OnChanges {
+export class ContentListWidthDirective extends ResourceOwner {
     private sizes?: FieldSizes;
     private size = -1;
 
@@ -118,7 +118,7 @@ export class ContentListWidthDirective extends ResourceOwner implements OnChange
 @Directive({
     selector: '[sqxContentListCell]',
 })
-export class ContentListCellDirective extends ResourceOwner implements OnChanges {
+export class ContentListCellDirective extends ResourceOwner {
     private sizes?: FieldSizes;
     private size = -1;
 

@@ -44,6 +44,7 @@ public sealed record WebhookAction : RuleAction
 
     [Display(Name = "Headers (Optional)", Description = "The message headers in the format '[Key]=[Value]', one entry per line.")]
     [Editor(RuleFieldEditor.TextArea)]
+    [Formattable]
     public string Headers { get; set; }
 
     [Display(Name = "Shared Secret", Description = "The shared secret that is used to calculate the payload signature.")]

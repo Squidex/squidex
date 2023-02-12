@@ -5,21 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
-import { SchemaDto, TriggerForm } from '@app/shared';
-
-export interface TriggerSchemaForm {
-    schema: SchemaDto;
-
-    condition?: string;
-}
+import { Component, Input } from '@angular/core';
+import { SchemaDto, TemplatedFormArray, TriggerForm } from '@app/shared';
+import { CompletionsCache } from './completions-cache';
 
 @Component({
     selector: 'sqx-content-changed-trigger[trigger][triggerForm]',
     styleUrls: ['./content-changed-trigger.component.scss'],
     templateUrl: './content-changed-trigger.component.html',
+    providers: [
+        CompletionsCache,
+    ],
 })
-export class ContentChangedTriggerComponent implements OnChanges {
+export class ContentChangedTriggerComponent {
     @Input()
     public schemas?: ReadonlyArray<SchemaDto> | null;
 
@@ -29,69 +27,15 @@ export class ContentChangedTriggerComponent implements OnChanges {
     @Input()
     public triggerForm!: TriggerForm;
 
-    public triggerSchemas: TriggerSchemaForm[] = [];
-
-    public schemaToAdd!: SchemaDto;
-    public schemasToAdd!: ReadonlyArray<SchemaDto>;
-
-    public get hasSchema() {
-        return !!this.schemaToAdd;
+    public get schemasForm() {
+        return this.triggerForm.form.get('schemas') as TemplatedFormArray;
     }
 
-    public ngOnChanges() {
-        const schemas: TriggerSchemaForm[] = [];
-
-        if (this.trigger.schemas && this.schemas) {
-            for (const triggerSchema of this.trigger.schemas) {
-                const schema = this.schemas.find(s => s.id === triggerSchema.schemaId);
-
-                if (schema) {
-                    const condition = triggerSchema.condition;
-
-                    schemas.push({ schema, condition });
-                }
-            }
-        }
-
-        this.triggerSchemas = schemas;
-        this.triggerSchemas.sortByString(x => x.schema.name);
-
-        this.updateSchemaToAdd();
+    public add() {
+        this.schemasForm.add();
     }
 
-    public removeSchema(schemaForm: TriggerSchemaForm) {
-        this.triggerSchemas.remove(schemaForm);
-
-        this.updateValue();
-        this.updateSchemaToAdd();
-    }
-
-    public addSchema() {
-        this.triggerSchemas.push({ schema: this.schemaToAdd });
-        this.triggerSchemas.sortByString(x => x.schema.name);
-
-        this.updateValue();
-        this.updateSchemaToAdd();
-    }
-
-    public updateCondition(schema: SchemaDto, condition: string) {
-        this.triggerSchemas.replaceBy('schema', { schema, condition });
-
-        this.updateValue();
-    }
-
-    public updateValue() {
-        const schemas = this.triggerSchemas.map(({ schema, condition }) => ({ schemaId: schema.id, condition }));
-
-        this.triggerForm.form.patchValue({ schemas });
-    }
-
-    private updateSchemaToAdd() {
-        this.schemasToAdd = this.schemas?.filter(schema => !this.triggerSchemas.find(s => s.schema.id === schema.id)).sortByString(x => x.name) || [];
-        this.schemaToAdd = this.schemasToAdd[0];
-    }
-
-    public trackBySchema(_index: number, schema: SchemaDto) {
-        return schema.id;
+    public remove(index: number) {
+        this.schemasForm.removeAt(index);
     }
 }

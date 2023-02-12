@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ErrorDto } from '@app/framework/internal';
+import { TypedSimpleChanges } from './../helpers';
 
 @Component({
     selector: 'sqx-form-error[error]',
@@ -14,7 +15,7 @@ import { ErrorDto } from '@app/framework/internal';
     templateUrl: './form-error.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormErrorComponent implements OnChanges {
+export class FormErrorComponent {
     @Input()
     public error?: ErrorDto | null;
 
@@ -26,8 +27,8 @@ export class FormErrorComponent implements OnChanges {
 
     public show = false;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['error']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.error) {
             this.show = !!this.error;
         }
     }

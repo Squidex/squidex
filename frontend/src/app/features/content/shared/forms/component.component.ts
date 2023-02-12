@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, EditContentForm, FieldDto, FieldSection, ModalModel, ResourceOwner, SchemaDto, Types } from '@app/shared';
+import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, EditContentForm, FieldDto, FieldSection, ModalModel, ResourceOwner, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -16,7 +16,7 @@ import { ComponentSectionComponent } from './component-section.component';
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ComponentComponent extends ResourceOwner implements OnChanges {
+export class ComponentComponent extends ResourceOwner {
     @Input()
     public canUnset?: boolean | null;
 
@@ -55,8 +55,8 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
         super();
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['formModel']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.formModel) {
             this.unsubscribeAll();
 
             this.isDisabled = disabled$(this.formModel.form);

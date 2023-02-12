@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, SchemaDto, Settings } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
+import { AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, SchemaDto, Settings, TypedSimpleChanges } from '@app/shared';
 
 const DESCRIPTIONS = {
     Developer: 'i18n:roles.defaults.developer',
@@ -37,7 +37,7 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
     templateUrl: './role.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RoleComponent implements OnChanges {
+export class RoleComponent {
     @Input()
     public role!: RoleDto;
 
@@ -70,8 +70,8 @@ export class RoleComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['role']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.role) {
             this.isEditable = this.role.canUpdate;
 
             this.properties = this.role.properties;

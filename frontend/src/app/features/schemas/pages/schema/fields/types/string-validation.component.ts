@@ -5,17 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, Types, value$ } from '@app/shared';
+import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, Types, value$, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation[field][fieldForm][languages][properties][schema][settings]',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
 })
-export class StringValidationComponent extends ResourceOwner implements OnChanges {
+export class StringValidationComponent extends ResourceOwner {
     public readonly contentTypes = STRING_CONTENT_TYPES;
 
     @Input()
@@ -49,12 +49,12 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
         return Types.is(this.field, RootFieldDto) && !this.field.isLocalizable && this.schema.type !== 'Component';
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['settings']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.settings) {
             this.setPatternName();
         }
 
-        if (changes['fieldForm']) {
+        if (changes.fieldForm) {
             this.unsubscribeAll();
 
             this.showPatternSuggestions =

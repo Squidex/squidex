@@ -9,7 +9,7 @@
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
-public delegate void AddDescription(JsonType type, string name, string description);
+public delegate void AddDescription(JsonType type, string name, string description, string[]? allowedValues = null);
 
 public interface IScriptDescriptor
 {

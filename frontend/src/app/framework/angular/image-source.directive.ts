@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { MathHelper, ResourceOwner, StringHelper } from '@app/framework/internal';
 
 const LAYOUT_CACHE: { [key: string]: { width: number; height: number } } = {};
@@ -13,7 +13,7 @@ const LAYOUT_CACHE: { [key: string]: { width: number; height: number } } = {};
 @Directive({
     selector: '[sqxImageSource]',
 })
-export class ImageSourceDirective extends ResourceOwner implements OnChanges, OnDestroy, OnInit, AfterViewInit {
+export class ImageSourceDirective extends ResourceOwner implements  OnDestroy, OnInit, AfterViewInit {
     private size: any;
     private loadTimer: any;
     private loadRetries = 0;

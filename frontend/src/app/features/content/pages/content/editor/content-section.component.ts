@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
 
 interface State {
     // The when the section is collapsed.
@@ -19,7 +19,7 @@ interface State {
     templateUrl: './content-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentSectionComponent extends StatefulComponent<State> implements OnChanges {
+export class ContentSectionComponent extends StatefulComponent<State> {
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
 
@@ -64,8 +64,8 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
         });
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['formSection' || changes['schema']]) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.formSection || changes.schema) {
             if (this.formSection?.separator && this.schema) {
                 const isCollapsed = this.localStore.getBoolean(this.isCollapsedKey());
 

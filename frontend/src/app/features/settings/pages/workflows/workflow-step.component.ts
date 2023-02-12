@@ -5,15 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { TypedSimpleChanges, WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
 
 @Component({
     selector: 'sqx-workflow-step[roles][step][workflow]',
     styleUrls: ['./workflow-step.component.scss'],
     templateUrl: './workflow-step.component.html',
 })
-export class WorkflowStepComponent implements OnChanges {
+export class WorkflowStepComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
     @Output()
@@ -54,8 +54,8 @@ export class WorkflowStepComponent implements OnChanges {
 
     public transitions!: ReadonlyArray<WorkflowTransitionView>;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['workflow'] || changes['step']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.workflow || changes.step) {
             this.openSteps = this.workflow.getOpenSteps(this.step);
             this.openStep = this.openSteps[0];
 

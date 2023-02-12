@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { META_FIELDS, SchemaDto, TableField } from '@app/shared';
 
 const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELDS.empty);
@@ -17,7 +17,7 @@ const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELD
     templateUrl: './field-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FieldListComponent implements OnChanges {
+export class FieldListComponent {
     @Input()
     public emptyText = '';
 

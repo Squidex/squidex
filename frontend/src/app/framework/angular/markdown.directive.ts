@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, Input, OnChanges, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, Input, Renderer2 } from '@angular/core';
 import { renderMarkdown } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxMarkdown]',
 })
-export class MarkdownDirective implements OnChanges {
+export class MarkdownDirective {
     @Input('sqxMarkdown')
     public markdown!: string;
 
@@ -46,7 +46,7 @@ export class MarkdownDirective implements OnChanges {
             html = renderMarkdown(markdown, this.inline);
         }
 
-        const hasHtml = html.indexOf('<') >= 0;
+        const hasHtml = html.indexOf('<') >= 0 || html.indexOf('&') >= 0;
 
         if (hasHtml) {
             this.renderer.setProperty(this.element.nativeElement, 'innerHTML', html);

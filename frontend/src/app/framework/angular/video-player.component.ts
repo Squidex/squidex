@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, Renderer2, ViewChild } from '@angular/core';
 import { ResourceLoaderService } from '@app/framework/internal';
 
 declare const videojs: any;
@@ -16,7 +16,7 @@ declare const videojs: any;
     templateUrl: './video-player.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges {
+export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
     private player: any;
 
     @Input()

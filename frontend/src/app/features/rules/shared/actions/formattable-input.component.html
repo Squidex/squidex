@@ -1,6 +1,6 @@
 <ng-container *ngIf="type === 'Text'; else code">
     <div class="input-group">
-        <input class="form-control" ngDefaultControl />
+        <sqx-code-editor [completion]="actualCompletion" [singleLine]="true" [mode]="aceMode"></sqx-code-editor>
 
         <div class="input-group-apppend">
             <select class="form-select" [ngModel]="mode" (ngModelChange)="setMode($event)" [disabled]="disabled" tabindex="-1">

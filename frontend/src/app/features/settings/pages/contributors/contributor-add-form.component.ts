@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Injectable, Input, OnChanges } from '@angular/core';
+import { Component, Injectable, Input } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
 import { AssignContributorForm, AutocompleteSource, ContributorsState, DialogModel, DialogService, RoleDto, UsersService } from '@app/shared';
@@ -45,7 +45,7 @@ export class UsersDataSource implements AutocompleteSource {
         UsersDataSource,
     ],
 })
-export class ContributorAddFormComponent implements OnChanges {
+export class ContributorAddFormComponent {
     private defaultValue: any;
 
     @Input()

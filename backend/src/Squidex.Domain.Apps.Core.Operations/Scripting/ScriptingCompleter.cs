@@ -73,6 +73,13 @@ public sealed class ScriptingCompleter
         return new Process(descriptors, dataSchema.Flatten()).ContentTrigger();
     }
 
+    public IReadOnlyList<ScriptingValue> FieldRule(FilterSchema dataSchema)
+    {
+        Guard.NotNull(dataSchema);
+
+        return new Process(descriptors, dataSchema.Flatten()).FieldRule();
+    }
+
     public IReadOnlyList<ScriptingValue> AssetScript()
     {
         return new Process(descriptors).AssetScript();
@@ -110,11 +117,6 @@ public sealed class ScriptingCompleter
         {
             this.descriptors = descriptors;
             this.dataSchema = dataSchema;
-        }
-
-        private IReadOnlyList<ScriptingValue> Build()
-        {
-            return result.Values.OrderBy(x => x.Path).ToList();
         }
 
         public IReadOnlyList<ScriptingValue> SchemaTrigger()
@@ -205,6 +207,41 @@ public sealed class ScriptingCompleter
             return Build();
         }
 
+        public IReadOnlyList<ScriptingValue> FieldRule()
+        {
+            AddObject("user", FieldDescriptions.User, () =>
+            {
+                AddString("id",
+                    FieldDescriptions.UserId);
+
+                AddString("email",
+                    FieldDescriptions.UserEmail);
+
+                AddString("displayName",
+                    FieldDescriptions.UserDisplayName);
+
+                AddString("role",
+                    FieldDescriptions.UserAppRole);
+            });
+
+            AddObject("data", FieldDescriptions.ContentData, () =>
+            {
+                AddData();
+            });
+
+            AddObject("itemData", FieldDescriptions.ItemData, () =>
+            {
+                AddAny("my-field", FieldDescriptions.ItemDataField);
+            });
+
+            return Build();
+        }
+
+        private IReadOnlyList<ScriptingValue> Build()
+        {
+            return result.Values.OrderBy(x => x.Path).ToList();
+        }
+
         private void AddHelpers(ScriptScope scope)
         {
             foreach (var descriptor in descriptors)
@@ -219,7 +256,13 @@ public sealed class ScriptingCompleter
             {
                 var propertyType = Nullable.GetUnderlyingType(propertyTypeOrNullable) ?? propertyTypeOrNullable;
 
-                if (propertyType.IsEnum ||
+                if (propertyType.IsEnum)
+                {
+                    var allowedValues = Enum.GetValues(propertyType).OfType<object>().Select(x => x.ToString()!).Order().ToArray();
+
+                    Add(JsonType.String, name, description, allowedValues);
+                }
+                else if (
                     propertyType == typeof(string) ||
                     propertyType == typeof(DomainId) ||
                     propertyType == typeof(Instant) ||
@@ -410,7 +453,7 @@ public sealed class ScriptingCompleter
             Add(JsonType.String, name, description);
         }
 
-        private void Add(JsonType type, string? name, string? description)
+        private void Add(JsonType type, string? name, string? description, string[]? allowedValues = null)
         {
             var parts = name?.Split('.') ?? Array.Empty<string>();
 
@@ -426,7 +469,10 @@ public sealed class ScriptingCompleter
 
             var path = string.Concat(prefixes.Reverse());
 
-            result[path] = new ScriptingValue(path, type, description);
+            result[path] = new ScriptingValue(path, type, description)
+            {
+                AllowedValues = allowedValues
+            };
 
             for (int i = 0; i < parts.Length; i++)
             {

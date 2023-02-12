@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { LocalizerService } from '@app/framework';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { LocalizerService, TypedSimpleChanges } from '@app/framework';
 import { ScheduleDto } from '@app/shared/internal';
 
 @Component({
@@ -15,7 +15,7 @@ import { ScheduleDto } from '@app/shared/internal';
     templateUrl: './content-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentStatusComponent implements OnChanges {
+export class ContentStatusComponent {
     @Input()
     public status!: string;
 
@@ -49,8 +49,8 @@ export class ContentStatusComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['scheduled']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.scheduled) {
             if (this.scheduled) {
                 const args = { status: this.scheduled.status, time: this.scheduled.dueTime.toStringFormat('PPpp') };
 

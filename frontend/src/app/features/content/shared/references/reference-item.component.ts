@@ -7,7 +7,7 @@
 
 /* tslint:disable: component-selector */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ContentDto, getContentValue, LanguageDto, META_FIELDS } from '@app/shared';
 
 @Component({
@@ -16,7 +16,7 @@ import { ContentDto, getContentValue, LanguageDto, META_FIELDS } from '@app/shar
     templateUrl: './reference-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReferenceItemComponent implements OnChanges {
+export class ReferenceItemComponent {
     public readonly metaFields = META_FIELDS;
 
     @Output()

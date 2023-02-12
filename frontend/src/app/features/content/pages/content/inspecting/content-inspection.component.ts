@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy } from '@angular/core';
 import { BehaviorSubject, combineLatest, of } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto, ToolbarService } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto, ToolbarService, TypedSimpleChanges } from '@app/shared';
 
 type Mode = 'Content' | 'Data' | 'FlatData';
 
@@ -17,7 +17,7 @@ type Mode = 'Content' | 'Data' | 'FlatData';
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',
 })
-export class ContentInspectionComponent implements OnChanges, OnDestroy {
+export class ContentInspectionComponent implements OnDestroy {
     private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);
 
     @Input()
@@ -69,12 +69,12 @@ export class ContentInspectionComponent implements OnChanges, OnDestroy {
         this.toolbar.remove(this);
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['language']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.language) {
             this.languageChanges$.next(this.language);
         }
 
-        if (changes['content']) {
+        if (changes.content) {
             this.updateActions();
         }
     }

@@ -7,7 +7,7 @@
 
 // tslint:disable: readonly-array
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TitleService, Types } from '@app/framework/internal';
 
@@ -16,7 +16,7 @@ import { TitleService, Types } from '@app/framework/internal';
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TitleComponent implements OnDestroy, OnChanges {
+export class TitleComponent implements OnDestroy {
     private previousIndex: undefined | number;
 
     @Input()

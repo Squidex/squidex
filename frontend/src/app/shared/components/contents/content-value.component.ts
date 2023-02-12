@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { StatefulComponent } from '@app/framework';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { StatefulComponent, TypedSimpleChanges } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
 interface State {
@@ -19,7 +19,7 @@ interface State {
     templateUrl: './content-value.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentValueComponent extends StatefulComponent<State> implements OnChanges {
+export class ContentValueComponent extends StatefulComponent<State> {
     @Input()
     public value!: any;
 
@@ -45,8 +45,8 @@ export class ContentValueComponent extends StatefulComponent<State> implements O
         super(changeDetector, { wrapping: false });
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fields']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.fields) {
             this.unsubscribeAll();
 
             this.own(this.fields?.fieldWrappings

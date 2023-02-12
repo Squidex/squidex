@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TableField } from '@app/shared';
 
 @Component({
@@ -15,7 +15,7 @@ import { TableField } from '@app/shared';
     templateUrl: './custom-view-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CustomViewEditorComponent implements OnChanges {
+export class CustomViewEditorComponent {
     @Output()
     public reset = new EventEmitter();
 

@@ -386,7 +386,10 @@ export type SchemaCompletions = ReadonlyArray<{
     description: string;
 
     // The type of the autocompletion field.
-    type: string;
+    type: 'Any' | 'Array' | 'Boolean' | 'Function' | 'Object' | 'String';
+
+    // The allowed values if the property is a string enum.
+    allowedValues?: string[];
  }>;
 
 export type SchemasDto = Readonly<{
@@ -743,8 +746,20 @@ export class SchemasService {
             pretifyError('i18n:schemas.deleteFailed'));
     }
 
-    public getCompletions(appName: string, schemaName: string): Observable<SchemaCompletions> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion`);
+    public getContentScriptsCompletion(appName: string, schemaName: string): Observable<SchemaCompletions> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion/content-scripts`);
+
+        return this.http.get<SchemaCompletions>(url);
+    }
+
+    public getContentTriggerCompletion(appName: string, schemaName: string): Observable<SchemaCompletions> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion/content-triggers`);
+
+        return this.http.get<SchemaCompletions>(url);
+    }
+
+    public getFieldRulesCompletion(appName: string, schemaName: string): Observable<SchemaCompletions> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion/field-rules`);
 
         return this.http.get<SchemaCompletions>(url);
     }

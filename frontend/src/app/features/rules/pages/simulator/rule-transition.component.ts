@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { SimulatedRuleEventDto } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { SimulatedRuleEventDto, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-transition',
@@ -14,7 +14,7 @@ import { SimulatedRuleEventDto } from '@app/shared';
     templateUrl: './rule-transition.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RuleTransitionComponent implements OnChanges {
+export class RuleTransitionComponent {
     @Input()
     public event: SimulatedRuleEventDto | undefined | null;
 
@@ -26,8 +26,8 @@ export class RuleTransitionComponent implements OnChanges {
 
     public filteredErrors?: string[] | null;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['event'] || changes['errors']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.event || changes.errors) {
             const errors = this.errors;
 
             if (!errors) {

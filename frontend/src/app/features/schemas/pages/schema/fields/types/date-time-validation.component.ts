@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@app/shared';
+import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto, TypedSimpleChanges } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
@@ -17,7 +17,7 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html',
 })
-export class DateTimeValidationComponent implements OnChanges {
+export class DateTimeValidationComponent {
     @Input()
     public fieldForm!: UntypedFormGroup;
 
@@ -38,8 +38,8 @@ export class DateTimeValidationComponent implements OnChanges {
 
     public calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['fieldForm']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.fieldForm) {
             this.showDefaultValues =
                 hasNoValue$(this.fieldForm.controls['isRequired']);
 

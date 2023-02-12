@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AppLanguageDto, EditLanguageForm, LanguageDto, LanguagesState, sorted } from '@app/shared';
 
 @Component({
@@ -14,7 +14,7 @@ import { AppLanguageDto, EditLanguageForm, LanguageDto, LanguagesState, sorted }
     styleUrls: ['./language.component.scss'],
     templateUrl: './language.component.html',
 })
-export class LanguageComponent implements OnChanges {
+export class LanguageComponent {
     @Input()
     public language!: AppLanguageDto;
 

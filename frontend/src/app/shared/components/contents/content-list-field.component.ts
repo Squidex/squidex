@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { ContentDto, FieldValue, getContentValue, LanguageDto, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
 
@@ -20,7 +20,7 @@ interface State {
     templateUrl: './content-list-field.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentListFieldComponent extends StatefulComponent<State> implements OnChanges {
+export class ContentListFieldComponent extends StatefulComponent<State> {
     public readonly metaFields = META_FIELDS;
 
     @Input()

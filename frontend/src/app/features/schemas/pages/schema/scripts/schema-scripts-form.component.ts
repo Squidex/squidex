@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { AppsState, EditSchemaScriptsForm, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 
@@ -14,7 +14,7 @@ import { AppsState, EditSchemaScriptsForm, SchemaCompletions, SchemaDto, Schemas
     styleUrls: ['./schema-scripts-form.component.scss'],
     templateUrl: './schema-scripts-form.component.html',
 })
-export class SchemaScriptsFormComponent implements OnChanges {
+export class SchemaScriptsFormComponent {
     @Input()
     public schema!: SchemaDto;
 
@@ -38,7 +38,7 @@ export class SchemaScriptsFormComponent implements OnChanges {
         this.editForm.load(this.schema.scripts);
         this.editForm.setEnabled(this.isEditable);
 
-        this.schemaCompletions = this.schemasService.getCompletions(this.appsState.appName, this.schema.name).pipe(shareReplay(1));
+        this.schemaCompletions = this.schemasService.getContentScriptsCompletion(this.appsState.appName, this.schema.name).pipe(shareReplay(1));
     }
 
     public selectField(field: string) {

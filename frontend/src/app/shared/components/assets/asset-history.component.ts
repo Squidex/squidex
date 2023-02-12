@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppsState, AssetDto, HistoryEventDto, HistoryService } from '@app/shared/internal';
@@ -17,7 +17,7 @@ interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boo
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
 })
-export class AssetHistoryComponent implements OnChanges {
+export class AssetHistoryComponent {
     @Input()
     public asset!: AssetDto;
 

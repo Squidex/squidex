@@ -5,17 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GridsterItem } from 'angular-gridster2';
 import { take } from 'rxjs/operators';
-import { AppDto, AppsState, AuthService, DialogModel, DialogService, LocalizerService, ModalModel, Types, UIState } from '@app/shared';
+import { AppDto, AppsState, AuthService, DialogModel, DialogService, LocalizerService, ModalModel, TypedSimpleChanges, Types, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-dashboard-config[app][config]',
     styleUrls: ['./dashboard-config.component.scss'],
     templateUrl: './dashboard-config.component.html',
 })
-export class DashboardConfigComponent implements OnChanges {
+export class DashboardConfigComponent {
     @Input()
     public app!: AppDto;
 
@@ -50,8 +50,8 @@ export class DashboardConfigComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['configAvailable']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.configAvailable) {
             this.configOptions = this.configAvailable.map(item => {
                 const name = this.localizer.getOrKey(item.name);
 
@@ -59,7 +59,7 @@ export class DashboardConfigComponent implements OnChanges {
             }).sortByString(x => x.name);
         }
 
-        if (changes['app']) {
+        if (changes.app) {
             this.uiState.getUser('dashboard.grid', this.configDefaults).pipe(take(1))
                 .subscribe(dto => {
                     this.setConfig(dto);

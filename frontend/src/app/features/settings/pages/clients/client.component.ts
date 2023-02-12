@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-client[client][clientRoles]',
@@ -14,7 +14,7 @@ import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto } from '@app/s
     templateUrl: './client.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ClientComponent implements OnChanges {
+export class ClientComponent {
     @Input()
     public client!: ClientDto;
 
@@ -31,8 +31,8 @@ export class ClientComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['client']) {
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.client) {
             this.apiCallsLimit = this.client.apiCallsLimit;
         }
     }

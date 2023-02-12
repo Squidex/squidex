@@ -52,7 +52,15 @@ describe('MarkdownDirective', () => {
         verifyHtmlRender('<strong>bold</strong>');
     });
 
-    it('should render as HTML if allowed', () => {
+    it('should render as HTML if it has encoded characters', () => {
+        markdownDirective.inline = false;
+        markdownDirective.markdown = '\'Example\'';
+        markdownDirective.ngOnChanges();
+
+        verifyHtmlRender('<p>&#39;Example&#39;</p>\n');
+    });
+
+    it('should render as HTML if it has tags', () => {
         markdownDirective.inline = false;
         markdownDirective.markdown = '**bold**';
         markdownDirective.ngOnChanges();
@@ -60,7 +68,7 @@ describe('MarkdownDirective', () => {
         verifyHtmlRender('<p><strong>bold</strong></p>\n');
     });
 
-    it('should render as inline HTML if allowed', () => {
+    it('should render as inline HTML if it has tags', () => {
         markdownDirective.markdown = '!**bold**';
         markdownDirective.ngOnChanges();
 
