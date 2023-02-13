@@ -61,6 +61,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The access token of the current user..
+        /// </summary>
+        public static string AccessToken {
+            get {
+                return ResourceManager.GetString("AccessToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user or client that triggered the event or command..
         /// </summary>
         public static string Actor {

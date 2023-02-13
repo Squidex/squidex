@@ -98,6 +98,7 @@ internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor
         {
             return new FilterSchema(FilterSchemaType.String)
             {
+                AllowedValues = field.Properties.AllowedValues?.ToArray(),
                 Extra = new
                 {
                     options = field.Properties.AllowedValues

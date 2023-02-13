@@ -9,5 +9,4 @@
 
 namespace Squidex.Infrastructure.Queries;
 
-public sealed record FilterField(FilterSchema Schema, string Path, string? Description = null,
-    bool IsNullable = false);
+public sealed record FilterField(FilterSchema Schema, string Path, string? Description = null, bool IsNullable = false);

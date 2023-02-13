@@ -313,7 +313,7 @@ public sealed class SchemasController : ApiController
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetScriptCompletion(string app, string schema,
+    public async Task<IActionResult> GetContentScriptsCompletion(string app, string schema,
         [FromServices] ScriptingCompleter completer)
     {
         var completion = completer.ContentScript(await BuildModel());
@@ -326,7 +326,7 @@ public sealed class SchemasController : ApiController
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetScriptTriggerCompletion(string app, string schema,
+    public async Task<IActionResult> GetContentTriggersCompletion(string app, string schema,
         [FromServices] ScriptingCompleter completer)
     {
         var completion = completer.ContentTrigger(await BuildModel());
@@ -339,10 +339,23 @@ public sealed class SchemasController : ApiController
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetScriptFieldRulesCompletion(string app, string schema,
+    public async Task<IActionResult> GetFieldRulesCompletion(string app, string schema,
         [FromServices] ScriptingCompleter completer)
     {
         var completion = completer.FieldRule(await BuildModel());
+
+        return Ok(completion);
+    }
+
+    [HttpGet]
+    [Route("apps/{app}/schemas/{schema}/completion/prview-urls")]
+    [ApiPermissionOrAnonymous]
+    [ApiCosts(1)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> GetPreviewUrlsCompletion(string app, string schema,
+        [FromServices] ScriptingCompleter completer)
+    {
+        var completion = completer.PreviewUrl(await BuildModel());
 
         return Ok(completion);
     }

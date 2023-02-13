@@ -39,7 +39,8 @@ public static class FilterExtensions
 
             foreach (var partitionKey in partitioning.AllKeys)
             {
-                var partitionDescription = FieldPartitionDescription(field, partitioning.GetName(partitionKey) ?? partitionKey);
+                var partitionName = partitioning.GetName(partitionKey) ?? partitionKey;
+                var partitionDescription = BuildPartitionDescription(field, partitionName);
 
                 var partitionField = new FilterField(
                     fieldSchema,
@@ -69,7 +70,7 @@ public static class FilterExtensions
         return dataSchema;
     }
 
-    private static string FieldPartitionDescription(RootField field, string partition)
+    private static string BuildPartitionDescription(RootField field, string partition)
     {
         var name = field.DisplayName();
 

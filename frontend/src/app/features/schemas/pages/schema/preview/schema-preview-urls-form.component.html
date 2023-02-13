@@ -22,7 +22,7 @@
                     <div class="col">
                         <sqx-control-errors for="url"></sqx-control-errors>
 
-                        <input class="form-control" maxlength="1000" formControlName="url" placeholder="{{ 'schemas.previewUrls.urlPlaceholder' | sqxTranslate }}">
+                        <sqx-code-editor [singleLine]="true" mode="ace/mode/liquid" formControlName="url" [completion]="fieldCompletions | async"></sqx-code-editor>
                     </div>
 
                     <div class="col-auto">

@@ -5,25 +5,33 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { ConfigurePreviewUrlsForm, SchemaDto, SchemasState } from '@app/shared';
+import { Component, Input, OnInit } from '@angular/core';
+import { EMPTY, Observable, shareReplay } from 'rxjs';
+import { ConfigurePreviewUrlsForm, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-preview-urls-form',
     styleUrls: ['./schema-preview-urls-form.component.scss'],
     templateUrl: './schema-preview-urls-form.component.html',
 })
-export class SchemaPreviewUrlsFormComponent {
+export class SchemaPreviewUrlsFormComponent implements OnInit {
     @Input()
     public schema!: SchemaDto;
 
     public editForm = new ConfigurePreviewUrlsForm();
 
+    public fieldCompletions: Observable<SchemaCompletions> = EMPTY;
+
     public isEditable = false;
 
     constructor(
         private readonly schemasState: SchemasState,
+        private readonly schemasService: SchemasService,
     ) {
+    }
+
+    public ngOnInit() {
+        this.fieldCompletions = this.schemasService.getFieldRulesCompletion(this.schemasState.appName, this.schema.name).pipe(shareReplay(1));
     }
 
     public ngOnChanges() {

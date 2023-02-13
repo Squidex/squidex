@@ -75,9 +75,7 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     }
 
     private navigateTo(name: string) {
-        const vars = { ...this.content };
-
-        vars['accessToken'] = this.authService.user?.accessToken;
+        const vars = { ...this.content, ...this.authService.user || {} };
 
         const url = interpolate(this.schema.previewUrls[name], vars, 'iv');
 

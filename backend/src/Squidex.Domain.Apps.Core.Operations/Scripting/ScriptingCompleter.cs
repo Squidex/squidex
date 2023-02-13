@@ -80,6 +80,13 @@ public sealed class ScriptingCompleter
         return new Process(descriptors, dataSchema.Flatten()).FieldRule();
     }
 
+    public IReadOnlyList<ScriptingValue> PreviewUrl(FilterSchema dataSchema)
+    {
+        Guard.NotNull(dataSchema);
+
+        return new Process(descriptors, dataSchema.Flatten()).PreviewUrl();
+    }
+
     public IReadOnlyList<ScriptingValue> AssetScript()
     {
         return new Process(descriptors).AssetScript();
@@ -157,9 +164,7 @@ public sealed class ScriptingCompleter
 
         public IReadOnlyList<ScriptingValue> ContentScript()
         {
-            var scope = ScriptScope.ContentScript | ScriptScope.Transform | ScriptScope.Async;
-
-            AddHelpers(scope);
+            AddHelpers(ScriptScope.ContentScript | ScriptScope.Transform | ScriptScope.Async);
 
             AddObject("ctx", FieldDescriptions.Context, () =>
             {
@@ -171,9 +176,7 @@ public sealed class ScriptingCompleter
 
         public IReadOnlyList<ScriptingValue> ContentTrigger()
         {
-            var scope = ScriptScope.ContentTrigger | ScriptScope.Async;
-
-            AddHelpers(scope);
+            AddHelpers(ScriptScope.ContentTrigger | ScriptScope.Async);
 
             AddObject("event", FieldDescriptions.Event, () =>
             {
@@ -202,6 +205,25 @@ public sealed class ScriptingCompleter
             AddObject("ctx", FieldDescriptions.Event, () =>
             {
                 AddType(typeof(AssetScriptVars));
+            });
+
+            return Build();
+        }
+
+        public IReadOnlyList<ScriptingValue> PreviewUrl()
+        {
+            AddString("id",
+                FieldDescriptions.EntityId);
+
+            AddNumber("version",
+                FieldDescriptions.EntityVersion);
+
+            AddString("accessToken",
+                FieldDescriptions.AccessToken);
+
+            AddObject("data", FieldDescriptions.ContentData, () =>
+            {
+                AddData();
             });
 
             return Build();
@@ -382,38 +404,37 @@ public sealed class ScriptingCompleter
 
             foreach (var field in dataSchema.Fields)
             {
+                JsonType type = ConvertType(field);
+
+                Add(type, field.Path, field.Description, field.Schema.AllowedValues);
+            }
+
+            static JsonType ConvertType(FilterField field)
+            {
                 switch (field.Schema.Type)
                 {
                     case FilterSchemaType.Any:
-                        AddAny(field.Path, field.Description);
-                        break;
+                        return JsonType.Any;
                     case FilterSchemaType.Boolean:
-                        AddBoolean(field.Path, field.Description);
-                        break;
+                        return JsonType.Boolean;
                     case FilterSchemaType.DateTime:
-                        AddString(field.Path, field.Description);
-                        break;
+                        return JsonType.String;
                     case FilterSchemaType.GeoObject:
-                        AddObject(field.Path, field.Description);
-                        break;
+                        return JsonType.Object;
                     case FilterSchemaType.Guid:
-                        AddString(field.Path, field.Description);
-                        break;
+                        return JsonType.String;
                     case FilterSchemaType.Number:
-                        AddNumber(field.Path, field.Description);
-                        break;
+                        return JsonType.Number;
                     case FilterSchemaType.Object:
-                        AddObject(field.Path, field.Description);
-                        break;
+                        return JsonType.Object;
                     case FilterSchemaType.ObjectArray:
-                        AddArray(field.Path, field.Description);
-                        break;
+                        return JsonType.Array;
                     case FilterSchemaType.String:
-                        AddString(field.Path, field.Description);
-                        break;
+                        return JsonType.String;
                     case FilterSchemaType.StringArray:
-                        AddArray(field.Path, field.Description);
-                        break;
+                        return JsonType.Array;
+                    default:
+                        return JsonType.String;
                 }
             }
         }

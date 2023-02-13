@@ -25,6 +25,8 @@ public sealed record FilterSchema(FilterSchemaType Type)
 
     public ReadonlyList<FilterField>? Fields { get; init; }
 
+    public string[]? AllowedValues { get; init; }
+
     public object? Extra { get; init; }
 
     public FilterSchema Flatten(int maxDepth = 7, Predicate<FilterSchema>? predicate = null)

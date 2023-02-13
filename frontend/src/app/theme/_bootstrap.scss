@@ -394,11 +394,10 @@ a {
         }
 
         &.active {
-            & {
-                background: none;
-                border-color: $color-theme-brand;
-                color: $color-theme-brand;
-            }
+            background: none;
+            border-color: $color-theme-brand;
+            border-radius: $border-radius;
+            color: $color-theme-brand;
 
             i {
                 color: $color-theme-brand;
@@ -415,6 +414,8 @@ a {
 
         &:hover {
             color: $color-theme-brand;
+            border-color: $color-border;
+            border-radius: $border-radius;
 
             i {
                 color: $color-theme-brand;

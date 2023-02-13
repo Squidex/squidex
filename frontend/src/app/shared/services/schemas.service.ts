@@ -764,6 +764,12 @@ export class SchemasService {
         return this.http.get<SchemaCompletions>(url);
     }
 
+    public getPreviewUrlsCompletion(appName: string, schemaName: string): Observable<SchemaCompletions> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion/preview-urls`);
+
+        return this.http.get<SchemaCompletions>(url);
+    }
+
     public getFilters(appName: string, schemaName: string): Observable<QueryModel> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/filters`);
 

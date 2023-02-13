@@ -190,7 +190,24 @@ public class ScriptingCompleterTests
                 "user.displayName",
                 "user.email",
                 "user.id",
-                "user.role",
+                "user.role"
+            });
+    }
+
+    [Fact]
+    public void Should_describe_prview_url()
+    {
+        var actual = sut.PreviewUrl(dataSchema);
+
+        AssertCompletion(actual,
+            new[]
+            {
+                "accessToken",
+                "data",
+                "data['my-field']",
+                "data['my-field'].iv",
+                "id",
+                "version"
             });
     }
 
