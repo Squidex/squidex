@@ -3,3 +3,4 @@ domain: https://squidex-staging-v2.learnwithhomer.com
 adminEmail: squidex-staging@homerlearning.com
 S3Bucket: homer-squidex-staging
 secretName: staging-v2-squidex
+useTransactions: false
