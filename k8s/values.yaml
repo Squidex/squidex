@@ -1,3 +1,4 @@
 replicas: 5
 name: squidex
 loggingLevel: warning
+useTransactions: false

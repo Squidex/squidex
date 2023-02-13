@@ -114,6 +114,11 @@ spec:
                 secretKeyRef:
                   name: squidex
                   key: iam_secret_key
+            - name: CONTENTS__USETRANSACTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: squidex
+                  key: CONTENTS__USETRANSACTIONS
             - name: IDENTITY__GOOGLECLIENT
               valueFrom:
                 secretKeyRef:

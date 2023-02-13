@@ -7,3 +7,4 @@ data:
   DOMAIN: {{ .Values.domain }}
   ADMIN_EMAIL: {{ .Values.adminEmail }}
   S3_BUCKET: {{ .Values.S3Bucket }}
+  CONTENTS__USETRANSACTIONS: {{ .Values.useTransactions }}
