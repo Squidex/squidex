@@ -375,6 +375,50 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         }
     }
 
+    [Theory]
+    [MemberData(nameof(GetCustomIdTestCases))]
+    public async Task Should_be_able_to_create_content_with_previously_used_custom_id_when_original_content_has_been_permanently_deleted(string id)
+    {
+        TestEntity content = null;
+        try
+        {
+            // STEP 1: Create a new item with a custom id.
+            var options = new ContentCreateOptions { Id = id, Publish = true };
+
+            content = await _.Contents.CreateAsync(new TestEntityData
+            {
+                Number = 1
+            }, options);
+
+            Assert.Equal(id, content.Id);
+
+            // STEP 2: Permanently delete content with custom id.
+            await _.Contents.DeleteAsync(id, new ContentDeleteOptions { Permanent = true });
+
+            // STEP 3: Create a new item with same custom id.
+            content = await _.Contents.CreateAsync(new TestEntityData
+            {
+                Number = 1
+            }, options);
+
+            Assert.Equal(id, content.Id);
+        }
+        finally
+        {
+            if (content != null)
+            {
+                await _.Contents.DeleteAsync(content.Id, new ContentDeleteOptions { Permanent = true });
+            }
+        }
+    }
+
+    public static IEnumerable<object[]> GetCustomIdTestCases() // Could use for other custom ID tests.
+    {
+        yield return new object[] { "customid" };
+        yield return new object[] { "custom-id-hyphenated" };
+        yield return new object[] { "custom-id_special-characters$$_[]" };
+    }
+
     [Fact]
     public async Task Should_create_content_with_custom_id_and_upsert()
     {
