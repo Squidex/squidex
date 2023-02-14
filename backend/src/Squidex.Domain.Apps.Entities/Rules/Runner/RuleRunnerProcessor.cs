@@ -188,7 +188,7 @@ public sealed class RuleRunnerProcessor
                     IncludeSkipped = true
                 };
 
-                if (run.Job.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(run.Context))
+                if (run.Job.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(rule.RuleDef))
                 {
                     await EnqueueFromSnapshotsAsync(run, ct);
                 }
@@ -219,24 +219,28 @@ public sealed class RuleRunnerProcessor
         // We collect errors and allow a few erors before we throw an exception.
         var errors = 0;
 
-        await foreach (var job in ruleService.CreateSnapshotJobsAsync(run.Context, ct))
+        // Write in batches of 100 items for better performance. Using completes the last write.
+        await using var batch = new RuleQueueWriter(ruleEventRepository);
+
+        await ruleService.CreateSnapshotJobsAsync(async (ruleId, rule, result, ct) =>
         {
-            if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Disabled)
+            if (await batch.WriteAsync(result, rule))
             {
-                await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
+                return;
             }
-            else if (job.EnrichmentError != null)
+
+            if (result.EnrichmentError != null)
             {
                 errors++;
 
                 if (errors >= MaxErrors)
                 {
-                    throw job.EnrichmentError;
+                    throw result.EnrichmentError;
                 }
 
-                log.LogWarning(job.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", run.Context.RuleId);
+                log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", ruleId);
             }
-        }
+        }, run.Context, ct);
     }
 
     private async Task EnqueueFromEventsAsync(Run run,
@@ -245,43 +249,42 @@ public sealed class RuleRunnerProcessor
         // We collect errors and allow a few erors before we throw an exception.
         var errors = 0;
 
+        // Write in batches of 100 items for better performance. Using completes the last write.
+        await using var batch = new RuleQueueWriter(ruleEventRepository);
+
         // Use a prefix query so that the storage can use an index for the query.
         var filter = $"^([a-z]+)\\-{appId}";
 
         await foreach (var storedEvent in eventStore.QueryAllAsync(filter, run.Job.Position, ct: ct))
         {
-            try
+            var @event = eventFormatter.ParseIfKnown(storedEvent);
+
+            if (@event == null)
             {
-                var @event = eventFormatter.ParseIfKnown(storedEvent);
+                continue;
+            }
 
-                if (@event != null)
+            await ruleService.CreateJobsAsync(async (ruleId, rule, result, ct) =>
+            {
+                if (await batch.WriteAsync(result, rule))
                 {
-                    var jobs = ruleService.CreateJobsAsync(@event, run.Context, ct);
+                    return;
+                }
 
-                    await foreach (var job in jobs.WithCancellation(ct))
+                if (result.EnrichmentError != null)
+                {
+                    errors++;
+
+                    if (errors >= MaxErrors)
                     {
-                        if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Disabled)
-                        {
-                            await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
-                        }
+                        throw result.EnrichmentError;
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                errors++;
 
-                if (errors >= MaxErrors)
-                {
-                    throw;
+                    log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", ruleId);
                 }
+            }, @event, run.Context.ToRulesContext(), ct);
 
-                log.LogWarning(ex, "Failed to run rule with ID {ruleId}, continue with next job.", run.Context.RuleId);
-            }
-            finally
-            {
-                run.Job.Position = storedEvent.EventPosition;
-            }
+            run.Job.Position = storedEvent.EventPosition;
 
             await state.WriteAsync(ct);
         }

@@ -70,7 +70,7 @@ public class SchemaChangedTriggerHandlerTests
 
         var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
 
         var enrichedEvent = actual.Single() as EnrichedSchemaEvent;
 
@@ -89,7 +89,7 @@ public class SchemaChangedTriggerHandlerTests
         {
             var @event = new SchemaCreated();
 
-            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -102,7 +102,7 @@ public class SchemaChangedTriggerHandlerTests
         {
             var @event = new EnrichedSchemaEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -115,7 +115,7 @@ public class SchemaChangedTriggerHandlerTests
         {
             var @event = new EnrichedSchemaEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -128,7 +128,7 @@ public class SchemaChangedTriggerHandlerTests
         {
             var @event = new EnrichedSchemaEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });

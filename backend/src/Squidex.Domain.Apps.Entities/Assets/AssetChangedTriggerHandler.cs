@@ -7,6 +7,7 @@
 
 using System.Runtime.CompilerServices;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -65,7 +66,7 @@ public sealed class AssetChangedTriggerHandler : IRuleTriggerHandler, ISubscript
         }
     }
 
-    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RulesContext context,
         [EnumeratorCancellation] CancellationToken ct)
     {
         yield return await CreateEnrichedEventsCoreAsync(@event, ct);
@@ -121,11 +122,11 @@ public sealed class AssetChangedTriggerHandler : IRuleTriggerHandler, ISubscript
         return result;
     }
 
-    public bool Trigger(EnrichedEvent @event, RuleContext context)
+    public bool Trigger(EnrichedEvent @event, RuleTrigger trigger)
     {
-        var trigger = (AssetChangedTriggerV2)context.Rule.Trigger;
+        var assetTrigger = (AssetChangedTriggerV2)trigger;
 
-        if (string.IsNullOrWhiteSpace(trigger.Condition))
+        if (string.IsNullOrWhiteSpace(assetTrigger.Condition))
         {
             return true;
         }
@@ -136,6 +137,6 @@ public sealed class AssetChangedTriggerHandler : IRuleTriggerHandler, ISubscript
             Event = @event
         };
 
-        return scriptEngine.Evaluate(vars, trigger.Condition);
+        return scriptEngine.Evaluate(vars, assetTrigger.Condition);
     }
 }

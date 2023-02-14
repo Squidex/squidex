@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Runtime.CompilerServices;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
@@ -21,20 +23,41 @@ internal sealed class QueryReferrers : OperationBase
             .Ascending(x => x.IsDeleted));
     }
 
-    public async Task<bool> CheckExistsAsync(DomainId appId, DomainId contentId,
+    public async Task<bool> CheckExistsAsync(DomainId appId, DomainId reference,
         CancellationToken ct)
     {
-        var filter =
-            Filter.And(
-                Filter.AnyEq(x => x.ReferencedIds, contentId),
-                Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.Ne(x => x.IsDeleted, true),
-                Filter.Ne(x => x.Id, contentId));
+        var filter = BuildFilter(appId, reference);
 
         var hasReferrerAsync =
             await Collection.Find(filter).Only(x => x.Id)
                 .AnyAsync(ct);
 
         return hasReferrerAsync;
+    }
+
+    public async IAsyncEnumerable<IContentEntity> StreamReferences(DomainId appId, DomainId reference,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        var filter = BuildFilter(appId, reference);
+
+        using (var cursor = await Collection.Find(filter).ToCursorAsync(ct))
+        {
+            while (await cursor.MoveNextAsync(ct))
+            {
+                foreach (var entity in cursor.Current)
+                {
+                    yield return entity;
+                }
+            }
+        }
+    }
+
+    private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId reference)
+    {
+        return Filter.And(
+            Filter.AnyEq(x => x.ReferencedIds, reference),
+            Filter.Eq(x => x.IndexedAppId, appId),
+            Filter.Ne(x => x.IsDeleted, true),
+            Filter.Ne(x => x.Id, reference));
     }
 }

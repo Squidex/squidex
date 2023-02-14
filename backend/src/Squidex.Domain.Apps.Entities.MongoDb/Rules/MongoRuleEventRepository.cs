@@ -106,14 +106,6 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
         return Collection.UpdateOneAsync(x => x.JobId == id, Update.Set(x => x.NextAttempt, nextAttempt), cancellationToken: ct);
     }
 
-    public async Task EnqueueAsync(RuleJob job, Instant? nextAttempt,
-        CancellationToken ct = default)
-    {
-        var entity = MongoRuleEventEntity.FromJob(job, nextAttempt);
-
-        await Collection.InsertOneIfNotExistsAsync(entity, ct);
-    }
-
     public Task CancelByEventAsync(DomainId id,
         CancellationToken ct = default)
     {
@@ -173,11 +165,11 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
     {
         if (update.ExecutionResult == RuleResult.Success)
         {
-            await statisticsCollection.IncrementSuccessAsync(job.AppId, job.RuleId, update.Finished, ct);
+            await statisticsCollection.IncrementSuccessAsync(job.AppId, job.RuleId, update.Finished, 1, ct);
         }
         else
         {
-            await statisticsCollection.IncrementFailedAsync(job.AppId, job.RuleId, update.Finished, ct);
+            await statisticsCollection.IncrementFailedAsync(job.AppId, job.RuleId, update.Finished, 1, ct);
         }
     }
 
@@ -185,5 +177,21 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
         CancellationToken ct = default)
     {
         return statisticsCollection.QueryByAppAsync(appId, ct);
+    }
+
+    public async Task EnqueueAsync(List<RuleEventWrite> jobs,
+        CancellationToken ct = default)
+    {
+        var entities = jobs.Select(MongoRuleEventEntity.FromJob).ToList();
+
+        if (entities.Count > 0)
+        {
+            await Collection.InsertManyAsync(entities, InsertUnordered, ct);
+        }
+
+        foreach (var group in entities.Where(x => x.JobResult == RuleJobResult.Failed).GroupBy(x => (x.AppId, x.RuleId)))
+        {
+            await statisticsCollection.IncrementFailedAsync(group.Key.AppId, group.Key.RuleId, group.Max(x => x.Job.Created), group.Count(), ct);
+        }
     }
 }

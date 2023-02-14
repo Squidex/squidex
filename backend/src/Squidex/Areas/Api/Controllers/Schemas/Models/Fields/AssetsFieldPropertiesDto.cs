@@ -124,10 +124,13 @@ public sealed class AssetsFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public bool AllowDuplicates { get; set; }
 
+    public static AssetsFieldPropertiesDto FromDomain(AssetsFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new AssetsFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new AssetsFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new AssetsFieldProperties());
     }
 }

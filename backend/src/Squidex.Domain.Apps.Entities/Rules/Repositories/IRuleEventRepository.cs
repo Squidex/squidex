@@ -6,39 +6,22 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
+#pragma warning disable MA0048 // File name must match type name
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Entities.Rules.Repositories;
+
+public record struct RuleEventWrite(RuleJob Job, Instant? NextAttempt = null, Exception? Error = null);
 
 public interface IRuleEventRepository
 {
-    async Task EnqueueAsync(RuleJob job, Exception? ex,
-        CancellationToken ct = default)
-    {
-        if (ex != null)
-        {
-            await EnqueueAsync(job, (Instant?)null, ct);
-
-            await UpdateAsync(job, new RuleJobUpdate
-            {
-                JobResult = RuleJobResult.Failed,
-                ExecutionResult = RuleResult.Failed,
-                ExecutionDump = ex.ToString(),
-                Finished = job.Created
-            }, ct);
-        }
-        else
-        {
-            await EnqueueAsync(job, job.Created, ct);
-        }
-    }
-
     Task UpdateAsync(RuleJob job, RuleJobUpdate update,
         CancellationToken ct = default);
 
-    Task EnqueueAsync(RuleJob job, Instant? nextAttempt,
+    Task EnqueueAsync(List<RuleEventWrite> jobs,
         CancellationToken ct = default);
 
     Task EnqueueAsync(DomainId id, Instant nextAttempt,

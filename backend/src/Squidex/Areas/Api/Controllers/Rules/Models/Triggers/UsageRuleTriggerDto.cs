@@ -25,6 +25,11 @@ public sealed class UsageRuleTriggerDto : RuleTriggerDto
     [LocalizedRange(1, 30)]
     public int? NumDays { get; set; }
 
+    public static UsageRuleTriggerDto FromDomain(UsageTrigger trigger)
+    {
+        return SimpleMapper.Map(trigger, new UsageRuleTriggerDto());
+    }
+
     public override RuleTrigger ToTrigger()
     {
         return SimpleMapper.Map(this, new UsageTrigger());

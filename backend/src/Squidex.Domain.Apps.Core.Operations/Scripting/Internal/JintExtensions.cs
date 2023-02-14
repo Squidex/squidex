@@ -58,7 +58,7 @@ public static class JintExtensions
     }
 
     internal static ScriptExecutionContext<T> Extend<T>(this ScriptExecutionContext<T> context,
-        ScriptVars vars, 
+        ScriptVars vars,
         ScriptOptions options)
     {
         var engine = context.Engine;

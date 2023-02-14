@@ -7,6 +7,7 @@
 
 using System.Runtime.CompilerServices;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -37,7 +38,7 @@ public sealed class CommentTriggerHandler : IRuleTriggerHandler
         return @event is CommentCreated;
     }
 
-    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RulesContext context,
         [EnumeratorCancellation] CancellationToken ct)
     {
         var commentCreated = (CommentCreated)@event.Payload;
@@ -70,11 +71,11 @@ public sealed class CommentTriggerHandler : IRuleTriggerHandler
         }
     }
 
-    public bool Trigger(EnrichedEvent @event, RuleContext context)
+    public bool Trigger(EnrichedEvent @event, RuleTrigger trigger)
     {
-        var trigger = (CommentTrigger)context.Rule.Trigger;
+        var commentTrigger = (CommentTrigger)trigger;
 
-        if (string.IsNullOrWhiteSpace(trigger.Condition))
+        if (string.IsNullOrWhiteSpace(commentTrigger.Condition))
         {
             return true;
         }
@@ -85,6 +86,6 @@ public sealed class CommentTriggerHandler : IRuleTriggerHandler
             Event = @event
         };
 
-        return scriptEngine.Evaluate(vars, trigger.Condition);
+        return scriptEngine.Evaluate(vars, commentTrigger.Condition);
     }
 }

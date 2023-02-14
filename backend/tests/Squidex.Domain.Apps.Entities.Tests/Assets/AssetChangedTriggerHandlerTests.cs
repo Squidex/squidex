@@ -102,7 +102,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         A.CallTo(() => assetLoader.GetAsync(ctx.AppId.Id, @event.AssetId, 12, CancellationToken))
             .Returns(new AssetEntity());
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), CancellationToken).ToListAsync(CancellationToken);
 
         var enrichedEvent = (EnrichedAssetEvent)actual.Single();
 
@@ -119,7 +119,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedAssetEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -132,7 +132,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedAssetEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -145,7 +145,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedAssetEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });

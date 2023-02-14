@@ -109,10 +109,13 @@ public sealed class StringFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public StringFieldEditor Editor { get; set; }
 
+    public static StringFieldPropertiesDto FromDomain(StringFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new StringFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new StringFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new StringFieldProperties());
     }
 }

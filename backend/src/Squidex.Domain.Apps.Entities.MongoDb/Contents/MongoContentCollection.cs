@@ -109,6 +109,12 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         return queryAsStream.StreamAll(appId, schemaIds, ct);
     }
 
+    public IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference,
+        CancellationToken ct)
+    {
+        return queryReferrers.StreamReferences(appId, reference, ct);
+    }
+
     public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
         CancellationToken ct)
     {
@@ -231,12 +237,12 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         }
     }
 
-    public async Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId,
+    public async Task<bool> HasReferrersAsync(DomainId appId, DomainId reference,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/HasReferrersAsync"))
         {
-            return await queryReferrers.CheckExistsAsync(appId, contentId, ct);
+            return await queryReferrers.CheckExistsAsync(appId, reference, ct);
         }
     }
 

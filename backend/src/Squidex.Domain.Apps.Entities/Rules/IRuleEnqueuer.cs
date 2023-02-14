@@ -13,5 +13,5 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 
 public interface IRuleEnqueuer
 {
-    Task EnqueueAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event);
+    Task EnqueueAsync(DomainId ruleId, Rule rule, Envelope<IEvent> @event);
 }

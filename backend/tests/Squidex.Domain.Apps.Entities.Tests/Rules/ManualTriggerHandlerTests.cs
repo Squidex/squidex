@@ -66,7 +66,7 @@ public class ManualTriggerHandlerTests
     {
         var @event = new RuleManuallyTriggered();
 
-        Assert.True(sut.Trigger(Envelope.Create<AppEvent>(@event), default));
+        Assert.True(sut.Trigger(Envelope.Create<AppEvent>(@event), null!));
     }
 
     [Fact]
@@ -74,6 +74,6 @@ public class ManualTriggerHandlerTests
     {
         var @event = new EnrichedUsageExceededEvent();
 
-        Assert.True(sut.Trigger(@event, default));
+        Assert.True(sut.Trigger(@event, null!));
     }
 }

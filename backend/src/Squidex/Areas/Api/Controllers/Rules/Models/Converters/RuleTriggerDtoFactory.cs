@@ -8,7 +8,6 @@
 using Squidex.Areas.Api.Controllers.Rules.Models.Triggers;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters;
 
@@ -27,33 +26,31 @@ public sealed class RuleTriggerDtoFactory : IRuleTriggerVisitor<RuleTriggerDto>
 
     public RuleTriggerDto Visit(AssetChangedTriggerV2 trigger)
     {
-        return SimpleMapper.Map(trigger, new AssetChangedRuleTriggerDto());
+        return AssetChangedRuleTriggerDto.FromDomain(trigger);
     }
 
     public RuleTriggerDto Visit(CommentTrigger trigger)
     {
-        return SimpleMapper.Map(trigger, new CommentRuleTriggerDto());
+        return CommentRuleTriggerDto.FromDomain(trigger);
     }
 
     public RuleTriggerDto Visit(ManualTrigger trigger)
     {
-        return SimpleMapper.Map(trigger, new ManualRuleTriggerDto());
+        return ManualRuleTriggerDto.FromDomain(trigger);
     }
 
     public RuleTriggerDto Visit(SchemaChangedTrigger trigger)
     {
-        return SimpleMapper.Map(trigger, new SchemaChangedRuleTriggerDto());
+        return SchemaChangedRuleTriggerDto.FromDomain(trigger);
     }
 
     public RuleTriggerDto Visit(UsageTrigger trigger)
     {
-        return SimpleMapper.Map(trigger, new UsageRuleTriggerDto());
+        return UsageRuleTriggerDto.FromDomain(trigger);
     }
 
     public RuleTriggerDto Visit(ContentChangedTriggerV2 trigger)
     {
-        var schemas = trigger.Schemas?.Select(ContentChangedRuleTriggerSchemaDto.FromDomain).ToArray();
-
-        return new ContentChangedRuleTriggerDto { Schemas = schemas, HandleAll = trigger.HandleAll };
+        return ContentChangedRuleTriggerDto.FromDomain(trigger);
     }
 }

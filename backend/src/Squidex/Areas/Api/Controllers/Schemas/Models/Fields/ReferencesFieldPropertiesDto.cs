@@ -59,10 +59,13 @@ public sealed class ReferencesFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public ReadonlyList<DomainId>? SchemaIds { get; set; }
 
+    public static ReferencesFieldPropertiesDto FromDomain(ReferencesFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new ReferencesFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new ReferencesFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new ReferencesFieldProperties());
     }
 }

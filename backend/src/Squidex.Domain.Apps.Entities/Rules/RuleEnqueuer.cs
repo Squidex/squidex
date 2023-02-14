@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
@@ -49,49 +50,69 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
         this.localCache = localCache;
     }
 
-    public async Task EnqueueAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event)
+    public async Task EnqueueAsync(DomainId ruleId, Rule rule, Envelope<IEvent> @event)
     {
         Guard.NotNull(rule);
         Guard.NotNull(@event, nameof(@event));
 
-        var ruleContext = new RuleContext
-        {
-            Rule = rule,
-            RuleId = ruleId
-        };
-
-        var jobs = ruleService.CreateJobsAsync(@event, ruleContext);
-
-        await foreach (var job in jobs)
-        {
-            // We do not want to handle disabled rules in the normal flow.
-            if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Failed)
-            {
-                log.LogInformation("Adding rule job {jobId} for Rule(action={ruleAction}, trigger={ruleTrigger})", job.Job.Id,
-                    rule.Action.GetType().Name, rule.Trigger.GetType().Name);
-
-                await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
-            }
-        }
-    }
-
-    public async Task On(Envelope<IEvent> @event)
-    {
-        if (@event.Headers.Restored())
+        if (@event.Payload is not AppEvent appEvent)
         {
             return;
         }
 
-        if (@event.Payload is AppEvent appEvent)
+        var context = new RulesContext
         {
-            using (localCache.StartContext())
+            AppId = appEvent.AppId,
+            IncludeSkipped = false,
+            IncludeStale = false,
+            Rules = new Dictionary<DomainId, Rule>
             {
+                [ruleId] = rule
+            }.ToReadonlyDictionary()
+        };
+
+        // Write in batches of 100 items for better performance. Using completes the last write.
+        await using var batch = new RuleQueueWriter(ruleEventRepository);
+
+        await ruleService.CreateJobsAsync(async (ruleId, rule, result, ct) =>
+        {
+            await batch.WriteAsync(result, rule, log);
+        }, @event, context, default);
+    }
+
+    public async Task On(IEnumerable<Envelope<IEvent>> events)
+    {
+        using (localCache.StartContext())
+        {
+            // Write in batches of 100 items for better performance. Using completes the last write.
+            await using var batch = new RuleQueueWriter(ruleEventRepository);
+
+            foreach (var @event in events)
+            {
+                if (@event.Headers.Restored())
+                {
+                    continue;
+                }
+
+                if (@event.Payload is not AppEvent appEvent)
+                {
+                    continue;
+                }
+
                 var rules = await GetRulesAsync(appEvent.AppId.Id);
 
-                foreach (var ruleEntity in rules)
+                var context = new RulesContext
                 {
-                    await EnqueueAsync(ruleEntity.RuleDef, ruleEntity.Id, @event);
-                }
+                    AppId = appEvent.AppId,
+                    IncludeSkipped = false,
+                    IncludeStale = false,
+                    Rules = rules.ToDictionary(x => x.Id, x => x.RuleDef).ToReadonlyDictionary(),
+                };
+
+                await ruleService.CreateJobsAsync(async (ruleId, rule, result, ct) =>
+                {
+                    await batch.WriteAsync(result, rule, log);
+                }, @event, context, default);
             }
         }
     }

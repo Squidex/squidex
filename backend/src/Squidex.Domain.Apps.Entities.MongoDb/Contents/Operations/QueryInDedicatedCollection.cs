@@ -165,7 +165,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
     }
 
     private static FilterDefinition<MongoContentEntity> CreateFilter(ClrQuery? query,
-        DomainId referenced, RefToken? createdBy)
+        DomainId reference, RefToken? createdBy)
     {
         var filters = new List<FilterDefinition<MongoContentEntity>>
         {
@@ -183,9 +183,9 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
             filters.Add(query.Filter.BuildFilter<MongoContentEntity>());
         }
 
-        if (referenced != default)
+        if (reference != default)
         {
-            filters.Add(Filter.AnyEq(x => x.ReferencedIds, referenced));
+            filters.Add(Filter.AnyEq(x => x.ReferencedIds, reference));
         }
 
         if (createdBy != null)

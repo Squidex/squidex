@@ -63,9 +63,9 @@ public static class AsyncHelper
 
             await using var timer = new Timer(_ => source.Writer.TryWrite(force));
 
-            async Task TrySendAsync()
+            async Task TrySendAsync(int minSize = 0)
             {
-                if (batch.Count > 0)
+                if (batch.Count > minSize)
                 {
                     await target.Writer.WriteAsync(batch, ct);
 
@@ -74,7 +74,7 @@ public static class AsyncHelper
                 }
             }
 
-            // Exceptions usually that the process was stopped and the channel closed, therefore we do not catch them.
+            // Exceptions usually mean that the process was stopped and the channel closed, therefore we do not catch them.
             await foreach (var item in source.Reader.ReadAllAsync(ct))
             {
                 if (ReferenceEquals(item, force))
@@ -84,15 +84,11 @@ public static class AsyncHelper
                 }
                 else if (item is TIn typed)
                 {
-                    // The timeout just with the last event and should push events out if no further events are received.
+                    // The timeout restarts with the last event and should push events out if no further events are received.
                     timer.Change(timeout, Timeout.Infinite);
 
                     batch.Add(typed);
-
-                    if (batch.Count >= batchSize)
-                    {
-                        await TrySendAsync();
-                    }
+                    await TrySendAsync(batchSize - 1);
                 }
             }
 

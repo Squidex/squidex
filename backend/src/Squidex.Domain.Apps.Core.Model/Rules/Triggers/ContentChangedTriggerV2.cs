@@ -13,7 +13,9 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers;
 [TypeName(nameof(ContentChangedTriggerV2))]
 public sealed record ContentChangedTriggerV2 : RuleTrigger
 {
-    public ReadonlyList<ContentChangedTriggerSchemaV2>? Schemas { get; init; }
+    public ReadonlyList<SchemaCondition>? Schemas { get; init; }
+
+    public ReadonlyList<SchemaCondition>? ReferencedSchemas { get; init; }
 
     public bool HandleAll { get; init; }
 

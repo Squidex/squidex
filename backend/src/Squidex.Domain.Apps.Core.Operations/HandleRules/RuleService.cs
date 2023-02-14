@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -30,6 +29,17 @@ public sealed class RuleService : IRuleService
     private readonly IJsonSerializer serializer;
     private readonly ILogger<RuleService> log;
 
+    private sealed class RuleState
+    {
+        public SkipReason Skip { get; set; }
+
+        public bool JobCreated { get; set; }
+
+        public Rule Rule { get; init; }
+
+        public DomainId RuleId { get; init; }
+    }
+
     public IClock Clock { get; set; } = SystemClock.Instance;
 
     public RuleService(
@@ -50,11 +60,9 @@ public sealed class RuleService : IRuleService
         this.log = log;
     }
 
-    public bool CanCreateSnapshotEvents(RuleContext context)
+    public bool CanCreateSnapshotEvents(Rule rule)
     {
-        Guard.NotNull(context.Rule, nameof(context.Rule));
-
-        if (!ruleTriggerHandlers.TryGetValue(context.Rule.Trigger.GetType(), out var triggerHandler))
+        if (!ruleTriggerHandlers.TryGetValue(rule.Trigger.GetType(), out var triggerHandler))
         {
             return false;
         }
@@ -62,31 +70,31 @@ public sealed class RuleService : IRuleService
         return triggerHandler.CanCreateSnapshotEvents;
     }
 
-    public async IAsyncEnumerable<JobResult> CreateSnapshotJobsAsync(RuleContext context,
-        [EnumeratorCancellation] CancellationToken ct = default)
+    public async Task CreateSnapshotJobsAsync(JobCallback callback, RuleContext context,
+        CancellationToken ct = default)
     {
-        Guard.NotNull(context.Rule, nameof(context.Rule));
+        Guard.NotNull(callback);
 
         var rule = context.Rule;
 
         if (!rule.IsEnabled && !context.IncludeSkipped)
         {
-            yield break;
+            return;
         }
 
         if (!ruleTriggerHandlers.TryGetValue(rule.Trigger.GetType(), out var triggerHandler))
         {
-            yield break;
+            return;
         }
 
         if (!ruleActionHandlers.TryGetValue(rule.Action.GetType(), out var actionHandler))
         {
-            yield break;
+            return;
         }
 
         if (!triggerHandler.CanCreateSnapshotEvents)
         {
-            yield break;
+            return;
         }
 
         var now = Clock.GetCurrentInstant();
@@ -98,68 +106,86 @@ public sealed class RuleService : IRuleService
             {
                 await eventEnricher.EnrichAsync(enrichedEvent, null);
 
-                if (!triggerHandler.Trigger(enrichedEvent, context))
+                if (!triggerHandler.Trigger(enrichedEvent, context.Rule.Trigger))
                 {
                     continue;
                 }
 
-                job = await CreateJobAsync(actionHandler, enrichedEvent, context, now);
+                job = await CreateJobAsync(actionHandler, enrichedEvent, context.RuleId, context.Rule, now);
             }
             catch (Exception ex)
             {
                 job = JobResult.Failed(ex);
             }
 
-            yield return job;
+            await callback(context.RuleId, context.Rule, job, ct);
         }
     }
 
-    public async IAsyncEnumerable<JobResult> CreateJobsAsync(Envelope<IEvent> @event, RuleContext context,
-        [EnumeratorCancellation] CancellationToken ct = default)
+    public async Task CreateJobsAsync(JobCallback callback, Envelope<IEvent> @event, RulesContext context,
+        CancellationToken ct = default)
     {
-        Guard.NotNull(@event, nameof(@event));
+        Guard.NotNull(callback);
+        Guard.NotNull(@event);
 
-        var jobs = new List<JobResult>();
+        // Each rule should create exactly one skip reason.
+        var ruleStates = new Dictionary<DomainId, RuleState>();
 
-        await AddJobsAsync(jobs, @event, context, ct);
-
-        foreach (var job in jobs)
+        foreach (var (ruleId, rule) in context.Rules)
         {
-            if (ct.IsCancellationRequested)
-            {
-                break;
-            }
-
-            yield return job;
+            ruleStates[ruleId] = new RuleState { Rule = rule };
         }
-    }
 
-    private async Task AddJobsAsync(List<JobResult> jobs, Envelope<IEvent> @event, RuleContext context,
-        CancellationToken ct)
-    {
+        ValueTask WriteAsync(RuleState ruleState, JobResult result)
+        {
+            ruleState.JobCreated = true;
+
+            return callback(ruleState.RuleId, ruleState.Rule, result, ct);
+        }
+
+        async ValueTask<bool> SkipAll(SkipReason skip, JobResult result, bool force = false)
+        {
+            // For the simulation we want to proceed as much as possible.
+            if (context.IncludeSkipped && !force)
+            {
+                foreach (var (_, ruleState) in ruleStates)
+                {
+                    ruleState.Skip |= skip;
+                }
+
+                return true;
+            }
+            else
+            {
+                foreach (var (_, ruleState) in ruleStates)
+                {
+                    await WriteAsync(ruleState, result);
+                }
+
+                return false;
+            }
+        }
+
+        async ValueTask<bool> SkipOne(RuleState ruleState, SkipReason skip, JobResult result, bool force = false)
+        {
+            // For the simulation we want to proceed as much as possible.
+            if (context.IncludeSkipped && !force)
+            {
+                ruleState.Skip |= skip;
+                return true;
+            }
+            else
+            {
+                await WriteAsync(ruleState, result);
+                return false;
+            }
+        }
+
         try
         {
-            var skipReason = SkipReason.None;
-
-            var rule = context.Rule;
-
-            if (!rule.IsEnabled)
-            {
-                // For the simulation we want to proceed as much as possible.
-                if (context.IncludeSkipped)
-                {
-                    skipReason |= SkipReason.Disabled;
-                }
-                else
-                {
-                    jobs.Add(JobResult.Disabled);
-                    return;
-                }
-            }
-
             if (@event.Payload is not AppEvent)
             {
-                jobs.Add(JobResult.WrongEvent);
+                await SkipAll(SkipReason.FromRule, JobResult.FromRule, true);
                 return;
             }
 
@@ -167,36 +193,10 @@ public sealed class RuleService : IRuleService
 
             if (typed.Payload.FromRule)
             {
-                // For the simulation we want to proceed as much as possible.
-                if (context.IncludeSkipped)
+                if (!await SkipAll(SkipReason.FromRule, JobResult.FromRule))
                 {
-                    skipReason |= SkipReason.FromRule;
-                }
-                else
-                {
-                    jobs.Add(JobResult.FromRule);
                     return;
                 }
-            }
-
-            var actionType = rule.Action.GetType();
-
-            if (!ruleTriggerHandlers.TryGetValue(rule.Trigger.GetType(), out var triggerHandler))
-            {
-                jobs.Add(JobResult.NoTrigger);
-                return;
-            }
-
-            if (!triggerHandler.Handles(typed.Payload))
-            {
-                jobs.Add(JobResult.WrongEventForTrigger);
-                return;
-            }
-
-            if (!ruleActionHandlers.TryGetValue(actionType, out var actionHandler))
-            {
-                jobs.Add(JobResult.NoAction);
-                return;
             }
 
             var now = Clock.GetCurrentInstant();
@@ -208,94 +208,160 @@ public sealed class RuleService : IRuleService
 
             if (!context.IncludeStale && eventTime.Plus(Constants.StaleTime) < now)
             {
-                // For the simulation we want to proceed as much as possible.
-                if (context.IncludeSkipped)
+                if (!await SkipAll(SkipReason.TooOld, JobResult.TooOld))
                 {
-                    skipReason |= SkipReason.TooOld;
-                }
-                else
-                {
-                    jobs.Add(JobResult.TooOld);
                     return;
                 }
             }
 
-            if (!triggerHandler.Trigger(typed, context))
+            Dictionary<IRuleTriggerHandler, List<(DomainId, Rules.Rule, IRuleActionHandler)>>? matchingRules = null;
+
+            foreach (var (ruleId, rule) in context.Rules)
             {
-                // For the simulation we want to proceed as much as possible.
-                if (context.IncludeSkipped)
+                if (!rule.IsEnabled)
                 {
-                    skipReason |= SkipReason.ConditionPrecheckDoesNotMatch;
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.Disabled;
+                    }
+                    else
+                    {
+                        await WriteAsync(ruleId, rule, JobResult.Disabled);
+                        break;
+                    }
                 }
-                else
+
+                var actionType = rule.Action.GetType();
+
+                if (!ruleTriggerHandlers.TryGetValue(rule.Trigger.GetType(), out var triggerHandler))
                 {
-                    jobs.Add(JobResult.ConditionPrecheckDoesNotMatch);
-                    return;
+                    await WriteAsync(ruleId, rule, JobResult.NoTrigger);
+                    break;
                 }
+
+                if (!triggerHandler.Handles(typed.Payload))
+                {
+                    await WriteAsync(ruleId, rule, JobResult.WrongEventForTrigger);
+                    break;
+                }
+
+                if (!ruleActionHandlers.TryGetValue(actionType, out var actionHandler))
+                {
+                    await WriteAsync(ruleId, rule, JobResult.NoAction);
+                    break;
+                }
+
+                if (!triggerHandler.Trigger(typed, rule.Trigger))
+                {
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.ConditionPrecheckDoesNotMatch;
+                    }
+                    else
+                    {
+                        await WriteAsync(ruleId, rule, JobResult.ConditionPrecheckDoesNotMatch);
+                        break;
+                    }
+                }
+
+                matchingRules ??= new Dictionary<IRuleTriggerHandler, List<(DomainId, Rules.Rule, IRuleActionHandler)>>();
+                matchingRules.GetOrAddNew(triggerHandler).Add((ruleId, rule, actionHandler));
             }
 
-            await foreach (var enrichedEvent in triggerHandler.CreateEnrichedEventsAsync(typed, context, ct))
+            if (matchingRules == null)
             {
-                if (string.IsNullOrWhiteSpace(enrichedEvent.Name))
-                {
-                    enrichedEvent.Name = GetName(typed.Payload);
-                }
+                return;
+            }
 
+            foreach (var (triggerHandler, rules) in matchingRules)
+            {
                 try
                 {
-                    await eventEnricher.EnrichAsync(enrichedEvent, typed);
-
-                    if (!triggerHandler.Trigger(enrichedEvent, context))
+                    await foreach (var enrichedEvent in triggerHandler.CreateEnrichedEventsAsync(typed, context, ct))
                     {
-                        // For the simulation we want to proceed as much as possible.
-                        if (context.IncludeSkipped)
+                        if (string.IsNullOrWhiteSpace(enrichedEvent.Name))
                         {
-                            skipReason |= SkipReason.ConditionDoesNotMatch;
+                            enrichedEvent.Name = GetName(typed.Payload);
                         }
-                        else
+
+                        try
                         {
-                            jobs.Add(JobResult.ConditionDoesNotMatch);
-                            return;
+                            await eventEnricher.EnrichAsync(enrichedEvent, typed);
+
+                            foreach (var (ruleId, rule, actionHandler) in rules)
+                            {
+                                if (!triggerHandler.Trigger(enrichedEvent, rule.Trigger))
+                                {
+                                    // For the simulation we want to proceed as much as possible.
+                                    if (context.IncludeSkipped)
+                                    {
+                                        skipReason |= SkipReason.ConditionDoesNotMatch;
+                                    }
+                                    else
+                                    {
+                                        await WriteAsync(ruleId, rule, JobResult.ConditionDoesNotMatch);
+                                        continue;
+                                    }
+                                }
+
+                                var result = await CreateJobAsync(actionHandler, enrichedEvent, ruleId, rule, now);
+
+                                // If the conditions matchs, we can skip creating a new object and save a few allocation.s
+                                if (skipReason != SkipReason.None)
+                                {
+                                    result = result with { SkipReason = skipReason };
+                                }
+
+                                await WriteAsync(ruleId, rule, result);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            foreach (var (ruleId, rule, actionHandler) in rules)
+                            {
+                                if (!hasWrittenForRule.Contains(ruleId))
+                                {
+                                    await WriteAsync(ruleId, rule, new JobResult
+                                    {
+                                        EnrichedEvent = enrichedEvent,
+                                        EnrichmentError = ex,
+                                        SkipReason = SkipReason.Failed
+                                    });
+                                }
+                            }
+
+                            log.LogError(ex, "Failed to create rule jobs from event.");
                         }
                     }
-
-                    var job = await CreateJobAsync(actionHandler, enrichedEvent, context, now);
-
-                    // If the conditions matchs, we can skip creating a new object and save a few allocation.s
-                    if (skipReason != SkipReason.None)
-                    {
-                        job = job with { SkipReason = skipReason };
-                    }
-
-                    jobs.Add(job);
                 }
                 catch (Exception ex)
                 {
-                    if (jobs.Count == 0)
+                    foreach (var (ruleId, rule, actionHandler) in rules)
                     {
-                        jobs.Add(new JobResult
+                        if (!hasWrittenForRule.Contains(ruleId))
                         {
-                            EnrichedEvent = enrichedEvent,
-                            EnrichmentError = ex,
-                            SkipReason = SkipReason.Failed
-                        });
+                            await WriteAsync(ruleId, rule, JobResult.Failed(ex));
+                        }
                     }
-
-                    log.LogError(ex, "Failed to create rule jobs from event.");
                 }
             }
         }
         catch (Exception ex)
         {
-            jobs.Add(JobResult.Failed(ex));
+            foreach (var (ruleId, rule) in context.Rules)
+            {
+                await WriteAsync(ruleId, rule, JobResult.Failed(ex));
+            }
 
             log.LogError(ex, "Failed to create rule job.");
         }
     }
 
-    private async Task<JobResult> CreateJobAsync(IRuleActionHandler actionHandler, EnrichedEvent enrichedEvent, RuleContext context, Instant now)
+    private async Task<JobResult> CreateJobAsync(IRuleActionHandler actionHandler, EnrichedEvent enrichedEvent, DomainId ruleId, Rule rule, Instant now)
     {
-        var actionType = context.Rule.Action.GetType();
+        var actionType = rule.Action.GetType();
         var actionName = typeRegistry.GetName<RuleAction>(actionType);
 
         var expires = now.Plus(Constants.ExpirationTime);
@@ -310,12 +376,12 @@ public sealed class RuleService : IRuleService
             EventName = enrichedEvent.Name,
             ExecutionPartition = enrichedEvent.Partition,
             Expires = expires,
-            RuleId = context.RuleId
+            RuleId = ruleId
         };
 
         try
         {
-            var (description, data) = await actionHandler.CreateJobAsync(enrichedEvent, context.Rule.Action);
+            var (description, data) = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
 
             var json = serializer.Serialize(data);
 

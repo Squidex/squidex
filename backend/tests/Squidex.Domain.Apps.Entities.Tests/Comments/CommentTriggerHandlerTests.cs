@@ -80,7 +80,7 @@ public class CommentTriggerHandlerTests
         A.CallTo(() => userResolver.QueryManyAsync(userIds, default))
             .Returns(users.ToDictionary(x => x.Id));
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
 
         Assert.Equal(2, actual.Count);
 
@@ -107,7 +107,7 @@ public class CommentTriggerHandlerTests
         var @event = new CommentCreated { Mentions = userIds };
         var envelope = Envelope.Create<AppEvent>(@event);
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
 
         Assert.Empty(actual);
     }
@@ -120,7 +120,7 @@ public class CommentTriggerHandlerTests
         var @event = new CommentCreated { Mentions = null };
         var envelope = Envelope.Create<AppEvent>(@event);
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
 
         Assert.Empty(actual);
 
@@ -136,7 +136,7 @@ public class CommentTriggerHandlerTests
         var @event = new CommentCreated { Mentions = Array.Empty<string>() };
         var envelope = Envelope.Create<AppEvent>(@event);
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
 
         Assert.Empty(actual);
 
@@ -151,7 +151,7 @@ public class CommentTriggerHandlerTests
         {
             var @event = new CommentCreated();
 
-            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -164,7 +164,7 @@ public class CommentTriggerHandlerTests
         {
             var @event = new EnrichedCommentEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -177,7 +177,7 @@ public class CommentTriggerHandlerTests
         {
             var @event = new EnrichedCommentEvent();
 
-            var actual = sut.Trigger(new EnrichedCommentEvent(), ctx);
+            var actual = sut.Trigger(new EnrichedCommentEvent(), ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -190,7 +190,7 @@ public class CommentTriggerHandlerTests
         {
             var @event = new EnrichedCommentEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -206,7 +206,7 @@ public class CommentTriggerHandlerTests
                 MentionedUser = UserMocks.User("1", "1@email.com")
             };
 
-            var actual = handler.Trigger(@event, ctx);
+            var actual = handler.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -222,7 +222,7 @@ public class CommentTriggerHandlerTests
                 MentionedUser = UserMocks.User("1", "1@email.com")
             };
 
-            var actual = handler.Trigger(@event, ctx);
+            var actual = handler.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -238,7 +238,7 @@ public class CommentTriggerHandlerTests
                 Text = "very_urgent_text"
             };
 
-            var actual = handler.Trigger(@event, ctx);
+            var actual = handler.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -254,7 +254,7 @@ public class CommentTriggerHandlerTests
                 Text = "just_gossip"
             };
 
-            var actual = handler.Trigger(@event, ctx);
+            var actual = handler.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });

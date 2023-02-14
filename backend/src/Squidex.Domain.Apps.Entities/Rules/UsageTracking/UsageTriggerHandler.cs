@@ -7,6 +7,7 @@
 
 using System.Runtime.CompilerServices;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
@@ -25,7 +26,7 @@ public sealed class UsageTriggerHandler : IRuleTriggerHandler
         return appEvent is AppUsageExceeded;
     }
 
-    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RulesContext context,
         [EnumeratorCancellation] CancellationToken ct)
     {
         var usageEvent = (AppUsageExceeded)@event.Payload;
@@ -42,12 +43,10 @@ public sealed class UsageTriggerHandler : IRuleTriggerHandler
         yield return result;
     }
 
-    public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
+    public bool Trigger(Envelope<AppEvent> @event, RuleTrigger trigger)
     {
-        var trigger = (UsageTrigger)context.Rule.Trigger;
-
         var usageEvent = (AppUsageExceeded)@event.Payload;
 
-        return usageEvent.CallsLimit >= trigger.Limit;
+        return usageEvent.CallsLimit >= ((UsageTrigger)trigger).Limit;
     }
 }

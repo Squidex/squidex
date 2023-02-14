@@ -17,10 +17,13 @@ public sealed class GeolocationFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public GeolocationFieldEditor Editor { get; set; }
 
+    public static GeolocationFieldPropertiesDto FromDomain(GeolocationFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new GeolocationFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new GeolocationFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new GeolocationFieldProperties());
     }
 }

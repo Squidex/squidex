@@ -75,6 +75,12 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         return collectionComplete.StreamAll(appId, schemaIds, ct);
     }
 
+    public IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference,
+        CancellationToken ct = default)
+    {
+        return collectionComplete.StreamReferencing(appId, reference, ct);
+    }
+
     public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
         CancellationToken ct = default)
     {
@@ -133,16 +139,16 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         }
     }
 
-    public Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId, SearchScope scope,
+    public Task<bool> HasReferrersAsync(DomainId appId, DomainId reference, SearchScope scope,
         CancellationToken ct = default)
     {
         if (scope == SearchScope.All)
         {
-            return collectionComplete.HasReferrersAsync(appId, contentId, ct);
+            return collectionComplete.HasReferrersAsync(appId, reference, ct);
         }
         else
         {
-            return collectionPublished.HasReferrersAsync(appId, contentId, ct);
+            return collectionPublished.HasReferrersAsync(appId, reference, ct);
         }
     }
 

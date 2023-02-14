@@ -149,7 +149,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         var trigger = new ContentChangedTriggerV2
         {
             Schemas = ReadonlyList.Create(
-                new ContentChangedTriggerSchemaV2
+                new SchemaCondition
                 {
                     SchemaId = schemaMatch.Id
                 })
@@ -186,7 +186,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 12, CancellationToken))
             .Returns(SimpleMapper.Map(@event, new ContentEntity()));
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), CancellationToken).ToListAsync(CancellationToken);
 
         var enrichedEvent = (EnrichedContentEvent)actual.Single();
 
@@ -216,7 +216,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         A.CallTo(() => contentLoader.GetAsync(ctx.AppId.Id, @event.ContentId, 11, CancellationToken))
             .Returns(new ContentEntity { AppId = ctx.AppId, SchemaId = schemaMatch, Version = 11, Data = dataOld });
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), CancellationToken).ToListAsync(CancellationToken);
 
         var enrichedEvent = actual.Single() as EnrichedContentEvent;
 
@@ -231,7 +231,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new ContentCreated { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -244,7 +244,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new ContentCreated { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -257,7 +257,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new ContentCreated { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -270,7 +270,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new ContentCreated { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -283,7 +283,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -296,7 +296,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -309,7 +309,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -322,7 +322,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -335,7 +335,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -348,7 +348,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedContentEvent { SchemaId = schemaMatch };
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -363,7 +363,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
             trigger = trigger with
             {
                 Schemas = ReadonlyList.Create(
-                    new ContentChangedTriggerSchemaV2
+                    new SchemaCondition
                     {
                         SchemaId = schemaId.Id,
                         Condition = condition

@@ -61,26 +61,26 @@ public sealed class MongoRuleStatisticsCollection : MongoRepositoryBase<RuleStat
         return statistics;
     }
 
-    public Task IncrementSuccessAsync(DomainId appId, DomainId ruleId, Instant now,
+    public Task IncrementSuccessAsync(DomainId appId, DomainId ruleId, Instant now, int increment,
         CancellationToken ct)
     {
         return Collection.UpdateOneAsync(
             x => x.AppId == appId && x.RuleId == ruleId,
             Update
-                .Inc(x => x.NumSucceeded, 1)
+                .Inc(x => x.NumSucceeded, increment)
                 .Set(x => x.LastExecuted, now)
                 .SetOnInsert(x => x.AppId, appId)
                 .SetOnInsert(x => x.RuleId, ruleId),
             Upsert, ct);
     }
 
-    public Task IncrementFailedAsync(DomainId appId, DomainId ruleId, Instant now,
+    public Task IncrementFailedAsync(DomainId appId, DomainId ruleId, Instant now, int increment,
         CancellationToken ct)
     {
         return Collection.UpdateOneAsync(
             x => x.AppId == appId && x.RuleId == ruleId,
             Update
-                .Inc(x => x.NumFailed, 1)
+                .Inc(x => x.NumFailed, increment)
                 .Set(x => x.LastExecuted, now)
                 .SetOnInsert(x => x.AppId, appId)
                 .SetOnInsert(x => x.RuleId, ruleId),

@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Messaging;
@@ -51,13 +52,15 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
     {
         Guard.NotNull(rule);
 
-        var context = new RuleContext
+        var context = new RulesContext
         {
             AppId = appId,
-            Rule = rule,
-            RuleId = ruleId,
             IncludeSkipped = true,
-            IncludeStale = true
+            IncludeStale = true,
+            Rules = new Dictionary<DomainId, Rule>
+            {
+                [ruleId] = rule
+            }.ToReadonlyDictionary()
         };
 
         var simulatedEvents = new List<SimulatedRuleEvent>(MaxSimulatedEvents);
@@ -68,31 +71,35 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
         {
             var @event = eventFormatter.ParseIfKnown(storedEvent);
 
-            if (@event?.Payload is AppEvent appEvent)
+            if (@event?.Payload is not AppEvent appEvent)
             {
-                // Also create jobs for rules with failing conditions because we want to show them in th table.
-                await foreach (var result in ruleService.CreateJobsAsync(@event, context, ct).WithCancellation(ct))
-                {
-                    var eventName = result.Job?.EventName;
-
-                    if (string.IsNullOrWhiteSpace(eventName))
-                    {
-                        eventName = ruleService.GetName(appEvent);
-                    }
-
-                    simulatedEvents.Add(new SimulatedRuleEvent
-                    {
-                        ActionData = result.Job?.ActionData,
-                        ActionName = result.Job?.ActionName,
-                        EnrichedEvent = result.EnrichedEvent,
-                        Error = result.EnrichmentError?.Message,
-                        Event = @event.Payload,
-                        EventId = @event.Headers.EventId(),
-                        EventName = eventName,
-                        SkipReason = result.SkipReason
-                    });
-                }
+                continue;
             }
+
+            // Also create jobs for rules with failing conditions because we want to show them in th table.
+            await ruleService.CreateJobsAsync((ruleId, rule, result, ct) =>
+            {
+                var eventName = result.Job?.EventName;
+
+                if (string.IsNullOrWhiteSpace(eventName))
+                {
+                    eventName = ruleService.GetName(appEvent);
+                }
+
+                simulatedEvents.Add(new SimulatedRuleEvent
+                {
+                    ActionData = result.Job?.ActionData,
+                    ActionName = result.Job?.ActionName,
+                    EnrichedEvent = result.EnrichedEvent,
+                    Error = result.EnrichmentError?.Message,
+                    Event = @event.Payload,
+                    EventId = @event.Headers.EventId(),
+                    EventName = eventName,
+                    SkipReason = result.SkipReason
+                });
+
+                return default;
+            }, @event, context, ct);
         }
 
         return simulatedEvents;
@@ -100,16 +107,12 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
 
     public bool CanRunRule(IRuleEntity rule)
     {
-        var context = GetContext(rule);
-
-        return context.Rule.Trigger is not ManualTrigger;
+        return rule.RuleDef.Trigger is not ManualTrigger;
     }
 
     public bool CanRunFromSnapshots(IRuleEntity rule)
     {
-        var context = GetContext(rule);
-
-        return CanRunRule(rule) && ruleService.CanCreateSnapshotEvents(context);
+        return rule.RuleDef.Trigger is not ManualTrigger && ruleService.CanCreateSnapshotEvents(rule.RuleDef);
     }
 
     public Task CancelAsync(DomainId appId,
@@ -140,15 +143,5 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
         await state.LoadAsync(ct);
 
         return state;
-    }
-
-    private static RuleContext GetContext(IRuleEntity rule)
-    {
-        return new RuleContext
-        {
-            AppId = rule.AppId,
-            Rule = rule.RuleDef,
-            RuleId = rule.Id
-        };
     }
 }

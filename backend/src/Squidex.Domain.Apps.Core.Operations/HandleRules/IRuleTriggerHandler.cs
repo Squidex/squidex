@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
@@ -26,7 +27,7 @@ public interface IRuleTriggerHandler
         return AsyncEnumerable.Empty<EnrichedEvent>();
     }
 
-    IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+    IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RulesContext context,
         CancellationToken ct);
 
     string? GetName(AppEvent @event)
@@ -34,12 +35,12 @@ public interface IRuleTriggerHandler
         return null;
     }
 
-    bool Trigger(Envelope<AppEvent> @event, RuleContext context)
+    bool Trigger(Envelope<AppEvent> @event, RuleTrigger trigger)
     {
         return true;
     }
 
-    bool Trigger(EnrichedEvent @event, RuleContext context)
+    bool Trigger(EnrichedEvent @event, RuleTrigger trigger)
     {
         return true;
     }

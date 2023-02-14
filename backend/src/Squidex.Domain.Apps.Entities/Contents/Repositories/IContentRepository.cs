@@ -19,6 +19,9 @@ public interface IContentRepository
     IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
         CancellationToken ct = default);
 
+    IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId references,
+        CancellationToken ct = default);
+
     Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope,
         CancellationToken ct = default);
 
@@ -34,7 +37,7 @@ public interface IContentRepository
     Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, DomainId id, SearchScope scope,
         CancellationToken ct = default);
 
-    Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId, SearchScope scope,
+    Task<bool> HasReferrersAsync(DomainId appId, DomainId reference, SearchScope scope,
         CancellationToken ct = default);
 
     Task ResetScheduledAsync(DomainId documentId,

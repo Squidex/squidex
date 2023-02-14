@@ -73,28 +73,28 @@ public class RuleEnqueuerTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_not_insert_job_if_null()
+    public async Task Should_not_insert_event_if_job_is_null()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var rule = CreateRule();
 
-        var job = new RuleJob
-        {
-            Created = now
-        };
+        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
+            .Invokes(x =>
+            {
+                var result = new JobResult();
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(new List<JobResult> { new JobResult() }.ToAsyncEnumerable());
+                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
+            });
 
-        await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null, default))
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .MustNotHaveHappened();
     }
 
     [Fact]
-    public async Task Should_not_insert_job_if_job_has_a_skip_reason()
+    public async Task Should_not_insert_event_if_job_has_a_skip_reason()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
@@ -105,17 +105,22 @@ public class RuleEnqueuerTests : GivenContext
             Created = now
         };
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(new List<JobResult> { new JobResult { Job = job, SkipReason = SkipReason.TooOld } }.ToAsyncEnumerable());
+        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
+            .Invokes(x =>
+            {
+                var result = new JobResult { Job = job, SkipReason = SkipReason.WrongEvent };
 
-        await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
+            });
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null, default))
+        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
+
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .MustNotHaveHappened();
     }
 
     [Fact]
-    public async Task Should_update_repository_if_enqueing()
+    public async Task Should_insert_insert_from_successful_job()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
@@ -126,17 +131,22 @@ public class RuleEnqueuerTests : GivenContext
             Created = now
         };
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(new List<JobResult> { new JobResult { Job = job } }.ToAsyncEnumerable());
+        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
+            .Invokes(x =>
+            {
+                var result = new JobResult { Job = job };
 
-        await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
+            });
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(job, (Exception?)null, default))
+        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
+
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>.That.Matches(x => x.Contains(new RuleEventWrite(job, now, null))), default))
             .MustHaveHappened();
     }
 
     [Fact]
-    public async Task Should_update_repository_if_enqueing_broken_job()
+    public async Task Should_insert_insert_from_failed_job()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
@@ -147,61 +157,88 @@ public class RuleEnqueuerTests : GivenContext
             Created = now
         };
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(new List<JobResult> { new JobResult { Job = job, SkipReason = SkipReason.Failed } }.ToAsyncEnumerable());
+        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
+            .Invokes(x =>
+            {
+                var result = new JobResult { Job = job, SkipReason = SkipReason.Failed };
 
-        await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
+            });
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(job, (Exception?)null, default))
+        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
+
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>.That.Matches(x => x.Contains(new RuleEventWrite(job, null, null))), default))
             .MustHaveHappened();
     }
 
     [Fact]
-    public async Task Should_update_repository_with_jobs_from_service()
+    public async Task Should_insert_insert_from_successful_in_event_consumer()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
-        var job1 = new RuleJob
+        var job = new RuleJob
         {
             Created = now
         };
 
-        SetupRules(@event, job1);
+        SetupRules(@event, job, default);
 
-        await sut.On(@event);
+        await sut.On(new[] { @event });
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, (Exception?)null, default))
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>.That.Matches(x => x.Contains(new RuleEventWrite(job, now, null))), default))
             .MustHaveHappened();
     }
 
     [Fact]
-    public async Task Should_not_eqneue_if_event_restored()
+    public async Task Should_insert_insert_from_failed_job_in_event_consumer()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
-        var job1 = new RuleJob { Created = now };
+        var job = new RuleJob
+        {
+            Created = now
+        };
 
-        SetupRules(@event, job1);
+        SetupRules(@event, job, SkipReason.Failed);
 
-        await sut.On(@event.SetRestored(true));
+        await sut.On(new[] { @event });
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, A<Exception?>._, default))
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>.That.Matches(x => x.Contains(new RuleEventWrite(job, null, null))), default))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_insert_event_in_event_consumer_if_restored()
+    {
+        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
+
+        var job = new RuleJob
+        {
+            Created = now
+        };
+
+        SetupRules(@event, job, default);
+
+        await sut.On(new[] { @event.SetRestored(true) });
+
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .MustNotHaveHappened();
     }
 
-    private void SetupRules(Envelope<IEvent> @event, RuleJob job1)
+    private void SetupRules(Envelope<IEvent> @event, RuleJob job, SkipReason skipReason)
     {
-        var rule1 = CreateRule();
-        var rule2 = CreateRule();
+        var rule = CreateRule();
 
         A.CallTo(() => AppProvider.GetRulesAsync(AppId.Id, A<CancellationToken>._))
-            .Returns(new List<IRuleEntity> { rule1, rule2 });
+            .Returns(new List<IRuleEntity> { rule });
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule1), default))
-            .Returns(new List<JobResult> { new JobResult { Job = job1 } }.ToAsyncEnumerable());
+        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
+            .Invokes(x =>
+            {
+                var result = new JobResult { Job = job, SkipReason = skipReason };
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule2), default))
-            .Returns(new List<JobResult>().ToAsyncEnumerable());
+                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
+            });
     }
 
     private static RuleEntity CreateRule()
@@ -211,11 +248,11 @@ public class RuleEnqueuerTests : GivenContext
         return new RuleEntity { RuleDef = rule, Id = DomainId.NewGuid() };
     }
 
-    private static RuleContext MatchingContext(RuleEntity rule)
+    private static RulesContext MatchingContext(RuleEntity rule)
     {
         // These two properties must not be set to true for performance reasons.
-        return A<RuleContext>.That.Matches(x =>
-            x.Rule == rule.RuleDef &&
+        return A<RulesContext>.That.Matches(x =>
+            x.Rules.Values.Contains(rule.RuleDef) &&
            !x.IncludeSkipped &&
            !x.IncludeStale);
     }

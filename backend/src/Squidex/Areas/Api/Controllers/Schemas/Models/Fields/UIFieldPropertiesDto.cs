@@ -17,10 +17,13 @@ public sealed class UIFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public UIFieldEditor Editor { get; set; }
 
+    public static UIFieldPropertiesDto FromDomain(UIFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new UIFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new UIFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new UIFieldProperties());
     }
 }
