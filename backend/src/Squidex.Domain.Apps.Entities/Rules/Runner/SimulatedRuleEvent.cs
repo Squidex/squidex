@@ -13,6 +13,8 @@ public sealed record SimulatedRuleEvent
 {
     public Guid EventId { get; init; }
 
+    public string UniqueId { get; init; }
+
     public string EventName { get; init; }
 
     public object Event { get; init; }

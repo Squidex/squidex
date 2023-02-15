@@ -482,10 +482,11 @@ describe('RulesService', () => {
             eventName: `name${key}`,
             event: { value: 'simple' },
             enrichedEvent: { value: 'enriched' },
+            error: `error${key}`,
             actionName: `action-name${key}`,
             actionData: `action-data${key}`,
-            error: `error${key}`,
             skipReasons: [`reason${key}`],
+            uniqueId: `unique-id${key}`,
             _links: {},
         };
     }
@@ -551,5 +552,8 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
         `action-name${key}`,
         `action-data${key}`,
         `error${key}`,
-        [`reason${key}`]);
+        [
+            `reason${key}`
+        ],
+        `unqiue-id${key}`
 }

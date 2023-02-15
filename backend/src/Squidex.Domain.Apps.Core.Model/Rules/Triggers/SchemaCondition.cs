@@ -5,8 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Assets;
+namespace Squidex.Domain.Apps.Core.Rules.Triggers;
 
-public sealed record AssetStats(DateTime Date, long TotalCount, long TotalSize);
+public record class SchemaCondition
+{
+    public DomainId SchemaId { get; init; }
+
+    public string? Condition { get; init; }
+}

@@ -181,6 +181,7 @@ export class SimulatedRuleEventDto {
         public readonly actionData: string | undefined,
         public readonly error: string | undefined,
         public readonly skipReasons: ReadonlyArray<string>,
+        public readonly uniqueId: string,
     ) {
         this._links = links;
     }
@@ -512,5 +513,6 @@ function parseSimulatedRuleEvent(response: any) {
         response.actionName,
         response.actionData,
         response.error,
-        response.skipReasons);
+        response.skipReasons,
+        response.uniqueId);
 }

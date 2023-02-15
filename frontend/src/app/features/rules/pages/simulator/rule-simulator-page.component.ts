@@ -45,14 +45,14 @@ export class RuleSimulatorPageComponent extends ResourceOwner implements OnInit 
     }
 
     public selectEvent(event: SimulatedRuleEventDto) {
-        if (this.selectedRuleEvent === event.eventId) {
+        if (this.selectedRuleEvent === event.uniqueId) {
             this.selectedRuleEvent = null;
         } else {
-            this.selectedRuleEvent = event.eventId;
+            this.selectedRuleEvent = event.uniqueId;
         }
     }
 
     public trackByEvent(_index: number, event: SimulatedRuleEventDto) {
-        return event.eventId;
+        return event.uniqueId;
     }
 }

@@ -22,6 +22,10 @@ public readonly struct RulesContext
     public bool IncludeSkipped { get; init; }
 
     public bool IncludeStale { get; init; }
+
+    public bool AllowExtraEvents { get; init; }
+
+    public int? MaxEvents { get; init; }
 }
 
 public readonly struct RuleContext

@@ -83,6 +83,11 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
 
         yield return enrichedEvent;
 
+        if (!context.AllowExtraEvents)
+        {
+            yield break;
+        }
+
         if (context.Rules.Values.Any(r => TriggerReferences(enrichedEvent, r)))
         {
             await foreach (var content in contentRepository.StreamReferencing(context.AppId.Id, enrichedEvent.Id, ct))

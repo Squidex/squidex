@@ -7,16 +7,12 @@
 
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
 public sealed record JobResult
 {
-    public static readonly JobResult ConditionDoesNotMatch = new JobResult
-    {
-        SkipReason = SkipReason.ConditionDoesNotMatch
-    };
-
     public static readonly JobResult ConditionPrecheckDoesNotMatch = new JobResult
     {
         SkipReason = SkipReason.ConditionPrecheckDoesNotMatch
@@ -57,6 +53,10 @@ public sealed record JobResult
         SkipReason = SkipReason.WrongEventForTrigger
     };
 
+    public DomainId RuleId { get; set; }
+
+    public Rule Rule { get; init; }
+
     public RuleJob? Job { get; init; }
 
     public EnrichedEvent? EnrichedEvent { get; init; }
@@ -64,6 +64,19 @@ public sealed record JobResult
     public Exception? EnrichmentError { get; init; }
 
     public SkipReason SkipReason { get; init; }
+
+    public int Offset { get; set; }
+
+    public static JobResult ConditionDoesNotMatch(EnrichedEvent? enrichedEvent = null, RuleJob? job = null)
+    {
+        return new JobResult
+        {
+            Job = job,
+            EnrichedEvent = enrichedEvent,
+            EnrichmentError = null,
+            SkipReason = SkipReason.ConditionDoesNotMatch,
+        };
+    }
 
     public static JobResult Failed(Exception exception, EnrichedEvent? enrichedEvent = null, RuleJob? job = null)
     {

@@ -31,11 +31,23 @@ export class ContentChangedTriggerComponent {
         return this.triggerForm.form.get('schemas') as TemplatedFormArray;
     }
 
-    public add() {
+    public get referencedSchemasForm() {
+        return this.triggerForm.form.get('referencedSchemas') as TemplatedFormArray;
+    }
+
+    public addSchema() {
         this.schemasForm.add();
     }
 
-    public remove(index: number) {
+    public addReferencedSchema() {
+        this.referencedSchemasForm.add();
+    }
+
+    public removeSchema(index: number) {
         this.schemasForm.removeAt(index);
+    }
+
+    public removeReferencedSchema(index: number) {
+        this.referencedSchemasForm.removeAt(index);
     }
 }

@@ -28,6 +28,7 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
     private readonly IAppProvider appProvider;
     private readonly ILocalCache localCache;
     private readonly TimeSpan cacheDuration;
+    private readonly int maxExtraEvents;
 
     public string Name
     {
@@ -48,6 +49,7 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
         this.ruleService = ruleService;
         this.log = log;
         this.localCache = localCache;
+        this.maxExtraEvents = options.Value.MaxEnrichedEvents;
     }
 
     public async Task EnqueueAsync(DomainId ruleId, Rule rule, Envelope<IEvent> @event)
@@ -74,10 +76,10 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
         // Write in batches of 100 items for better performance. Using completes the last write.
         await using var batch = new RuleQueueWriter(ruleEventRepository);
 
-        await ruleService.CreateJobsAsync(async (ruleId, rule, result, ct) =>
+        await foreach (var result in ruleService.CreateJobsAsync(@event, context))
         {
-            await batch.WriteAsync(result, rule, log);
-        }, @event, context, default);
+            await batch.WriteAsync(result, log);
+        }
     }
 
     public async Task On(IEnumerable<Envelope<IEvent>> events)
@@ -104,15 +106,17 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
                 var context = new RulesContext
                 {
                     AppId = appEvent.AppId,
+                    AllowExtraEvents = true,
                     IncludeSkipped = false,
                     IncludeStale = false,
                     Rules = rules.ToDictionary(x => x.Id, x => x.RuleDef).ToReadonlyDictionary(),
+                    MaxEvents = maxExtraEvents
                 };
 
-                await ruleService.CreateJobsAsync(async (ruleId, rule, result, ct) =>
+                await foreach (var result in ruleService.CreateJobsAsync(@event, context))
                 {
-                    await batch.WriteAsync(result, rule, log);
-                }, @event, context, default);
+                    await batch.WriteAsync(result, log);
+                }
             }
         }
     }

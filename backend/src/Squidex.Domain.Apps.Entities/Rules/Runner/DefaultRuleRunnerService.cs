@@ -77,29 +77,30 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
             }
 
             // Also create jobs for rules with failing conditions because we want to show them in th table.
-            await ruleService.CreateJobsAsync((ruleId, rule, result, ct) =>
+            await foreach (var job in ruleService.CreateJobsAsync(@event, context, ct).Take(MaxSimulatedEvents).WithCancellation(ct))
             {
-                var eventName = result.Job?.EventName;
+                var eventName = job.Job?.EventName;
 
                 if (string.IsNullOrWhiteSpace(eventName))
                 {
                     eventName = ruleService.GetName(appEvent);
                 }
 
+                var eventId = @event.Headers.EventId();
+
                 simulatedEvents.Add(new SimulatedRuleEvent
                 {
-                    ActionData = result.Job?.ActionData,
-                    ActionName = result.Job?.ActionName,
-                    EnrichedEvent = result.EnrichedEvent,
-                    Error = result.EnrichmentError?.Message,
+                    ActionData = job.Job?.ActionData,
+                    ActionName = job.Job?.ActionName,
+                    EnrichedEvent = job.EnrichedEvent,
+                    Error = job.EnrichmentError?.Message,
                     Event = @event.Payload,
-                    EventId = @event.Headers.EventId(),
+                    EventId = eventId,
                     EventName = eventName,
-                    SkipReason = result.SkipReason
+                    SkipReason = job.SkipReason,
+                    UniqueId = $"{eventId}_{job.Offset}",
                 });
-
-                return default;
-            }, @event, context, ct);
+            }
         }
 
         return simulatedEvents;

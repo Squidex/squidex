@@ -61,6 +61,9 @@ export class TriggerForm extends Form<any, UntypedFormGroup> {
                     schemas: new TemplatedFormArray(ContentChangedSchemaTemplate.INSTANCE,
                         Validators.nullValidator,
                     ),
+                    referencedSchemas: new TemplatedFormArray(ContentChangedSchemaTemplate.INSTANCE,
+                        Validators.nullValidator,
+                    ),
                 });
             }
             case 'Usage': {

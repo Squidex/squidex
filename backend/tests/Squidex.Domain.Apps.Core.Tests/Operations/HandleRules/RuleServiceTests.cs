@@ -185,7 +185,7 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
             .Returns(false);
 
-        var jobs = await CreateSnapshotJobsAsync(context);
+        var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
 
         Assert.Empty(jobs);
 
@@ -201,7 +201,7 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
             .Returns(true);
 
-        var jobs = await CreateSnapshotJobsAsync(context);
+        var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
 
         Assert.Empty(jobs);
 
@@ -217,7 +217,7 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
             .Returns(true);
 
-        var jobs = await CreateSnapshotJobsAsync(context);
+        var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
 
         Assert.Empty(jobs);
 
@@ -233,7 +233,7 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
             .Returns(true);
 
-        var jobs = await CreateSnapshotJobsAsync(context);
+        var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
 
         Assert.Empty(jobs);
 
@@ -242,7 +242,7 @@ public class RuleServiceTests
     }
 
     [Fact]
-    public async Task Should_create_jobs_from_snapshots_if_rule_disabled_but_included()
+    public async Task Should_create_jobs_from_snapshots_if_rule_disabled_and_included()
     {
         var context = Rule(disable: true, includeSkipped: true);
 
@@ -259,7 +259,7 @@ public class RuleServiceTests
                 new EnrichedContentEvent { AppId = appId }
             }.ToAsyncEnumerable());
 
-        var jobs = await CreateSnapshotJobsAsync(context);
+        var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
 
         Assert.Equal(2, jobs.Count(x => x.Job != null && x.EnrichmentError == null));
     }
@@ -282,7 +282,7 @@ public class RuleServiceTests
                 new EnrichedContentEvent { AppId = appId }
             }.ToAsyncEnumerable());
 
-        var jobs = await CreateSnapshotJobsAsync(context);
+        var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
 
         Assert.Equal(2, jobs.Count(x => x.Job != null && x.EnrichmentError == null));
     }
@@ -305,7 +305,7 @@ public class RuleServiceTests
                 new EnrichedContentEvent { AppId = appId }
             }.ToAsyncEnumerable());
 
-        var jobs = await CreateSnapshotJobsAsync(context);
+        var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
 
         Assert.Equal(2, jobs.Count(x => x.Job == null && x.EnrichmentError != null));
     }
@@ -319,7 +319,7 @@ public class RuleServiceTests
 
         var eventEnvelope = CreateEnvelope(new InvalidEvent());
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.WrongEvent, actual.SkipReason);
 
@@ -336,7 +336,7 @@ public class RuleServiceTests
 
         var eventEnvelope = CreateEnvelope(new ContentCreated());
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.NoTrigger, actual.SkipReason);
 
@@ -353,7 +353,7 @@ public class RuleServiceTests
 
         var eventEnvelope = CreateEnvelope(new ContentCreated());
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.WrongEventForTrigger, actual.SkipReason);
 
@@ -373,7 +373,7 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.Handles(eventEnvelope.Payload))
             .Returns(true);
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.NoAction, actual.SkipReason);
 
@@ -388,7 +388,7 @@ public class RuleServiceTests
 
         var eventEnvelope = CreateEnvelope(new ContentCreated());
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.Disabled, actual.SkipReason);
 
@@ -397,14 +397,14 @@ public class RuleServiceTests
     }
 
     [Fact]
-    public async Task Should_create_job_if_rule_disabled_and_skipped_included()
+    public async Task Should_create_job_if_rule_disabled_and_included()
     {
         var context = Rule(disable: true, includeSkipped: true);
 
         var eventEnvelope = CreateEnvelope(new ContentCreated());
-        var eventEnriched = SetupFullFlow(context, eventEnvelope);
+        var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         AssertJob(eventEnriched, actual, SkipReason.Disabled);
     }
@@ -421,7 +421,7 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.Handles(eventEnvelope.Payload))
             .Returns(true);
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.TooOld, actual.SkipReason);
 
@@ -437,24 +437,24 @@ public class RuleServiceTests
         var eventEnvelope =
             Envelope.Create(new ContentCreated())
                 .SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
-        var eventEnriched = SetupFullFlow(context, eventEnvelope);
+        var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         AssertJob(eventEnriched, actual, SkipReason.None);
     }
 
     [Fact]
-    public async Task Should_create_job_if_too_old_but_skipped_are_included()
+    public async Task Should_create_job_if_too_old_and_included()
     {
         var context = Rule(includeSkipped: true);
 
         var eventEnvelope =
             Envelope.Create(new ContentCreated())
                 .SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
-        var eventEnriched = SetupFullFlow(context, eventEnvelope);
+        var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         AssertJob(eventEnriched, actual, SkipReason.TooOld);
     }
@@ -466,7 +466,7 @@ public class RuleServiceTests
 
         var eventEnvelope = CreateEnvelope(new ContentCreated { FromRule = true });
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.FromRule, actual.SkipReason);
 
@@ -478,14 +478,14 @@ public class RuleServiceTests
     }
 
     [Fact]
-    public async Task Should_job_if_event_created_by_rule_but_skipped_are_included()
+    public async Task Should_create_debug_job_if_event_created_by_rule_and_included()
     {
         var context = Rule(includeSkipped: true);
 
         var eventEnvelope = CreateEnvelope(new ContentCreated { FromRule = true });
-        var eventEnriched = SetupFullFlow(context, eventEnvelope);
+        var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         AssertJob(eventEnriched, actual, SkipReason.FromRule);
     }
@@ -507,7 +507,7 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(MatchPayload(eventEnvelope), context.ToRulesContext(), default))
             .Returns(new List<EnrichedEvent> { eventEnriched }.ToAsyncEnumerable());
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.ConditionPrecheckDoesNotMatch, actual.SkipReason);
         Assert.Null(actual.EnrichedEvent);
@@ -515,17 +515,17 @@ public class RuleServiceTests
     }
 
     [Fact]
-    public async Task Should_create_job_if_not_triggered_with_precheck_but_skipped_are_included()
+    public async Task Should_create_job_if_not_triggered_with_precheck_and_included()
     {
         var context = Rule(includeSkipped: true);
 
         var eventEnvelope = CreateEnvelope(new ContentCreated());
-        var eventEnriched = SetupFullFlow(context, eventEnvelope);
+        var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
         A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(eventEnvelope), context.Rule.Trigger))
             .Returns(false);
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         AssertJob(eventEnriched, actual, SkipReason.ConditionPrecheckDoesNotMatch);
     }
@@ -543,7 +543,7 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(eventEnvelope), context.Rule.Trigger))
             .Throws(new InvalidOperationException());
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.Failed, actual.SkipReason);
     }
@@ -564,13 +564,13 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(MatchPayload(eventEnvelope), context.ToRulesContext(), default))
             .Returns(AsyncEnumerable.Empty<EnrichedEvent>());
 
-        var job = await CreateJobsAsync(context, eventEnvelope);
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).ToListAsync();
 
-        Assert.Empty(job);
+        Assert.Empty(actual);
     }
 
     [Fact]
-    public async Task Should_create_debug_job_if_not_triggered()
+    public async Task Should_create_skipped_result_if_not_triggered_and_included()
     {
         var context = Rule(includeSkipped: true);
 
@@ -589,30 +589,30 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(MatchPayload(eventEnvelope), context.ToRulesContext(), default))
             .Returns(new List<EnrichedEvent> { eventEnriched }.ToAsyncEnumerable());
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.ConditionDoesNotMatch, actual.SkipReason);
         Assert.Equal(eventEnriched, actual.EnrichedEvent);
     }
 
     [Fact]
-    public async Task Should_debug_job_if_not_triggered_but_skipped_included()
+    public async Task Should_create_debug_job_if_not_triggered_and_included()
     {
         var context = Rule(includeSkipped: true);
 
         var eventEnvelope = CreateEnvelope(new ContentCreated());
-        var eventEnriched = SetupFullFlow(context, eventEnvelope);
+        var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
         A.CallTo(() => ruleTriggerHandler.Trigger(eventEnriched, context.Rule.Trigger))
             .Returns(false);
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         AssertJob(eventEnriched, actual, SkipReason.ConditionDoesNotMatch);
     }
 
     [Fact]
-    public async Task Should_create_debug_job_if_enrichment_failed()
+    public async Task Should_skipped_result_if_enrichment_failed()
     {
         var context = Rule();
 
@@ -627,7 +627,7 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(MatchPayload(eventEnvelope), context.ToRulesContext(), default))
             .Throws(new InvalidOperationException());
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.Equal(SkipReason.Failed, actual.SkipReason);
     }
@@ -638,9 +638,9 @@ public class RuleServiceTests
         var context = Rule();
 
         var eventEnvelope = CreateEnvelope(new ContentCreated());
-        var eventEnriched = SetupFullFlow(context, eventEnvelope);
+        var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         AssertJob(eventEnriched, actual, SkipReason.None);
 
@@ -654,12 +654,12 @@ public class RuleServiceTests
         var context = Rule();
 
         var eventEnvelope = CreateEnvelope(new ContentCreated());
-        var eventEnriched = SetupFullFlow(context, eventEnvelope);
+        var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
         A.CallTo(() => ruleActionHandler.CreateJobAsync(eventEnriched, context.Rule.Action))
             .Throws(new InvalidOperationException());
 
-        var actual = (await CreateJobsAsync(context, eventEnvelope)).Single();
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
 
         Assert.NotNull(actual.EnrichmentError);
         Assert.NotNull(actual.Job?.ActionData);
@@ -676,34 +676,16 @@ public class RuleServiceTests
         var context = Rule();
 
         var eventEnvelope = CreateEnvelope(new ContentCreated());
-        var eventEnriched1 = new EnrichedContentEvent { AppId = appId };
-        var eventEnriched2 = new EnrichedContentEvent { AppId = appId };
-
-        A.CallTo(() => ruleTriggerHandler.Handles(eventEnvelope.Payload))
-            .Returns(true);
-
-        A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(eventEnvelope), context.Rule.Trigger))
-            .Returns(true);
-
-        A.CallTo(() => ruleTriggerHandler.Trigger(eventEnriched1, context.Rule.Trigger))
-            .Returns(true);
-
-        A.CallTo(() => ruleTriggerHandler.Trigger(eventEnriched2, context.Rule.Trigger))
-            .Returns(true);
+        var eventEnriched1 = CreateDefaultFlow(context.Rule, eventEnvelope);
+        var eventEnriched2 = CreateDefaultFlow(context.Rule, eventEnvelope);
 
         A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(MatchPayload(eventEnvelope), A<RulesContext>._, default))
             .Returns(new List<EnrichedEvent> { eventEnriched1, eventEnriched2 }.ToAsyncEnumerable());
 
-        A.CallTo(() => ruleActionHandler.CreateJobAsync(eventEnriched1, context.Rule.Action))
-            .Returns((actionDescription, new ValidData { Value = 10 }));
+        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).ToListAsync();
 
-        A.CallTo(() => ruleActionHandler.CreateJobAsync(eventEnriched2, context.Rule.Action))
-            .Returns((actionDescription, new ValidData { Value = 10 }));
-
-        var jobs = await CreateJobsAsync(context, eventEnvelope);
-
-        AssertJob(eventEnriched1, jobs[0], SkipReason.None);
-        AssertJob(eventEnriched2, jobs[1], SkipReason.None);
+        AssertJob(eventEnriched1, actual[0], SkipReason.None);
+        AssertJob(eventEnriched2, actual[1], SkipReason.None);
 
         A.CallTo(() => eventEnricher.EnrichAsync(eventEnriched1, MatchPayload(eventEnvelope)))
             .MustHaveHappened();
@@ -713,7 +695,7 @@ public class RuleServiceTests
     }
 
     [Fact]
-    public async Task Should_return_succeeded_job_with_full_dump_if_handler_returns_no_exception()
+    public async Task Should_return_success_job_with_full_dump_if_handler_returns_no_exception()
     {
         A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
             .Returns(Result.Success(actionDump));
@@ -741,7 +723,7 @@ public class RuleServiceTests
     }
 
     [Fact]
-    public async Task Should_return_timedout_job_with_full_dump_if_exception_from_handler_indicates_timeout()
+    public async Task Should_return_timeout_job_with_full_dump_if_exception_from_handler_indicates_timeout()
     {
         A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
             .Returns(Result.Failed(new TimeoutException(), actionDump));
@@ -769,52 +751,26 @@ public class RuleServiceTests
         Assert.Equal(ex, actual.Result.Exception);
     }
 
-    private EnrichedContentEvent SetupFullFlow<T>(RuleContext context, Envelope<T> eventEnvelope) where T : AppEvent
+    private EnrichedContentEvent CreateDefaultFlow<T>(Rule rule, Envelope<T> eventEnvelope) where T : AppEvent
     {
         var eventEnriched = new EnrichedContentEvent { AppId = appId };
 
         A.CallTo(() => ruleTriggerHandler.Handles(eventEnvelope.Payload))
             .Returns(true);
 
-        A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(eventEnvelope), context.Rule.Trigger))
+        A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(eventEnvelope), rule.Trigger))
             .Returns(true);
 
-        A.CallTo(() => ruleTriggerHandler.Trigger(eventEnriched, context.Rule.Trigger))
+        A.CallTo(() => ruleTriggerHandler.Trigger(eventEnriched, rule.Trigger))
             .Returns(true);
 
         A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(MatchPayload(eventEnvelope), A<RulesContext>._, default))
             .Returns(new List<EnrichedEvent> { eventEnriched }.ToAsyncEnumerable());
 
-        A.CallTo(() => ruleActionHandler.CreateJobAsync(eventEnriched, context.Rule.Action))
+        A.CallTo(() => ruleActionHandler.CreateJobAsync(eventEnriched, rule.Action))
             .Returns((actionDescription, new ValidData { Value = 10 }));
 
         return eventEnriched;
-    }
-
-    private async Task<List<JobResult>> CreateSnapshotJobsAsync(RuleContext context)
-    {
-        var results = new List<JobResult>();
-
-        await sut.CreateSnapshotJobsAsync((ruleId, rule, result, ct) =>
-        {
-            results.Add(result);
-            return default;
-        }, context, default);
-
-        return results;
-    }
-
-    private async Task<List<JobResult>> CreateJobsAsync(RuleContext context, Envelope<IEvent> @event)
-    {
-        var results = new List<JobResult>();
-
-        await sut.CreateJobsAsync((ruleId, rule, result, ct) =>
-        {
-            results.Add(result);
-            return default;
-        }, @event, context.ToRulesContext(), default);
-
-        return results;
     }
 
     private RuleContext Rule(bool disable = false, bool includeStale = false, bool includeSkipped = false, RuleAction? action = null, RuleTrigger? trigger = null)

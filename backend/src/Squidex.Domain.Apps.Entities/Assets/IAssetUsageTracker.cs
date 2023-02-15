@@ -7,6 +7,9 @@
 
 using Squidex.Infrastructure;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Entities.Assets;
 
 public interface IAssetUsageTracker
@@ -17,9 +20,13 @@ public interface IAssetUsageTracker
     Task<IReadOnlyList<AssetStats>> QueryByTeamAsync(DomainId teamId, DateTime fromDate, DateTime toDate,
         CancellationToken ct = default);
 
-    Task<long> GetTotalSizeByAppAsync(DomainId appId,
+    Task<AssetCounters> GetTotalByAppAsync(DomainId appId,
         CancellationToken ct = default);
 
-    Task<long> GetTotalSizeByTeamAsync(DomainId teamId,
+    Task<AssetCounters> GetTotalByTeamAsync(DomainId teamId,
         CancellationToken ct = default);
 }
+
+public record struct AssetStats(DateTime Date, AssetCounters Counters);
+
+public record struct AssetCounters(long TotalCount, long TotalSize);

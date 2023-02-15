@@ -79,13 +79,8 @@ public class RuleEnqueuerTests : GivenContext
 
         var rule = CreateRule();
 
-        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
-            .Invokes(x =>
-            {
-                var result = new JobResult();
-
-                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
-            });
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+            .Returns(Enumerable.Repeat(new JobResult(), 1).ToAsyncEnumerable());
 
         await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
 
@@ -105,13 +100,14 @@ public class RuleEnqueuerTests : GivenContext
             Created = now
         };
 
-        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
-            .Invokes(x =>
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+            .Returns(Enumerable.Repeat(new JobResult
             {
-                var result = new JobResult { Job = job, SkipReason = SkipReason.WrongEvent };
-
-                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
-            });
+                Job = job,
+                Rule = rule.RuleDef,
+                RuleId = rule.Id,
+                SkipReason = SkipReason.WrongEvent
+            }, 1).ToAsyncEnumerable());
 
         await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
 
@@ -131,13 +127,13 @@ public class RuleEnqueuerTests : GivenContext
             Created = now
         };
 
-        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
-            .Invokes(x =>
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+            .Returns(Enumerable.Repeat(new JobResult
             {
-                var result = new JobResult { Job = job };
-
-                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
-            });
+                Job = job,
+                Rule = rule.RuleDef,
+                RuleId = rule.Id
+            }, 1).ToAsyncEnumerable());
 
         await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
 
@@ -157,13 +153,14 @@ public class RuleEnqueuerTests : GivenContext
             Created = now
         };
 
-        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
-            .Invokes(x =>
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+            .Returns(Enumerable.Repeat(new JobResult
             {
-                var result = new JobResult { Job = job, SkipReason = SkipReason.Failed };
-
-                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
-            });
+                Job = job,
+                Rule = rule.RuleDef,
+                RuleId = rule.Id,
+                SkipReason = SkipReason.Failed
+            }, 1).ToAsyncEnumerable());
 
         await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
 
@@ -232,13 +229,14 @@ public class RuleEnqueuerTests : GivenContext
         A.CallTo(() => AppProvider.GetRulesAsync(AppId.Id, A<CancellationToken>._))
             .Returns(new List<IRuleEntity> { rule });
 
-        A.CallTo(() => ruleService.CreateJobsAsync(A<JobCallback>._, @event, MatchingContext(rule), default))
-            .Invokes(x =>
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+            .Returns(Enumerable.Repeat(new JobResult
             {
-                var result = new JobResult { Job = job, SkipReason = skipReason };
-
-                x.GetArgument<JobCallback>(0)!(rule.Id, rule.RuleDef, result, default).AsTask().Forget();
-            });
+                Job = job,
+                Rule = rule.RuleDef,
+                RuleId = rule.Id,
+                SkipReason = skipReason
+            }, 1).ToAsyncEnumerable());
     }
 
     private static RuleEntity CreateRule()

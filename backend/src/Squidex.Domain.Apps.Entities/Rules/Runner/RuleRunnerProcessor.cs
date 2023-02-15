@@ -222,9 +222,9 @@ public sealed class RuleRunnerProcessor
         // Write in batches of 100 items for better performance. Using completes the last write.
         await using var batch = new RuleQueueWriter(ruleEventRepository);
 
-        await ruleService.CreateSnapshotJobsAsync(async (ruleId, rule, result, ct) =>
+        await foreach (var result in ruleService.CreateSnapshotJobsAsync(run.Context, ct))
         {
-            if (await batch.WriteAsync(result, rule))
+            if (await batch.WriteAsync(result))
             {
                 return;
             }
@@ -238,9 +238,9 @@ public sealed class RuleRunnerProcessor
                     throw result.EnrichmentError;
                 }
 
-                log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", ruleId);
+                log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.RuleId);
             }
-        }, run.Context, ct);
+        }
     }
 
     private async Task EnqueueFromEventsAsync(Run run,
@@ -264,9 +264,9 @@ public sealed class RuleRunnerProcessor
                 continue;
             }
 
-            await ruleService.CreateJobsAsync(async (ruleId, rule, result, ct) =>
+            await foreach (var result in ruleService.CreateJobsAsync(@event, run.Context.ToRulesContext(), ct))
             {
-                if (await batch.WriteAsync(result, rule))
+                if (await batch.WriteAsync(result))
                 {
                     return;
                 }
@@ -280,9 +280,9 @@ public sealed class RuleRunnerProcessor
                         throw result.EnrichmentError;
                     }
 
-                    log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", ruleId);
+                    log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.RuleId);
                 }
-            }, @event, run.Context.ToRulesContext(), ct);
+            }
 
             run.Job.Position = storedEvent.EventPosition;
 
