@@ -112,7 +112,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
 
             if (response.Status == RuleResult.Failed)
             {
-                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateTimeUtc(), 0, 0, 1);
+                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateOnly(), 0, 0, 1);
 
                 log.LogWarning(response.Exception, "Failed to execute rule event with rule id {ruleId}/{description}.",
                     @event.Job.RuleId,
@@ -120,7 +120,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
             }
             else
             {
-                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateTimeUtc(), 0, 1, 0);
+                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateOnly(), 0, 1, 0);
             }
         }
         catch (Exception ex)

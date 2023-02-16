@@ -83,7 +83,7 @@ public sealed class UsagesController : ApiController
         // Decrypt the token that has previously been generated.
         var appId = DomainId.Create(dataProtector.Unprotect(token));
 
-        var fileDate = DateTime.UtcNow.Date;
+        var fileDate = DateTime.UtcNow;
         var fileName = $"Usage-{fileDate:yyy-MM-dd}.csv";
 
         var callback = new FileCallback((body, range, ct) =>
@@ -105,21 +105,14 @@ public sealed class UsagesController : ApiController
     /// <param name="toDate">The to date.</param>
     /// <response code="200">API call returned.</response>.
     /// <response code="404">App not found.</response>.
-    /// <response code="400">Range between from date and to date is not valid or has more than 100 days.</response>.
     [HttpGet]
     [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppUsage)]
     [ApiCosts(0)]
-    public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
+    public async Task<IActionResult> GetUsages(string app, DateOnly fromDate, DateOnly toDate)
     {
-        // We can only query 100 logs for up to 100 days.
-        if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)
-        {
-            return BadRequest();
-        }
-
-        var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
+        var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate, toDate, HttpContext.RequestAborted);
 
         // Use the current app plan to show the limits to the user.
         var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, false, HttpContext.RequestAborted);
@@ -136,22 +129,15 @@ public sealed class UsagesController : ApiController
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
     /// <response code="200">API call returned.</response>.
-    /// <response code="400">Range between from date and to date is not valid or has more than 100 days.</response>.
     /// <response code="404">Team not found.</response>.
     [HttpGet]
     [Route("teams/{team}/usages/calls/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.TeamUsage)]
     [ApiCosts(0)]
-    public async Task<IActionResult> GetUsagesForTeam(string team, DateTime fromDate, DateTime toDate)
+    public async Task<IActionResult> GetUsagesForTeam(string team, DateOnly fromDate, DateOnly toDate)
     {
-        // We can only query 100 logs for up to 100 days.
-        if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)
-        {
-            return BadRequest();
-        }
-
-        var (summary, details) = await usageTracker.QueryAsync(TeamId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
+        var (summary, details) = await usageTracker.QueryAsync(TeamId.ToString(), fromDate, toDate, HttpContext.RequestAborted);
 
         // Use the current team plan to show the limits to the user.
         var (plan, _) = await usageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
@@ -214,21 +200,15 @@ public sealed class UsagesController : ApiController
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
     /// <response code="200">Storage usage returned.</response>.
-    /// <response code="400">Range between from date and to date is not valid or has more than 100 days.</response>.
     /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/usages/storage/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(StorageUsagePerDateDto[]), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppUsage)]
     [ApiCosts(0)]
-    public async Task<IActionResult> GetStorageSizes(string app, DateTime fromDate, DateTime toDate)
+    public async Task<IActionResult> GetStorageSizes(string app, DateOnly fromDate, DateOnly toDate)
     {
-        if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)
-        {
-            return BadRequest();
-        }
-
-        var usages = await assetUsageTracker.QueryByAppAsync(AppId, fromDate.Date, toDate.Date, HttpContext.RequestAborted);
+        var usages = await assetUsageTracker.QueryByAppAsync(AppId, fromDate, toDate, HttpContext.RequestAborted);
 
         var models = usages.Select(StorageUsagePerDateDto.FromDomain).ToArray();
 
@@ -242,21 +222,15 @@ public sealed class UsagesController : ApiController
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
     /// <response code="200">Storage usage returned.</response>.
-    /// <response code="400">Range between from date and to date is not valid or has more than 100 days.</response>.
     /// <response code="404">Team not found.</response>.
     [HttpGet]
     [Route("teams/{team}/usages/storage/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(StorageUsagePerDateDto[]), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.TeamUsage)]
     [ApiCosts(0)]
-    public async Task<IActionResult> GetStorageSizesForTeam(string team, DateTime fromDate, DateTime toDate)
+    public async Task<IActionResult> GetStorageSizesForTeam(string team, DateOnly fromDate, DateOnly toDate)
     {
-        if (fromDate > toDate && (toDate - fromDate).TotalDays > 100)
-        {
-            return BadRequest();
-        }
-
-        var usages = await assetUsageTracker.QueryByTeamAsync(TeamId, fromDate.Date, toDate.Date, HttpContext.RequestAborted);
+        var usages = await assetUsageTracker.QueryByTeamAsync(TeamId, fromDate, toDate, HttpContext.RequestAborted);
 
         var models = usages.Select(StorageUsagePerDateDto.FromDomain).ToArray();
 

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Routing;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline;
 
@@ -50,7 +51,7 @@ public class ApiCostsFilterTests : GivenContext
 
         SetupApp();
 
-        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today, default))
+        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today.ToDateOnly(), default))
             .Returns(true);
 
         await sut.OnActionExecutionAsync(actionContext, next);
@@ -66,7 +67,7 @@ public class ApiCostsFilterTests : GivenContext
 
         SetupApp();
 
-        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today, default))
+        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today.ToDateOnly(), default))
             .Returns(false);
 
         await sut.OnActionExecutionAsync(actionContext, next);
@@ -85,7 +86,7 @@ public class ApiCostsFilterTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today, default))
+        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, A<DateOnly>._, default))
             .MustNotHaveHappened();
     }
 
@@ -98,7 +99,7 @@ public class ApiCostsFilterTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, DateTime.Today, default))
+        A.CallTo(() => usageGate.IsBlockedAsync(App, A<string>._, A<DateOnly>._, default))
             .MustNotHaveHappened();
     }
 

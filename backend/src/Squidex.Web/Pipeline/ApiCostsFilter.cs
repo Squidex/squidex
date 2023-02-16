@@ -42,26 +42,26 @@ public sealed class ApiCostsFilter : IAsyncActionFilter, IFilterContainer
 
         var app = context.HttpContext.Context().App;
 
-        if (app != null)
+        if (app == null || FilterDefinition.Costs <= 0)
         {
-            if (FilterDefinition.Costs > 0)
-            {
-                using (Telemetry.Activities.StartActivity("CheckUsage"))
-                {
-                    var (_, clientId) = context.HttpContext.User.GetClient();
-
-                    var isBlocked = await usageGate.IsBlockedAsync(app, clientId, DateTime.Today, context.HttpContext.RequestAborted);
-
-                    if (isBlocked)
-                    {
-                        context.Result = new StatusCodeResult(429);
-                        return;
-                    }
-                }
-            }
-
-            context.HttpContext.Response.Headers.Add("X-Costs", FilterDefinition.Costs.ToString(CultureInfo.InvariantCulture));
+            await next();
+            return;
         }
+
+        using (Telemetry.Activities.StartActivity("CheckUsage"))
+        {
+            var (_, clientId) = context.HttpContext.User.GetClient();
+
+            var isBlocked = await usageGate.IsBlockedAsync(app, clientId, DateTime.Today.ToDateOnly(), context.HttpContext.RequestAborted);
+
+            if (isBlocked)
+            {
+                context.Result = new StatusCodeResult(429);
+                return;
+            }
+        }
+
+        context.HttpContext.Response.Headers.Add("X-Costs", FilterDefinition.Costs.ToString(CultureInfo.InvariantCulture));
 
         await next();
     }

@@ -151,7 +151,7 @@ public class RuleEnqueuerTests : GivenContext
 
         Assert.Equal(new[] { new RuleEventWrite(job, job.Created) }, writes);
 
-        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, rule.Id, now.ToDateTimeUtc(), 1, 0, 0, default))
+        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, rule.Id, now.ToDateOnly(), 1, 0, 0, default))
             .MustHaveHappened();
     }
 
@@ -188,7 +188,7 @@ public class RuleEnqueuerTests : GivenContext
 
         Assert.Equal(new[] { new RuleEventWrite(job) }, writes);
 
-        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, rule.Id, now.ToDateTimeUtc(), 1, 0, 1, default))
+        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, rule.Id, now.ToDateOnly(), 1, 0, 1, default))
             .MustHaveHappened();
     }
 
@@ -216,7 +216,7 @@ public class RuleEnqueuerTests : GivenContext
 
         Assert.Equal(new[] { new RuleEventWrite(job, job.Created) }, writes);
 
-        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, A<DomainId>._, now.ToDateTimeUtc(), 1, 0, 0, default))
+        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, A<DomainId>._, now.ToDateOnly(), 1, 0, 0, default))
             .MustHaveHappened();
     }
 
@@ -244,7 +244,7 @@ public class RuleEnqueuerTests : GivenContext
 
         Assert.Equal(new[] { new RuleEventWrite(job) }, writes);
 
-        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, A<DomainId>._, now.ToDateTimeUtc(), 1, 0, 1, default))
+        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, A<DomainId>._, now.ToDateOnly(), 1, 0, 1, default))
             .MustHaveHappened();
     }
 

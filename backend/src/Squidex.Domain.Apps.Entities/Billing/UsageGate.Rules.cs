@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL.Validation;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
@@ -28,13 +27,13 @@ public sealed partial class UsageGate : IRuleUsageTracker
         return usageTracker.DeleteAsync(AppRulesKey(appId), ct);
     }
 
-    Task<IReadOnlyList<RuleStats>> IRuleUsageTracker.QueryByAppAsync(DomainId appId, DateTime fromDate, DateTime toDate,
+    Task<IReadOnlyList<RuleStats>> IRuleUsageTracker.QueryByAppAsync(DomainId appId, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct)
     {
         return QueryForRulesAsync(AppRulesKey(appId), fromDate, toDate, ct);
     }
 
-    Task<IReadOnlyList<RuleStats>> IRuleUsageTracker.QueryByTeamAsync(DomainId appId, DateTime fromDate, DateTime toDate,
+    Task<IReadOnlyList<RuleStats>> IRuleUsageTracker.QueryByTeamAsync(DomainId appId, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct)
     {
         return QueryForRulesAsync(TeamRulesKey(appId), fromDate, toDate, ct);
@@ -58,7 +57,7 @@ public sealed partial class UsageGate : IRuleUsageTracker
         return result;
     }
 
-    private async Task<IReadOnlyList<RuleStats>> QueryForRulesAsync(string key, DateTime fromDate, DateTime toDate,
+    private async Task<IReadOnlyList<RuleStats>> QueryForRulesAsync(string key, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct)
     {
         var result = new List<RuleStats>();
@@ -90,7 +89,7 @@ public sealed partial class UsageGate : IRuleUsageTracker
         return result;
     }
 
-    async Task IRuleUsageTracker.TrackAsync(DomainId appId, DomainId ruleId, DateTime date, int created, int succeeded, int failed,
+    async Task IRuleUsageTracker.TrackAsync(DomainId appId, DomainId ruleId, DateOnly date, int created, int succeeded, int failed,
         CancellationToken ct)
     {
         var counters = new Counters

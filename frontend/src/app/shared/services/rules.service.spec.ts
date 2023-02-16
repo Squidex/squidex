@@ -436,7 +436,6 @@ describe('RulesService', () => {
             name: `rule-name${key}`,
             numSucceeded: id * 3,
             numFailed: id * 4,
-            lastExecuted: `${id % 1000 + 2000}-10-10T10:10:00Z`,
             isEnabled: id % 2 === 0,
             trigger: {
                 param1: 1,

@@ -7,7 +7,6 @@
 
 using MongoDB.Driver;
 using NodaTime;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;

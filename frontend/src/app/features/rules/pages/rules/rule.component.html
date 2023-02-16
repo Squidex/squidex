@@ -97,18 +97,15 @@
     </div>
     <div class="card-footer">
         <div class="row">
-            <div class="col-3">
+            <div class="col">
                 {{ 'common.succeeded' | sqxTranslate }} 
                 
                 <span class="badge badge-success rounded-pill" *ngIf="rule.numSucceeded > 0">{{rule.numSucceeded}}</span>
             </div>
-            <div class="col-3">
+            <div class="col">
                 {{ 'common.failed' | sqxTranslate }} 
                 
                 <span class="badge badge-danger rounded-pill" *ngIf="rule.numFailed > 0">{{rule.numFailed}}</span>
-            </div>
-            <div class="col">
-                {{ 'common.lastExecuted' | sqxTranslate }}: <span>{{rule.lastExecuted | sqxFromNow:'-'}}</span>
             </div>
             <div class="col-auto" *ngIf="rule.canReadLogs">
                 <a routerLink="events" [queryParams]="{ ruleId: rule.id }">

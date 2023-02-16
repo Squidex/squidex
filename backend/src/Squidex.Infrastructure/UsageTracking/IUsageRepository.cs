@@ -15,7 +15,7 @@ public interface IUsageRepository
     Task TrackUsagesAsync(UsageUpdate[] updates,
         CancellationToken ct = default);
 
-    Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+    Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct = default);
 
     Task DeleteAsync(string key,

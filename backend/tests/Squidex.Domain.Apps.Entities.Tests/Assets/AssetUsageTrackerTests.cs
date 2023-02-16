@@ -7,7 +7,6 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -79,13 +78,13 @@ public class AssetUsageTrackerTests : GivenContext
     [MemberData(nameof(EventData))]
     public async Task Should_increase_usage_if_for_event(AssetEvent @event, long sizeDiff, long countDiff)
     {
-        var date = DateTime.UtcNow.Date.AddDays(13);
+        var date = DateTime.UtcNow.Date.AddDays(13).ToDateOnly();
 
         @event.AppId = AppId;
 
         var envelope =
             Envelope.Create<IEvent>(@event)
-                .SetTimestamp(Instant.FromDateTimeUtc(date));
+                .SetTimestamp(Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(13)));
 
         await sut.On(new[] { envelope });
 

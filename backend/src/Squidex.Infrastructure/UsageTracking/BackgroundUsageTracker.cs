@@ -17,7 +17,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     private readonly IUsageRepository usageRepository;
     private readonly ILogger<BackgroundUsageTracker> log;
     private readonly CompletionTimer usageTimer;
-    private ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>();
+    private ConcurrentDictionary<(string Key, string Category, DateOnly Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateOnly Date), Counters>();
     private bool isUpdating;
 
     public bool HasPendingJobs => !jobs.IsEmpty || isUpdating;
@@ -55,7 +55,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
         {
             isUpdating = true;
 
-            var localUsages = Interlocked.Exchange(ref jobs, new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>());
+            var localUsages = Interlocked.Exchange(ref jobs, new ConcurrentDictionary<(string Key, string Category, DateOnly Date), Counters>());
 
             if (!localUsages.IsEmpty)
             {
@@ -106,7 +106,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
         return usageRepository.DeleteByKeyPatternAsync(pattern, ct);
     }
 
-    public Task TrackAsync(DateTime date, string key, string? category, Counters counters,
+    public Task TrackAsync(DateOnly date, string key, string? category, Counters counters,
         CancellationToken ct = default)
     {
         Guard.NotNullOrEmpty(key);
@@ -123,21 +123,21 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
         return Task.CompletedTask;
     }
 
-    public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+    public async Task<Dictionary<string, List<(DateOnly, Counters)>>> QueryAsync(string key, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct = default)
     {
         Guard.NotNullOrEmpty(key);
 
         ThrowIfDisposed();
 
-        var result = new Dictionary<string, List<(DateTime Date, Counters Counters)>>();
+        var result = new Dictionary<string, List<(DateOnly Date, Counters Counters)>>();
 
         var usageData = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
         var usageGroups = usageData.GroupBy(x => GetCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
 
         if (usageGroups.Keys.Count == 0)
         {
-            var enriched = new List<(DateTime Date, Counters Counters)>();
+            var enriched = new List<(DateOnly Date, Counters Counters)>();
 
             for (var date = fromDate; date <= toDate; date = date.AddDays(1))
             {
@@ -149,7 +149,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
 
         foreach (var (category, value) in usageGroups)
         {
-            var enriched = new List<(DateTime Date, Counters Counters)>();
+            var enriched = new List<(DateOnly Date, Counters Counters)>();
 
             for (var date = fromDate; date <= toDate; date = date.AddDays(1))
             {
@@ -164,16 +164,16 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
         return result;
     }
 
-    public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category,
+    public Task<Counters> GetForMonthAsync(string key, DateOnly date, string? category,
         CancellationToken ct = default)
     {
-        var dateFrom = new DateTime(date.Year, date.Month, 1);
+        var dateFrom = new DateOnly(date.Year, date.Month, 1);
         var dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
         return GetAsync(key, dateFrom, dateTo, category, ct);
     }
 
-    public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
+    public async Task<Counters> GetAsync(string key, DateOnly fromDate, DateOnly toDate, string? category,
         CancellationToken ct = default)
     {
         Guard.NotNullOrEmpty(key);

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;

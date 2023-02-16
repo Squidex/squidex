@@ -223,7 +223,7 @@ public sealed class RuleRunnerProcessor
         var errors = 0;
 
         // Write in batches of 100 items for better performance. Using completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker);
+        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
 
         await foreach (var result in ruleService.CreateSnapshotJobsAsync(run.Context, ct))
         {
@@ -251,7 +251,7 @@ public sealed class RuleRunnerProcessor
         var errors = 0;
 
         // Write in batches of 100 items for better performance. Using completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker);
+        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
 
         // Use a prefix query so that the storage can use an index for the query.
         var filter = $"^([a-z]+)\\-{appId}";

@@ -12,15 +12,15 @@ public interface IApiUsageTracker
     Task DeleteAsync(string key,
         CancellationToken ct = default);
 
-    Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsedMs, long bytes,
+    Task TrackAsync(DateOnly date, string key, string? category, double weight, long elapsedMs, long bytes,
         CancellationToken ct = default);
 
-    Task<long> GetMonthCallsAsync(string key, DateTime date, string? category,
+    Task<long> GetMonthCallsAsync(string key, DateOnly date, string? category,
         CancellationToken ct = default);
 
-    Task<long> GetMonthBytesAsync(string key, DateTime date, string? category,
+    Task<long> GetMonthBytesAsync(string key, DateOnly date, string? category,
         CancellationToken ct = default);
 
-    Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+    Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct = default);
 }

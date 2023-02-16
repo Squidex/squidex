@@ -75,7 +75,7 @@ public sealed class MongoUsageRepository : MongoRepositoryBase<MongoUsage>, IUsa
         }
         else if (updates.Length > 0)
         {
-            var writes = new List<WriteModel<MongoUsage>>();
+            var writes = new List<WriteModel<MongoUsage>>(updates.Length);
 
             foreach (var update in updates)
             {
@@ -87,7 +87,10 @@ public sealed class MongoUsageRepository : MongoRepositoryBase<MongoUsage>, IUsa
                 }
             }
 
-            await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+            if (writes.Count > 0)
+            {
+                await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+            }
         }
     }
 
@@ -97,7 +100,7 @@ public sealed class MongoUsageRepository : MongoRepositoryBase<MongoUsage>, IUsa
 
         var update = Update
             .SetOnInsert(x => x.Key, usageUpdate.Key)
-            .SetOnInsert(x => x.Date, usageUpdate.Date)
+            .SetOnInsert(x => x.Date, usageUpdate.Date.ToDateTime(default))
             .SetOnInsert(x => x.Category, usageUpdate.Category);
 
         foreach (var (key, value) in usageUpdate.Counters)
@@ -110,11 +113,14 @@ public sealed class MongoUsageRepository : MongoRepositoryBase<MongoUsage>, IUsa
         return (filter, update);
     }
 
-    public async Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+    public async Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct = default)
     {
-        var entities = await Collection.Find(x => x.Key == key && x.Date >= fromDate && x.Date <= toDate).ToListAsync(ct);
+        var dateTimeFrom = fromDate.ToDateTime(default);
+        var dateTimeTo = toDate.ToDateTime(default);
 
-        return entities.Select(x => new StoredUsage(x.Category, x.Date, x.Counters)).ToList();
+        var entities = await Collection.Find(x => x.Key == key && x.Date >= dateTimeFrom && x.Date <= dateTimeTo).ToListAsync(ct);
+
+        return entities.Select(x => new StoredUsage(x.Category, x.Date.ToDateOnly(), x.Counters)).ToList();
     }
 }

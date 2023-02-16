@@ -14,7 +14,7 @@ public class ApiUsageTrackerTests
     private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
     private readonly string key = Guid.NewGuid().ToString();
     private readonly string category = Guid.NewGuid().ToString();
-    private readonly DateTime date = DateTime.Today;
+    private readonly DateOnly date = DateTime.Today.ToDateOnly();
     private readonly ApiUsageTracker sut;
 
     public ApiUsageTrackerTests()
@@ -92,9 +92,9 @@ public class ApiUsageTrackerTests
         var dateFrom = date;
         var dateTo = dateFrom.AddDays(4);
 
-        var counters = new Dictionary<string, List<(DateTime Date, Counters Counters)>>
+        var counters = new Dictionary<string, List<(DateOnly Date, Counters Counters)>>
         {
-            ["my-category"] = new List<(DateTime Date, Counters Counters)>
+            ["my-category"] = new List<(DateOnly Date, Counters Counters)>
             {
                 (dateFrom.AddDays(0), Counters(0, 0, 0)),
                 (dateFrom.AddDays(1), Counters(4, 100, 2048)),
@@ -102,7 +102,7 @@ public class ApiUsageTrackerTests
                 (dateFrom.AddDays(3), Counters(2, 60, 1024)),
                 (dateFrom.AddDays(4), Counters(3, 30, 512))
             },
-            ["*"] = new List<(DateTime Date, Counters Counters)>
+            ["*"] = new List<(DateOnly Date, Counters Counters)>
             {
                 (dateFrom.AddDays(0), Counters(1, 20, 128)),
                 (dateFrom.AddDays(1), Counters(0, 0, 0)),
@@ -118,7 +118,7 @@ public class ApiUsageTrackerTests
             [ApiUsageTracker.CounterTotalBytes] = 400
         };
 
-        A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", DateTime.Today, null, ct))
+        A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", dateFrom, null, ct))
             .Returns(forMonth);
 
         A.CallTo(() => usageTracker.QueryAsync($"{key}_API", dateFrom, dateTo, ct))

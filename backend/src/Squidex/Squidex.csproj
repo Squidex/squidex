@@ -71,7 +71,6 @@
     <PackageReference Include="Squidex.Assets.Mongo" Version="5.3.0" />
     <PackageReference Include="Squidex.Assets.S3" Version="5.3.0" />
     <PackageReference Include="Squidex.Assets.TusAdapter" Version="5.3.0" />
-    <PackageReference Include="Squidex.Caching.Orleans" Version="1.9.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="12.6.0" />
     <PackageReference Include="Squidex.Hosting" Version="5.3.0" />
     <PackageReference Include="Squidex.Messaging.All" Version="5.3.0" />

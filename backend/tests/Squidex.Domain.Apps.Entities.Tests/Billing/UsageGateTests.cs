@@ -9,7 +9,6 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
@@ -24,7 +23,7 @@ public class UsageGateTests : GivenContext
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
     private readonly string clientId = Guid.NewGuid().ToString();
-    private readonly DateTime today = new DateTime(2020, 10, 3);
+    private readonly DateOnly today = new DateOnly(2020, 10, 3);
     private readonly Plan planFree = new Plan { Id = "free" };
     private readonly Plan planPaid = new Plan { Id = "paid" };
     private readonly UsageGate sut;
@@ -244,7 +243,7 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_not_notify_if_lower_than_10_percent()
     {
-        var now = new DateTime(2020, 10, 2);
+        var now = new DateOnly(2020, 10, 2);
 
         var plan = new Plan { Id = "custom", BlockingApiCalls = 5000, MaxApiCalls = 3000 };
 
@@ -344,9 +343,9 @@ public class UsageGateTests : GivenContext
     {
         A.CallTo(() => usageTracker.QueryAsync($"{AppId.Id}_Rules", default, default, CancellationToken))
             .Returns(
-                new Dictionary<string, List<(DateTime, Counters)>>
+                new Dictionary<string, List<(DateOnly, Counters)>>
                 {
-                    [AppId.Id.ToString()] = new List<(DateTime, Counters)>
+                    [AppId.Id.ToString()] = new List<(DateOnly, Counters)>
                     {
                         (default, new Counters
                         {
@@ -398,9 +397,9 @@ public class UsageGateTests : GivenContext
     private void SetupRulesQuery(string key)
     {
         A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(2), CancellationToken))
-            .Returns(new Dictionary<string, List<(DateTime, Counters)>>
+            .Returns(new Dictionary<string, List<(DateOnly, Counters)>>
             {
-                [usageTracker.FallbackCategory] = new List<(DateTime, Counters)>
+                [usageTracker.FallbackCategory] = new List<(DateOnly, Counters)>
                 {
                     (today.AddDays(0), new Counters
                     {
@@ -421,7 +420,7 @@ public class UsageGateTests : GivenContext
                         [UsageGate.RulesKeys.TotalFailed] = 340
                     })
                 },
-                ["Custom"] = new List<(DateTime, Counters)>
+                ["Custom"] = new List<(DateOnly, Counters)>
                 {
                     (today.AddDays(0), new Counters
                     {
@@ -547,9 +546,9 @@ public class UsageGateTests : GivenContext
     private void SetupAssetQuery(string key)
     {
         A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(2), CancellationToken))
-            .Returns(new Dictionary<string, List<(DateTime, Counters)>>
+            .Returns(new Dictionary<string, List<(DateOnly, Counters)>>
             {
-                [usageTracker.FallbackCategory] = new List<(DateTime, Counters)>
+                [usageTracker.FallbackCategory] = new List<(DateOnly, Counters)>
                 {
                     (today.AddDays(0), new Counters
                     {
@@ -567,7 +566,7 @@ public class UsageGateTests : GivenContext
                         [UsageGate.AssetsKeys.TotalAssets] = 4
                     })
                 },
-                ["Custom"] = new List<(DateTime, Counters)>
+                ["Custom"] = new List<(DateOnly, Counters)>
                 {
                     (today.AddDays(0), new Counters
                     {

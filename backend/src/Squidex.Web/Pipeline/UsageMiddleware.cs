@@ -73,9 +73,10 @@ public sealed class UsageMiddleware : IMiddleware
 
                     if (request.Costs > 0)
                     {
-                        var date = request.Timestamp.ToDateTimeUtc().Date;
-
-                        await usageGate.TrackRequestAsync(app, request.UserClientId, date,
+                        await usageGate.TrackRequestAsync(
+                            app,
+                            request.UserClientId,
+                            request.Timestamp.ToDateOnly(),
                             request.Costs,
                             request.ElapsedMs,
                             request.Bytes,

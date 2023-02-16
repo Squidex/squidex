@@ -122,7 +122,7 @@ public class RuleDequeuerWorkerTests
             A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                 .MustHaveHappened();
 
-            A.CallTo(() => ruleUsageTracker.TrackAsync(@event.Job.AppId, @event.Job.RuleId, now.ToDateTimeUtc(), 0, 0, 1, A<CancellationToken>._))
+            A.CallTo(() => ruleUsageTracker.TrackAsync(@event.Job.AppId, @event.Job.RuleId, now.ToDateOnly(), 0, 0, 1, A<CancellationToken>._))
                 .MustHaveHappened();
         }
         else
@@ -130,7 +130,7 @@ public class RuleDequeuerWorkerTests
             A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                 .MustNotHaveHappened();
 
-            A.CallTo(() => ruleUsageTracker.TrackAsync(@event.Job.AppId, @event.Job.RuleId, now.ToDateTimeUtc(), 0, 1, 0, A<CancellationToken>._))
+            A.CallTo(() => ruleUsageTracker.TrackAsync(@event.Job.AppId, @event.Job.RuleId, now.ToDateOnly(), 0, 1, 0, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

@@ -128,7 +128,6 @@ export class RuleDto {
         public readonly name: string,
         public readonly numSucceeded: number,
         public readonly numFailed: number,
-        public readonly lastExecuted?: DateTime,
     ) {
         this._links = links;
 
@@ -487,8 +486,7 @@ function parseRule(response: any) {
         response.action.actionType,
         response.name,
         response.numSucceeded,
-        response.numFailed,
-        response.lastExecuted ? DateTime.parseISO(response.lastExecuted) : undefined);
+        response.numFailed);
 }
 
 function parseRuleEvent(response: any) {

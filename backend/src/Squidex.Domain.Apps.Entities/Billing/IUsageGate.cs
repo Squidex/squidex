@@ -13,10 +13,10 @@ namespace Squidex.Domain.Apps.Entities.Billing;
 
 public interface IUsageGate
 {
-    Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime date,
+    Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateOnly date,
         CancellationToken ct = default);
 
-    Task TrackRequestAsync(IAppEntity app, string? clientId, DateTime date, double costs, long elapsedMs, long bytes,
+    Task TrackRequestAsync(IAppEntity app, string? clientId, DateOnly date, double costs, long elapsedMs, long bytes,
         CancellationToken ct = default);
 
     Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(IAppEntity app, bool canCache,

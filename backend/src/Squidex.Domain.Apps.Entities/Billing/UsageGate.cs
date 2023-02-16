@@ -9,7 +9,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
@@ -19,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Billing;
 
 public sealed partial class UsageGate : IUsageGate
 {
-    private static readonly DateTime SummaryDate = default;
+    private static readonly DateOnly SummaryDate = default;
     private readonly IApiUsageTracker apiUsageTracker;
     private readonly IAppProvider appProvider;
     private readonly IBillingPlans billingPlans;
@@ -41,7 +40,7 @@ public sealed partial class UsageGate : IUsageGate
         this.usageTracker = usageTracker;
     }
 
-    public async Task TrackRequestAsync(IAppEntity app, string? clientId, DateTime date, double costs, long elapsedMs, long bytes,
+    public async Task TrackRequestAsync(IAppEntity app, string? clientId, DateOnly date, double costs, long elapsedMs, long bytes,
        CancellationToken ct = default)
     {
         var appId = app.Id.ToString();
@@ -54,7 +53,7 @@ public sealed partial class UsageGate : IUsageGate
         await apiUsageTracker.TrackAsync(date, appId, clientId, costs, elapsedMs, bytes, ct);
     }
 
-    public async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime date,
+    public async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateOnly date,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -122,7 +121,7 @@ public sealed partial class UsageGate : IUsageGate
         return usage > limit * 0.1;
     }
 
-    private static bool IsAboutToBeLocked(DateTime today, long limit, long usage)
+    private static bool IsAboutToBeLocked(DateOnly today, long limit, long usage)
     {
         var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
 

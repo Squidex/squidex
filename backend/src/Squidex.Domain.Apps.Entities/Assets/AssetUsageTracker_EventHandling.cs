@@ -198,8 +198,8 @@ public partial class AssetUsageTracker : IEventConsumer
         return Task.CompletedTask;
     }
 
-    private static DateTime GetDate(Envelope<IEvent> @event)
+    private static DateOnly GetDate(Envelope<IEvent> @event)
     {
-        return @event.Headers.Timestamp().ToDateTimeUtc().Date;
+        return @event.Headers.Timestamp().ToDateOnly();
     }
 }

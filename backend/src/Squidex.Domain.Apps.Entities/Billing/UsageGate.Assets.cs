@@ -45,13 +45,13 @@ public sealed partial class UsageGate : IAssetUsageTracker
         return GetTotalForAssetsAsync(TeamAssetsKey(teamId), ct);
     }
 
-    Task<IReadOnlyList<AssetStats>> IAssetUsageTracker.QueryByAppAsync(DomainId appId, DateTime fromDate, DateTime toDate,
+    Task<IReadOnlyList<AssetStats>> IAssetUsageTracker.QueryByAppAsync(DomainId appId, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct)
     {
         return QueryForAssetsAsync(AppAssetsKey(appId), fromDate, toDate, ct);
     }
 
-    Task<IReadOnlyList<AssetStats>> IAssetUsageTracker.QueryByTeamAsync(DomainId teamId, DateTime fromDate, DateTime toDate,
+    Task<IReadOnlyList<AssetStats>> IAssetUsageTracker.QueryByTeamAsync(DomainId teamId, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct)
     {
         return QueryForAssetsAsync(TeamAssetsKey(teamId), fromDate, toDate, ct);
@@ -65,7 +65,7 @@ public sealed partial class UsageGate : IAssetUsageTracker
         return GetAssetCounters(counters);
     }
 
-    private async Task<IReadOnlyList<AssetStats>> QueryForAssetsAsync(string key, DateTime fromDate, DateTime toDate,
+    private async Task<IReadOnlyList<AssetStats>> QueryForAssetsAsync(string key, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct)
     {
         var result = new List<AssetStats>();
@@ -96,7 +96,7 @@ public sealed partial class UsageGate : IAssetUsageTracker
         return result;
     }
 
-    async Task IAssetUsageTracker.TrackAsync(DomainId appId, DateTime date, long fileSize, long count,
+    async Task IAssetUsageTracker.TrackAsync(DomainId appId, DateOnly date, long fileSize, long count,
         CancellationToken ct)
     {
         var counters = new Counters

@@ -27,7 +27,7 @@ public sealed class ApiUsageTracker : IApiUsageTracker
         return usageTracker.DeleteAsync(apiKey, ct);
     }
 
-    public async Task<long> GetMonthCallsAsync(string key, DateTime date, string? category,
+    public async Task<long> GetMonthCallsAsync(string key, DateOnly date, string? category,
         CancellationToken ct = default)
     {
         var apiKey = GetKey(key);
@@ -37,7 +37,7 @@ public sealed class ApiUsageTracker : IApiUsageTracker
         return counters.GetInt64(CounterTotalCalls);
     }
 
-    public async Task<long> GetMonthBytesAsync(string key, DateTime date, string? category,
+    public async Task<long> GetMonthBytesAsync(string key, DateOnly date, string? category,
         CancellationToken ct = default)
     {
         var apiKey = GetKey(key);
@@ -47,7 +47,7 @@ public sealed class ApiUsageTracker : IApiUsageTracker
         return counters.GetInt64(CounterTotalBytes);
     }
 
-    public Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsedMs, long bytes,
+    public Task TrackAsync(DateOnly date, string key, string? category, double weight, long elapsedMs, long bytes,
         CancellationToken ct = default)
     {
         var apiKey = GetKey(key);
@@ -62,7 +62,7 @@ public sealed class ApiUsageTracker : IApiUsageTracker
         return usageTracker.TrackAsync(date, apiKey, category, counters, ct);
     }
 
-    public async Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+    public async Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct = default)
     {
         var apiKey = GetKey(key);
@@ -98,7 +98,7 @@ public sealed class ApiUsageTracker : IApiUsageTracker
 
         var summaryElapsedAvg = CalculateAverage(summaryCalls, summaryElapsed);
 
-        var monthStats = await usageTracker.GetForMonthAsync(apiKey, DateTime.Today, null, ct);
+        var monthStats = await usageTracker.GetForMonthAsync(apiKey, DateTime.Today.ToDateOnly(), null, ct);
 
         var summary = new ApiStatsSummary(
             summaryElapsedAvg,

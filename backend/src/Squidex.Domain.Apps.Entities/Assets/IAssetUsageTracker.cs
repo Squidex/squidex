@@ -14,10 +14,10 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public interface IAssetUsageTracker
 {
-    Task<IReadOnlyList<AssetStats>> QueryByAppAsync(DomainId appId, DateTime fromDate, DateTime toDate,
+    Task<IReadOnlyList<AssetStats>> QueryByAppAsync(DomainId appId, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct = default);
 
-    Task<IReadOnlyList<AssetStats>> QueryByTeamAsync(DomainId teamId, DateTime fromDate, DateTime toDate,
+    Task<IReadOnlyList<AssetStats>> QueryByTeamAsync(DomainId teamId, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct = default);
 
     Task<AssetCounters> GetTotalByAppAsync(DomainId appId,
@@ -26,7 +26,7 @@ public interface IAssetUsageTracker
     Task<AssetCounters> GetTotalByTeamAsync(DomainId teamId,
         CancellationToken ct = default);
 
-    Task TrackAsync(DomainId appId, DateTime date, long fileSize, long count,
+    Task TrackAsync(DomainId appId, DateOnly date, long fileSize, long count,
         CancellationToken ct = default);
 
     Task DeleteUsageAsync(DomainId appId,
@@ -36,6 +36,6 @@ public interface IAssetUsageTracker
         CancellationToken ct = default);
 }
 
-public record struct AssetStats(DateTime Date, AssetCounters Counters);
+public record struct AssetStats(DateOnly Date, AssetCounters Counters);
 
 public record struct AssetCounters(long TotalSize, long TotalAssets);
