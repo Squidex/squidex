@@ -32,8 +32,8 @@ public sealed class StorageUsagePerDateDto
         var result = new StorageUsagePerDateDto
         {
             Date = LocalDate.FromDateTime(DateTime.SpecifyKind(stats.Date, DateTimeKind.Utc)),
-            TotalCount = stats.TotalCount,
-            TotalSize = stats.TotalSize
+            TotalCount = stats.Counters.TotalAssets,
+            TotalSize = stats.Counters.TotalSize
         };
 
         return result;

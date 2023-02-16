@@ -23,6 +23,7 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
 {
     private readonly IMemoryCache cache;
     private readonly IRuleEventRepository ruleEventRepository;
+    private readonly IRuleUsageTracker ruleUsageTracker;
     private readonly IRuleService ruleService;
     private readonly ILogger<RuleEnqueuer> log;
     private readonly IAppProvider appProvider;
@@ -39,6 +40,7 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
         IAppProvider appProvider,
         IRuleEventRepository ruleEventRepository,
         IRuleService ruleService,
+        IRuleUsageTracker ruleUsageTracker,
         IOptions<RuleOptions> options,
         ILogger<RuleEnqueuer> log)
     {
@@ -46,6 +48,7 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
         this.cache = cache;
         this.cacheDuration = options.Value.RulesCacheDuration;
         this.ruleEventRepository = ruleEventRepository;
+        this.ruleUsageTracker = ruleUsageTracker;
         this.ruleService = ruleService;
         this.log = log;
         this.localCache = localCache;
@@ -73,12 +76,12 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
             }.ToReadonlyDictionary()
         };
 
-        // Write in batches of 100 items for better performance. Using completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository);
+        // Write in batches of 100 items for better performance. Dispose completes the last write.
+        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, log);
 
         await foreach (var result in ruleService.CreateJobsAsync(@event, context))
         {
-            await batch.WriteAsync(result, log);
+            await batch.WriteAsync(result);
         }
     }
 
@@ -86,8 +89,8 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
     {
         using (localCache.StartContext())
         {
-            // Write in batches of 100 items for better performance. Using completes the last write.
-            await using var batch = new RuleQueueWriter(ruleEventRepository);
+            // Write in batches of 100 items for better performance. Dispose completes the last write.
+            await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, log);
 
             foreach (var @event in events)
             {
@@ -115,7 +118,7 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
 
                 await foreach (var result in ruleService.CreateJobsAsync(@event, context))
                 {
-                    await batch.WriteAsync(result, log);
+                    await batch.WriteAsync(result);
                 }
             }
         }

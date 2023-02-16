@@ -52,12 +52,13 @@ public partial class AssetUsageTracker : IEventConsumer
         // Will not remove data, but reset alls counts to zero.
         await tagService.ClearAsync();
 
+        // Delete the full usage history, because tracking is incremental.
+        await assetUsageTracker.DeleteUsageAsync();
+
         // Also clear the store and cache, because otherwise we would use data from the future when querying old tags.
         ClearCache();
 
         await store.ClearAsync();
-
-        await usageGate.DeleteAssetsUsageAsync();
     }
 
     public async Task On(IEnumerable<Envelope<IEvent>> events)
@@ -185,13 +186,13 @@ public partial class AssetUsageTracker : IEventConsumer
         switch (@event.Payload)
         {
             case AssetCreated assetCreated:
-                return usageGate.TrackAssetAsync(assetCreated.AppId.Id, GetDate(@event), assetCreated.FileSize, 1);
+                return assetUsageTracker.TrackAsync(assetCreated.AppId.Id, GetDate(@event), assetCreated.FileSize, 1);
 
             case AssetUpdated assetUpdated:
-                return usageGate.TrackAssetAsync(assetUpdated.AppId.Id, GetDate(@event), assetUpdated.FileSize, 0);
+                return assetUsageTracker.TrackAsync(assetUpdated.AppId.Id, GetDate(@event), assetUpdated.FileSize, 0);
 
             case AssetDeleted assetDeleted:
-                return usageGate.TrackAssetAsync(assetDeleted.AppId.Id, GetDate(@event), -assetDeleted.DeletedSize, -1);
+                return assetUsageTracker.TrackAsync(assetDeleted.AppId.Id, GetDate(@event), -assetDeleted.DeletedSize, -1);
         }
 
         return Task.CompletedTask;

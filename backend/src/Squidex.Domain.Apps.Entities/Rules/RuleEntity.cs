@@ -33,9 +33,9 @@ public sealed class RuleEntity : IEnrichedRuleEntity
 
     public bool IsDeleted { get; set; }
 
-    public int NumSucceeded { get; set; }
+    public long NumSucceeded { get; set; }
 
-    public int NumFailed { get; set; }
+    public long NumFailed { get; set; }
 
     public Instant? LastExecuted { get; set; }
 

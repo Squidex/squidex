@@ -11,9 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 
 public interface IEnrichedRuleEntity : IRuleEntity
 {
-    int NumSucceeded { get; }
+    long NumSucceeded { get; }
 
-    int NumFailed { get; }
-
-    Instant? LastExecuted { get; set; }
+    long NumFailed { get; }
 }

@@ -39,9 +39,6 @@ public interface IRuleEventRepository
     Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback,
         CancellationToken ct = default);
 
-    Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(DomainId appId,
-        CancellationToken ct = default);
-
     Task<IResultList<IRuleEventEntity>> QueryByAppAsync(DomainId appId, DomainId? ruleId = null, int skip = 0, int take = 20,
         CancellationToken ct = default);
 

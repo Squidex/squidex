@@ -445,7 +445,7 @@ public sealed class AssetsController : ApiController
 
         var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, true, HttpContext.RequestAborted);
 
-        var currentSize = await assetUsageTracker.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
+        var (_, currentSize) = await assetUsageTracker.GetTotalByAppAsync(AppId, HttpContext.RequestAborted);
 
         if (plan.MaxAssetSize > 0 && plan.MaxAssetSize < currentSize + file.Length)
         {

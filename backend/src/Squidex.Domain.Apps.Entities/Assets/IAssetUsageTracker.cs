@@ -25,8 +25,17 @@ public interface IAssetUsageTracker
 
     Task<AssetCounters> GetTotalByTeamAsync(DomainId teamId,
         CancellationToken ct = default);
+
+    Task TrackAsync(DomainId appId, DateTime date, long fileSize, long count,
+        CancellationToken ct = default);
+
+    Task DeleteUsageAsync(DomainId appId,
+        CancellationToken ct = default);
+
+    Task DeleteUsageAsync(
+        CancellationToken ct = default);
 }
 
 public record struct AssetStats(DateTime Date, AssetCounters Counters);
 
-public record struct AssetCounters(long TotalCount, long TotalSize);
+public record struct AssetCounters(long TotalSize, long TotalAssets);

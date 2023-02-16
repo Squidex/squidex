@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Reflection;
@@ -14,13 +13,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries;
 
 public sealed class RuleEnricher : IRuleEnricher
 {
-    private readonly IRuleEventRepository ruleEventRepository;
+    private readonly IRuleUsageTracker ruleUsageTracker;
     private readonly IRequestCache requestCache;
 
-    public RuleEnricher(IRuleEventRepository ruleEventRepository, IRequestCache requestCache)
+    public RuleEnricher(IRuleUsageTracker ruleUsageTracker, IRequestCache requestCache)
     {
-        this.ruleEventRepository = ruleEventRepository;
-
+        this.ruleUsageTracker = ruleUsageTracker;
         this.requestCache = requestCache;
     }
 
@@ -53,22 +51,20 @@ public sealed class RuleEnricher : IRuleEnricher
 
             foreach (var group in results.GroupBy(x => x.AppId.Id))
             {
-                var statistics = await ruleEventRepository.QueryStatisticsByAppAsync(group.Key, ct);
+                var statistics = await ruleUsageTracker.GetTotalByAppAsync(group.Key, ct);
 
                 foreach (var rule in group)
                 {
                     requestCache.AddDependency(rule.UniqueId, rule.Version);
 
-                    var statistic = statistics.FirstOrDefault(x => x.RuleId == rule.Id);
-
-                    if (statistic != null)
+                    if (statistics.TryGetValue(rule.Id, out var statistic))
                     {
-                        rule.LastExecuted = statistic.LastExecuted;
-                        rule.NumFailed = statistic.NumFailed;
-                        rule.NumSucceeded = statistic.NumSucceeded;
-
-                        requestCache.AddDependency(rule.LastExecuted);
+                        rule.NumFailed = statistic.TotalFailed;
+                        rule.NumSucceeded = statistic.TotalSucceeded;
                     }
+
+                    requestCache.AddDependency(rule.NumFailed);
+                    requestCache.AddDependency(rule.NumSucceeded);
                 }
             }
 

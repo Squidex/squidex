@@ -29,7 +29,7 @@ public sealed class UsagesController : ApiController
     private readonly IApiUsageTracker usageTracker;
     private readonly IAppLogStore usageLog;
     private readonly IUsageGate usageGate;
-    private readonly IAssetUsageTracker assetStatsRepository;
+    private readonly IAssetUsageTracker assetUsageTracker;
     private readonly IDataProtector dataProtector;
     private readonly IUrlGenerator urlGenerator;
 
@@ -39,12 +39,12 @@ public sealed class UsagesController : ApiController
         IApiUsageTracker usageTracker,
         IAppLogStore usageLog,
         IUsageGate usageGate,
-        IAssetUsageTracker assetStatsRepository,
+        IAssetUsageTracker assetUsageTracker,
         IUrlGenerator urlGenerator)
         : base(commandBus)
     {
         this.usageLog = usageLog;
-        this.assetStatsRepository = assetStatsRepository;
+        this.assetUsageTracker = assetUsageTracker;
         this.urlGenerator = urlGenerator;
         this.usageGate = usageGate;
         this.usageTracker = usageTracker;
@@ -174,7 +174,7 @@ public sealed class UsagesController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> GetCurrentStorageSize(string app)
     {
-        var size = await assetStatsRepository.GetTotalSizeByAppAsync(AppId, HttpContext.RequestAborted);
+        var (_, size) = await assetUsageTracker.GetTotalByAppAsync(AppId, HttpContext.RequestAborted);
 
         // Use the current app plan to show the limits to the user.
         var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, false, HttpContext.RequestAborted);
@@ -197,7 +197,7 @@ public sealed class UsagesController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> GetTeamCurrentStorageSizeForTeam(string team)
     {
-        var size = await assetStatsRepository.GetTotalSizeByTeamAsync(TeamId, HttpContext.RequestAborted);
+        var (_, size) = await assetUsageTracker.GetTotalByTeamAsync(TeamId, HttpContext.RequestAborted);
 
         // Use the current team plan to show the limits to the user.
         var (plan, _) = await usageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
@@ -228,7 +228,7 @@ public sealed class UsagesController : ApiController
             return BadRequest();
         }
 
-        var usages = await assetStatsRepository.QueryByAppAsync(AppId, fromDate.Date, toDate.Date, HttpContext.RequestAborted);
+        var usages = await assetUsageTracker.QueryByAppAsync(AppId, fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
         var models = usages.Select(StorageUsagePerDateDto.FromDomain).ToArray();
 
@@ -256,7 +256,7 @@ public sealed class UsagesController : ApiController
             return BadRequest();
         }
 
-        var usages = await assetStatsRepository.QueryByTeamAsync(TeamId, fromDate.Date, toDate.Date, HttpContext.RequestAborted);
+        var usages = await assetUsageTracker.QueryByTeamAsync(TeamId, fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
         var models = usages.Select(StorageUsagePerDateDto.FromDomain).ToArray();
 

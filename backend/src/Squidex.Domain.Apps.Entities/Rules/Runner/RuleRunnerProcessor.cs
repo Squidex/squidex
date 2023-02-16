@@ -27,6 +27,7 @@ public sealed class RuleRunnerProcessor
     private readonly ILocalCache localCache;
     private readonly IRuleEventRepository ruleEventRepository;
     private readonly IRuleService ruleService;
+    private readonly IRuleUsageTracker ruleUsageTracker;
     private readonly ILogger<RuleRunnerProcessor> log;
     private readonly SimpleState<RuleRunnerState> state;
     private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
@@ -78,6 +79,7 @@ public sealed class RuleRunnerProcessor
         IPersistenceFactory<RuleRunnerState> persistenceFactory,
         IRuleEventRepository ruleEventRepository,
         IRuleService ruleService,
+        IRuleUsageTracker ruleUsageTracker,
         ILogger<RuleRunnerProcessor> log)
     {
         this.appId = appId;
@@ -87,6 +89,7 @@ public sealed class RuleRunnerProcessor
         this.eventFormatter = eventFormatter;
         this.ruleEventRepository = ruleEventRepository;
         this.ruleService = ruleService;
+        this.ruleUsageTracker = ruleUsageTracker;
         this.log = log;
 
         state = new SimpleState<RuleRunnerState>(persistenceFactory, GetType(), appId);
@@ -220,19 +223,17 @@ public sealed class RuleRunnerProcessor
         var errors = 0;
 
         // Write in batches of 100 items for better performance. Using completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository);
+        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker);
 
         await foreach (var result in ruleService.CreateSnapshotJobsAsync(run.Context, ct))
         {
-            if (await batch.WriteAsync(result))
-            {
-                return;
-            }
+            await batch.WriteAsync(result);
 
             if (result.EnrichmentError != null)
             {
                 errors++;
 
+                // We accept a few errors and stop the process if there are too many errors.
                 if (errors >= MaxErrors)
                 {
                     throw result.EnrichmentError;
@@ -250,7 +251,7 @@ public sealed class RuleRunnerProcessor
         var errors = 0;
 
         // Write in batches of 100 items for better performance. Using completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository);
+        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker);
 
         // Use a prefix query so that the storage can use an index for the query.
         var filter = $"^([a-z]+)\\-{appId}";
@@ -266,15 +267,13 @@ public sealed class RuleRunnerProcessor
 
             await foreach (var result in ruleService.CreateJobsAsync(@event, run.Context.ToRulesContext(), ct))
             {
-                if (await batch.WriteAsync(result))
-                {
-                    return;
-                }
+                await batch.WriteAsync(result);
 
                 if (result.EnrichmentError != null)
                 {
                     errors++;
 
+                    // We accept a few errors and stop the process if there are too many errors.
                     if (errors >= MaxErrors)
                     {
                         throw result.EnrichmentError;

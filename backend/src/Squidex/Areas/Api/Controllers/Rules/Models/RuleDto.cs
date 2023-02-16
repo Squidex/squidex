@@ -76,16 +76,17 @@ public sealed class RuleDto : Resource
     /// <summary>
     /// The number of completed executions.
     /// </summary>
-    public int NumSucceeded { get; set; }
+    public long NumSucceeded { get; set; }
 
     /// <summary>
     /// The number of failed executions.
     /// </summary>
-    public int NumFailed { get; set; }
+    public long NumFailed { get; set; }
 
     /// <summary>
     /// The date and time when the rule was executed the last time.
     /// </summary>
+    [Obsolete("Removed when migrated to new rule statistics.")]
     public Instant? LastExecuted { get; set; }
 
     public static RuleDto FromDomain(IEnrichedRuleEntity rule, bool canRun, IRuleRunnerService ruleRunnerService, Resources resources)

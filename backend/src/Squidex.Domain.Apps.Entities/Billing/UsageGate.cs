@@ -17,10 +17,8 @@ using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Billing;
 
-public sealed class UsageGate : IUsageGate, IAssetUsageTracker
+public sealed partial class UsageGate : IUsageGate
 {
-    private const string CounterTotalCount = "TotalAssets";
-    private const string CounterTotalSize = "TotalSize";
     private static readonly DateTime SummaryDate = default;
     private readonly IApiUsageTracker apiUsageTracker;
     private readonly IAppProvider appProvider;
@@ -41,78 +39,6 @@ public sealed class UsageGate : IUsageGate, IAssetUsageTracker
         this.billingPlans = billingPlans;
         this.messaging = messaging;
         this.usageTracker = usageTracker;
-    }
-
-    public Task DeleteAssetUsageAsync(DomainId appId,
-        CancellationToken ct = default)
-    {
-        // Do not delete the team, as this is only called when an app is deleted.
-        return usageTracker.DeleteAsync(AppAssetsKey(appId), ct);
-    }
-
-    public Task DeleteAssetsUsageAsync(
-        CancellationToken ct = default)
-    {
-        // Use a well defined prefix query for the deletion to improve performance.
-        return usageTracker.DeleteByKeyPatternAsync("^([a-zA-Z0-9]+)_Assets", ct);
-    }
-
-    public Task<long> GetTotalSizeByAppAsync(DomainId appId,
-        CancellationToken ct = default)
-    {
-        return GetTotalSizeAsync(AppAssetsKey(appId), ct);
-    }
-
-    public Task<long> GetTotalSizeByTeamAsync(DomainId teamId,
-        CancellationToken ct = default)
-    {
-        return GetTotalSizeAsync(TeamAssetsKey(teamId), ct);
-    }
-
-    private async Task<long> GetTotalSizeAsync(string key,
-        CancellationToken ct)
-    {
-        var counters = await usageTracker.GetAsync(key, SummaryDate, SummaryDate, null, ct);
-
-        return counters.GetInt64(CounterTotalSize);
-    }
-
-    public Task<IReadOnlyList<AssetStats>> QueryByAppAsync(DomainId appId, DateTime fromDate, DateTime toDate,
-        CancellationToken ct = default)
-    {
-        return QueryAsync(AppAssetsKey(appId), fromDate, toDate, ct);
-    }
-
-    public Task<IReadOnlyList<AssetStats>> QueryByTeamAsync(DomainId teamId, DateTime fromDate, DateTime toDate,
-        CancellationToken ct = default)
-    {
-        return QueryAsync(TeamAssetsKey(teamId), fromDate, toDate, ct);
-    }
-
-    private async Task<IReadOnlyList<AssetStats>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
-        CancellationToken ct)
-    {
-        var enriched = new List<AssetStats>();
-
-        var usages = await usageTracker.QueryAsync(key, fromDate, toDate, ct);
-
-        if (usages.TryGetValue(usageTracker.FallbackCategory, out var byCategory1))
-        {
-            AddCounters(enriched, byCategory1);
-        }
-
-        return enriched;
-    }
-
-    private static void AddCounters(List<AssetStats> enriched, List<(DateTime, Counters)> details)
-    {
-        foreach (var (date, counters) in details)
-        {
-            var totalCount = counters.GetInt64(CounterTotalCount);
-            var totalSize = counters.GetInt64(CounterTotalSize);
-
-            enriched.Add(new AssetStats(date, totalCount, totalSize));
-        }
     }
 
     public async Task TrackRequestAsync(IAppEntity app, string? clientId, DateTime date, double costs, long elapsedMs, long bytes,
@@ -205,36 +131,6 @@ public sealed class UsageGate : IUsageGate, IAssetUsageTracker
         return forecasted > limit;
     }
 
-    public async Task TrackAssetAsync(DomainId appId, DateTime date, long fileSize, long count,
-        CancellationToken ct = default)
-    {
-        var counters = new Counters
-        {
-            [CounterTotalSize] = fileSize,
-            [CounterTotalCount] = count
-        };
-
-        var appKey = AppAssetsKey(appId);
-
-        var tasks = new List<Task>
-        {
-            usageTracker.TrackAsync(date, appKey, null, counters, ct),
-            usageTracker.TrackAsync(SummaryDate, appKey, null, counters, ct)
-        };
-
-        var (_, _, teamId) = await GetPlanForAppAsync(appId, true, ct);
-
-        if (teamId != null)
-        {
-            var teamKey = TeamAssetsKey(teamId.Value);
-
-            tasks.Add(usageTracker.TrackAsync(date, teamKey, null, counters, ct));
-            tasks.Add(usageTracker.TrackAsync(SummaryDate, teamKey, null, counters, ct));
-        }
-
-        await Task.WhenAll(tasks);
-    }
-
     public Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(IAppEntity app, bool canCache,
         CancellationToken ct = default)
     {
@@ -309,16 +205,6 @@ public sealed class UsageGate : IUsageGate, IAssetUsageTracker
         var (plan, planId) = billingPlans.GetActualPlan(team?.Plan?.PlanId);
 
         return Task.FromResult((plan, planId));
-    }
-
-    private static string AppAssetsKey(DomainId appId)
-    {
-        return $"{appId}_Assets";
-    }
-
-    private static string TeamAssetsKey(DomainId appId)
-    {
-        return $"{appId}_TeamAssets";
     }
 
     private static string CacheKey(DomainId appId)

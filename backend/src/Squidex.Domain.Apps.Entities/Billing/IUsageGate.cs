@@ -19,18 +19,6 @@ public interface IUsageGate
     Task TrackRequestAsync(IAppEntity app, string? clientId, DateTime date, double costs, long elapsedMs, long bytes,
         CancellationToken ct = default);
 
-    Task TrackAssetAsync(DomainId appId, DateTime date, long fileSize, long count,
-        CancellationToken ct = default);
-
-    Task TrackRouteAsync(DomainId appid, DateTime date, int created, int succeeded, int failed,
-        CancellationToken ct = default);
-
-    Task DeleteAssetUsageAsync(DomainId appId,
-        CancellationToken ct = default);
-
-    Task DeleteAssetsUsageAsync(
-        CancellationToken ct = default);
-
     Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(IAppEntity app, bool canCache,
         CancellationToken ct = default);
 
