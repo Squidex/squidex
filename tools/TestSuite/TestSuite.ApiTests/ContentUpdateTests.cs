@@ -605,6 +605,35 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         Assert.NotNull(contents_4.Items.Find(x => x.Id == content_1.Id));
     }
 
+    [Theory]
+    [InlineData("custom-id")]
+    [InlineData("custom-id_special-characters$$_[]")]
+    public async Task Should_be_able_to_create_content_with_previously_used_custom_id_when_original_content_has_been_permanently_deleted(string id)
+    {
+        var fullId = $"{Guid.NewGuid()}-{id}";
+
+        // STEP 1: Create a new item with a custom id.
+        var options = new ContentCreateOptions { Id = fullId, Publish = true };
+
+        var content = await _.Contents.CreateAsync(new TestEntityData
+        {
+            Number = 1
+        }, options);
+
+
+        // STEP 2: Permanently delete content with custom id.
+        await _.Contents.DeleteAsync(content.Id, new ContentDeleteOptions { Permanent = true });
+
+
+        // STEP 3: Create a new item with same custom id.
+        content = await _.Contents.CreateAsync(new TestEntityData
+        {
+            Number = 1
+        }, options);
+
+        Assert.Equal(fullId, content.Id);
+    }
+
     [Fact]
     public async Task Should_update_singleton_content_with_special_id()
     {
