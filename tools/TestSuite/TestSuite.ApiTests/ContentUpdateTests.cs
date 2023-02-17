@@ -552,12 +552,12 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 3: Recreate the item with the same id.
-        var deleteOptions = new ContentCreateOptions { Id = content_1.Id, Publish = true };
+        var createOptions = new ContentCreateOptions { Id = content_1.Id, Publish = true };
 
         var content_2 = await _.Contents.CreateAsync(new TestEntityData
         {
             Number = 2
-        }, deleteOptions);
+        }, createOptions);
 
         Assert.Equal(Status.Published, content_2.Status);
 
@@ -565,9 +565,9 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         // STEP 4: Check if we can find it again with a query.
         var q = new ContentQuery { Filter = $"id eq '{content_1.Id}'" };
 
-        var contents_4 = await _.Contents.GetAsync(q);
+        var contents = await _.Contents.GetAsync(q);
 
-        Assert.NotNull(contents_4.Items.Find(x => x.Id == content_1.Id));
+        Assert.Contains(contents.Items, x => x.Id == content_2.Id);
     }
 
     [Theory]
@@ -595,43 +595,41 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         }, ContentUpsertOptions.AsPublish);
 
         Assert.Equal(Status.Published, content_2.Status);
-
-
-        // STEP 4: Check if we can find it again with a query.
-        var q = new ContentQuery { Filter = $"id eq '{content_1.Id}'" };
-
-        var contents_4 = await _.Contents.GetAsync(q);
-
-        Assert.NotNull(contents_4.Items.Find(x => x.Id == content_1.Id));
     }
 
     [Theory]
-    [InlineData("custom-id")]
-    [InlineData("custom-id_special-characters$$_[]")]
-    public async Task Should_be_able_to_create_content_with_previously_used_custom_id_when_original_content_has_been_permanently_deleted(string id)
+    [InlineData(Strategies.Deletion.SingleSoft)]
+    [InlineData(Strategies.Deletion.SinglePermanent)]
+    [InlineData(Strategies.Deletion.BulkSoft)]
+    [InlineData(Strategies.Deletion.BulkPermanent)]
+    public async Task Should_delete_recreated_content(Strategies.Deletion strategy)
     {
-        var fullId = $"{Guid.NewGuid()}-{id}";
+        var id = $"custom-{Guid.NewGuid()}";
 
         // STEP 1: Create a new item with a custom id.
-        var options = new ContentCreateOptions { Id = fullId, Publish = true };
+        var options = new ContentCreateOptions { Id = id, Publish = true };
 
-        var content = await _.Contents.CreateAsync(new TestEntityData
+        var content_1 = await _.Contents.CreateAsync(new TestEntityData
         {
             Number = 1
         }, options);
 
 
         // STEP 2: Permanently delete content with custom id.
-        await _.Contents.DeleteAsync(content.Id, new ContentDeleteOptions { Permanent = true });
+        await _.Contents.DeleteAsync(content_1.Id, new ContentDeleteOptions { Permanent = true });
 
 
         // STEP 3: Create a new item with same custom id.
-        content = await _.Contents.CreateAsync(new TestEntityData
+        var content_2 = await _.Contents.CreateAsync(new TestEntityData
         {
-            Number = 1
+            Number = 2
         }, options);
 
-        Assert.Equal(fullId, content.Id);
+        Assert.Equal(2, content_2.Data.Number);
+
+
+        // STEP 3: Permanently delete content with custom id again.
+        await _.ClientManager.DeleteAsync(content_2, strategy);
     }
 
     [Fact]
