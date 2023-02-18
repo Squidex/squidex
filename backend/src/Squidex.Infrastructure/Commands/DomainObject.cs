@@ -181,8 +181,19 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
                 var deletedId = DomainId.Combine(UniqueId, DomainId.Create("deleted"));
                 var deletedStream = persistenceFactory.WithEventSourcing(GetType(), deletedId, null);
 
-                // Write to the deleted stream first so we never loose this information.
-                await deletedStream.WriteEventsAsync(uncomittedEvents, ct);
+                try
+                {
+                    // Write to the deleted stream first so we never loose this information.
+                    await deletedStream.WriteEventsAsync(uncomittedEvents, ct);
+                }
+                catch (InconsistentStateException)
+                {
+
+                    // There is another deletion event, therefore we have to fetch the version.
+                    await deletedStream.ReadAsync(ct: default);
+
+                    await deletedStream.WriteEventsAsync(uncomittedEvents, ct);
+                }
             }
 
             // Cleanup the primary stream second.

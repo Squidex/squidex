@@ -1,12 +1,12 @@
 ﻿{
   Data: {
-    Localized: {
-      custom: default,
-      de: default,
-      en: null
+    Number: {
+      iv: 1
     }
   },
+  NewStatus: ,
   Status: Published,
+  EditingStatus: Published,
   Id: Guid_1,
   Version: 1,
   _links: {
