@@ -90,24 +90,15 @@ public class RuleEnqueuerTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_not_enqueue_event_if_job_has_a_skip_reason()
+    public async Task Should_not_enqueue_event_if_it_has_no_job()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var rule = CreateRule();
 
-        var job = new RuleJob
-        {
-            AppId = AppId.Id,
-            ActionData = string.Empty,
-            ActionName = string.Empty,
-            Created = now
-        };
-
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
             .Returns(Enumerable.Repeat(new JobResult
             {
-                Job = job,
                 Rule = rule.RuleDef,
                 RuleId = rule.Id,
                 SkipReason = SkipReason.WrongEvent

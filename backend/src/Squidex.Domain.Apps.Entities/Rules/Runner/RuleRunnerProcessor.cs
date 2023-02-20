@@ -265,9 +265,15 @@ public sealed class RuleRunnerProcessor
                 continue;
             }
 
+            run.Job.Position = storedEvent.EventPosition;
+
             await foreach (var result in ruleService.CreateJobsAsync(@event, run.Context.ToRulesContext(), ct))
             {
-                await batch.WriteAsync(result);
+                if (await batch.WriteAsync(result))
+                {
+                    // Update the process when something has been written.
+                    await state.WriteAsync(ct);
+                }
 
                 if (result.EnrichmentError != null)
                 {
@@ -282,9 +288,11 @@ public sealed class RuleRunnerProcessor
                     log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.RuleId);
                 }
             }
+        }
 
-            run.Job.Position = storedEvent.EventPosition;
-
+        if (await batch.FlushAsync())
+        {
+            // Update the process when something has been written.
             await state.WriteAsync(ct);
         }
     }

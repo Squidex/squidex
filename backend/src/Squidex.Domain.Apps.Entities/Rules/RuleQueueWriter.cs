@@ -26,12 +26,12 @@ internal sealed class RuleQueueWriter : IAsyncDisposable
         this.log = log;
     }
 
-    public async Task WriteAsync(JobResult result)
+    public async Task<bool> WriteAsync(JobResult result)
     {
-        // We do not want to handle disabled rules in the normal flow.
-        if (result.Job == null || result.SkipReason is not SkipReason.None and not SkipReason.Failed)
+        // We do not want to handle events without a job in the normal flow.
+        if (result.Job == null)
         {
-            return;
+            return false;
         }
 
         if (result.EnrichmentError != null || result.SkipReason is SkipReason.Failed)
@@ -56,19 +56,35 @@ internal sealed class RuleQueueWriter : IAsyncDisposable
 
         if (writes.Count >= 100)
         {
-            await ruleEventRepository.EnqueueAsync(writes, default);
-            writes.Clear();
+            await FlushCoreAsync();
+            return true;
         }
 
-        return;
+        return false;
+    }
+
+    public async Task<bool> FlushAsync()
+    {
+        if (writes.Count > 0)
+        {
+            await FlushCoreAsync();
+            return true;
+        }
+
+        return false;
     }
 
     public async ValueTask DisposeAsync()
     {
         if (writes.Count > 0)
         {
-            await ruleEventRepository.EnqueueAsync(writes);
-            writes.Clear();
+            await FlushCoreAsync();
         }
+    }
+
+    private async Task FlushCoreAsync()
+    {
+        await ruleEventRepository.EnqueueAsync(writes, default);
+        writes.Clear();
     }
 }
