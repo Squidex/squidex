@@ -403,41 +403,47 @@ class ArrayTemplate implements FormArrayTemplate {
     }
 
     public createControl() {
-        const child = this.model.isComponents ?
-            this.createComponent() :
-            this.createItem();
+        const model = this.model;
 
-        this.model.internalItems = [...this.model.items, child];
+        const child = this.model.isComponents ?
+            this.createComponent(model) :
+            this.createItem(model);
+
+        model.internalItems = [...this.model.items, child];
 
         return child.form;
     }
 
     public removeControl(index: number) {
-        this.model.internalItems = this.model.items.filter((_, i) => i !== index);
+        const model = this.model;
+
+        model.internalItems = model.items.filter((_, i) => i !== index);
     }
 
     public clearControls() {
-        this.model.internalItems = [];
+        const model = this.model;
+
+        model.internalItems = [];
     }
 
-    private createItem() {
+    private createItem(model: FieldArrayForm) {
         return new ArrayItemForm(
-            this.model.globals,
-            this.model.field as RootFieldDto,
-            this.model.fieldPath,
-            this.model.isOptional,
-            this.model.rules,
-            this.model.partition);
+            model.globals,
+            model.field as RootFieldDto,
+            model.fieldPath,
+            model.isOptional,
+            model.rules,
+            model.partition);
     }
 
-    private createComponent() {
+    private createComponent(model: FieldArrayForm) {
         return new ComponentForm(
-            this.model.globals,
-            this.model.field as RootFieldDto,
-            this.model.fieldPath,
-            this.model.isOptional,
-            this.model.rules,
-            this.model.partition);
+            model.globals,
+            model.field as RootFieldDto,
+            model.fieldPath,
+            model.isOptional,
+            model.rules,
+            model.partition);
     }
 }
 
@@ -518,10 +524,12 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
         const schema = this.getSchema(value, this.model);
 
         if (this.currentSchema !== schema) {
-            this.clearControlsCore(this.model);
+            const model = this.model;
+
+            this.clearControlsCore(model);
 
             if (schema) {
-                this.setControlsCore(schema, value, this.model, form);
+                this.setControlsCore(schema, value, model, form);
             }
 
             this.currentSchema = schema;
