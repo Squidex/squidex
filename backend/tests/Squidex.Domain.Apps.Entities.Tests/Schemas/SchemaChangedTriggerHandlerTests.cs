@@ -66,20 +66,19 @@ public class SchemaChangedTriggerHandlerTests
     [MemberData(nameof(TestEvents))]
     public async Task Should_create_enriched_events(SchemaEvent @event, EnrichedSchemaEventType type)
     {
-        var ctx = Context(appId: @event.AppId);
+        var ctx = Context(appId: @event.AppId).ToRulesContext();
 
         var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
+        var actuals = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+        var actual = actuals.Single() as EnrichedSchemaEvent;
 
-        var enrichedEvent = actual.Single() as EnrichedSchemaEvent;
-
-        Assert.Equal(type, enrichedEvent!.Type);
-        Assert.Equal(@event.Actor, enrichedEvent.Actor);
-        Assert.Equal(@event.AppId, enrichedEvent.AppId);
-        Assert.Equal(@event.AppId.Id, enrichedEvent.AppId.Id);
-        Assert.Equal(@event.SchemaId, enrichedEvent.SchemaId);
-        Assert.Equal(@event.SchemaId.Id, enrichedEvent.SchemaId.Id);
+        Assert.Equal(type, actual!.Type);
+        Assert.Equal(@event.Actor, actual.Actor);
+        Assert.Equal(@event.AppId, actual.AppId);
+        Assert.Equal(@event.AppId.Id, actual.AppId.Id);
+        Assert.Equal(@event.SchemaId, actual.SchemaId);
+        Assert.Equal(@event.SchemaId.Id, actual.SchemaId.Id);
     }
 
     [Fact]

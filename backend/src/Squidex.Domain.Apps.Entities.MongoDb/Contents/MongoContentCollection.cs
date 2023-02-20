@@ -109,10 +109,10 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         return queryAsStream.StreamAll(appId, schemaIds, ct);
     }
 
-    public IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference,
+    public IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference, int take,
         CancellationToken ct)
     {
-        return queryReferrers.StreamReferences(appId, reference, ct);
+        return queryReferrers.StreamReferencing(appId, reference, take, ct);
     }
 
     public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,

@@ -35,12 +35,12 @@ internal sealed class QueryReferrers : OperationBase
         return hasReferrerAsync;
     }
 
-    public async IAsyncEnumerable<IContentEntity> StreamReferences(DomainId appId, DomainId reference,
+    public async IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference, int take,
         [EnumeratorCancellation] CancellationToken ct)
     {
         var filter = BuildFilter(appId, reference);
 
-        using (var cursor = await Collection.Find(filter).ToCursorAsync(ct))
+        using (var cursor = await Collection.Find(filter).Limit(take).ToCursorAsync(ct))
         {
             while (await cursor.MoveNextAsync(ct))
             {

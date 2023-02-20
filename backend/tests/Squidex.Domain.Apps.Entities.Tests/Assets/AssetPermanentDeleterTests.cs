@@ -27,25 +27,19 @@ public class AssetPermanentDeleterTests : GivenContext
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal("^asset-", consumer.EventsFilter);
+        Assert.Equal("^asset-", sut.EventsFilter);
     }
 
     [Fact]
     public async Task Should_do_nothing_on_clear()
     {
-        IEventConsumer consumer = sut;
-
-        await consumer.ClearAsync();
+        await ((IEventConsumer)sut).ClearAsync();
     }
 
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal(nameof(AssetPermanentDeleter), consumer.Name);
+        Assert.Equal(nameof(AssetPermanentDeleter), sut.Name);
     }
 
     [Fact]

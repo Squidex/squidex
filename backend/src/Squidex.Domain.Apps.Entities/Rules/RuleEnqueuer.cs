@@ -31,6 +31,11 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
     private readonly TimeSpan cacheDuration;
     private readonly int maxExtraEvents;
 
+    public int BatchSize
+    {
+        get => 200;
+    }
+
     public string Name
     {
         get => GetType().Name;
@@ -109,7 +114,7 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
                 var context = new RulesContext
                 {
                     AppId = appEvent.AppId,
-                    AllowExtraEvents = true,
+                    AllowExtraEvents = maxExtraEvents > 0,
                     IncludeSkipped = false,
                     IncludeStale = false,
                     Rules = rules.ToDictionary(x => x.Id, x => x.RuleDef).ToReadonlyDictionary(),

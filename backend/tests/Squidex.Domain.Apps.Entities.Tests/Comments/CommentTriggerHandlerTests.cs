@@ -66,7 +66,7 @@ public class CommentTriggerHandlerTests
     [Fact]
     public async Task Should_create_enriched_events()
     {
-        var ctx = Context();
+        var ctx = Context().ToRulesContext();
 
         var user1 = UserMocks.User("1");
         var user2 = UserMocks.User("2");
@@ -80,7 +80,7 @@ public class CommentTriggerHandlerTests
         A.CallTo(() => userResolver.QueryManyAsync(userIds, default))
             .Returns(users.ToDictionary(x => x.Id));
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
         Assert.Equal(2, actual.Count);
 
@@ -96,7 +96,7 @@ public class CommentTriggerHandlerTests
     [Fact]
     public async Task Should_not_create_enriched_events_if_users_cannot_be_resolved()
     {
-        var ctx = Context();
+        var ctx = Context().ToRulesContext();
 
         var user1 = UserMocks.User("1");
         var user2 = UserMocks.User("2");
@@ -107,7 +107,7 @@ public class CommentTriggerHandlerTests
         var @event = new CommentCreated { Mentions = userIds };
         var envelope = Envelope.Create<AppEvent>(@event);
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
         Assert.Empty(actual);
     }
@@ -115,12 +115,12 @@ public class CommentTriggerHandlerTests
     [Fact]
     public async Task Should_not_create_enriched_events_if_mentions_is_null()
     {
-        var ctx = Context();
+        var ctx = Context().ToRulesContext();
 
         var @event = new CommentCreated { Mentions = null };
         var envelope = Envelope.Create<AppEvent>(@event);
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
         Assert.Empty(actual);
 
@@ -131,12 +131,12 @@ public class CommentTriggerHandlerTests
     [Fact]
     public async Task Should_not_create_enriched_events_if_mentions_is_empty()
     {
-        var ctx = Context();
+        var ctx = Context().ToRulesContext();
 
         var @event = new CommentCreated { Mentions = Array.Empty<string>() };
         var envelope = Envelope.Create<AppEvent>(@event);
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), default).ToListAsync();
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
 
         Assert.Empty(actual);
 

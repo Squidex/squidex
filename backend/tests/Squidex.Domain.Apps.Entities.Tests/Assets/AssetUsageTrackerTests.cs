@@ -35,25 +35,25 @@ public class AssetUsageTrackerTests : GivenContext
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal("^asset-", consumer.EventsFilter);
+        Assert.Equal("^asset-", sut.EventsFilter);
     }
 
     [Fact]
     public async Task Should_do_nothing_on_clear()
     {
-        IEventConsumer consumer = sut;
-
-        await consumer.ClearAsync();
+        await sut.ClearAsync();
     }
 
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        IEventConsumer consumer = sut;
+        Assert.Equal(nameof(AssetUsageTracker), sut.Name);
+    }
 
-        Assert.Equal(nameof(AssetUsageTracker), consumer.Name);
+    [Fact]
+    public void Should_process_in_batches()
+    {
+        Assert.True(sut.BatchSize > 1);
     }
 
     public static IEnumerable<object[]> EventData()

@@ -33,25 +33,19 @@ public class RecursiveDeleterTests : GivenContext
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal("^assetFolder-", consumer.EventsFilter);
+        Assert.Equal("^assetFolder-", sut.EventsFilter);
     }
 
     [Fact]
     public async Task Should_do_nothing_on_clear()
     {
-        IEventConsumer consumer = sut;
-
-        await consumer.ClearAsync();
+        await ((IEventConsumer)sut).ClearAsync();
     }
 
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal(nameof(RecursiveDeleter), consumer.Name);
+        Assert.Equal(nameof(RecursiveDeleter), sut.Name);
     }
 
     [Fact]

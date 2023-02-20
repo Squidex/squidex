@@ -75,10 +75,10 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         return collectionComplete.StreamAll(appId, schemaIds, ct);
     }
 
-    public IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference,
+    public IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference, int take,
         CancellationToken ct = default)
     {
-        return collectionComplete.StreamReferencing(appId, reference, ct);
+        return collectionComplete.StreamReferencing(appId, reference, take, ct);
     }
 
     public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,

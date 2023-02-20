@@ -82,7 +82,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
             CreateEventData(2)
         };
 
-        await Sut.AppendAsync(Guid.NewGuid(), streamName, commit);
+        await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit);
 
         await Assert.ThrowsAsync<WrongEventVersionException>(() => Sut.AppendAsync(Guid.NewGuid(), streamName, 0, commit));
     }
@@ -104,8 +104,8 @@ public abstract class EventStoreTests<T> where T : IEventStore
             CreateEventData(2)
         };
 
-        await Sut.AppendAsync(Guid.NewGuid(), streamName, commit1);
-        await Sut.AppendAsync(Guid.NewGuid(), streamName, commit2);
+        await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit1);
+        await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit2);
 
         var readEvents1 = await QueryAsync(streamName);
         var readEvents2 = await QueryAllAsync(streamName);
@@ -164,7 +164,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
 
         var readEvents = await QueryWithSubscriptionAsync(streamName, async () =>
         {
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, commit1);
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit1);
         });
 
         var expected = new[]
@@ -190,7 +190,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
         // Append and read in parallel.
         await QueryWithSubscriptionAsync(streamName, async () =>
         {
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, commit1);
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit1);
         });
 
         var commit2 = new[]
@@ -202,7 +202,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
         // Append and read in parallel.
         var readEventsFromPosition = await QueryWithSubscriptionAsync(streamName, async () =>
         {
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, commit2);
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit2);
         });
 
         var expectedFromPosition = new[]
@@ -247,7 +247,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
                         CreateEventData(i * j)
                     };
 
-                    await Sut.AppendAsync(Guid.NewGuid(), fullStreamName, commit1);
+                    await Sut.AppendAsync(Guid.NewGuid(), fullStreamName, EtagVersion.Any, commit1);
                 }
             });
         });
@@ -266,7 +266,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
             CreateEventData(2)
         };
 
-        await Sut.AppendAsync(Guid.NewGuid(), streamName, commit);
+        await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit);
 
         var firstRead = await QueryAsync(streamName);
 
@@ -300,8 +300,8 @@ public abstract class EventStoreTests<T> where T : IEventStore
             CreateEventData(4)
         };
 
-        await Sut.AppendAsync(Guid.NewGuid(), streamName1, stream1Commit);
-        await Sut.AppendAsync(Guid.NewGuid(), streamName2, stream2Commit);
+        await Sut.AppendAsync(Guid.NewGuid(), streamName1, EtagVersion.Any, stream1Commit);
+        await Sut.AppendAsync(Guid.NewGuid(), streamName2, EtagVersion.Any, stream2Commit);
 
         var readEvents = await Sut.QueryManyAsync(new[] { streamName1, streamName2 });
 
@@ -337,9 +337,9 @@ public abstract class EventStoreTests<T> where T : IEventStore
 
         for (var i = 0; i < events.Count / commitSize; i++)
         {
-            var commit = events.Skip(i * commitSize).Take(commitSize);
+            var commit = events.Skip(i * commitSize).Take(commitSize).ToArray();
 
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, commit.ToArray());
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit);
         }
 
         var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
@@ -369,9 +369,9 @@ public abstract class EventStoreTests<T> where T : IEventStore
 
         for (var i = 0; i < events.Count / commitSize; i++)
         {
-            var commit = events.Skip(i * commitSize).Take(commitSize);
+            var commit = events.Skip(i * commitSize).Take(commitSize).ToArray();
 
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, commit.ToArray());
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit);
         }
 
         var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
@@ -396,7 +396,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
             CreateEventData(2)
         };
 
-        await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+        await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, events);
 
         IReadOnlyList<StoredEvent>? readEvents = null;
 
@@ -429,7 +429,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
             CreateEventData(2)
         };
 
-        await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+        await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, events);
 
         IReadOnlyList<StoredEvent>? readEvents = null;
 

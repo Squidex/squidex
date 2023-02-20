@@ -76,7 +76,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
     {
         var ctx = Context();
 
-        A.CallTo(() => assetRepository.StreamAll(ctx.AppId.Id, CancellationToken))
+        A.CallTo(() => assetRepository.StreamAll(AppId.Id, CancellationToken))
             .Returns(new List<AssetEntity>
             {
                 new AssetEntity(),
@@ -95,14 +95,14 @@ public class AssetChangedTriggerHandlerTests : GivenContext
     [MemberData(nameof(TestEvents))]
     public async Task Should_create_enriched_events(AssetEvent @event, EnrichedAssetEventType type)
     {
-        var ctx = Context(appId: @event.AppId);
+        var ctx = Context(appId: @event.AppId).ToRulesContext();
 
         var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-        A.CallTo(() => assetLoader.GetAsync(ctx.AppId.Id, @event.AssetId, 12, CancellationToken))
+        A.CallTo(() => assetLoader.GetAsync(AppId.Id, @event.AssetId, 12, CancellationToken))
             .Returns(new AssetEntity());
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx.ToRulesContext(), CancellationToken).ToListAsync(CancellationToken);
+        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
 
         var enrichedEvent = (EnrichedAssetEvent)actual.Single();
 

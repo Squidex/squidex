@@ -83,27 +83,40 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
 
         yield return enrichedEvent;
 
-        if (!context.AllowExtraEvents)
+        if (!context.AllowExtraEvents ||
+            context.MaxEvents == null ||
+            context.MaxEvents <= 0)
         {
             yield break;
         }
 
-        if (context.Rules.Values.Any(r => TriggerReferences(enrichedEvent, r)))
+        // When the content has just been created, it cannot be referenced by another content. Therefore we can skip it.
+        if (enrichedEvent.Type == EnrichedContentEventType.Created)
         {
-            await foreach (var content in contentRepository.StreamReferencing(context.AppId.Id, enrichedEvent.Id, ct))
+            yield break;
+        }
+
+        // This method is only called once per event, therefore we check all rules.
+        if (!context.Rules.Values.Any(r => TriggerReferences(enrichedEvent, r)))
+        {
+            yield break;
+        }
+
+        var take = context.MaxEvents.Value;
+
+        await foreach (var content in contentRepository.StreamReferencing(context.AppId.Id, enrichedEvent.Id, take, ct))
+        {
+            var result = new EnrichedContentEvent
             {
-                var result = new EnrichedContentEvent
-                {
-                    Type = EnrichedContentEventType.Created
-                };
+                Type = EnrichedContentEventType.ReferenceUpdated
+            };
 
-                SimpleMapper.Map(content, result);
+            SimpleMapper.Map(content, result);
 
-                result.Actor = content.LastModifiedBy;
-                result.Name = $"{content.SchemaId.Name.ToPascalCase()}ReferenceUpdated";
+            result.Actor = content.LastModifiedBy;
+            result.Name = $"{content.SchemaId.Name.ToPascalCase()}ReferenceUpdated";
 
-                yield return result;
-            }
+            yield return result;
         }
     }
 
@@ -134,6 +147,9 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
 
         // Use the concrete event to map properties that are not part of app event.
         SimpleMapper.Map(contentEvent, result);
+
+        // This property has another name, so we cannot use the simple mapper.
+        result.Id = contentEvent.ContentId;
 
         switch (@event.Payload)
         {
@@ -213,19 +229,6 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
             var contentEvent = (ContentEvent)@event.Payload;
 
             foreach (var schema in schemaTrigger.Schemas)
-            {
-                if (MatchsSchema(schema, contentEvent.SchemaId))
-                {
-                    return true;
-                }
-            }
-        }
-
-        if (schemaTrigger.ReferencedSchemas != null)
-        {
-            var contentEvent = (ContentEvent)@event.Payload;
-
-            foreach (var schema in schemaTrigger.ReferencedSchemas)
             {
                 if (MatchsSchema(schema, contentEvent.SchemaId))
                 {

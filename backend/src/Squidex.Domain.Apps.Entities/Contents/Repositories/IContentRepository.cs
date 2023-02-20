@@ -19,7 +19,7 @@ public interface IContentRepository
     IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
         CancellationToken ct = default);
 
-    IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId references,
+    IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId references, int take,
         CancellationToken ct = default);
 
     Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope,

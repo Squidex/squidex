@@ -52,25 +52,25 @@ public class RuleEnqueuerTests : GivenContext
     [Fact]
     public void Should_return_wildcard_filter_for_events_filter()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal(".*", consumer.EventsFilter);
+        Assert.Equal(".*", ((IEventConsumer)sut).EventsFilter);
     }
 
     [Fact]
     public async Task Should_do_nothing_on_clear()
     {
-        IEventConsumer consumer = sut;
-
-        await consumer.ClearAsync();
+        await ((IEventConsumer)sut).ClearAsync();
     }
 
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        IEventConsumer consumer = sut;
+        Assert.Equal(nameof(RuleEnqueuer), ((IEventConsumer)sut).Name);
+    }
 
-        Assert.Equal(nameof(RuleEnqueuer), consumer.Name);
+    [Fact]
+    public void Should_process_in_batches()
+    {
+        Assert.True(sut.BatchSize > 1);
     }
 
     [Fact]

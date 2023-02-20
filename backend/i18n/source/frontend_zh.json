@@ -563,7 +563,6 @@
   "roles.loadPermissionsFailed": "加载权限失败。请重新加载。",
   "roles.permissions": "权限",
   "roles.permissionsDescription": "权限在 API 级别限制允许的操作和查询，是一项安全功能。",
-  "roles.permissionsPlaceholder": "开始输入以搜索权限",
   "roles.properties": "属性",
   "roles.properties.hideAPI": "隐藏 API",
   "roles.properties.hideAssets": "隐藏资源",
