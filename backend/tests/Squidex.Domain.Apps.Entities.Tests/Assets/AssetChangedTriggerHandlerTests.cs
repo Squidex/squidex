@@ -95,7 +95,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
     [MemberData(nameof(TestEvents))]
     public async Task Should_create_enriched_events(AssetEvent @event, EnrichedAssetEventType type)
     {
-        var ctx = Context(appId: @event.AppId).ToRulesContext();
+        var ctx = Context().ToRulesContext();
 
         var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
@@ -172,13 +172,13 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         }
     }
 
-    private static RuleContext Context(RuleTrigger? trigger = null, NamedId<DomainId>? appId = null)
+    private RuleContext Context(RuleTrigger? trigger = null)
     {
         trigger ??= new AssetChangedTriggerV2();
 
         return new RuleContext
         {
-            AppId = appId ?? NamedId.Of(DomainId.NewGuid(), "my-app"),
+            AppId = AppId,
             Rule = new Rule(trigger, A.Fake<RuleAction>()),
             RuleId = DomainId.NewGuid()
         };
