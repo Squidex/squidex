@@ -20,6 +20,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     private readonly string secret = Guid.NewGuid().ToString();
     private readonly string appName = Guid.NewGuid().ToString();
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
+    private readonly string schemaNameRef = $"schema-{Guid.NewGuid()}-ref";
     private readonly string contentString = Guid.NewGuid().ToString();
     private readonly WebhookCatcherClient webhookCatcher;
 
@@ -81,6 +82,107 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
+    }
+
+    [Fact]
+    public async Task Should_run_rules_on_reference_change()
+    {
+        // STEP 0: Create app.
+        await CreateAppAsync();
+
+
+        // STEP 1: Start webhook session
+        var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
+
+
+        // STEP 2: Create contents
+        var referencedSchema = await TestEntity.CreateSchemaAsync(_.Schemas, appName, schemaName);
+
+        // Create a test content.
+        var referencedContents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(appName, schemaName);
+
+        var referencedContent = await referencedContents.CreateAsync(new TestEntityData
+        {
+            String = contentString
+        });
+
+        var parentSchema = await TestEntityWithReferences.CreateSchemaAsync(_.Schemas, appName, schemaNameRef);
+
+        // Create a test content that references the other schema.
+        var parentContents = _.ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(appName, schemaNameRef);
+
+        await parentContents.CreateAsync(new TestEntityWithReferencesData
+        {
+            References = new[]
+            {
+                referencedContent.Id
+            }
+        });
+
+
+        // STEP 2: Create rule
+        var createRule = new CreateRuleDto
+        {
+            Action = new WebhookRuleActionDto
+            {
+                Method = WebhookMethod.POST,
+                Url = new Uri(url),
+                PayloadType = null,
+                Payload = @$"Script(
+                    getReferences(event.data.{TestEntityWithReferencesData.ReferencesField}.iv, function (references) {{
+                        var payload = {{
+                            name: references[0].data.{TestEntityData.StringField}.iv,
+                            type: event.type
+                        }};
+                        complete(payload);
+                    }});
+                )",
+            },
+            Trigger = new ContentChangedRuleTriggerDto
+            {
+                Schemas = new List<SchemaCondition>
+                {
+                    new SchemaCondition
+                    {
+                        SchemaId = parentSchema.Id
+                    }
+                },
+                ReferencedSchemas = new List<SchemaCondition>
+                {
+                    new SchemaCondition
+                    {
+                        SchemaId = referencedSchema.Id
+                    }
+                }
+            }
+        };
+
+        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+
+
+        // STEP 3: Update referenced content
+        var updatedString = Guid.NewGuid().ToString();
+        var updateEvent = "ReferenceUpdated";
+
+        await referencedContents.UpdateAsync(referencedContent.Id, new TestEntityData
+        {
+            String = updatedString
+        });
+
+
+        // Get requests.
+        var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
+        var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains(updatedString, StringComparison.OrdinalIgnoreCase) && x.Content.Contains(updateEvent, StringComparison.OrdinalIgnoreCase));
+
+        Assert.NotNull(request);
+
+
+        // STEP 4: Get events
+        var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
+        var eventsRule = await _.Rules.GetEventsAsync(appName);
+
+        Assert.NotEmpty(eventsAll.Items);
+        Assert.NotEmpty(eventsRule.Items);
     }
 
     [Fact]

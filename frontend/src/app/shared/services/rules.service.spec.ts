@@ -518,8 +518,7 @@ export function createRule(id: number, suffix = '') {
         `rule-action${key}`,
         `rule-name${key}`,
         id * 3,
-        id * 4,
-        DateTime.parseISO(`${id % 1000 + 2000}-10-10T10:10:00Z`));
+        id * 4);
 }
 
 export function createRuleEvent(id: number, suffix = '') {
@@ -552,7 +551,7 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
         `action-data${key}`,
         `error${key}`,
         [
-            `reason${key}`
+            `reason${key}`,
         ],
-        `unqiue-id${key}`
+        `unique-id${key}`);
 }

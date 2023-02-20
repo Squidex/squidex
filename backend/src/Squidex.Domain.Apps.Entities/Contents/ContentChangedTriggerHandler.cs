@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Text;
@@ -217,68 +218,73 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
 
     public bool Trigger(Envelope<AppEvent> @event, RuleTrigger trigger)
     {
-        var schemaTrigger = (ContentChangedTriggerV2)trigger;
+        var typed = (ContentChangedTriggerV2)trigger;
 
-        if (schemaTrigger.HandleAll)
+        if (typed.HandleAll)
         {
             return true;
         }
 
-        if (schemaTrigger.Schemas != null)
-        {
-            var contentEvent = (ContentEvent)@event.Payload;
-
-            foreach (var schema in schemaTrigger.Schemas)
-            {
-                if (MatchsSchema(schema, contentEvent.SchemaId))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        // Also check for the referenced schemas, because it is needed to query the references.
+        return MatchesAnySchema(typed.Schemas, @event.Payload) || MatchesAnySchema(typed.ReferencedSchemas, @event.Payload);
     }
 
     public bool Trigger(EnrichedEvent @event, RuleTrigger trigger)
     {
-        var contentTrigger = (ContentChangedTriggerV2)trigger;
+        var typed = (ContentChangedTriggerV2)trigger;
 
-        if (contentTrigger.HandleAll)
+        if (typed.HandleAll)
         {
             return true;
         }
 
-        if (contentTrigger.Schemas != null)
-        {
-            var contentEvent = (EnrichedContentEvent)@event;
-
-            foreach (var schema in contentTrigger.Schemas)
-            {
-                if (MatchsSchema(schema, contentEvent.SchemaId) && MatchsCondition(schema, contentEvent))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        // Only check for the actual schemas, not references schemas as they have already been queried.
+        return MatchesAnySchema(typed.Schemas, @event);
     }
 
     private bool TriggerReferences(EnrichedEvent @event, Rule rule)
     {
         var trigger = (ContentChangedTriggerV2)rule.Trigger;
 
-        if (trigger.ReferencedSchemas != null)
-        {
-            var contentEvent = (EnrichedContentEvent)@event;
+        return MatchesAnySchema(trigger.ReferencedSchemas, @event);
+    }
 
-            foreach (var schema in trigger.ReferencedSchemas)
+    private bool MatchesAnySchema(ReadonlyList<SchemaCondition>? schemas, EnrichedEvent @event)
+    {
+        if (schemas == null)
+        {
+            return false;
+        }
+
+        var contentEvent = (EnrichedContentEvent)@event;
+
+        foreach (var schema in schemas)
+        {
+            // Check for the conditions once to improve performance.
+            if (MatchsSchema(schema, contentEvent.SchemaId) && MatchsCondition(schema, contentEvent))
             {
-                if (MatchsSchema(schema, contentEvent.SchemaId) && MatchsCondition(schema, contentEvent))
-                {
-                    return true;
-                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool MatchesAnySchema(ReadonlyList<SchemaCondition>? schemas, AppEvent @event)
+    {
+        if (schemas == null)
+        {
+            return false;
+        }
+
+        var contentEvent = (ContentEvent)@event;
+
+        foreach (var schema in schemas)
+        {
+            // Check for the conditions once to improve performance.
+            if (MatchsSchema(schema, contentEvent.SchemaId))
+            {
+                return true;
             }
         }
 

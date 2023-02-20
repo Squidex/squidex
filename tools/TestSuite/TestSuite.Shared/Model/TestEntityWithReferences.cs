@@ -24,7 +24,7 @@ public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesD
             {
                 new UpsertSchemaFieldDto
                 {
-                    Name = nameof(TestEntityWithReferencesData.References).ToLowerInvariant(),
+                    Name = TestEntityWithReferencesData.ReferencesField,
                     Properties = new ReferencesFieldPropertiesDto
                     {
                         IsRequired = false
@@ -40,6 +40,8 @@ public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesD
 
 public sealed class TestEntityWithReferencesData
 {
+    public static readonly string ReferencesField = nameof(References).ToLowerInvariant();
+
     [JsonConverter(typeof(InvariantConverter))]
     public string[] References { get; set; }
 }
