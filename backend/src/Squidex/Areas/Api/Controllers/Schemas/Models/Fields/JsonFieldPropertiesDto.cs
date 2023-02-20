@@ -17,10 +17,13 @@ public sealed class JsonFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public string? GraphQLSchema { get; set; }
 
+    public static JsonFieldPropertiesDto FromDomain(JsonFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new JsonFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new JsonFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new JsonFieldProperties());
     }
 }

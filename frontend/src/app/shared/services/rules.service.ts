@@ -128,7 +128,6 @@ export class RuleDto {
         public readonly name: string,
         public readonly numSucceeded: number,
         public readonly numFailed: number,
-        public readonly lastExecuted?: DateTime,
     ) {
         this._links = links;
 
@@ -181,6 +180,7 @@ export class SimulatedRuleEventDto {
         public readonly actionData: string | undefined,
         public readonly error: string | undefined,
         public readonly skipReasons: ReadonlyArray<string>,
+        public readonly uniqueId: string,
     ) {
         this._links = links;
     }
@@ -486,8 +486,7 @@ function parseRule(response: any) {
         response.action.actionType,
         response.name,
         response.numSucceeded,
-        response.numFailed,
-        response.lastExecuted ? DateTime.parseISO(response.lastExecuted) : undefined);
+        response.numFailed);
 }
 
 function parseRuleEvent(response: any) {
@@ -512,5 +511,6 @@ function parseSimulatedRuleEvent(response: any) {
         response.actionName,
         response.actionData,
         response.error,
-        response.skipReasons);
+        response.skipReasons,
+        response.uniqueId);
 }

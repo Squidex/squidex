@@ -94,6 +94,7 @@ public static class OpenApiServices
             CreateArrayMap<FieldNames>(JsonObjectType.String),
             CreateObjectMap<AssetMetadata>(),
             CreateObjectMap<JsonObject>(),
+            CreateStringMap<DateOnly>(JsonFormatStrings.Date),
             CreateStringMap<DomainId>(),
             CreateStringMap<Instant>(JsonFormatStrings.DateTime),
             CreateStringMap<Language>(),

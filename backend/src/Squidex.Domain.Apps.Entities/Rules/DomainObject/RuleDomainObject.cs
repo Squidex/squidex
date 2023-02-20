@@ -117,7 +117,7 @@ public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
         SimpleMapper.Map(command, @event);
         SimpleMapper.Map(Snapshot, @event);
 
-        await RuleEnqueuer().EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
+        await RuleEnqueuer().EnqueueAsync(Snapshot.Id, Snapshot.RuleDef, Envelope.Create(@event));
     }
 
     private IRuleEnqueuer RuleEnqueuer()

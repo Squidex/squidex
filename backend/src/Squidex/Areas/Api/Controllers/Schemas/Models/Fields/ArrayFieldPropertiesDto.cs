@@ -28,10 +28,13 @@ public sealed class ArrayFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public ReadonlyList<string>? UniqueFields { get; set; }
 
+    public static ArrayFieldPropertiesDto FromDomain(ArrayFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new ArrayFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new ArrayFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new ArrayFieldProperties());
     }
 }

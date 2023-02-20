@@ -66,7 +66,7 @@ public class CommentTriggerHandlerTests
     [Fact]
     public async Task Should_create_enriched_events()
     {
-        var ctx = Context();
+        var ctx = Context().ToRulesContext();
 
         var user1 = UserMocks.User("1");
         var user2 = UserMocks.User("2");
@@ -96,7 +96,7 @@ public class CommentTriggerHandlerTests
     [Fact]
     public async Task Should_not_create_enriched_events_if_users_cannot_be_resolved()
     {
-        var ctx = Context();
+        var ctx = Context().ToRulesContext();
 
         var user1 = UserMocks.User("1");
         var user2 = UserMocks.User("2");
@@ -115,7 +115,7 @@ public class CommentTriggerHandlerTests
     [Fact]
     public async Task Should_not_create_enriched_events_if_mentions_is_null()
     {
-        var ctx = Context();
+        var ctx = Context().ToRulesContext();
 
         var @event = new CommentCreated { Mentions = null };
         var envelope = Envelope.Create<AppEvent>(@event);
@@ -131,7 +131,7 @@ public class CommentTriggerHandlerTests
     [Fact]
     public async Task Should_not_create_enriched_events_if_mentions_is_empty()
     {
-        var ctx = Context();
+        var ctx = Context().ToRulesContext();
 
         var @event = new CommentCreated { Mentions = Array.Empty<string>() };
         var envelope = Envelope.Create<AppEvent>(@event);
@@ -151,7 +151,7 @@ public class CommentTriggerHandlerTests
         {
             var @event = new CommentCreated();
 
-            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+            var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -164,7 +164,7 @@ public class CommentTriggerHandlerTests
         {
             var @event = new EnrichedCommentEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -177,7 +177,7 @@ public class CommentTriggerHandlerTests
         {
             var @event = new EnrichedCommentEvent();
 
-            var actual = sut.Trigger(new EnrichedCommentEvent(), ctx);
+            var actual = sut.Trigger(new EnrichedCommentEvent(), ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -190,7 +190,7 @@ public class CommentTriggerHandlerTests
         {
             var @event = new EnrichedCommentEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -206,7 +206,7 @@ public class CommentTriggerHandlerTests
                 MentionedUser = UserMocks.User("1", "1@email.com")
             };
 
-            var actual = handler.Trigger(@event, ctx);
+            var actual = handler.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -222,7 +222,7 @@ public class CommentTriggerHandlerTests
                 MentionedUser = UserMocks.User("1", "1@email.com")
             };
 
-            var actual = handler.Trigger(@event, ctx);
+            var actual = handler.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -238,7 +238,7 @@ public class CommentTriggerHandlerTests
                 Text = "very_urgent_text"
             };
 
-            var actual = handler.Trigger(@event, ctx);
+            var actual = handler.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -254,7 +254,7 @@ public class CommentTriggerHandlerTests
                 Text = "just_gossip"
             };
 
-            var actual = handler.Trigger(@event, ctx);
+            var actual = handler.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });

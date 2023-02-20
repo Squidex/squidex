@@ -7,7 +7,6 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -19,9 +18,9 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 public class AssetUsageTrackerTests : GivenContext
 {
     private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
+    private readonly IAssetUsageTracker assetUsageTracker = A.Fake<IAssetUsageTracker>();
     private readonly ISnapshotStore<AssetUsageTracker.State> store = A.Fake<ISnapshotStore<AssetUsageTracker.State>>();
     private readonly ITagService tagService = A.Fake<ITagService>();
-    private readonly IUsageGate usageGate = A.Fake<IUsageGate>();
     private readonly DomainId assetId = DomainId.NewGuid();
     private readonly DomainId assetKey;
     private readonly AssetUsageTracker sut;
@@ -30,31 +29,31 @@ public class AssetUsageTrackerTests : GivenContext
     {
         assetKey = DomainId.Combine(AppId, assetId);
 
-        sut = new AssetUsageTracker(usageGate, assetLoader, tagService, store);
+        sut = new AssetUsageTracker(assetLoader, assetUsageTracker, tagService, store);
     }
 
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal("^asset-", consumer.EventsFilter);
+        Assert.Equal("^asset-", sut.EventsFilter);
     }
 
     [Fact]
     public async Task Should_do_nothing_on_clear()
     {
-        IEventConsumer consumer = sut;
-
-        await consumer.ClearAsync();
+        await sut.ClearAsync();
     }
 
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        IEventConsumer consumer = sut;
+        Assert.Equal(nameof(AssetUsageTracker), sut.Name);
+    }
 
-        Assert.Equal(nameof(AssetUsageTracker), consumer.Name);
+    [Fact]
+    public void Should_process_in_batches()
+    {
+        Assert.True(sut.BatchSize > 1);
     }
 
     public static IEnumerable<object[]> EventData()
@@ -79,17 +78,17 @@ public class AssetUsageTrackerTests : GivenContext
     [MemberData(nameof(EventData))]
     public async Task Should_increase_usage_if_for_event(AssetEvent @event, long sizeDiff, long countDiff)
     {
-        var date = DateTime.UtcNow.Date.AddDays(13);
+        var date = DateTime.UtcNow.Date.AddDays(13).ToDateOnly();
 
         @event.AppId = AppId;
 
         var envelope =
             Envelope.Create<IEvent>(@event)
-                .SetTimestamp(Instant.FromDateTimeUtc(date));
+                .SetTimestamp(Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(13)));
 
         await sut.On(new[] { envelope });
 
-        A.CallTo(() => usageGate.TrackAssetAsync(AppId.Id, date, sizeDiff, countDiff, default))
+        A.CallTo(() => assetUsageTracker.TrackAsync(AppId.Id, date, sizeDiff, countDiff, default))
             .MustHaveHappened();
     }
 

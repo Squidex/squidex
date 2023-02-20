@@ -21,6 +21,12 @@ public sealed record SimulatedRuleEventDto
     public Guid EventId { get; init; }
 
     /// <summary>
+    /// The the unique id of the simulated event.
+    /// </summary>
+    [Required]
+    public string UniqueId { get; set; }
+
+    /// <summary>
     /// The name of the event.
     /// </summary>
     [Required]

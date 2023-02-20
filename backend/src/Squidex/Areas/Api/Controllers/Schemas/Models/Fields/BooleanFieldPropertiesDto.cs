@@ -32,10 +32,13 @@ public sealed class BooleanFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public BooleanFieldEditor Editor { get; set; }
 
+    public static BooleanFieldPropertiesDto FromDomain(BooleanFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new BooleanFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new BooleanFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new BooleanFieldProperties());
     }
 }

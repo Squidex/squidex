@@ -9,7 +9,7 @@ namespace Squidex.Infrastructure.UsageTracking;
 
 public struct UsageUpdate
 {
-    public DateTime Date;
+    public DateOnly Date;
 
     public string Key;
 
@@ -17,7 +17,7 @@ public struct UsageUpdate
 
     public Counters Counters;
 
-    public UsageUpdate(DateTime date, string key, string category, Counters counters)
+    public UsageUpdate(DateOnly date, string key, string category, Counters counters)
     {
         Key = key;
         Category = category;

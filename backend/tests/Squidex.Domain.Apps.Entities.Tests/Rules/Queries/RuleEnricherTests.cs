@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
@@ -15,13 +14,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries;
 
 public class RuleEnricherTests : GivenContext
 {
-    private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
+    private readonly IRuleUsageTracker ruleUsageTracker = A.Fake<IRuleUsageTracker>();
     private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
     private readonly RuleEnricher sut;
 
     public RuleEnricherTests()
     {
-        sut = new RuleEnricher(ruleEventRepository, requestCache);
+        sut = new RuleEnricher(ruleUsageTracker, requestCache);
     }
 
     [Fact]
@@ -31,10 +30,8 @@ public class RuleEnricherTests : GivenContext
 
         var actual = await sut.EnrichAsync(source, ApiContext, CancellationToken);
 
-        Assert.Equal(0, actual.NumFailed);
         Assert.Equal(0, actual.NumSucceeded);
-
-        Assert.Null(actual.LastExecuted);
+        Assert.Equal(0, actual.NumFailed);
 
         A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
             .MustHaveHappened();
@@ -48,23 +45,26 @@ public class RuleEnricherTests : GivenContext
     {
         var source = CreateRule();
 
-        var stats = new RuleStatistics
+        var stats = new Dictionary<DomainId, RuleCounters>
         {
-            RuleId = source.Id,
-            NumFailed = 12,
-            NumSucceeded = 17,
-            LastExecuted = SystemClock.Instance.GetCurrentInstant()
+            [source.Id] = new RuleCounters(42, 17, 12)
         };
 
-        A.CallTo(() => ruleEventRepository.QueryStatisticsByAppAsync(AppId.Id, CancellationToken))
-            .Returns(new List<RuleStatistics> { stats });
+        A.CallTo(() => ruleUsageTracker.GetTotalByAppAsync(AppId.Id, CancellationToken))
+            .Returns(stats);
 
-        await sut.EnrichAsync(source, ApiContext, CancellationToken);
+        var actual = await sut.EnrichAsync(source, ApiContext, CancellationToken);
+
+        Assert.Equal(17, actual.NumSucceeded);
+        Assert.Equal(12, actual.NumFailed);
 
         A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
             .MustHaveHappened();
 
-        A.CallTo(() => requestCache.AddDependency(stats.LastExecuted))
+        A.CallTo(() => requestCache.AddDependency(17L))
+            .MustHaveHappened();
+
+        A.CallTo(() => requestCache.AddDependency(12L))
             .MustHaveHappened();
     }
 

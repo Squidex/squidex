@@ -8,7 +8,6 @@
 using Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
 
@@ -20,73 +19,73 @@ internal sealed class FieldPropertiesDtoFactory : IFieldPropertiesVisitor<FieldP
     {
     }
 
-    public static FieldPropertiesDto Create(FieldProperties properties)
+    public static FieldPropertiesDto Create(FieldProperties fieldProperties)
     {
-        return properties.Accept(Instance, None.Value);
+        return fieldProperties.Accept(Instance, None.Value);
     }
 
-    public FieldPropertiesDto Visit(ArrayFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(ArrayFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new ArrayFieldPropertiesDto());
+        return ArrayFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(AssetsFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(AssetsFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new AssetsFieldPropertiesDto());
+        return AssetsFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(BooleanFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(BooleanFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new BooleanFieldPropertiesDto());
+        return BooleanFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(ComponentFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(ComponentFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new ComponentFieldPropertiesDto());
+        return ComponentFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(ComponentsFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(ComponentsFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new ComponentsFieldPropertiesDto());
+        return ComponentsFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(DateTimeFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(DateTimeFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new DateTimeFieldPropertiesDto());
+        return DateTimeFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(GeolocationFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(GeolocationFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new GeolocationFieldPropertiesDto());
+        return GeolocationFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(JsonFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(JsonFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new JsonFieldPropertiesDto());
+        return JsonFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(NumberFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(NumberFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new NumberFieldPropertiesDto());
+        return NumberFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(ReferencesFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(ReferencesFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new ReferencesFieldPropertiesDto());
+        return ReferencesFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(StringFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(StringFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new StringFieldPropertiesDto());
+        return StringFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(TagsFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(TagsFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
+        return TagsFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
-    public FieldPropertiesDto Visit(UIFieldProperties properties, None args)
+    public FieldPropertiesDto Visit(UIFieldProperties fieldProperties, None args)
     {
-        return SimpleMapper.Map(properties, new UIFieldPropertiesDto());
+        return UIFieldPropertiesDto.FromDomain(fieldProperties);
     }
 }

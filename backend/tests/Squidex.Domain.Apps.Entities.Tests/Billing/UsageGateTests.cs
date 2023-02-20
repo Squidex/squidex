@@ -8,7 +8,7 @@
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
@@ -23,8 +23,7 @@ public class UsageGateTests : GivenContext
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
     private readonly string clientId = Guid.NewGuid().ToString();
-    private readonly DomainId teamId = DomainId.NewGuid();
-    private readonly DateTime today = new DateTime(2020, 10, 3);
+    private readonly DateOnly today = new DateOnly(2020, 10, 3);
     private readonly Plan planFree = new Plan { Id = "free" };
     private readonly Plan planPaid = new Plan { Id = "paid" };
     private readonly UsageGate sut;
@@ -44,9 +43,9 @@ public class UsageGateTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_delete_app_asset_usage()
+    public async Task Should_delete_assets_usage_by_app()
     {
-        await sut.DeleteAssetUsageAsync(AppId.Id, CancellationToken);
+        await ((IAssetUsageTracker)sut).DeleteUsageAsync(AppId.Id, CancellationToken);
 
         A.CallTo(() => usageTracker.DeleteAsync($"{AppId.Id}_Assets", CancellationToken))
             .MustHaveHappened();
@@ -55,9 +54,18 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_delete_assets_usage()
     {
-        await sut.DeleteAssetsUsageAsync(CancellationToken);
+        await ((IAssetUsageTracker)sut).DeleteUsageAsync(CancellationToken);
 
-        A.CallTo(() => usageTracker.DeleteByKeyPatternAsync("^([a-zA-Z0-9]+)_Assets", CancellationToken))
+        A.CallTo(() => usageTracker.DeleteByKeyPatternAsync("^([a-zA-Z0-9]+)_[A-Za-z]+Assets", CancellationToken))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_delete_rules_usage_by_app()
+    {
+        await ((IRuleUsageTracker)sut).DeleteUsageAsync(AppId.Id, CancellationToken);
+
+        A.CallTo(() => usageTracker.DeleteAsync($"{AppId.Id}_Rules", CancellationToken))
             .MustHaveHappened();
     }
 
@@ -72,20 +80,12 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_get_free_plan_for_app_with_team()
     {
-        var team = A.Fake<ITeamEntity>();
-
-        A.CallTo(() => AppProvider.GetTeamAsync(teamId, CancellationToken))
-            .Returns(team);
-
-        A.CallTo(() => team.Id)
-            .Returns(teamId);
-
         A.CallTo(() => App.TeamId)
-            .Returns(teamId);
+            .Returns(TeamId);
 
         var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
 
-        Assert.Equal((planFree, planFree.Id, teamId), plan);
+        Assert.Equal((planFree, planFree.Id, TeamId), plan);
     }
 
     [Fact]
@@ -113,23 +113,15 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_get_paid_plan_for_app_with_team()
     {
-        var team = A.Fake<ITeamEntity>();
-
-        A.CallTo(() => AppProvider.GetTeamAsync(teamId, CancellationToken))
-            .Returns(team);
-
-        A.CallTo(() => team.Id)
-            .Returns(teamId);
-
-        A.CallTo(() => team.Plan)
+        A.CallTo(() => Team.Plan)
             .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
 
         A.CallTo(() => App.TeamId)
-            .Returns(teamId);
+            .Returns(TeamId);
 
         var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
 
-        Assert.Equal((planPaid, planPaid.Id, teamId), plan);
+        Assert.Equal((planPaid, planPaid.Id, TeamId), plan);
     }
 
     [Fact]
@@ -251,7 +243,7 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_not_notify_if_lower_than_10_percent()
     {
-        var now = new DateTime(2020, 10, 2);
+        var now = new DateOnly(2020, 10, 2);
 
         var plan = new Plan { Id = "custom", BlockingApiCalls = 5000, MaxApiCalls = 3000 };
 
@@ -269,29 +261,7 @@ public class UsageGateTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_get_app_asset_total_size_from_summary_date()
-    {
-        A.CallTo(() => usageTracker.GetAsync($"{AppId.Id}_Assets", default, default, null, CancellationToken))
-            .Returns(new Counters { ["TotalSize"] = 2048 });
-
-        var size = await sut.GetTotalSizeByAppAsync(AppId.Id, CancellationToken);
-
-        Assert.Equal(2048, size);
-    }
-
-    [Fact]
-    public async Task Should_get_team_asset_total_size_from_summary_date()
-    {
-        A.CallTo(() => usageTracker.GetAsync($"{AppId.Id}_TeamAssets", default, default, null, CancellationToken))
-            .Returns(new Counters { ["TotalSize"] = 2048 });
-
-        var size = await sut.GetTotalSizeByTeamAsync(AppId.Id, CancellationToken);
-
-        Assert.Equal(2048, size);
-    }
-
-    [Fact]
-    public async Task Should_track_request_async()
+    public async Task Should_track_api_request_without_team()
     {
         await sut.TrackRequestAsync(App, "client", today, 42, 50, 512, CancellationToken);
 
@@ -300,10 +270,10 @@ public class UsageGateTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_track_request_for_team_async()
+    public async Task Should_track_api_request_with_team()
     {
         A.CallTo(() => App.TeamId)
-            .Returns(teamId);
+            .Returns(TeamId);
 
         await sut.TrackRequestAsync(App, "client", today, 42, 50, 512, CancellationToken);
 
@@ -312,63 +282,158 @@ public class UsageGateTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_get_app_asset_counters_from_categories()
+    public async Task Should_track_rules_usage_without_team()
     {
-        SetupAssetQuery($"{AppId.Id}_Assets");
+        Counters? countersSummary = null;
+        Counters? countersDate = null;
 
-        var actual = await sut.QueryByAppAsync(AppId.Id, today, today.AddDays(3), CancellationToken);
+        var ruleId = DomainId.NewGuid();
 
-        actual.Should().BeEquivalentTo(new List<AssetStats>
+        A.CallTo(() => usageTracker.TrackAsync(default, $"{AppId.Id}_Rules", ruleId.ToString(), A<Counters>._, CancellationToken))
+            .Invokes(x => countersSummary = x.GetArgument<Counters>(3));
+
+        A.CallTo(() => usageTracker.TrackAsync(today, $"{AppId.Id}_Rules", ruleId.ToString(), A<Counters>._, CancellationToken))
+            .Invokes(x => countersDate = x.GetArgument<Counters>(3));
+
+        await ((IRuleUsageTracker)sut).TrackAsync(AppId.Id, ruleId, today, 100, 120, 140, CancellationToken);
+
+        var expected = new Counters
         {
-            new AssetStats(today.AddDays(0), 2, 128),
-            new AssetStats(today.AddDays(1), 3, 256),
-            new AssetStats(today.AddDays(2), 4, 512)
+            [UsageGate.RulesKeys.TotalCreated] = 100,
+            [UsageGate.RulesKeys.TotalSucceeded] = 120,
+            [UsageGate.RulesKeys.TotalFailed] = 140
+        };
+
+        countersSummary.Should().BeEquivalentTo(expected);
+        countersDate.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task Should_track_rules_usage_with_team()
+    {
+        Counters? countersSummary = null;
+        Counters? countersDate = null;
+
+        var ruleId = DomainId.NewGuid();
+
+        A.CallTo(() => App.TeamId)
+            .Returns(TeamId);
+
+        A.CallTo(() => usageTracker.TrackAsync(default, $"{TeamId}_TeamRules", AppId.Id.ToString(), A<Counters>._, CancellationToken))
+            .Invokes(x => countersSummary = x.GetArgument<Counters>(3));
+
+        A.CallTo(() => usageTracker.TrackAsync(today, $"{TeamId}_TeamRules", AppId.Id.ToString(), A<Counters>._, CancellationToken))
+            .Invokes(x => countersDate = x.GetArgument<Counters>(3));
+
+        await ((IRuleUsageTracker)sut).TrackAsync(AppId.Id, ruleId, today, 100, 120, 140, CancellationToken);
+
+        var expected = new Counters
+        {
+            [UsageGate.RulesKeys.TotalCreated] = 100,
+            [UsageGate.RulesKeys.TotalSucceeded] = 120,
+            [UsageGate.RulesKeys.TotalFailed] = 140
+        };
+
+        countersSummary.Should().BeEquivalentTo(expected);
+        countersDate.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task Should_get_rules_total_from_summary_date_by_app()
+    {
+        A.CallTo(() => usageTracker.QueryAsync($"{AppId.Id}_Rules", default, default, CancellationToken))
+            .Returns(
+                new Dictionary<string, List<(DateOnly, Counters)>>
+                {
+                    [AppId.Id.ToString()] = new List<(DateOnly, Counters)>
+                    {
+                        (default, new Counters
+                        {
+                            [UsageGate.RulesKeys.TotalCreated] = 100,
+                            [UsageGate.RulesKeys.TotalSucceeded] = 120,
+                            [UsageGate.RulesKeys.TotalFailed] = 140
+                        })
+                    }
+                });
+
+        var total = await ((IRuleUsageTracker)sut).GetTotalByAppAsync(AppId.Id, CancellationToken);
+
+        total.Should().BeEquivalentTo(new Dictionary<DomainId, RuleCounters>
+        {
+            [AppId.Id] = new RuleCounters(100, 120, 140)
         });
     }
 
     [Fact]
-    public async Task Should_get_team_asset_counters_from_categories()
+    public async Task Should_query_rules_counters_by_app()
     {
-        SetupAssetQuery($"{AppId.Id}_TeamAssets");
+        SetupRulesQuery($"{AppId.Id}_Rules");
 
-        var actual = await sut.QueryByTeamAsync(AppId.Id, today, today.AddDays(3), CancellationToken);
+        var actual = await ((IRuleUsageTracker)sut).QueryByAppAsync(AppId.Id, today, today.AddDays(2), CancellationToken);
 
-        actual.Should().BeEquivalentTo(new List<AssetStats>
+        actual.Should().BeEquivalentTo(new List<RuleStats>
         {
-            new AssetStats(today.AddDays(0), 2, 128),
-            new AssetStats(today.AddDays(1), 3, 256),
-            new AssetStats(today.AddDays(2), 4, 512)
+            new RuleStats(today.AddDays(0), new RuleCounters(100, 120, 140)),
+            new RuleStats(today.AddDays(1), new RuleCounters(200, 220, 240)),
+            new RuleStats(today.AddDays(2), new RuleCounters(300, 320, 340))
         });
     }
 
-    private void SetupAssetQuery(string key)
+    [Fact]
+    public async Task Should_query_rules_countery_by_team()
     {
-        A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(3), CancellationToken))
-            .Returns(new Dictionary<string, List<(DateTime, Counters)>>
+        SetupRulesQuery($"{TeamId}_TeamRules");
+
+        var actual = await ((IRuleUsageTracker)sut).QueryByTeamAsync(TeamId, today, today.AddDays(2), CancellationToken);
+
+        actual.Should().BeEquivalentTo(new List<RuleStats>
+        {
+            new RuleStats(today.AddDays(0), new RuleCounters(100, 120, 140)),
+            new RuleStats(today.AddDays(1), new RuleCounters(200, 220, 240)),
+            new RuleStats(today.AddDays(2), new RuleCounters(300, 320, 340))
+        });
+    }
+
+    private void SetupRulesQuery(string key)
+    {
+        A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(2), CancellationToken))
+            .Returns(new Dictionary<string, List<(DateOnly, Counters)>>
             {
-                [usageTracker.FallbackCategory] = new List<(DateTime, Counters)>
+                [usageTracker.FallbackCategory] = new List<(DateOnly, Counters)>
                 {
                     (today.AddDays(0), new Counters
                     {
-                        ["TotalSize"] = 128,
-                        ["TotalAssets"] = 2
+                        [UsageGate.RulesKeys.TotalCreated] = 50,
+                        [UsageGate.RulesKeys.TotalSucceeded] = 60,
+                        [UsageGate.RulesKeys.TotalFailed] = 70
                     }),
                     (today.AddDays(1), new Counters
                     {
-                        ["TotalSize"] = 256,
-                        ["TotalAssets"] = 3
+                        [UsageGate.RulesKeys.TotalCreated] = 200,
+                        [UsageGate.RulesKeys.TotalSucceeded] = 220,
+                        [UsageGate.RulesKeys.TotalFailed] = 240
                     }),
                     (today.AddDays(2), new Counters
                     {
-                        ["TotalSize"] = 512,
-                        ["TotalAssets"] = 4
+                        [UsageGate.RulesKeys.TotalCreated] = 300,
+                        [UsageGate.RulesKeys.TotalSucceeded] = 320,
+                        [UsageGate.RulesKeys.TotalFailed] = 340
+                    })
+                },
+                ["Custom"] = new List<(DateOnly, Counters)>
+                {
+                    (today.AddDays(0), new Counters
+                    {
+                        [UsageGate.RulesKeys.TotalCreated] = 50,
+                        [UsageGate.RulesKeys.TotalSucceeded] = 60,
+                        [UsageGate.RulesKeys.TotalFailed] = 70
                     })
                 }
             });
     }
 
     [Fact]
-    public async Task Should_increase_usage_for_asset_event()
+    public async Task Should_track_assets_usage_without_team()
     {
         Counters? countersSummary = null;
         Counters? countersDate = null;
@@ -379,12 +444,12 @@ public class UsageGateTests : GivenContext
         A.CallTo(() => usageTracker.TrackAsync(today, $"{AppId.Id}_Assets", null, A<Counters>._, CancellationToken))
             .Invokes(x => countersDate = x.GetArgument<Counters>(3));
 
-        await sut.TrackAssetAsync(AppId.Id, today, 512, 3, CancellationToken);
+        await ((IAssetUsageTracker)sut).TrackAsync(AppId.Id, today, 512, 3, CancellationToken);
 
         var expected = new Counters
         {
-            ["TotalSize"] = 512,
-            ["TotalAssets"] = 3
+            [UsageGate.AssetsKeys.TotalSize] = 512,
+            [UsageGate.AssetsKeys.TotalAssets] = 3
         };
 
         countersSummary.Should().BeEquivalentTo(expected);
@@ -392,37 +457,123 @@ public class UsageGateTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_increase_team_usage_for_asset_event_and_team_app()
+    public async Task Should_track_assets_usage_with_team()
     {
         Counters? countersSummary = null;
         Counters? countersDate = null;
 
-        var team = A.Fake<ITeamEntity>();
-
-        A.CallTo(() => team.Id)
-            .Returns(teamId);
-
         A.CallTo(() => App.TeamId)
-            .Returns(teamId);
+            .Returns(TeamId);
 
-        A.CallTo(() => AppProvider.GetTeamAsync(teamId, CancellationToken))
-            .Returns(team);
-
-        A.CallTo(() => usageTracker.TrackAsync(default, $"{teamId}_TeamAssets", null, A<Counters>._, CancellationToken))
+        A.CallTo(() => usageTracker.TrackAsync(default, $"{TeamId}_TeamAssets", AppId.Id.ToString(), A<Counters>._, CancellationToken))
             .Invokes(x => countersSummary = x.GetArgument<Counters>(3));
 
-        A.CallTo(() => usageTracker.TrackAsync(today, $"{teamId}_TeamAssets", null, A<Counters>._, CancellationToken))
+        A.CallTo(() => usageTracker.TrackAsync(today, $"{TeamId}_TeamAssets", AppId.Id.ToString(), A<Counters>._, CancellationToken))
             .Invokes(x => countersDate = x.GetArgument<Counters>(3));
 
-        await sut.TrackAssetAsync(AppId.Id, today, 512, 3, CancellationToken);
+        await ((IAssetUsageTracker)sut).TrackAsync(AppId.Id, today, 512, 3, CancellationToken);
 
         var expected = new Counters
         {
-            ["TotalSize"] = 512,
-            ["TotalAssets"] = 3
+            [UsageGate.AssetsKeys.TotalSize] = 512,
+            [UsageGate.AssetsKeys.TotalAssets] = 3
         };
 
         countersSummary.Should().BeEquivalentTo(expected);
         countersDate.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task Should_get_assets_total_from_summary_date_by_app()
+    {
+        A.CallTo(() => usageTracker.GetAsync($"{AppId.Id}_Assets", default, default, null, CancellationToken))
+            .Returns(new Counters
+            {
+                [UsageGate.AssetsKeys.TotalSize] = 2048,
+                [UsageGate.AssetsKeys.TotalAssets] = 124
+            });
+
+        var total = await ((IAssetUsageTracker)sut).GetTotalByAppAsync(AppId.Id, CancellationToken);
+
+        Assert.Equal(new AssetCounters(2048, 124), total);
+    }
+
+    [Fact]
+    public async Task Should_get_assets_total_from_summary_date_by_team()
+    {
+        A.CallTo(() => usageTracker.GetAsync($"{AppId.Id}_TeamAssets", default, default, null, CancellationToken))
+            .Returns(new Counters
+            {
+                [UsageGate.AssetsKeys.TotalSize] = 2048,
+                [UsageGate.AssetsKeys.TotalAssets] = 124
+            });
+
+        var total = await ((IAssetUsageTracker)sut).GetTotalByTeamAsync(AppId.Id, CancellationToken);
+
+        Assert.Equal(new AssetCounters(2048, 124), total);
+    }
+
+    [Fact]
+    public async Task Should_query_assets_counters_by_app()
+    {
+        SetupAssetQuery($"{AppId.Id}_Assets");
+
+        var actual = await ((IAssetUsageTracker)sut).QueryByAppAsync(AppId.Id, today, today.AddDays(2), CancellationToken);
+
+        actual.Should().BeEquivalentTo(new List<AssetStats>
+        {
+            new AssetStats(today.AddDays(0), new AssetCounters(128, 2)),
+            new AssetStats(today.AddDays(1), new AssetCounters(256, 3)),
+            new AssetStats(today.AddDays(2), new AssetCounters(512, 4))
+        });
+    }
+
+    [Fact]
+    public async Task Should_query_assets_countery_by_team()
+    {
+        SetupAssetQuery($"{TeamId}_TeamAssets");
+
+        var actual = await ((IAssetUsageTracker)sut).QueryByTeamAsync(TeamId, today, today.AddDays(2), CancellationToken);
+
+        actual.Should().BeEquivalentTo(new List<AssetStats>
+        {
+            new AssetStats(today.AddDays(0), new AssetCounters(128, 2)),
+            new AssetStats(today.AddDays(1), new AssetCounters(256, 3)),
+            new AssetStats(today.AddDays(2), new AssetCounters(512, 4))
+        });
+    }
+
+    private void SetupAssetQuery(string key)
+    {
+        A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(2), CancellationToken))
+            .Returns(new Dictionary<string, List<(DateOnly, Counters)>>
+            {
+                [usageTracker.FallbackCategory] = new List<(DateOnly, Counters)>
+                {
+                    (today.AddDays(0), new Counters
+                    {
+                        [UsageGate.AssetsKeys.TotalSize] = 64,
+                        [UsageGate.AssetsKeys.TotalAssets] = 1
+                    }),
+                    (today.AddDays(1), new Counters
+                    {
+                        [UsageGate.AssetsKeys.TotalSize] = 256,
+                        [UsageGate.AssetsKeys.TotalAssets] = 3
+                    }),
+                    (today.AddDays(2), new Counters
+                    {
+                        [UsageGate.AssetsKeys.TotalSize] = 512,
+                        [UsageGate.AssetsKeys.TotalAssets] = 4
+                    })
+                },
+                ["Custom"] = new List<(DateOnly, Counters)>
+                {
+                    (today.AddDays(0), new Counters
+                    {
+                        [UsageGate.AssetsKeys.TotalSize] = 64,
+                        [UsageGate.AssetsKeys.TotalAssets] = 1
+                    })
+                }
+            });
     }
 }

@@ -29,7 +29,7 @@ public sealed class ContentChangedTriggerSchema
 
     public bool SendRestore { get; set; }
 
-    public ContentChangedTriggerSchemaV2 Migrate()
+    public SchemaCondition Migrate()
     {
         var conditions = new List<string>();
 
@@ -71,6 +71,6 @@ public sealed class ContentChangedTriggerSchema
 
         var schemaId = DomainId.Create(SchemaId);
 
-        return new ContentChangedTriggerSchemaV2 { SchemaId = schemaId, Condition = condition };
+        return new SchemaCondition { SchemaId = schemaId, Condition = condition };
     }
 }

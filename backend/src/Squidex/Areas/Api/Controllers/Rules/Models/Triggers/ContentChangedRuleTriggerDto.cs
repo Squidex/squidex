@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers;
 
@@ -16,17 +17,25 @@ public sealed class ContentChangedRuleTriggerDto : RuleTriggerDto
     /// <summary>
     /// The schema settings.
     /// </summary>
-    public ContentChangedRuleTriggerSchemaDto[]? Schemas { get; set; }
+    public ReadonlyList<SchemaCondition>? Schemas { get; set; }
+
+    /// <summary>
+    /// The schema references.
+    /// </summary>
+    public ReadonlyList<SchemaCondition>? ReferencedSchemas { get; set; }
 
     /// <summary>
     /// Determines whether the trigger should handle all content changes events.
     /// </summary>
     public bool HandleAll { get; set; }
 
+    public static ContentChangedRuleTriggerDto FromDomain(ContentChangedTriggerV2 trigger)
+    {
+        return SimpleMapper.Map(trigger, new ContentChangedRuleTriggerDto());
+    }
+
     public override RuleTrigger ToTrigger()
     {
-        var schemas = Schemas?.Select(x => x.ToTrigger()).ToReadonlyList();
-
-        return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
+        return SimpleMapper.Map(this, new ContentChangedTriggerV2());
     }
 }

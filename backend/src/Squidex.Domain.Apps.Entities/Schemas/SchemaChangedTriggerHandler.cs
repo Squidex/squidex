@@ -7,6 +7,7 @@
 
 using System.Runtime.CompilerServices;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -33,7 +34,7 @@ public sealed class SchemaChangedTriggerHandler : IRuleTriggerHandler
         return appEvent is SchemaEvent;
     }
 
-    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RulesContext context,
         [EnumeratorCancellation] CancellationToken ct)
     {
         var result = new EnrichedSchemaEvent();
@@ -71,11 +72,11 @@ public sealed class SchemaChangedTriggerHandler : IRuleTriggerHandler
         yield return result;
     }
 
-    public bool Trigger(EnrichedEvent @event, RuleContext context)
+    public bool Trigger(EnrichedEvent @event, RuleTrigger trigger)
     {
-        var trigger = (SchemaChangedTrigger)context.Rule.Trigger;
+        var schemaTrigger = (SchemaChangedTrigger)trigger;
 
-        if (string.IsNullOrWhiteSpace(trigger.Condition))
+        if (string.IsNullOrWhiteSpace(schemaTrigger.Condition))
         {
             return true;
         }
@@ -86,6 +87,6 @@ public sealed class SchemaChangedTriggerHandler : IRuleTriggerHandler
             ["event"] = @event
         };
 
-        return scriptEngine.Evaluate(vars, trigger.Condition);
+        return scriptEngine.Evaluate(vars, schemaTrigger.Condition);
     }
 }

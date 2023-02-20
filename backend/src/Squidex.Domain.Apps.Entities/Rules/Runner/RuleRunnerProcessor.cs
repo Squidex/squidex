@@ -27,6 +27,7 @@ public sealed class RuleRunnerProcessor
     private readonly ILocalCache localCache;
     private readonly IRuleEventRepository ruleEventRepository;
     private readonly IRuleService ruleService;
+    private readonly IRuleUsageTracker ruleUsageTracker;
     private readonly ILogger<RuleRunnerProcessor> log;
     private readonly SimpleState<RuleRunnerState> state;
     private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
@@ -78,6 +79,7 @@ public sealed class RuleRunnerProcessor
         IPersistenceFactory<RuleRunnerState> persistenceFactory,
         IRuleEventRepository ruleEventRepository,
         IRuleService ruleService,
+        IRuleUsageTracker ruleUsageTracker,
         ILogger<RuleRunnerProcessor> log)
     {
         this.appId = appId;
@@ -87,6 +89,7 @@ public sealed class RuleRunnerProcessor
         this.eventFormatter = eventFormatter;
         this.ruleEventRepository = ruleEventRepository;
         this.ruleService = ruleService;
+        this.ruleUsageTracker = ruleUsageTracker;
         this.log = log;
 
         state = new SimpleState<RuleRunnerState>(persistenceFactory, GetType(), appId);
@@ -188,7 +191,7 @@ public sealed class RuleRunnerProcessor
                     IncludeSkipped = true
                 };
 
-                if (run.Job.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(run.Context))
+                if (run.Job.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(rule.RuleDef))
                 {
                     await EnqueueFromSnapshotsAsync(run, ct);
                 }
@@ -219,22 +222,24 @@ public sealed class RuleRunnerProcessor
         // We collect errors and allow a few erors before we throw an exception.
         var errors = 0;
 
-        await foreach (var job in ruleService.CreateSnapshotJobsAsync(run.Context, ct))
+        // Write in batches of 100 items for better performance. Using completes the last write.
+        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
+
+        await foreach (var result in ruleService.CreateSnapshotJobsAsync(run.Context, ct))
         {
-            if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Disabled)
-            {
-                await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
-            }
-            else if (job.EnrichmentError != null)
+            await batch.WriteAsync(result);
+
+            if (result.EnrichmentError != null)
             {
                 errors++;
 
+                // We accept a few errors and stop the process if there are too many errors.
                 if (errors >= MaxErrors)
                 {
-                    throw job.EnrichmentError;
+                    throw result.EnrichmentError;
                 }
 
-                log.LogWarning(job.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", run.Context.RuleId);
+                log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.RuleId);
             }
         }
     }
@@ -245,44 +250,49 @@ public sealed class RuleRunnerProcessor
         // We collect errors and allow a few erors before we throw an exception.
         var errors = 0;
 
+        // Write in batches of 100 items for better performance. Using completes the last write.
+        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
+
         // Use a prefix query so that the storage can use an index for the query.
         var filter = $"^([a-z]+)\\-{appId}";
 
         await foreach (var storedEvent in eventStore.QueryAllAsync(filter, run.Job.Position, ct: ct))
         {
-            try
+            var @event = eventFormatter.ParseIfKnown(storedEvent);
+
+            if (@event == null)
             {
-                var @event = eventFormatter.ParseIfKnown(storedEvent);
+                continue;
+            }
 
-                if (@event != null)
+            run.Job.Position = storedEvent.EventPosition;
+
+            await foreach (var result in ruleService.CreateJobsAsync(@event, run.Context.ToRulesContext(), ct))
+            {
+                if (await batch.WriteAsync(result))
                 {
-                    var jobs = ruleService.CreateJobsAsync(@event, run.Context, ct);
+                    // Update the process when something has been written.
+                    await state.WriteAsync(ct);
+                }
 
-                    await foreach (var job in jobs.WithCancellation(ct))
+                if (result.EnrichmentError != null)
+                {
+                    errors++;
+
+                    // We accept a few errors and stop the process if there are too many errors.
+                    if (errors >= MaxErrors)
                     {
-                        if (job.Job != null && job.SkipReason is SkipReason.None or SkipReason.Disabled)
-                        {
-                            await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
-                        }
+                        throw result.EnrichmentError;
                     }
+
+                    log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.RuleId);
                 }
             }
-            catch (Exception ex)
-            {
-                errors++;
+        }
 
-                if (errors >= MaxErrors)
-                {
-                    throw;
-                }
-
-                log.LogWarning(ex, "Failed to run rule with ID {ruleId}, continue with next job.", run.Context.RuleId);
-            }
-            finally
-            {
-                run.Job.Position = storedEvent.EventPosition;
-            }
-
+        if (await batch.FlushAsync())
+        {
+            // Update the process when something has been written.
             await state.WriteAsync(ct);
         }
     }

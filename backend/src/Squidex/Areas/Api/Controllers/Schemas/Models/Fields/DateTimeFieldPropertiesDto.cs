@@ -48,10 +48,13 @@ public sealed class DateTimeFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; set; }
 
+    public static DateTimeFieldPropertiesDto FromDomain(DateTimeFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new DateTimeFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new DateTimeFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new DateTimeFieldProperties());
     }
 }

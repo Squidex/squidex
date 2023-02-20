@@ -7,7 +7,6 @@
 
 using MongoDB.Driver;
 using NodaTime;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
@@ -19,12 +18,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules;
 
 public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEventEntity>, IRuleEventRepository, IDeleter
 {
-    private readonly MongoRuleStatisticsCollection statisticsCollection;
-
     public MongoRuleEventRepository(IMongoDatabase database)
         : base(database)
     {
-        statisticsCollection = new MongoRuleStatisticsCollection(database);
     }
 
     protected override string CollectionName()
@@ -35,8 +31,6 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
     protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection,
         CancellationToken ct)
     {
-        await statisticsCollection.InitializeAsync(ct);
-
         await collection.Indexes.CreateManyAsync(new[]
         {
             new CreateIndexModel<MongoRuleEventEntity>(
@@ -58,8 +52,6 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
     async Task IDeleter.DeleteAppAsync(IAppEntity app,
         CancellationToken ct)
     {
-        await statisticsCollection.DeleteAppAsync(app.Id, ct);
-
         await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
     }
 
@@ -106,14 +98,6 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
         return Collection.UpdateOneAsync(x => x.JobId == id, Update.Set(x => x.NextAttempt, nextAttempt), cancellationToken: ct);
     }
 
-    public async Task EnqueueAsync(RuleJob job, Instant? nextAttempt,
-        CancellationToken ct = default)
-    {
-        var entity = MongoRuleEventEntity.FromJob(job, nextAttempt);
-
-        await Collection.InsertOneIfNotExistsAsync(entity, ct);
-    }
-
     public Task CancelByEventAsync(DomainId id,
         CancellationToken ct = default)
     {
@@ -150,14 +134,6 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
         Guard.NotNull(job);
         Guard.NotNull(update);
 
-        return Task.WhenAll(
-            UpdateStatisticsAsync(job, update, ct),
-            UpdateEventAsync(job, update, ct));
-    }
-
-    private Task UpdateEventAsync(RuleJob job, RuleJobUpdate update,
-        CancellationToken ct = default)
-    {
         return Collection.UpdateOneAsync(x => x.JobId == job.Id,
             Update
                 .Set(x => x.Result, update.ExecutionResult)
@@ -168,22 +144,14 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
             cancellationToken: ct);
     }
 
-    private async Task UpdateStatisticsAsync(RuleJob job, RuleJobUpdate update,
+    public async Task EnqueueAsync(List<RuleEventWrite> jobs,
         CancellationToken ct = default)
     {
-        if (update.ExecutionResult == RuleResult.Success)
-        {
-            await statisticsCollection.IncrementSuccessAsync(job.AppId, job.RuleId, update.Finished, ct);
-        }
-        else
-        {
-            await statisticsCollection.IncrementFailedAsync(job.AppId, job.RuleId, update.Finished, ct);
-        }
-    }
+        var entities = jobs.Select(MongoRuleEventEntity.FromJob).ToList();
 
-    public Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(DomainId appId,
-        CancellationToken ct = default)
-    {
-        return statisticsCollection.QueryByAppAsync(appId, ct);
+        if (entities.Count > 0)
+        {
+            await Collection.InsertManyAsync(entities, InsertUnordered, ct);
+        }
     }
 }

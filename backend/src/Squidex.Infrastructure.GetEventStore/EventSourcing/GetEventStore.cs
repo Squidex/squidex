@@ -170,25 +170,12 @@ public sealed class GetEventStore : IEventStore, IInitializable
         await client.DeleteAsync(GetStreamName(streamName), StreamState.Any, cancellationToken: ct);
     }
 
-    public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events,
+    public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
         CancellationToken ct = default)
-    {
-        return AppendEventsInternalAsync(streamName, EtagVersion.Any, events, ct);
-    }
-
-    public Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
-        CancellationToken ct = default)
-    {
-        Guard.GreaterEquals(expectedVersion, -1);
-
-        return AppendEventsInternalAsync(streamName, expectedVersion, events, ct);
-    }
-
-    private async Task AppendEventsInternalAsync(string streamName, long expectedVersion, ICollection<EventData> events,
-        CancellationToken ct)
     {
         Guard.NotNullOrEmpty(streamName);
         Guard.NotNull(events);
+        Guard.GreaterEquals(expectedVersion, EtagVersion.Any);
 
         using (Telemetry.Activities.StartActivity("GetEventStore/AppendEventsInternalAsync"))
         {

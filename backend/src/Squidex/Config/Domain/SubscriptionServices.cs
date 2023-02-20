@@ -8,6 +8,7 @@
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Web;
 
@@ -26,6 +27,6 @@ public static class SubscriptionServices
             .AsOptional<IBillingManager>();
 
         services.AddSingletonAs<UsageGate>()
-            .AsOptional<IUsageGate>().As<IAssetUsageTracker>();
+            .AsOptional<IUsageGate>().As<IAssetUsageTracker>().As<IRuleUsageTracker>();
     }
 }

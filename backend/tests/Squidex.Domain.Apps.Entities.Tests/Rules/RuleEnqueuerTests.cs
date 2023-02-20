@@ -24,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 public class RuleEnqueuerTests : GivenContext
 {
     private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-    private readonly ILocalCache localCache = A.Fake<ILocalCache>();
     private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
     private readonly IRuleService ruleService = A.Fake<IRuleService>();
+    private readonly IRuleUsageTracker ruleUsageTracker = A.Fake<IRuleUsageTracker>();
     private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
     private readonly RuleEnqueuer sut;
 
@@ -40,10 +40,11 @@ public class RuleEnqueuerTests : GivenContext
     {
         var options = Options.Create(new RuleOptions());
 
-        sut = new RuleEnqueuer(cache, localCache,
+        sut = new RuleEnqueuer(cache, A.Fake<ILocalCache>(),
             AppProvider,
             ruleEventRepository,
             ruleService,
+            ruleUsageTracker,
             options,
             A.Fake<ILogger<RuleEnqueuer>>());
     }
@@ -51,71 +52,66 @@ public class RuleEnqueuerTests : GivenContext
     [Fact]
     public void Should_return_wildcard_filter_for_events_filter()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal(".*", consumer.EventsFilter);
+        Assert.Equal(".*", ((IEventConsumer)sut).EventsFilter);
     }
 
     [Fact]
     public async Task Should_do_nothing_on_clear()
     {
-        IEventConsumer consumer = sut;
-
-        await consumer.ClearAsync();
+        await ((IEventConsumer)sut).ClearAsync();
     }
 
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal(nameof(RuleEnqueuer), consumer.Name);
+        Assert.Equal(nameof(RuleEnqueuer), ((IEventConsumer)sut).Name);
     }
 
     [Fact]
-    public async Task Should_not_insert_job_if_null()
+    public void Should_process_in_batches()
+    {
+        Assert.True(sut.BatchSize > 1);
+    }
+
+    [Fact]
+    public async Task Should_not_enqueue_event_if_job_is_null()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var rule = CreateRule();
 
-        var job = new RuleJob
-        {
-            Created = now
-        };
-
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(new List<JobResult> { new JobResult() }.ToAsyncEnumerable());
+            .Returns(Enumerable.Repeat(new JobResult(), 1).ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null, default))
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .MustNotHaveHappened();
     }
 
     [Fact]
-    public async Task Should_not_insert_job_if_job_has_a_skip_reason()
+    public async Task Should_not_enqueue_event_if_it_has_no_job()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
         var rule = CreateRule();
 
-        var job = new RuleJob
-        {
-            Created = now
-        };
-
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(new List<JobResult> { new JobResult { Job = job, SkipReason = SkipReason.TooOld } }.ToAsyncEnumerable());
+            .Returns(Enumerable.Repeat(new JobResult
+            {
+                Rule = rule.RuleDef,
+                RuleId = rule.Id,
+                SkipReason = SkipReason.WrongEvent
+            }, 1).ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null, default))
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .MustNotHaveHappened();
     }
 
     [Fact]
-    public async Task Should_update_repository_if_enqueing()
+    public async Task Should_enqueue_event_with_successful_job()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
@@ -123,20 +119,35 @@ public class RuleEnqueuerTests : GivenContext
 
         var job = new RuleJob
         {
+            AppId = AppId.Id,
+            ActionData = string.Empty,
+            ActionName = string.Empty,
             Created = now
         };
 
+        RuleEventWrite[]? writes = null;
+
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
+            .Invokes(x => writes = x.GetArgument<List<RuleEventWrite>>(0)?.ToArray());
+
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(new List<JobResult> { new JobResult { Job = job } }.ToAsyncEnumerable());
+            .Returns(Enumerable.Repeat(new JobResult
+            {
+                Job = job,
+                Rule = rule.RuleDef,
+                RuleId = rule.Id
+            }, 1).ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(job, (Exception?)null, default))
+        Assert.Equal(new[] { new RuleEventWrite(job, job.Created) }, writes);
+
+        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, rule.Id, now.ToDateOnly(), 1, 0, 0, default))
             .MustHaveHappened();
     }
 
     [Fact]
-    public async Task Should_update_repository_if_enqueing_broken_job()
+    public async Task Should_enqueue_event_with_failed_job()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
@@ -144,64 +155,150 @@ public class RuleEnqueuerTests : GivenContext
 
         var job = new RuleJob
         {
+            AppId = AppId.Id,
+            ActionData = string.Empty,
+            ActionName = string.Empty,
             Created = now
         };
+
+        RuleEventWrite[]? writes = null;
+
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
+            .Invokes(x => writes = x.GetArgument<List<RuleEventWrite>>(0)?.ToArray());
 
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(new List<JobResult> { new JobResult { Job = job, SkipReason = SkipReason.Failed } }.ToAsyncEnumerable());
+            .Returns(Enumerable.Repeat(new JobResult
+            {
+                Job = job,
+                Rule = rule.RuleDef,
+                RuleId = rule.Id,
+                SkipReason = SkipReason.Failed
+            }, 1).ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(job, (Exception?)null, default))
+        Assert.Equal(new[] { new RuleEventWrite(job) }, writes);
+
+        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, rule.Id, now.ToDateOnly(), 1, 0, 1, default))
             .MustHaveHappened();
     }
 
     [Fact]
-    public async Task Should_update_repository_with_jobs_from_service()
+    public async Task Should_handle_event_with_successful_job()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
-        var job1 = new RuleJob
+        var job = new RuleJob
         {
+            AppId = AppId.Id,
+            ActionData = string.Empty,
+            ActionName = string.Empty,
             Created = now
         };
 
-        SetupRules(@event, job1);
+        SetupRules(@event, job, default);
 
-        await sut.On(@event);
+        RuleEventWrite[]? writes = null;
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, (Exception?)null, default))
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
+            .Invokes(x => writes = x.GetArgument<List<RuleEventWrite>>(0)?.ToArray());
+
+        await sut.On(new[] { @event });
+
+        Assert.Equal(new[] { new RuleEventWrite(job, job.Created) }, writes);
+
+        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, A<DomainId>._, now.ToDateOnly(), 1, 0, 0, default))
             .MustHaveHappened();
     }
 
     [Fact]
-    public async Task Should_not_eqneue_if_event_restored()
+    public async Task Should_handle_event_with_failed_job()
     {
         var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
 
-        var job1 = new RuleJob { Created = now };
+        var job = new RuleJob
+        {
+            AppId = AppId.Id,
+            ActionData = string.Empty,
+            ActionName = string.Empty,
+            Created = now
+        };
 
-        SetupRules(@event, job1);
+        SetupRules(@event, job, SkipReason.Failed);
 
-        await sut.On(@event.SetRestored(true));
+        RuleEventWrite[]? writes = null;
 
-        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, A<Exception?>._, default))
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
+            .Invokes(x => writes = x.GetArgument<List<RuleEventWrite>>(0)?.ToArray());
+
+        await sut.On(new[] { @event });
+
+        Assert.Equal(new[] { new RuleEventWrite(job) }, writes);
+
+        A.CallTo(() => ruleUsageTracker.TrackAsync(AppId.Id, A<DomainId>._, now.ToDateOnly(), 1, 0, 1, default))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_handle_restored_event()
+    {
+        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
+
+        var job = new RuleJob
+        {
+            AppId = AppId.Id,
+            ActionData = string.Empty,
+            ActionName = string.Empty,
+            Created = now
+        };
+
+        SetupRules(@event, job, default);
+
+        await sut.On(new[] { @event.SetRestored(true) });
+
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .MustNotHaveHappened();
     }
 
-    private void SetupRules(Envelope<IEvent> @event, RuleJob job1)
+    [Fact]
+    public async Task Should_handle_events_in_batches()
     {
-        var rule1 = CreateRule();
-        var rule2 = CreateRule();
+        var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
+
+        var job = new RuleJob
+        {
+            AppId = AppId.Id,
+            ActionData = string.Empty,
+            ActionName = string.Empty,
+            Created = now
+        };
+
+        SetupRules(@event, job, default);
+
+        await sut.On(Enumerable.Repeat(@event, 10));
+
+        A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
+            .MustHaveHappenedOnceExactly();
+
+        A.CallTo(ruleUsageTracker)
+            .MustHaveHappenedANumberOfTimesMatching(x => x == 10);
+    }
+
+    private void SetupRules(Envelope<IEvent> @event, RuleJob job, SkipReason skipReason)
+    {
+        var rule = CreateRule();
 
         A.CallTo(() => AppProvider.GetRulesAsync(AppId.Id, A<CancellationToken>._))
-            .Returns(new List<IRuleEntity> { rule1, rule2 });
+            .Returns(new List<IRuleEntity> { rule });
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule1), default))
-            .Returns(new List<JobResult> { new JobResult { Job = job1 } }.ToAsyncEnumerable());
-
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule2), default))
-            .Returns(new List<JobResult>().ToAsyncEnumerable());
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+            .Returns(Enumerable.Repeat(new JobResult
+            {
+                Job = job,
+                Rule = rule.RuleDef,
+                RuleId = rule.Id,
+                SkipReason = skipReason
+            }, 1).ToAsyncEnumerable());
     }
 
     private static RuleEntity CreateRule()
@@ -211,11 +308,11 @@ public class RuleEnqueuerTests : GivenContext
         return new RuleEntity { RuleDef = rule, Id = DomainId.NewGuid() };
     }
 
-    private static RuleContext MatchingContext(RuleEntity rule)
+    private static RulesContext MatchingContext(RuleEntity rule)
     {
         // These two properties must not be set to true for performance reasons.
-        return A<RuleContext>.That.Matches(x =>
-            x.Rule == rule.RuleDef &&
+        return A<RulesContext>.That.Matches(x =>
+            x.Rules.Values.Contains(rule.RuleDef) &&
            !x.IncludeSkipped &&
            !x.IncludeStale);
     }

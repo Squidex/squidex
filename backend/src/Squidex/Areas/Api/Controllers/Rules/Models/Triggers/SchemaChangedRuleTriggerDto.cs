@@ -18,6 +18,11 @@ public sealed class SchemaChangedRuleTriggerDto : RuleTriggerDto
     /// </summary>
     public string? Condition { get; set; }
 
+    public static SchemaChangedRuleTriggerDto FromDomain(SchemaChangedTrigger trigger)
+    {
+        return SimpleMapper.Map(trigger, new SchemaChangedRuleTriggerDto());
+    }
+
     public override RuleTrigger ToTrigger()
     {
         return SimpleMapper.Map(this, new SchemaChangedTrigger());

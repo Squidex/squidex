@@ -25,7 +25,7 @@ public sealed class ManualTriggerHandler : IRuleTriggerHandler
         return appEvent is RuleManuallyTriggered;
     }
 
-    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RulesContext context,
         [EnumeratorCancellation] CancellationToken ct)
     {
         var result = new EnrichedManualEvent();

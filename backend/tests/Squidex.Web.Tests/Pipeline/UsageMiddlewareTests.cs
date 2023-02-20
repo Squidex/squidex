@@ -11,6 +11,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline;
 
@@ -50,9 +51,9 @@ public class UsageMiddlewareTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        var date = instant.ToDateTimeUtc().Date;
+        var date = instant.ToDateOnly();
 
-        A.CallTo(() => usageGate.TrackRequestAsync(A<IAppEntity>._, A<string>._, A<DateTime>._, A<double>._, A<long>._, A<long>._, default))
+        A.CallTo(() => usageGate.TrackRequestAsync(A<IAppEntity>._, A<string>._, A<DateOnly>._, A<double>._, A<long>._, A<long>._, default))
             .MustNotHaveHappened();
     }
 
@@ -68,7 +69,7 @@ public class UsageMiddlewareTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        var date = instant.ToDateTimeUtc().Date;
+        var date = instant.ToDateOnly();
 
         A.CallTo(() => usageGate.TrackRequestAsync(App, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
             .MustNotHaveHappened();
@@ -84,7 +85,7 @@ public class UsageMiddlewareTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        var date = instant.ToDateTimeUtc().Date;
+        var date = instant.ToDateOnly();
 
         A.CallTo(() => usageGate.TrackRequestAsync(App, A<string>._, date, 13, A<long>._, A<long>._, default))
             .MustHaveHappened();
@@ -101,7 +102,7 @@ public class UsageMiddlewareTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        var date = instant.ToDateTimeUtc().Date;
+        var date = instant.ToDateOnly();
 
         A.CallTo(() => usageGate.TrackRequestAsync(App, A<string>._, date, 13, A<long>._, 1024, default))
             .MustHaveHappened();
@@ -122,7 +123,7 @@ public class UsageMiddlewareTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        var date = instant.ToDateTimeUtc().Date;
+        var date = instant.ToDateOnly();
 
         A.CallTo(() => usageGate.TrackRequestAsync(App, A<string>._, date, 13, A<long>._, 11, default))
             .MustHaveHappened();
@@ -143,7 +144,7 @@ public class UsageMiddlewareTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        var date = instant.ToDateTimeUtc().Date;
+        var date = instant.ToDateOnly();
 
         A.CallTo(() => usageGate.TrackRequestAsync(App, A<string>._, date, 13, A<long>._, 11, default))
             .MustHaveHappened();
@@ -174,7 +175,7 @@ public class UsageMiddlewareTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        var date = instant.ToDateTimeUtc().Date;
+        var date = instant.ToDateOnly();
 
         A.CallTo(() => usageGate.TrackRequestAsync(App, A<string>._, date, 13, A<long>._, 11, default))
             .MustHaveHappened();
@@ -190,7 +191,7 @@ public class UsageMiddlewareTests : GivenContext
 
         Assert.True(isNextCalled);
 
-        var date = instant.ToDateTimeUtc().Date;
+        var date = instant.ToDateOnly();
 
         A.CallTo(() => usageGate.TrackRequestAsync(App, A<string>._, date, A<double>._, A<long>._, A<long>._, default))
             .MustNotHaveHappened();

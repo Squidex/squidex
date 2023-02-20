@@ -76,7 +76,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
     {
         var ctx = Context();
 
-        A.CallTo(() => assetRepository.StreamAll(ctx.AppId.Id, CancellationToken))
+        A.CallTo(() => assetRepository.StreamAll(AppId.Id, CancellationToken))
             .Returns(new List<AssetEntity>
             {
                 new AssetEntity(),
@@ -95,11 +95,11 @@ public class AssetChangedTriggerHandlerTests : GivenContext
     [MemberData(nameof(TestEvents))]
     public async Task Should_create_enriched_events(AssetEvent @event, EnrichedAssetEventType type)
     {
-        var ctx = Context(appId: @event.AppId);
+        var ctx = Context().ToRulesContext();
 
         var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-        A.CallTo(() => assetLoader.GetAsync(ctx.AppId.Id, @event.AssetId, 12, CancellationToken))
+        A.CallTo(() => assetLoader.GetAsync(AppId.Id, @event.AssetId, 12, CancellationToken))
             .Returns(new AssetEntity());
 
         var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
@@ -119,7 +119,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedAssetEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -132,7 +132,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedAssetEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.True(actual);
         });
@@ -145,7 +145,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedAssetEvent();
 
-            var actual = sut.Trigger(@event, ctx);
+            var actual = sut.Trigger(@event, ctx.Rule.Trigger);
 
             Assert.False(actual);
         });
@@ -172,13 +172,13 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         }
     }
 
-    private static RuleContext Context(RuleTrigger? trigger = null, NamedId<DomainId>? appId = null)
+    private RuleContext Context(RuleTrigger? trigger = null)
     {
         trigger ??= new AssetChangedTriggerV2();
 
         return new RuleContext
         {
-            AppId = appId ?? NamedId.Of(DomainId.NewGuid(), "my-app"),
+            AppId = AppId,
             Rule = new Rule(trigger, A.Fake<RuleAction>()),
             RuleId = DomainId.NewGuid()
         };

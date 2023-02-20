@@ -34,10 +34,13 @@ public sealed class ComponentsFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public ReadonlyList<string>? UniqueFields { get; set; }
 
+    public static ComponentsFieldPropertiesDto FromDomain(ComponentsFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new ComponentsFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new ComponentsFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new ComponentsFieldProperties());
     }
 }

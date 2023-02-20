@@ -23,9 +23,6 @@ public interface IEventStore
     IAsyncEnumerable<StoredEvent> QueryAllAsync(string? streamFilter = null, string? position = null, int take = int.MaxValue,
         CancellationToken ct = default);
 
-    Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events,
-        CancellationToken ct = default);
-
     Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
         CancellationToken ct = default);
 

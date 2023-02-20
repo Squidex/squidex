@@ -436,7 +436,6 @@ describe('RulesService', () => {
             name: `rule-name${key}`,
             numSucceeded: id * 3,
             numFailed: id * 4,
-            lastExecuted: `${id % 1000 + 2000}-10-10T10:10:00Z`,
             isEnabled: id % 2 === 0,
             trigger: {
                 param1: 1,
@@ -482,10 +481,11 @@ describe('RulesService', () => {
             eventName: `name${key}`,
             event: { value: 'simple' },
             enrichedEvent: { value: 'enriched' },
+            error: `error${key}`,
             actionName: `action-name${key}`,
             actionData: `action-data${key}`,
-            error: `error${key}`,
             skipReasons: [`reason${key}`],
+            uniqueId: `unique-id${key}`,
             _links: {},
         };
     }
@@ -518,8 +518,7 @@ export function createRule(id: number, suffix = '') {
         `rule-action${key}`,
         `rule-name${key}`,
         id * 3,
-        id * 4,
-        DateTime.parseISO(`${id % 1000 + 2000}-10-10T10:10:00Z`));
+        id * 4);
 }
 
 export function createRuleEvent(id: number, suffix = '') {
@@ -551,5 +550,8 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
         `action-name${key}`,
         `action-data${key}`,
         `error${key}`,
-        [`reason${key}`]);
+        [
+            `reason${key}`,
+        ],
+        `unique-id${key}`);
 }

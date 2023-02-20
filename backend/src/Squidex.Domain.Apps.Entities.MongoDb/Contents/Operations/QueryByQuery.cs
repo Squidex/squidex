@@ -150,7 +150,7 @@ internal sealed class QueryByQuery : OperationBase
     }
 
     private static (FilterDefinition<MongoContentEntity>, bool) CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds, ClrQuery? query,
-        DomainId referenced, RefToken? createdBy)
+        DomainId reference, RefToken? createdBy)
     {
         var filters = new List<FilterDefinition<MongoContentEntity>>
         {
@@ -176,9 +176,9 @@ internal sealed class QueryByQuery : OperationBase
             isDefault = false;
         }
 
-        if (referenced != default)
+        if (reference != default)
         {
-            filters.Add(Filter.AnyEq(x => x.ReferencedIds, referenced));
+            filters.Add(Filter.AnyEq(x => x.ReferencedIds, reference));
 
             isDefault = false;
         }

@@ -211,7 +211,7 @@ public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreRepl
                         commitList.Add(eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId));
                     }
 
-                    await _.EventStore.AppendAsync(commitId, streamName, commitList);
+                    await _.EventStore.AppendAsync(commitId, streamName, EtagVersion.Any, commitList);
                 }
 
                 if (i < iterations - 1)

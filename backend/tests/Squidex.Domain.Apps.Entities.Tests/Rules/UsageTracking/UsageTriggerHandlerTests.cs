@@ -41,17 +41,16 @@ public class UsageTriggerHandlerTests
     [Fact]
     public async Task Should_create_enriched_event()
     {
-        var ctx = Context();
+        var ctx = Context().ToRulesContext();
 
         var @event = new AppUsageExceeded { CallsCurrent = 80, CallsLimit = 120 };
         var envelope = Envelope.Create<AppEvent>(@event);
 
-        var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+        var actuals = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();
+        var actual = actuals.Single() as EnrichedUsageExceededEvent;
 
-        var enrichedEvent = actual.Single() as EnrichedUsageExceededEvent;
-
-        Assert.Equal(@event.CallsCurrent, enrichedEvent!.CallsCurrent);
-        Assert.Equal(@event.CallsLimit, enrichedEvent!.CallsLimit);
+        Assert.Equal(@event.CallsCurrent, actual!.CallsCurrent);
+        Assert.Equal(@event.CallsLimit, actual!.CallsLimit);
     }
 
     [Fact]
@@ -61,7 +60,7 @@ public class UsageTriggerHandlerTests
 
         var @event = new AppUsageExceeded();
 
-        var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+        var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
         Assert.True(actual);
     }
@@ -73,7 +72,7 @@ public class UsageTriggerHandlerTests
 
         var @event = new AppUsageExceeded { RuleId = ctx.RuleId };
 
-        var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx);
+        var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
         Assert.True(actual);
     }

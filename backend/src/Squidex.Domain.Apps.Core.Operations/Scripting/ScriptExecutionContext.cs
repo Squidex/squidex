@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Diagnostics;
 using Jint;
 using Squidex.Infrastructure.Tasks;
 
@@ -27,7 +26,6 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
 {
     private readonly TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
     private readonly CancellationToken cancellationToken;
-    private readonly ReaderWriterLockSlim slimLock = new ReaderWriterLockSlim();
     private int pendingTasks = 1;
 
     public bool IsCompleted
@@ -62,10 +60,9 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
 
         async Task ScheduleAsync()
         {
+            TryStart();
             try
             {
-                TryStart();
-
                 await action(this, cancellationToken);
 
                 TryComplete(default!);
@@ -86,21 +83,20 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
             return;
         }
 
-        lock (Engine)
+        TryStart();
+        try
         {
-            try
+            lock (Engine)
             {
-                TryStart();
-
                 Engine.ResetConstraints();
                 action();
+            }
 
-                TryComplete(default!);
-            }
-            catch (Exception ex)
-            {
-                TryFail(ex);
-            }
+            TryComplete(default!);
+        }
+        catch (Exception ex)
+        {
+            TryFail(ex);
         }
     }
 
@@ -111,21 +107,20 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
             return;
         }
 
-        lock (Engine)
+        TryStart();
+        try
         {
-            try
+            lock (Engine)
             {
-                TryStart();
-
                 Engine.ResetConstraints();
                 action(argument);
+            }
 
-                TryComplete(default!);
-            }
-            catch (Exception ex)
-            {
-                TryFail(ex);
-            }
+            TryComplete(default!);
+        }
+        catch (Exception ex)
+        {
+            TryFail(ex);
         }
     }
 
@@ -137,8 +132,6 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
     private void TryStart()
     {
         Interlocked.Increment(ref pendingTasks);
-
-        Debug.WriteLine(pendingTasks);
     }
 
     private void TryComplete(T result)
@@ -147,8 +140,6 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         {
             tcs.TrySetResult(result);
         }
-
-        Debug.WriteLine(pendingTasks);
     }
 }
 

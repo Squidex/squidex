@@ -29,41 +29,31 @@ public class SubscriptionPublisherTests
     [Fact]
     public void Should_return_content_and_asset_filter_for_events_filter()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal("^(content-|asset-)", consumer.EventsFilter);
+        Assert.Equal("^(content-|asset-)", sut.EventsFilter);
     }
 
     [Fact]
     public async Task Should_do_nothing_on_clear()
     {
-        IEventConsumer consumer = sut;
-
-        await consumer.ClearAsync();
+        await ((IEventConsumer)sut).ClearAsync();
     }
 
     [Fact]
     public void Should_return_custom_name_for_name()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.Equal("Subscriptions", consumer.Name);
+        Assert.Equal("Subscriptions", sut.Name);
     }
 
     [Fact]
     public void Should_not_support_clear()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.False(consumer.CanClear);
+        Assert.False(sut.CanClear);
     }
 
     [Fact]
     public void Should_start_from_latest()
     {
-        IEventConsumer consumer = sut;
-
-        Assert.True(consumer.StartLatest);
+        Assert.True(sut.StartLatest);
     }
 
     [Theory]

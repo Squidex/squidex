@@ -11,16 +11,16 @@ public interface IUsageTracker
 {
     string FallbackCategory { get; }
 
-    Task TrackAsync(DateTime date, string key, string? category, Counters counters,
+    Task TrackAsync(DateOnly date, string key, string? category, Counters counters,
         CancellationToken ct = default);
 
-    Task<Counters> GetForMonthAsync(string key, DateTime date, string? category,
+    Task<Counters> GetForMonthAsync(string key, DateOnly date, string? category,
         CancellationToken ct = default);
 
-    Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
+    Task<Counters> GetAsync(string key, DateOnly fromDate, DateOnly toDate, string? category,
         CancellationToken ct = default);
 
-    Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+    Task<Dictionary<string, List<(DateOnly, Counters)>>> QueryAsync(string key, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct = default);
 
     Task DeleteAsync(string key,

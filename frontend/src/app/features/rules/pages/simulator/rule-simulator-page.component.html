@@ -27,7 +27,7 @@
 
                 <tbody *ngFor="let event of ruleSimulatorState.simulatedRuleEvents | async; trackBy: trackByEvent"
                     [sqxSimulatedRuleEvent]="event"
-                    [expanded]="event.eventId === selectedRuleEvent"
+                    [expanded]="event.uniqueId === selectedRuleEvent"
                     (expandedChange)="selectEvent(event)">
                 </tbody>
             </table>

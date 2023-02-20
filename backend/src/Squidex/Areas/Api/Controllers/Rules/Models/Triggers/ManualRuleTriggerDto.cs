@@ -13,6 +13,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers;
 
 public sealed class ManualRuleTriggerDto : RuleTriggerDto
 {
+    public static ManualRuleTriggerDto FromDomain(ManualTrigger trigger)
+    {
+        return SimpleMapper.Map(trigger, new ManualRuleTriggerDto());
+    }
+
     public override RuleTrigger ToTrigger()
     {
         return SimpleMapper.Map(this, new ManualTrigger());

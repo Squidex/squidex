@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Squidex.Infrastructure;
 
@@ -420,6 +421,54 @@ public static class CollectionExtensions
             sourceList.Remove(takenElement);
 
             yield return takenElement.Value;
+        }
+    }
+
+    public static IAsyncEnumerable<TSource> Catch<TSource>(this IAsyncEnumerable<TSource> source, Func<Exception, IEnumerable<TSource>> handler)
+    {
+        return Core(source, handler);
+
+        static async IAsyncEnumerable<TSource> Core(IAsyncEnumerable<TSource> source, Func<Exception, IEnumerable<TSource>> handler,
+            [EnumeratorCancellation] CancellationToken ct = default)
+        {
+            var error = default(IEnumerable<TSource>);
+
+            await using (var e = source.GetAsyncEnumerator(ct))
+            {
+                while (true)
+                {
+                    TSource c;
+
+                    try
+                    {
+                        if (!await e.MoveNextAsync(ct))
+                        {
+                            break;
+                        }
+
+                        c = e.Current;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        error = handler(ex);
+                        break;
+                    }
+
+                    yield return c;
+                }
+            }
+
+            if (error != null)
+            {
+                foreach (var item in error)
+                {
+                    yield return item;
+                }
+            }
         }
     }
 }

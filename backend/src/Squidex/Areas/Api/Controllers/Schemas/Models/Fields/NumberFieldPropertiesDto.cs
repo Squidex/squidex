@@ -53,10 +53,13 @@ public sealed class NumberFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public NumberFieldEditor Editor { get; set; }
 
+    public static NumberFieldPropertiesDto FromDomain(NumberFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new NumberFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new NumberFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new NumberFieldProperties());
     }
 }

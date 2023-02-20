@@ -19,6 +19,7 @@ public class RuleDequeuerWorkerTests
     private readonly IClock clock = A.Fake<IClock>();
     private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
     private readonly IRuleService ruleService = A.Fake<IRuleService>();
+    private readonly IRuleUsageTracker ruleUsageTracker = A.Fake<IRuleUsageTracker>();
     private readonly ILogger<RuleDequeuerWorker> log = A.Dummy<ILogger<RuleDequeuerWorker>>();
     private readonly RuleDequeuerWorker sut;
 
@@ -27,7 +28,7 @@ public class RuleDequeuerWorkerTests
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
 
-        sut = new RuleDequeuerWorker(ruleService, ruleEventRepository, log)
+        sut = new RuleDequeuerWorker(ruleService, ruleUsageTracker, ruleEventRepository, log)
         {
             Clock = clock
         };
@@ -114,25 +115,26 @@ public class RuleDequeuerWorkerTests
 
         var now = clock.GetCurrentInstant();
 
-        Instant? nextCall = null;
-
-        if (minutes > 0)
-        {
-            nextCall = now.Plus(Duration.FromMinutes(minutes));
-        }
-
         await sut.HandleAsync(@event);
 
         if (actual == RuleResult.Failed)
         {
             A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                 .MustHaveHappened();
+
+            A.CallTo(() => ruleUsageTracker.TrackAsync(@event.Job.AppId, @event.Job.RuleId, now.ToDateOnly(), 0, 0, 1, A<CancellationToken>._))
+                .MustHaveHappened();
         }
         else
         {
             A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                 .MustNotHaveHappened();
+
+            A.CallTo(() => ruleUsageTracker.TrackAsync(@event.Job.AppId, @event.Job.RuleId, now.ToDateOnly(), 0, 1, 0, A<CancellationToken>._))
+                .MustHaveHappened();
         }
+
+        var nextCall = minutes > 0 ? now.Plus(Duration.FromMinutes(minutes)) : (Instant?)null;
 
         A.CallTo(() => ruleEventRepository.UpdateAsync(@event.Job,
                 A<RuleJobUpdate>.That.Matches(x =>
@@ -158,9 +160,11 @@ public class RuleDequeuerWorkerTests
         var job = new RuleJob
         {
             Id = id,
+            AppId = DomainId.NewGuid(),
             ActionData = actionData,
             ActionName = actionName,
-            Created = clock.GetCurrentInstant()
+            Created = clock.GetCurrentInstant(),
+            RuleId = DomainId.NewGuid()
         };
 
         A.CallTo(() => @event.Id).Returns(id);

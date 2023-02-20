@@ -22,7 +22,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     {
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2())
+            Schemas = ReadonlyList.Create(new SchemaCondition())
         };
 
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
@@ -45,7 +45,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
 
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = SchemaId.Id })
+            Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id })
         };
 
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
@@ -72,7 +72,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     {
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
+            Schemas = ReadonlyList.Empty<SchemaCondition>()
         };
 
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
@@ -88,7 +88,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
 
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = SchemaId.Id })
+            Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id })
         };
 
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);

@@ -8,6 +8,7 @@
 using System.Runtime.CompilerServices;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -16,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Text;
@@ -75,10 +77,48 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
         }
     }
 
-    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+    public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RulesContext context,
         [EnumeratorCancellation] CancellationToken ct)
     {
-        yield return await CreateEnrichedEventsCoreAsync(@event, ct);
+        var enrichedEvent = await CreateEnrichedEventsCoreAsync(@event, ct);
+
+        yield return enrichedEvent;
+
+        if (!context.AllowExtraEvents ||
+            context.MaxEvents == null ||
+            context.MaxEvents <= 0)
+        {
+            yield break;
+        }
+
+        // When the content has just been created, it cannot be referenced by another content. Therefore we can skip it.
+        if (enrichedEvent.Type == EnrichedContentEventType.Created)
+        {
+            yield break;
+        }
+
+        // This method is only called once per event, therefore we check all rules.
+        if (!context.Rules.Values.Any(r => TriggerReferences(enrichedEvent, r)))
+        {
+            yield break;
+        }
+
+        var take = context.MaxEvents.Value;
+
+        await foreach (var content in contentRepository.StreamReferencing(context.AppId.Id, enrichedEvent.Id, take, ct))
+        {
+            var result = new EnrichedContentEvent
+            {
+                Type = EnrichedContentEventType.ReferenceUpdated
+            };
+
+            SimpleMapper.Map(content, result);
+
+            result.Actor = content.LastModifiedBy;
+            result.Name = $"{content.SchemaId.Name.ToPascalCase()}ReferenceUpdated";
+
+            yield return result;
+        }
     }
 
     public async ValueTask<EnrichedEvent?> CreateEnrichedEventsAsync(Envelope<AppEvent> @event,
@@ -87,7 +127,7 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
         return await CreateEnrichedEventsCoreAsync(@event, ct);
     }
 
-    private async ValueTask<EnrichedEvent> CreateEnrichedEventsCoreAsync(Envelope<AppEvent> @event,
+    private async ValueTask<EnrichedContentEvent> CreateEnrichedEventsCoreAsync(Envelope<AppEvent> @event,
         CancellationToken ct)
     {
         var contentEvent = (ContentEvent)@event.Payload;
@@ -108,6 +148,9 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
 
         // Use the concrete event to map properties that are not part of app event.
         SimpleMapper.Map(contentEvent, result);
+
+        // This property has another name, so we cannot use the simple mapper.
+        result.Id = contentEvent.ContentId;
 
         switch (@event.Payload)
         {
@@ -173,62 +216,87 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
         return null;
     }
 
-    public bool Trigger(Envelope<AppEvent> @event, RuleContext context)
+    public bool Trigger(Envelope<AppEvent> @event, RuleTrigger trigger)
     {
-        var trigger = (ContentChangedTriggerV2)context.Rule.Trigger;
+        var typed = (ContentChangedTriggerV2)trigger;
 
-        if (trigger.HandleAll)
+        if (typed.HandleAll)
         {
             return true;
         }
 
-        if (trigger.Schemas != null)
-        {
-            var contentEvent = (ContentEvent)@event.Payload;
+        // Also check for the referenced schemas, because it is needed to query the references.
+        return MatchesAnySchema(typed.Schemas, @event.Payload) || MatchesAnySchema(typed.ReferencedSchemas, @event.Payload);
+    }
 
-            foreach (var schema in trigger.Schemas)
+    public bool Trigger(EnrichedEvent @event, RuleTrigger trigger)
+    {
+        var typed = (ContentChangedTriggerV2)trigger;
+
+        if (typed.HandleAll)
+        {
+            return true;
+        }
+
+        // Only check for the actual schemas, not references schemas as they have already been queried.
+        return MatchesAnySchema(typed.Schemas, @event);
+    }
+
+    private bool TriggerReferences(EnrichedEvent @event, Rule rule)
+    {
+        var trigger = (ContentChangedTriggerV2)rule.Trigger;
+
+        return MatchesAnySchema(trigger.ReferencedSchemas, @event);
+    }
+
+    private bool MatchesAnySchema(ReadonlyList<SchemaCondition>? schemas, EnrichedEvent @event)
+    {
+        if (schemas == null)
+        {
+            return false;
+        }
+
+        var contentEvent = (EnrichedContentEvent)@event;
+
+        foreach (var schema in schemas)
+        {
+            // Check for the conditions once to improve performance.
+            if (MatchsSchema(schema, contentEvent.SchemaId) && MatchsCondition(schema, contentEvent))
             {
-                if (MatchsSchema(schema, contentEvent.SchemaId))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
         return false;
     }
 
-    public bool Trigger(EnrichedEvent @event, RuleContext context)
+    private bool MatchesAnySchema(ReadonlyList<SchemaCondition>? schemas, AppEvent @event)
     {
-        var trigger = (ContentChangedTriggerV2)context.Rule.Trigger;
-
-        if (trigger.HandleAll)
+        if (schemas == null)
         {
-            return true;
+            return false;
         }
 
-        if (trigger.Schemas != null)
-        {
-            var contentEvent = (EnrichedContentEvent)@event;
+        var contentEvent = (ContentEvent)@event;
 
-            foreach (var schema in trigger.Schemas)
+        foreach (var schema in schemas)
+        {
+            // Check for the conditions once to improve performance.
+            if (MatchsSchema(schema, contentEvent.SchemaId))
             {
-                if (MatchsSchema(schema, contentEvent.SchemaId) && MatchsCondition(schema, contentEvent))
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
         return false;
     }
 
-    private static bool MatchsSchema(ContentChangedTriggerSchemaV2? schema, NamedId<DomainId> schemaId)
+    private static bool MatchsSchema(SchemaCondition? schema, NamedId<DomainId> schemaId)
     {
         return schemaId != null && schemaId.Id == schema?.SchemaId;
     }
 
-    private bool MatchsCondition(ContentChangedTriggerSchemaV2 schema, EnrichedSchemaEventBase @event)
+    private bool MatchsCondition(SchemaCondition schema, EnrichedSchemaEventBase @event)
     {
         if (string.IsNullOrWhiteSpace(schema.Condition))
         {

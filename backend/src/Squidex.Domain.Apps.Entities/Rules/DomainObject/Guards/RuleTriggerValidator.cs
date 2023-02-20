@@ -93,7 +93,7 @@ public sealed class RuleTriggerValidator : IRuleTriggerVisitor<Task<IEnumerable<
         return errors;
     }
 
-    private async Task<ValidationError?> CheckSchemaAsync(ContentChangedTriggerSchemaV2 schema)
+    private async Task<ValidationError?> CheckSchemaAsync(SchemaCondition schema)
     {
         if (await SchemaProvider(schema.SchemaId) == null)
         {

@@ -7,6 +7,7 @@
 
 namespace Squidex.Web.Pipeline;
 
+[AttributeUsage(AttributeTargets.All)]
 public sealed class IgnoreCacheFilterAttribute : Attribute
 {
 }

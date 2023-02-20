@@ -89,27 +89,33 @@ public sealed class UsageTrackerWorker : IMessageHandler<UsageTrackingMessage>, 
         {
             var from = GetFromDate(today, target.NumDays);
 
-            if (target.Triggered == null || target.Triggered < from)
+            // If we have triggered recently we just stop.
+            if (target.Triggered != null && target.Triggered >= from)
             {
-                var costs = await usageTracker.GetMonthCallsAsync(target.AppId.Id.ToString(), today, null);
-
-                var limit = target.Limits;
-
-                if (costs > limit)
-                {
-                    target.Triggered = today;
-
-                    var @event = new AppUsageExceeded
-                    {
-                        AppId = target.AppId,
-                        CallsCurrent = costs,
-                        CallsLimit = limit,
-                        RuleId = key
-                    };
-
-                    await state.WriteEventAsync(Envelope.Create<IEvent>(@event));
-                }
+                continue;
             }
+
+            var costs = await usageTracker.GetMonthCallsAsync(target.AppId.Id.ToString(), today.ToDateOnly(), null);
+
+            var limit = target.Limits;
+
+            // If we have not reached our limit, there is nothing to do now.
+            if (costs <= limit)
+            {
+                continue;
+            }
+
+            target.Triggered = today;
+
+            var @event = new AppUsageExceeded
+            {
+                AppId = target.AppId,
+                CallsCurrent = costs,
+                CallsLimit = limit,
+                RuleId = key
+            };
+
+            await state.WriteEventAsync(Envelope.Create<IEvent>(@event));
         }
 
         await state.WriteAsync();

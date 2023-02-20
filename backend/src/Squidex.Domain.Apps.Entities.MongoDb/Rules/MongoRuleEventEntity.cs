@@ -11,6 +11,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
@@ -80,8 +81,10 @@ public sealed class MongoRuleEventEntity : IRuleEventEntity
         get => JobId;
     }
 
-    public static MongoRuleEventEntity FromJob(RuleJob job, Instant? nextAttempt)
+    public static MongoRuleEventEntity FromJob(RuleEventWrite item)
     {
+        var (job, nextAttempt, error) = item;
+
         var entity = new MongoRuleEventEntity
         {
             Job = job,
@@ -90,6 +93,14 @@ public sealed class MongoRuleEventEntity : IRuleEventEntity
         };
 
         SimpleMapper.Map(job, entity);
+
+        if (nextAttempt == null)
+        {
+            entity.JobResult = RuleJobResult.Failed;
+            entity.LastDump = error?.ToString();
+            entity.LastModified = job.Created;
+            entity.Result = RuleResult.Failed;
+        }
 
         return entity;
     }

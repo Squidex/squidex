@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers;
 
-public sealed record ContentChangedTriggerSchemaV2
+public record class SchemaCondition
 {
     public DomainId SchemaId { get; init; }
 

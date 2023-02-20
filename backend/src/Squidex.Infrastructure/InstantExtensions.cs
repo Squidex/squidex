@@ -20,4 +20,14 @@ public static class InstantExtensions
     {
         return Instant.FromUnixTimeMilliseconds(value.ToUnixTimeMilliseconds());
     }
+
+    public static DateOnly ToDateOnly(this Instant value)
+    {
+        return DateOnly.FromDateTime(value.ToDateTimeUtc());
+    }
+
+    public static DateOnly ToDateOnly(this DateTime value)
+    {
+        return DateOnly.FromDateTime(value);
+    }
 }

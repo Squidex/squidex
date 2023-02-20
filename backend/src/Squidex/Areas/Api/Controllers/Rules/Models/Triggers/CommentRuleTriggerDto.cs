@@ -18,6 +18,11 @@ public class CommentRuleTriggerDto : RuleTriggerDto
     /// </summary>
     public string? Condition { get; set; }
 
+    public static CommentRuleTriggerDto FromDomain(CommentTrigger trigger)
+    {
+        return SimpleMapper.Map(trigger, new CommentRuleTriggerDto());
+    }
+
     public override RuleTrigger ToTrigger()
     {
         return SimpleMapper.Map(this, new CommentTrigger());

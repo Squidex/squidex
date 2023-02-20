@@ -39,7 +39,7 @@ public sealed class CachingUsageTracker : IUsageTracker
         return inner.DeleteByKeyPatternAsync(pattern, ct);
     }
 
-    public Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+    public Task<Dictionary<string, List<(DateOnly, Counters)>>> QueryAsync(string key, DateOnly fromDate, DateOnly toDate,
         CancellationToken ct = default)
     {
         Guard.NotNull(key);
@@ -47,7 +47,7 @@ public sealed class CachingUsageTracker : IUsageTracker
         return inner.QueryAsync(key, fromDate, toDate, ct);
     }
 
-    public Task TrackAsync(DateTime date, string key, string? category, Counters counters,
+    public Task TrackAsync(DateOnly date, string key, string? category, Counters counters,
         CancellationToken ct = default)
     {
         Guard.NotNull(key);
@@ -55,7 +55,7 @@ public sealed class CachingUsageTracker : IUsageTracker
         return inner.TrackAsync(date, key, category, counters, ct);
     }
 
-    public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category,
+    public Task<Counters> GetForMonthAsync(string key, DateOnly date, string? category,
         CancellationToken ct = default)
     {
         Guard.NotNull(key);
@@ -70,7 +70,7 @@ public sealed class CachingUsageTracker : IUsageTracker
         })!;
     }
 
-    public Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
+    public Task<Counters> GetAsync(string key, DateOnly fromDate, DateOnly toDate, string? category,
         CancellationToken ct = default)
     {
         Guard.NotNull(key);

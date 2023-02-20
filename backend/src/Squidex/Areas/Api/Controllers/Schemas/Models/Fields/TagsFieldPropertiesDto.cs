@@ -48,10 +48,13 @@ public sealed class TagsFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public TagsFieldEditor Editor { get; set; }
 
+    public static TagsFieldPropertiesDto FromDomain(TagsFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new TagsFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new TagsFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new TagsFieldProperties());
     }
 }

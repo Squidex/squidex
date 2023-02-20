@@ -620,7 +620,6 @@
   "roles.loadPermissionsFailed": "Kan machtigingen niet laden. Laad opnieuw.",
   "roles.permissions": "Rechten",
   "roles.permissionsDescription": "Machtigingen beperken de toegestane bewerkingen en zoekopdrachten op API-niveau en zijn een beveiligingsfunctie.",
-  "roles.permissionsPlaceholder": "Begin met typen om naar rechten te zoeken",
   "roles.properties": "Eigenschappen",
   "roles.properties.hideAPI": "API verbergen",
   "roles.properties.hideAssets": "Assets verbergen",

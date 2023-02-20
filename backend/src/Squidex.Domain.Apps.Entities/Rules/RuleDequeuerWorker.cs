@@ -25,6 +25,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
     private readonly ITargetBlock<IRuleEventEntity> requestBlock;
     private readonly IRuleEventRepository ruleEventRepository;
     private readonly IRuleService ruleService;
+    private readonly IRuleUsageTracker ruleUsageTracker;
     private readonly ILogger<RuleDequeuerWorker> log;
     private CompletionTimer timer;
 
@@ -32,11 +33,13 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
 
     public RuleDequeuerWorker(
         IRuleService ruleService,
+        IRuleUsageTracker ruleUsageTracker,
         IRuleEventRepository ruleEventRepository,
         ILogger<RuleDequeuerWorker> log)
     {
         this.ruleEventRepository = ruleEventRepository;
         this.ruleService = ruleService;
+        this.ruleUsageTracker = ruleUsageTracker;
         this.log = log;
 
         requestBlock =
@@ -109,9 +112,15 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
 
             if (response.Status == RuleResult.Failed)
             {
+                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateOnly(), 0, 0, 1);
+
                 log.LogWarning(response.Exception, "Failed to execute rule event with rule id {ruleId}/{description}.",
                     @event.Job.RuleId,
                     @event.Job.Description);
+            }
+            else
+            {
+                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateOnly(), 0, 1, 0);
             }
         }
         catch (Exception ex)

@@ -19,10 +19,13 @@ public sealed class ComponentFieldPropertiesDto : FieldPropertiesDto
     /// </summary>
     public ReadonlyList<DomainId>? SchemaIds { get; set; }
 
+    public static ComponentFieldPropertiesDto FromDomain(ComponentFieldProperties fieldProperties)
+    {
+        return SimpleMapper.Map(fieldProperties, new ComponentFieldPropertiesDto());
+    }
+
     public override FieldProperties ToProperties()
     {
-        var result = SimpleMapper.Map(this, new ComponentFieldProperties());
-
-        return result;
+        return SimpleMapper.Map(this, new ComponentFieldProperties());
     }
 }

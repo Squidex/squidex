@@ -15,7 +15,7 @@ public class BackgroundUsageTrackerTests
     private readonly CancellationToken ct;
     private readonly IUsageRepository usageStore = A.Fake<IUsageRepository>();
     private readonly string key = Guid.NewGuid().ToString();
-    private readonly DateTime date = DateTime.Today;
+    private readonly DateOnly date = DateTime.Today.ToDateOnly();
     private readonly BackgroundUsageTracker sut;
 
     public BackgroundUsageTrackerTests()
@@ -84,7 +84,7 @@ public class BackgroundUsageTrackerTests
     [Fact]
     public async Task Should_sum_up_if_getting_monthly_calls()
     {
-        var dateFrom = new DateTime(date.Year, date.Month, 1);
+        var dateFrom = new DateOnly(date.Year, date.Month, 1);
         var dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
         var originalData = new List<StoredUsage>
@@ -144,9 +144,9 @@ public class BackgroundUsageTrackerTests
 
         var actual = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
-        var expected = new Dictionary<string, List<(DateTime Date, Counters Counters)>>
+        var expected = new Dictionary<string, List<(DateOnly Date, Counters Counters)>>
         {
-            ["*"] = new List<(DateTime Date, Counters Counters)>
+            ["*"] = new List<(DateOnly Date, Counters Counters)>
             {
                 (dateFrom.AddDays(0), new Counters()),
                 (dateFrom.AddDays(1), new Counters()),
@@ -179,9 +179,9 @@ public class BackgroundUsageTrackerTests
 
         var actual = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
-        var expected = new Dictionary<string, List<(DateTime Date, Counters Counters)>>
+        var expected = new Dictionary<string, List<(DateOnly Date, Counters Counters)>>
         {
-            ["my-category"] = new List<(DateTime Date, Counters Counters)>
+            ["my-category"] = new List<(DateOnly Date, Counters Counters)>
             {
                 (dateFrom.AddDays(0), Counters()),
                 (dateFrom.AddDays(1), Counters(a: 10, b: 15)),
@@ -189,7 +189,7 @@ public class BackgroundUsageTrackerTests
                 (dateFrom.AddDays(3), Counters(a: 13, b: 18)),
                 (dateFrom.AddDays(4), Counters(a: 15, b: 20))
             },
-            ["*"] = new List<(DateTime Date, Counters Counters)>
+            ["*"] = new List<(DateOnly Date, Counters Counters)>
             {
                 (dateFrom.AddDays(0), Counters(a: 17, b: 22)),
                 (dateFrom.AddDays(1), Counters()),

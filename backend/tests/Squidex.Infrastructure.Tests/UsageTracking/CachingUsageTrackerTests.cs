@@ -17,7 +17,7 @@ public class CachingUsageTrackerTests
     private readonly MemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
     private readonly string key = Guid.NewGuid().ToString();
     private readonly string category = Guid.NewGuid().ToString();
-    private readonly DateTime date = DateTime.Today;
+    private readonly DateOnly date = DateTime.Today.ToDateOnly();
     private readonly IUsageTracker inner = A.Fake<IUsageTracker>();
     private readonly IUsageTracker sut;
 
@@ -92,7 +92,7 @@ public class CachingUsageTrackerTests
         Assert.Same(counters, actual1);
         Assert.Same(counters, actual2);
 
-        A.CallTo(() => inner.GetForMonthAsync(key, DateTime.Today, category, ct))
+        A.CallTo(() => inner.GetForMonthAsync(key, date, category, ct))
             .MustHaveHappenedOnceExactly();
     }
 
