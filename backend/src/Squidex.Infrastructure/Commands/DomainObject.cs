@@ -178,22 +178,12 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
 
             if (uncomittedEvents.Count > 0)
             {
-                var deletedId = DomainId.Combine(UniqueId, DomainId.Create("deleted"));
-                var deletedStream = persistenceFactory.WithEventSourcing(GetType(), deletedId, null);
+                // Use the persisistence with snapshots, because it writes to event store without version check.
+                var deletedName = DomainId.Combine(UniqueId, DomainId.Create("deleted"));
+                var deletedStream = persistenceFactory.WithSnapshots(GetType(), deletedName, null);
 
-                try
-                {
-                    // Write to the deleted stream first so we never loose this information.
-                    await deletedStream.WriteEventsAsync(uncomittedEvents, ct);
-                }
-                catch (InconsistentStateException)
-                {
-
-                    // There is another deletion event, therefore we have to fetch the version.
-                    await deletedStream.ReadAsync(ct: default);
-
-                    await deletedStream.WriteEventsAsync(uncomittedEvents, ct);
-                }
+                // Write to the deleted stream first so we never loose this information.
+                await deletedStream.WriteEventsAsync(uncomittedEvents, ct);
             }
 
             // Cleanup the primary stream second.
