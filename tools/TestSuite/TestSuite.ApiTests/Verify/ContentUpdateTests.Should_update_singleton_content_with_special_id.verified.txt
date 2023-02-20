@@ -4,7 +4,9 @@
       iv: singleton
     }
   },
+  NewStatus: ,
   Status: Published,
+  EditingStatus: Published,
   Id: Guid_1,
   Version: 2,
   _links: {

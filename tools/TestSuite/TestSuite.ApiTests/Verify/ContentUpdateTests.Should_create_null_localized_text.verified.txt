@@ -1,15 +1,16 @@
 ﻿{
   Data: {
-    Number: {
-      iv: 2
-    },
-    String: {
-      iv: test
+    Localized: {
+      custom: default,
+      de: default,
+      en: null
     }
   },
+  NewStatus: ,
   Status: Published,
+  EditingStatus: Published,
   Id: Guid_1,
-  Version: 3,
+  Version: 1,
   _links: {
     delete: {
       Method: DELETE
