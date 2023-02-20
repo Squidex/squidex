@@ -39,48 +39,52 @@
         function logState(message) {
             var text = '';
 
-            function append(value) {
-                text += value;
+            function appendLabel(value) {
+                value += ':';
+
+                text += value.padEnd(20);
             }
 
             function appendLine(value) {
                 if (value !== undefined) {
-                    append(value);
+                    text += value;
                 }
 
                 text += '\n';
             }
 
             appendLine(message);
-            appendLine();
 
-            append('Language: ');
-            appendLine(field.getLanguage());
-            appendLine();
+            appendLabel('Language');
+            appendLine(`<${JSON.stringify(field.getLanguage(), 2)}>`);
 
-            append('Disabled: ');
-            appendLine(field.isDisabled());
-            appendLine();
-
-            append('FullScreen: ');
+            appendLabel('Is FullScreen');
             appendLine(field.isFullscreen());
-            appendLine();
 
-            append('Index: ');
+            appendLabel('Is Expanded');
+            appendLine(field.isExpanded());
+
+            appendLabel('Index');
             appendLine(field.getIndex());
-            appendLine();
 
-            appendLine('Value');
+            appendLabel('Value of Field');
             appendLine(`<${JSON.stringify(field.getValue(), 2)}>`);
-            appendLine();
 
-            appendLine('Form Value');
+            appendLabel('Value of Form');
             appendLine(`<${JSON.stringify(field.getFormValue(), 2)}>`);
-            appendLine();
+
+            appendLabel('Disabled: ');
+            appendLine(field.isDisabled());
 
             console.log(text);
 
-            textarea.value = text;
+            if (!textarea.value) {
+                textarea.value = text;
+            } else {
+                textarea.value = textarea.value + '\n---\n\n' + text;
+                textarea.scrollLeft = 0;
+                textarea.scrollTop = textarea.scrollHeight;
+            }
         }
 
         logState('Setup');
@@ -113,6 +117,10 @@
 
         field.onLanguageChanged(function () {
             logState('Field language changed');
+        });
+
+        field.onExpanded(function () {
+            logState('Expanded changed');
         });
 
         field.onDisabled(function (disabled) {
