@@ -64,26 +64,28 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
     private sealed class AsyncExtension : IJintExtension
     {
-        private delegate void Delay(Action callback);
+        private delegate void Delay(Action callback, int time);
 
         public void ExtendAsync(ScriptExecutionContext context)
         {
-            context.Engine.SetValue("setTimeout", new Delay(callback =>
+            context.Engine.SetValue("setTimeout", new Delay((callback, time) =>
             {
-                context.Schedule(async (scheduler, ct) =>
+                if (time == 0)
                 {
-                    await Task.Delay(1, ct);
-                    scheduler.Run(callback);
-                });
-            }));
-
-            context.Engine.SetValue("setSyncTimeout", new Delay(callback =>
-            {
-                context.Schedule((scheduler, ct) =>
+                    context.Schedule((scheduler, ct) =>
+                    {
+                        scheduler.Run(callback);
+                        return Task.CompletedTask;
+                    });
+                }
+                else
                 {
-                    scheduler.Run(callback);
-                    return Task.CompletedTask;
-                });
+                    context.Schedule(async (scheduler, ct) =>
+                    {
+                        await Task.Delay(time, ct);
+                        scheduler.Run(callback);
+                    });
+                }
             }));
         }
     }
@@ -626,57 +628,59 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         Assert.Equal(JsonValue.Create(28), actual["test"]!["iv"]);
     }
 
-    [Fact]
-    public async Task Should_not_run_callbacks_in_parallel()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(10)]
+    [InlineData(100)]
+    public async Task Should_not_run_callbacks_in_parallel(int waitTime)
     {
-        for (var i = 0; i < 10; i++)
+        var vars = new DataScriptVars
         {
-            var vars = new DataScriptVars
-            {
-                ["value"] = 13
-            };
+            ["value"] = 13
+        };
 
-            const string script = @"
-                var x = ctx.value;
-                for (var i = 0; i < 100; i++) {
-                    setTimeout(function () {
-                        x++;
-                        ctx.shared = x;
-                    });
-                }
-            ";
+        var script = @$"
+            var x = ctx.value;
+            for (var i = 0; i < 100; i++) {{
+                setTimeout(function () {{
+                    x++;
+                    ctx.shared = x;
+                }}, {waitTime});
+            }}
+        ";
 
-            await sut.ExecuteAsync(vars, script, new ScriptOptions { AsContext = true });
+        await sut.ExecuteAsync(vars, script, new ScriptOptions { AsContext = true });
 
-            Assert.Equal(113.0, vars["shared"]);
-        }
+        Assert.Equal(113.0, vars["shared"]);
     }
 
-    [Fact]
-    public async Task Should_not_run_nested_callbacks_in_parallel()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(10)]
+    [InlineData(100)]
+    public async Task Should_not_run_nested_callbacks_in_parallel(int waitTime)
     {
-        for (var i = 0; i < 10; i++)
+        var vars = new DataScriptVars
         {
-            var vars = new DataScriptVars
-            {
-                ["value"] = 13
-            };
+            ["value"] = 13
+        };
 
-            const string script = @"
-                var x = ctx.value;
-                for (var i = 0; i < 100; i++) {
-                    setSyncTimeout(function () {
-                        setSyncTimeout(function () {
-                            x++;
-                            ctx.shared = x;
-                        });
-                    });
-                }
-            ";
+        var script = @$"
+            var x = ctx.value;
+            for (var i = 0; i < 100; i++) {{
+                setTimeout(function () {{
+                    setTimeout(function () {{
+                        x++;
+                        ctx.shared = x;
+                    }}, {waitTime});
+                }}, {waitTime});
+            }}
+        ";
 
-            await sut.ExecuteAsync(vars, script, new ScriptOptions { AsContext = true });
+        await sut.ExecuteAsync(vars, script, new ScriptOptions { AsContext = true });
 
-            Assert.Equal(113.0, vars["shared"]);
-        }
+        Assert.Equal(113.0, vars["shared"]);
     }
 }
