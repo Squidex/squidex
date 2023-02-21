@@ -8,4 +8,4 @@ data:
   ADMIN_EMAIL: {{ .Values.adminEmail }}
   S3_BUCKET: {{ .Values.S3Bucket }}
   CONTENTS__USETRANSACTIONS: "{{ .Values.useTransactions }}"
-  FULLTEXT__ELASTIC__OPENSEARCH: true
+  FULLTEXT__ELASTIC__OPENSEARCH: "true"
