@@ -107,6 +107,6 @@ internal sealed class CompositeUniqueValidator : IValidator
         return
             field.Partitioning == Partitioning.Invariant &&
             field.RawProperties.Tags?.Contains(tag) == true &&
-            field.RawProperties is BooleanFieldProperties or NumberFieldProperties or ReferencesFieldProperties or StringFieldProperties;
+            field.RawProperties is BooleanFieldProperties or DateTimeFieldProperties or NumberFieldProperties or ReferencesFieldProperties or StringFieldProperties;
     }
 }
