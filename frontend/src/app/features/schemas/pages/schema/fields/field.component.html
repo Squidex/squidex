@@ -6,7 +6,7 @@
             </div>
             <div class="col">
                 <span class="field-name">
-                    <i *ngIf="!plain" class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
+                    <i *ngIf="!plain" class="field-icon icon-type-{{field.properties.fieldType}}" [title]="field.properties.fieldType"></i> 
 
                     <ng-container *ngIf="field.isHidden else visible">
                         <span class="field-hidden" title="i18n:schemas.field.hiddenMarker">{{field.displayName}}</span>
