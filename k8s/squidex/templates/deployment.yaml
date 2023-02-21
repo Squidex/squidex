@@ -165,4 +165,9 @@ spec:
               value: "true"
             - name: EMAIL__SMTP__PORT
               value: "587"
+            - name: FULLTEXT__ELASTIC__OPENSEARCH
+              valueFrom:
+                configMapKeyRef:
+                  name: squidex
+                  key: FULLTEXT__ELASTIC__OPENSEARCH
       terminationGracePeriodSeconds: 30
