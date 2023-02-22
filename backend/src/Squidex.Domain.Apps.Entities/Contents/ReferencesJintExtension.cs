@@ -39,13 +39,19 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
             return;
         }
 
-        var action = new GetReferencesDelegate((references, callback) =>
+        var getReference = new GetReferencesDelegate((references, callback) =>
+        {
+            GetReference(context, appId, user, references, callback);
+        });
+
+        var getReferences = new GetReferencesDelegate((references, callback) =>
         {
             GetReferences(context, appId, user, references, callback);
         });
 
-        context.Engine.SetValue("getReference", action);
-        context.Engine.SetValue("getReferences", action);
+        context.Engine.SetValue("getReference", getReferences);
+        context.Engine.SetValue("getReferenceV2", getReference);
+        context.Engine.SetValue("getReferences", getReferences);
     }
 
     public void Describe(AddDescription describe, ScriptScope scope)
@@ -55,11 +61,15 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
             return;
         }
 
+        describe(JsonType.Function, "getReference(id, callback)",
+            Resources.ScriptingGetReference,
+            deprecationReason: Resources.ScriptingGetReferenceDeprecated);
+
+        describe(JsonType.Function, "getReferenceV2(id, callback)",
+            Resources.ScriptingGetReferenceV2);
+
         describe(JsonType.Function, "getReferences(ids, callback)",
             Resources.ScriptingGetReferences);
-
-        describe(JsonType.Function, "getReference(ids, callback)",
-            Resources.ScriptingGetReference);
     }
 
     private void GetReferences(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
@@ -72,9 +82,7 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
 
             if (ids.Count == 0)
             {
-                var emptyContents = Array.Empty<IEnrichedContentEntity>();
-
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyContents));
+                scheduler.Run(callback, new JsArray(context.Engine));
                 return;
             }
 
@@ -82,9 +90,7 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
 
             if (app == null)
             {
-                var emptyContents = Array.Empty<IEnrichedContentEntity>();
-
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyContents));
+                scheduler.Run(callback, new JsArray(context.Engine));
                 return;
             }
 
@@ -99,6 +105,42 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
             var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
 
             scheduler.Run(callback, JsValue.FromObject(context.Engine, contents.ToArray()));
+        });
+    }
+
+    private void GetReference(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+    {
+        Guard.NotNull(callback);
+
+        context.Schedule(async (scheduler, ct) =>
+        {
+            var ids = references.ToIds();
+
+            if (ids.Count == 0)
+            {
+                scheduler.Run(callback, JsValue.Null);
+                return;
+            }
+
+            var app = await GetAppAsync(appId);
+
+            if (app == null)
+            {
+                scheduler.Run(callback, JsValue.Null);
+                return;
+            }
+
+            var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
+
+            var requestContext =
+                new Context(user, app).Clone(b => b
+                    .WithoutContentEnrichment()
+                    .WithUnpublished()
+                    .WithoutTotal());
+
+            var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
+
+            scheduler.Run(callback, JsValue.FromObject(context.Engine, contents.FirstOrDefault()));
         });
     }
 

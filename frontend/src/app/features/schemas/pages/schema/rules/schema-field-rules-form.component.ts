@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { ConfigureFieldRulesForm, FIELD_RULE_ACTIONS, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
+import { ConfigureFieldRulesForm, FIELD_RULE_ACTIONS, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-field-rules-form',
@@ -22,7 +22,7 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
 
     public fieldNames!: ReadonlyArray<string>;
     public fieldActions = FIELD_RULE_ACTIONS;
-    public fieldCompletions: Observable<SchemaCompletions> = EMPTY;
+    public fieldCompletions: Observable<ScriptCompletions> = EMPTY;
 
     public isEditable = false;
 

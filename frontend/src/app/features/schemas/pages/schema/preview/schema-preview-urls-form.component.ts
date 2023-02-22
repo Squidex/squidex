@@ -7,7 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { ConfigurePreviewUrlsForm, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
+import { ConfigurePreviewUrlsForm, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-preview-urls-form',
@@ -20,7 +20,7 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
 
     public editForm = new ConfigurePreviewUrlsForm();
 
-    public fieldCompletions: Observable<SchemaCompletions> = EMPTY;
+    public fieldCompletions: Observable<ScriptCompletions> = EMPTY;
 
     public isEditable = false;
 

@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, forwardRef, Input, ViewChild } from '@angular/core';
 import { ControlValueAccessor, DefaultValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CodeEditorComponent, Types } from '@app/framework';
+import { CodeEditorComponent, ScriptCompletions, Types } from '@app/framework';
 
 export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormattableInputComponent), multi: true,
@@ -35,7 +35,7 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
     public type: 'Text' | 'Code' = 'Text';
 
     @Input()
-    public completion: ReadonlyArray<{ path: string; description: string; type: string }> | undefined | null;
+    public completion: ScriptCompletions | undefined | null;
 
     @ViewChild(DefaultValueAccessor)
     public inputEditor!: DefaultValueAccessor;

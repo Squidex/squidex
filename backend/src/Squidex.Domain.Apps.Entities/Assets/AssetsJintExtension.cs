@@ -24,6 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 {
+    private static readonly JsString ErrorNoAsset = new JsString(nameof(ErrorNoAsset));
+    private static readonly JsString ErrorTooBig = new JsString(nameof(ErrorTooBig));
     private delegate void GetAssetsDelegate(JsValue references, Action<JsValue> callback);
     private delegate void GetAssetTextDelegate(JsValue asset, Action<JsValue> callback, JsValue? encoding);
     private delegate void GetBlurHashDelegate(JsValue asset, Action<JsValue> callback, JsValue? componentX, JsValue? componentY);
@@ -48,11 +50,15 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
             return;
         }
 
+        describe(JsonType.Function, "getAsset(ids, callback)",
+            Resources.ScriptingGetAsset,
+            deprecationReason: Resources.ScriptingGetAssetDeprecated);
+
+        describe(JsonType.Function, "getAssetV2(ids, callback)",
+            Resources.ScriptingGetAssetV2);
+
         describe(JsonType.Function, "getAssets(ids, callback)",
             Resources.ScriptingGetAssets);
-
-        describe(JsonType.Function, "getAsset(ids, callback)",
-            Resources.ScriptingGetAsset);
 
         describe(JsonType.Function, "getAssetText(asset, callback, encoding?)",
             Resources.ScriptingGetAssetText);
@@ -78,7 +84,13 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
             GetAssets(context, appId, user, references, callback);
         });
 
+        var getAsset = new GetAssetsDelegate((references, callback) =>
+        {
+            GetAsset(context, appId, user, references, callback);
+        });
+
         context.Engine.SetValue("getAsset", getAssets);
+        context.Engine.SetValue("getAssetV2", getAsset);
         context.Engine.SetValue("getAssets", getAssets);
     }
 
@@ -110,7 +122,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         {
             if (input is not ObjectWrapper objectWrapper)
             {
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorNoAsset"));
+                scheduler.Run(callback, ErrorNoAsset);
                 return;
             }
 
@@ -118,7 +130,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
             {
                 if (asset.FileSize > 256_000)
                 {
-                    scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorTooBig"));
+                    scheduler.Run(callback, ErrorTooBig);
                     return;
                 }
 
@@ -127,7 +139,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
                 {
                     var text = await asset.GetTextAsync(encoding?.ToString(), assetFileStore, ct);
 
-                    scheduler.Run(callback, JsValue.FromObject(context.Engine, text));
+                    scheduler.Run(callback, text);
                 }
                 catch
                 {
@@ -146,7 +158,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
                     break;
 
                 default:
-                    scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorNoAsset"));
+                    scheduler.Run(callback, ErrorNoAsset);
                     break;
             }
         });
@@ -160,7 +172,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         {
             if (input is not ObjectWrapper objectWrapper)
             {
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorNoAsset"));
+                scheduler.Run(callback, ErrorNoAsset);
                 return;
             }
 
@@ -190,7 +202,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
                 {
                     var hash = await asset.GetBlurHashAsync(options, assetFileStore, assetGenerator, ct);
 
-                    scheduler.Run(callback, JsValue.FromObject(context.Engine, hash));
+                    scheduler.Run(callback, hash);
                 }
                 catch
                 {
@@ -209,7 +221,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
                     break;
 
                 default:
-                    scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorNoAsset"));
+                    scheduler.Run(callback,ErrorNoAsset);
                     break;
             }
         });
@@ -225,9 +237,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
             if (ids.Count == 0)
             {
-                var emptyAssets = Array.Empty<IEnrichedAssetEntity>();
-
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyAssets));
+                scheduler.Run(callback, new JsArray(context.Engine));
                 return;
             }
 
@@ -235,9 +245,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
             if (app == null)
             {
-                var emptyAssets = Array.Empty<IEnrichedAssetEntity>();
-
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyAssets));
+                scheduler.Run(callback, new JsArray(context.Engine));
                 return;
             }
 
@@ -250,6 +258,41 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
             var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
 
             scheduler.Run(callback, JsValue.FromObject(context.Engine, assets.ToArray()));
+            return;
+        });
+    }
+
+    private void GetAsset(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+    {
+        Guard.NotNull(callback);
+
+        context.Schedule(async (scheduler, ct) =>
+        {
+            var ids = references.ToIds();
+
+            if (ids.Count == 0)
+            {
+                scheduler.Run(callback, JsValue.Null);
+                return;
+            }
+
+            var app = await GetAppAsync(appId, ct);
+
+            if (app == null)
+            {
+                scheduler.Run(callback, JsValue.Null);
+                return;
+            }
+
+            var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
+
+            var requestContext =
+                new Context(user, app).Clone(b => b
+                    .WithoutTotal());
+
+            var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
+
+            scheduler.Run(callback, JsValue.FromObject(context.Engine, assets.FirstOrDefault()));
             return;
         });
     }

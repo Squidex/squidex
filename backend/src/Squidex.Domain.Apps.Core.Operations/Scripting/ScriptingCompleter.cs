@@ -474,7 +474,7 @@ public sealed class ScriptingCompleter
             Add(JsonType.String, name, description);
         }
 
-        private void Add(JsonType type, string? name, string? description, string[]? allowedValues = null)
+        private void Add(JsonType type, string? name, string? description, string[]? allowedValues = null, string? decprecationReason = null)
         {
             var parts = name?.Split('.') ?? Array.Empty<string>();
 
@@ -490,9 +490,11 @@ public sealed class ScriptingCompleter
 
             var path = string.Concat(prefixes.Reverse());
 
-            result[path] = new ScriptingValue(path, type, description)
+            result[path] = new ScriptingValue(path, type)
             {
-                AllowedValues = allowedValues
+                AllowedValues = allowedValues,
+                Description = description,
+                DeprecationReason = decprecationReason
             };
 
             for (int i = 0; i < parts.Length; i++)

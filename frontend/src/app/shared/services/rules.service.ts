@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, Model, pretifyError, Resource, ResourceLinks, Version } from '@app/framework';
+import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, Model, pretifyError, Resource, ResourceLinks, ScriptCompletions, Version } from '@app/framework';
 
 export type RuleElementMetadataDto = Readonly<{
     description: string;
@@ -185,17 +185,6 @@ export class SimulatedRuleEventDto {
         this._links = links;
     }
 }
-
-export type RuleCompletions = ReadonlyArray<Readonly<{
-    // The autocompletion path.
-    path: string;
-
-    // The description of the autocompletion field.
-    description: string;
-
-    // The type of the autocompletion field.
-    type: string;
-}>>;
 
 export type RulesDto = Readonly<{
     // The list of rules.
@@ -409,10 +398,10 @@ export class RulesService {
             pretifyError('i18n:rules.ruleEvents.cancelFailed'));
     }
 
-    public getCompletions(appName: string, actionType: string): Observable<RuleCompletions> {
+    public getCompletions(appName: string, actionType: string): Observable<ScriptCompletions> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/completion/${actionType}`);
 
-        return this.http.get<RuleCompletions>(url);
+        return this.http.get<ScriptCompletions>(url);
     }
 }
 

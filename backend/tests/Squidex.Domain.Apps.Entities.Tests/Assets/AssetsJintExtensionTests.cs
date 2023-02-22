@@ -98,6 +98,27 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
     }
 
     [Fact]
+    public async Task Should_resolve_asset_v2()
+    {
+        var (vars, assets) = SetupAssetsVars(1);
+
+        var expected = $@"
+                Text: {assets[0].FileName} {assets[0].Id}
+            ";
+
+        var script = @"
+                getAssetV2(data.assets.iv[0], function (asset) {
+                    var actual1 = `Text: ${asset.fileName} ${asset.id}`;
+
+                    complete(`${actual1}`);
+                });";
+
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
+
+        Assert.Equal(Cleanup(expected), Cleanup(actual));
+    }
+
+    [Fact]
     public async Task Should_resolve_assets()
     {
         var (vars, assets) = SetupAssetsVars(2);

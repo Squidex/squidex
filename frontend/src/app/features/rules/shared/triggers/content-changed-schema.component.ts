@@ -8,7 +8,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { EMPTY, Observable, switchMap } from 'rxjs';
-import { SchemaCompletions, SchemaDto, TypedSimpleChanges, value$ } from '@app/shared';
+import { SchemaDto, ScriptCompletions, TypedSimpleChanges, value$ } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
 
 @Component({
@@ -26,7 +26,7 @@ export class ContentChangedSchemaComponent {
     @Output()
     public remove = new EventEmitter<any>();
 
-    public completions: Observable<SchemaCompletions> = EMPTY;
+    public completions: Observable<ScriptCompletions> = EMPTY;
 
     constructor(
         private readonly completionsCache: CompletionsCache,

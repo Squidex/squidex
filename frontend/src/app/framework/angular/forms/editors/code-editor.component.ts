@@ -8,7 +8,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
-import { ResourceLoaderService, StatefulControlComponent, Types } from '@app/framework/internal';
+import { ResourceLoaderService, ScriptCompletions, StatefulControlComponent, Types } from '@app/framework/internal';
 import { TypedSimpleChanges } from './../../helpers';
 import { FocusComponent } from './../forms-helper';
 
@@ -68,9 +68,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     @Input()
-    public set completion(value: ReadonlyArray<{ path: string; description: string; type: string; allowedValues?: string[] }> | undefined | null) {
+    public set completion(value: ScriptCompletions | undefined | null) {
         if (value) {
-            this.completions = value.map(({ path, description, type, allowedValues }) => ({ value: path, name: path, description, meta: type?.toLowerCase(), path, allowedValues }));
+            this.completions = value.map(({ path, description, type, ...other }) => ({ value: path, name: path, description, meta: type?.toLowerCase(), path, ...other }));
         } else {
             this.completions = [];
         }
@@ -177,6 +177,10 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
                                     }
 
                                     item.docHTML += '</ul></div>';
+                                }
+
+                                if (item.deprecationReason) {
+                                    item.docHTML += `<div class="mt-2 mb-2"><strong>Deprecated</strong>: ${item.deprecationReason}</div>`;
                                 }
                             }
                         },

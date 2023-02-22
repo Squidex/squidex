@@ -120,11 +120,17 @@
   <data name="ScriptingGetAsset" xml:space="preserve">
     <value>Queries the asset with the specified ID and invokes the callback with an array of assets.</value>
   </data>
+  <data name="ScriptingGetAssetDeprecated" xml:space="preserve">
+    <value>Please use getAssetV2, which returns a single asset and not an array.</value>
+  </data>
   <data name="ScriptingGetAssets" xml:space="preserve">
     <value>Queries the assets with the specified IDs and invokes the callback with an array of assets.</value>
   </data>
   <data name="ScriptingGetAssetText" xml:space="preserve">
     <value>Get the text of an asset. Encodings: base64,ascii,unicode,utf8</value>
+  </data>
+  <data name="ScriptingGetAssetV2" xml:space="preserve">
+    <value>Queries the asset with the specified ID and invokes the callback with the found asset or null otherwise.</value>
   </data>
   <data name="ScriptingGetBlurHash" xml:space="preserve">
     <value>Gets the blur hash of an asset if it is an image or null otherwise.</value>
@@ -132,8 +138,14 @@
   <data name="ScriptingGetReference" xml:space="preserve">
     <value>Queries the content item with the specified ID and invokes the callback with an array of contents.</value>
   </data>
+  <data name="ScriptingGetReferenceDeprecated" xml:space="preserve">
+    <value>Please use getReferenceV2, which returns a single content item and not an array.</value>
+  </data>
   <data name="ScriptingGetReferences" xml:space="preserve">
     <value>Queries the content items with the specified IDs and invokes the callback with an array of contents.</value>
+  </data>
+  <data name="ScriptingGetReferenceV2" xml:space="preserve">
+    <value>Queries the content item with the specified ID and invokes the callback with the found content item or null otherwise.</value>
   </data>
   <data name="ScriptingIncrementCounter" xml:space="preserve">
     <value>Increments the counter with the given name and returns the value (OBSOLETE).</value>

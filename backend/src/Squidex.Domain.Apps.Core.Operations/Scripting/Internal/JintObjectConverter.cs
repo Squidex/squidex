@@ -51,7 +51,7 @@ public sealed class JintObjectConverter : IObjectConverter
                 result = guid.ToString();
                 return true;
             case Instant instant:
-                result = JsValue.FromObject(engine, instant.ToDateTimeUtc());
+                result = new JsDate(engine, instant.ToDateTimeUtc());
                 return true;
             case Status status:
                 result = status.ToString();

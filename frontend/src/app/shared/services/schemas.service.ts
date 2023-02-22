@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
+import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, ScriptCompletions, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { QueryModel } from './query';
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
@@ -378,20 +378,6 @@ export type FieldRule = Readonly<{
     condition: string;
 }>;
 
-export type SchemaCompletions = ReadonlyArray<{
-    // The autocompletion path.
-    path: string;
-
-    // The description of the autocompletion field.
-    description: string;
-
-    // The type of the autocompletion field.
-    type: 'Any' | 'Array' | 'Boolean' | 'Function' | 'Object' | 'String';
-
-    // The allowed values if the property is a string enum.
-    allowedValues?: string[];
- }>;
-
 export type SchemasDto = Readonly<{
     // The list of schemas.
     items: ReadonlyArray<SchemaDto>;
@@ -746,28 +732,28 @@ export class SchemasService {
             pretifyError('i18n:schemas.deleteFailed'));
     }
 
-    public getContentScriptsCompletion(appName: string, schemaName: string): Observable<SchemaCompletions> {
+    public getContentScriptsCompletion(appName: string, schemaName: string): Observable<ScriptCompletions> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion/content-scripts`);
 
-        return this.http.get<SchemaCompletions>(url);
+        return this.http.get<ScriptCompletions>(url);
     }
 
-    public getContentTriggerCompletion(appName: string, schemaName: string): Observable<SchemaCompletions> {
+    public getContentTriggerCompletion(appName: string, schemaName: string): Observable<ScriptCompletions> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion/content-triggers`);
 
-        return this.http.get<SchemaCompletions>(url);
+        return this.http.get<ScriptCompletions>(url);
     }
 
-    public getFieldRulesCompletion(appName: string, schemaName: string): Observable<SchemaCompletions> {
+    public getFieldRulesCompletion(appName: string, schemaName: string): Observable<ScriptCompletions> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion/field-rules`);
 
-        return this.http.get<SchemaCompletions>(url);
+        return this.http.get<ScriptCompletions>(url);
     }
 
-    public getPreviewUrlsCompletion(appName: string, schemaName: string): Observable<SchemaCompletions> {
+    public getPreviewUrlsCompletion(appName: string, schemaName: string): Observable<ScriptCompletions> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion/preview-urls`);
 
-        return this.http.get<SchemaCompletions>(url);
+        return this.http.get<ScriptCompletions>(url);
     }
 
     public getFilters(appName: string, schemaName: string): Observable<QueryModel> {

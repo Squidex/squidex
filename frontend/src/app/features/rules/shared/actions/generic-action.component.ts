@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { ActionForm, RuleCompletions, RulesService, TypedSimpleChanges } from '@app/shared';
+import { ActionForm, RulesService, ScriptCompletions, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-generic-action[actionForm][appName][trigger][triggerType]',
@@ -28,7 +28,7 @@ export class GenericActionComponent {
     @Input()
     public triggerType: string | undefined | null;
 
-    public ruleCompletions: Observable<RuleCompletions> = EMPTY;
+    public ruleCompletions: Observable<ScriptCompletions> = EMPTY;
 
     constructor(
         private readonly rulesService: RulesService,

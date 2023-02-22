@@ -7,8 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, createProperties, DateTime, FieldRule, NestedFieldDto, Resource, ResourceLinks, RootFieldDto, SchemaDto, SchemaPropertiesDto, SchemasDto, SchemasService, Version } from '@app/shared/internal';
-import { SchemaCompletions } from './..';
+import { ApiUrlConfig, createProperties, DateTime, FieldRule, NestedFieldDto, Resource, ResourceLinks, RootFieldDto, SchemaDto, SchemaPropertiesDto, SchemasDto, SchemasService, ScriptCompletions, Version } from '@app/shared/internal';
 
 describe('SchemasService', () => {
     const version = new Version('1');
@@ -577,7 +576,7 @@ describe('SchemasService', () => {
 
     it('should make get request to get content scripts completions',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            let completions: SchemaCompletions;
+            let completions: ScriptCompletions;
 
             schemasService.getContentScriptsCompletion('my-app', 'my-schema').subscribe(result => {
                 completions = result;
@@ -595,7 +594,7 @@ describe('SchemasService', () => {
 
     it('should make get request to get content trigger completions',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            let completions: SchemaCompletions;
+            let completions: ScriptCompletions;
 
             schemasService.getContentTriggerCompletion('my-app', 'my-schema').subscribe(result => {
                 completions = result;
@@ -613,7 +612,7 @@ describe('SchemasService', () => {
 
     it('should make get request to get field rules completions',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            let completions: SchemaCompletions;
+            let completions: ScriptCompletions;
 
             schemasService.getFieldRulesCompletion('my-app', 'my-schema').subscribe(result => {
                 completions = result;
@@ -631,7 +630,7 @@ describe('SchemasService', () => {
 
     it('should make get request to get preview urls completions',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            let completions: SchemaCompletions;
+            let completions: ScriptCompletions;
 
             schemasService.getPreviewUrlsCompletion('my-app', 'my-schema').subscribe(result => {
                 completions = result;

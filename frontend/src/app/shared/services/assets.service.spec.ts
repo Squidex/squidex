@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, AssetCompletions, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, ResourceLinks, sanitize, Version } from '@app/shared/internal';
+import { ApiUrlConfig, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, ResourceLinks, sanitize, ScriptCompletions, Version } from '@app/shared/internal';
 
 describe('AssetsService', () => {
     const version = new Version('1');
@@ -472,7 +472,7 @@ describe('AssetsService', () => {
 
     it('should make get request to get completions',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            let completions: AssetCompletions;
+            let completions: ScriptCompletions;
 
             assetsService.getCompletions('my-app').subscribe(result => {
                 completions = result;

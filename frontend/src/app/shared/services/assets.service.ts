@@ -9,7 +9,7 @@ import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@ang
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
+import { ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ScriptCompletions, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { AuthService } from './auth.service';
 import { Query, sanitize } from './query';
 
@@ -140,17 +140,6 @@ export type AssetFoldersDto = Readonly<{
     // True, if the user has permissions to create an asset folder.
     canCreate?: boolean;
 }>;
-
-export type AssetCompletions = ReadonlyArray<{
-    // The autocompletion path.
-    path: string;
-
-    // The description of the autocompletion field.
-    description: string;
-
-    // The type of the autocompletion field.
-    type: string;
- }>;
 
 export type AnnotateAssetDto = Readonly<{
     // The optional file name.
@@ -407,10 +396,10 @@ export class AssetsService {
             pretifyError('i18n:assets.deleteFailed'));
     }
 
-    public getCompletions(appName: string): Observable<AssetCompletions> {
+    public getCompletions(appName: string): Observable<ScriptCompletions> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/completion`);
 
-        return this.http.get<AssetCompletions>(url);
+        return this.http.get<ScriptCompletions>(url);
     }
 }
 

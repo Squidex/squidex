@@ -67,6 +67,27 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
     }
 
     [Fact]
+    public async Task Should_resolve_reference_v2()
+    {
+        var (vars, _) = SetupReferenceVars(1);
+
+        var expected = @"
+                Text: Hello 1 World 1
+            ";
+
+        var script = @"
+                getReferenceV2(data.references.iv[0], function (reference) {
+                    var actual1 = `Text: ${reference.data.field1.iv} ${reference.data.field2.iv}`;
+
+                    complete(`${actual1}`);
+                })";
+
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
+
+        Assert.Equal(Cleanup(expected), Cleanup(actual));
+    }
+
+    [Fact]
     public async Task Should_resolve_references()
     {
         var (vars, _) = SetupReferenceVars(2);

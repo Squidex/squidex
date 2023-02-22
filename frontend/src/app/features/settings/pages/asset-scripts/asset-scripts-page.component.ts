@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { AppsState, AssetCompletions, AssetScriptsState, AssetsService, EditAssetScriptsForm, ResourceOwner } from '@app/shared';
+import { AppsState, AssetScriptsState, AssetsService, EditAssetScriptsForm, ResourceOwner, ScriptCompletions } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-scripts-page',
@@ -16,7 +16,7 @@ import { AppsState, AssetCompletions, AssetScriptsState, AssetsService, EditAsse
 })
 export class AssetScriptsPageComponent extends ResourceOwner implements OnInit {
     public assetScript = 'query';
-    public assetCompletions: Observable<AssetCompletions> = EMPTY;
+    public assetCompletions: Observable<ScriptCompletions> = EMPTY;
 
     public editForm = new EditAssetScriptsForm();
 

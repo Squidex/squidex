@@ -9,7 +9,11 @@
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
-public sealed record ScriptingValue(string Path, JsonType Type, string? Description)
+public sealed record ScriptingValue(string Path, JsonType Type)
 {
+    public string? Description { get; init; }
+
+    public string? DeprecationReason { get; init; }
+
     public string[]? AllowedValues { get; init; }
 }

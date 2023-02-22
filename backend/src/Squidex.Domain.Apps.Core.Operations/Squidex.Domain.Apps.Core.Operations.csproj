@@ -28,7 +28,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="NJsonSchema" Version="10.8.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="5.3.0" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="5.4.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Collections.Immutable" Version="7.0.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />

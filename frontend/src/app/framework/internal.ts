@@ -25,6 +25,7 @@ export * from './services/title.service';
 export * from './services/toolbar.service';
 export * from './utils/array-helper';
 export * from './utils/cookies';
+export * from './utils/completion';
 export * from './utils/date-helper';
 export * from './utils/date-time';
 export * from './utils/duration';
