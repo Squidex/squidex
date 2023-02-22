@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Jint;
+using Jint.Native;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -16,18 +17,50 @@ internal static class ScriptOperations
 {
     private delegate void MessageDelegate(string? message);
 
-    private static readonly MessageDelegate Disallow = message =>
+    private delegate void MessageJsonDelegate(string? message);
+
+    private static readonly Action<string> Disallow = message =>
     {
         message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsNotAllowed");
 
         throw new DomainForbiddenException(message);
     };
 
-    private static readonly MessageDelegate Reject = message =>
+    private static readonly Action<JsValue> Reject = message =>
     {
-        message = !string.IsNullOrWhiteSpace(message) ? message : T.Get("common.jsRejected");
+        var errors = new List<ValidationError>();
 
-        throw new ValidationException(message);
+        void AddError(JsString message)
+        {
+            var text = message.ToString();
+
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                errors.Add(new ValidationError(text));
+            }
+        }
+
+        if (message is JsString typed)
+        {
+            AddError(typed);
+        }
+        else if (message is JsArray jsArray)
+        {
+            foreach (var item in jsArray)
+            {
+                if (item is JsString typedItem)
+                {
+                    AddError(typedItem);
+                }
+            }
+        }
+
+        if (errors.Count == 0)
+        {
+            errors.Add(new ValidationError(T.Get("common.jsRejected")));
+        }
+
+        throw new ValidationException(errors);
     };
 
     public static Engine AddDisallow(this Engine engine)

@@ -279,12 +279,33 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                reject('Not valid')
+                reject('Error1')
             ";
 
         var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
 
-        Assert.Equal("Not valid", ex.Errors.Single().Message);
+        Assert.Equal(new[] { "Error1" }, ex.Errors.Select(x => x.Message).ToArray());
+    }
+
+    [Fact]
+    public async Task Should_throw_validation_exception_if_calling_reject_with_messages()
+    {
+        var options = new ScriptOptions
+        {
+            CanReject = true
+        };
+
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                reject(['Error1', 'Error2'])
+            ";
+
+        var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
+
+        Assert.Equal(new[] { "Error1", "Error2" }, ex.Errors.Select(x => x.Message).ToArray());
     }
 
     [Fact]
