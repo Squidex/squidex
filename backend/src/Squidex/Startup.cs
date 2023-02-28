@@ -49,7 +49,6 @@ public sealed class Startup
         services.AddSquidexComments();
         services.AddSquidexContents(config);
         services.AddSquidexControllerServices(config);
-        services.AddSquidexEventPublisher(config);
         services.AddSquidexEventSourcing(config);
         services.AddSquidexGraphQL();
         services.AddSquidexHealthChecks(config);

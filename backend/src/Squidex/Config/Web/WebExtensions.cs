@@ -108,12 +108,6 @@ public static class WebExtensions
             ResponseWriter = writer
         });
 
-        app.UseHealthChecks("/cluster-healthz", new HealthCheckOptions
-        {
-            Predicate = check => check.Tags.Contains("cluster"),
-            ResponseWriter = writer
-        });
-
         app.UseHealthChecks("/background-healthz", new HealthCheckOptions
         {
             Predicate = check => check.Tags.Contains("background"),

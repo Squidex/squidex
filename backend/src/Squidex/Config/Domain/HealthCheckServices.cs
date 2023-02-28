@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.EventSourcing.Consume;
 
 namespace Squidex.Config.Domain;
 
@@ -17,6 +18,7 @@ public static class HealthCheckServices
             "diagnostics:gc");
 
         services.AddHealthChecks()
-            .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" });
+            .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })
+            .AddCheck<EventConsumersHealthCheck>("EventConsumers", tags: new[] { "background" });
     }
 }
