@@ -49,22 +49,27 @@ public sealed class RuleEnricher : IRuleEnricher
                 results.Add(result);
             }
 
+            // Sometimes we just want to skip this for performance reasons.
+            var enrichCacheKeys = !context.ShouldSkipCacheKeys();
+
             foreach (var group in results.GroupBy(x => x.AppId.Id))
             {
                 var statistics = await ruleUsageTracker.GetTotalByAppAsync(group.Key, ct);
 
                 foreach (var rule in group)
                 {
-                    requestCache.AddDependency(rule.UniqueId, rule.Version);
-
                     if (statistics.TryGetValue(rule.Id, out var statistic))
                     {
                         rule.NumFailed = statistic.TotalFailed;
                         rule.NumSucceeded = statistic.TotalSucceeded;
                     }
 
-                    requestCache.AddDependency(rule.NumFailed);
-                    requestCache.AddDependency(rule.NumSucceeded);
+                    if (enrichCacheKeys)
+                    {
+                        requestCache.AddDependency(rule.UniqueId, rule.Version);
+                        requestCache.AddDependency(rule.NumFailed);
+                        requestCache.AddDependency(rule.NumSucceeded);
+                    }
                 }
             }
 

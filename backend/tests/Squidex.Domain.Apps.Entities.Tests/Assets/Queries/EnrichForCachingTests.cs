@@ -59,6 +59,26 @@ public class EnrichForCachingTests : GivenContext
             .MustHaveHappened();
     }
 
+    [Fact]
+    public async Task Should_not_add_cache_headers_if_disabled()
+    {
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutCacheKeys()), CancellationToken);
+
+        A.CallTo(() => requestCache.AddHeader(A<string>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_add_cache_headers_for_assets_if_disabled()
+    {
+        var asset = CreateAsset();
+
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutCacheKeys()), Enumerable.Repeat(asset, 1), CancellationToken);
+
+        A.CallTo(() => requestCache.AddHeader(A<string>._))
+            .MustNotHaveHappened();
+    }
+
     private AssetEntity CreateAsset()
     {
         return new AssetEntity { AppId = AppId, Id = DomainId.NewGuid(), Version = 13 };

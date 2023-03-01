@@ -49,6 +49,20 @@ public class ScriptAssetTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_not_call_script_engine_if_disabled()
+    {
+        A.CallTo(() => App.AssetScripts)
+            .Returns(new AssetScripts { Query = "my-query" });
+
+        var asset = new AssetEntity();
+
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutScripting()), new[] { asset }, CancellationToken);
+
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<AssetScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_call_script_engine()
     {
         A.CallTo(() => App.AssetScripts)

@@ -21,6 +21,7 @@ public sealed class ScriptContent : IContentEnricherStep
     public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
+        // Sometimes we just want to skip this for performance reasons.
         if (!ShouldEnrich(context))
         {
             return;
@@ -93,6 +94,6 @@ public sealed class ScriptContent : IContentEnricherStep
 
     private static bool ShouldEnrich(Context context)
     {
-        return !context.IsFrontendClient;
+        return !context.IsFrontendClient && !context.ShouldSkipScripting();
     }
 }

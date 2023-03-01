@@ -39,7 +39,7 @@ public class DefaultDomainObjectCacheTests
         A.CallTo(() => cache.CreateEntry($"{id}_10"))
             .MustHaveHappened();
 
-        A.CallTo(() => serializer.Serialize(20, A<Stream>._, true))
+        A.CallTo(() => serializer.Serialize(20, A<Stream>._, false))
             .MustHaveHappened();
 
         A.CallTo(() => distributedCache.SetAsync($"{id}_10", A<byte[]>._, A<DistributedCacheEntryOptions>._, ct))
@@ -72,7 +72,7 @@ public class DefaultDomainObjectCacheTests
     [Fact]
     public async Task Should_provide_from_distributed_cache_if_not_found_in_cache()
     {
-        A.CallTo(() => serializer.Deserialize<int>(A<Stream>._, null, false))
+        A.CallTo(() => serializer.Deserialize<int>(A<Stream>._, null))
             .Returns(20);
 
         var actual = await sut.GetAsync<int>(id, 10, ct);

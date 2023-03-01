@@ -56,6 +56,20 @@ public class ScriptContentTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_not_call_script_engine_if_disabled()
+    {
+        var (provider, schemaId) = CreateSchema(
+            query: "my-query");
+
+        var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
+
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutScripting()), new[] { content }, provider, default);
+
+        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_call_script_engine_with_data()
     {
         var oldData = new ContentData();

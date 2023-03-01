@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -41,6 +42,29 @@ public sealed class ContentQueryService : IContentQueryService
         this.queryParser = queryParser;
     }
 
+    public async IAsyncEnumerable<IEnrichedContentEntity> StreamAsync(Context context, string schemaIdOrName, int skip,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        Guard.NotNull(context);
+
+        // We assume that the user has the full read permissions for this schema to optimize the DB query.
+        var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
+
+        // Skip all expensive operations when we call the enricher.
+        context = context.Clone(b => b
+            .WithoutScripting()
+            .WithoutCacheKeys()
+            .WithoutContentEnrichment());
+
+        // We run this query without a timeout because it is meant for long running background operations.
+        var contents = contentRepository.StreamAll(context.App.Id, HashSet.Of(schema.Id), ct);
+
+        await foreach (var content in contents.WithCancellation(ct))
+        {
+            yield return await contentEnricher.EnrichAsync(content, false, context, ct);
+        }
+    }
+
     public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
         CancellationToken ct = default)
     {
@@ -55,6 +79,7 @@ public sealed class ContentQueryService : IContentQueryService
 
             IContentEntity? content;
 
+            // A special ID to always query the single content of the singleton.
             if (id.ToString().Equals(SingletonId, StringComparison.Ordinal))
             {
                 id = schema.Id;
@@ -87,6 +112,7 @@ public sealed class ContentQueryService : IContentQueryService
         {
             activity?.SetTag("schemaName", schemaIdOrName);
 
+            // Usually the query should not be null, but we never know.
             if (q == null)
             {
                 return ResultList.Empty<IEnrichedContentEntity>();
@@ -94,6 +120,7 @@ public sealed class ContentQueryService : IContentQueryService
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
 
+            // The API only checks for read.own permission, so we might need an additional filter here.
             if (!HasPermission(context, schema, PermissionIds.AppContentsRead))
             {
                 q = q with { CreatedBy = context.UserPrincipal.Token() };
@@ -119,6 +146,7 @@ public sealed class ContentQueryService : IContentQueryService
 
         using (Telemetry.Activities.StartActivity("ContentQueryService/QueryAsync"))
         {
+            // Usually the query should not be null, but we never know.
             if (q == null)
             {
                 return ResultList.Empty<IEnrichedContentEntity>();
@@ -126,6 +154,7 @@ public sealed class ContentQueryService : IContentQueryService
 
             var schemas = await GetSchemasAsync(context, ct);
 
+            // If the user does not have a permission to query a single schema the database would return an empty result anyway.
             if (schemas.Count == 0)
             {
                 return ResultList.Empty<IEnrichedContentEntity>();

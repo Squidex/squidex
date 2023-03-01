@@ -43,6 +43,7 @@ public sealed class ResolveAssets : IContentEnricherStep
 
         var ids = new HashSet<DomainId>();
 
+        // Group by schema, so we only fetch the schema once.
         foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
             var (schema, components) = await schemas(group.Key);
@@ -52,6 +53,7 @@ public sealed class ResolveAssets : IContentEnricherStep
 
         var assets = await GetAssetsAsync(context, ids, ct);
 
+        // Group by schema, so we only fetch the schema once.
         foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
             var (schema, components) = await schemas(group.Key);

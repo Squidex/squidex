@@ -76,7 +76,7 @@ public sealed class DefaultDomainObjectCache : IDomainObjectCache
         {
             using (var stream = DefaultPools.MemoryStream.GetStream())
             {
-                serializer.Serialize(snapshot, stream, true);
+                serializer.Serialize(snapshot, stream);
 
                 await distributedCache.SetAsync(cacheKey, stream.ToArray(), cacheOptions, ct);
             }

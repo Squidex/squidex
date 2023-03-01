@@ -96,6 +96,6 @@ public sealed class ScriptAsset : IAssetEnricherStep
 
     private static bool ShouldEnrich(Context context)
     {
-        return !context.IsFrontendClient;
+        return !context.IsFrontendClient && !context.ShouldSkipScripting();
     }
 }

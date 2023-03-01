@@ -19,7 +19,8 @@ public sealed class ConvertTags : IAssetEnricherStep
         this.tagService = tagService;
     }
 
-    public async Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
+    public async Task 
+        EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
         CancellationToken ct)
     {
         if (context.ShouldSkipAssetEnrichment())

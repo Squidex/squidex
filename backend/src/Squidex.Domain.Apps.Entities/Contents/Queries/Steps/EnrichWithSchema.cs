@@ -14,6 +14,7 @@ public sealed class EnrichWithSchema : IContentEnricherStep
     public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
+        // Group by schema, so we only fetch the schema once.
         foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
             ct.ThrowIfCancellationRequested();

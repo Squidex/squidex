@@ -12,6 +12,9 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 
 public interface IContentQueryService
 {
+    IAsyncEnumerable<IEnrichedContentEntity> StreamAsync(Context context, string schemaIdOrName, int skip,
+        CancellationToken ct = default);
+
     Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, Q q,
         CancellationToken ct = default);
 
