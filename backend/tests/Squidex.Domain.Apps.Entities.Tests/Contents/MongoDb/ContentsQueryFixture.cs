@@ -104,7 +104,7 @@ public abstract class ContentsQueryFixtureBase : IAsyncLifetime
     private async Task CreateDataAsync(
         CancellationToken ct)
     {
-        if (await ContentRepository.StreamAll(AppIds[0].Id, null, ct).AnyAsync(ct))
+        if (await ContentRepository.StreamAll(AppIds[0].Id, null, SearchScope.All, ct).AnyAsync(ct))
         {
             return;
         }

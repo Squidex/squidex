@@ -221,7 +221,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
                     break;
 
                 default:
-                    scheduler.Run(callback,ErrorNoAsset);
+                    scheduler.Run(callback, ErrorNoAsset);
                     break;
             }
         });

@@ -57,7 +57,7 @@ public sealed class ContentQueryService : IContentQueryService
             .WithoutContentEnrichment());
 
         // We run this query without a timeout because it is meant for long running background operations.
-        var contents = contentRepository.StreamAll(context.App.Id, HashSet.Of(schema.Id), ct);
+        var contents = contentRepository.StreamAll(context.App.Id, HashSet.Of(schema.Id), context.Scope(), ct);
 
         await foreach (var content in contents.WithCancellation(ct))
         {

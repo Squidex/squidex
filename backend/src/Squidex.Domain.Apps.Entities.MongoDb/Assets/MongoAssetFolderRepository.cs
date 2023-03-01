@@ -90,7 +90,7 @@ public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<Mon
         var filters = new List<FilterDefinition<MongoAssetFolderEntity>>
         {
             Filter.Eq(x => x.IndexedAppId, appId),
-            Filter.Eq(x => x.IsDeleted, false)
+            Filter.Ne(x => x.IsDeleted, true)
         };
 
         if (parentId != null)

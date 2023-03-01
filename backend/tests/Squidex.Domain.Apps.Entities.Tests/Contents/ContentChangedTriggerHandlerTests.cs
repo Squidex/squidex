@@ -125,7 +125,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
     {
         var ctx = Context();
 
-        A.CallTo(() => contentRepository.StreamAll(AppId.Id, null, CancellationToken))
+        A.CallTo(() => contentRepository.StreamAll(AppId.Id, null, SearchScope.All, CancellationToken))
             .Returns(new List<ContentEntity>
             {
                 new ContentEntity { SchemaId = schemaMatching },
@@ -157,7 +157,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
 
         var ctx = Context(trigger);
 
-        A.CallTo(() => contentRepository.StreamAll(AppId.Id, A<HashSet<DomainId>>.That.Is(schemaMatching.Id), CancellationToken))
+        A.CallTo(() => contentRepository.StreamAll(AppId.Id, A<HashSet<DomainId>>.That.Is(schemaMatching.Id), SearchScope.All, CancellationToken))
             .Returns(new List<ContentEntity>
             {
                 new ContentEntity { SchemaId = schemaMatching },
@@ -231,7 +231,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
 
         SetupData(@event, 12);
 
-        A.CallTo(() => contentRepository.StreamReferencing(AppId.Id, @event.ContentId, 100, CancellationToken))
+        A.CallTo(() => contentRepository.StreamReferencing(AppId.Id, @event.ContentId, 100, SearchScope.All, CancellationToken))
             .Returns(new List<ContentEntity>
             {
                 new ContentEntity { SchemaId = schemaMatching },

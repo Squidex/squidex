@@ -69,98 +69,68 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         CanUseTransactions = clusteredAsReplica && clusterVersion >= 4 && options.UseTransactions;
     }
 
-    public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
+    public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds, SearchScope scope,
         CancellationToken ct = default)
     {
-        return collectionComplete.StreamAll(appId, schemaIds, ct);
+        return GetCollection(scope).StreamAll(appId, schemaIds, ct);
     }
 
-    public IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference, int take,
+    public IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference, int take, SearchScope scope,
         CancellationToken ct = default)
     {
-        return collectionComplete.StreamReferencing(appId, reference, take, ct);
+        return GetCollection(scope).StreamReferencing(appId, reference, take, ct);
     }
 
-    public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
+    public IAsyncEnumerable<IContentEntity> StreamScheduledWithoutDataAsync(Instant now, SearchScope scope,
         CancellationToken ct = default)
     {
-        return collectionComplete.QueryScheduledWithoutDataAsync(now, ct);
+        return GetCollection(scope).QueryScheduledWithoutDataAsync(now, ct);
     }
 
     public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope,
         CancellationToken ct = default)
     {
-        if (scope == SearchScope.All)
-        {
-            return collectionComplete.QueryAsync(app, schemas, q, ct);
-        }
-        else
-        {
-            return collectionPublished.QueryAsync(app, schemas, q, ct);
-        }
+        return GetCollection(scope).QueryAsync(app, schemas, q, ct);
     }
 
     public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q, SearchScope scope,
         CancellationToken ct = default)
     {
-        if (scope == SearchScope.All)
-        {
-            return collectionComplete.QueryAsync(app, schema, q, ct);
-        }
-        else
-        {
-            return collectionPublished.QueryAsync(app, schema, q, ct);
-        }
+        return GetCollection(scope).QueryAsync(app, schema, q, ct);
     }
 
     public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, DomainId id, SearchScope scope,
         CancellationToken ct = default)
     {
-        if (scope == SearchScope.All)
-        {
-            return collectionComplete.FindContentAsync(schema, id, ct);
-        }
-        else
-        {
-            return collectionPublished.FindContentAsync(schema, id, ct);
-        }
+        return GetCollection(scope).FindContentAsync(schema, id, ct);
     }
 
     public Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids, SearchScope scope,
         CancellationToken ct = default)
     {
-        if (scope == SearchScope.All)
-        {
-            return collectionComplete.QueryIdsAsync(appId, ids, ct);
-        }
-        else
-        {
-            return collectionPublished.QueryIdsAsync(appId, ids, ct);
-        }
+        return GetCollection(scope).QueryIdsAsync(appId, ids, ct);
     }
 
     public Task<bool> HasReferrersAsync(DomainId appId, DomainId reference, SearchScope scope,
         CancellationToken ct = default)
     {
-        if (scope == SearchScope.All)
-        {
-            return collectionComplete.HasReferrersAsync(appId, reference, ct);
-        }
-        else
-        {
-            return collectionPublished.HasReferrersAsync(appId, reference, ct);
-        }
+        return GetCollection(scope).HasReferrersAsync(appId, reference, ct);
     }
 
-    public Task ResetScheduledAsync(DomainId documentId,
+    public Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode, SearchScope scope,
         CancellationToken ct = default)
     {
-        return collectionComplete.ResetScheduledAsync(documentId, ct);
+        return GetCollection(scope).QueryIdsAsync(appId, schemaId, filterNode, ct);
     }
 
-    public Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
+    public Task ResetScheduledAsync(DomainId documentId, SearchScope scope,
         CancellationToken ct = default)
     {
-        return collectionComplete.QueryIdsAsync(appId, schemaId, filterNode, ct);
+        return GetCollection(SearchScope.All).ResetScheduledAsync(documentId, ct);
+    }
+
+    private MongoContentCollection GetCollection(SearchScope scope)
+    {
+        return scope == SearchScope.All ? collectionComplete : collectionPublished;
     }
 }

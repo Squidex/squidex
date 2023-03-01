@@ -53,7 +53,7 @@ public class ContentSchedulerProcessTests : GivenContext
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(now);
 
-        A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, CancellationToken))
+        A.CallTo(() => contentRepository.StreamScheduledWithoutDataAsync(now, SearchScope.All, CancellationToken))
             .Returns(new[] { content1, content2 }.ToAsyncEnumerable());
 
         await sut.PublishAsync(CancellationToken);
@@ -90,7 +90,7 @@ public class ContentSchedulerProcessTests : GivenContext
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(now);
 
-        A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, CancellationToken))
+        A.CallTo(() => contentRepository.StreamScheduledWithoutDataAsync(now, SearchScope.All, CancellationToken))
             .Returns(new[] { content1 }.ToAsyncEnumerable());
 
         await sut.PublishAsync(CancellationToken);
@@ -114,7 +114,7 @@ public class ContentSchedulerProcessTests : GivenContext
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(now);
 
-        A.CallTo(() => contentRepository.QueryScheduledWithoutDataAsync(now, CancellationToken))
+        A.CallTo(() => contentRepository.StreamScheduledWithoutDataAsync(now, SearchScope.All, CancellationToken))
             .Returns(new[] { content1 }.ToAsyncEnumerable());
 
         A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, default))
@@ -122,7 +122,7 @@ public class ContentSchedulerProcessTests : GivenContext
 
         await sut.PublishAsync(CancellationToken);
 
-        A.CallTo(() => contentRepository.ResetScheduledAsync(content1.UniqueId, default))
+        A.CallTo(() => contentRepository.ResetScheduledAsync(content1.UniqueId, SearchScope.All, default))
             .MustHaveHappened();
     }
 }

@@ -119,7 +119,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     [Fact]
     public async Task Should_query_with_all()
     {
-        var values = new SortedSet<int>();
+        var values = new List<int>();
 
         await _.Contents.GetAllAsync(content =>
         {
@@ -127,13 +127,13 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             return Task.CompletedTask;
         });
 
-        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.ToArray());
+        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.OrderBy(x => x).ToArray());
     }
 
     [Fact]
     public async Task Should_query_with_streaming()
     {
-        var values = new SortedSet<int>();
+        var values = new List<int>();
 
         await _.Contents.StreamAllAsync(content =>
         {
@@ -141,7 +141,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             return Task.CompletedTask;
         });
 
-        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.ToArray());
+        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.OrderBy(x => x).ToArray());
     }
 
     [Fact]

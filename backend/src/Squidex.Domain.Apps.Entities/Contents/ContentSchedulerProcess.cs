@@ -54,7 +54,7 @@ public sealed class ContentSchedulerProcess : IBackgroundProcess
     {
         var now = Clock.GetCurrentInstant();
 
-        await foreach (var content in contentRepository.QueryScheduledWithoutDataAsync(now, ct))
+        await foreach (var content in contentRepository.StreamScheduledWithoutDataAsync(now, SearchScope.All, ct))
         {
             await TryPublishAsync(content);
         }

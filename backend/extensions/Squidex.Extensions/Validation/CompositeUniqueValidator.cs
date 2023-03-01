@@ -9,6 +9,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
@@ -17,13 +18,12 @@ namespace Squidex.Extensions.Validation;
 
 internal sealed class CompositeUniqueValidator : IValidator
 {
-    private readonly string tag;
+    private readonly string contentTag;
     private readonly IContentRepository contentRepository;
 
-    public CompositeUniqueValidator(string tag, IContentRepository contentRepository)
+    public CompositeUniqueValidator(string contentTag, IContentRepository contentRepository)
     {
-        this.tag = tag;
-
+        this.contentTag = contentTag;
         this.contentRepository = contentRepository;
     }
 
@@ -55,7 +55,7 @@ internal sealed class CompositeUniqueValidator : IValidator
         {
             var filter = ClrFilter.And(filters);
 
-            var found = await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, filter);
+            var found = await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, filter, SearchScope.All);
 
             if (found.Any(x => x.Id != context.Root.ContentId))
             {
@@ -106,7 +106,7 @@ internal sealed class CompositeUniqueValidator : IValidator
     {
         return
             field.Partitioning == Partitioning.Invariant &&
-            field.RawProperties.Tags?.Contains(tag) == true &&
+            field.RawProperties.Tags?.Contains(contentTag) == true &&
             field.RawProperties is BooleanFieldProperties or DateTimeFieldProperties or NumberFieldProperties or ReferencesFieldProperties or StringFieldProperties;
     }
 }

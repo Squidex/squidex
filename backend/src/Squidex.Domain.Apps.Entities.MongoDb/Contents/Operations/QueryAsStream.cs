@@ -44,6 +44,13 @@ public sealed class QueryAsStream : OperationBase
         {
             filters.Add(Filter.In(x => x.IndexedSchemaId, schemaIds));
         }
+        else
+        {
+            // If we also add this filter, it is more likely that the index will be used.
+            filters.Add(Filter.Exists(x => x.IndexedSchemaId));
+        }
+
+        filters.Add(Filter.Ne(x => x.IsDeleted, true));
 
         return Filter.And(filters);
     }

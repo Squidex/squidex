@@ -68,7 +68,7 @@ public abstract class ContentsQueryTestsBase
     {
         var filter = F.Eq("data.field1.iv", 12);
 
-        var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter);
+        var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter, SearchScope.All);
 
         // We have a concrete query, so we expect an actual.
         Assert.NotEmpty(contents);
@@ -93,7 +93,7 @@ public abstract class ContentsQueryTestsBase
     {
         var time = SystemClock.Instance.GetCurrentInstant();
 
-        var contents = await _.ContentRepository.QueryScheduledWithoutDataAsync(time).ToListAsync();
+        var contents = await _.ContentRepository.StreamScheduledWithoutDataAsync(time, SearchScope.All).ToListAsync();
 
         // The IDs are random here, as it does not really matter.
         Assert.NotNull(contents);

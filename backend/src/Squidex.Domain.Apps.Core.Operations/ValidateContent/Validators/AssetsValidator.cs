@@ -15,7 +15,8 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-public delegate Task<IReadOnlyList<IAssetInfo>> CheckAssets(IEnumerable<DomainId> ids);
+public delegate Task<IReadOnlyList<IAssetInfo>> CheckAssets(IEnumerable<DomainId> ids,
+    CancellationToken ct);
 
 public sealed class AssetsValidator : IValidator
 {
@@ -46,16 +47,17 @@ public sealed class AssetsValidator : IValidator
 
     public void Validate(object? value, ValidationContext context)
     {
-        context.Root.AddTask(ct => ValidateCoreAsync(value, context));
+        context.Root.AddTask(ct => ValidateCoreAsync(value, context, ct));
     }
 
-    private async Task ValidateCoreAsync(object? value, ValidationContext context)
+    private async Task ValidateCoreAsync(object? value, ValidationContext context,
+        CancellationToken ct)
     {
         var foundIds = new List<DomainId>();
 
         if (value is ICollection<DomainId> { Count: > 0 } assetIds)
         {
-            var assets = await checkAssets(assetIds);
+            var assets = await checkAssets(assetIds, ct);
             var index = 1;
 
             foreach (var assetId in assetIds)

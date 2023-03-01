@@ -14,7 +14,8 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-public delegate Task<IReadOnlyList<ContentIdStatus>> CheckContentsByIds(HashSet<DomainId> ids);
+public delegate Task<IReadOnlyList<ContentIdStatus>> CheckContentsByIds(HashSet<DomainId> ids,
+    CancellationToken ct);
 
 public sealed class ReferencesValidator : IValidator
 {
@@ -45,16 +46,17 @@ public sealed class ReferencesValidator : IValidator
 
     public void Validate(object? value, ValidationContext context)
     {
-        context.Root.AddTask(ct => ValidateCoreAsync(value, context));
+        context.Root.AddTask(ct => ValidateCoreAsync(value, context, ct));
     }
 
-    private async Task ValidateCoreAsync(object? value, ValidationContext context)
+    private async Task ValidateCoreAsync(object? value, ValidationContext context,
+        CancellationToken ct)
     {
         var foundIds = new List<DomainId>();
 
         if (value is ICollection<DomainId> { Count: > 0 } contentIds)
         {
-            var references = await checkReferences(contentIds.ToHashSet());
+            var references = await checkReferences(contentIds.ToHashSet(), ct);
             var referenceIndex = 1;
 
             foreach (var id in contentIds)

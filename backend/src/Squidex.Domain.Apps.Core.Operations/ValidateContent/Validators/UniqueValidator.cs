@@ -13,7 +13,8 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-public delegate Task<IReadOnlyList<ContentIdStatus>> CheckUniqueness(FilterNode<ClrValue> filter);
+public delegate Task<IReadOnlyList<ContentIdStatus>> CheckUniqueness(FilterNode<ClrValue> filter,
+    CancellationToken ct);
 
 public sealed class UniqueValidator : IValidator
 {
@@ -43,14 +44,15 @@ public sealed class UniqueValidator : IValidator
 
             if (filter != null)
             {
-                context.Root.AddTask(ct => ValidateCoreAsync(context, filter));
+                context.Root.AddTask(ct => ValidateCoreAsync(context, filter, ct));
             }
         }
     }
 
-    private async Task ValidateCoreAsync(ValidationContext context, FilterNode<ClrValue> filter)
+    private async Task ValidateCoreAsync(ValidationContext context, FilterNode<ClrValue> filter,
+        CancellationToken ct)
     {
-        var found = await checkUniqueness(filter);
+        var found = await checkUniqueness(filter, ct);
 
         if (found.Any(x => x.Id != context.Root.ContentId))
         {
