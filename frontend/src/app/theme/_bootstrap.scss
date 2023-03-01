@@ -393,7 +393,18 @@ a {
             display: none;
         }
 
-        &.active {
+        &:hover {
+            color: $color-theme-brand;
+            border-color: $color-border;
+            border-radius: $border-radius;
+
+            i {
+                color: $color-theme-brand;
+            }
+        }
+
+        &.active,
+        &:active {
             background: none;
             border-color: $color-theme-brand;
             border-radius: $border-radius;
@@ -409,16 +420,6 @@ a {
                 i {
                     color: $color-theme-brand-dark;
                 }
-            }
-        }
-
-        &:hover {
-            color: $color-theme-brand;
-            border-color: $color-border;
-            border-radius: $border-radius;
-
-            i {
-                color: $color-theme-brand;
             }
         }
     }
