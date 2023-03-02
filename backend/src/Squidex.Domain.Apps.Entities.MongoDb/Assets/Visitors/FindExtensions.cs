@@ -49,7 +49,7 @@ public static class FindExtensions
 
         if (!query.HasFilterField("IsDeleted"))
         {
-            filters.Add(Filter.Eq(x => x.IsDeleted, false));
+            filters.Add(Filter.Ne(x => x.IsDeleted, true));
 
             isDefault = true;
         }

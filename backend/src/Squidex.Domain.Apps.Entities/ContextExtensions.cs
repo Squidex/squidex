@@ -11,6 +11,28 @@ public static class ContextExtensions
 {
     private const string HeaderNoTotal = "X-NoTotal";
     private const string HeaderNoSlowTotal = "X-NoSlowTotal";
+    private const string HeaderNoCacheKeys = "X-NoCacheKeys";
+    private const string HeaderNoScripting = "X-NoScripting";
+
+    public static bool ShouldSkipCacheKeys(this Context context)
+    {
+        return context.Headers.ContainsKey(HeaderNoCacheKeys);
+    }
+
+    public static ICloneBuilder WithoutCacheKeys(this ICloneBuilder builder, bool value = true)
+    {
+        return builder.WithBoolean(HeaderNoCacheKeys, value);
+    }
+
+    public static bool ShouldSkipScripting(this Context context)
+    {
+        return context.Headers.ContainsKey(HeaderNoScripting);
+    }
+
+    public static ICloneBuilder WithoutScripting(this ICloneBuilder builder, bool value = true)
+    {
+        return builder.WithBoolean(HeaderNoScripting, value);
+    }
 
     public static bool ShouldSkipTotal(this Context context)
     {

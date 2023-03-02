@@ -100,7 +100,12 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
     public Task ResetScheduledAsync(DomainId documentId,
         CancellationToken ct)
     {
-        return Collection.UpdateOneAsync(x => x.DocumentId == documentId, Update.Unset(x => x.ScheduleJob).Unset(x => x.ScheduledAt), cancellationToken: ct);
+        return Collection.UpdateOneAsync(
+            x => x.DocumentId == documentId,
+            Update
+                .Unset(x => x.ScheduleJob)
+                .Unset(x => x.ScheduledAt),
+            cancellationToken: ct);
     }
 
     public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,

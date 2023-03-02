@@ -61,12 +61,11 @@ public static class GeoJsonValue
         {
             using (var stream = DefaultPools.MemoryStream.GetStream())
             {
-                serializer.Serialize(obj, stream, true);
+                serializer.Serialize(obj, stream);
 
                 stream.Position = 0;
 
-                geoJSON = serializer.Deserialize<Geometry>(stream, null, true);
-
+                geoJSON = serializer.Deserialize<Geometry>(stream, null);
                 return true;
             }
         }

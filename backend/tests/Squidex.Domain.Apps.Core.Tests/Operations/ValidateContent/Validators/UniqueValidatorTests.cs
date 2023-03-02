@@ -95,7 +95,7 @@ public class UniqueValidatorTests : IClassFixture<TranslationsFixture>
 
     private static CheckUniqueness FoundDuplicates(DomainId id, Action<string>? filter = null)
     {
-        return filterNode =>
+        return (filterNode, ct) =>
         {
             filter?.Invoke(filterNode.ToString());
 

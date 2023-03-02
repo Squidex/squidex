@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
@@ -21,6 +22,7 @@ public sealed class ScriptContent : IContentEnricherStep
     public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
+        // Sometimes we just want to skip this for performance reasons.
         if (!ShouldEnrich(context))
         {
             return;
@@ -93,6 +95,11 @@ public sealed class ScriptContent : IContentEnricherStep
 
     private static bool ShouldEnrich(Context context)
     {
-        return !context.IsFrontendClient;
+        // We need a special permission to disable scripting for security reasons, if the script removes sensible data.
+        var shouldScript =
+            !context.ShouldSkipScripting() ||
+            !context.UserPermissions.Allows(PermissionIds.ForApp(PermissionIds.AppNoScripting, context.App.Name));
+
+        return !context.IsFrontendClient && shouldScript;
     }
 }

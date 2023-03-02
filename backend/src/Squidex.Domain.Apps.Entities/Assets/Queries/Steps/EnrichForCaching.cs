@@ -22,6 +22,12 @@ public sealed class EnrichForCaching : IAssetEnricherStep
     public Task EnrichAsync(Context context,
         CancellationToken ct)
     {
+        // Sometimes we just want to skip this for performance reasons.
+        if (!ShouldEnrich(context))
+        {
+            return Task.CompletedTask;
+        }
+
         context.AddCacheHeaders(requestCache);
 
         return Task.CompletedTask;
@@ -30,6 +36,12 @@ public sealed class EnrichForCaching : IAssetEnricherStep
     public Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
         CancellationToken ct)
     {
+        // Sometimes we just want to skip this for performance reasons.
+        if (!ShouldEnrich(context))
+        {
+            return Task.CompletedTask;
+        }
+
         requestCache.AddDependency(context.App.Id, context.App.Version);
 
         foreach (var asset in assets)
@@ -38,5 +50,10 @@ public sealed class EnrichForCaching : IAssetEnricherStep
         }
 
         return Task.CompletedTask;
+    }
+
+    private static bool ShouldEnrich(Context context)
+    {
+        return !context.ShouldSkipCacheKeys();
     }
 }

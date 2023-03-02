@@ -257,7 +257,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
 
     private static CheckAssets FoundAssets()
     {
-        return ids =>
+        return (ids, ct) =>
         {
             var actual = new List<IAssetInfo> { Document, Image1, Image2, ImageSvg, Video };
 

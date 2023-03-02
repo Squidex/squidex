@@ -36,7 +36,7 @@ public class ReferencesFieldTests : IClassFixture<TranslationsFixture>
         {
             if (field is IField<ReferencesFieldProperties> references)
             {
-                yield return new ReferencesValidator(references.Properties.IsRequired, references.Properties, ids =>
+                yield return new ReferencesValidator(references.Properties.IsRequired, references.Properties, (ids, ct) =>
                 {
                     var actual = ids.Select(x => new ContentIdStatus(schemaId, x, Status.Published)).ToList();
 

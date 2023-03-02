@@ -69,6 +69,9 @@ namespace Squidex.Shared
         // App
         public const string App = "squidex.apps.{app}";
 
+        // App
+        public const string AppNoScripting = "squidex.apps.{app}.no-scripting";
+
         // App General
         public const string AppAdmin = "squidex.apps.{app}.*";
         public const string AppDelete = "squidex.apps.{app}.delete";

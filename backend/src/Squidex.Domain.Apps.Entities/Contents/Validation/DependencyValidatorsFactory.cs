@@ -35,9 +35,9 @@ public sealed class DependencyValidatorsFactory : IValidatorsFactory
 
         if (field is IField<AssetsFieldProperties> assetsField)
         {
-            var checkAssets = new CheckAssets(async ids =>
+            var checkAssets = new CheckAssets(async (ids, ct) =>
             {
-                return await assetRepository.QueryAsync(context.Root.AppId.Id, null, Q.Empty.WithIds(ids), default);
+                return await assetRepository.QueryAsync(context.Root.AppId.Id, null, Q.Empty.WithIds(ids), ct);
             });
 
             yield return new AssetsValidator(isRequired, assetsField.Properties, checkAssets);
@@ -45,9 +45,9 @@ public sealed class DependencyValidatorsFactory : IValidatorsFactory
 
         if (field is IField<ReferencesFieldProperties> referencesField)
         {
-            var checkReferences = new CheckContentsByIds(async ids =>
+            var checkReferences = new CheckContentsByIds(async (ids, ct) =>
             {
-                return await contentRepository.QueryIdsAsync(context.Root.AppId.Id, ids, SearchScope.All, default);
+                return await contentRepository.QueryIdsAsync(context.Root.AppId.Id, ids, SearchScope.All, ct);
             });
 
             yield return new ReferencesValidator(isRequired, referencesField.Properties, checkReferences);
@@ -55,9 +55,9 @@ public sealed class DependencyValidatorsFactory : IValidatorsFactory
 
         if (field is IField<NumberFieldProperties> numberField && numberField.Properties.IsUnique)
         {
-            var checkUniqueness = new CheckUniqueness(async filter =>
+            var checkUniqueness = new CheckUniqueness(async (f, ct) =>
             {
-                return await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, filter, default);
+                return await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, f, SearchScope.All, ct);
             });
 
             yield return new UniqueValidator(checkUniqueness);
@@ -65,9 +65,9 @@ public sealed class DependencyValidatorsFactory : IValidatorsFactory
 
         if (field is IField<StringFieldProperties> stringField && stringField.Properties.IsUnique)
         {
-            var checkUniqueness = new CheckUniqueness(async filter =>
+            var checkUniqueness = new CheckUniqueness(async (f, ct) =>
             {
-                return await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, filter, default);
+                return await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, f, SearchScope.All, ct);
             });
 
             yield return new UniqueValidator(checkUniqueness);

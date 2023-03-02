@@ -8,7 +8,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Utils;
 using TestSuite.Model;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -115,6 +114,34 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         AssertItems(items_0, 3, new[] { 4, 5, 6 });
         AssertItems(items_1, 3, new[] { 4, 5, 6 });
+    }
+
+    [Fact]
+    public async Task Should_query_with_all()
+    {
+        var values = new List<int>();
+
+        await _.Contents.GetAllAsync(content =>
+        {
+            values.Add(content.Data.Number);
+            return Task.CompletedTask;
+        });
+
+        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.OrderBy(x => x).ToArray());
+    }
+
+    [Fact]
+    public async Task Should_query_with_streaming()
+    {
+        var values = new List<int>();
+
+        await _.Contents.StreamAllAsync(content =>
+        {
+            values.Add(content.Data.Number);
+            return Task.CompletedTask;
+        });
+
+        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.OrderBy(x => x).ToArray());
     }
 
     [Fact]

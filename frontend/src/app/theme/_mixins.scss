@@ -42,6 +42,10 @@
     &:hover {
         color: darken($color, 15%);
     }
+
+    &:active {
+        border-color: transparent !important;
+    }
 }
 
 @mixin scrollbars($size, $foreground-color, $background-color: mix($foreground-color, white, 50%)) {

@@ -27,7 +27,7 @@ public class AssetsFieldTests : IClassFixture<TranslationsFixture>
         {
             if (field is IField<AssetsFieldProperties> assets)
             {
-                yield return new AssetsValidator(assets.Properties.IsRequired, assets.Properties, ids =>
+                yield return new AssetsValidator(assets.Properties.IsRequired, assets.Properties, (ids, ct) =>
                 {
                     var actual = ids.Select(TestAssets.Document).ToList();
 

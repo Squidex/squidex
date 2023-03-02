@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
@@ -26,7 +27,7 @@ public class ScriptAssetTests : GivenContext
     [Fact]
     public async Task Should_not_call_script_engine_if_no_script_configured()
     {
-        var asset = new AssetEntity();
+        var asset = CreateAsset();
 
         await sut.EnrichAsync(ApiContext, new[] { asset }, CancellationToken);
 
@@ -37,10 +38,9 @@ public class ScriptAssetTests : GivenContext
     [Fact]
     public async Task Should_not_call_script_engine_for_frontend_user()
     {
-        A.CallTo(() => App.AssetScripts)
-            .Returns(new AssetScripts { Query = "my-query" });
+        SetupScript(query: "my-query");
 
-        var asset = new AssetEntity();
+        var asset = CreateAsset();
 
         await sut.EnrichAsync(FrontendContext, new[] { asset }, CancellationToken);
 
@@ -49,12 +49,24 @@ public class ScriptAssetTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_not_call_script_engine_if_disabled_and_user_has_permission()
+    {
+        SetupScript(query: "my-query");
+
+        var asset = CreateAsset();
+
+        await sut.EnrichAsync(ContextWithNoScript(), new[] { asset }, CancellationToken);
+
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<AssetScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_call_script_engine()
     {
-        A.CallTo(() => App.AssetScripts)
-            .Returns(new AssetScripts { Query = "my-query" });
+        SetupScript(query: "my-query");
 
-        var asset = new AssetEntity { Id = DomainId.NewGuid() };
+        var asset = CreateAsset();
 
         await sut.EnrichAsync(ApiContext, new[] { asset }, CancellationToken);
 
@@ -65,17 +77,17 @@ public class ScriptAssetTests : GivenContext
                     Equals(x["appName"], AppId.Name) &&
                     Equals(x["user"], ApiContext.UserPrincipal)),
                 "my-query",
-                ScriptOptions(), CancellationToken))
+                ScriptOptions(),
+                CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
-    public async Task Should_make_test_with_pre_query_script()
+    public async Task Should_call_script_engine_with_pre_query_script()
     {
-        A.CallTo(() => App.AssetScripts)
-            .Returns(new AssetScripts { Query = "my-query", QueryPre = "my-pre-query" });
+        SetupScript(query: "my-query", queryPre: "my-pre-query");
 
-        var asset = new AssetEntity { Id = DomainId.NewGuid() };
+        var asset = CreateAsset();
 
         await sut.EnrichAsync(ApiContext, new[] { asset }, CancellationToken);
 
@@ -86,7 +98,8 @@ public class ScriptAssetTests : GivenContext
                     Equals(x["appName"], AppId.Name) &&
                     Equals(x["user"], ApiContext.UserPrincipal)),
                 "my-pre-query",
-                ScriptOptions(), CancellationToken))
+                ScriptOptions(),
+                CancellationToken))
             .MustHaveHappened();
 
         A.CallTo(() => scriptEngine.ExecuteAsync(
@@ -96,12 +109,36 @@ public class ScriptAssetTests : GivenContext
                     Equals(x["appName"], AppId.Name) &&
                     Equals(x["user"], ApiContext.UserPrincipal)),
                 "my-query",
-                ScriptOptions(), CancellationToken))
+                ScriptOptions(),
+                CancellationToken))
             .MustHaveHappened();
+    }
+
+    private void SetupScript(string? query = null, string? queryPre = null)
+    {
+        A.CallTo(() => App.AssetScripts)
+            .Returns(new AssetScripts
+            {
+                Query = query,
+                QueryPre = queryPre
+            });
+    }
+
+    private static AssetEntity CreateAsset()
+    {
+        return new AssetEntity { Id = DomainId.NewGuid() };
     }
 
     private static ScriptOptions ScriptOptions()
     {
         return A<ScriptOptions>.That.Matches(x => x.AsContext);
+    }
+
+    private Context ContextWithNoScript()
+    {
+        var contextPermission = PermissionIds.ForApp(PermissionIds.AppNoScripting, App.Name).Id;
+        var contextInstance = CreateContext(false, contextPermission).Clone(b => b.WithoutScripting());
+
+        return contextInstance;
     }
 }

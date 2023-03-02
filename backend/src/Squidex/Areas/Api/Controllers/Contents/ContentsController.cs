@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
@@ -15,6 +16,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
+using Squidex.Web.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Contents;
 
@@ -34,13 +36,37 @@ public sealed class ContentsController : ApiController
     }
 
     /// <summary>
+    /// Streams contents.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="schema">The name of the schema.</param>
+    /// <param name="skip">The number of items to skip.</param>
+    /// <response code="200">Contents returned.</response>.
+    /// <response code="404">Schema or app not found.</response>.
+    /// <remarks>
+    /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+    /// </remarks>
+    [HttpGet]
+    [Route("content/{app}/{schema}/stream")]
+    [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppContentsRead)]
+    [ApiCosts(10)]
+    [OpenApiIgnore]
+    public IActionResult StreamContents(string app, string schema, [FromQuery] int skip = 0)
+    {
+        var contents = contentQuery.StreamAsync(Context, schema, skip, HttpContext.RequestAborted);
+
+        return new JsonStreamResult<IEnrichedContentEntity>(contents);
+    }
+
+    /// <summary>
     /// Queries contents.
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="ids">The optional ids of the content to fetch.</param>
     /// <param name="q">The optional json query.</param>
-    /// <response code="200">Contents retunred.</response>.
+    /// <response code="200">Contents returned.</response>.
     /// <response code="404">Schema or app not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.

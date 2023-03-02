@@ -266,6 +266,12 @@ hr {
     }
 }
 
+.no-focus-shadow {
+    &:focus {
+        box-shadow: none;
+    }
+}
+
 .sidebar {
     @include absolute($size-navbar-height, null, 0, 0);
     background: $color-theme-brand;

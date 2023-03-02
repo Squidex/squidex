@@ -286,8 +286,10 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                     .AddField("ref2",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(ref2.Select(x => x.ToString())))),
-            SchemaId = SchemaId,
             AppId = AppId,
+            SchemaId = SchemaId,
+            Status = Status.Draft,
+            StatusColor = null!,
             Version = 0
         };
     }
@@ -305,8 +307,10 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                     .AddField("number",
                         new ContentFieldData()
                             .AddInvariant(number)),
-            SchemaId = refSchemaId,
             AppId = AppId,
+            SchemaId = refSchemaId,
+            Status = Status.Draft,
+            StatusColor = null!,
             Version = version
         };
     }

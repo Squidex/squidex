@@ -30,7 +30,6 @@ public sealed class ResolveReferences : IContentEnricherStep
     public ResolveReferences(Lazy<IContentQueryService> contentQuery, IRequestCache requestCache)
     {
         this.contentQuery = contentQuery;
-
         this.requestCache = requestCache;
     }
 
@@ -44,6 +43,7 @@ public sealed class ResolveReferences : IContentEnricherStep
 
         var ids = new HashSet<DomainId>();
 
+        // Group by schema, so we only fetch the schema once.
         foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
             var (schema, components) = await schemas(group.Key);
@@ -53,6 +53,7 @@ public sealed class ResolveReferences : IContentEnricherStep
 
         var references = await GetReferencesAsync(context, ids, ct);
 
+        // Group by schema, so we only fetch the schema once.
         foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
             var (schema, components) = await schemas(group.Key);

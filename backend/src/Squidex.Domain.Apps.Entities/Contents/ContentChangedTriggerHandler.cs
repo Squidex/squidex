@@ -61,7 +61,7 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
             trigger.Schemas.Select(x => x.SchemaId).Distinct().ToHashSet() :
             null;
 
-        await foreach (var content in contentRepository.StreamAll(context.AppId.Id, schemaIds, ct))
+        await foreach (var content in contentRepository.StreamAll(context.AppId.Id, schemaIds, SearchScope.All, ct))
         {
             var result = new EnrichedContentEvent
             {
@@ -105,7 +105,7 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
 
         var take = context.MaxEvents.Value;
 
-        await foreach (var content in contentRepository.StreamReferencing(context.AppId.Id, enrichedEvent.Id, take, ct))
+        await foreach (var content in contentRepository.StreamReferencing(context.AppId.Id, enrichedEvent.Id, take, SearchScope.All, ct))
         {
             var result = new EnrichedContentEvent
             {

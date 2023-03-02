@@ -215,7 +215,7 @@ public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
 
     private static CheckContentsByIds FoundReferences(DomainId schemaId, params (DomainId Id, Status Status)[] references)
     {
-        return x =>
+        return (ids, ct) =>
         {
             var actual = references.Select(x => new ContentIdStatus(schemaId, x.Id, x.Status)).ToList();
 

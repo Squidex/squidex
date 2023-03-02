@@ -41,7 +41,7 @@ public sealed class SystemJsonSerializer : IJsonSerializer
         }
     }
 
-    public T Deserialize<T>(Stream stream, Type? actualType = null, bool leaveOpen = false)
+    public T Deserialize<T>(Stream stream, Type? actualType = null)
     {
         try
         {
@@ -52,13 +52,6 @@ public sealed class SystemJsonSerializer : IJsonSerializer
             ThrowHelper.JsonException(ex.Message, ex);
             return default!;
         }
-        finally
-        {
-            if (!leaveOpen)
-            {
-                stream.Dispose();
-            }
-        }
     }
 
     public string Serialize<T>(T value, bool indented = false)
@@ -66,11 +59,11 @@ public sealed class SystemJsonSerializer : IJsonSerializer
         return Serialize(value, typeof(T), indented);
     }
 
-    public string Serialize(object? value, Type type, bool intented = false)
+    public string Serialize(object? value, Type type, bool indented = false)
     {
         try
         {
-            var options = intented ? optionsIndented : optionsNormal;
+            var options = indented ? optionsIndented : optionsNormal;
 
             return JsonSerializer.Serialize(value, type, options);
         }
@@ -81,27 +74,43 @@ public sealed class SystemJsonSerializer : IJsonSerializer
         }
     }
 
-    public void Serialize<T>(T value, Stream stream, bool leaveOpen = false)
+    public void Serialize<T>(T value, Stream stream, bool indented = false)
     {
-        Serialize(value, typeof(T), stream, leaveOpen);
+        Serialize(value, typeof(T), stream, indented);
     }
 
-    public void Serialize(object? value, Type type, Stream stream, bool leaveOpen = false)
+    public void Serialize(object? value, Type type, Stream stream, bool indented = false)
     {
         try
         {
+            var options = indented ? optionsIndented : optionsNormal;
+
             JsonSerializer.Serialize(stream, value, optionsNormal);
         }
         catch (SystemJsonException ex)
         {
             ThrowHelper.JsonException(ex.Message, ex);
         }
-        finally
+    }
+
+    public Task SerializeAsync<T>(T value, Stream stream, bool indented = false,
+        CancellationToken ct = default)
+    {
+        return SerializeAsync(value, typeof(T), stream, indented, ct);
+    }
+
+    public async Task SerializeAsync(object? value, Type type, Stream stream, bool indented = false,
+        CancellationToken ct = default)
+    {
+        try
         {
-            if (!leaveOpen)
-            {
-                stream.Dispose();
-            }
+            var options = indented ? optionsIndented : optionsNormal;
+
+            await JsonSerializer.SerializeAsync(stream, value, optionsNormal, ct);
+        }
+        catch (SystemJsonException ex)
+        {
+            ThrowHelper.JsonException(ex.Message, ex);
         }
     }
 }

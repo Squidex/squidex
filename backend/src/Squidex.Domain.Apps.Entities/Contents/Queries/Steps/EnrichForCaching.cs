@@ -21,6 +21,12 @@ public sealed class EnrichForCaching : IContentEnricherStep
     public Task EnrichAsync(Context context,
         CancellationToken ct)
     {
+        // Sometimes we just want to skip this for performance reasons.
+        if (!ShouldEnrich(context))
+        {
+            return Task.CompletedTask;
+        }
+
         context.AddCacheHeaders(requestCache);
 
         return Task.CompletedTask;
@@ -29,8 +35,15 @@ public sealed class EnrichForCaching : IContentEnricherStep
     public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
+        // Sometimes we just want to skip this for performance reasons.
+        if (!ShouldEnrich(context))
+        {
+            return;
+        }
+
         var app = context.App;
 
+        // Group by schema, so we only fetch the schema once.
         foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
             ct.ThrowIfCancellationRequested();
@@ -44,5 +57,10 @@ public sealed class EnrichForCaching : IContentEnricherStep
                 requestCache.AddDependency(app.UniqueId, app.Version);
             }
         }
+    }
+
+    private static bool ShouldEnrich(Context context)
+    {
+        return !context.ShouldSkipCacheKeys();
     }
 }
