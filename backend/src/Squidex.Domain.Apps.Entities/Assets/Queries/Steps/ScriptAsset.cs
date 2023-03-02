@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 
@@ -96,6 +97,11 @@ public sealed class ScriptAsset : IAssetEnricherStep
 
     private static bool ShouldEnrich(Context context)
     {
-        return !context.IsFrontendClient && !context.ShouldSkipScripting();
+        // We need a special permission to disable scripting for security reasons, if the script removes sensible data.
+        var shouldScript =
+            !context.ShouldSkipScripting() ||
+            !context.UserPermissions.Allows(PermissionIds.ForApp(context.App.Name));
+
+        return !context.IsFrontendClient && shouldScript;
     }
 }

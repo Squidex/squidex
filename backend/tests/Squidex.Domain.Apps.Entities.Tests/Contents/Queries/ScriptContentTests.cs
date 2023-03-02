@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
@@ -56,14 +57,17 @@ public class ScriptContentTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_not_call_script_engine_if_disabled()
+    public async Task Should_not_call_script_engine_if_disabled_and_user_has_permission()
     {
+        var contextPermission = PermissionIds.ForApp(PermissionIds.AppNoScripting, App.Name).Id;
+        var contextInstance = CreateContext(false, contextPermission).Clone(b => b.WithoutScripting());
+
         var (provider, schemaId) = CreateSchema(
             query: "my-query");
 
         var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
 
-        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutScripting()), new[] { content }, provider, default);
+        await sut.EnrichAsync(contextInstance, new[] { content }, provider, default);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();

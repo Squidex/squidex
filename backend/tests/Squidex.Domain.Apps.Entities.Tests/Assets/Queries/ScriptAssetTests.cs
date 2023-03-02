@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
@@ -49,14 +50,17 @@ public class ScriptAssetTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_not_call_script_engine_if_disabled()
+    public async Task Should_not_call_script_engine_if_disabled_and_user_has_permission()
     {
+        var contextPermission = PermissionIds.ForApp(PermissionIds.AppNoScripting, App.Name).Id;
+        var contextInstance = CreateContext(false, contextPermission).Clone(b => b.WithoutScripting());
+
         A.CallTo(() => App.AssetScripts)
             .Returns(new AssetScripts { Query = "my-query" });
 
         var asset = new AssetEntity();
 
-        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutScripting()), new[] { asset }, CancellationToken);
+        await sut.EnrichAsync(contextInstance, new[] { asset }, CancellationToken);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<AssetScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();

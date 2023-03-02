@@ -31,10 +31,10 @@ public sealed record Role(string Name, PermissionSet? Permissions = null, JsonOb
         PermissionIds.AppUsage
     };
 
-    public const string Editor = "Editor";
-    public const string Developer = "Developer";
-    public const string Owner = "Owner";
-    public const string Reader = "Reader";
+    public const string Editor = nameof(Editor);
+    public const string Developer = nameof(Developer);
+    public const string Owner = nameof(Owner);
+    public const string Reader = nameof(Reader);
 
     public string Name { get; } = Guard.NotNullOrEmpty(Name);
 
