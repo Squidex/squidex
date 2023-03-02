@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared;
 
@@ -31,12 +30,9 @@ public class ScriptContentTests : GivenContext
     [Fact]
     public async Task Should_not_call_script_engine_if_no_script_configured()
     {
-        var (provider, schemaId) = CreateSchema(
-            queryPre: "my-pre-query");
+        var content = CreateContent();
 
-        var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
-
-        await sut.EnrichAsync(ApiContext, new[] { content }, provider, default);
+        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -45,12 +41,11 @@ public class ScriptContentTests : GivenContext
     [Fact]
     public async Task Should_not_call_script_engine_for_frontend_user()
     {
-        var (provider, schemaId) = CreateSchema(
-            query: "my-query");
+        SetupScript(query: "my-query");
 
-        var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
+        var content = CreateContent();
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, provider, default);
+        await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -59,59 +54,87 @@ public class ScriptContentTests : GivenContext
     [Fact]
     public async Task Should_not_call_script_engine_if_disabled_and_user_has_permission()
     {
-        var contextPermission = PermissionIds.ForApp(PermissionIds.AppNoScripting, App.Name).Id;
-        var contextInstance = CreateContext(false, contextPermission).Clone(b => b.WithoutScripting());
+        SetupScript(query: "my-query");
 
-        var (provider, schemaId) = CreateSchema(
-            query: "my-query");
+        var content = CreateContent();
 
-        var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
-
-        await sut.EnrichAsync(contextInstance, new[] { content }, provider, default);
+        await sut.EnrichAsync(ContextWithNoScript(), new[] { content }, SchemaProvider(), CancellationToken);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
-    public async Task Should_call_script_engine_with_data()
+    public async Task Should_call_script_engine()
     {
-        var oldData = new ContentData();
+        SetupScript(query: "my-query");
 
-        var (provider, schemaId) = CreateSchema(
-            query: "my-query");
+        var contentBefore = CreateContent();
+        var contentData = contentBefore.Data;
 
-        var content = new ContentEntity { Data = oldData, SchemaId = schemaId };
+        await sut.EnrichAsync(ApiContext, new[] { contentBefore }, SchemaProvider(), CancellationToken);
 
-        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "my-query", ScriptOptions(), A<CancellationToken>._))
-            .Returns(new ContentData());
-
-        await sut.EnrichAsync(ApiContext, new[] { content }, provider, default);
-
-        Assert.NotSame(oldData, content.Data);
+        Assert.NotSame(contentBefore.Data, contentData);
 
         A.CallTo(() => scriptEngine.TransformAsync(
                 A<DataScriptVars>.That.Matches(x =>
-                    Equals(x["contentId"], content.Id) &&
-                    Equals(x["data"], oldData) &&
+                    Equals(x["contentId"], contentBefore.Id) &&
+                    Equals(x["data"], contentData) &&
                     Equals(x["appId"], AppId.Id) &&
                     Equals(x["appName"], AppId.Name) &&
                     Equals(x["user"], ApiContext.UserPrincipal)),
                 "my-query",
-                ScriptOptions(), A<CancellationToken>._))
+                ScriptOptions(),
+                CancellationToken))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_call_script_engine_with_pre_query_script()
+    {
+        SetupScript(query: "my-query", queryPre: "my-pre-query");
+
+        var contentBefore = CreateContent();
+        var contentData = contentBefore.Data;
+
+        await sut.EnrichAsync(ApiContext, new[] { contentBefore }, SchemaProvider(), CancellationToken);
+
+        Assert.NotSame(contentBefore.Data, contentData);
+
+        A.CallTo(() => scriptEngine.ExecuteAsync(
+                A<DataScriptVars>.That.Matches(x =>
+                    Equals(x.GetValue<object>("contentId"), null) &&
+                    Equals(x["appId"], AppId.Id) &&
+                    Equals(x["appName"], AppId.Name) &&
+                    Equals(x["user"], ApiContext.UserPrincipal)),
+                "my-pre-query",
+                ScriptOptions(),
+                CancellationToken))
+            .MustHaveHappened();
+
+        A.CallTo(() => scriptEngine.TransformAsync(
+                A<DataScriptVars>.That.Matches(x =>
+                    Equals(x["contentId"], contentBefore.Id) &&
+                    Equals(x["data"], contentData) &&
+                    Equals(x["appId"], AppId.Id) &&
+                    Equals(x["appName"], AppId.Name) &&
+                    Equals(x["user"], ApiContext.UserPrincipal)),
+                "my-query",
+                ScriptOptions(),
+                CancellationToken))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_make_test_with_pre_query_script()
     {
-        var (provider, id) = CreateSchema(
+        SetupScript(
             query: @"
                     ctx.data.test = { iv: ctx.custom };
                     replace()",
             queryPre: "ctx.custom = 123;");
 
-        var content = new ContentEntity { Data = new ContentData(), SchemaId = id };
+        var content = CreateContent();
 
         var realScriptEngine =
             new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
@@ -123,31 +146,43 @@ public class ScriptContentTests : GivenContext
 
         var sut2 = new ScriptContent(realScriptEngine);
 
-        await sut2.EnrichAsync(ApiContext, new[] { content }, provider, default);
+        await sut2.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
 
         Assert.Equal(JsonValue.Create(123), content.Data["test"]!["iv"]);
     }
 
-    private (ProvideSchema, NamedId<DomainId>) CreateSchema(string? query = null, string? queryPre = null)
+    private void SetupScript(string? query = null, string? queryPre = null)
     {
-        var id = NamedId.Of(DomainId.NewGuid(), "my-schema");
-
-        return (__ =>
-        {
-            var schemaDef =
-                new Schema(id.Name)
+        A.CallTo(() => Schema.SchemaDef)
+            .Returns(
+                new Schema(SchemaId.Name)
                     .SetScripts(new SchemaScripts
                     {
                         Query = query,
                         QueryPre = queryPre
-                    });
+                    }));
+    }
 
-            return Task.FromResult((Mocks.Schema(AppId, id, schemaDef), ResolvedComponents.Empty));
-        }, id);
+    private ContentEntity CreateContent()
+    {
+        return new ContentEntity { Data = new ContentData(), SchemaId = SchemaId };
+    }
+
+    private ProvideSchema SchemaProvider()
+    {
+        return x => Task.FromResult((Schema, ResolvedComponents.Empty));
     }
 
     private static ScriptOptions ScriptOptions()
     {
         return A<ScriptOptions>.That.Matches(x => x.AsContext);
+    }
+
+    private Context ContextWithNoScript()
+    {
+        var contextPermission = PermissionIds.ForApp(PermissionIds.AppNoScripting, App.Name).Id;
+        var contextInstance = CreateContext(false, contextPermission).Clone(b => b.WithoutScripting());
+
+        return contextInstance;
     }
 }

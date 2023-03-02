@@ -100,7 +100,7 @@ public sealed class ScriptAsset : IAssetEnricherStep
         // We need a special permission to disable scripting for security reasons, if the script removes sensible data.
         var shouldScript =
             !context.ShouldSkipScripting() ||
-            !context.UserPermissions.Allows(PermissionIds.ForApp(context.App.Name));
+            !context.UserPermissions.Allows(PermissionIds.ForApp(PermissionIds.AppNoScripting, context.App.Name));
 
         return !context.IsFrontendClient && shouldScript;
     }
