@@ -58,7 +58,7 @@ public sealed class OpenSearchActionHandler : RuleActionHandler<OpenSearchAction
             contentId = DomainId.NewGuid().ToString();
         }
 
-        var ruleDescription = string.Empty;
+        var ruleText = string.Empty;
         var ruleJob = new OpenSearchJob
         {
             IndexName = await FormatAsync(action.IndexName, @event),
@@ -70,11 +70,11 @@ public sealed class OpenSearchActionHandler : RuleActionHandler<OpenSearchAction
 
         if (delete)
         {
-            ruleDescription = $"Delete entry index: {action.IndexName}";
+            ruleText = $"Delete entry index: {action.IndexName}";
         }
         else
         {
-            ruleDescription = $"Upsert to index: {action.IndexName}";
+            ruleText = $"Upsert to index: {action.IndexName}";
 
             OpenSearchContent content;
             try
@@ -109,7 +109,7 @@ public sealed class OpenSearchActionHandler : RuleActionHandler<OpenSearchAction
             ruleJob.Content = serializer.Serialize(content, true);
         }
 
-        return (ruleDescription, ruleJob);
+        return (ruleText, ruleJob);
     }
 
     protected override async Task<Result> ExecuteJobAsync(OpenSearchJob job,

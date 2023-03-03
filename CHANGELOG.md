@@ -4,6 +4,40 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.5.0] - 2023-03-03
+
+### Fixed
+
+* **UI**: Fixed styling of schemas in workflow settings.
+* **Contents**: Fixed a bug when permanently deleting a content that was permanently deleted before didn't work.
+* **Scripting**: Fixes to the handling of asynchronous tasks in scripts.
+
+### Changed
+
+* **Rabbit MQ**: Removed the RabbitMQ event consumer.
+* **Contents**: Allow DateTime fields in sample uniqueness validator.
+* **Rules**: Only create enriched content events once for the same trigger type.
+* **Schemas**: Added tooltip to field icon in schema editor.
+* **Tests**: Improvements to the tests to verify all methods to make an update, delete and so on.
+* **UI** 
+
+### Added
+
+* **Assets**: Added support for Cloudflare R2.
+* **Contents**: New endpoint to stream all content items out using server-sent-events.
+* **Rules**: Also trigger rules when a reference has changed.
+* **Scripting**: Expose information about deprecated helper methods.
+* **Scripting**: Improved the `reject` method to output multiple errors.
+* **Scripting**: New method to resolve a single asset.
+* **Scripting**: New method to resolve a single reference.
+* **UI**: Autocompletion for Preview URLs.
+* **UI**: Autocompletion for single line code editors.
+* **UI**: Show allowed values in autocompletion.
+
+### Security
+
+* **UI**: Escape HTML in the hightlight pipe, that is used to highlight matching words in search.
+
 ## [7.4.0] - 2023-02-01
 
 ### Fixed

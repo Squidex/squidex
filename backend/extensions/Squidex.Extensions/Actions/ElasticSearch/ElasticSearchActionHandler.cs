@@ -58,7 +58,7 @@ public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearch
             contentId = DomainId.NewGuid().ToString();
         }
 
-        var ruleDescription = string.Empty;
+        var ruleText = string.Empty;
         var ruleJob = new ElasticSearchJob
         {
             IndexName = await FormatAsync(action.IndexName, @event),
@@ -70,11 +70,11 @@ public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearch
 
         if (delete)
         {
-            ruleDescription = $"Delete entry index: {action.IndexName}";
+            ruleText = $"Delete entry index: {action.IndexName}";
         }
         else
         {
-            ruleDescription = $"Upsert to index: {action.IndexName}";
+            ruleText = $"Upsert to index: {action.IndexName}";
 
             ElasticSearchContent content;
             try
@@ -109,7 +109,7 @@ public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearch
             ruleJob.Content = serializer.Serialize(content, true);
         }
 
-        return (ruleDescription, ruleJob);
+        return (ruleText, ruleJob);
     }
 
     protected override async Task<Result> ExecuteJobAsync(ElasticSearchJob job,

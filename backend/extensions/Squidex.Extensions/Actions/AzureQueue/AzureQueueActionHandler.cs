@@ -47,7 +47,7 @@ public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction
             requestBody = ToEnvelopeJson(@event);
         }
 
-        var ruleDescription = $"Send AzureQueueJob to azure queue '{queueName}'";
+        var ruleText = $"Send AzureQueueJob to azure queue '{queueName}'";
         var ruleJob = new AzureQueueJob
         {
             QueueConnectionString = action.ConnectionString,
@@ -55,7 +55,7 @@ public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction
             MessageBodyV2 = requestBody
         };
 
-        return (ruleDescription, ruleJob);
+        return (ruleText, ruleJob);
     }
 
     protected override async Task<Result> ExecuteJobAsync(AzureQueueJob job,

@@ -52,7 +52,7 @@ public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, Sign
 
         var target = (await FormatAsync(action.Target, @event)) ?? string.Empty;
 
-        var ruleDescription = $"Send SignalRJob to signalR hub '{hubName}'";
+        var ruleText = $"Send SignalRJob to signalR hub '{hubName}'";
 
         var ruleJob = new SignalRJob
         {
@@ -64,7 +64,7 @@ public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, Sign
             Targets = target.Split("\n")
         };
 
-        return (ruleDescription, ruleJob);
+        return (ruleText, ruleJob);
     }
 
     protected override async Task<Result> ExecuteJobAsync(SignalRJob job,

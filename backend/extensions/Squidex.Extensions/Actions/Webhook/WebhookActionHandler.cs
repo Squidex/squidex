@@ -44,7 +44,7 @@ public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, Webh
             requestSignature = $"{requestBody}{action.SharedSecret}".ToSha256Base64();
         }
 
-        var ruleDescription = $"Send event to webhook '{requestUrl}'";
+        var ruleText = $"Send event to webhook '{requestUrl}'";
         var ruleJob = new WebhookJob
         {
             Method = action.Method,
@@ -55,7 +55,7 @@ public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, Webh
             Headers = await ParseHeadersAsync(action.Headers, @event)
         };
 
-        return (ruleDescription, ruleJob);
+        return (ruleText, ruleJob);
     }
 
     private async Task<Dictionary<string, string>> ParseHeadersAsync(string headers, EnrichedEvent @event)

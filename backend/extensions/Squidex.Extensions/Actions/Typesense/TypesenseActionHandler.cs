@@ -49,7 +49,7 @@ public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, 
 
         var indexName = await FormatAsync(action.IndexName, @event);
 
-        var ruleDescription = string.Empty;
+        var ruleText = string.Empty;
         var ruleJob = new TypesenseJob
         {
             ServerUrl = $"{action.Host.ToString().TrimEnd('/')}/collections/{indexName}/documents",
@@ -59,11 +59,11 @@ public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, 
 
         if (delete)
         {
-            ruleDescription = $"Delete entry index: {action.IndexName}";
+            ruleText = $"Delete entry index: {action.IndexName}";
         }
         else
         {
-            ruleDescription = $"Upsert to index: {action.IndexName}";
+            ruleText = $"Upsert to index: {action.IndexName}";
 
             TypesenseContent content;
             try
@@ -98,7 +98,7 @@ public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, 
             ruleJob.Content = serializer.Serialize(content, true);
         }
 
-        return (ruleDescription, ruleJob);
+        return (ruleText, ruleJob);
     }
 
     protected override async Task<Result> ExecuteJobAsync(TypesenseJob job,
