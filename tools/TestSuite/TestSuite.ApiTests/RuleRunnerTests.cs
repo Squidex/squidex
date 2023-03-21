@@ -78,7 +78,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
         // STEP 4: Get events
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
-        var eventsRule = await app.Rules.GetEventsAsync(appName);
+        var eventsRule = await app.Rules.GetEventsAsync();
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
@@ -179,7 +179,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
         // STEP 4: Get events
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
-        var eventsRule = await app.Rules.GetEventsAsync(appName);
+        var eventsRule = await app.Rules.GetEventsAsync();
 
         Assert.NotEmpty(eventsAll.Items);
         Assert.NotEmpty(eventsRule.Items);
@@ -226,7 +226,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
         // STEP 4: Get events
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
-        var eventsRule = await app.Rules.GetEventsAsync(appName);
+        var eventsRule = await app.Rules.GetEventsAsync();
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
@@ -274,7 +274,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
         // STEP 4: Get events
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
-        var eventsRule = await app.Rules.GetEventsAsync(appName);
+        var eventsRule = await app.Rules.GetEventsAsync();
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
@@ -322,7 +322,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
         // STEP 4: Get events
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
-        var eventsRule = await app.Rules.GetEventsAsync(appName);
+        var eventsRule = await app.Rules.GetEventsAsync();
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
@@ -370,7 +370,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
         // STEP 4: Get events
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
-        var eventsRule = await app.Rules.GetEventsAsync(appName);
+        var eventsRule = await app.Rules.GetEventsAsync();
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
