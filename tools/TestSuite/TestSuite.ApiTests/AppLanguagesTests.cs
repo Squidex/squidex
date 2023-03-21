@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 
@@ -29,14 +30,14 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_add_language()
     {
         // STEP 0: Add app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.
-        await AddLanguageAsync("de");
-        await AddLanguageAsync("it");
+        await AddLanguageAsync(app, "de");
+        await AddLanguageAsync(app, "it");
 
-        var languages_1 = await _.Apps.GetLanguagesAsync(appName);
+        var languages_1 = await app.Apps.GetLanguagesAsync();
 
         Assert.Equal(new string[] { "en", "de", "it" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
 
@@ -47,14 +48,14 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_add_custom_language()
     {
         // STEP 0: Add app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.
-        await AddLanguageAsync("abc");
-        await AddLanguageAsync("xyz");
+        await AddLanguageAsync(app, "abc");
+        await AddLanguageAsync(app, "xyz");
 
-        var languages_1 = await _.Apps.GetLanguagesAsync(appName);
+        var languages_1 = await app.Apps.GetLanguagesAsync();
 
         Assert.Equal(new string[] { "en", "abc", "xyz" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
 
@@ -65,12 +66,12 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_update_language()
     {
         // STEP 0: Add app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.
-        await AddLanguageAsync("de");
-        await AddLanguageAsync("it");
+        await AddLanguageAsync(app, "de");
+        await AddLanguageAsync(app, "it");
 
 
         // STEP 3: Update German language.
@@ -83,7 +84,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
             IsOptional = true
         };
 
-        var languages_2 = await _.Apps.PutLanguageAsync(appName, "de", updateRequest);
+        var languages_2 = await app.Apps.PutLanguageAsync("de", updateRequest);
         var language_2_DE = languages_2.Items.Find(x => x.Iso2Code == "de");
 
         Assert.Equal(updateRequest.Fallback, language_2_DE.Fallback);
@@ -96,12 +97,12 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_update_master_language()
     {
         // STEP 0: Add app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.
-        await AddLanguageAsync("de");
-        await AddLanguageAsync("it");
+        await AddLanguageAsync(app, "de");
+        await AddLanguageAsync(app, "it");
 
 
         // STEP 2: Update Italian language.
@@ -114,7 +115,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
             IsOptional = true
         };
 
-        await _.Apps.PutLanguageAsync(appName, "it", updateRequest);
+        await app.Apps.PutLanguageAsync("it", updateRequest);
 
 
         // STEP 3: Change master language to Italian.
@@ -123,7 +124,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
             IsMaster = true
         };
 
-        var languages_4 = await _.Apps.PutLanguageAsync(appName, "it", masterRequest);
+        var languages_4 = await app.Apps.PutLanguageAsync("it", masterRequest);
         var language_4_IT = languages_4.Items.Find(x => x.Iso2Code == "it");
         var language_4_EN = languages_4.Items.Find(x => x.Iso2Code == "en");
 
@@ -145,12 +146,12 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_delete_language()
     {
         // STEP 0: Add app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.
-        await AddLanguageAsync("de");
-        await AddLanguageAsync("it");
+        await AddLanguageAsync(app, "de");
+        await AddLanguageAsync(app, "it");
 
 
         // STEP 2: Update Italian language.
@@ -163,11 +164,11 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
             IsOptional = true
         };
 
-        await _.Apps.PutLanguageAsync(appName, "it", updateRequest);
+        await app.Apps.PutLanguageAsync("it", updateRequest);
 
 
         // STEP 3: Remove language.
-        var languages_2 = await _.Apps.DeleteLanguageAsync(appName, "de");
+        var languages_2 = await app.Apps.DeleteLanguageAsync("de");
         var language_2_IT = languages_2.Items.Find(x => x.Iso2Code == "it");
 
         // Fallback language must be removed.
@@ -178,23 +179,13 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
         await Verify(languages_2);
     }
 
-    private async Task CreateAppAsync()
-    {
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.Apps.PostAppAsync(createRequest);
-    }
-
-    private async Task AddLanguageAsync(string code)
+    private async Task AddLanguageAsync(ISquidexClient app, string code)
     {
         var createRequest = new AddLanguageDto
         {
             Language = code
         };
 
-        await _.Apps.PostLanguageAsync(appName, createRequest);
+        await app.Apps.PostLanguageAsync(createRequest);
     }
 }

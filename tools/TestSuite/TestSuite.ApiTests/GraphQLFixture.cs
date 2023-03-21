@@ -32,7 +32,7 @@ public sealed class GraphQLFixture : ContentFixture
         {
             try
             {
-                var response = await Schemas.PostSchemaAsync(AppName, request);
+                var response = await Client.Schemas.PostSchemaAsync(request);
 
                 return response.Id;
             }
@@ -43,7 +43,7 @@ public sealed class GraphQLFixture : ContentFixture
                     throw;
                 }
 
-                var schema = await Schemas.GetSchemaAsync(AppName, request.Name);
+                var schema = await Client.Schemas.GetSchemaAsync(request.Name);
 
                 return schema.Id;
             }
@@ -121,7 +121,7 @@ public sealed class GraphQLFixture : ContentFixture
 
     private async Task CreateContentsAsync()
     {
-        var countriesClient = ClientManager.CreateContentsClient<DynamicEntity, object>("countries");
+        var countriesClient = Client.Contents<DynamicEntity, object>("countries");
         var countriesResponse = await countriesClient.GetAsync();
 
         if (countriesResponse.Total > 0)
@@ -139,11 +139,10 @@ public sealed class GraphQLFixture : ContentFixture
                 }
             };
 
-            var citiesClient = ClientManager.CreateContentsClient<DynamicEntity, object>("cities");
+            var citiesClient = Client.Contents<DynamicEntity, object>("cities");
+            var cityResponse = await citiesClient.CreateAsync(citySAData, ContentCreateOptions.AsPublish);
 
-            var city = await citiesClient.CreateAsync(citySAData, ContentCreateOptions.AsPublish);
-
-            return city.Id;
+            return cityResponse.Id;
         }
 
         async Task<string> CreateStateAsync(string name, string cityId)
@@ -160,11 +159,10 @@ public sealed class GraphQLFixture : ContentFixture
                 }
             };
 
-            var statesClient = ClientManager.CreateContentsClient<DynamicEntity, object>("states");
+            var statesClient = Client.Contents<DynamicEntity, object>("states");
+            var stateResponse = await statesClient.CreateAsync(citySAData, ContentCreateOptions.AsPublish);
 
-            var state = await statesClient.CreateAsync(citySAData, ContentCreateOptions.AsPublish);
-
-            return state.Id;
+            return stateResponse.Id;
         }
 
         // STEP 1: Create state 1

@@ -34,28 +34,28 @@ public class AppCreationTests : IClassFixture<ClientFixture>
             Name = appName
         };
 
-        var app = await _.Apps.PostAppAsync(createRequest);
+        var app = await _.PostAppAsync(createRequest);
 
         // Should return created app with correct name.
-        Assert.Equal(appName, app.Name);
+        Assert.Equal(appName, app.Options.AppName);
 
 
         // STEP 2: Get all apps
-        var apps = await _.Apps.GetAppsAsync();
+        var apps = await app.Apps.GetAppsAsync();
 
         // Should provide new app when apps are queried.
         Assert.Contains(apps, x => x.Name == appName);
 
 
         // STEP 3: Check contributors
-        var contributors = await _.Apps.GetContributorsAsync(appName);
+        var contributors = await app.Apps.GetContributorsAsync();
 
         // Should not add client itself as a contributor.
         Assert.Empty(contributors.Items);
 
 
         // STEP 4: Check clients
-        var clients = await _.Apps.GetClientsAsync(appName);
+        var clients = await app.Apps.GetClientsAsync();
 
         // Should create default client.
         Assert.Contains(clients.Items, x => x.Id == "default");
@@ -67,18 +67,13 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     public async Task Should_not_allow_creation_if_name_used()
     {
         // STEP 1: Create app
-        await CreateAppAsync();
+        await _.PostAppAsync(appName);
 
 
         // STEP 2: Create again and fail
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
         var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
         {
-            return _.Apps.PostAppAsync(createRequest);
+            return _.PostAppAsync(appName);
         });
 
         Assert.Equal(400, ex.StatusCode);
@@ -88,13 +83,13 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     public async Task Should_archive_app()
     {
         // STEP 1: Create app
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 2: Archive app
-        await _.Apps.DeleteAppAsync(appName);
+        await app.Apps.DeleteAppAsync();
 
-        var apps = await _.Apps.GetAppsAsync();
+        var apps = await app.Apps.GetAppsAsync();
 
         // Should not provide deleted app when apps are queried.
         Assert.DoesNotContain(apps, x => x.Name == appName);
@@ -104,11 +99,11 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     public async Task Should_recreate_after_archived()
     {
         // STEP 1: Create app
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 2: Archive app
-        await _.Apps.DeleteAppAsync(appName);
+        await app.Apps.DeleteAppAsync();
 
 
         // STEP 3: Create app again
@@ -117,14 +112,14 @@ public class AppCreationTests : IClassFixture<ClientFixture>
             Name = appName
         };
 
-        await _.Apps.PostAppAsync(createRequest);
+        await _.PostAppAsync(createRequest);
     }
 
     [Fact]
     public async Task Should_create_app_from_templates()
     {
         // STEP 1: Get template.
-        var templates = await _.Templates.GetTemplatesAsync();
+        var templates = await _.Client.Templates.GetTemplatesAsync();
 
         var template = templates.Items.First(x => x.IsStarter);
 
@@ -137,24 +132,14 @@ public class AppCreationTests : IClassFixture<ClientFixture>
             Template = template.Name
         };
 
-        await _.Apps.PostAppAsync(createRequest);
+        var app = await _.PostAppAsync(createRequest);
 
 
         // STEP 3: Get schemas
-        var schemas = await _.Schemas.GetSchemasAsync(appName);
+        var schemas = await app.Schemas.GetSchemasAsync();
 
         Assert.NotEmpty(schemas.Items);
 
         await Verify(schemas);
-    }
-
-    private async Task CreateAppAsync()
-    {
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.Apps.PostAppAsync(createRequest);
     }
 }

@@ -58,7 +58,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Get content.
-        var contents = _.ClientManager.CreateDynamicContentsClient(_.Contents.SchemaName);
+        var contents = _.Client.DynamicContents(_.Contents.SchemaName);
 
         var contentFlatten = await contents.GetAsync(content.Id, QueryContext.Default.Flatten().WithLanguages(code));
 
@@ -113,9 +113,9 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
 
     private async Task<(string, string)> GetEtagAsync(string id, Dictionary<string, string> headers)
     {
-        var url = $"{_.ClientManager.Options.Url}api/content/{_.AppName}/{_.SchemaName}/{id}";
+        var url = $"{_.Client.Options.Url}api/content/{_.AppName}/{_.SchemaName}/{id}";
 
-        var httpClient = _.ClientManager.CreateHttpClient();
+        var httpClient = _.Client.CreateHttpClient();
 
         foreach (var (key, value) in headers)
         {

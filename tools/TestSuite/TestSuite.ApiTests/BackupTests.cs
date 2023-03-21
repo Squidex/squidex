@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using TestSuite.Model;
@@ -18,6 +19,7 @@ namespace TestSuite.ApiTests;
 public class BackupTests : IClassFixture<ClientFixture>
 {
     private readonly string appName = Guid.NewGuid().ToString();
+    private readonly string appNameRestore = $"{Guid.NewGuid()}-restore";
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
 
     public ClientFixture _ { get; }
@@ -33,25 +35,18 @@ public class BackupTests : IClassFixture<ClientFixture>
         // Load the backup from another URL, because the public URL is might not be accessible for the server.
         var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.Url);
 
-        var appNameRestore = $"{appName}-restore";
-
         // STEP 1: Create app
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.Apps.PostAppAsync(createRequest);
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 2: Prepare app.
-        await PrepareAppAsync(appName);
+        await PrepareAppAsync(app);
 
 
         // STEP 3: Create backup
-        await _.Backups.PostBackupAsync(appName);
+        await app.Backups.PostBackupAsync();
 
-        var backups = await _.Backups.WaitForBackupsAsync(appName, x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
+        var backups = await app.Backups.WaitForBackupsAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
         var backup = backups.FirstOrDefault(x => x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, backup?.Status);
@@ -67,11 +62,11 @@ public class BackupTests : IClassFixture<ClientFixture>
             Name = appNameRestore
         };
 
-        await _.Backups.PostRestoreJobAsync(restoreRequest);
+        await _.Client.Backups.PostRestoreJobAsync(restoreRequest);
 
 
         // STEP 5: Wait for the backup.
-        var restore = await _.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
+        var restore = await app.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
 
         Assert.Equal(JobStatus.Completed, restore?.Status);
     }
@@ -83,29 +78,24 @@ public class BackupTests : IClassFixture<ClientFixture>
         var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.Url);
 
         // STEP 1: Create app
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.Apps.PostAppAsync(createRequest);
+        var app = await _.PostAppAsync(appNameRestore);
 
 
         // STEP 2: Prepare app.
-        await PrepareAppAsync(appName);
+        await PrepareAppAsync(app);
 
 
         // STEP 3: Create backup
-        await _.Backups.PostBackupAsync(appName);
+        await app.Backups.PostBackupAsync();
 
-        var backups = await _.Backups.WaitForBackupsAsync(appName, x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
+        var backups = await app.Backups.WaitForBackupsAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
         var backup = backups.FirstOrDefault(x => x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, backup?.Status);
 
 
         // STEP 4: Delete app
-        await _.Apps.DeleteAppAsync(appName);
+        await app.Apps.DeleteAppAsync();
 
 
         // STEP 5: Restore backup
@@ -118,21 +108,21 @@ public class BackupTests : IClassFixture<ClientFixture>
             Name = appName
         };
 
-        await _.Backups.PostRestoreJobAsync(restoreRequest);
+        await app.Backups.PostRestoreJobAsync(restoreRequest);
 
 
         // STEP 6: Wait for the backup.
-        var restore = await _.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
+        var restore = await app.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
 
         Assert.Equal(JobStatus.Completed, restore?.Status);
     }
 
-    private async Task PrepareAppAsync(string appName)
+    private async Task PrepareAppAsync(ISquidexClient app)
     {
         // Create a test schema.
-        await TestEntity.CreateSchemaAsync(_.Schemas, appName, schemaName);
+        await TestEntity.CreateSchemaAsync(app.Schemas, schemaName);
 
-        var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(appName, schemaName);
+        var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
         await contents.CreateAsync(new TestEntityData
         {
@@ -147,7 +137,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         {
             var upload = new FileParameter(stream, fileInfo.Name, "image/png");
 
-            await _.Assets.PostAssetAsync(appName, file: upload);
+            await app.Assets.PostAssetAsync(file: upload);
         }
 
 
@@ -157,7 +147,7 @@ public class BackupTests : IClassFixture<ClientFixture>
             Name = appName
         };
 
-        await _.Apps.PostWorkflowAsync(appName, workflowRequest);
+        await app.Apps.PostWorkflowAsync( workflowRequest);
 
 
         // Create a language
@@ -166,6 +156,6 @@ public class BackupTests : IClassFixture<ClientFixture>
             Language = "de"
         };
 
-        await _.Apps.PostLanguageAsync(appName, languageRequest);
+        await app.Apps.PostLanguageAsync(languageRequest);
     }
 }

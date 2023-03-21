@@ -37,7 +37,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rules_on_content_change()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -61,11 +61,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             }
         };
 
-        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+        var rule = await app.Rules.PostRuleAsync(createRule);
 
 
         // STEP 3: Create test content
-        await CreateContentAsync();
+        await CreateContentAsync(app);
 
         // Get requests.
         var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
@@ -77,8 +77,8 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
 
         // STEP 4: Get events
-        var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
-        var eventsRule = await _.Rules.GetEventsAsync(appName);
+        var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
+        var eventsRule = await app.Rules.GetEventsAsync(appName);
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
@@ -88,7 +88,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rules_on_reference_change()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -96,20 +96,20 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
 
         // STEP 2: Create contents
-        var referencedSchema = await TestEntity.CreateSchemaAsync(_.Schemas, appName, schemaName);
+        var referencedSchema = await TestEntity.CreateSchemaAsync(app.Schemas, schemaName);
 
         // Create a test content.
-        var referencedContents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(appName, schemaName);
+        var referencedContents = app.Contents<TestEntity, TestEntityData>(schemaName);
 
         var referencedContent = await referencedContents.CreateAsync(new TestEntityData
         {
             String = contentString
         });
 
-        var parentSchema = await TestEntityWithReferences.CreateSchemaAsync(_.Schemas, appName, schemaNameRef);
+        var parentSchema = await TestEntityWithReferences.CreateSchemaAsync(app.Schemas, schemaNameRef);
 
         // Create a test content that references the other schema.
-        var parentContents = _.ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(appName, schemaNameRef);
+        var parentContents = app.Contents<TestEntityWithReferences, TestEntityWithReferencesData>(schemaNameRef);
 
         await parentContents.CreateAsync(new TestEntityWithReferencesData
         {
@@ -157,7 +157,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             }
         };
 
-        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+        var rule = await app.Rules.PostRuleAsync(createRule);
 
 
         // STEP 3: Update referenced content
@@ -178,8 +178,8 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
 
         // STEP 4: Get events
-        var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
-        var eventsRule = await _.Rules.GetEventsAsync(appName);
+        var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
+        var eventsRule = await app.Rules.GetEventsAsync(appName);
 
         Assert.NotEmpty(eventsAll.Items);
         Assert.NotEmpty(eventsRule.Items);
@@ -189,7 +189,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_scripting_rule_on_content_change()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -211,11 +211,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             }
         };
 
-        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+        var rule = await app.Rules.PostRuleAsync(createRule);
 
 
         // STEP 3: Create test content
-        await CreateContentAsync();
+        await CreateContentAsync(app);
 
         // Get requests.
         var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
@@ -225,8 +225,8 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
 
         // STEP 4: Get events
-        var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
-        var eventsRule = await _.Rules.GetEventsAsync(appName);
+        var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
+        var eventsRule = await app.Rules.GetEventsAsync(appName);
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
@@ -236,7 +236,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rules_on_asset_change()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -257,11 +257,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             Trigger = new AssetChangedRuleTriggerDto()
         };
 
-        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+        var rule = await app.Rules.PostRuleAsync(createRule);
 
 
         // STEP 3: Create test asset
-        await CreateAssetAsync();
+        await CreateAssetAsync(app);
 
         // Get requests.
         var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
@@ -273,8 +273,8 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
 
         // STEP 4: Get events
-        var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
-        var eventsRule = await _.Rules.GetEventsAsync(appName);
+        var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
+        var eventsRule = await app.Rules.GetEventsAsync(appName);
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
@@ -284,7 +284,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rules_on_schema_change()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -305,11 +305,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             Trigger = new SchemaChangedRuleTriggerDto()
         };
 
-        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+        var rule = await app.Rules.PostRuleAsync(createRule);
 
 
         // STEP 3: Create test schema
-        await TestEntity.CreateSchemaAsync(_.Schemas, appName, schemaName);
+        await TestEntity.CreateSchemaAsync(app.Schemas, schemaName);
 
         // Get requests.
         var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
@@ -321,8 +321,8 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
 
         // STEP 4: Get events
-        var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
-        var eventsRule = await _.Rules.GetEventsAsync(appName);
+        var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
+        var eventsRule = await app.Rules.GetEventsAsync(appName);
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
@@ -332,7 +332,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rule_manually()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -353,11 +353,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             Trigger = new ManualRuleTriggerDto()
         };
 
-        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+        var rule = await app.Rules.PostRuleAsync(createRule);
 
 
         // STEP 3: Trigger rule
-        await _.Rules.TriggerRuleAsync(appName, rule.Id);
+        await app.Rules.TriggerRuleAsync(rule.Id);
 
         // Get requests.
         var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromSeconds(30));
@@ -369,8 +369,8 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
 
         // STEP 4: Get events
-        var eventsAll = await _.Rules.GetEventsAsync(appName, rule.Id);
-        var eventsRule = await _.Rules.GetEventsAsync(appName);
+        var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
+        var eventsRule = await app.Rules.GetEventsAsync(appName);
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
@@ -382,7 +382,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_rerun_rules(bool fromSnapshots)
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -405,18 +405,18 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             }
         };
 
-        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+        var rule = await app.Rules.PostRuleAsync(createRule);
 
         // Disable rule, so that we do not create the event from the rule itself.
-        await _.Rules.DisableRuleAsync(appName, rule.Id);
+        await app.Rules.DisableRuleAsync(rule.Id);
 
 
         // STEP 3: Create test content before rule
-        await CreateContentAsync();
+        await CreateContentAsync(app);
 
 
         // STEP 4: Run rule.
-        await _.Rules.PutRuleRunAsync(appName, rule.Id, fromSnapshots);
+        await app.Rules.PutRuleRunAsync(rule.Id, fromSnapshots);
 
         // Get requests.
         var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromSeconds(30));
@@ -424,12 +424,12 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         Assert.Contains(requests, x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
     }
 
-    private async Task CreateContentAsync()
+    private async Task CreateContentAsync(ISquidexClient app)
     {
-        await TestEntity.CreateSchemaAsync(_.Schemas, appName, schemaName);
+        await TestEntity.CreateSchemaAsync(app.Schemas, schemaName);
 
         // Create a test content.
-        var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(appName, schemaName);
+        var contents = app.Contents<TestEntity, TestEntityData>(schemaName);
 
         await contents.CreateAsync(new TestEntityData
         {
@@ -437,7 +437,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         });
     }
 
-    private async Task CreateAssetAsync()
+    private static async Task CreateAssetAsync(ISquidexClient app)
     {
         // Upload a test asset
         var fileInfo = new FileInfo("Assets/logo-squared.png");
@@ -446,17 +446,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         {
             var upload = new FileParameter(stream, fileInfo.Name, "image/png");
 
-            await _.Assets.PostAssetAsync(appName, file: upload);
+            await app.Assets.PostAssetAsync(file: upload);
         }
-    }
-
-    private async Task CreateAppAsync()
-    {
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.Apps.PostAppAsync(createRequest);
     }
 }

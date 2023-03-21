@@ -31,9 +31,9 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         {
             var schemaName = $"schema-{Guid.NewGuid()}";
 
-            await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
+            await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName);
 
-            var contentClient = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
+            var contentClient = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
             var contentItems = await contentClient.GetAsync();
 
             Assert.Equal(0, contentItems.Total);
@@ -55,7 +55,6 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         foreach (var item in items_1.Items)
         {
-            Assert.Equal(_.AppName, item.AppName);
             Assert.Equal(_.SchemaName, item.SchemaName);
         }
     }
@@ -68,14 +67,13 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var items_0 = await _.Contents.GetAsync(q);
         var itemsIds = items_0.Items.Take(3).Select(x => x.Id).ToHashSet();
 
-        var items_1 = await _.SharedContents.GetAsync(itemsIds);
+        var items_1 = await _.Client.SharedDynamicContents.GetAsync(itemsIds);
 
         Assert.Equal(3, items_1.Items.Count);
         Assert.Equal(3, items_1.Total);
 
         foreach (var item in items_1.Items)
         {
-            Assert.Equal(_.AppName, item.AppName);
             Assert.Equal(_.SchemaName, item.SchemaName);
         }
     }
@@ -528,7 +526,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
                     }"
         };
 
-        var result = await _.SharedContents.GraphQlAsync<JObject>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
 
         var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
 
@@ -563,7 +561,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var result = await _.SharedContents.GraphQlAsync<JObject>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
 
         var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
 
@@ -611,7 +609,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var results = await _.SharedContents.GraphQlAsync<QueryResult>(new[] { query1, query2 });
+        var results = await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>(new[] { query1, query2 });
 
         var items1 = results.ElementAt(0).Data.Items;
         var items2 = results.ElementAt(1).Data.Items;
@@ -642,7 +640,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var result = await _.SharedContents.GraphQlAsync<QueryResult>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>(query);
         var items = result.Items;
 
         Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
@@ -670,7 +668,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var result = await _.SharedContents.GraphQlGetAsync<QueryResult>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlGetAsync<QueryResult>(query);
         var items = result.Items;
 
         Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
@@ -694,7 +692,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
                 }"
         };
 
-        var result = await _.SharedContents.GraphQlAsync<JObject>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
         var items = result["queryMyReadsContents"];
 
         Assert.Equal(items.Select(x => x["data"]["number"]["iv"].Value<int>()).ToArray(), new[] { 4, 5, 6 });
@@ -722,7 +720,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        await _.SharedContents.GraphQlAsync<QueryResult>(query);
+        await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>(query);
     }
 
     private sealed class QueryResult

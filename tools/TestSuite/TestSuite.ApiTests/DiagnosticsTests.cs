@@ -23,6 +23,6 @@ public class DiagnosticsTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_create_gc_dump()
     {
-        await _.Diagnostics.GetGCDumpAsync();
+        await _.Client.Diagnostics.GetGCDumpAsync();
     }
 }

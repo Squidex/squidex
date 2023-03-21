@@ -27,11 +27,11 @@ public class SearchTests : IClassFixture<ContentFixture>
     public async Task Should_search_asset()
     {
         // STEP 1: Create asset
-        await _.Assets.UploadFileAsync(_.AppName, "Assets/logo-wide.png", "image/png");
+        await _.Client.Assets.UploadFileAsync("Assets/logo-wide.png", "image/png");
 
 
         // STEP 2: Search for schema.
-        var result = await _.Search.GetSearchResultsAsync(_.AppName, "logo");
+        var result = await _.Client.Search.GetSearchResultsAsync("logo");
 
         Assert.Contains(result, x => x.Type == SearchResultType.Asset);
     }
@@ -47,11 +47,11 @@ public class SearchTests : IClassFixture<ContentFixture>
             Name = schemaName
         };
 
-        await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        await _.Client.Schemas.PostSchemaAsync(createRequest);
 
 
         // STEP 2: Search for schema.
-        var result = await _.Search.WaitForSearchAsync(_.AppName, schemaName, x => x.Type == SearchResultType.Content, TimeSpan.FromSeconds(30));
+        var result = await _.Client.Search.WaitForSearchAsync(schemaName, x => x.Type == SearchResultType.Content, TimeSpan.FromSeconds(30));
 
         Assert.NotEmpty(result);
     }
@@ -71,7 +71,7 @@ public class SearchTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Search for schema.
-        var result = await _.Search.WaitForSearchAsync(_.AppName, contentString, x => x.Type == SearchResultType.Content, TimeSpan.FromSeconds(30));
+        var result = await _.Client.Search.WaitForSearchAsync(contentString, x => x.Type == SearchResultType.Content, TimeSpan.FromSeconds(30));
 
         Assert.NotEmpty(result);
     }
@@ -90,7 +90,7 @@ public class SearchTests : IClassFixture<ContentFixture>
     [InlineData(SearchResultType.Setting, "Workflows")]
     public async Task Should_search_for_dashboard_pages(SearchResultType expectedType, string query)
     {
-        var result = await _.Search.GetSearchResultsAsync(_.AppName, query);
+        var result = await _.Client.Search.GetSearchResultsAsync(query);
 
         Assert.Contains(result, x => x.Type == expectedType);
     }

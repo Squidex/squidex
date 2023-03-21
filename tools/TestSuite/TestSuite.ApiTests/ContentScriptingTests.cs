@@ -37,11 +37,11 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         };
 
         // STEP 1: Create a schema.
-        await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName, scripts);
+        await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
 
 
         // STEP 2: Create content
-        var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
+        var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
         var content = await contents.CreateAsync(new TestEntityData
         {
@@ -62,11 +62,11 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         };
 
         // STEP 1: Create a schema.
-        await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName, scripts);
+        await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
 
 
         // STEP 2: Create content
-        var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
+        var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
         var content = await contents.CreateAsync(new TestEntityData
         {
@@ -89,11 +89,11 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         };
 
         // STEP 1: Create a schema.
-        await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName, scripts);
+        await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
 
 
         // STEP 2: Create content
-        var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
+        var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
         var content = await contents.CreateAsync(new TestEntityData
         {
@@ -114,11 +114,11 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
                     replace()"
         };
 
-        await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName, scripts);
+        await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
 
 
         // STEP 2: Create content with a value that triggers the schema.
-        var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
+        var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
         var results = await contents.BulkUpdateAsync(new BulkUpdate
         {
@@ -162,11 +162,11 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
                     replace()"
         };
 
-        await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName, scripts);
+        await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
 
 
         // STEP 1: Create content with a value that triggers the schema.
-        var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
+        var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
         var results = await contents.BulkUpdateAsync(new BulkUpdate
         {

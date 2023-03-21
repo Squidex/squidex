@@ -30,7 +30,7 @@ public abstract class TestSchemaWithReferencesFixtureBase : CreatedAppFixture
         {
             try
             {
-                await TestEntityWithReferences.CreateSchemaAsync(Schemas, AppName, SchemaName);
+                await TestEntityWithReferences.CreateSchemaAsync(Client.Schemas, SchemaName);
             }
             catch (SquidexManagementException ex)
             {
@@ -43,6 +43,6 @@ public abstract class TestSchemaWithReferencesFixtureBase : CreatedAppFixture
             return true;
         });
 
-        Contents = ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(SchemaName);
+        Contents = Client.Contents<TestEntityWithReferences, TestEntityWithReferencesData>(SchemaName);
     }
 }

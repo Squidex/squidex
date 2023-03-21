@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using Xunit;
@@ -13,97 +14,17 @@ namespace TestSuite.Fixtures;
 
 public class ClientFixture : IAsyncLifetime
 {
-    public ClientManagerWrapper Squidex { get; private set; }
+    public ClientWrapper Squidex { get; private set; }
 
-    public string AppName => ClientManager.Options.AppName;
+    public string AppName => Client.Options.AppName;
 
-    public string ClientId => ClientManager.Options.ClientId;
+    public string ClientId => Client.Options.ClientId;
 
-    public string ClientSecret => ClientManager.Options.ClientSecret;
+    public string ClientSecret => Client.Options.ClientSecret;
 
-    public string Url => ClientManager.Options.Url;
+    public string Url => Client.Options.Url;
 
-    public ISquidexClientManager ClientManager => Squidex.ClientManager;
-
-    public IAppsClient Apps
-    {
-        get => ClientManager.CreateAppsClient();
-    }
-
-    public IAssetsClient Assets
-    {
-        get => ClientManager.CreateAssetsClient();
-    }
-
-    public IBackupsClient Backups
-    {
-        get => ClientManager.CreateBackupsClient();
-    }
-
-    public ICommentsClient Comments
-    {
-        get => ClientManager.CreateCommentsClient();
-    }
-
-    public IDiagnosticsClient Diagnostics
-    {
-        get => ClientManager.CreateDiagnosticsClient();
-    }
-
-    public IHistoryClient History
-    {
-        get => ClientManager.CreateHistoryClient();
-    }
-
-    public ILanguagesClient Languages
-    {
-        get => ClientManager.CreateLanguagesClient();
-    }
-
-    public IPingClient Ping
-    {
-        get => ClientManager.CreatePingClient();
-    }
-
-    public IPlansClient Plans
-    {
-        get => ClientManager.CreatePlansClient();
-    }
-
-    public IRulesClient Rules
-    {
-        get => ClientManager.CreateRulesClient();
-    }
-
-    public ISchemasClient Schemas
-    {
-        get => ClientManager.CreateSchemasClient();
-    }
-
-    public ISearchClient Search
-    {
-        get => ClientManager.CreateSearchClient();
-    }
-
-    public ITemplatesClient Templates
-    {
-        get => ClientManager.CreateTemplatesClient();
-    }
-
-    public ITranslationsClient Translations
-    {
-        get => ClientManager.CreateTranslationsClient();
-    }
-
-    public IUserManagementClient UserManagement
-    {
-        get => ClientManager.CreateUserManagementClient();
-    }
-
-    public IContentsSharedClient<DynamicContent, DynamicData> SharedContents
-    {
-        get => ClientManager.CreateSharedDynamicContentsClient();
-    }
+    public ISquidexClient Client => Squidex.Client;
 
     static ClientFixture()
     {
@@ -119,11 +40,50 @@ public class ClientFixture : IAsyncLifetime
         VerifierSettings.IgnoreMembersWithType<DateTimeOffset>();
     }
 
+    public Task<ISquidexClient> PostAppAsync(string name)
+    {
+        var createRequest = new CreateAppDto
+        {
+            Name = name
+        };
+
+        return PostAppAsync(createRequest);
+    }
+
+    public async Task<ISquidexClient> PostAppAsync(CreateAppDto request)
+    {
+        var services =
+            new ServiceCollection()
+                .AddSquidexClient(options =>
+                {
+                    options.AppName = request.Name;
+                    options.ClientId = ClientId;
+                    options.ClientSecret = ClientSecret;
+                    options.Url = Client.Options.Url;
+                    options.ReadResponseAsString = true;
+                })
+                .AddSquidexHttpClient()
+                    .ConfigurePrimaryHttpMessageHandler(() =>
+                    {
+                        return new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                        };
+                    }).Services
+                .BuildServiceProvider();
+
+        var client = services.GetRequiredService<ISquidexClient>();
+
+        await client.Apps.PostAppAsync(request);
+
+        return client;
+    }
+
     public virtual async Task InitializeAsync()
     {
-        Squidex = await Factories.CreateAsync(nameof(ClientManagerWrapper), async () =>
+        Squidex = await Factories.CreateAsync(nameof(ClientWrapper), async () =>
         {
-            var clientManager = new ClientManagerWrapper();
+            var clientManager = new ClientWrapper();
 
             await clientManager.ConnectAsync();
 

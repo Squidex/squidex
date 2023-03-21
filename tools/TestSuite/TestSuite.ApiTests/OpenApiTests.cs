@@ -23,7 +23,7 @@ public class OpenApiTests : IClassFixture<ContentFixture>
     [Fact]
     public async Task Should_provide_general_spec()
     {
-        var url = $"{_.ClientManager.Options.Url}api/swagger/v1/swagger.json";
+        var url = $"{_.Client.Options.Url}api/swagger/v1/swagger.json";
 
         var document = await OpenApiDocument.FromUrlAsync(url);
 
@@ -33,7 +33,7 @@ public class OpenApiTests : IClassFixture<ContentFixture>
     [Fact]
     public async Task Should_provide_content_spec()
     {
-        var url = $"{_.ClientManager.Options.Url}api/content/{_.AppName}/swagger/v1/swagger.json";
+        var url = $"{_.Client.Options.Url}api/content/{_.AppName}/swagger/v1/swagger.json";
 
         var document = await OpenApiDocument.FromUrlAsync(url);
 
@@ -43,7 +43,7 @@ public class OpenApiTests : IClassFixture<ContentFixture>
     [Fact]
     public async Task Should_provide_flat_content_spec()
     {
-        var url = $"{_.ClientManager.Options.Url}api/content/{_.AppName}/flat/swagger/v1/swagger.json";
+        var url = $"{_.Client.Options.Url}api/content/{_.AppName}/flat/swagger/v1/swagger.json";
 
         var document = await OpenApiDocument.FromUrlAsync(url);
 

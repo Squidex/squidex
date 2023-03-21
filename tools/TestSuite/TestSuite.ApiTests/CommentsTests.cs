@@ -28,7 +28,7 @@ public class CommentsTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_make_watch_request()
     {
-        var result = await _.Comments.GetWatchingUsersAsync(_.AppName, resource);
+        var result = await _.Client.Comments.GetWatchingUsersAsync(resource);
 
         Assert.NotNull(result);
     }
@@ -42,11 +42,11 @@ public class CommentsTests : IClassFixture<CreatedAppFixture>
             Text = resource
         };
 
-        await _.Comments.PostCommentAsync(_.AppName, resource, createRequest);
+        await _.Client.Comments.PostCommentAsync(resource, createRequest);
 
 
         // STEP 2: Get comments
-        var comments = await _.Comments.GetCommentsAsync(_.AppName, resource);
+        var comments = await _.Client.Comments.GetCommentsAsync(resource);
 
         Assert.Contains(comments.CreatedComments, x => x.Text == createRequest.Text);
 
@@ -63,7 +63,7 @@ public class CommentsTests : IClassFixture<CreatedAppFixture>
             Text = resource
         };
 
-        var comment = await _.Comments.PostCommentAsync(_.AppName, resource, createRequest);
+        var comment = await _.Client.Comments.PostCommentAsync(resource, createRequest);
 
 
         // STEP 2: Update comment.
@@ -72,11 +72,11 @@ public class CommentsTests : IClassFixture<CreatedAppFixture>
             Text = $"{resource}_Update"
         };
 
-        await _.Comments.PutCommentAsync(_.AppName, resource, comment.Id, updateRequest);
+        await _.Client.Comments.PutCommentAsync(resource, comment.Id, updateRequest);
 
 
         // STEP 3: Get comments since create.
-        var comments = await _.Comments.GetCommentsAsync(_.AppName, resource, 0);
+        var comments = await _.Client.Comments.GetCommentsAsync(resource, 0);
 
         Assert.Contains(comments.UpdatedComments, x => x.Text == updateRequest.Text);
 
@@ -93,15 +93,15 @@ public class CommentsTests : IClassFixture<CreatedAppFixture>
             Text = resource
         };
 
-        var comment = await _.Comments.PostCommentAsync(_.AppName, resource, createRequest);
+        var comment = await _.Client.Comments.PostCommentAsync(resource, createRequest);
 
 
         // STEP 2: Delete comment.
-        await _.Comments.DeleteCommentAsync(_.AppName, resource, comment.Id);
+        await _.Client.Comments.DeleteCommentAsync(resource, comment.Id);
 
 
         // STEP 3: Get comments since create.
-        var comments = await _.Comments.GetCommentsAsync(_.AppName, resource, 0);
+        var comments = await _.Client.Comments.GetCommentsAsync(resource, 0);
 
         Assert.Contains(comment.Id, comments.DeletedComments);
 

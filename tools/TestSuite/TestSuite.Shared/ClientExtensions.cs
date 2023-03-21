@@ -13,7 +13,7 @@ namespace TestSuite;
 
 public static class ClientExtensions
 {
-    public static async Task<bool> WaitForDeletionAsync(this IAssetsClient assetsClient, string app, string id, TimeSpan timeout)
+    public static async Task<bool> WaitForDeletionAsync(this IAssetsClient assetsClient, string id, TimeSpan timeout)
     {
         try
         {
@@ -23,7 +23,7 @@ public static class ClientExtensions
             {
                 try
                 {
-                    await assetsClient.GetAssetAsync(app, id, cts.Token);
+                    await assetsClient.GetAssetAsync(id, cts.Token);
                 }
                 catch (SquidexManagementException ex) when (ex.StatusCode == 404)
                 {
@@ -65,7 +65,7 @@ public static class ClientExtensions
         return new ContentsResult<TEntity, TData>();
     }
 
-    public static async Task<IList<SearchResultDto>> WaitForSearchAsync(this ISearchClient searchClient, string app, string query, Func<SearchResultDto, bool> predicate, TimeSpan timeout)
+    public static async Task<IList<SearchResultDto>> WaitForSearchAsync(this ISearchClient searchClient, string query, Func<SearchResultDto, bool> predicate, TimeSpan timeout)
     {
         try
         {
@@ -73,7 +73,7 @@ public static class ClientExtensions
 
             while (!cts.IsCancellationRequested)
             {
-                var result = await searchClient.GetSearchResultsAsync(app, query, cts.Token);
+                var result = await searchClient.GetSearchResultsAsync(query, cts.Token);
 
                 if (result.Any(predicate))
                 {
@@ -90,7 +90,7 @@ public static class ClientExtensions
         return new List<SearchResultDto>();
     }
 
-    public static async Task<IList<HistoryEventDto>> WaitForHistoryAsync(this IHistoryClient historyClient, string app, string channel, Func<HistoryEventDto, bool> predicate, TimeSpan timeout)
+    public static async Task<IList<HistoryEventDto>> WaitForHistoryAsync(this IHistoryClient historyClient, string channel, Func<HistoryEventDto, bool> predicate, TimeSpan timeout)
     {
         try
         {
@@ -98,7 +98,7 @@ public static class ClientExtensions
 
             while (!cts.IsCancellationRequested)
             {
-                var result = await historyClient.GetAppHistoryAsync(app, channel, cts.Token);
+                var result = await historyClient.GetAppHistoryAsync(channel, cts.Token);
 
                 if (result.Any(predicate))
                 {
@@ -115,7 +115,7 @@ public static class ClientExtensions
         return new List<HistoryEventDto>();
     }
 
-    public static async Task<IDictionary<string, int>> WaitForTagsAsync(this IAssetsClient assetsClient, string app, string id, TimeSpan timeout)
+    public static async Task<IDictionary<string, int>> WaitForTagsAsync(this IAssetsClient assetsClient, string id, TimeSpan timeout)
     {
         try
         {
@@ -123,7 +123,7 @@ public static class ClientExtensions
 
             while (!cts.IsCancellationRequested)
             {
-                var result = await assetsClient.GetTagsAsync(app, cts.Token);
+                var result = await assetsClient.GetTagsAsync(cts.Token);
 
                 if (result.TryGetValue(id, out var count) && count > 0)
                 {
@@ -137,10 +137,10 @@ public static class ClientExtensions
         {
         }
 
-        return await assetsClient.GetTagsAsync(app);
+        return await assetsClient.GetTagsAsync();
     }
 
-    public static async Task<IList<BackupJobDto>> WaitForBackupsAsync(this IBackupsClient backupsClient, string app, Func<BackupJobDto, bool> predicate, TimeSpan timeout)
+    public static async Task<IList<BackupJobDto>> WaitForBackupsAsync(this IBackupsClient backupsClient, Func<BackupJobDto, bool> predicate, TimeSpan timeout)
     {
         try
         {
@@ -148,7 +148,7 @@ public static class ClientExtensions
 
             while (!cts.IsCancellationRequested)
             {
-                var result = await backupsClient.GetBackupsAsync(app, cts.Token);
+                var result = await backupsClient.GetBackupsAsync(cts.Token);
 
                 if (result.Items.Any(predicate))
                 {
@@ -219,7 +219,7 @@ public static class ClientExtensions
         return temp;
     }
 
-    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path, AssetDto asset, string fileName = null)
+    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string path, AssetDto asset, string fileName = null)
     {
         var fileInfo = new FileInfo(path);
 
@@ -227,11 +227,11 @@ public static class ClientExtensions
         {
             var upload = new FileParameter(stream, fileName ?? fileInfo.Name, asset.MimeType);
 
-            return await assetsClients.PutAssetContentAsync(app, asset.Id, upload);
+            return await assetsClients.PutAssetContentAsync(asset.Id, upload);
         }
     }
 
-    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string app, string path, string fileType, string fileName = null, string parentId = null, string id = null)
+    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string path, string fileType, string fileName = null, string parentId = null, string id = null)
     {
         var fileInfo = new FileInfo(path);
 
@@ -239,17 +239,17 @@ public static class ClientExtensions
         {
             var upload = new FileParameter(stream, fileName ?? fileInfo.Name, fileType);
 
-            return await assetsClients.PostAssetAsync(app, parentId, id, true, upload);
+            return await assetsClients.PostAssetAsync(parentId, id, true, upload);
         }
     }
 
-    public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient assetsClients, string app, int size, string parentId = null, string id = null)
+    public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient assetsClients, int size, string parentId = null, string id = null)
     {
         using (var stream = RandomAsset(size))
         {
             var upload = new FileParameter(stream, RandomName(".txt"), "text/csv");
 
-            return await assetsClients.PostAssetAsync(app, parentId, id, true, upload);
+            return await assetsClients.PostAssetAsync(parentId, id, true, upload);
         }
     }
 

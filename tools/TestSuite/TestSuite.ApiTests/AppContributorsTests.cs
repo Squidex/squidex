@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 
@@ -30,7 +31,7 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     public async Task Should_not_invite_contributor_if_flag_is_false()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1:  Do not invite contributors when flag is false.
@@ -41,7 +42,7 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
 
         var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
         {
-            return _.Apps.PostContributorAsync(appName, createRequest);
+            return app.Apps.PostContributorAsync(createRequest);
         });
 
         Assert.Equal(404, ex.StatusCode);
@@ -51,11 +52,11 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     public async Task Should_invite_contributor()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Assign contributor.
-        ContributorDto contributor_1 = await InviteAsync();
+        ContributorDto contributor_1 = await InviteAsync(app);
 
         Assert.Equal("Developer", contributor_1?.Role);
 
@@ -69,11 +70,11 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     public async Task Should_update_contributor()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Assign contributor.
-        var contributor = await InviteAsync();
+        var contributor = await InviteAsync(app);
 
 
         // STEP 1: Update contributor role.
@@ -84,7 +85,7 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
             Role = "Owner"
         };
 
-        var contributors_2 = await _.Apps.PostContributorAsync(appName, updateRequest);
+        var contributors_2 = await app.Apps.PostContributorAsync(updateRequest);
         var contributor_2 = contributors_2.Items.Find(x => x.ContributorId == contributor.ContributorId);
 
         Assert.Equal(updateRequest.Role, contributor_2?.Role);
@@ -94,22 +95,22 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     public async Task Should_remove_contributor()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var app = await _.PostAppAsync(appName);
 
 
         // STEP 1: Assign contributor.
-        var contributor = await InviteAsync();
+        var contributor = await InviteAsync(app);
 
 
         // STEP 1: Remove contributor.
-        var contributors_2 = await _.Apps.DeleteContributorAsync(appName, contributor.ContributorId);
+        var contributors_2 = await app.Apps.DeleteContributorAsync(contributor.ContributorId);
 
         Assert.DoesNotContain(contributors_2.Items, x => x.ContributorId == contributor.ContributorId);
 
         await Verify(contributors_2);
     }
 
-    private async Task<ContributorDto> InviteAsync()
+    private async Task<ContributorDto> InviteAsync(ISquidexClient app)
     {
         var createInviteRequest = new AssignContributorDto
         {
@@ -118,19 +119,9 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
             Invite = true
         };
 
-        var contributors = await _.Apps.PostContributorAsync(appName, createInviteRequest);
+        var contributors = await app.Apps.PostContributorAsync(createInviteRequest);
         var contributor = contributors.Items.Find(x => x.ContributorName == email);
 
         return contributor;
-    }
-
-    private async Task CreateAppAsync()
-    {
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.Apps.PostAppAsync(createRequest);
     }
 }

@@ -15,9 +15,9 @@ namespace TestSuite.Model;
 
 public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesData>
 {
-    public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
+    public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string name)
     {
-        var schema = await schemas.PostSchemaAsync(appName, new CreateSchemaDto
+        var schema = await schemas.PostSchemaAsync(new CreateSchemaDto
         {
             Name = name,
             Fields = new List<UpsertSchemaFieldDto>

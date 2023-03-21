@@ -29,9 +29,9 @@ public class ContentCleanupTests : IClassFixture<CreatedAppFixture>
     public async Task Should_cleanup_old_data_from_update_response()
     {
         // STEP 1: Create a schema.
-        var schema = await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
+        var schema = await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName);
 
-        var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
+        var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
 
         // STEP 2: Create a content for this schema.
@@ -44,7 +44,7 @@ public class ContentCleanupTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 3: Delete a field from schema.
-        await _.Schemas.DeleteFieldAsync(_.AppName, schema.Name, schema.Fields.First(x => x.Name == TestEntityData.StringField).FieldId);
+        await _.Client.Schemas.DeleteFieldAsync(schema.Name, schema.Fields.First(x => x.Name == TestEntityData.StringField).FieldId);
 
 
         // STEP 4: Make any update.
@@ -61,9 +61,9 @@ public class ContentCleanupTests : IClassFixture<CreatedAppFixture>
     public async Task Should_cleanup_old_references()
     {
         // STEP 1: Create a schema.
-        await TestEntityWithReferences.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);
+        await TestEntityWithReferences.CreateSchemaAsync(_.Client.Schemas, schemaName);
 
-        var contents = _.ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(schemaName);
+        var contents = _.Client.Contents<TestEntityWithReferences, TestEntityWithReferencesData>(schemaName);
 
 
         // STEP 2: Create a referenced content.

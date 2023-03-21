@@ -19,9 +19,9 @@ public sealed class TestEntity : Content<TestEntityData>
 {
     public const int ScriptTrigger = -99;
 
-    public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name, SchemaScriptsDto scripts = null)
+    public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string name, SchemaScriptsDto scripts = null)
     {
-        var schema = await schemas.PostSchemaAsync(appName, new CreateSchemaDto
+        var schema = await schemas.PostSchemaAsync(new CreateSchemaDto
         {
             Name = name,
             Fields = new List<UpsertSchemaFieldDto>

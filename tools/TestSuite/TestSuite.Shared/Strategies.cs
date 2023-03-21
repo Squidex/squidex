@@ -19,11 +19,11 @@ public static class Strategies
         BulkPermanent
     }
 
-    public static Task DeleteAsync(this ISquidexClientManager clientManager, ContentBase content, Deletion strategy)
+    public static Task DeleteAsync(this ISquidexClient client, ContentBase content, Deletion strategy)
     {
         IContentsClient<MyContent, object> GetClient()
         {
-            return clientManager.CreateContentsClient<MyContent, object>(content.SchemaName);
+            return client.Contents<MyContent, object>(content.SchemaName);
         }
 
         switch (strategy)
@@ -73,11 +73,11 @@ public static class Strategies
         BulkShared
     }
 
-    public static Task UpdateAsync(this ISquidexClientManager clientManager, ContentBase content, object data, Update strategy)
+    public static Task UpdateAsync(this ISquidexClient client, ContentBase content, object data, Update strategy)
     {
         IContentsClient<MyContent, object> GetClient()
         {
-            return clientManager.CreateContentsClient<MyContent, object>(content.SchemaName);
+            return client.Contents<MyContent, object>(content.SchemaName);
         }
 
         switch (strategy)
@@ -127,7 +127,7 @@ public static class Strategies
                     }
                 });
             case Update.BulkShared:
-                return clientManager.CreateSharedContentsClient<MyContent, object>().BulkUpdateAsync(new BulkUpdate
+                return client.SharedContents<MyContent, object>().BulkUpdateAsync(new BulkUpdate
                 {
                     Jobs = new List<BulkUpdateJob>
                     {
@@ -155,11 +155,11 @@ public static class Strategies
         UpsertBulk
     }
 
-    public static Task PatchAsync(this ISquidexClientManager clientManager, ContentBase content, object data, Patch strategy)
+    public static Task PatchAsync(this ISquidexClient client, ContentBase content, object data, Patch strategy)
     {
         IContentsClient<MyContent, object> GetClient()
         {
-            return clientManager.CreateContentsClient<MyContent, object>(content.SchemaName);
+            return client.Contents<MyContent, object>(content.SchemaName);
         }
 
         switch (strategy)
@@ -209,7 +209,7 @@ public static class Strategies
                     }
                 });
             case Patch.BulkShared:
-                return clientManager.CreateSharedContentsClient<MyContent, object>().BulkUpdateAsync(new BulkUpdate
+                return client.SharedContents<MyContent, object>().BulkUpdateAsync(new BulkUpdate
                 {
                     Jobs = new List<BulkUpdateJob>
                     {

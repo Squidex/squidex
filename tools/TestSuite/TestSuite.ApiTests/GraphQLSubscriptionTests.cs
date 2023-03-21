@@ -117,7 +117,7 @@ public class GraphQLSubscriptionTests : IClassFixture<ContentFixture>
 
         await using (fileParameter.Data)
         {
-            await _.Assets.UploadAssetAsync(_.AppName, fileParameter, new AssetUploadOptions { Id = assetId });
+            await _.Client.Assets.UploadAssetAsync(fileParameter, new AssetUploadOptions { Id = assetId });
         }
 
         // STEP 3: Wait for publication.
@@ -128,11 +128,11 @@ public class GraphQLSubscriptionTests : IClassFixture<ContentFixture>
 
     private async Task<GraphQLHttpClient> CreateClient()
     {
-        var accessToken = await _.ClientManager.Options.Authenticator.GetBearerTokenAsync(_.AppName, default);
+        var accessToken = await _.Client.Options.Authenticator.GetBearerTokenAsync(_.AppName, default);
 
         var options = new GraphQLHttpClientOptions
         {
-            EndPoint = new Uri(_.ClientManager.GenerateUrl($"/api/content/{_.AppName}/graphql?access_token={accessToken}"))
+            EndPoint = new Uri(_.Client.GenerateUrl($"/api/content/{_.AppName}/graphql?access_token={accessToken}"))
         };
 
         var client = new GraphQLHttpClient(options, new NewtonsoftJsonSerializer());

@@ -17,6 +17,8 @@ namespace TestSuite.ApiTests;
 [UsesVerify]
 public class AnonymousTests : IClassFixture<ClientFixture>
 {
+    private readonly string appName = Guid.NewGuid().ToString();
+
     public ClientFixture _ { get; }
 
     public AnonymousTests(ClientFixture fixture)
@@ -27,18 +29,11 @@ public class AnonymousTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_create_app_with_anonymous_read_access()
     {
-        var appName = Guid.NewGuid().ToString();
-
-        // STEP 1: Create app
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        var app = await _.Apps.PostAppAsync(createRequest);
+        // STEP 1: Create app.
+        var app = await _.PostAppAsync(appName);
 
         // Should return create app with correct name.
-        Assert.Equal(appName, app.Name);
+        Assert.Equal(appName, app.Options.AppName);
 
 
         // STEP 2: Make the client anonymous.
@@ -47,11 +42,11 @@ public class AnonymousTests : IClassFixture<ClientFixture>
             AllowAnonymous = true
         };
 
-        await _.Apps.PutClientAsync(appName, "default", clientRequest);
+        await app.Apps.PutClientAsync("default", clientRequest);
 
 
         // STEP 3: Check anonymous permission
-        var url = $"{_.ClientManager.Options.Url}api/apps/{appName}/settings";
+        var url = $"{_.Client.Options.Url}api/apps/{appName}/settings";
 
         using (var httpClient = new HttpClient())
         {
@@ -66,18 +61,11 @@ public class AnonymousTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_create_app_with_anonymous_write_access()
     {
-        var appName = Guid.NewGuid().ToString();
-
-        // STEP 1: Create app
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        var app = await _.Apps.PostAppAsync(createRequest);
+        // STEP 1: Create app.
+        var app = await _.PostAppAsync(appName);
 
         // Should return create app with correct name.
-        Assert.Equal(appName, app.Name);
+        Assert.Equal(appName, app.Options.AppName);
 
 
         // STEP 2: Make the client anonymous.
@@ -86,7 +74,7 @@ public class AnonymousTests : IClassFixture<ClientFixture>
             AllowAnonymous = true
         };
 
-        await _.Apps.PutClientAsync(appName, "default", clientRequest);
+        await app.Apps.PutClientAsync("default", clientRequest);
 
 
         // STEP 3: Create schema
@@ -97,11 +85,11 @@ public class AnonymousTests : IClassFixture<ClientFixture>
             IsPublished = true
         };
 
-        await _.Schemas.PostSchemaAsync(appName, schemaRequest);
+        await app.Schemas.PostSchemaAsync(schemaRequest);
 
 
         // STEP 3: Create a content.
-        var url = $"{_.ClientManager.Options.Url}api/content/{appName}/my-content";
+        var url = $"{_.Client.Options.Url}api/content/{appName}/my-content";
 
         using (var httpClient = new HttpClient())
         {

@@ -23,7 +23,7 @@ public class LanguagesTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_provide_languages()
     {
-        var languages = await _.Languages.GetLanguagesAsync();
+        var languages = await _.Client.Languages.GetLanguagesAsync();
 
         Assert.True(languages.Count > 100);
     }
