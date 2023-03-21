@@ -33,7 +33,7 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
     public async Task Should_create_client()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create client.
@@ -51,7 +51,7 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
     public async Task Should_update_client()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 0: Create client.
@@ -86,7 +86,7 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
     public async Task Should_delete_client()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 0: Create client.

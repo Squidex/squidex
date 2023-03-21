@@ -37,7 +37,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rules_on_content_change()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -88,7 +88,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rules_on_reference_change()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -189,7 +189,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_scripting_rule_on_content_change()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -236,7 +236,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rules_on_asset_change()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -284,7 +284,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rules_on_schema_change()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -332,7 +332,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_run_rule_manually()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session
@@ -382,7 +382,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
     public async Task Should_rerun_rules(bool fromSnapshots)
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Start webhook session

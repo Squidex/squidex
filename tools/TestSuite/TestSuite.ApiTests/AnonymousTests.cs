@@ -30,7 +30,7 @@ public class AnonymousTests : IClassFixture<ClientFixture>
     public async Task Should_create_app_with_anonymous_read_access()
     {
         // STEP 1: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, dto) = await _.PostAppAsync(appName);
 
         // Should return create app with correct name.
         Assert.Equal(appName, app.Options.AppName);
@@ -55,14 +55,14 @@ public class AnonymousTests : IClassFixture<ClientFixture>
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        await Verify(app);
+        await Verify(dto);
     }
 
     [Fact]
     public async Task Should_create_app_with_anonymous_write_access()
     {
         // STEP 1: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, dto) = await _.PostAppAsync(appName);
 
         // Should return create app with correct name.
         Assert.Equal(appName, app.Options.AppName);
@@ -98,6 +98,6 @@ public class AnonymousTests : IClassFixture<ClientFixture>
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
 
-        await Verify(app);
+        await Verify(dto);
     }
 }

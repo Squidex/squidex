@@ -29,12 +29,7 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     public async Task Should_create_app()
     {
         // STEP 1: Create app
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        var app = await _.PostAppAsync(createRequest);
+        var (app, dto) = await _.PostAppAsync(appName);
 
         // Should return created app with correct name.
         Assert.Equal(appName, app.Options.AppName);
@@ -60,7 +55,7 @@ public class AppCreationTests : IClassFixture<ClientFixture>
         // Should create default client.
         Assert.Contains(clients.Items, x => x.Id == "default");
 
-        await Verify(app);
+        await Verify(dto);
     }
 
     [Fact]
@@ -83,7 +78,7 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     public async Task Should_archive_app()
     {
         // STEP 1: Create app
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 2: Archive app
@@ -99,7 +94,7 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     public async Task Should_recreate_after_archived()
     {
         // STEP 1: Create app
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 2: Archive app
@@ -132,7 +127,7 @@ public class AppCreationTests : IClassFixture<ClientFixture>
             Template = template.Name
         };
 
-        var app = await _.PostAppAsync(createRequest);
+        var (app, _) = await _.PostAppAsync(createRequest);
 
 
         // STEP 3: Get schemas

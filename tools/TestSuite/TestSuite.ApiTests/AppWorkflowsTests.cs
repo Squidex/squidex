@@ -31,7 +31,7 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     public async Task Should_create_workflow()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create workflow.
@@ -48,7 +48,7 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     public async Task Should_update_workflow()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 0: Create workflow.
@@ -87,7 +87,7 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     public async Task Should_delete_workflow()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 0: Create workflow.

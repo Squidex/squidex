@@ -30,7 +30,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_add_language()
     {
         // STEP 0: Add app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.
@@ -48,7 +48,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_add_custom_language()
     {
         // STEP 0: Add app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.
@@ -66,7 +66,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_update_language()
     {
         // STEP 0: Add app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.
@@ -97,7 +97,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_update_master_language()
     {
         // STEP 0: Add app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.
@@ -146,7 +146,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
     public async Task Should_delete_language()
     {
         // STEP 0: Add app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Add languages.

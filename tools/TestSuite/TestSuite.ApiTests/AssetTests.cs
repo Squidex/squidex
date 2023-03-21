@@ -483,7 +483,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 2: Create asset
-        var asset_1 = await _.Client.Assets.UploadFileAsync(appName, "Assets/logo-squared.png", "image/png", parentId: folder.Id);
+        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", parentId: folder.Id);
 
 
         // STEP 3: Download asset
@@ -824,7 +824,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
             if (remaining < buffer.Length)
             {
-                buffer = buffer[.. (int)remaining];
+                buffer = buffer[..(int)remaining];
             }
 
             var bytesRead = await base.ReadAsync(buffer, cancellationToken);

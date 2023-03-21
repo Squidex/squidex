@@ -36,7 +36,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.Url);
 
         // STEP 1: Create app
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 2: Prepare app.
@@ -78,7 +78,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.Url);
 
         // STEP 1: Create app
-        var app = await _.PostAppAsync(appNameRestore);
+        var (app, _) = await _.PostAppAsync(appNameRestore);
 
 
         // STEP 2: Prepare app.
@@ -122,7 +122,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         // Create a test schema.
         await TestEntity.CreateSchemaAsync(app.Schemas, schemaName);
 
-        var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
+        var contents = app.Contents<TestEntity, TestEntityData>(schemaName);
 
         await contents.CreateAsync(new TestEntityData
         {
@@ -147,7 +147,7 @@ public class BackupTests : IClassFixture<ClientFixture>
             Name = appName
         };
 
-        await app.Apps.PostWorkflowAsync( workflowRequest);
+        await app.Apps.PostWorkflowAsync(workflowRequest);
 
 
         // Create a language

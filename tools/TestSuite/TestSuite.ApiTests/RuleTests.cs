@@ -30,7 +30,7 @@ public class RuleTests : IClassFixture<ClientFixture>
     public async Task Should_create_rule()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create rule
@@ -60,7 +60,7 @@ public class RuleTests : IClassFixture<ClientFixture>
     public async Task Should_update_rule()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create rule
@@ -99,7 +99,7 @@ public class RuleTests : IClassFixture<ClientFixture>
     public async Task Should_delete_rule()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create rule

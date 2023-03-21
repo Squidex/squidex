@@ -40,7 +40,7 @@ public class ClientFixture : IAsyncLifetime
         VerifierSettings.IgnoreMembersWithType<DateTimeOffset>();
     }
 
-    public Task<ISquidexClient> PostAppAsync(string name)
+    public Task<(ISquidexClient, AppDto)> PostAppAsync(string name)
     {
         var createRequest = new CreateAppDto
         {
@@ -50,7 +50,7 @@ public class ClientFixture : IAsyncLifetime
         return PostAppAsync(createRequest);
     }
 
-    public async Task<ISquidexClient> PostAppAsync(CreateAppDto request)
+    public async Task<(ISquidexClient, AppDto)> PostAppAsync(CreateAppDto request)
     {
         var services =
             new ServiceCollection()
@@ -74,9 +74,7 @@ public class ClientFixture : IAsyncLifetime
 
         var client = services.GetRequiredService<ISquidexClient>();
 
-        await client.Apps.PostAppAsync(request);
-
-        return client;
+        return (client, await client.Apps.PostAppAsync(request));
     }
 
     public virtual async Task InitializeAsync()

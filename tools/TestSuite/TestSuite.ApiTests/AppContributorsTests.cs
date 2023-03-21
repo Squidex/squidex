@@ -31,7 +31,7 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     public async Task Should_not_invite_contributor_if_flag_is_false()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1:  Do not invite contributors when flag is false.
@@ -52,7 +52,7 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     public async Task Should_invite_contributor()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Assign contributor.
@@ -70,7 +70,7 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     public async Task Should_update_contributor()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Assign contributor.
@@ -95,7 +95,7 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     public async Task Should_remove_contributor()
     {
         // STEP 0: Create app.
-        var app = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Assign contributor.
