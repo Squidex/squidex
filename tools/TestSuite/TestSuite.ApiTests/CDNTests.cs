@@ -27,7 +27,7 @@ public class CDNTests : IClassFixture<ClientCloudFixture>
     {
         var id = "ef4286f9-8b1d-4dda-bd52-c5bd191c47bb";
 
-        var url = _.CDNClientManager.GenerateImageUrl(id);
+        var url = _.CDNClient.GenerateImageUrl(id);
 
         Assert.StartsWith("https://assets.squidex.io/", url, StringComparison.Ordinal);
     }
@@ -37,7 +37,7 @@ public class CDNTests : IClassFixture<ClientCloudFixture>
     {
         var id = "ef4286f9-8b1d-4dda-bd52-c5bd191c47bb";
 
-        var url = _.CDNClientManager.GenerateImageUrl(id);
+        var url = _.CDNClient.GenerateImageUrl(id);
 
         await DownloadAsync(url);
     }
@@ -47,7 +47,7 @@ public class CDNTests : IClassFixture<ClientCloudFixture>
     {
         var id = "ef4286f9-8b1d-4dda-bd52-c5bd191c47bb";
 
-        var url = _.ClientManager.GenerateImageUrl(id);
+        var url = _.CloudClient.GenerateImageUrl(id);
 
         Assert.StartsWith("https://cloud.squidex.io/", url, StringComparison.Ordinal);
     }
@@ -57,7 +57,7 @@ public class CDNTests : IClassFixture<ClientCloudFixture>
     {
         var id = "ef4286f9-8b1d-4dda-bd52-c5bd191c47bb";
 
-        var url = _.ClientManager.GenerateImageUrl(id);
+        var url = _.CloudClient.GenerateImageUrl(id);
 
         await DownloadAsync(url);
     }
@@ -65,7 +65,7 @@ public class CDNTests : IClassFixture<ClientCloudFixture>
     [Fact]
     public async Task Should_get_blog_items_from_cdn()
     {
-        var client = _.CDNClientManager.CreateContentsClient<TestEntity, TestEntityData>("blog");
+        var client = _.CDNClient.Contents<TestEntity, TestEntityData>("blog");
 
         var result = await client.GetAsync();
 
@@ -75,7 +75,7 @@ public class CDNTests : IClassFixture<ClientCloudFixture>
     [Fact]
     public async Task Should_get_blog_items_from_cloud_when_cdn_not_configured()
     {
-        var client = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>("blog");
+        var client = _.CloudClient.Contents<TestEntity, TestEntityData>("blog");
 
         var result = await client.GetAsync();
 

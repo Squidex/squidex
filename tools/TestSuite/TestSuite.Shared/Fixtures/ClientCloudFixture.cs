@@ -12,13 +12,13 @@ namespace TestSuite.Fixtures;
 
 public sealed class ClientCloudFixture
 {
-    public ISquidexClientManager ClientManager { get; private set; }
+    public ISquidexClient CloudClient { get; private set; }
 
-    public ISquidexClientManager CDNClientManager { get; private set; }
+    public ISquidexClient CDNClient { get; private set; }
 
     public ClientCloudFixture()
     {
-        ClientManager =
+        CloudClient =
             new ServiceCollection()
                 .AddSquidexClient(options =>
                 {
@@ -28,9 +28,9 @@ public sealed class ClientCloudFixture
                     options.ReadResponseAsString = true;
                 })
                 .BuildServiceProvider()
-                .GetRequiredService<ISquidexClientManager>();
+                .GetRequiredService<ISquidexClient>();
 
-        CDNClientManager =
+        CDNClient =
             new ServiceCollection()
                 .AddSquidexClient(options =>
                 {
@@ -41,6 +41,6 @@ public sealed class ClientCloudFixture
                     options.ContentCDN = "https://contents.squidex.io";
                 })
                 .BuildServiceProvider()
-                .GetRequiredService<ISquidexClientManager>();
+                .GetRequiredService<ISquidexClient>();
     }
 }

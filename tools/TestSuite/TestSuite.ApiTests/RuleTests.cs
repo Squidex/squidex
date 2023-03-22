@@ -30,7 +30,7 @@ public class RuleTests : IClassFixture<ClientFixture>
     public async Task Should_create_rule()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create rule
@@ -49,7 +49,7 @@ public class RuleTests : IClassFixture<ClientFixture>
             }
         };
 
-        var rule = await _.Rules.PostRuleAsync(appName, createRule);
+        var rule = await app.Rules.PostRuleAsync(createRule);
 
         Assert.IsType<WebhookRuleActionDto>(rule.Action);
 
@@ -60,7 +60,7 @@ public class RuleTests : IClassFixture<ClientFixture>
     public async Task Should_update_rule()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create rule
@@ -79,7 +79,7 @@ public class RuleTests : IClassFixture<ClientFixture>
             }
         };
 
-        var rule_0 = await _.Rules.PostRuleAsync(appName, createRequest);
+        var rule_0 = await app.Rules.PostRuleAsync(createRequest);
 
 
         // STEP 2: Update rule
@@ -88,7 +88,7 @@ public class RuleTests : IClassFixture<ClientFixture>
             Name = ruleName
         };
 
-        var rule_1 = await _.Rules.PutRuleAsync(appName, rule_0.Id, updateRequest);
+        var rule_1 = await app.Rules.PutRuleAsync(rule_0.Id, updateRequest);
 
         Assert.Equal(ruleName, rule_1.Name);
 
@@ -99,7 +99,7 @@ public class RuleTests : IClassFixture<ClientFixture>
     public async Task Should_delete_rule()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create rule
@@ -118,13 +118,13 @@ public class RuleTests : IClassFixture<ClientFixture>
             }
         };
 
-        var rule = await _.Rules.PostRuleAsync(appName, createRequest);
+        var rule = await app.Rules.PostRuleAsync(createRequest);
 
 
         // STEP 2: Delete rule
-        await _.Rules.DeleteRuleAsync(appName, rule.Id);
+        await app.Rules.DeleteRuleAsync(rule.Id);
 
-        var rules = await _.Rules.GetRulesAsync(appName);
+        var rules = await app.Rules.GetRulesAsync();
 
         Assert.DoesNotContain(rules.Items, x => x.Id == rule.Id);
     }
@@ -132,7 +132,7 @@ public class RuleTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_get_actions()
     {
-        var actions = await _.Rules.GetActionsAsync();
+        var actions = await _.Client.Rules.GetActionsAsync();
 
         Assert.NotEmpty(actions);
     }
@@ -140,7 +140,7 @@ public class RuleTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_get_event_schemas()
     {
-        var schema = await _.Rules.GetEventSchemaAsync("EnrichedContentEvent");
+        var schema = await _.Client.Rules.GetEventSchemaAsync("EnrichedContentEvent");
 
         Assert.NotNull(schema);
     }
@@ -148,18 +148,8 @@ public class RuleTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_get_event_types()
     {
-        var eventTypes = await _.Rules.GetEventTypesAsync();
+        var eventTypes = await _.Client.Rules.GetEventTypesAsync();
 
         Assert.NotEmpty(eventTypes);
-    }
-
-    private async Task CreateAppAsync()
-    {
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.Apps.PostAppAsync(createRequest);
     }
 }

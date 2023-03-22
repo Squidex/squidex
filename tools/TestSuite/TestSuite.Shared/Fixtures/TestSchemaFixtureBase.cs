@@ -30,7 +30,7 @@ public abstract class TestSchemaFixtureBase : CreatedAppFixture
         {
             try
             {
-                await TestEntity.CreateSchemaAsync(Schemas, AppName, SchemaName);
+                await TestEntity.CreateSchemaAsync(Client.Schemas, SchemaName);
             }
             catch (SquidexManagementException ex)
             {
@@ -43,6 +43,6 @@ public abstract class TestSchemaFixtureBase : CreatedAppFixture
             return true;
         });
 
-        Contents = ClientManager.CreateContentsClient<TestEntity, TestEntityData>(SchemaName);
+        Contents = Client.Contents<TestEntity, TestEntityData>(SchemaName);
     }
 }

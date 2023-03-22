@@ -23,19 +23,19 @@ public class PingTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_ping_service()
     {
-        await _.Ping.GetPingAsync();
+        await _.Client.Ping.GetPingAsync();
     }
 
     [Fact]
     public async Task Should_ping_app()
     {
-        await _.Ping.GetAppPingAsync(_.AppName);
+        await _.Client.Ping.GetAppPingAsync();
     }
 
     [Fact]
     public async Task Should_get_info()
     {
-        var infos = await _.Ping.GetInfoAsync();
+        var infos = await _.Client.Ping.GetInfoAsync();
 
         Assert.NotNull(infos);
     }

@@ -14,16 +14,16 @@
     <None Remove="Assets\SampleImage_WEBP_350kb - Copy.webp" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Codeuctivity.ImageSharpCompare" Version="2.0.76" />
-    <PackageReference Include="GraphQL.Client" Version="5.1.0" />
-    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.757">
+    <PackageReference Include="Codeuctivity.ImageSharpCompare" Version="3.0.118" />
+    <PackageReference Include="GraphQL.Client" Version="5.1.1" />
+    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.1" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.22">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="NSwag.Core" Version="13.18.2" />
-    <PackageReference Include="PuppeteerSharp" Version="8.0.0" />
+    <PackageReference Include="PuppeteerSharp" Version="9.0.2" />
     <PackageReference Include="Squidex.Assets" Version="5.4.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="Verify.Xunit" Version="17.5.0" />

@@ -50,7 +50,7 @@ public sealed class FrontendTests : IClassFixture<ClientFixture>
 
         await using var page = await browser.NewPageAsync();
 
-        await page.GoToAsync(_.ClientManager.Options.Url + url + "?skip-setup");
+        await page.GoToAsync(_.Client.Options.Url + url + "?skip-setup");
         await page.ScreenshotAsync($"__{name}.jpg");
 
         var diff = ImageSharpCompare.CalcDiff($"__{name}.jpg", $"Assets/{name}.jpg");

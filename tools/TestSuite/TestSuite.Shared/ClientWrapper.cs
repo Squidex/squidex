@@ -12,11 +12,11 @@ using TestSuite.Utils;
 
 namespace TestSuite;
 
-public sealed class ClientManagerWrapper
+public sealed class ClientWrapper
 {
-    public ISquidexClientManager ClientManager { get; }
+    public ISquidexClient Client { get; }
 
-    public ClientManagerWrapper()
+    public ClientWrapper()
     {
         var services =
             new ServiceCollection()
@@ -38,10 +38,10 @@ public sealed class ClientManagerWrapper
                     }).Services
                 .BuildServiceProvider();
 
-        ClientManager = services.GetRequiredService<ISquidexClientManager>();
+        Client = services.GetRequiredService<ISquidexClient>();
     }
 
-    public async Task<ClientManagerWrapper> ConnectAsync()
+    public async Task<ClientWrapper> ConnectAsync()
     {
         var waitSeconds = TestHelpers.Configuration.GetValue<int>("config:wait");
 
@@ -49,7 +49,6 @@ public sealed class ClientManagerWrapper
         {
             Console.WriteLine("Waiting {0} seconds to access server", waitSeconds);
 
-            var pingClient = ClientManager.CreatePingClient();
             try
             {
                 using (var cts = new CancellationTokenSource(waitSeconds * 1000))
@@ -58,7 +57,7 @@ public sealed class ClientManagerWrapper
                     {
                         try
                         {
-                            await pingClient.GetPingAsync(cts.Token);
+                            await Client.Ping.GetPingAsync(cts.Token);
                             break;
                         }
                         catch

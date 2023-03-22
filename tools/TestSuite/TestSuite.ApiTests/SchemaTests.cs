@@ -35,14 +35,14 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
             Name = schemaName
         };
 
-        var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
 
         // Should return created schemas with correct name.
         Assert.Equal(schemaName, schema.Name);
 
 
         // STEP 2: Get all schemas
-        var schemas = await _.Schemas.GetSchemasAsync(_.AppName);
+        var schemas = await _.Client.Schemas.GetSchemasAsync();
 
         // Should provide new schema when apps are schemas.
         Assert.Contains(schemas.Items, x => x.Name == schemaName);
@@ -57,13 +57,13 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
             Name = schemaName
         };
 
-        var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
 
 
         // STEP 2: Create again and fail
         var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
         {
-            return _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+            return _.Client.Schemas.PostSchemaAsync(createRequest);
         });
 
         Assert.Equal(400, ex.StatusCode);
@@ -82,7 +82,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
             IsPublished = true
         };
 
-        var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
 
         // Should return created schemas with correct name.
         Assert.Equal(schemaName, schema.Name);
@@ -92,16 +92,14 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 2: Get all schemas
-        var schemas = await _.Schemas.GetSchemasAsync(_.AppName);
+        var schemas = await _.Client.Schemas.GetSchemasAsync();
 
         // Should provide new schema when apps are schemas.
         Assert.Contains(schemas.Items, x => x.Name == schemaName);
 
 
         // STEP 3: Get singleton content
-        var client = _.ClientManager.CreateDynamicContentsClient(schemaName);
-
-        var content = await client.GetAsync(schema.Id);
+        var content = await _.Client.DynamicContents(schemaName).GetAsync(schema.Id);
 
         Assert.NotNull(content);
     }
@@ -119,7 +117,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
             IsPublished = true
         };
 
-        var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
 
         // Should return created schemas with correct name.
         Assert.Equal(schemaName, schema.Name);
@@ -129,16 +127,14 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 2: Get all schemas
-        var schemas = await _.Schemas.GetSchemasAsync(_.AppName);
+        var schemas = await _.Client.Schemas.GetSchemasAsync();
 
         // Should provide new schema when apps are schemas.
         Assert.Contains(schemas.Items, x => x.Name == schemaName);
 
 
         // STEP 3: Get singleton content
-        var client = _.ClientManager.CreateDynamicContentsClient(schemaName);
-
-        var content = await client.GetAsync(schema.Id);
+        var content = await _.Client.DynamicContents(schemaName).GetAsync(schema.Id);
 
         Assert.NotNull(content);
     }
@@ -174,7 +170,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
             }
         };
 
-        var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
 
         // Should return created schemas with correct name.
         Assert.Equal(schemaName, schema.Name);
@@ -189,16 +185,16 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
             Name = schemaName
         };
 
-        var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
 
         // Should return created schemas with correct name.
         Assert.Equal(schemaName, schema.Name);
 
 
         // STEP 2: Delete schema
-        await _.Schemas.DeleteSchemaAsync(_.AppName, schemaName);
+        await _.Client.Schemas.DeleteSchemaAsync(schemaName);
 
-        var schemas = await _.Schemas.GetSchemasAsync(_.AppName);
+        var schemas = await _.Client.Schemas.GetSchemasAsync();
 
         // Should not provide deleted schema when schema are queried.
         Assert.DoesNotContain(schemas.Items, x => x.Name == schemaName);
@@ -213,17 +209,17 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
             Name = schemaName
         };
 
-        var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
 
         // Should return created schemas with correct name.
         Assert.Equal(schemaName, schema.Name);
 
 
         // STEP 2: Delete schema.
-        await _.Schemas.DeleteSchemaAsync(_.AppName, schemaName);
+        await _.Client.Schemas.DeleteSchemaAsync(schemaName);
 
 
         // STEP 3: Create app again
-        await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        await _.Client.Schemas.PostSchemaAsync(createRequest);
     }
 }

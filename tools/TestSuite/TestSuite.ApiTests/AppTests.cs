@@ -27,7 +27,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
     public async Task Should_get_app()
     {
         // STEP 1: Get app.
-        var app = await _.Apps.GetAppAsync(_.AppName);
+        var app = await _.Client.Apps.GetAppAsync();
 
         Assert.Equal(_.AppName, app.Name);
     }
@@ -41,7 +41,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
             Label = Guid.NewGuid().ToString()
         };
 
-        var app_1 = await _.Apps.PutAppAsync(_.AppName, updateRequest);
+        var app_1 = await _.Client.Apps.PutAppAsync(updateRequest);
 
         Assert.Equal(updateRequest.Label, app_1.Label);
     }
@@ -55,7 +55,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
             Description = Guid.NewGuid().ToString()
         };
 
-        var app_1 = await _.Apps.PutAppAsync(_.AppName, updateRequest);
+        var app_1 = await _.Client.Apps.PutAppAsync(updateRequest);
 
         Assert.Equal(updateRequest.Description, app_1.Description);
     }
@@ -68,7 +68,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
         {
             var file = new FileParameter(stream, "logo-squared.png", "image/png");
 
-            var app_1 = await _.Apps.UploadImageAsync(_.AppName, file);
+            var app_1 = await _.Client.Apps.UploadImageAsync(file);
 
             // Should contain image link.
             Assert.True(app_1._links.ContainsKey("image"));
@@ -82,7 +82,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
 
             var downloaded = new MemoryStream();
 
-            using (var imageStream = await _.Apps.GetImageAsync(_.AppName))
+            using (var imageStream = await _.Client.Apps.GetImageAsync())
             {
                 await imageStream.Stream.CopyToAsync(downloaded);
             }
@@ -100,7 +100,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
         {
             var file = new FileParameter(stream, "logo-squared.png", "image/png");
 
-            var app_1 = await _.Apps.UploadImageAsync(_.AppName, file);
+            var app_1 = await _.Client.Apps.UploadImageAsync(file);
 
             // Should contain image link.
             Assert.True(app_1._links.ContainsKey("image"));
@@ -108,7 +108,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 2: Delete Image.
-        var app_2 = await _.Apps.DeleteImageAsync(_.AppName);
+        var app_2 = await _.Client.Apps.DeleteImageAsync();
 
         // Should contain image link.
         Assert.False(app_2._links.ContainsKey("image"));
@@ -118,7 +118,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
     public async Task Should_get_settings()
     {
         // STEP 1: Get initial settings.
-        var settings_0 = await _.Apps.GetSettingsAsync(_.AppName);
+        var settings_0 = await _.Client.Apps.GetSettingsAsync();
 
         Assert.NotEmpty(settings_0.Patterns);
     }
@@ -139,7 +139,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
             }
         };
 
-        var settings_1 = await _.Apps.PutSettingsAsync(_.AppName, updateRequest);
+        var settings_1 = await _.Client.Apps.PutSettingsAsync(updateRequest);
 
         Assert.NotEmpty(settings_1.Patterns);
         Assert.NotEmpty(settings_1.Editors);

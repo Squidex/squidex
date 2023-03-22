@@ -23,7 +23,7 @@ public class PlansTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_get_plans()
     {
-        var plans = await _.Plans.GetPlansAsync(_.AppName);
+        var plans = await _.Client.Plans.GetPlansAsync();
 
         Assert.NotNull(plans);
     }

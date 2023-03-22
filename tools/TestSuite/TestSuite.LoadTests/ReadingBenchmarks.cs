@@ -10,6 +10,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
+#pragma warning disable xUnit1033 // Test classes decorated with 'Xunit.IClassFixture<TFixture>' or 'Xunit.ICollectionFixture<TFixture>' should add a constructor argument of type TFixture
 
 namespace TestSuite.LoadTests;
 
@@ -66,7 +67,7 @@ public class ReadingBenchmarks : IClassFixture<CreatedAppFixture>
     {
         await Run.Parallel(numUsers, numIterationsPerUser, async () =>
         {
-            await _.Apps.GetClientsAsync(_.AppName);
+            await _.Client.Apps.GetClientsAsync();
         }, 100, testOutput);
     }
 }

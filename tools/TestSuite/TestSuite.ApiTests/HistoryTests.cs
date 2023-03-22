@@ -23,7 +23,7 @@ public class HistoryTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_get_history()
     {
-        var history = await _.History.WaitForHistoryAsync(_.AppName, null, x => true, TimeSpan.FromSeconds(30));
+        var history = await _.Client.History.WaitForHistoryAsync(null, x => true, TimeSpan.FromSeconds(30));
 
         Assert.NotEmpty(history);
     }

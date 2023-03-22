@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 
@@ -32,11 +33,11 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
     public async Task Should_create_client()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create client.
-        var client = await CreateAsync();
+        var client = await CreateAsync(app);
 
         // Should return client with correct name and id.
         Assert.Equal(clientRole, client.Role);
@@ -50,11 +51,11 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
     public async Task Should_update_client()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 0: Create client.
-        var client = await CreateAsync();
+        var client = await CreateAsync(app);
 
 
         // STEP 1: Update client name.
@@ -67,7 +68,7 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
             Role = "Owner"
         };
 
-        var clients_2 = await _.Apps.PutClientAsync(appName, client.Id, updateNameRequest);
+        var clients_2 = await app.Apps.PutClientAsync(client.Id, updateNameRequest);
         var client_2 = clients_2.Items.Find(x => x.Id == client.Id);
 
         // Should update client name.
@@ -85,15 +86,15 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
     public async Task Should_delete_client()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 0: Create client.
-        var client = await CreateAsync();
+        var client = await CreateAsync(app);
 
 
         // STEP 1: Delete client
-        var clients_2 = await _.Apps.DeleteClientAsync(appName, client.Id);
+        var clients_2 = await app.Apps.DeleteClientAsync(client.Id);
 
         // Should not return deleted client.
         Assert.DoesNotContain(clients_2.Items, x => x.Id == client.Id);
@@ -102,26 +103,16 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
             .IgnoreMember<ClientDto>(x => x.Secret);
     }
 
-    private async Task<ClientDto> CreateAsync()
+    private async Task<ClientDto> CreateAsync(ISquidexClient app)
     {
         var createRequest = new CreateClientDto
         {
             Id = id
         };
 
-        var clients = await _.Apps.PostClientAsync(appName, createRequest);
+        var clients = await app.Apps.PostClientAsync(createRequest);
         var client = clients.Items.Find(x => x.Id == id);
 
         return client;
-    }
-
-    private async Task CreateAppAsync()
-    {
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.Apps.PostAppAsync(createRequest);
     }
 }

@@ -35,14 +35,14 @@ public sealed class AdminUsersTests : IClassFixture<ClientFixture>
 
 
         // STEP 2: Get user by ID.
-        var userById = await _.UserManagement.GetUserAsync(user_0.Id);
+        var userById = await _.Client.UserManagement.GetUserAsync(user_0.Id);
 
         Assert.Equal(email, userById.Email);
         Assert.Equal(email, userById.DisplayName);
 
 
         // STEP 2: Get users by email.
-        var usersByEmail = await _.UserManagement.GetUsersAsync(user_0.Email);
+        var usersByEmail = await _.Client.UserManagement.GetUsersAsync(user_0.Email);
 
         Assert.Equal(email, usersByEmail.Items.First().Email);
         Assert.Equal(email, usersByEmail.Items.First().DisplayName);
@@ -63,7 +63,7 @@ public sealed class AdminUsersTests : IClassFixture<ClientFixture>
             Email = email,
         };
 
-        var user_1 = await _.UserManagement.PutUserAsync(user_0.Id, updateRequest);
+        var user_1 = await _.Client.UserManagement.PutUserAsync(user_0.Id, updateRequest);
 
         Assert.Equal(updateRequest.DisplayName, user_1.DisplayName);
     }
@@ -76,13 +76,13 @@ public sealed class AdminUsersTests : IClassFixture<ClientFixture>
 
 
         // STEP 1: Lock user.
-        var user_1 = await _.UserManagement.LockUserAsync(user_0.Id);
+        var user_1 = await _.Client.UserManagement.LockUserAsync(user_0.Id);
 
         Assert.True(user_1.IsLocked);
 
 
         // STEP 2: Unlock user.
-        var user_2 = await _.UserManagement.UnlockUserAsync(user_0.Id);
+        var user_2 = await _.Client.UserManagement.UnlockUserAsync(user_0.Id);
 
         Assert.False(user_2.IsLocked);
     }
@@ -98,11 +98,11 @@ public sealed class AdminUsersTests : IClassFixture<ClientFixture>
 
 
         // STEP 1: Delete user
-        await _.UserManagement.DeleteUserAsync(user_0.Id);
+        await _.Client.UserManagement.DeleteUserAsync(user_0.Id);
 
 
         // STEP 2: Get user by email.
-        var usersByEmail = await _.UserManagement.GetUsersAsync(user_0.Email);
+        var usersByEmail = await _.Client.UserManagement.GetUsersAsync(user_0.Email);
 
         Assert.Empty(usersByEmail.Items);
     }
@@ -118,6 +118,6 @@ public sealed class AdminUsersTests : IClassFixture<ClientFixture>
             DisplayName = email,
         };
 
-        return await _.UserManagement.PostUserAsync(createRequest);
+        return await _.Client.UserManagement.PostUserAsync(createRequest);
     }
 }

@@ -7,6 +7,7 @@
 
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
+using Squidex.ClientLibrary.EnrichedEvents;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
 
@@ -347,7 +348,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Update with selected strategy.
-        await _.ClientManager.UpdateAsync(content, new TestEntityData
+        await _.Client.UpdateAsync(content, new TestEntityData
         {
             Number = 200
         }, strategy);
@@ -377,7 +378,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Update with selected strategy.
-        await _.ClientManager.UpdateAsync(content, new TestEntityData
+        await _.Client.UpdateAsync(content, new TestEntityData
         {
             String = null
         }, strategy);
@@ -404,7 +405,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Patch with selected strategy.
-        await _.ClientManager.PatchAsync(content, new TestEntityData
+        await _.Client.PatchAsync(content, new TestEntityData
         {
             Number = 200
         }, strategy);
@@ -434,7 +435,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Patch with selected strategy.
-        await _.ClientManager.PatchAsync(content, new TestEntityData
+        await _.Client.PatchAsync(content, new TestEntityData
         {
             Id = "id2"
         }, strategy);
@@ -461,7 +462,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Patch with selected strategy.
-        await _.ClientManager.PatchAsync(content, new
+        await _.Client.PatchAsync(content, new
         {
             @string = new { iv = (string)null }
         }, strategy);
@@ -486,7 +487,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Delete with selected strategy.
-        await _.ClientManager.DeleteAsync(content, strategy);
+        await _.Client.DeleteAsync(content, strategy);
 
 
         // STEP 3: Retrieve all items and ensure that the deleted item does not exist.
@@ -524,7 +525,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Delete with selected strategy.
-        await _.ClientManager.DeleteAsync(content, strategy);
+        await _.Client.DeleteAsync(content, strategy);
 
 
         // STEP 3: Retrieve all items and ensure that the deleted item does not exist.
@@ -548,7 +549,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Delete with selected strategy.
-        await _.ClientManager.DeleteAsync(content_1, strategy);
+        await _.Client.DeleteAsync(content_1, strategy);
 
 
         // STEP 3: Recreate the item with the same id.
@@ -585,7 +586,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Delete with selected strategy.
-        await _.ClientManager.DeleteAsync(content_1, strategy);
+        await _.Client.DeleteAsync(content_1, strategy);
 
 
         // STEP 3: Recreate the item with the same id.
@@ -629,7 +630,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 3: Permanently delete content with custom id again.
-        await _.ClientManager.DeleteAsync(content_2, strategy);
+        await _.Client.DeleteAsync(content_2, strategy);
     }
 
     [Fact]
@@ -653,10 +654,10 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
             }
         };
 
-        await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+        await _.Client.Schemas.PostSchemaAsync(createRequest);
 
 
-        var client = _.ClientManager.CreateDynamicContentsClient(schemaName);
+        var client = _.Client.DynamicContents(schemaName);
 
         // STEP 2: Get content.
         var content_1 = await client.GetAsync("_schemaId_");
@@ -702,17 +703,17 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 4: Get current version.
-        var data_2 = await _.Contents.GetDataAsync(content.Id, content.Version);
+        var content_2 = await _.Contents.GetAsync(content.Id, content.Version);
 
-        Assert.Equal(2, data_2.Number);
+        Assert.Equal(2, content_2.Data.Number);
 
 
         // STEP 4: Get previous version
-        var data_1 = await _.Contents.GetDataAsync(content.Id, content.Version - 1);
+        var content_1 = await _.Contents.GetAsync(content.Id, content.Version - 1);
 
-        Assert.Equal(1, data_1.Number);
+        Assert.Equal(1, content_1.Data.Number);
 
-        await Verify(data_1);
+        await Verify(content_1);
     }
 
     [Fact]

@@ -1,5 +1,26 @@
 ﻿{
-  Number: {
-    iv: 1
+  Data: {
+    Number: {
+      iv: 1
+    }
+  },
+  NewStatus: ,
+  Status: Published,
+  EditingStatus: Published,
+  Id: Guid_1,
+  Version: 1,
+  _links: {
+    delete: {
+      Method: DELETE
+    },
+    draft/create: {
+      Method: POST
+    },
+    previous: {
+      Method: GET
+    },
+    self: {
+      Method: GET
+    }
   }
 }

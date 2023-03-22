@@ -55,7 +55,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }".Replace("<ID>", content_0.Id, StringComparison.Ordinal)
         };
 
-        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         Assert.Equal(1, result["findMyWritesContent"]["flatData"]["json"]["value"].Value<int>());
         Assert.Equal(2, result["findMyWritesContent"]["flatData"]["json"]["obj"]["value"].Value<int>());
@@ -86,7 +86,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var cityNames =
             result["countries"].ToObject<List<Country>>()[0].Data.States
@@ -122,7 +122,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var cityNames =
             result["countries"]
@@ -159,7 +159,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var cityNames =
             result["countries"]
@@ -188,7 +188,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var stateNames =
             result["cities"]
@@ -216,7 +216,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var result = await _.SharedContents.GraphQlAsync<JToken>(query);
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var stateNames =
             result["cities"]
@@ -240,10 +240,10 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var httpClient = _.ClientManager.CreateHttpClient();
+        var httpClient = _.Client.CreateHttpClient();
 
         // Create the request manually to check the content type.
-        var response = await httpClient.PostAsync(_.ClientManager.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent());
+        var response = await httpClient.PostAsync(_.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent());
 
         Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
     }
@@ -261,7 +261,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var httpClient = _.ClientManager.CreateHttpClient();
+        var httpClient = _.Client.CreateHttpClient();
 
         // Create the request manually to check the headers.
         var response = await httpClient.PostAsJsonAsync($"api/content/{_.AppName}/graphql", query);

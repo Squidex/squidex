@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 
@@ -30,11 +31,11 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     public async Task Should_create_workflow()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create workflow.
-        var workflow = await CreateAsync();
+        var workflow = await CreateAsync(app);
 
         Assert.NotNull(workflow);
         Assert.NotNull(workflow.Name);
@@ -47,11 +48,11 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     public async Task Should_update_workflow()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 0: Create workflow.
-        var workflow = await CreateAsync();
+        var workflow = await CreateAsync(app);
 
 
         // STEP 1: Update workflow.
@@ -72,7 +73,7 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
             Name = name
         };
 
-        var workflows_2 = await _.Apps.PutWorkflowAsync(appName, workflow.Id, updateRequest);
+        var workflows_2 = await app.Apps.PutWorkflowAsync(workflow.Id, updateRequest);
         var workflow_2 = workflows_2.Items.Find(x => x.Name == name);
 
         Assert.NotNull(workflow_2);
@@ -86,41 +87,31 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     public async Task Should_delete_workflow()
     {
         // STEP 0: Create app.
-        await CreateAppAsync();
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 0: Create workflow.
-        var workflow = await CreateAsync();
+        var workflow = await CreateAsync(app);
 
 
         // STEP 1: Delete workflow.
-        var workflows_2 = await _.Apps.DeleteWorkflowAsync(appName, workflow.Id);
+        var workflows_2 = await app.Apps.DeleteWorkflowAsync(workflow.Id);
 
         Assert.DoesNotContain(workflows_2.Items, x => x.Name == name);
 
         await Verify(workflows_2);
     }
 
-    private async Task<WorkflowDto> CreateAsync()
+    private async Task<WorkflowDto> CreateAsync(ISquidexClient app)
     {
         var createRequest = new AddWorkflowDto
         {
             Name = name
         };
 
-        var workflows = await _.Apps.PostWorkflowAsync(appName, createRequest);
+        var workflows = await app.Apps.PostWorkflowAsync(createRequest);
         var workflow = workflows.Items.Find(x => x.Name == name);
 
         return workflow;
-    }
-
-    private async Task CreateAppAsync()
-    {
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.Apps.PostAppAsync(createRequest);
     }
 }

@@ -66,7 +66,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
             Permissions = new List<string> { "a", "b" }
         };
 
-        var roles_2 = await _.Apps.PutRoleAsync(_.AppName, roleName, updateRequest);
+        var roles_2 = await _.Client.Apps.PutRoleAsync(roleName, updateRequest);
         var role_2 = roles_2.Items.Find(x => x.Name == roleName);
 
         // Should return role with correct name.
@@ -89,11 +89,11 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
             Id = client
         };
 
-        await _.Apps.PostClientAsync(_.AppName, createClientRequest);
+        await _.Client.Apps.PostClientAsync(createClientRequest);
 
         await AssignClient(roleName);
 
-        var roles_2 = await _.Apps.GetRolesAsync(_.AppName);
+        var roles_2 = await _.Client.Apps.GetRolesAsync();
         var role_2 = roles_2.Items.Find(x => x.Name == roleName);
 
         // Should return role with correct number of users and clients.
@@ -104,7 +104,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         // STEP 4: Try to delete role.
         var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
         {
-            return _.Apps.DeleteRoleAsync(_.AppName, roleName);
+            return _.Client.Apps.DeleteRoleAsync(roleName);
         });
 
         Assert.Equal(400, ex.StatusCode);
@@ -113,7 +113,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         // STEP 5: AssignClient client.
         await AssignClient("Developer");
 
-        var roles_3 = await _.Apps.DeleteRoleAsync(_.AppName, roleName);
+        var roles_3 = await _.Client.Apps.DeleteRoleAsync(roleName);
 
         Assert.DoesNotContain(roles_3.Items, x => x.Name == roleName);
     }
@@ -128,7 +128,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         // STEP 2 Assign contributor.
         await AssignContributor(roleName);
 
-        var roles_2 = await _.Apps.GetRolesAsync(_.AppName);
+        var roles_2 = await _.Client.Apps.GetRolesAsync();
         var role_2 = roles_2.Items.Find(x => x.Name == roleName);
 
         // Should return role with correct number of users and clients.
@@ -139,7 +139,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         // STEP 4: Try to delete role.
         var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
         {
-            return _.Apps.DeleteRoleAsync(_.AppName, roleName);
+            return _.Client.Apps.DeleteRoleAsync(roleName);
         });
 
         Assert.Equal(400, ex.StatusCode);
@@ -148,7 +148,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         // STEP 5: Remove role after contributor removed.
         await AssignContributor("Developer");
 
-        var roles_3 = await _.Apps.DeleteRoleAsync(_.AppName, roleName);
+        var roles_3 = await _.Client.Apps.DeleteRoleAsync(roleName);
 
         Assert.DoesNotContain(roles_3.Items, x => x.Name == roleName);
     }
@@ -164,7 +164,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
             Invite = true
         };
 
-        await _.Apps.PostContributorAsync(_.AppName, assignRequest);
+        await _.Client.Apps.PostContributorAsync(assignRequest);
     }
 
     private async Task AssignClient(string role = null)
@@ -174,7 +174,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
             Role = role
         };
 
-        await _.Apps.PutClientAsync(_.AppName, client, updateRequest);
+        await _.Client.Apps.PutClientAsync(client, updateRequest);
     }
 
     private async Task<RoleDto> CreateRoleAsync(string name)
@@ -184,7 +184,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
             Name = name
         };
 
-        var roles = await _.Apps.PostRoleAsync(_.AppName, createRequest);
+        var roles = await _.Client.Apps.PostRoleAsync(createRequest);
         var role = roles.Items.Find(x => x.Name == name);
 
         return role;
