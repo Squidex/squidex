@@ -1,42 +1,42 @@
 ﻿{
-  items: [
+  Items: [
     {
-      id: default,
-      name: default,
-      role: Owner,
-      allowAnonymous: false,
+      Id: default,
+      Name: default,
+      Role: Owner,
+      AllowAnonymous: false,
       _links: {
         delete: {
-          method: DELETE
+          Method: DELETE
         },
         update: {
-          method: PUT
+          Method: PUT
         }
       }
     },
     {
-      id: Guid_1,
-      name: My Client,
-      role: Owner,
-      apiCallsLimit: 100,
-      apiTrafficLimit: 200,
-      allowAnonymous: true,
+      Id: Guid_1,
+      Name: My Client,
+      Role: Owner,
+      ApiCallsLimit: 100,
+      ApiTrafficLimit: 200,
+      AllowAnonymous: true,
       _links: {
         delete: {
-          method: DELETE
+          Method: DELETE
         },
         update: {
-          method: PUT
+          Method: PUT
         }
       }
     }
   ],
   _links: {
     create: {
-      method: POST
+      Method: POST
     },
     self: {
-      method: GET
+      Method: GET
     }
   }
 }

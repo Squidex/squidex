@@ -1,14 +1,14 @@
 ﻿{
-  id: Guid_1,
-  name: Guid_1,
-  role: Editor,
-  allowAnonymous: false,
+  Id: Guid_1,
+  Name: Guid_1,
+  Role: Editor,
+  AllowAnonymous: false,
   _links: {
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     update: {
-      method: PUT
+      Method: PUT
     }
   }
 }

@@ -1,47 +1,47 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
-  fileName: logo-wide-rotated.jpg,
-  fileHash: TLNAlI4UM3i8O4IF/O7ZuH3PrI3+bsz4AsBt9NrEydI=,
-  isProtected: false,
-  slug: logo-wide-rotated.jpg,
-  mimeType: image/jpg,
-  fileType: jpg,
-  metadataText: 600x135px, 15.1 kB,
-  metadata: {
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FileName: logo-wide-rotated.jpg,
+  FileHash: TLNAlI4UM3i8O4IF/O7ZuH3PrI3+bsz4AsBt9NrEydI=,
+  IsProtected: false,
+  Slug: logo-wide-rotated.jpg,
+  MimeType: image/jpg,
+  FileType: jpg,
+  MetadataText: 600x135px, 15.1 kB,
+  Metadata: {
     description: JFIF File,
     imageQuality: 79,
     pixelHeight: 135,
     pixelWidth: 600
   },
-  tags: [
+  Tags: [
     type/jpg,
     image,
     image/medium
   ],
-  fileSize: 15425,
-  type: Image,
+  FileSize: 15425,
+  Type: Image,
   _links: {
     content: {
-      method: GET
+      Method: GET
     },
     content/slug: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     move: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     upload: {
-      method: PUT
+      Method: PUT
     }
   }
 }

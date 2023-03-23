@@ -13,6 +13,7 @@ using System.Text.Json.Serialization;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization.Serializers;
 using NetTopologySuite.IO.Converters;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
@@ -62,10 +63,12 @@ public static class TestUtils
 
     public static void SetupBson()
     {
+        // Allow all types, independent from the actual assembly.
+        BsonSerializer.TryRegisterSerializer(new ObjectSerializer(type => true));
+
         BsonDomainIdSerializer.Register();
         BsonEscapedDictionarySerializer<ContentFieldData, ContentData>.Register();
         BsonEscapedDictionarySerializer<JsonValue, ContentFieldData>.Register();
-        BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
         BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
         BsonInstantSerializer.Register();
         BsonJsonConvention.Register(DefaultOptions());

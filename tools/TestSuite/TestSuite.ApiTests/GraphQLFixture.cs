@@ -165,17 +165,17 @@ public sealed class GraphQLFixture : ContentFixture
             return stateResponse.Id;
         }
 
-        // STEP 1: Create state 1
+        // STEP 1: Create state. 1
         var sachsenCapital = await CreateCityAsync("Leipzig");
         var sachstenState = await CreateStateAsync("Sachsen", sachsenCapital);
 
 
-        // STEP 1: Create state 2
+        // STEP 1: Create state. 2
         var badenWCapital = await CreateCityAsync("Stuttgart");
         var badenWState = await CreateStateAsync("Baden Württemberg", badenWCapital);
 
 
-        // STEP 3: Create country
+        // STEP 3: Create country.
         var countryData = new
         {
             name = new

@@ -1,68 +1,68 @@
 ﻿{
-  id: Guid_1,
-  name: Guid_2,
-  version: 2,
-  canAccessContent: true,
+  Id: Guid_1,
+  Name: Guid_2,
+  Version: 2,
+  CanAccessContent: true,
   _links: {
     assets: {
-      method: GET
+      Method: GET
     },
     assets/create: {
-      method: POST
+      Method: POST
     },
     assets/scripts: {
-      method: DELETE
+      Method: DELETE
     },
     backups: {
-      method: GET
+      Method: GET
     },
     clients: {
-      method: GET
+      Method: GET
     },
     contributors: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     image/delete: {
-      method: DELETE
+      Method: DELETE
     },
     image/upload: {
-      method: POST
+      Method: POST
     },
     languages: {
-      method: GET
+      Method: GET
     },
     ping: {
-      method: GET
+      Method: GET
     },
     plans: {
-      method: GET
+      Method: GET
     },
     roles: {
-      method: GET
+      Method: GET
     },
     rules: {
-      method: GET
+      Method: GET
     },
     schemas: {
-      method: GET
+      Method: GET
     },
     schemas/create: {
-      method: POST
+      Method: POST
     },
     settings: {
-      method: GET
+      Method: GET
     },
     transfer: {
-      method: PUT
+      Method: PUT
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     workflows: {
-      method: GET
+      Method: GET
     }
   }
 }

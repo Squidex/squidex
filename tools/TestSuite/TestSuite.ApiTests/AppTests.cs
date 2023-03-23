@@ -35,7 +35,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_set_label()
     {
-        // STEP 1: Update app
+        // STEP 1: Update app.
         var updateRequest = new UpdateAppDto
         {
             Label = Guid.NewGuid().ToString()
@@ -49,7 +49,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_set_description()
     {
-        // STEP 1: Update app
+        // STEP 1: Update app.
         var updateRequest = new UpdateAppDto
         {
             Description = Guid.NewGuid().ToString()

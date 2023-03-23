@@ -39,10 +39,10 @@ public class InMemoryScopeStore : IOpenIddictScopeStore<ImmutableScope>
         return query(scopes.AsQueryable()).LongCount().AsValueTask();
     }
 
-    public virtual ValueTask<TResult> GetAsync<TState, TResult>(Func<IQueryable<ImmutableScope>, TState, IQueryable<TResult>> query, TState state,
+    public virtual ValueTask<TResult?> GetAsync<TState, TResult>(Func<IQueryable<ImmutableScope>, TState, IQueryable<TResult>> query, TState state,
         CancellationToken cancellationToken)
     {
-        var result = query(scopes.AsQueryable(), state).First();
+        var result = query(scopes.AsQueryable(), state).FirstOrDefault();
 
         return result.AsValueTask();
     }

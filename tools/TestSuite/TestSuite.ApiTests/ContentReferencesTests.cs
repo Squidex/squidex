@@ -39,20 +39,20 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         }, ContentCreateOptions.AsPublish);
 
 
-        // STEP 3: Query new item
+        // STEP 3: Query new item.
         var contentB_2 = await _.Contents.GetAsync(contentB_1.Id);
 
         Assert.Empty(contentB_2.Data.References);
 
 
-        // STEP 4: Publish reference
+        // STEP 4: Publish reference.
         await _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
         {
             Status = "Published"
         });
 
 
-        // STEP 5: Query new item again
+        // STEP 5: Query new item again.
         var contentB_3 = await _.Contents.GetAsync(contentB_1.Id);
 
         Assert.Equal(new string[] { contentA_1.Id }, contentB_3.Data.References);
@@ -84,7 +84,7 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         });
 
 
-        // STEP 4: Delete without referrer check
+        // STEP 4: Delete without referrer check.
         await _.Contents.DeleteAsync(contentA_1.Id);
     }
 
@@ -117,7 +117,7 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         });
 
 
-        // STEP 4: Delete without referrer check
+        // STEP 4: Delete without referrer check.
         await _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
         {
             Status = "Draft",
@@ -161,7 +161,7 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         Assert.NotNull(result1[0].Error);
 
 
-        // STEP 4: Delete without referrer check
+        // STEP 4: Delete without referrer check.
         var result2 = await _.Contents.BulkUpdateAsync(new BulkUpdate
         {
             Jobs = new List<BulkUpdateJob>
@@ -214,7 +214,7 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         Assert.NotNull(result1[0].Error);
 
 
-        // STEP 4: Delete without referrer check
+        // STEP 4: Delete without referrer check.
         var result2 = await _.Contents.BulkUpdateAsync(new BulkUpdate
         {
             Jobs = new List<BulkUpdateJob>

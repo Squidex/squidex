@@ -169,6 +169,21 @@
                     </p>
                 </div>
 
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">2</span> {{ 'clients.connectWizard.sdkStep2_15' | sqxTranslate }}</h5>
+
+                    <p>              
+                        <sqx-code>
+                            <div ngPreserveWhitespaces>var client = new SquidexClient(new SquidexOptions</div>
+                            <div ngPreserveWhitespaces>{{'{'}}</div>
+                            <div ngPreserveWhitespaces>    AppName = {{appName}},</div>
+                            <div ngPreserveWhitespaces>    ClientId = {{appName}}:{{client.id}},</div>
+                            <div ngPreserveWhitespaces>    ClientSecret = {{client.secret}},</div>
+                            <div ngPreserveWhitespaces>    Url = {{apiUrl.value}}</div>
+                            <div ngPreserveWhitespaces>});</div>
+                        </sqx-code>
+                    </p>
+                </div>
 
                 <div class="section step">
                     <h5><span class="badge rounded-pill bg-dark">3</span> {{ 'clients.connectWizard.sdkStep3' | sqxTranslate }}</h5>

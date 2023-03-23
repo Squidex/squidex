@@ -13,6 +13,7 @@ using Migrations.Migrations.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
+using MongoDB.Driver.Linq;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
@@ -221,14 +222,13 @@ public static class StoreServices
     {
         return Singletons<IMongoClient>.GetOrAdd(configuration, connectionString =>
         {
-            var clientSettings = MongoClientSettings.FromConnectionString(connectionString);
-
-            clientSettings.ClusterConfigurator = builder =>
+            return MongoClientFactory.Create(connectionString, settings =>
             {
-                builder.Subscribe(new DiagnosticsActivityEventSubscriber());
-            };
-
-            return new MongoClient(clientSettings);
+                settings.ClusterConfigurator = builder =>
+                {
+                    builder.Subscribe(new DiagnosticsActivityEventSubscriber());
+                };
+            });
         });
     }
 

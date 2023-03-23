@@ -40,7 +40,7 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
 
 
-        // STEP 2: Create content
+        // STEP 2: Create content.
         var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
         var content = await contents.CreateAsync(new TestEntityData
@@ -65,7 +65,7 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
 
 
-        // STEP 2: Create content
+        // STEP 2: Create content.
         var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
         var content = await contents.CreateAsync(new TestEntityData
@@ -92,7 +92,7 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
 
 
-        // STEP 2: Create content
+        // STEP 2: Create content.
         var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
         var content = await contents.CreateAsync(new TestEntityData

@@ -1,15 +1,13 @@
 ﻿{
   Data: {
-    Number: {
-      iv: 1
-    }
+    Number: 1
   },
   NewStatus: ,
   Status: Published,
   EditingStatus: Published,
   Id: Guid_1,
   Version: 1,
-  _links: {
+  Links: {
     delete: {
       Method: DELETE
     },

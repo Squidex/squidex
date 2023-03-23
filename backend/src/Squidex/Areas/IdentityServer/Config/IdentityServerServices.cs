@@ -83,11 +83,9 @@ public static class IdentityServerServices
             {
                 builder.AddEventHandler<ProcessSignInContext>(builder =>
                 {
-                    builder.UseSingletonHandler<AlwaysAddTokenHandler>()
-                        .SetOrder(AttachTokenParameters.Descriptor.Order + 1);
+                    builder.UseSingletonHandler<AlwaysAddScopeHandler>()
+                        .SetOrder(AttachSignInParameters.Descriptor.Order + 1);
                 });
-
-                builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
                 builder.DisableAccessTokenEncryption();
 
@@ -109,11 +107,18 @@ public static class IdentityServerServices
                     .EnableStatusCodePagesIntegration()
                     .EnableTokenEndpointPassthrough()
                     .EnableUserinfoEndpointPassthrough();
+
+                builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
             })
-            .AddValidation(options =>
+            .AddValidation(builder =>
             {
-                options.UseLocalServer();
-                options.UseAspNetCore();
+                builder.UseLocalServer();
+                builder.UseAspNetCore();
+
+                builder.Configure(options =>
+                {
+                    options.Issuer = options.Configuration?.Issuer;
+                });
             });
 
         services.Configure<AntiforgeryOptions>((c, options) =>
@@ -130,41 +135,33 @@ public static class IdentityServerServices
             var identityPrefix = Constants.PrefixIdentityServer;
             var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
-            Func<string, Uri> buildUrl;
-
-            if (identityOptions.MultipleDomains)
+            Uri BuildUrl(string path)
             {
-                buildUrl = url => new Uri($"{identityPrefix}{url}", UriKind.Relative);
-
-                options.Issuer = new Uri(urlGenerator.BuildUrl());
+                return new Uri($"{identityPrefix.TrimStart('/')}/{path}", UriKind.Relative);
             }
-            else
-            {
-                buildUrl = url => new Uri(urlGenerator.BuildUrl($"{identityPrefix}{url}", false));
 
-                options.Issuer = new Uri(urlGenerator.BuildUrl(identityPrefix, false));
-            }
+            options.Issuer = new Uri(urlGenerator.BuildUrl());
 
             options.AuthorizationEndpointUris.SetEndpoint(
-                buildUrl("/connect/authorize"));
+                BuildUrl("connect/authorize"));
 
             options.IntrospectionEndpointUris.SetEndpoint(
-                buildUrl("/connect/introspect"));
+                BuildUrl("connect/introspect"));
 
             options.LogoutEndpointUris.SetEndpoint(
-                buildUrl("/connect/logout"));
+                BuildUrl("connect/logout"));
 
             options.TokenEndpointUris.SetEndpoint(
-                buildUrl("/connect/token"));
+                BuildUrl("connect/token"));
 
             options.UserinfoEndpointUris.SetEndpoint(
-                buildUrl("/connect/userinfo"));
+                BuildUrl("connect/userinfo"));
 
             options.CryptographyEndpointUris.SetEndpoint(
-                buildUrl("/.well-known/jwks"));
+                BuildUrl(".well-known/jwks"));
 
             options.ConfigurationEndpointUris.SetEndpoint(
-                buildUrl("/.well-known/openid-configuration"));
+                BuildUrl(".well-known/openid-configuration"));
         });
     }
 

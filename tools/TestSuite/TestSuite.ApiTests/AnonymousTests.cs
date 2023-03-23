@@ -45,7 +45,7 @@ public class AnonymousTests : IClassFixture<ClientFixture>
         await app.Apps.PutClientAsync("default", clientRequest);
 
 
-        // STEP 3: Check anonymous permission
+        // STEP 3: Check anonymous permission.
         var url = $"{_.Client.Options.Url}api/apps/{appName}/settings";
 
         using (var httpClient = new HttpClient())
@@ -77,7 +77,7 @@ public class AnonymousTests : IClassFixture<ClientFixture>
         await app.Apps.PutClientAsync("default", clientRequest);
 
 
-        // STEP 3: Create schema
+        // STEP 3: Create schema.
         var schemaRequest = new CreateSchemaDto
         {
             Name = "my-content",

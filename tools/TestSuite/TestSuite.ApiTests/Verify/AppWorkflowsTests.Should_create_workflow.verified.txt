@@ -1,41 +1,41 @@
 ﻿{
-  id: Guid_1,
-  name: Guid_2,
-  steps: {
+  Id: Guid_1,
+  Name: Guid_2,
+  Steps: {
     Archived: {
-      transitions: {
+      Transitions: {
         Draft: {}
       },
-      color: #eb3142,
-      validate: false,
-      noUpdate: true
+      Color: #eb3142,
+      Validate: false,
+      NoUpdate: true
     },
     Draft: {
-      transitions: {
+      Transitions: {
         Archived: {},
         Published: {}
       },
-      color: #8091a5,
-      validate: false,
-      noUpdate: false
+      Color: #8091a5,
+      Validate: false,
+      NoUpdate: false
     },
     Published: {
-      transitions: {
+      Transitions: {
         Archived: {},
         Draft: {}
       },
-      color: #4bb958,
-      validate: false,
-      noUpdate: false
+      Color: #4bb958,
+      Validate: false,
+      NoUpdate: false
     }
   },
-  initial: Draft,
+  Initial: Draft,
   _links: {
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     update: {
-      method: PUT
+      Method: PUT
     }
   }
 }

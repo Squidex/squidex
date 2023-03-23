@@ -80,7 +80,7 @@ public class ContentCleanupTests : IClassFixture<CreatedAppFixture>
         });
 
 
-        // STEP 3: Delete a reference
+        // STEP 3: Delete a reference.
         await contents.DeleteAsync(contentA_1.Id);
 
 

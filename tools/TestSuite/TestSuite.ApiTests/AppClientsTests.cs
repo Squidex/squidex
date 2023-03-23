@@ -93,7 +93,7 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
         var client = await CreateAsync(app);
 
 
-        // STEP 1: Delete client
+        // STEP 1: Delete client.
         var clients_2 = await app.Apps.DeleteClientAsync(client.Id);
 
         // Should not return deleted client.

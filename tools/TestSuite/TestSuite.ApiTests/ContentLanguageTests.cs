@@ -25,7 +25,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
     [Fact]
     public async Task Should_filter_language()
     {
-        // STEP 1: Create content
+        // STEP 1: Create content.
         var content = await _.Contents.CreateAsync(new TestEntityData
         {
             Localized = new Dictionary<string, string>
@@ -45,7 +45,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
     [InlineData("custom", "Custom")]
     public async Task Should_flatten_language(string code, string expected)
     {
-        // STEP 1: Create content
+        // STEP 1: Create content.
         var content = await _.Contents.CreateAsync(new TestEntityData
         {
             Localized = new Dictionary<string, string>
@@ -68,7 +68,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
     [Fact]
     public async Task Should_provide_etag_based_on_headers()
     {
-        // STEP 1: Create content
+        // STEP 1: Create content.
         var content = await _.Contents.CreateAsync(new TestEntityData
         {
             Localized = new Dictionary<string, string>

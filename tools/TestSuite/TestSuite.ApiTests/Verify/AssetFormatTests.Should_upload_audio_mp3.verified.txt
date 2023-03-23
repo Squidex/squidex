@@ -1,46 +1,46 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
-  fileName: SampleAudio_0.4mb.mp3,
-  fileHash: 0pbi5CFhQWqqSVy37vaw8bUOg3k1tDrlK1ySXxDrmNE=,
-  isProtected: false,
-  slug: sampleaudio-0.4mb.mp3,
-  mimeType: audio/mp3,
-  fileType: mp3,
-  metadataText: 00:00:28.2708750, 433.5 kB,
-  metadata: {
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FileName: SampleAudio_0.4mb.mp3,
+  FileHash: 0pbi5CFhQWqqSVy37vaw8bUOg3k1tDrlK1ySXxDrmNE=,
+  IsProtected: false,
+  Slug: sampleaudio-0.4mb.mp3,
+  MimeType: audio/mp3,
+  FileType: mp3,
+  MetadataText: 00:00:28.2708750, 433.5 kB,
+  Metadata: {
     audioBitrate: 128,
     audioChannels: 2,
     audioSampleRate: 44100,
     description: MPEG Version 1 Audio, Layer 3,
     duration: 00:00:28.2708750
   },
-  tags: [
+  Tags: [
     type/mp3
   ],
-  fileSize: 443926,
-  type: Audio,
+  FileSize: 443926,
+  Type: Audio,
   _links: {
     content: {
-      method: GET
+      Method: GET
     },
     content/slug: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     move: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     upload: {
-      method: PUT
+      Method: PUT
     }
   }
 }

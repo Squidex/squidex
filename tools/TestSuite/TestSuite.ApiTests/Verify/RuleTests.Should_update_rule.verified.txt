@@ -1,31 +1,29 @@
 ﻿{
-  id: Guid_1,
-  version: 1,
-  isEnabled: true,
-  name: Guid_2,
-  trigger: {
-    triggerType: ContentChanged,
-    handleAll: true
+  Id: Guid_1,
+  Version: 1,
+  IsEnabled: true,
+  Name: Guid_2,
+  Trigger: {
+    HandleAll: true
   },
-  action: {
-    actionType: Webhook,
-    url: http://squidex.io
+  Action: {
+    Url: http://squidex.io
   },
   _links: {
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     disable: {
-      method: PUT
+      Method: PUT
     },
     logs: {
-      method: GET
+      Method: GET
     },
     trigger: {
-      method: PUT
+      Method: PUT
     },
     update: {
-      method: PUT
+      Method: PUT
     }
   }
 }

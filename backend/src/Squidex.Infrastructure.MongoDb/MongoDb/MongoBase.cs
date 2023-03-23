@@ -44,15 +44,4 @@ public abstract class MongoBase<TEntity>
 
     protected static readonly BsonDocument FindAll =
         new BsonDocument();
-
-    static MongoBase()
-    {
-        BsonDefaultConventions.Register();
-        BsonDomainIdSerializer.Register();
-        BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
-        BsonInstantSerializer.Register();
-        BsonJsonConvention.Register();
-        BsonJsonValueSerializer.Register();
-        BsonStringSerializer<RefToken>.Register();
-    }
 }

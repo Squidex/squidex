@@ -28,28 +28,28 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_create_app()
     {
-        // STEP 1: Create app
+        // STEP 1: Create app.
         var (app, dto) = await _.PostAppAsync(appName);
 
         // Should return created app with correct name.
         Assert.Equal(appName, app.Options.AppName);
 
 
-        // STEP 2: Get all apps
+        // STEP 2: Get all apps.
         var apps = await app.Apps.GetAppsAsync();
 
         // Should provide new app when apps are queried.
         Assert.Contains(apps, x => x.Name == appName);
 
 
-        // STEP 3: Check contributors
+        // STEP 3: Check contributors.
         var contributors = await app.Apps.GetContributorsAsync();
 
         // Should not add client itself as a contributor.
         Assert.Empty(contributors.Items);
 
 
-        // STEP 4: Check clients
+        // STEP 4: Check clients.
         var clients = await app.Apps.GetClientsAsync();
 
         // Should create default client.
@@ -61,11 +61,11 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_not_allow_creation_if_name_used()
     {
-        // STEP 1: Create app
+        // STEP 1: Create app.
         await _.PostAppAsync(appName);
 
 
-        // STEP 2: Create again and fail
+        // STEP 2: Create again and fail.
         var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
         {
             return _.PostAppAsync(appName);
@@ -77,11 +77,11 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_archive_app()
     {
-        // STEP 1: Create app
+        // STEP 1: Create app.
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 2: Archive app
+        // STEP 2: Archive app.
         await app.Apps.DeleteAppAsync();
 
         var apps = await app.Apps.GetAppsAsync();
@@ -93,21 +93,16 @@ public class AppCreationTests : IClassFixture<ClientFixture>
     [Fact]
     public async Task Should_recreate_after_archived()
     {
-        // STEP 1: Create app
+        // STEP 1: Create app.
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 2: Archive app
+        // STEP 2: Archive app.
         await app.Apps.DeleteAppAsync();
 
 
-        // STEP 3: Create app again
-        var createRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.PostAppAsync(createRequest);
+        // STEP 3: Create app again.
+        await _.PostAppAsync(appName);
     }
 
     [Fact]
@@ -130,7 +125,7 @@ public class AppCreationTests : IClassFixture<ClientFixture>
         var (app, _) = await _.PostAppAsync(createRequest);
 
 
-        // STEP 3: Get schemas
+        // STEP 3: Get schemas.
         var schemas = await app.Schemas.GetSchemasAsync();
 
         Assert.NotEmpty(schemas.Items);

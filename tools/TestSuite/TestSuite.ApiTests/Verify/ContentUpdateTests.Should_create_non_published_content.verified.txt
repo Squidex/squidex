@@ -1,14 +1,12 @@
 ﻿{
   Data: {
-    Number: {
-      iv: 1
-    }
+    Number: 1
   },
   NewStatus: ,
   Status: Draft,
   EditingStatus: Draft,
   Id: Guid_1,
-  _links: {
+  Links: {
     delete: {
       Method: DELETE
     },

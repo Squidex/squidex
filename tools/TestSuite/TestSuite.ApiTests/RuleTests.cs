@@ -33,7 +33,7 @@ public class RuleTests : IClassFixture<ClientFixture>
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Create rule
+        // STEP 1: Create rule.
         var createRule = new CreateRuleDto
         {
             Action = new WebhookRuleActionDto
@@ -63,7 +63,7 @@ public class RuleTests : IClassFixture<ClientFixture>
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Create rule
+        // STEP 1: Create rule.
         var createRequest = new CreateRuleDto
         {
             Action = new WebhookRuleActionDto
@@ -82,7 +82,7 @@ public class RuleTests : IClassFixture<ClientFixture>
         var rule_0 = await app.Rules.PostRuleAsync(createRequest);
 
 
-        // STEP 2: Update rule
+        // STEP 2: Update rule.
         var updateRequest = new UpdateRuleDto
         {
             Name = ruleName
@@ -102,7 +102,7 @@ public class RuleTests : IClassFixture<ClientFixture>
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Create rule
+        // STEP 1: Create rule.
         var createRequest = new CreateRuleDto
         {
             Action = new WebhookRuleActionDto
@@ -121,7 +121,7 @@ public class RuleTests : IClassFixture<ClientFixture>
         var rule = await app.Rules.PostRuleAsync(createRequest);
 
 
-        // STEP 2: Delete rule
+        // STEP 2: Delete rule.
         await app.Rules.DeleteRuleAsync(rule.Id);
 
         var rules = await app.Rules.GetRulesAsync();

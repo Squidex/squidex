@@ -20,7 +20,7 @@ public sealed class GetEventStoreFixture : IAsyncLifetime
     {
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-        settings = EventStoreClientSettings.Create(TestConfig.Configuration["eventStore:configuration"]);
+        settings = EventStoreClientSettings.Create(TestConfig.Configuration["eventStore:configuration"]!);
 
         EventStore = new GetEventStore(settings, TestUtils.DefaultSerializer);
     }

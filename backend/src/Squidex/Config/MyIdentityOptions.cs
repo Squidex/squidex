@@ -67,8 +67,6 @@ public sealed class MyIdentityOptions
 
     public bool LockAutomatically { get; set; }
 
-    public bool MultipleDomains { get; set; }
-
     public bool NoConsent { get; set; }
 
     public bool RequiresHttps { get; set; }

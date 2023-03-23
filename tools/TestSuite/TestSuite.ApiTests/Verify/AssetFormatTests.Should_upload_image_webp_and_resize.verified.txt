@@ -1,45 +1,45 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
-  fileName: SampleImage_100kb.webp,
-  fileHash: WwD409RVswvccG2YopnFqJzpWrCveLrd0Zj6Buw8Vao=,
-  isProtected: false,
-  slug: sampleimage-100kb.webp,
-  mimeType: image/jpg,
-  fileType: webp,
-  metadataText: 600x400px, 109.5 kB,
-  metadata: {
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FileName: SampleImage_100kb.webp,
+  FileHash: WwD409RVswvccG2YopnFqJzpWrCveLrd0Zj6Buw8Vao=,
+  IsProtected: false,
+  Slug: sampleimage-100kb.webp,
+  MimeType: image/jpg,
+  FileType: webp,
+  MetadataText: 600x400px, 109.5 kB,
+  Metadata: {
     pixelHeight: 400,
     pixelWidth: 600
   },
-  tags: [
+  Tags: [
     type/webp,
     image,
     image/medium
   ],
-  fileSize: 112138,
-  type: Image,
+  FileSize: 112138,
+  Type: Image,
   _links: {
     content: {
-      method: GET
+      Method: GET
     },
     content/slug: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     move: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     upload: {
-      method: PUT
+      Method: PUT
     }
   }
 }

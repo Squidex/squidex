@@ -18,7 +18,6 @@ using Squidex.CLI.Commands.Implementation.Sync.Schemas;
 using Squidex.CLI.Commands.Implementation.Sync.Workflows;
 using Squidex.CLI.Configuration;
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Configuration;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
@@ -122,11 +121,10 @@ public sealed class TemplateCommandMiddleware : ICommandMiddleware
         }
 
         return new Session(
-            app.Name,
             new DirectoryInfo(Path.GetTempPath()),
-            new SquidexClientManager(new SquidexOptions
+            new SquidexClient(new SquidexOptions
             {
-                Configurator = AcceptAllCertificatesConfigurator.Instance,
+                IgnoreSelfSignedCertificates = true,
                 AppName = app.Name,
                 ClientId = $"{app.Name}:{client.Key}",
                 ClientSecret = client.Value.Secret,

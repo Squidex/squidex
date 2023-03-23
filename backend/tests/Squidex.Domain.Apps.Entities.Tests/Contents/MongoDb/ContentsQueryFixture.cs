@@ -73,7 +73,7 @@ public abstract class ContentsQueryFixtureBase : IAsyncLifetime
     {
         BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
-        mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
+        mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongodb:configuration"]);
         mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
         var services =

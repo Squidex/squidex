@@ -1,38 +1,38 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
-  fileName: SampleVideo_1280x720_1mb.flv,
-  fileHash: 3oKq+MS0nT4apMnvvhPkIpFIBkk+GY8z2qevv16cbgI=,
-  isProtected: false,
-  slug: samplevideo-1280x720-1mb.flv,
-  mimeType: audio/x-flv,
-  fileType: flv,
-  metadataText: 1 MB,
-  tags: [
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FileName: SampleVideo_1280x720_1mb.flv,
+  FileHash: 3oKq+MS0nT4apMnvvhPkIpFIBkk+GY8z2qevv16cbgI=,
+  IsProtected: false,
+  Slug: samplevideo-1280x720-1mb.flv,
+  MimeType: audio/x-flv,
+  FileType: flv,
+  MetadataText: 1 MB,
+  Tags: [
     type/flv
   ],
-  fileSize: 1051185,
+  FileSize: 1051185,
   _links: {
     content: {
-      method: GET
+      Method: GET
     },
     content/slug: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     move: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     upload: {
-      method: PUT
+      Method: PUT
     }
   }
 }
