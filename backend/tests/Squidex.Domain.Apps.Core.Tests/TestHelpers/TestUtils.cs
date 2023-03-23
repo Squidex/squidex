@@ -64,7 +64,7 @@ public static class TestUtils
     public static void SetupBson()
     {
         // Allow all types, independent from the actual assembly.
-        BsonSerializer.RegisterSerializer(new ObjectSerializer(type => true));
+        BsonSerializer.TryRegisterSerializer(new ObjectSerializer(type => true));
 
         BsonDomainIdSerializer.Register();
         BsonEscapedDictionarySerializer<ContentFieldData, ContentData>.Register();
