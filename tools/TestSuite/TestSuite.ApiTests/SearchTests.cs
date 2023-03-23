@@ -26,7 +26,7 @@ public class SearchTests : IClassFixture<ContentFixture>
     [Fact]
     public async Task Should_search_asset()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         await _.Client.Assets.UploadFileAsync("Assets/logo-wide.png", "image/png");
 
 
@@ -39,7 +39,7 @@ public class SearchTests : IClassFixture<ContentFixture>
     [Fact]
     public async Task Should_search_schema()
     {
-        // STEP 1: Create schema
+        // STEP 1: Create schema.
         var schemaName = Guid.NewGuid().ToString();
 
         var createRequest = new CreateSchemaDto
@@ -59,7 +59,7 @@ public class SearchTests : IClassFixture<ContentFixture>
     [Fact]
     public async Task Should_search_content()
     {
-        // STEP 1: Create content
+        // STEP 1: Create content.
         var contentString = Guid.NewGuid().ToString();
 
         var createRequest = new TestEntityData

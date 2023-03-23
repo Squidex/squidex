@@ -1,32 +1,32 @@
 ﻿{
-  items: [
+  Items: [
     {
-      iso2Code: en,
-      englishName: English,
-      isMaster: true,
-      isOptional: false
+      Iso2Code: en,
+      EnglishName: English,
+      IsMaster: true,
+      IsOptional: false
     },
     {
-      iso2Code: it,
-      englishName: Italian,
-      isMaster: false,
-      isOptional: true,
+      Iso2Code: it,
+      EnglishName: Italian,
+      IsMaster: false,
+      IsOptional: true,
       _links: {
         delete: {
-          method: DELETE
+          Method: DELETE
         },
         update: {
-          method: PUT
+          Method: PUT
         }
       }
     }
   ],
   _links: {
     create: {
-      method: POST
+      Method: POST
     },
     self: {
-      method: GET
+      Method: GET
     }
   }
 }

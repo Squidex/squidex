@@ -1,7 +1,7 @@
 ﻿{
   Data: {
     my-field: {
-      iv: singleton
+      iv: []
     }
   },
   NewStatus: ,
@@ -9,7 +9,7 @@
   EditingStatus: Published,
   Id: Guid_1,
   Version: 2,
-  _links: {
+  Links: {
     draft/create: {
       Method: POST
     },

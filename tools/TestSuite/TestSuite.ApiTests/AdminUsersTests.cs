@@ -44,8 +44,8 @@ public sealed class AdminUsersTests : IClassFixture<ClientFixture>
         // STEP 2: Get users by email.
         var usersByEmail = await _.Client.UserManagement.GetUsersAsync(user_0.Email);
 
-        Assert.Equal(email, usersByEmail.Items.First().Email);
-        Assert.Equal(email, usersByEmail.Items.First().DisplayName);
+        Assert.Equal(email, usersByEmail.Items[0].Email);
+        Assert.Equal(email, usersByEmail.Items[0].DisplayName);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public sealed class AdminUsersTests : IClassFixture<ClientFixture>
         Assert.Equal(email, user_0.DisplayName);
 
 
-        // STEP 1: Delete user
+        // STEP 1: Delete user.
         await _.Client.UserManagement.DeleteUserAsync(user_0.Id);
 
 

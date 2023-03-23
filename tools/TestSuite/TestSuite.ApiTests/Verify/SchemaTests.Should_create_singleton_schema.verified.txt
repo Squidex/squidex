@@ -1,50 +1,50 @@
 ﻿{
-  id: Guid_1,
-  type: Singleton,
-  properties: {
-    validateOnPublish: false
+  Id: Guid_1,
+  Type: Singleton,
+  Properties: {
+    ValidateOnPublish: false
   },
-  isPublished: true,
-  scripts: {},
+  IsPublished: true,
+  Scripts: {},
   _links: {
     contents: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     fields/add: {
-      method: POST
+      Method: POST
     },
     fields/order: {
-      method: PUT
+      Method: PUT
     },
     fields/ui: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     unpublish: {
-      method: PUT
+      Method: PUT
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     update/category: {
-      method: PUT
+      Method: PUT
     },
     update/rules: {
-      method: PUT
+      Method: PUT
     },
     update/scripts: {
-      method: PUT
+      Method: PUT
     },
     update/sync: {
-      method: PUT
+      Method: PUT
     },
     update/urls: {
-      method: PUT
+      Method: PUT
     }
   }
 }

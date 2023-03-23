@@ -35,15 +35,15 @@ public class BackupTests : IClassFixture<ClientFixture>
         // Load the backup from another URL, because the public URL is might not be accessible for the server.
         var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.Url);
 
-        // STEP 1: Create app
+        // STEP 0: Create app.
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 2: Prepare app.
+        // STEP 1: Prepare app.
         await PrepareAppAsync(app);
 
 
-        // STEP 3: Create backup
+        // STEP 2: Create backup.
         await app.Backups.PostBackupAsync();
 
         var backups = await app.Backups.WaitForBackupsAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
@@ -52,7 +52,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         Assert.Equal(JobStatus.Completed, backup?.Status);
 
 
-        // STEP 4: Restore backup
+        // STEP 3: Restore backup.
         var uri = new Uri(new Uri(backupUrl), backup._links["download"].Href);
 
         var restoreRequest = new RestoreRequestDto
@@ -65,7 +65,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         await _.Client.Backups.PostRestoreJobAsync(restoreRequest);
 
 
-        // STEP 5: Wait for the backup.
+        // STEP 4: Wait for the backup.
         var restore = await app.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
 
         Assert.Equal(JobStatus.Completed, restore?.Status);
@@ -77,15 +77,15 @@ public class BackupTests : IClassFixture<ClientFixture>
         // Load the backup from another URL, because the public URL is might not be accessible for the server.
         var backupUrl = TestHelpers.GetAndPrintValue("config:backupUrl", _.Url);
 
-        // STEP 1: Create app
+        // STEP 0: Create app.
         var (app, _) = await _.PostAppAsync(appNameRestore);
 
 
-        // STEP 2: Prepare app.
+        // STEP 1: Prepare app.
         await PrepareAppAsync(app);
 
 
-        // STEP 3: Create backup
+        // STEP 2: Create backup.
         await app.Backups.PostBackupAsync();
 
         var backups = await app.Backups.WaitForBackupsAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
@@ -94,11 +94,11 @@ public class BackupTests : IClassFixture<ClientFixture>
         Assert.Equal(JobStatus.Completed, backup?.Status);
 
 
-        // STEP 4: Delete app
+        // STEP 3: Delete app.
         await app.Apps.DeleteAppAsync();
 
 
-        // STEP 5: Restore backup
+        // STEP 4: Restore backup.
         var uri = new Uri(new Uri(backupUrl), backup._links["download"].Href);
 
         var restoreRequest = new RestoreRequestDto
@@ -111,7 +111,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         await app.Backups.PostRestoreJobAsync(restoreRequest);
 
 
-        // STEP 6: Wait for the backup.
+        // STEP 5: Wait for the backup.
         var restore = await app.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
 
         Assert.Equal(JobStatus.Completed, restore?.Status);

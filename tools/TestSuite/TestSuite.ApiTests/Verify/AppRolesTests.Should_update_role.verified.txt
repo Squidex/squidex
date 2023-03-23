@@ -1,15 +1,15 @@
 ﻿{
-  isDefaultRole: false,
-  permissions: [
+  IsDefaultRole: false,
+  Permissions: [
     a,
     b
   ],
   _links: {
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     update: {
-      method: PUT
+      Method: PUT
     }
   }
 }

@@ -1,11 +1,11 @@
 ﻿{
-  isDefaultRole: false,
+  IsDefaultRole: false,
   _links: {
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     update: {
-      method: PUT
+      Method: PUT
     }
   }
 }

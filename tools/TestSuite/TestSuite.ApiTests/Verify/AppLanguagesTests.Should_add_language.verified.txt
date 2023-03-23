@@ -1,46 +1,46 @@
 ﻿{
-  items: [
+  Items: [
     {
-      iso2Code: en,
-      englishName: English,
-      isMaster: true,
-      isOptional: false
+      Iso2Code: en,
+      EnglishName: English,
+      IsMaster: true,
+      IsOptional: false
     },
     {
-      iso2Code: de,
-      englishName: German,
-      isMaster: false,
-      isOptional: false,
+      Iso2Code: de,
+      EnglishName: German,
+      IsMaster: false,
+      IsOptional: false,
       _links: {
         delete: {
-          method: DELETE
+          Method: DELETE
         },
         update: {
-          method: PUT
+          Method: PUT
         }
       }
     },
     {
-      iso2Code: it,
-      englishName: Italian,
-      isMaster: false,
-      isOptional: false,
+      Iso2Code: it,
+      EnglishName: Italian,
+      IsMaster: false,
+      IsOptional: false,
       _links: {
         delete: {
-          method: DELETE
+          Method: DELETE
         },
         update: {
-          method: PUT
+          Method: PUT
         }
       }
     }
   ],
   _links: {
     create: {
-      method: POST
+      Method: POST
     },
     self: {
-      method: GET
+      Method: GET
     }
   }
 }

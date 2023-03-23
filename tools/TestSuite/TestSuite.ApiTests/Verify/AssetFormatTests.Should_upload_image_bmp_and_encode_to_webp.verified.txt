@@ -1,45 +1,45 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
-  fileName: SampleImage_700kb.bmp,
-  fileHash: LNQGH33R2ShAFTo54UlxKOKzBg8a+yjVaFgzwiHw2LQ=,
-  isProtected: false,
-  slug: sampleimage-700kb.bmp,
-  mimeType: image/bmp,
-  fileType: bmp,
-  metadataText: 600x400px, 703.2 kB,
-  metadata: {
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FileName: SampleImage_700kb.bmp,
+  FileHash: LNQGH33R2ShAFTo54UlxKOKzBg8a+yjVaFgzwiHw2LQ=,
+  IsProtected: false,
+  Slug: sampleimage-700kb.bmp,
+  MimeType: image/bmp,
+  FileType: bmp,
+  MetadataText: 600x400px, 703.2 kB,
+  Metadata: {
     pixelHeight: 400,
     pixelWidth: 600
   },
-  tags: [
+  Tags: [
     type/bmp,
     image,
     image/medium
   ],
-  fileSize: 720054,
-  type: Image,
+  FileSize: 720054,
+  Type: Image,
   _links: {
     content: {
-      method: GET
+      Method: GET
     },
     content/slug: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     move: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     upload: {
-      method: PUT
+      Method: PUT
     }
   }
 }

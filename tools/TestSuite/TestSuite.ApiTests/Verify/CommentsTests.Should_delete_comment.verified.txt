@@ -1,6 +1,6 @@
 ﻿{
-  deletedComments: [
+  DeletedComments: [
     Guid_1
   ],
-  version: 1
+  Version: 1
 }

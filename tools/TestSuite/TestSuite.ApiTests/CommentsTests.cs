@@ -45,7 +45,7 @@ public class CommentsTests : IClassFixture<CreatedAppFixture>
         await _.Client.Comments.PostCommentAsync(resource, createRequest);
 
 
-        // STEP 2: Get comments
+        // STEP 2: Get comments.
         var comments = await _.Client.Comments.GetCommentsAsync(resource);
 
         Assert.Contains(comments.CreatedComments, x => x.Text == createRequest.Text);

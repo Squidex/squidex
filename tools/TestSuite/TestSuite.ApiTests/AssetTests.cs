@@ -30,7 +30,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_upload_asset()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
         await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
@@ -47,7 +47,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_upload_asset_using_tus()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
         await using (fileParameter.Data)
@@ -73,7 +73,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     {
         for (var i = 0; i < 5; i++)
         {
-            // STEP 1: Create asset
+            // STEP 1: Create asset.
             progress = new ProgressHandler();
 
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
@@ -100,7 +100,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     {
         var id = Guid.NewGuid().ToString();
 
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id);
 
         Assert.Equal(id, asset_1.Id);
@@ -113,7 +113,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     {
         var id = Guid.NewGuid().ToString();
 
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var fileParameter = FileParameter.FromPath("Assets/logo-squared.png");
 
         await _.Client.Assets.UploadAssetAsync(fileParameter, progress.AsOptions(id));
@@ -126,7 +126,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     {
         var id = Guid.NewGuid().ToString();
 
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id);
 
 
@@ -142,11 +142,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_not_create_very_big_asset()
     {
-        // STEP 1: Create small asset
+        // STEP 1: Create small asset.
         await _.Client.Assets.UploadRandomFileAsync(1_000_000);
 
 
-        // STEP 2: Create big asset
+        // STEP 2: Create big asset.
         var ex = await Assert.ThrowsAnyAsync<Exception>(() =>
         {
             return _.Client.Assets.UploadRandomFileAsync(10_000_000);
@@ -159,11 +159,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_replace_asset()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
-        // STEP 2: Reupload asset
+        // STEP 2: Reupload asset.
         var asset_2 = await _.Client.Assets.UploadFileAsync("Assets/logo-wide.png", asset_1);
 
         await using (var stream = new FileStream("Assets/logo-wide.png", FileMode.Open))
@@ -180,11 +180,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_replace_asset_using_tus()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
-        // STEP 2: Reupload asset
+        // STEP 2: Reupload asset.
         var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
         await using (fileParameter.Data)
@@ -210,11 +210,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     {
         for (var i = 0; i < 1; i++)
         {
-            // STEP 1: Create asset
+            // STEP 1: Create asset.
             var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
-            // STEP 2: Reupload asset
+            // STEP 2: Reupload asset.
             progress = new ProgressHandler();
 
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
@@ -239,7 +239,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_annote_asset_file_name()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
@@ -260,7 +260,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_annote_asset_metadata()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
@@ -285,7 +285,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_annote_asset_slug()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
@@ -306,7 +306,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_annote_asset_tags()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
@@ -331,7 +331,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_annotate_asset_in_parallel()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
@@ -377,7 +377,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, metadataRequest);
 
 
-        // STEP 4: Check tags
+        // STEP 4: Check tags.
         var tags = await _.Client.Assets.WaitForTagsAsync(tag1, TimeSpan.FromMinutes(2));
 
         Assert.Contains(tag1, tags);
@@ -393,11 +393,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_protect_asset()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
-        // STEP 2: Download asset
+        // STEP 2: Download asset.
         await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
         {
             var downloaded = await _.DownloadAsync(asset_1);
@@ -407,7 +407,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         }
 
 
-        // STEP 4: Protect asset
+        // STEP 4: Protect asset.
         var protectRequest = new AnnotateAssetDto
         {
             IsProtected = true
@@ -465,12 +465,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         var appName = Guid.NewGuid().ToString();
 
         // STEP 0: Create app.
-        var appRequest = new CreateAppDto
-        {
-            Name = appName
-        };
-
-        await _.PostAppAsync(appRequest);
+        var (app, _) = await _.PostAppAsync(appName);
 
 
         // STEP 1: Create folder.
@@ -479,14 +474,14 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             FolderName = "folder"
         };
 
-        var folder = await _.Client.Assets.PostAssetFolderAsync(folderRequest);
+        var folder = await app.Assets.PostAssetFolderAsync(folderRequest);
 
 
-        // STEP 2: Create asset
-        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", parentId: folder.Id);
+        // STEP 2: Create asset.
+        var asset_1 = await app.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", parentId: folder.Id);
 
 
-        // STEP 3: Download asset
+        // STEP 3: Download asset.
         await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
         {
             var downloaded = await _.DownloadAsync(asset_1);
@@ -496,7 +491,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         }
 
 
-        // STEP 4: Protect asset using a script
+        // STEP 4: Protect asset using a script.
         var scriptsRequest = new UpdateAssetScriptsDto
         {
             Query = $@"
@@ -505,7 +500,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                 }}"
         };
 
-        await _.Client.Apps.PutAssetScriptsAsync(scriptsRequest);
+        await app.Apps.PutAssetScriptsAsync(scriptsRequest);
 
 
         // STEP 5: Download asset.
@@ -526,7 +521,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_query_asset_by_metadata()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
@@ -548,7 +543,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         });
 
 
-        // STEP 4: Query asset by custom metadata
+        // STEP 4: Query asset by custom metadata.
         var assets_2 = await _.Client.Assets.GetAssetsAsync(new AssetQuery
         {
             Filter = "metadata/custom eq 'foo'"
@@ -560,7 +555,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_query_asset_by_root_folder()
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
@@ -576,7 +571,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_query_asset_by_subfolder()
     {
-        // STEP 1: Create asset folder
+        // STEP 1: Create asset folder.
         var folderRequest = new CreateAssetFolderDto
         {
             FolderName = "sub"
@@ -585,7 +580,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         var folder = await _.Client.Assets.PostAssetFolderAsync(folderRequest);
 
 
-        // STEP 1: Create asset in folder
+        // STEP 1: Create asset in folder.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", parentId: folder.Id);
 
 
@@ -601,7 +596,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_delete_recursively()
     {
-        // STEP 1: Create asset folder
+        // STEP 1: Create asset folder.
         var createRequest1 = new CreateAssetFolderDto
         {
             FolderName = "folder1"
@@ -610,7 +605,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         var folder_1 = await _.Client.Assets.PostAssetFolderAsync(createRequest1);
 
 
-        // STEP 2: Create nested asset folder
+        // STEP 2: Create nested asset folder.
         var createRequest2 = new CreateAssetFolderDto
         {
             FolderName = "subfolder",
@@ -621,11 +616,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         var folder_2 = await _.Client.Assets.PostAssetFolderAsync(createRequest2);
 
 
-        // STEP 3: Create asset in folder
+        // STEP 3: Create asset in folder.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", null, folder_2.Id);
 
 
-        // STEP 4: Create asset outside folder
+        // STEP 4: Create asset outside folder.
         var asset_2 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
@@ -644,11 +639,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [InlineData(true)]
     public async Task Should_delete_asset(bool permanent)
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
-        // STEP 2: Delete asset
+        // STEP 2: Delete asset.
         await _.Client.Assets.DeleteAssetAsync(asset.Id, permanent: permanent);
 
         // Should return 404 when asset deleted.
@@ -680,15 +675,15 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [InlineData(true)]
     public async Task Should_recreate_deleted_asset(bool permanent)
     {
-        // STEP 1: Create asset
+        // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
-        // STEP 2: Delete asset
+        // STEP 2: Delete asset.
         await _.Client.Assets.DeleteAssetAsync(asset_1.Id, permanent: permanent);
 
 
-        // STEP 3: Recreate asset
+        // STEP 3: Recreate asset.
         var asset_2 = await _.Client.Assets.UploadFileAsync("Assets/logo-wide.png", "image/png");
 
         Assert.NotEqual(asset_1.FileSize, asset_2.FileSize);

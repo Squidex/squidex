@@ -40,11 +40,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Start webhook session
+        // STEP 1: Start webhook session.
         var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
 
 
-        // STEP 2: Create rule
+        // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
             Action = new WebhookRuleActionDto
@@ -64,7 +64,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var rule = await app.Rules.PostRuleAsync(createRule);
 
 
-        // STEP 3: Create test content
+        // STEP 3: Create test content.
         await CreateContentAsync(app);
 
         // Get requests.
@@ -76,7 +76,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
 
 
-        // STEP 4: Get events
+        // STEP 4: Get events.
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
         var eventsRule = await app.Rules.GetEventsAsync();
 
@@ -91,11 +91,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Start webhook session
+        // STEP 1: Start webhook session.
         var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
 
 
-        // STEP 2: Create contents
+        // STEP 2: Create contents.
         var referencedSchema = await TestEntity.CreateSchemaAsync(app.Schemas, schemaName);
 
         // Create a test content.
@@ -120,7 +120,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         });
 
 
-        // STEP 2: Create rule
+        // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
             Action = new WebhookRuleActionDto
@@ -160,7 +160,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var rule = await app.Rules.PostRuleAsync(createRule);
 
 
-        // STEP 3: Update referenced content
+        // STEP 3: Update referenced content.
         var updatedString = Guid.NewGuid().ToString();
         var updateEvent = "ReferenceUpdated";
 
@@ -177,7 +177,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         Assert.NotNull(request);
 
 
-        // STEP 4: Get events
+        // STEP 4: Get events.
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
         var eventsRule = await app.Rules.GetEventsAsync();
 
@@ -192,11 +192,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Start webhook session
+        // STEP 1: Start webhook session.
         var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
 
 
-        // STEP 2: Create rule
+        // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
             Action = new ScriptRuleActionDto
@@ -214,7 +214,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var rule = await app.Rules.PostRuleAsync(createRule);
 
 
-        // STEP 3: Create test content
+        // STEP 3: Create test content.
         await CreateContentAsync(app);
 
         // Get requests.
@@ -224,7 +224,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         Assert.NotNull(request);
 
 
-        // STEP 4: Get events
+        // STEP 4: Get events.
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
         var eventsRule = await app.Rules.GetEventsAsync();
 
@@ -239,11 +239,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Start webhook session
+        // STEP 1: Start webhook session.
         var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
 
 
-        // STEP 2: Create rule
+        // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
             Action = new WebhookRuleActionDto
@@ -260,7 +260,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var rule = await app.Rules.PostRuleAsync(createRule);
 
 
-        // STEP 3: Create test asset
+        // STEP 3: Create test asset.
         await CreateAssetAsync(app);
 
         // Get requests.
@@ -272,7 +272,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
 
 
-        // STEP 4: Get events
+        // STEP 4: Get events.
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
         var eventsRule = await app.Rules.GetEventsAsync();
 
@@ -287,11 +287,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Start webhook session
+        // STEP 1: Start webhook session.
         var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
 
 
-        // STEP 2: Create rule
+        // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
             Action = new WebhookRuleActionDto
@@ -308,7 +308,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var rule = await app.Rules.PostRuleAsync(createRule);
 
 
-        // STEP 3: Create test schema
+        // STEP 3: Create test schema.
         await TestEntity.CreateSchemaAsync(app.Schemas, schemaName);
 
         // Get requests.
@@ -320,7 +320,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
 
 
-        // STEP 4: Get events
+        // STEP 4: Get events.
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
         var eventsRule = await app.Rules.GetEventsAsync();
 
@@ -335,11 +335,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Start webhook session
+        // STEP 1: Start webhook session.
         var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
 
 
-        // STEP 2: Create rule
+        // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
             Action = new WebhookRuleActionDto
@@ -356,7 +356,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var rule = await app.Rules.PostRuleAsync(createRule);
 
 
-        // STEP 3: Trigger rule
+        // STEP 3: Trigger rule.
         await app.Rules.TriggerRuleAsync(rule.Id);
 
         // Get requests.
@@ -368,7 +368,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
 
 
-        // STEP 4: Get events
+        // STEP 4: Get events.
         var eventsAll = await app.Rules.GetEventsAsync(rule.Id);
         var eventsRule = await app.Rules.GetEventsAsync();
 
@@ -385,11 +385,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         var (app, _) = await _.PostAppAsync(appName);
 
 
-        // STEP 1: Start webhook session
+        // STEP 1: Start webhook session.
         var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
 
 
-        // STEP 2: Create disabled rule
+        // STEP 2: Create disabled rule.
         var createRule = new CreateRuleDto
         {
             Action = new WebhookRuleActionDto
@@ -411,7 +411,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         await app.Rules.DisableRuleAsync(rule.Id);
 
 
-        // STEP 3: Create test content before rule
+        // STEP 3: Create test content before rule.
         await CreateContentAsync(app);
 
 

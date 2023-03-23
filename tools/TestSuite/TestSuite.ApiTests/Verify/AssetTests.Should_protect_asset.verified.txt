@@ -1,47 +1,47 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
-  fileName: logo-squared.png,
-  fileHash: pAp0RDvipkoNCCTgey1HTJekRKKEWT6Ft5JdRLuAfAc=,
-  isProtected: true,
-  slug: logo-squared.png,
-  mimeType: image/png,
-  fileType: png,
-  metadataText: 600x600px, 19 kB,
-  metadata: {
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FileName: logo-squared.png,
+  FileHash: pAp0RDvipkoNCCTgey1HTJekRKKEWT6Ft5JdRLuAfAc=,
+  IsProtected: true,
+  Slug: logo-squared.png,
+  MimeType: image/png,
+  FileType: png,
+  MetadataText: 600x600px, 19 kB,
+  Metadata: {
     description: PNG File,
     pixelHeight: 600,
     pixelWidth: 600
   },
-  tags: [
+  Tags: [
     type/png,
     image,
     image/medium
   ],
-  fileSize: 19430,
-  type: Image,
-  version: 1,
+  FileSize: 19430,
+  Type: Image,
+  Version: 1,
   _links: {
     content: {
-      method: GET
+      Method: GET
     },
     content/slug: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     move: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     upload: {
-      method: PUT
+      Method: PUT
     }
   }
 }

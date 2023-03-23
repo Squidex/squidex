@@ -238,7 +238,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         Assert.Equal(1, updated_1.Data.Number);
 
 
-        // STEP 4: Get the unpublished version
+        // STEP 4: Get the unpublished version.
         var unpublished = await _.Contents.GetAsync(content.Id, QueryContext.Default.Unpublished());
 
         Assert.Equal(2, unpublished.Data.Number);
@@ -708,7 +708,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         Assert.Equal(2, content_2.Data.Number);
 
 
-        // STEP 4: Get previous version
+        // STEP 4: Get previous version.
         var content_1 = await _.Contents.GetAsync(content.Id, content.Version - 1);
 
         Assert.Equal(1, content_1.Data.Number);

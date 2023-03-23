@@ -1,38 +1,38 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
-  fileName: SampleVideo_176x144_1mb.3gp,
-  fileHash: 5zD+lLsuo4GmL9csQoc25ihbmRzkRUAym+PNe1Z73Y0=,
-  isProtected: false,
-  slug: samplevideo-176x144-1mb.3gp,
-  mimeType: audio/3gpp,
-  fileType: 3gp,
-  metadataText: 1014.4 kB,
-  tags: [
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FileName: SampleVideo_176x144_1mb.3gp,
+  FileHash: 5zD+lLsuo4GmL9csQoc25ihbmRzkRUAym+PNe1Z73Y0=,
+  IsProtected: false,
+  Slug: samplevideo-176x144-1mb.3gp,
+  MimeType: audio/3gpp,
+  FileType: 3gp,
+  MetadataText: 1014.4 kB,
+  Tags: [
     type/3gp
   ],
-  fileSize: 1038741,
+  FileSize: 1038741,
   _links: {
     content: {
-      method: GET
+      Method: GET
     },
     content/slug: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     move: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     upload: {
-      method: PUT
+      Method: PUT
     }
   }
 }

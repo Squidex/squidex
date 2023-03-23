@@ -1,46 +1,46 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
-  fileName: SampleImage_150kb.gif,
-  fileHash: j+n9HuQJ0F4n5z0G29NfFlWJTuaGIW+eqw3NDOYCtU8=,
-  isProtected: false,
-  slug: sampleimage-150kb.gif,
-  mimeType: image/gif,
-  fileType: gif,
-  metadataText: 600x400px, 154.2 kB,
-  metadata: {
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FileName: SampleImage_150kb.gif,
+  FileHash: j+n9HuQJ0F4n5z0G29NfFlWJTuaGIW+eqw3NDOYCtU8=,
+  IsProtected: false,
+  Slug: sampleimage-150kb.gif,
+  MimeType: image/gif,
+  FileType: gif,
+  MetadataText: 600x400px, 154.2 kB,
+  Metadata: {
     description: GIF File,
     pixelHeight: 400,
     pixelWidth: 600
   },
-  tags: [
+  Tags: [
     type/gif,
     image,
     image/medium
   ],
-  fileSize: 157934,
-  type: Image,
+  FileSize: 157934,
+  Type: Image,
   _links: {
     content: {
-      method: GET
+      Method: GET
     },
     content/slug: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     move: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     upload: {
-      method: PUT
+      Method: PUT
     }
   }
 }

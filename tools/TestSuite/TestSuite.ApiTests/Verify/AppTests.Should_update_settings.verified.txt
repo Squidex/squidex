@@ -1,24 +1,24 @@
 ﻿{
-  patterns: [
+  Patterns: [
     {
-      name: pattern,
-      regex: .*
+      Name: pattern,
+      Regex: .*
     }
   ],
-  editors: [
+  Editors: [
     {
-      name: editor,
-      url: http://squidex.io/path/to/editor
+      Name: editor,
+      Url: http://squidex.io/path/to/editor
     }
   ],
-  hideScheduler: false,
-  hideDateTimeModeButton: false,
+  HideScheduler: false,
+  HideDateTimeModeButton: false,
   _links: {
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     }
   }
 }

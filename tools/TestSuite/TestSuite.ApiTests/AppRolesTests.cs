@@ -30,7 +30,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_create_role()
     {
-        // STEP 1: Add role.
+        // STEP 1: Add role..
         var role = await CreateRoleAsync(roleName);
 
         // Should return role with correct name.
@@ -43,7 +43,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_create_role_with_buggy_name()
     {
-        // STEP 1: Add role.
+        // STEP 1: Add role..
         var role = await CreateRoleAsync($"{Guid.NewGuid()}/1");
 
         // Should return role with correct name.
@@ -56,11 +56,11 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_update_role()
     {
-        // STEP 1: Add role.
+        // STEP 1: Add role..
         var role = await CreateRoleAsync(roleName);
 
 
-        // STEP 2: Update role.
+        // STEP 2: Update role..
         var updateRequest = new UpdateRoleDto
         {
             Permissions = new List<string> { "a", "b" }
@@ -79,7 +79,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_prevent_deletion_if_client_assigned()
     {
-        // STEP 1: Add role.
+        // STEP 1: Add role..
         var role = await CreateRoleAsync(roleName);
 
 
@@ -125,7 +125,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         var role = await CreateRoleAsync(roleName);
 
 
-        // STEP 2 Assign contributor.
+        // STEP 2 Assign contributor..
         await AssignContributor(roleName);
 
         var roles_2 = await _.Client.Apps.GetRolesAsync();
@@ -136,7 +136,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         Assert.Equal(1, role_2.NumContributors);
 
 
-        // STEP 4: Try to delete role.
+        // STEP 4: Try to delete role..
         var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
         {
             return _.Client.Apps.DeleteRoleAsync(roleName);
@@ -145,7 +145,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         Assert.Equal(400, ex.StatusCode);
 
 
-        // STEP 5: Remove role after contributor removed.
+        // STEP 5: Remove role after contributor removed..
         await AssignContributor("Developer");
 
         var roles_3 = await _.Client.Apps.DeleteRoleAsync(roleName);

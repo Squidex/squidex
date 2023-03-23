@@ -1,14 +1,14 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
-  fileName: SampleVideo_1280x720_1mb.mp4,
-  fileHash: SoNpw/wBHvjtUJPXWHOoJrGZco0qSJWp27vl5qXcQOo=,
-  isProtected: false,
-  slug: samplevideo-1280x720-1mb.mp4,
-  mimeType: audio/mp4,
-  fileType: mp4,
-  metadataText: 1280x720pt, 00:00:05.3120000, 1 MB,
-  metadata: {
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FileName: SampleVideo_1280x720_1mb.mp4,
+  FileHash: SoNpw/wBHvjtUJPXWHOoJrGZco0qSJWp27vl5qXcQOo=,
+  IsProtected: false,
+  Slug: samplevideo-1280x720-1mb.mp4,
+  MimeType: audio/mp4,
+  FileType: mp4,
+  MetadataText: 1280x720pt, 00:00:05.3120000, 1 MB,
+  Metadata: {
     audioBitrate: 384,
     audioChannels: 2,
     audioSampleRate: 48000,
@@ -17,32 +17,32 @@
     videoHeight: 720,
     videoWidth: 1280
   },
-  tags: [
+  Tags: [
     type/mp4
   ],
-  fileSize: 1055736,
-  type: Video,
+  FileSize: 1055736,
+  Type: Video,
   _links: {
     content: {
-      method: GET
+      Method: GET
     },
     content/slug: {
-      method: GET
+      Method: GET
     },
     delete: {
-      method: DELETE
+      Method: DELETE
     },
     move: {
-      method: PUT
+      Method: PUT
     },
     self: {
-      method: GET
+      Method: GET
     },
     update: {
-      method: PUT
+      Method: PUT
     },
     upload: {
-      method: PUT
+      Method: PUT
     }
   }
 }

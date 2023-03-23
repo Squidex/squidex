@@ -11,7 +11,7 @@
   EditingStatus: Published,
   Id: Guid_1,
   Version: 1,
-  _links: {
+  Links: {
     delete: {
       Method: DELETE
     },

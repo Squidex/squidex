@@ -29,7 +29,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_create_schema()
     {
-        // STEP 1: Create schema
+        // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
             Name = schemaName
@@ -41,7 +41,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
         Assert.Equal(schemaName, schema.Name);
 
 
-        // STEP 2: Get all schemas
+        // STEP 2: Get all schemas.
         var schemas = await _.Client.Schemas.GetSchemasAsync();
 
         // Should provide new schema when apps are schemas.
@@ -51,7 +51,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_not_allow_creation_if_name_used()
     {
-        // STEP 1: Create schema
+        // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
             Name = schemaName
@@ -60,7 +60,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
         var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
 
 
-        // STEP 2: Create again and fail
+        // STEP 2: Create again and fail.
         var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
         {
             return _.Client.Schemas.PostSchemaAsync(createRequest);
@@ -72,7 +72,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_create_singleton_schema()
     {
-        // STEP 1: Create schema
+        // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
             Name = schemaName,
@@ -91,14 +91,14 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
             .IgnoreMember<SchemaDto>(x => x.Name);
 
 
-        // STEP 2: Get all schemas
+        // STEP 2: Get all schemas.
         var schemas = await _.Client.Schemas.GetSchemasAsync();
 
         // Should provide new schema when apps are schemas.
         Assert.Contains(schemas.Items, x => x.Name == schemaName);
 
 
-        // STEP 3: Get singleton content
+        // STEP 3: Get singleton content.
         var content = await _.Client.DynamicContents(schemaName).GetAsync(schema.Id);
 
         Assert.NotNull(content);
@@ -107,7 +107,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_create_singleton_schema_with_obsolete_property()
     {
-        // STEP 1: Create schema
+        // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
             Name = schemaName,
@@ -126,14 +126,14 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
             .IgnoreMember<SchemaDto>(x => x.Name);
 
 
-        // STEP 2: Get all schemas
+        // STEP 2: Get all schemas.
         var schemas = await _.Client.Schemas.GetSchemasAsync();
 
         // Should provide new schema when apps are schemas.
         Assert.Contains(schemas.Items, x => x.Name == schemaName);
 
 
-        // STEP 3: Get singleton content
+        // STEP 3: Get singleton content.
         var content = await _.Client.DynamicContents(schemaName).GetAsync(schema.Id);
 
         Assert.NotNull(content);
@@ -142,7 +142,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_create_schema_with_checkboxes()
     {
-        // STEP 1: Create schema
+        // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
             Name = schemaName,
@@ -179,7 +179,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_delete_Schema()
     {
-        // STEP 1: Create schema
+        // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
             Name = schemaName
@@ -191,7 +191,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
         Assert.Equal(schemaName, schema.Name);
 
 
-        // STEP 2: Delete schema
+        // STEP 2: Delete schema.
         await _.Client.Schemas.DeleteSchemaAsync(schemaName);
 
         var schemas = await _.Client.Schemas.GetSchemasAsync();
@@ -203,7 +203,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_recreate_after_deleted()
     {
-        // STEP 1: Create schema
+        // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
             Name = schemaName
@@ -219,7 +219,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
         await _.Client.Schemas.DeleteSchemaAsync(schemaName);
 
 
-        // STEP 3: Create app again
+        // STEP 3: Create app again.
         await _.Client.Schemas.PostSchemaAsync(createRequest);
     }
 }
