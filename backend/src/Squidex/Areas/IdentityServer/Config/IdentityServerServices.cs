@@ -135,21 +135,20 @@ public static class IdentityServerServices
             var identityPrefix = Constants.PrefixIdentityServer;
             var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
-            Func<string, Uri> buildUrl;
+            Func<string, string> buildUrl;
 
             if (identityOptions.MultipleDomains)
             {
                 // Use relative endpoints and use the incoming domain name to calculate absolute paths for each request.
-                buildUrl = url => new Uri($"{identityPrefix}{url}".TrimStart('/'), UriKind.Relative);
+                buildUrl = url => url;
 
+                // The endpoint URLs are relative to the issuer, therefore we cannot append the identity server here.
                 options.Issuer = new Uri(urlGenerator.BuildUrl());
             }
             else
             {
                 // Just use absolute endpoints from the start.
-                buildUrl = url => new Uri(urlGenerator.BuildUrl($"{identityPrefix}{url}", false));
-
-                options.Issuer = new Uri(urlGenerator.BuildUrl(identityPrefix, false));
+                buildUrl = url => urlGenerator.BuildUrl($"{identityPrefix}{url}", false);
             }
 
             options.AuthorizationEndpointUris.SetEndpoint(
@@ -172,12 +171,14 @@ public static class IdentityServerServices
 
             options.ConfigurationEndpointUris.SetEndpoint(
                 buildUrl("/.well-known/openid-configuration"));
+
+            options.Issuer = new Uri(urlGenerator.BuildUrl(identityPrefix, false));
         });
     }
 
-    private static void SetEndpoint(this List<Uri> endpointUris, Uri uri)
+    private static void SetEndpoint(this List<Uri> endpointUris, string uri)
     {
         endpointUris.Clear();
-        endpointUris.Add(uri);
+        endpointUris.Add(new Uri(uri.TrimStart('/')));
     }
 }
