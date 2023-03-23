@@ -140,7 +140,7 @@ public static class IdentityServerServices
             if (identityOptions.MultipleDomains)
             {
                 // Use relative endpoints and use the incoming domain name to calculate absolute paths for each request.
-                buildUrl = url => new Uri($"{identityPrefix}{url}", UriKind.Relative);
+                buildUrl = url => new Uri($"{identityPrefix}{url}".TrimStart('/'), UriKind.Relative);
 
                 options.Issuer = new Uri(urlGenerator.BuildUrl());
             }
