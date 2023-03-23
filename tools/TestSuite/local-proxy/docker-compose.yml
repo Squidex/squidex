@@ -1,0 +1,17 @@
+version: '3'
+services:
+  squidex_proxy2:
+    image: squidex/caddy-proxy-path:2.6.2
+    ports:
+      - "8081:8081"
+    environment:
+      - SITE_ADDRESS=http://localhost:8081
+      - SITE_PATH=/squidex/*
+      - SITE_SERVER="http://172.21.0.1:5000"
+    networks:
+      - internal
+    restart: unless-stopped
+    
+networks:
+  internal:
+    driver: host

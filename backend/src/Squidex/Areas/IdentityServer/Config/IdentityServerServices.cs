@@ -135,50 +135,39 @@ public static class IdentityServerServices
             var identityPrefix = Constants.PrefixIdentityServer;
             var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
-            Func<string, string> buildUrl;
-
-            if (identityOptions.MultipleDomains)
+            Uri BuildUrl(string path)
             {
-                // Use relative endpoints and use the incoming domain name to calculate absolute paths for each request.
-                buildUrl = url => url;
+                return new Uri($"{identityPrefix.TrimStart('/')}/{path}", UriKind.Relative);
+            }
 
-                // The endpoint URLs are relative to the issuer, therefore we cannot append the identity server here.
-                options.Issuer = new Uri(urlGenerator.BuildUrl());
-            }
-            else
-            {
-                // Just use absolute endpoints from the start.
-                buildUrl = url => urlGenerator.BuildUrl($"{identityPrefix}{url}", false);
-            }
+            options.Issuer = new Uri(urlGenerator.BuildUrl());
 
             options.AuthorizationEndpointUris.SetEndpoint(
-                buildUrl("/connect/authorize"));
+                BuildUrl("connect/authorize"));
 
             options.IntrospectionEndpointUris.SetEndpoint(
-                buildUrl("/connect/introspect"));
+                BuildUrl("connect/introspect"));
 
             options.LogoutEndpointUris.SetEndpoint(
-                buildUrl("/connect/logout"));
+                BuildUrl("connect/logout"));
 
             options.TokenEndpointUris.SetEndpoint(
-                buildUrl("/connect/token"));
+                BuildUrl("connect/token"));
 
             options.UserinfoEndpointUris.SetEndpoint(
-                buildUrl("/connect/userinfo"));
+                BuildUrl("connect/userinfo"));
 
             options.CryptographyEndpointUris.SetEndpoint(
-                buildUrl("/.well-known/jwks"));
+                BuildUrl(".well-known/jwks"));
 
             options.ConfigurationEndpointUris.SetEndpoint(
-                buildUrl("/.well-known/openid-configuration"));
-
-            options.Issuer = new Uri(urlGenerator.BuildUrl(identityPrefix, false));
+                BuildUrl(".well-known/openid-configuration"));
         });
     }
 
-    private static void SetEndpoint(this List<Uri> endpointUris, string uri)
+    private static void SetEndpoint(this List<Uri> endpointUris, Uri uri)
     {
         endpointUris.Clear();
-        endpointUris.Add(new Uri(uri.TrimStart('/')));
+        endpointUris.Add(uri);
     }
 }
