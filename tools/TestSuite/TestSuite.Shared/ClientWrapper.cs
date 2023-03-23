@@ -25,7 +25,7 @@ public sealed class ClientWrapper
                     options.AppName = TestHelpers.GetAndPrintValue("config:app:name", "integration-tests");
                     options.ClientId = TestHelpers.GetAndPrintValue("config:client:id", "root");
                     options.ClientSecret = TestHelpers.GetAndPrintValue("config:client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
-                    options.Url = TestHelpers.GetAndPrintValue("config:server:url", "http://localhost:8081/squidex");
+                    options.Url = TestHelpers.GetAndPrintValue("config:server:url", "https://localhost:5001");
                     options.ReadResponseAsString = true;
                 })
                 .AddSquidexHttpClient()
