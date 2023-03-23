@@ -9,6 +9,7 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb;
 
@@ -20,7 +21,7 @@ public sealed class SchemasHashFixture
     {
         TestUtils.SetupBson();
 
-        var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
+        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongodb:configuration"]);
         var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
         var schemasHash = new MongoSchemasHash(mongoDatabase);

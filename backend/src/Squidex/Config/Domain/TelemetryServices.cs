@@ -16,7 +16,7 @@ public static class TelemetryServices
 {
     public static void AddSquidexTelemetry(this IServiceCollection services, IConfiguration config)
     {
-        services.AddOpenTelemetryTracing();
+        services.AddOpenTelemetry();
 
         services.AddSingleton(serviceProvider =>
         {
@@ -49,7 +49,7 @@ public static class TelemetryServices
                 configurator.Configure(builder);
             }
 
-            return builder.Build();
+            return builder.Build()!;
         });
     }
 }

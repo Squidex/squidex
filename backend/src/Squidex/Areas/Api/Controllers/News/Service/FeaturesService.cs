@@ -17,7 +17,7 @@ public sealed class FeaturesService
 {
     private const int FeatureVersion = 21;
     private readonly QueryContext flatten = QueryContext.Default.Flatten();
-    private readonly IContentsClient<NewsEntity, FeatureDto> client;
+    private readonly IContentsClient<NewsEntity, FeatureDto> contents;
 
     public sealed class NewsEntity : Content<FeatureDto>
     {
@@ -35,9 +35,9 @@ public sealed class FeaturesService
                 Url = "https://cloud.squidex.io"
             };
 
-            var clientManager = new SquidexClientManager(squidexOptions);
+            var client = new SquidexClient(squidexOptions);
 
-            client = clientManager.CreateContentsClient<NewsEntity, FeatureDto>("feature-news");
+            contents = client.Contents<NewsEntity, FeatureDto>("feature-news");
         }
     }
 
@@ -49,7 +49,7 @@ public sealed class FeaturesService
             Version = version
         };
 
-        if (client != null && version < FeatureVersion)
+        if (contents != null && version < FeatureVersion)
         {
             try
             {
@@ -64,7 +64,7 @@ public sealed class FeaturesService
                     query.Filter = $"data/version/iv le {FeatureVersion} and data/version/iv gt {version}";
                 }
 
-                var features = await client.GetAsync(query, flatten, ct);
+                var features = await contents.GetAsync(query, flatten, ct);
 
                 result.Features.AddRange(features.Items.Select(x => x.Data).ToList());
 

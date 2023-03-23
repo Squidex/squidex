@@ -12,7 +12,7 @@ using static OpenIddict.Server.OpenIddictServerEvents;
 
 namespace Squidex.Areas.IdentityServer.Config;
 
-public sealed class AlwaysAddTokenHandler : IOpenIddictServerHandler<ProcessSignInContext>
+public sealed class AlwaysAddScopeHandler : IOpenIddictServerHandler<ProcessSignInContext>
 {
     public ValueTask HandleAsync(ProcessSignInContext context)
     {

@@ -198,6 +198,7 @@
   "clients.connectWizard.sdkStep1": "安装.NET SDK",
   "clients.connectWizard.sdkStep1Download": "SDK 可在 [nuget](https://www.nuget.org/packages/Squidex.ClientLibrary/)",
   "clients.connectWizard.sdkStep2": "创建客户端管理器",
+  "clients.connectWizard.sdkStep2_15": "Version 15 and later: Create a client",
   "clients.connectWizard.sdkStep3": "Optionally: Install the Service Extensions for the SDK",
   "clients.connectWizard.sdkStep3Download": "The SDK Extension is available on [nuget](https://www.nuget.org/packages/Squidex.ClientLibrary.ServiceExtensions/)",
   "clients.connectWizard.sdkStep4": "Optionally: Register the client manager and all clients",

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.TestHelpers;
 
@@ -23,7 +24,7 @@ public abstract class MongoEventStoreFixture : IAsyncLifetime
 
     protected MongoEventStoreFixture(string connectionString)
     {
-        mongoClient = new MongoClient(connectionString);
+        mongoClient = MongoClientFactory.Create(connectionString);
         mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
         BsonJsonConvention.Register(TestUtils.DefaultOptions());

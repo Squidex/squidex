@@ -39,10 +39,10 @@ public class InMemoryApplicationStore : IOpenIddictApplicationStore<ImmutableApp
         return query(applications.AsQueryable()).LongCount().AsValueTask();
     }
 
-    public virtual ValueTask<TResult> GetAsync<TState, TResult>(Func<IQueryable<ImmutableApplication>, TState, IQueryable<TResult>> query, TState state,
+    public virtual ValueTask<TResult?> GetAsync<TState, TResult>(Func<IQueryable<ImmutableApplication>, TState, IQueryable<TResult>> query, TState state,
         CancellationToken cancellationToken)
     {
-        var result = query(applications.AsQueryable(), state).First();
+        var result = query(applications.AsQueryable(), state).FirstOrDefault();
 
         return result.AsValueTask();
     }

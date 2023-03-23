@@ -83,11 +83,9 @@ public static class IdentityServerServices
             {
                 builder.AddEventHandler<ProcessSignInContext>(builder =>
                 {
-                    builder.UseSingletonHandler<AlwaysAddTokenHandler>()
-                        .SetOrder(AttachTokenParameters.Descriptor.Order + 1);
+                    builder.UseSingletonHandler<AlwaysAddScopeHandler>()
+                        .SetOrder(AttachSignInParameters.Descriptor.Order + 1);
                 });
-
-                builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
                 builder.DisableAccessTokenEncryption();
 
@@ -109,11 +107,18 @@ public static class IdentityServerServices
                     .EnableStatusCodePagesIntegration()
                     .EnableTokenEndpointPassthrough()
                     .EnableUserinfoEndpointPassthrough();
+
+                builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
             })
-            .AddValidation(options =>
+            .AddValidation(builder =>
             {
-                options.UseLocalServer();
-                options.UseAspNetCore();
+                builder.UseLocalServer();
+                builder.UseAspNetCore();
+
+                builder.Configure(options =>
+                {
+                    options.Issuer = options.Configuration?.Issuer;
+                });
             });
 
         services.Configure<AntiforgeryOptions>((c, options) =>
@@ -134,12 +139,14 @@ public static class IdentityServerServices
 
             if (identityOptions.MultipleDomains)
             {
+                // Use relative endpoints and use the incoming domain name to calculate absolute paths for each request.
                 buildUrl = url => new Uri($"{identityPrefix}{url}", UriKind.Relative);
 
                 options.Issuer = new Uri(urlGenerator.BuildUrl());
             }
             else
             {
+                // Just use absolute endpoints from the start.
                 buildUrl = url => new Uri(urlGenerator.BuildUrl($"{identityPrefix}{url}", false));
 
                 options.Issuer = new Uri(urlGenerator.BuildUrl(identityPrefix, false));

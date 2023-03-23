@@ -8,6 +8,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Squidex.Caching;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
@@ -61,7 +62,7 @@ public abstract class EventConsumerProcessorIntegrationTests
 
         var eventConsumer = new EventConsumer();
 
-        var mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
+        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongodb:configuration"]);
         var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
         var typeRegistry = new TypeRegistry().Add<IEvent, MyEvent>("MyEvent");
