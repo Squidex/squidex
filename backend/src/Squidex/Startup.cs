@@ -123,7 +123,6 @@ public sealed class Startup
         });
 
         app.UseFrontend();
-
         app.UsePlugins();
     }
 }

@@ -26,29 +26,26 @@ export class HomePageComponent {
     ) {
     }
 
-    public login() {
+    public async login() {
         const redirectPath =
             this.route.snapshot.queryParams.redirectPath ||
             this.location.path();
 
-        if (this.isIE()) {
+        if (this.isInternetExplorer()) {
             this.authService.loginRedirect(redirectPath);
-        } else {
-            this.authService.loginPopup(redirectPath)
-                .subscribe({
-                    next: path => {
-                        path ||= '/app';
+            return;
+        }
 
-                        this.router.navigateByUrl(path);
-                    },
-                    error: () => {
-                        this.showLoginError = true;
-                    },
-                });
+        try {
+            const path = await this.authService.loginPopup(redirectPath);
+
+            this.router.navigateByUrl(path || '/app', { replaceUrl: true });
+        } catch {
+            this.router.navigate(['/'], { replaceUrl: true });
         }
     }
 
-    public isIE() {
+    public isInternetExplorer() {
         return !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
     }
 }

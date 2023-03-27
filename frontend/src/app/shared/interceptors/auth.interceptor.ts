@@ -9,7 +9,7 @@ import { Location } from '@angular/common';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { EMPTY, Observable, throwError } from 'rxjs';
+import { EMPTY, from, Observable, throwError } from 'rxjs';
 import { catchError, switchMap, take } from 'rxjs/operators';
 import { ApiUrlConfig, ErrorDto } from '@app/framework';
 import { AuthService, Profile } from './../services/auth.service';
@@ -50,7 +50,7 @@ export class AuthInterceptor implements HttpInterceptor {
         return next.handle(req).pipe(
             catchError((error: HttpErrorResponse) => {
                 if (error.status === 401 && renew) {
-                    return this.authService.loginSilent().pipe(
+                    return from(this.authService.loginSilent()).pipe(
                         catchError(() => {
                             this.authService.logoutRedirect(this.location.path());
 

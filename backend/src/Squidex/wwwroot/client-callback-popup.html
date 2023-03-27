@@ -4,12 +4,13 @@
     <base href="/">
 </head>
 <body>
-    <script src="scripts/oidc-client.min.js"></script>
+    <script src="scripts/oidc-client-ts.min.js"></script>
     <script>
-        Oidc.Log.logger = console;
-        Oidc.Log.logLevel = Oidc.Log.INFO;
+        oidc.Log.setLogger(console);
 
-        new Oidc.UserManager().signinPopupCallback();
+        new oidc.UserManager({ response_mode: 'query' }).signinPopupCallback().catch(error => {
+            console.error(error);
+        });
     </script>
 </body>
 </html>

@@ -33,7 +33,6 @@
               "cropperjs",
               "mousetrap",
               "mersenne-twister",
-              "oidc-client",
               "pikaday/pikaday",
               "progressbar.js",
               "slugify"

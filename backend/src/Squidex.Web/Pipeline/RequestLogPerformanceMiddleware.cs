@@ -15,41 +15,36 @@ namespace Squidex.Web.Pipeline;
 
 public sealed class RequestLogPerformanceMiddleware
 {
-    private readonly RequestLogOptions requestLogOptions;
     private readonly RequestDelegate next;
 
-    public RequestLogPerformanceMiddleware(RequestDelegate next, IOptions<RequestLogOptions> requestLogOptions)
+    public RequestLogPerformanceMiddleware(RequestDelegate next)
     {
-        this.requestLogOptions = requestLogOptions.Value;
-
         this.next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, ISemanticLog log)
+    public async Task InvokeAsync(HttpContext context, ISemanticLog log, IOptions<RequestLogOptions> requestLogOptions)
     {
-        if (requestLogOptions.LogRequests)
-        {
-            var watch = ValueStopwatch.StartNew();
-
-            try
-            {
-                await next(context);
-            }
-            finally
-            {
-                var elapsedMs = watch.Stop();
-
-                log.LogInformation((elapsedMs, context), (ctx, w) =>
-                {
-                    w.WriteProperty("message", "HTTP request executed.");
-                    w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
-                    w.WriteObject("filters", ctx.context, LogFilters);
-                });
-            }
-        }
-        else
+        if (!requestLogOptions.Value.LogRequests)
         {
             await next(context);
+            return;
+        }
+
+        var watch = ValueStopwatch.StartNew();
+        try
+        {
+            await next(context);
+        }
+        finally
+        {
+            var elapsedMs = watch.Stop();
+
+            log.LogInformation((elapsedMs, context), (ctx, w) =>
+            {
+                w.WriteProperty("message", "HTTP request executed.");
+                w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
+                w.WriteObject("filters", ctx.context, LogFilters);
+            });
         }
     }
 
