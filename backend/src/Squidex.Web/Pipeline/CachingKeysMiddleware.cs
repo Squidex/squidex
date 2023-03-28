@@ -22,7 +22,6 @@ public sealed class CachingKeysMiddleware
     {
         this.cachingOptions = cachingOptions.Value;
         this.cachingManager = cachingManager;
-
         this.next = next;
     }
 

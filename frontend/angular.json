@@ -31,9 +31,14 @@
             "allowedCommonJsDependencies": [
               "@tweenjs/tween.js",
               "cropperjs",
+              "crypto-js",
+              "crypto-js/core.js",
+              "crypto-js/enc-base64.js",
+              "crypto-js/enc-utf8.js",
+              "crypto-js/sha256.js",
               "mousetrap",
               "mersenne-twister",
-              "oidc-client",
+              "pikaday",
               "pikaday/pikaday",
               "progressbar.js",
               "slugify"

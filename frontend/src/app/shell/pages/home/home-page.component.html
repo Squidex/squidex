@@ -9,7 +9,7 @@
                 </button>
             </div>
 
-            <div class="login-info login-element" *ngIf="!isIE()">
+            <div class="login-info login-element" *ngIf="!isInternetExplorer()">
                 {{ 'start.loginHint' | sqxTranslate }}
             </div>
         </div>

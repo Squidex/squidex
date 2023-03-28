@@ -56,20 +56,24 @@ describe('AuthInterceptor', () => {
 
     it('should append headers to request',
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-            authService.setup(x => x.userChanges).returns(() => of(<any>{ authorization: 'letmein' }));
+            authService.setup(x => x.userChanges)
+                .returns(() => of(<any>{ authorization: 'token1' }));
 
             http.get('http://service/p/apps').subscribe();
 
             const req = httpMock.expectOne('http://service/p/apps');
 
             expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('Authorization')).toEqual('letmein');
+            expect(req.request.headers.get('Authorization')).toEqual('token1');
+            expect(req.request.headers.get('Accept')).toBeNull();
+            expect(req.request.headers.get('Accept-Language')).toBeNull();
             expect(req.request.headers.get('Pragma')).toEqual('no-cache');
         }));
 
     it('should not append headers for no auth headers',
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-            authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+            authService.setup(x => x.userChanges)
+                .returns(() => of(<any>{ authToauthorizationken: 'token1' }));
 
             http.get('http://service/p/apps', { headers: new HttpHeaders().set('NoAuth', '') }).subscribe();
 
@@ -77,13 +81,15 @@ describe('AuthInterceptor', () => {
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('Authorization')).toBeNull();
+            expect(req.request.headers.get('Accept')).toBeNull();
             expect(req.request.headers.get('Accept-Language')).toBeNull();
             expect(req.request.headers.get('Pragma')).toBeNull();
         }));
 
     it('should not append headers for other requests',
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-            authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+            authService.setup(x => x.userChanges)
+                .returns(() => of(<any>{ authorization: 'token1' }));
 
             http.get('http://cloud/p/apps').subscribe();
 
@@ -91,19 +97,23 @@ describe('AuthInterceptor', () => {
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('Authorization')).toBeNull();
+            expect(req.request.headers.get('Accept')).toBeNull();
             expect(req.request.headers.get('Accept-Language')).toBeNull();
             expect(req.request.headers.get('Pragma')).toBeNull();
         }));
 
-    it('should logout for 401 status code',
+    it('should logout for 401 status code after retry',
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-            authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
-            authService.setup(x => x.loginSilent()).returns(() => of(<any>{ authToken: 'letmereallyin' }));
+            authService.setup(x => x.userChanges)
+                .returns(() => of(<any>{ authorization: 'token1' }));
+
+            authService.setup(x => x.loginSilent())
+                .returns(() => ofPromise(<any>{ authorization: 'token2' }));
 
             http.get('http://service/p/apps').pipe(onErrorResumeNextWith()).subscribe();
 
-            httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
-            httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
+            httpMock.expectOne('http://service/p/apps').flush({}, { status: 401, statusText: '401' });
+            httpMock.expectOne('http://service/p/apps').flush({}, { status: 401, statusText: '401' });
 
             expect().nothing();
 
@@ -112,16 +122,15 @@ describe('AuthInterceptor', () => {
 
     const AUTH_ERRORS = [403];
 
-    AUTH_ERRORS.forEach(statusCode => {
-        it(`should redirect for ${statusCode} status code`,
+    AUTH_ERRORS.forEach(status => {
+        it(`should redirect for ${status} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-                authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+                authService.setup(x => x.userChanges)
+                    .returns(() => of(<any>{ authorization: 'token1' }));
 
                 http.get('http://service/p/apps').pipe(onErrorResumeNextWith()).subscribe();
 
-                const req = httpMock.expectOne('http://service/p/apps');
-
-                req.error(<any>{}, { status: statusCode });
+                httpMock.expectOne('http://service/p/apps').flush({}, { status, statusText: `${status}` });
 
                 expect().nothing();
 
@@ -131,16 +140,15 @@ describe('AuthInterceptor', () => {
 
     const SERVER_ERRORS = [500, 404, 405];
 
-    SERVER_ERRORS.forEach(statusCode => {
-        it(`should not logout for ${statusCode} status code`,
+    SERVER_ERRORS.forEach(status => {
+        it(`should not logout for ${status} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-                authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+                authService.setup(x => x.userChanges)
+                    .returns(() => of(<any>{ authorization: 'token1' }));
 
                 http.get('http://service/p/apps').pipe(onErrorResumeNextWith()).subscribe();
 
-                const req = httpMock.expectOne('http://service/p/apps');
-
-                req.error(<any>{}, { status: statusCode });
+                httpMock.expectOne('http://service/p/apps').flush({}, { status, statusText: `${status}` });
 
                 expect().nothing();
 
@@ -148,3 +156,11 @@ describe('AuthInterceptor', () => {
             }));
     });
 });
+
+function ofPromise(value: any): Promise<any> {
+    return {
+        then: (onfullfilled: (value: any) => void) => {
+            onfullfilled(value);
+        },
+    } as any;
+}

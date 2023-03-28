@@ -140,8 +140,6 @@ public class DynamicApplicationStore : InMemoryApplicationStore
 
     private static IEnumerable<(string, OpenIddictApplicationDescriptor)> CreateStaticClients(IServiceProvider serviceProvider)
     {
-        var identityOptions = serviceProvider.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
-
         var urlGenerator = serviceProvider.GetRequiredService<IUrlGenerator>();
 
         var frontendId = Constants.ClientFrontendId;
@@ -206,6 +204,8 @@ public class DynamicApplicationStore : InMemoryApplicationStore
             },
             Type = ClientTypes.Public
         });
+
+        var identityOptions = serviceProvider.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
         if (!identityOptions.IsAdminClientConfigured())
         {

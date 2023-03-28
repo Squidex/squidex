@@ -20,17 +20,13 @@ export class LoginPageComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
-        this.authService.loginRedirectComplete()
-            .subscribe({
-                next: path => {
-                    path ||= '/app';
+    public async ngOnInit() {
+        try {
+            const path = await this.authService.loginRedirectComplete();
 
-                    this.router.navigateByUrl(path, { replaceUrl: true });
-                },
-                error: () => {
-                    this.router.navigate(['/'], { replaceUrl: true });
-                },
-            });
+            this.router.navigateByUrl(path || '/app', { replaceUrl: true });
+        } catch {
+            this.router.navigate(['/'], { replaceUrl: true });
+        }
     }
 }

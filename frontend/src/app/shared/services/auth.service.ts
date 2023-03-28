@@ -6,45 +6,44 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client';
-import { concat, Observable, of, ReplaySubject, throwError, TimeoutError } from 'rxjs';
-import { delay, mergeMap, retryWhen, take, timeout } from 'rxjs/operators';
-import { ApiUrlConfig, Types } from '@app/framework';
+import { Log, User, UserManager } from 'oidc-client-ts';
+import { Observable, ReplaySubject } from 'rxjs';
+import { ApiUrlConfig } from '@app/framework';
 
 export class Profile {
-    public get id(): string {
+    public get id() {
         return this.user.profile['sub'];
     }
 
-    public get email(): string {
+    public get email() {
         return this.user.profile['email']!;
     }
 
-    public get displayName(): string {
-        return this.user.profile['urn:squidex:name'];
+    public get displayName() {
+        return this.user.profile['urn:squidex:name'] as string;
     }
 
-    public get pictureUrl(): string {
+    public get pictureUrl() {
         return this.user.profile['urn:squidex:picture'];
     }
 
     public get notifoToken(): string | undefined {
-        return this.user.profile['urn:squidex:notifo'];
+        return this.user.profile['urn:squidex:notifo'] as string | undefined;
     }
 
-    public get isExpired(): boolean {
+    public get isExpired() {
         return this.user.expired || false;
     }
 
-    public get accessToken(): string {
+    public get accessToken() {
         return this.user.access_token;
     }
 
-    public get authorization(): string {
+    public get authorization() {
         return `${this.user!.token_type} ${this.user.access_token}`;
     }
 
-    public get token(): string {
+    public get token() {
         return `subject:${this.id}`;
     }
 
@@ -94,19 +93,16 @@ export class AuthService {
             return;
         }
 
-        Log.logger = console;
+        Log.setLogger(console);
 
         this.userManager = new UserManager({
                        client_id: 'squidex-frontend',
                            scope: 'squidex-api openid profile email permissions',
-                   response_type: 'code',
                     redirect_uri: apiUrl.buildUrl('login;'),
         post_logout_redirect_uri: apiUrl.buildUrl('logout'),
              silent_redirect_uri: apiUrl.buildUrl('client-callback-silent.html'),
               popup_redirect_uri: apiUrl.buildUrl('client-callback-popup.html'),
                        authority: apiUrl.buildUrl('identity-server/'),
-                       userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
-            automaticSilentRenew: true,
         });
 
         this.userManager.events.addUserLoaded(user => {
@@ -132,80 +128,49 @@ export class AuthService {
         this.userManager.signinRedirect({ state: { redirectPath } });
     }
 
-    public logoutRedirectComplete(): Observable<string | undefined> {
-        return new Observable<string | undefined>(observer => {
-            this.userManager.signoutRedirectCallback()
-                .then(x => {
-                    observer.next(x.state?.redirectPath);
-                    observer.complete();
-                }, err => {
-                    observer.error(err);
-                    observer.complete();
-                });
-        });
+    public async logoutRedirectComplete() {
+        const result = await this.userManager.signoutRedirectCallback();
+
+        return getRedirectPath(result.userState);
     }
 
-    public loginPopup(redirectPath: string): Observable<string | undefined> {
-        return new Observable<string | undefined>(observer => {
-            this.userManager.signinPopup({ state: { redirectPath } })
-                .then(x => {
-                    observer.next(x.state?.redirectPath);
-                    observer.complete();
-                }, err => {
-                    observer.error(err);
-                    observer.complete();
-                });
-        });
+    public async loginPopup(redirectPath: string) {
+        const result = await this.userManager.signinPopup({ state: { redirectPath } });
+
+        return getRedirectPath(result.state);
     }
 
-    public loginRedirectComplete(): Observable<string | undefined> {
-        return new Observable<string | undefined>(observer => {
-            this.userManager.signinRedirectCallback()
-                .then(x => {
-                    observer.next(x.state?.redirectPath);
-                    observer.complete();
-                }, err => {
-                    observer.error(err);
-                    observer.complete();
-                });
-        });
+    public async loginRedirectComplete() {
+        const result = await this.userManager.signinRedirectCallback();
+
+        return getRedirectPath(result.state);
     }
 
-    public loginSilent(): Observable<Profile> {
-        const observable =
-            new Observable<Profile>(observer => {
-                this.userManager.signinSilent()
-                    .then(x => {
-                        observer.next(AuthService.createProfile(x));
-                        observer.complete();
-                    }, err => {
-                        observer.error(err);
-                        observer.complete();
-                    });
-            });
+    public async loginSilent() {
+        const MAX_ATTEMPTS = 5;
 
-        return observable.pipe(
-            timeout(2000),
-            retryWhen(errors =>
-                concat(
-                    errors.pipe(
-                        mergeMap(e => (Types.is(e, TimeoutError) ? of(e) : throwError(() => e))),
-                        delay(500),
-                        take(5)),
-                    throwError(() => new Error('Retry limit exceeded.')),
-                ),
-            ),
-        );
-    }
+        for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+            const promiseTimeout = delayPromise(2000);
+            const promiseUser = this.userManager.signinRedirectCallback();
 
-    private static createProfile(user: User): Profile {
-        return new Profile(user);
+            const result = Promise.race([promiseTimeout, promiseUser]);
+
+            if (result === promiseUser) {
+                return getProfile(await promiseUser);
+            }
+
+            if (attempt < MAX_ATTEMPTS) {
+                await delayPromise(500);
+            }
+        }
+
+        throw new Error('Retry limit exceeded.');
     }
 
     private checkState(promise: Promise<User | null>) {
         promise.then(user => {
             if (user) {
-                this.user$.next(AuthService.createProfile(user));
+                this.user$.next(getProfile(user));
             } else {
                 this.user$.next(null);
             }
@@ -217,4 +182,18 @@ export class AuthService {
             return false;
         });
     }
+}
+
+function getProfile(user: User): Profile {
+    return new Profile(user);
+}
+
+function getRedirectPath(state: any) {
+    return state?.['redirectPath'] as string | undefined;
+}
+
+function delayPromise(ms: number) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
 }
