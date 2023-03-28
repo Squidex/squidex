@@ -42,9 +42,7 @@ export class AuthInterceptor implements HttpInterceptor {
         const token = user?.authorization || '';
 
         req = req.clone({
-            headers: req.headers
-                .set('Authorization', token)
-                .set('Pragma', 'no-cache'),
+            headers: req.headers.set('Authorization', token).set('Pragma', 'no-cache'),
         });
 
         return next.handle(req).pipe(
