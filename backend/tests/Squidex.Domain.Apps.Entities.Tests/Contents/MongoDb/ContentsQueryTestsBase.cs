@@ -18,9 +18,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
 
 public abstract class ContentsQueryTestsBase
 {
-    public ContentsQueryFixtureBase _ { get; }
+    public ContentsQueryFixture _ { get; }
 
-    protected ContentsQueryTestsBase(ContentsQueryFixtureBase fixture)
+    protected ContentsQueryTestsBase(ContentsQueryFixture fixture)
     {
         _ = fixture;
     }
@@ -196,27 +196,22 @@ public abstract class ContentsQueryTestsBase
 
     private async Task<IResultList<IContentEntity>> QueryAsync(IContentRepository contentRepository,
         ClrQuery clrQuery,
-        int take = 1000,
+        int top = 1000,
         int skip = 100,
         DomainId reference = default)
     {
-        if (clrQuery.Take == long.MaxValue)
+        clrQuery.Take = top;
+        clrQuery.Skip = skip;
+        clrQuery.Sort ??= new List<SortNode>();
+
+        if (clrQuery.Sort.Count == 0)
         {
-            clrQuery.Take = take;
+            clrQuery.Sort.Add(new SortNode("LastModified", SortOrder.Descending));
         }
 
-        if (clrQuery.Skip == 0)
+        if (!clrQuery.Sort.Exists(x => x.Path.Equals("Id")))
         {
-            clrQuery.Skip = skip;
-        }
-
-        if (clrQuery.Sort == null || clrQuery.Sort.Count == 0)
-        {
-            clrQuery.Sort = new List<SortNode>
-            {
-                new SortNode("LastModified", SortOrder.Descending),
-                new SortNode("Id", SortOrder.Ascending)
-            };
+            clrQuery.Sort.Add(new SortNode(new List<string> { "Id" }, SortOrder.Ascending));
         }
 
         var q =

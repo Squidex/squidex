@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
 using Squidex.Caching;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
@@ -62,7 +61,7 @@ public abstract class EventConsumerProcessorIntegrationTests
 
         var eventConsumer = new EventConsumer();
 
-        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongodb:configuration"]);
+        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongoDb:configurationDirect"]);
         var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
         var typeRegistry = new TypeRegistry().Add<IEvent, MyEvent>("MyEvent");
@@ -130,7 +129,9 @@ public abstract class EventConsumerProcessorIntegrationTests
         {
             while (!cts.IsCancellationRequested && eventConsumer.Events.Count < expectedEvents)
             {
+#pragma warning disable MA0040 // Forward the CancellationToken parameter to methods that take one
                 await Task.Delay(100);
+#pragma warning restore MA0040 // Forward the CancellationToken parameter to methods that take one
             }
         }
 

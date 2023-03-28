@@ -49,7 +49,7 @@ public sealed class AssetQueryService : IAssetQueryService
             {
                 var folder = await FindFolderCoreAsync(appId, id, ct);
 
-                if (folder == null || result.Any(x => x.Id == folder.Id))
+                if (folder == null || result.Exists(x => x.Id == folder.Id))
                 {
                     result.Clear();
                     break;

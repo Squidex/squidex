@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.TestHelpers;
 
@@ -14,22 +13,41 @@ using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
+public sealed class MongoEventStoreFixture_Direct : MongoEventStoreFixture
+{
+    public MongoEventStoreFixture_Direct()
+        : base(TestConfig.Configuration["mongoDb:configurationDirect"]!)
+    {
+    }
+}
+
+public sealed class MongoEventStoreFixture_Replica : MongoEventStoreFixture
+{
+    public MongoEventStoreFixture_Replica()
+        : base(TestConfig.Configuration["mongoDb:configurationReplica"]!)
+    {
+    }
+}
+
 public abstract class MongoEventStoreFixture : IAsyncLifetime
 {
-    private readonly IMongoClient mongoClient;
-    private readonly IMongoDatabase mongoDatabase;
-    private readonly IEventNotifier notifier = A.Fake<IEventNotifier>();
-
     public MongoEventStore EventStore { get; }
+
+    public IMongoDatabase Database { get; }
+
+    static MongoEventStoreFixture()
+    {
+        BsonJsonConvention.Register(TestUtils.DefaultOptions());
+    }
 
     protected MongoEventStoreFixture(string connectionString)
     {
-        mongoClient = MongoClientFactory.Create(connectionString);
-        mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
+        var mongoClient = MongoClientFactory.Create(connectionString);
+        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-        BsonJsonConvention.Register(TestUtils.DefaultOptions());
+        Database = mongoDatabase;
 
-        EventStore = new MongoEventStore(mongoDatabase, notifier);
+        EventStore = new MongoEventStore(mongoDatabase);
     }
 
     public Task InitializeAsync()
@@ -39,22 +57,6 @@ public abstract class MongoEventStoreFixture : IAsyncLifetime
 
     public Task DisposeAsync()
     {
-        return mongoClient.DropDatabaseAsync(mongoDatabase.DatabaseNamespace.DatabaseName);
-    }
-}
-
-public sealed class MongoEventStoreDirectFixture : MongoEventStoreFixture
-{
-    public MongoEventStoreDirectFixture()
-        : base(TestConfig.Configuration["mongodb:configuration"]!)
-    {
-    }
-}
-
-public sealed class MongoEventStoreReplicaSetFixture : MongoEventStoreFixture
-{
-    public MongoEventStoreReplicaSetFixture()
-        : base(TestConfig.Configuration["mongodb:configurationReplica"]!)
-    {
+        return Task.CompletedTask;
     }
 }

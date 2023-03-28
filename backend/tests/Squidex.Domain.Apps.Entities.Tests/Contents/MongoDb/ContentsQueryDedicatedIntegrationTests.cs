@@ -8,9 +8,9 @@
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
 
 [Trait("Category", "Dependencies")]
-public class ContentsQueryDedicatedIntegrationTests : ContentsQueryTestsBase, IClassFixture<ContentsQueryDedicatedFixture>
+public class ContentsQueryDedicatedIntegrationTests : ContentsQueryTestsBase, IClassFixture<ContentsQueryFixture_Dedicated>
 {
-    public ContentsQueryDedicatedIntegrationTests(ContentsQueryDedicatedFixture fixture)
+    public ContentsQueryDedicatedIntegrationTests(ContentsQueryFixture_Dedicated fixture)
         : base(fixture)
     {
     }

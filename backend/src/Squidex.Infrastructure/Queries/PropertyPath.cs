@@ -9,7 +9,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Queries;
 
-public sealed class PropertyPath : ReadonlyList<string>
+public sealed class PropertyPath : ReadonlyList<string>, IEquatable<string>
 {
     private static readonly char[] Separators = { '.', '/' };
 
@@ -81,6 +81,11 @@ public sealed class PropertyPath : ReadonlyList<string>
     public static implicit operator PropertyPath(List<string> path)
     {
         return Create(path);
+    }
+
+    public bool Equals(string? other)
+    {
+        return string.Equals(ToString(), other, StringComparison.Ordinal);
     }
 
     public override string ToString()

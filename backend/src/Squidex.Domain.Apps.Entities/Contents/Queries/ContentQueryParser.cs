@@ -155,7 +155,7 @@ public class ContentQueryParser
             query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
         }
 
-        if (!query.Sort.Any(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
+        if (!query.Sort.Exists(x => string.Equals(x.Path.ToString(), "id", StringComparison.OrdinalIgnoreCase)))
         {
             query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
         }

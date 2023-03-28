@@ -136,7 +136,7 @@ public class RuleEventFormatter
 
         var parts = BuildParts(text, @event);
 
-        if (parts.Any(x => !x.Var.IsCompleted))
+        if (parts.Exists(x => !x.Var.IsCompleted))
         {
             await ValueTaskEx.WhenAll(parts.Select(x => x.Var));
         }

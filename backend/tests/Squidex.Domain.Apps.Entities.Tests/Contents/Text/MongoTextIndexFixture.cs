@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -21,7 +20,7 @@ public sealed class MongoTextIndexFixture : IAsyncLifetime
     {
         TestUtils.SetupBson();
 
-        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongodb:configuration"]);
+        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongoDb:configuration"]);
         var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
         Index = new MongoTextIndex(mongoDatabase);

@@ -63,12 +63,6 @@ public partial class MongoEventStore
                 try
                 {
                     await Collection.InsertOneAsync(commit, cancellationToken: ct);
-
-                    if (!CanUseChangeStreams)
-                    {
-                        notifier.NotifyEventsStored(streamName);
-                    }
-
                     return;
                 }
                 catch (MongoWriteException ex)

@@ -119,7 +119,7 @@ public class AppResolverTests : GivenContext
         Assert.Same(App, httpContext.Context().App);
         Assert.True(user.Claims.Any());
         Assert.True(permissions.Count < 3);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{AppId.Name}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.TrueForAll(x => x.Value.StartsWith($"squidex.apps.{AppId.Name}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 
@@ -143,7 +143,7 @@ public class AppResolverTests : GivenContext
         Assert.Same(App, httpContext.Context().App);
         Assert.True(user.Claims.Count() > 2);
         Assert.True(permissions.Count < 3);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{AppId.Name}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.TrueForAll(x => x.Value.StartsWith($"squidex.apps.{AppId.Name}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 
@@ -168,7 +168,7 @@ public class AppResolverTests : GivenContext
         Assert.Same(App, httpContext.Context().App);
         Assert.True(user.Claims.Count() > 2);
         Assert.True(permissions.Count > 10);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.apps.{AppId.Name}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.TrueForAll(x => x.Value.StartsWith($"squidex.apps.{AppId.Name}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 

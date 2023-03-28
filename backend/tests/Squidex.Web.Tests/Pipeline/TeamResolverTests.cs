@@ -119,7 +119,7 @@ public class TeamResolverTests : GivenContext
         Assert.Same(Team, httpContext.Features.Get<ITeamFeature>()!.Team);
         Assert.True(user.Claims.Any());
         Assert.True(permissions.Count < 3);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.teams.{TeamId}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.TrueForAll(x => x.Value.StartsWith($"squidex.teams.{TeamId}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 
@@ -143,7 +143,7 @@ public class TeamResolverTests : GivenContext
         Assert.Same(Team, httpContext.Features.Get<ITeamFeature>()!.Team);
         Assert.True(user.Claims.Count() > 2);
         Assert.True(permissions.Count < 3);
-        Assert.True(permissions.All(x => x.Value.StartsWith($"squidex.teams.{TeamId}", StringComparison.OrdinalIgnoreCase)));
+        Assert.True(permissions.TrueForAll(x => x.Value.StartsWith($"squidex.teams.{TeamId}", StringComparison.OrdinalIgnoreCase)));
         Assert.True(isNextCalled);
     }
 

@@ -14,7 +14,7 @@ public static class SortBuilder
 {
     public static SortDefinition<T>? BuildSort<T>(this ClrQuery query)
     {
-        if (query is { Sort: not null, Sort: { Count: > 0 } })
+        if (query is { Sort: not null, Sort.Count: > 0 })
         {
             var sorts = query.Sort.Select(OrderBy<T>).ToList();
 

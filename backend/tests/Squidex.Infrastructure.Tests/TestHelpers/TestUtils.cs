@@ -12,7 +12,6 @@ using System.Text.Json.Serialization;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.Serializers;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 using Squidex.Infrastructure.Json;
@@ -46,9 +45,7 @@ public static class TestUtils
 
     public static void SetupBson()
     {
-        // Allow all types, independent from the actual assembly.
-        BsonSerializer.TryRegisterSerializer(new ObjectSerializer(type => true));
-
+        BsonDefaultConventions.Register();
         BsonDomainIdSerializer.Register();
         BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
         BsonInstantSerializer.Register();

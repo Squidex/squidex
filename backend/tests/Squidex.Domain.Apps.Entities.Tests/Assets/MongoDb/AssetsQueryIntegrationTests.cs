@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Amazon.Runtime;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using F = Squidex.Infrastructure.Queries.ClrFilter;
 
@@ -14,13 +16,32 @@ using F = Squidex.Infrastructure.Queries.ClrFilter;
 namespace Squidex.Domain.Apps.Entities.Assets.MongoDb;
 
 [Trait("Category", "Dependencies")]
-public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>
+public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IAsyncLifetime
 {
+    private readonly ProfilerCollection profiler;
+
     public AssetsQueryFixture _ { get; }
 
     public AssetsQueryIntegrationTests(AssetsQueryFixture fixture)
     {
         _ = fixture;
+
+        profiler = new ProfilerCollection(_.Database);
+    }
+
+    public Task InitializeAsync()
+    {
+        return profiler.ClearAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        var queries = await profiler.GetQueriesAsync(_.AssetRepository.GetInternalCollection().CollectionNamespace.CollectionName);
+
+        Assert.All(queries, query =>
+        {
+            Assert.Equal(query.NumDocuments, query.DocsExamined);
+        });
     }
 
     [Fact]
@@ -46,7 +67,7 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>
     }
 
     [Fact]
-    public async Task Should_verify_ids()
+    public async Task Should_query_ids()
     {
         var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
@@ -157,18 +178,22 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>
         yield return new object?[] { DomainId.Empty };
     }
 
-    private async Task<IResultList<IAssetEntity>> QueryAsync(DomainId? parentId, ClrQuery clrQuery)
+    private async Task<IResultList<IAssetEntity>> QueryAsync(DomainId? parentId, ClrQuery clrQuery,
+        int top = 1000,
+        int skip = 100)
     {
-        clrQuery.Top = 1000;
-        clrQuery.Skip = 100;
+        clrQuery.Top = top;
+        clrQuery.Skip = skip;
+        clrQuery.Sort ??= new List<SortNode>();
 
-        if (clrQuery.Sort == null || clrQuery.Sort.Count == 0)
+        if (clrQuery.Sort.Count == 0)
         {
-            clrQuery.Sort = new List<SortNode>
-            {
-                new SortNode("LastModified", SortOrder.Descending),
-                new SortNode("Id", SortOrder.Descending)
-            };
+            clrQuery.Sort.Add(new SortNode("LastModified", SortOrder.Descending));
+        }
+
+        if (!clrQuery.Sort.Exists(x => x.Path.Equals("Id")))
+        {
+            clrQuery.Sort.Add(new SortNode(new List<string> { "Id" }, SortOrder.Ascending));
         }
 
         var q =

@@ -15,7 +15,7 @@ using Squidex.Infrastructure.TestHelpers;
 namespace Squidex.Infrastructure.EventSourcing;
 
 [Trait("Category", "Dependencies")]
-public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreReplicaSetFixture>
+public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreFixture_Replica>
 {
     private readonly TestState<EventConsumerState> state = new TestState<EventConsumerState>(DomainId.Empty);
     private readonly IEventFormatter eventFormatter;
@@ -65,7 +65,7 @@ public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreRepl
         }
     }
 
-    public MongoParallelInsertTests(MongoEventStoreReplicaSetFixture fixture)
+    public MongoParallelInsertTests(MongoEventStoreFixture_Replica fixture)
     {
         _ = fixture;
 

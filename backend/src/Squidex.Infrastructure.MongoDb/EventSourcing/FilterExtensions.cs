@@ -11,6 +11,11 @@ namespace Squidex.Infrastructure.EventSourcing;
 
 internal static class FilterExtensions
 {
+    public static FilterDefinition<MongoEventCommit> ByOffset(long streamPosition)
+    {
+        return Builders<MongoEventCommit>.Filter.Gte(x => x.EventStreamOffset, streamPosition);
+    }
+
     public static FilterDefinition<MongoEventCommit> ByPosition(StreamPosition streamPosition)
     {
         if (streamPosition.IsEndOfCommit)
@@ -27,7 +32,7 @@ internal static class FilterExtensions
     {
         if (StreamFilter.IsAll(streamFilter))
         {
-            return null;
+            return Builders<MongoEventCommit>.Filter.Exists(x => x.EventStream, true);
         }
 
         if (streamFilter.Contains('^', StringComparison.Ordinal))
