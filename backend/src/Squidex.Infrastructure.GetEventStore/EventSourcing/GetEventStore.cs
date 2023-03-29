@@ -114,7 +114,7 @@ public sealed class GetEventStore : IEventStore, IInitializable
         }
     }
 
-    public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0,
+    public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
         CancellationToken ct = default)
     {
         Guard.NotNullOrEmpty(streamName);
@@ -123,7 +123,7 @@ public sealed class GetEventStore : IEventStore, IInitializable
         {
             var result = new List<StoredEvent>();
 
-            var stream = QueryAsync(GetStreamName(streamName), streamPosition.ToPosition(), int.MaxValue, ct);
+            var stream = QueryAsync(GetStreamName(streamName), afterStreamPosition.ToPositionBefore(), int.MaxValue, ct);
 
             await foreach (var storedEvent in stream.IgnoreNotFound(ct))
             {

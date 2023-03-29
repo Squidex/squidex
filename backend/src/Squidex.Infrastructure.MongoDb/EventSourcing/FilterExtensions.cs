@@ -62,7 +62,7 @@ internal static class FilterExtensions
         }
     }
 
-    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, StreamPosition lastPosition)
+    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, StreamPosition position)
     {
         var eventStreamOffset = commit.EventStreamOffset;
 
@@ -73,7 +73,7 @@ internal static class FilterExtensions
         {
             eventStreamOffset++;
 
-            if (commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp)
+            if (commitOffset > position.CommitOffset || commitTimestamp > position.Timestamp)
             {
                 var eventData = @event.ToEventData();
                 var eventPosition = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
@@ -85,7 +85,12 @@ internal static class FilterExtensions
         }
     }
 
-    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, long streamPosition = EtagVersion.Empty)
+    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit)
+    {
+        return commit.Filtered(EtagVersion.Empty);
+    }
+
+    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, long position)
     {
         var eventStreamOffset = commit.EventStreamOffset;
 
@@ -96,7 +101,7 @@ internal static class FilterExtensions
         {
             eventStreamOffset++;
 
-            if (eventStreamOffset >= streamPosition)
+            if (eventStreamOffset > position)
             {
                 var eventData = @event.ToEventData();
                 var eventPosition = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);

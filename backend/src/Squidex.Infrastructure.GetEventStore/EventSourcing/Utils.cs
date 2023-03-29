@@ -18,14 +18,14 @@ public static class Utils
         return StreamRevision.FromInt64(version);
     }
 
-    public static StreamPosition ToPosition(this long version)
+    public static StreamPosition ToPositionBefore(this long version)
     {
-        if (version <= 0)
+        if (version < 0)
         {
             return StreamPosition.Start;
         }
 
-        return StreamPosition.FromInt64(version);
+        return StreamPosition.FromInt64(version - 1);
     }
 
     public static StreamPosition ToPosition(this string? position, bool inclusive)

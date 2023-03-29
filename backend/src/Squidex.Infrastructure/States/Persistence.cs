@@ -144,7 +144,7 @@ internal sealed class Persistence<T> : IPersistence<T>
     private async Task ReadEventsAsync(
         CancellationToken ct)
     {
-        var events = await eventStore.QueryAsync(streamName.Value, versionEvents + 1, ct);
+        var events = await eventStore.QueryAsync(streamName.Value, versionEvents, ct);
 
         var isStopped = false;
 

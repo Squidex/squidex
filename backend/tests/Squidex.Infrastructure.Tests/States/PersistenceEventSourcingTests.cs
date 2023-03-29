@@ -65,7 +65,7 @@ public class PersistenceEventSourcingTests
     {
         var storedEvent = new StoredEvent("1", "1", 0, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
-        A.CallTo(() => eventStore.QueryAsync(key.ToString(), 0, A<CancellationToken>._))
+        A.CallTo(() => eventStore.QueryAsync(key.ToString(), -1, A<CancellationToken>._))
             .Returns(new List<StoredEvent> { storedEvent });
 
         A.CallTo(() => eventFormatter.ParseIfKnown(storedEvent))
@@ -96,17 +96,17 @@ public class PersistenceEventSourcingTests
 
         Assert.False(persistence.IsSnapshotStale);
 
-        A.CallTo(() => eventStore.QueryAsync(key.ToString(), 3, A<CancellationToken>._))
+        A.CallTo(() => eventStore.QueryAsync(key.ToString(), 2, A<CancellationToken>._))
             .MustHaveHappened();
     }
 
     [Fact]
-    public async Task Should_mark_as_stale_if_snapshot_old_than_events()
+    public async Task Should_mark_as_stale_if_snapshot_is_older_than_events()
     {
         A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
             .Returns(new SnapshotResult<string>(key, "2", 1));
 
-        SetupEventStore(3, 2, 2);
+        SetupEventStore(3, 2, 1);
 
         var persistedState = Save.Snapshot(string.Empty);
         var persistedEvents = Save.Events();
@@ -116,7 +116,7 @@ public class PersistenceEventSourcingTests
 
         Assert.True(persistence.IsSnapshotStale);
 
-        A.CallTo(() => eventStore.QueryAsync(key.ToString(), 2, A<CancellationToken>._))
+        A.CallTo(() => eventStore.QueryAsync(key.ToString(), 1, A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -126,7 +126,7 @@ public class PersistenceEventSourcingTests
         A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
             .Returns(new SnapshotResult<string>(key, "2", 2));
 
-        SetupEventStore(3, 0, 3);
+        SetupEventStore(3, 0, 2);
 
         var persistedState = Save.Snapshot(string.Empty);
         var persistedEvents = Save.Events();
@@ -141,7 +141,7 @@ public class PersistenceEventSourcingTests
         A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
             .Returns(new SnapshotResult<string>(key, "2", 2));
 
-        SetupEventStore(3, 4, 3);
+        SetupEventStore(3, 4, 2);
 
         var persistedState = Save.Snapshot(string.Empty);
         var persistedEvents = Save.Events();
@@ -350,17 +350,17 @@ public class PersistenceEventSourcingTests
         Assert.Equal(EtagVersion.Empty, persistence.Version);
     }
 
-    private void SetupEventStore(int count, int eventOffset = 0, int readPosition = 0)
+    private void SetupEventStore(int count, int eventOffset = 0, long readPosition = EtagVersion.Empty)
     {
         SetupEventStore(Enumerable.Repeat(0, count).Select(x => new MyEvent()).ToArray(), eventOffset, readPosition);
     }
 
     private void SetupEventStore(params MyEvent[] events)
     {
-        SetupEventStore(events, 0, 0);
+        SetupEventStore(events, 0, EtagVersion.Empty);
     }
 
-    private void SetupEventStore(MyEvent[] events, int eventOffset, int readPosition = 0)
+    private void SetupEventStore(MyEvent[] events, int eventOffset = 0, long readPosition = EtagVersion.Empty)
     {
         var eventsStored = new List<StoredEvent>();
 

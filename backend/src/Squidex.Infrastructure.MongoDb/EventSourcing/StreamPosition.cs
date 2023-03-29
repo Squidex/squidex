@@ -10,29 +10,16 @@ using MongoDB.Bson;
 using NodaTime;
 using Squidex.Infrastructure.ObjectPool;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+#pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
+
 namespace Squidex.Infrastructure.EventSourcing;
 
-internal sealed class StreamPosition
+internal sealed record StreamPosition(BsonTimestamp Timestamp, long CommitOffset, long CommitSize)
 {
     public static readonly StreamPosition Empty = new StreamPosition(new BsonTimestamp(0, 0), -1, -1);
 
-    public BsonTimestamp Timestamp { get; }
-
-    public long CommitOffset { get; }
-
-    public long CommitSize { get; }
-
-    public bool IsEndOfCommit { get; }
-
-    public StreamPosition(BsonTimestamp timestamp, long commitOffset, long commitSize)
-    {
-        Timestamp = timestamp;
-
-        CommitOffset = commitOffset;
-        CommitSize = commitSize;
-
-        IsEndOfCommit = CommitOffset == CommitSize - 1;
-    }
+    public bool IsEndOfCommit => CommitOffset == CommitSize - 1;
 
     public static implicit operator string(StreamPosition position)
     {

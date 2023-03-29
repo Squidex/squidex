@@ -294,6 +294,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
     }
 
     [Theory]
+    [InlineData(1, 30)]
     [InlineData(5, 30)]
     [InlineData(5, 300)]
     [InlineData(5, 3000)]
@@ -304,7 +305,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
         var eventsWritten = await AppendEventsAsync(streamName, count, commits);
 
         var readEvents0 = await QueryAsync(streamName);
-        var readEvents1 = await QueryAsync(streamName, count - 1);
+        var readEvents1 = await QueryAsync(streamName, count - 2);
         var readEvents2 = await QueryAllAsync(streamName, readEvents0[^2].EventPosition);
 
         var expected = new[]
