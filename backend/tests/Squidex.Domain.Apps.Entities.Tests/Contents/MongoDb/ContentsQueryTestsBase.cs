@@ -206,12 +206,12 @@ public abstract class ContentsQueryTestsBase
 
         if (clrQuery.Sort.Count == 0)
         {
-            clrQuery.Sort.Add(new SortNode("LastModified", SortOrder.Descending));
+            clrQuery.Sort.Add(new SortNode("lastModified", SortOrder.Descending));
         }
 
-        if (!clrQuery.Sort.Exists(x => x.Path.Equals("Id")))
+        if (!clrQuery.Sort.Exists(x => x.Path.Equals("id")))
         {
-            clrQuery.Sort.Add(new SortNode(new List<string> { "Id" }, SortOrder.Ascending));
+            clrQuery.Sort.Add(new SortNode("id", SortOrder.Ascending));
         }
 
         var q =
