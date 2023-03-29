@@ -108,12 +108,12 @@ public class AssetQueryParser
 
         if (query.Sort.Count == 0)
         {
-            query.Sort.Add(new SortNode(new List<string> { "LastModified" }, SortOrder.Descending));
+            query.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
         }
 
-        if (!query.Sort.Exists(x => x.Path.Equals("Id")))
+        if (!query.Sort.Exists(x => x.Path.Equals("id")))
         {
-            query.Sort.Add(new SortNode(new List<string> { "Id" }, SortOrder.Ascending));
+            query.Sort.Add(new SortNode(new List<string> { "id" }, SortOrder.Ascending));
         }
     }
 
