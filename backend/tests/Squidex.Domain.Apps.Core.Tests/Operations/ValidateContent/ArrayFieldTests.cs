@@ -137,12 +137,12 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
 
     private static JsonObject Object()
     {
-        return new JsonObject();
+        return JsonValue.Object();
     }
 
     private static JsonObject Object(string key, JsonValue value)
     {
-        return new JsonObject().Add(key, value);
+        return JsonValue.Object().Add(key, value);
     }
 
     private static RootField<ArrayFieldProperties> Field(ArrayFieldProperties properties)

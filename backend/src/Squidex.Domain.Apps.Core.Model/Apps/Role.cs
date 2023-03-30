@@ -38,7 +38,7 @@ public sealed record Role(string Name, PermissionSet? Permissions = null, JsonOb
 
     public string Name { get; } = Guard.NotNullOrEmpty(Name);
 
-    public JsonObject Properties { get; } = Properties ?? new JsonObject();
+    public JsonObject Properties { get; } = Properties ?? JsonValue.Object();
 
     public PermissionSet Permissions { get; } = Permissions ?? PermissionSet.Empty;
 
@@ -49,7 +49,7 @@ public sealed record Role(string Name, PermissionSet? Permissions = null, JsonOb
 
     public static Role WithPermissions(string name, params string[] permissions)
     {
-        return new Role(name, new PermissionSet(permissions), new JsonObject());
+        return new Role(name, new PermissionSet(permissions), JsonValue.Object());
     }
 
     public static Role WithProperties(string name, JsonObject properties)

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -16,6 +17,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent;
 public class ContentConversionTests
 {
     private readonly Schema schema;
+    private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
+    private readonly Language language = Language.DE;
     private readonly ResolvedComponents components;
 
     public ContentConversionTests()
@@ -51,33 +54,33 @@ public class ContentConversionTests
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("nested", JsonValue.Array(1, 2)))))
                 .AddField("component",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("references",
                                     JsonValue.Array(1, 2))
                                 .Add("assets1",
                                     JsonValue.Array(1))
                                 .Add("array",
                                     JsonValue.Array(
-                                        new JsonObject()
+                                        JsonValue.Object()
                                             .Add("nested", JsonValue.Array(1, 2))))
                                 .Add(Component.Discriminator, DomainId.Empty)))
                 .AddField("components",
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("references",
                                         JsonValue.Array(1, 2))
                                     .Add("assets1",
                                         JsonValue.Array(1))
                                     .Add("array",
                                         JsonValue.Array(
-                                            new JsonObject()
+                                            JsonValue.Object()
                                                 .Add("nested", JsonValue.Array(1, 2))))
                                     .Add(Component.Discriminator, DomainId.Empty))));
 
@@ -97,27 +100,27 @@ public class ContentConversionTests
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject())))
+                                JsonValue.Object())))
                 .AddField("component",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("assets1",
                                     JsonValue.Array(1))
                                 .Add("array",
                                     JsonValue.Array(
-                                        new JsonObject()))
+                                        JsonValue.Object()))
                                 .Add(Component.Discriminator, DomainId.Empty)))
                 .AddField("components",
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("assets1",
                                         JsonValue.Array(1))
                                     .Add("array",
                                         JsonValue.Array(
-                                            new JsonObject()))
+                                            JsonValue.Object()))
                                     .Add(Component.Discriminator, DomainId.Empty))));
 
         Assert.Equal(expected, actual);
@@ -138,33 +141,33 @@ public class ContentConversionTests
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("nested", JsonValue.Array(1, 2)))))
                 .AddField("component",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("references",
                                     JsonValue.Array(1, 2))
                                 .Add("assets1",
                                     JsonValue.Array(1))
                                 .Add("array",
                                     JsonValue.Array(
-                                        new JsonObject()
+                                        JsonValue.Object()
                                             .Add("nested", JsonValue.Array(1, 2))))
                                 .Add(Component.Discriminator, DomainId.Empty)))
                 .AddField("components",
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("references",
                                         JsonValue.Array(1, 2))
                                     .Add("assets1",
                                         JsonValue.Array(1))
                                     .Add("array",
                                         JsonValue.Array(
-                                            new JsonObject()
+                                            JsonValue.Object()
                                                 .Add("nested", JsonValue.Array(1, 2))))
                                     .Add(Component.Discriminator, DomainId.Empty))));
 
@@ -185,13 +188,13 @@ public class ContentConversionTests
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("extraField", 42)
                                     .Add("nested", JsonValue.Array(1, 2)))))
                 .AddField("component",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("extraField", 42)
                                 .Add("references",
                                     JsonValue.Array(1, 2))
@@ -199,7 +202,7 @@ public class ContentConversionTests
                                     JsonValue.Array(1))
                                 .Add("array",
                                     JsonValue.Array(
-                                        new JsonObject()
+                                        JsonValue.Object()
                                             .Add("extraField", 42)
                                             .Add("nested", JsonValue.Array(1, 2))))
                                 .Add(Component.Discriminator, DomainId.Empty)))
@@ -207,7 +210,7 @@ public class ContentConversionTests
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("extraField", 42)
                                     .Add("references",
                                         JsonValue.Array(1, 2))
@@ -215,7 +218,7 @@ public class ContentConversionTests
                                         JsonValue.Array(1))
                                     .Add("array",
                                         JsonValue.Array(
-                                            new JsonObject()
+                                            JsonValue.Object()
                                                 .Add("extraField", 42)
                                                 .Add("nested", JsonValue.Array(1, 2))))
                                     .Add(Component.Discriminator, DomainId.Empty))));
@@ -225,7 +228,7 @@ public class ContentConversionTests
 
     private sealed class ItemConverter : IContentItemConverter
     {
-        public JsonObject ConvertItem(IField field, JsonObject source)
+        public JsonObject ConvertItemAfter(IField field, JsonObject source, IEnumerable<IField> schema)
         {
             source["extraField"] = 42;
 

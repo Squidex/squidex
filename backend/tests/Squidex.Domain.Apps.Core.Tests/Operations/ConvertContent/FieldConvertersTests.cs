@@ -618,13 +618,13 @@ public class FieldConvertersTests
         var source =
             new ContentFieldData()
                 .AddInvariant(
-                    new JsonObject()
+                    JsonValue.Object()
                         .Add(Component.Discriminator, componentId));
 
         var expected =
             new ContentFieldData()
                 .AddInvariant(
-                    new JsonObject()
+                    JsonValue.Object()
                         .Add(Component.Discriminator, componentId)
                         .Add("schemaName", component.Name));
 

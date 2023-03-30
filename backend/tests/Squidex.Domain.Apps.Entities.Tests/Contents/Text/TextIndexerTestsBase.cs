@@ -411,7 +411,7 @@ public abstract class TextIndexerTestsBase : GivenContext
         return new ContentData()
             .AddField(field,
                 new ContentFieldData()
-                    .AddInvariant(new JsonObject().Add("latitude", latitude).Add("longitude", longitude)));
+                    .AddInvariant(JsonValue.Object().Add("latitude", latitude).Add("longitude", longitude)));
     }
 
     private static ContentData GeoJsonData(string field, double latitude, double longitude)
@@ -419,7 +419,7 @@ public abstract class TextIndexerTestsBase : GivenContext
         return new ContentData()
             .AddField(field,
                 new ContentFieldData()
-                    .AddInvariant(new JsonObject()
+                    .AddInvariant(JsonValue.Object()
                         .Add("type", "Point")
                         .Add("coordinates",
                             new JsonArray()

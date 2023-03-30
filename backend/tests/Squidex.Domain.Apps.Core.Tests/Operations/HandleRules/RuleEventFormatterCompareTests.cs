@@ -599,7 +599,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(new JsonObject().Add("name", "Berlin")))
+                            .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -671,7 +671,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(new JsonObject().Add("name", "Berlin")))
+                            .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -695,7 +695,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(new JsonObject().Add("name", "Berlin")))
+                            .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -743,7 +743,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(new JsonObject().Add("name", "Berlin")))
+                            .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
         };
 
         var actual = await sut.FormatAsync(script, @event);

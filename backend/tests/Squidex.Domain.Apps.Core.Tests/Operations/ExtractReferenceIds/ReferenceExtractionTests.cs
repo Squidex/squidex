@@ -95,44 +95,44 @@ public class ReferenceExtractionTests
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("nestedAssets", JsonValue.Array(id1, id2))
                                     .Add("nestedComponent",
-                                        new JsonObject()
+                                        JsonValue.Object()
                                             .Add("references",
                                                 JsonValue.Array(id1, id2))
                                             .Add(Component.Discriminator, DomainId.Empty))
                                     .Add("nestedComponents",
                                         JsonValue.Array(
-                                            new JsonObject()
+                                            JsonValue.Object()
                                                 .Add("references",
                                                     JsonValue.Array(id1, id2))
                                                 .Add(Component.Discriminator, DomainId.Empty))))))
                 .AddField("component",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("references",
                                     JsonValue.Array(id1, id2))
                                 .Add("assets1",
                                     JsonValue.Array(id1))
                                 .Add("array",
                                     JsonValue.Array(
-                                        new JsonObject()
+                                        JsonValue.Object()
                                             .Add("nestedAssets", JsonValue.Array(id1, id2))))
                                 .Add(Component.Discriminator, DomainId.Empty)))
                 .AddField("components",
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("references",
                                         JsonValue.Array(id1, id2))
                                     .Add("assets1",
                                         JsonValue.Array(id1))
                                     .Add("array",
                                         JsonValue.Array(
-                                            new JsonObject()
+                                            JsonValue.Object()
                                                 .Add("nestedAssets", JsonValue.Array(id1, id2))))
                                     .Add(Component.Discriminator, DomainId.Empty))));
 
@@ -148,44 +148,44 @@ public class ReferenceExtractionTests
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("nestedAssets", JsonValue.Array(id2))
                                     .Add("nestedComponent",
-                                        new JsonObject()
+                                        JsonValue.Object()
                                             .Add("references",
                                                 JsonValue.Array(id2))
                                             .Add(Component.Discriminator, DomainId.Empty))
                                     .Add("nestedComponents",
                                         JsonValue.Array(
-                                            new JsonObject()
+                                            JsonValue.Object()
                                                 .Add("references",
                                                     JsonValue.Array(id2))
                                                 .Add(Component.Discriminator, DomainId.Empty))))))
                 .AddField("component",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("references",
                                     JsonValue.Array(id2))
                                 .Add("assets1",
                                     new JsonArray())
                                 .Add("array",
                                     JsonValue.Array(
-                                        new JsonObject()
+                                        JsonValue.Object()
                                             .Add("nestedAssets", JsonValue.Array(id2))))
                                 .Add(Component.Discriminator, DomainId.Empty)))
                 .AddField("components",
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("references",
                                         JsonValue.Array(id2))
                                     .Add("assets1",
                                         new JsonArray())
                                     .Add("array",
                                         JsonValue.Array(
-                                            new JsonObject()
+                                            JsonValue.Object()
                                                 .Add("nestedAssets", JsonValue.Array(id2))))
                                     .Add(Component.Discriminator, DomainId.Empty))));
 
@@ -218,7 +218,7 @@ public class ReferenceExtractionTests
 
         var value =
             JsonValue.Array(
-                new JsonObject()
+                JsonValue.Object()
                     .Add(field.Name, CreateValue(id1, id2)));
 
         var actual = arrayField.GetReferencedIds(value, components).ToArray();

@@ -162,15 +162,15 @@ public class ValueConvertersTests
         });
 
         var source =
-            new JsonObject()
+            JsonValue.Object()
                 .Add(Component.Discriminator, componentId);
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItem(field, source);
+                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
 
         var expected =
-            new JsonObject()
+            JsonValue.Object()
                 .Add(Component.Discriminator, componentId)
                 .Add("schemaName", component.Name);
 
@@ -190,13 +190,13 @@ public class ValueConvertersTests
         });
 
         var source =
-            new JsonObject()
+            JsonValue.Object()
                 .Add(Component.Discriminator, componentId)
                 .Add("schemaName", "existing");
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItem(field, source);
+                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
 
         var expected = source;
 
@@ -216,12 +216,12 @@ public class ValueConvertersTests
         });
 
         var source =
-            new JsonObject()
+            JsonValue.Object()
                 .Add(Component.Discriminator, componentId);
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItem(field, source);
+                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
 
         var expected = source;
 
@@ -241,11 +241,11 @@ public class ValueConvertersTests
         });
 
         var source =
-            new JsonObject();
+            JsonValue.Object();
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItem(field, source);
+                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
 
         var expected = source;
 
@@ -260,12 +260,12 @@ public class ValueConvertersTests
         var componentId = DomainId.NewGuid();
 
         var source =
-            new JsonObject()
+            JsonValue.Object()
                 .Add(Component.Discriminator, componentId);
 
         var actual =
             new AddSchemaNames(ResolvedComponents.Empty)
-                .ConvertItem(field, source);
+                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
 
         var expected = source;
 

@@ -65,12 +65,12 @@ public sealed class AppUISettingsTests : GivenContext
     [Fact]
     public async Task Should_set_setting()
     {
-        await sut.SetAsync(AppId.Id, userId, new JsonObject().Add("key", 42), CancellationToken);
+        await sut.SetAsync(AppId.Id, userId, JsonValue.Object().Add("key", 42), CancellationToken);
 
         var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
-            new JsonObject().Add("key", 42);
+            JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
@@ -86,7 +86,7 @@ public sealed class AppUISettingsTests : GivenContext
         var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
-            new JsonObject().Add("key", 42);
+            JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
@@ -104,7 +104,7 @@ public sealed class AppUISettingsTests : GivenContext
 
         var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
-        var expected = new JsonObject();
+        var expected = JsonValue.Object();
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
@@ -120,8 +120,8 @@ public sealed class AppUISettingsTests : GivenContext
         var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
-            new JsonObject().Add("root",
-                new JsonObject().Add("nested", 42));
+            JsonValue.Object().Add("root",
+                JsonValue.Object().Add("nested", 42));
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
@@ -138,8 +138,8 @@ public sealed class AppUISettingsTests : GivenContext
         var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
-            new JsonObject().Add("root",
-                new JsonObject().Add("nested", 42));
+            JsonValue.Object().Add("root",
+                JsonValue.Object().Add("nested", 42));
 
         Assert.Equal(expected.ToString(), actual.ToString());
 
@@ -158,8 +158,8 @@ public sealed class AppUISettingsTests : GivenContext
         var actual = await sut.GetAsync(AppId.Id, userId, CancellationToken);
 
         var expected =
-            new JsonObject().Add("root",
-                new JsonObject());
+            JsonValue.Object().Add("root",
+                JsonValue.Object());
 
         Assert.Equal(expected.ToString(), actual.ToString());
 

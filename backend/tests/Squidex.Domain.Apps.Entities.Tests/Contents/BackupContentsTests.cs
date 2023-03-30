@@ -107,7 +107,7 @@ public class BackupContentsTests : GivenContext
                 .AddField("assetsInObj",
                     new ContentFieldData()
                         .AddLocalized("iv",
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("asset", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")));
 
         var updateData =
@@ -124,7 +124,7 @@ public class BackupContentsTests : GivenContext
                 .AddField("assetsInObj",
                     new ContentFieldData()
                         .AddLocalized("iv",
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("asset", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")));
 
         var context = new RestoreContext(AppId.Id, new UserMapping(me), reader, DomainId.NewGuid());

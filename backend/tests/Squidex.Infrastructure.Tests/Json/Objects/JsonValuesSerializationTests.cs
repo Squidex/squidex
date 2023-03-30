@@ -128,7 +128,7 @@ public class JsonValuesSerializationTests
     public void Should_serialize_and_deserialize_object(SerializerMode mode)
     {
         var value =
-            new JsonObject()
+            JsonValue.Object()
                 .Add("1", 1)
                 .Add("2", 1);
 
@@ -142,13 +142,13 @@ public class JsonValuesSerializationTests
     public void Should_serialize_and_deserialize_complex_object(SerializerMode mode)
     {
         var value =
-            new JsonObject()
+            JsonValue.Object()
                 .Add("1",
                     JsonValue.Array(
-                        new JsonObject().Add("1_1", 11),
-                        new JsonObject().Add("1_2", 12)))
+                        JsonValue.Object().Add("1_1", 11),
+                        JsonValue.Object().Add("1_2", 12)))
                 .Add("2",
-                    new JsonObject().Add("2_1", 11));
+                    JsonValue.Object().Add("2_1", 11));
 
         var serialized = Serialize(value, mode);
 
@@ -164,7 +164,7 @@ public class JsonValuesSerializationTests
         };
 
         var expected =
-            new JsonObject()
+            JsonValue.Object()
                 .Add("key.with.dot", 10);
 
         var serialized = TestUtils.SerializeAndDeserializeBson<JsonObject, Dictionary<string, int>>(value);

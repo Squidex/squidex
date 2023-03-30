@@ -37,7 +37,7 @@ public class RolesTests
     {
         var roles_1 = roles_0.Add(role);
 
-        Assert.Equal(new Role(role, null, new JsonObject()), roles_1[role]);
+        Assert.Equal(new Role(role, null, JsonValue.Object()), roles_1[role]);
     }
 
     [Fact]
@@ -68,9 +68,9 @@ public class RolesTests
     [Fact]
     public void Should_update_role_properties()
     {
-        var roles_1 = roles_0.Update(firstRole, properties: new JsonObject().Add("P1", true));
+        var roles_1 = roles_0.Update(firstRole, properties: JsonValue.Object().Add("P1", true));
 
-        roles_1[firstRole].Should().BeEquivalentTo(Role.WithProperties(firstRole, new JsonObject().Add("P1", true)));
+        roles_1[firstRole].Should().BeEquivalentTo(Role.WithProperties(firstRole, JsonValue.Object().Add("P1", true)));
     }
 
     [Fact]

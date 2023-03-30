@@ -144,6 +144,7 @@ public sealed class ConvertData : IContentEnricherStep
             }
 
             converter.Add(new AddSchemaNames(components));
+            converter.Add(new AddDefaultValues(context.App.PartitionResolver(), false));
         }
 
         return converter;

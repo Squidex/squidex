@@ -6,78 +6,18 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.DefaultValues;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.Operations.DefaultValues;
+namespace Squidex.Domain.Apps.Core.Operations.ConvertContent;
 
-public class DefaultValuesTests
+public class DefaultValueFactoryTests
 {
     private readonly Instant now = Instant.FromUtc(2017, 10, 12, 16, 30, 10);
-    private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
     private readonly Language language = Language.DE;
-    private readonly Schema schema;
-
-    public DefaultValuesTests()
-    {
-        schema =
-            new Schema("my-schema")
-                .AddString(1, "myString", Partitioning.Language,
-                    new StringFieldProperties { DefaultValue = "en-string" })
-                .AddNumber(2, "myNumber", Partitioning.Invariant,
-                    new NumberFieldProperties())
-                .AddDateTime(3, "myDatetime", Partitioning.Invariant,
-                    new DateTimeFieldProperties { DefaultValue = now })
-                .AddBoolean(4, "myBoolean", Partitioning.Invariant,
-                    new BooleanFieldProperties { DefaultValue = true });
-    }
-
-    [Fact]
-    public void Should_enrich_with_default_values()
-    {
-        var data =
-            new ContentData()
-                .AddField("myString",
-                    new ContentFieldData()
-                        .AddLocalized("de", "de-string"))
-                .AddField("myNumber",
-                    new ContentFieldData()
-                        .AddInvariant(456));
-
-        data.GenerateDefaultValues(schema, languages.ToResolver());
-
-        Assert.Equal(456, data["myNumber"]!["iv"].AsNumber);
-
-        Assert.Equal("de-string", data["myString"]!["de"].AsString);
-        Assert.Equal("en-string", data["myString"]!["en"].AsString);
-
-        Assert.Equal(now.ToString(), data["myDatetime"]!["iv"].AsString);
-
-        Assert.True(data["myBoolean"]!["iv"].AsBoolean);
-    }
-
-    [Fact]
-    public void Should_not_enrich_with_default_values_if_string_is_empty()
-    {
-        var data =
-            new ContentData()
-                .AddField("myString",
-                    new ContentFieldData()
-                        .AddLocalized("de", string.Empty))
-                .AddField("myNumber",
-                    new ContentFieldData()
-                        .AddInvariant(456));
-
-        data.GenerateDefaultValues(schema, languages.ToResolver());
-
-        Assert.Equal(string.Empty, data["myString"]!["de"].AsString);
-        Assert.Equal("en-string", data["myString"]!["en"].AsString);
-    }
 
     [Fact]
     public void Should_get_default_value_from_assets_field()

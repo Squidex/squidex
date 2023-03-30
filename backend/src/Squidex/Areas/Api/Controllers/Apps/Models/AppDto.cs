@@ -125,7 +125,7 @@ public sealed class AppDto : Resource
         }
         else
         {
-            result.RoleProperties = new JsonObject();
+            result.RoleProperties = JsonValue.Object();
         }
 
         foreach (var (key, value) in resources.Context.UserPrincipal.Claims.GetUIProperties(app.Name))

@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class ResolveLanguages : IContentFieldAfterConverter
+public sealed class ResolveLanguages : IContentFieldConverter
 {
     private readonly LanguagesConfig languages;
     private readonly bool resolveFallback;

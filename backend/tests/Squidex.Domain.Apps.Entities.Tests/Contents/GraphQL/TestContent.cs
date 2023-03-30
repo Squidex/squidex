@@ -236,29 +236,29 @@ public static class TestContent
                 .AddField("my-geolocation",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("latitude", 10)
                                 .Add("longitude", 20)))
                 .AddField("my-component",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add(Component.Discriminator, TestSchemas.Ref1.Id)
                                 .Add("schemaRef1Field", "Component1")))
                 .AddField("my-components",
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add(Component.Discriminator, TestSchemas.Ref1.Id)
                                     .Add("schemaRef1Field", "Component1"),
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add(Component.Discriminator, TestSchemas.Ref2.Id)
                                     .Add("schemaRef2Field", "Component2"))))
                 .AddField("my-json",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("value", 1)))
                 .AddField("my-json2",
                     new ContentFieldData()
@@ -287,10 +287,10 @@ public static class TestContent
                 .AddField("my-array",
                     new ContentFieldData()
                         .AddInvariant(JsonValue.Array(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("nested-number", 42)
                                 .Add("nested-boolean", true),
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("nested-number", 3.14)
                                 .Add("nested-boolean", false))));
 

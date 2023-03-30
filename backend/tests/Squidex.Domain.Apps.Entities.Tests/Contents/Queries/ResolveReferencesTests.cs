@@ -144,13 +144,13 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                 .AddField("ref1",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("en", "ref1_1, 13")
                                 .Add("de", "ref1_1, 13")))
                 .AddField("ref2",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("en", "ref2_1, 23")
                                 .Add("de", "ref2_1, 23"))),
             contents[0].ReferenceData);
@@ -160,13 +160,13 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                 .AddField("ref1",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("en", "ref1_2, 17")
                                 .Add("de", "ref1_2, 17")))
                 .AddField("ref2",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("en", "ref2_2, 29")
                                 .Add("de", "ref2_2, 29"))),
             contents[1].ReferenceData);
@@ -197,13 +197,13 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                 .AddField("ref1",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("en", "ref1_1, 13")
                                 .Add("de", "ref1_1, 13")))
                 .AddField("ref2",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("en", "2 Reference(s)")
                                 .Add("de", "2 Reference(s)"))),
             contents[0].ReferenceData);
@@ -213,13 +213,13 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                 .AddField("ref1",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("en", "ref1_2, 17")
                                 .Add("de", "ref1_2, 17")))
                 .AddField("ref2",
                     new ContentFieldData()
                         .AddInvariant(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("en", "2 Reference(s)")
                                 .Add("de", "2 Reference(s)"))),
             contents[1].ReferenceData);

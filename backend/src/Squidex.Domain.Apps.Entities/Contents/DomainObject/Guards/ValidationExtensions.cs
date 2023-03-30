@@ -7,7 +7,7 @@
 
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.DefaultValues;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
@@ -87,9 +87,15 @@ public static class ValidationExtensions
         operation.AddErrors(validator.Errors).ThrowOnErrors();
     }
 
-    public static void GenerateDefaultValues(this ContentOperation operation, ContentData data)
+    public static ContentData GenerateDefaultValues(this ContentOperation operation, ContentData data)
     {
-        data.GenerateDefaultValues(operation.Schema.SchemaDef, operation.Partition());
+        var converter =
+            new ContentConverter(
+                operation.Components,
+                operation.Schema.SchemaDef);
+        converter.Add(new AddDefaultValues(operation.Partition(), true));
+
+        return converter.Convert(data);
     }
 
     public static async Task CheckReferrersAsync(this ContentOperation operation,

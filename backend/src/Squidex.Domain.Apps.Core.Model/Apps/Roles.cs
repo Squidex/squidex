@@ -25,13 +25,13 @@ public sealed class Roles
             new Role(Role.Owner,
                 new PermissionSet(
                     WithoutPrefix(PermissionIds.App)),
-                new JsonObject()),
+                JsonValue.Object()),
         [Role.Reader] =
             new Role(Role.Reader,
                 new PermissionSet(
                     WithoutPrefix(PermissionIds.AppAssetsRead),
                     WithoutPrefix(PermissionIds.AppContentsRead)),
-                new JsonObject()
+                JsonValue.Object()
                     .Add("ui.api.hide", true)),
         [Role.Editor] =
             new Role(Role.Editor,
@@ -40,7 +40,7 @@ public sealed class Roles
                     WithoutPrefix(PermissionIds.AppContents),
                     WithoutPrefix(PermissionIds.AppRolesRead),
                     WithoutPrefix(PermissionIds.AppWorkflowsRead)),
-                new JsonObject()
+                JsonValue.Object()
                     .Add("ui.api.hide", true)),
         [Role.Developer] =
             new Role(Role.Developer,
@@ -51,7 +51,7 @@ public sealed class Roles
                     WithoutPrefix(PermissionIds.AppRules),
                     WithoutPrefix(PermissionIds.AppSchemas),
                     WithoutPrefix(PermissionIds.AppWorkflows)),
-                new JsonObject())
+                JsonValue.Object())
     };
 
     public static readonly Roles Empty = new Roles(new ReadonlyDictionary<string, Role>());
@@ -105,7 +105,7 @@ public sealed class Roles
             return this;
         }
 
-        var newRole = new Role(name, null, new JsonObject());
+        var newRole = new Role(name, null, JsonValue.Object());
 
         if (!inner.TryAdd(name, newRole, out var updated))
         {

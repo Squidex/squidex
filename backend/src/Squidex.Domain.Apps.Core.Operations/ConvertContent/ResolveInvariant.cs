@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class ResolveInvariant : IContentFieldAfterConverter
+public sealed class ResolveInvariant : IContentFieldConverter
 {
     private readonly LanguagesConfig languages;
 

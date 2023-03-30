@@ -19,7 +19,7 @@ public sealed class ExcludeHidden : IContentFieldConverter, IContentValueConvert
     {
     }
 
-    public ContentFieldData? ConvertField(IRootField field, ContentFieldData source)
+    public ContentFieldData? ConvertFieldBefore(IRootField field, ContentFieldData source)
     {
         return field.IsForApi() ? source : null;
     }
