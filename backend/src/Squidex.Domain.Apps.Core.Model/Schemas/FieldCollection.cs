@@ -99,7 +99,7 @@ public sealed class FieldCollection<T> where T : IField
     {
         Guard.NotNull(ids);
 
-        if (ids.Count != fieldsOrdered.Length || ids.Any(x => !ById.ContainsKey(x)))
+        if (ids.Count != fieldsOrdered.Length || ids.Exists(x => !ById.ContainsKey(x)))
         {
             ThrowHelper.ArgumentException("Ids must cover all fields.", nameof(ids));
         }

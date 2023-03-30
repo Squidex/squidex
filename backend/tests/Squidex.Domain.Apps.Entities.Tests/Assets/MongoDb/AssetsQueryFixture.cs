@@ -7,7 +7,6 @@
 
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
@@ -25,26 +24,29 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb;
 public sealed class AssetsQueryFixture : IAsyncLifetime
 {
     private readonly int numValues = 250;
-    private readonly IMongoClient mongoClient;
-    private readonly IMongoDatabase mongoDatabase;
 
-    public MongoAssetRepository AssetRepository { get; }
-
-    public NamedId<DomainId>[] AppIds { get; } =
+    private readonly NamedId<DomainId>[] appIds =
     {
         NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
         NamedId.Of(DomainId.Create("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1")
     };
 
+    public IMongoDatabase Database { get; }
+
+    public MongoAssetRepository AssetRepository { get; }
+
     public AssetsQueryFixture()
     {
         BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
-        mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongodb:configuration"]);
-        mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
+        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongoDb:configuration"]);
+        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
+
+        Database = mongoDatabase;
 
         var services =
             new ServiceCollection()
+                .AddSingleton<MongoAssetRepository>()
                 .AddSingleton(mongoClient)
                 .AddSingleton(mongoDatabase)
                 .AddLogging()
@@ -53,23 +55,22 @@ public sealed class AssetsQueryFixture : IAsyncLifetime
         AssetRepository = services.GetRequiredService<MongoAssetRepository>();
     }
 
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
     public async Task InitializeAsync()
     {
         await AssetRepository.InitializeAsync(default);
 
         await CreateDataAsync(default);
-        await ClearProfileAsync(default);
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     private async Task CreateDataAsync(
         CancellationToken ct)
     {
-        if (await AssetRepository.StreamAll(AppIds[0].Id, ct).AnyAsync(ct))
+        if (await AssetRepository.StreamAll(appIds[0].Id, ct).AnyAsync(ct))
         {
             return;
         }
@@ -88,16 +89,14 @@ public sealed class AssetsQueryFixture : IAsyncLifetime
                 var store = (ISnapshotStore<AssetDomainObject.State>)AssetRepository;
 
                 await store.WriteManyAsync(batch, ct);
-
                 batch.Clear();
             }
         }
 
-        var now = SystemClock.Instance.GetCurrentInstant();
+        var created = SystemClock.Instance.GetCurrentInstant();
+        var createdBy = RefToken.User("1");
 
-        var user = RefToken.User("1");
-
-        foreach (var appId in AppIds)
+        foreach (var appId in appIds)
         {
             for (var i = 0; i < numValues; i++)
             {
@@ -111,13 +110,13 @@ public sealed class AssetsQueryFixture : IAsyncLifetime
                     {
                         Id = DomainId.NewGuid(),
                         AppId = appId,
-                        Created = now,
-                        CreatedBy = user,
+                        Created = created,
+                        CreatedBy = createdBy,
                         FileHash = fileName,
                         FileName = fileName,
                         FileSize = 1024,
-                        LastModified = now,
-                        LastModifiedBy = user,
+                        LastModified = created,
+                        LastModifiedBy = createdBy,
                         IsDeleted = false,
                         IsProtected = false,
                         Metadata = new AssetMetadata
@@ -139,17 +138,9 @@ public sealed class AssetsQueryFixture : IAsyncLifetime
         await ExecuteBatchAsync(null);
     }
 
-    private async Task ClearProfileAsync(
-        CancellationToken ct)
-    {
-        await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }", cancellationToken: ct);
-        await mongoDatabase.DropCollectionAsync("system.profile", ct);
-        await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 2 }", cancellationToken: ct);
-    }
-
     public DomainId RandomAppId()
     {
-        return AppIds[Random.Shared.Next(AppIds.Length)].Id;
+        return appIds[Random.Shared.Next(appIds.Length)].Id;
     }
 
     public string RandomValue()

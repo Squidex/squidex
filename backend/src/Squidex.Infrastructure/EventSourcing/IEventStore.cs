@@ -14,7 +14,7 @@ public interface IEventStore
     Task<IReadOnlyList<StoredEvent>> QueryReverseAsync(string streamName, int take = int.MaxValue,
         CancellationToken ct = default);
 
-    Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0,
+    Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
         CancellationToken ct = default);
 
     IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, Instant timestamp = default, int take = int.MaxValue,
@@ -50,7 +50,7 @@ public interface IEventStore
 
         foreach (var streamName in streamNames)
         {
-            result[streamName] = await QueryAsync(streamName, 0, ct);
+            result[streamName] = await QueryAsync(streamName, EtagVersion.Empty, ct);
         }
 
         return result;

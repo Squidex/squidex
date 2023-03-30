@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
@@ -16,7 +17,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
 
     public sealed class EventSubscriber : IEventSubscriber<StoredEvent>
     {
-        public List<StoredEvent> Events { get; } = new List<StoredEvent>();
+        public List<StoredEvent> LastEvents { get; } = new List<StoredEvent>();
 
         public string LastPosition { get; set; }
 
@@ -36,9 +37,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
         public ValueTask OnNextAsync(IEventSubscription subscription, StoredEvent @event)
         {
             LastPosition = @event.EventPosition;
-
-            Events.Add(@event);
-
+            LastEvents.Add(@event);
             return default;
         }
     }
@@ -256,33 +255,6 @@ public abstract class EventStoreTests<T> where T : IEventStore
     }
 
     [Fact]
-    public async Task Should_read_events_from_offset()
-    {
-        var streamName = $"test-{Guid.NewGuid()}";
-
-        var commit = new[]
-        {
-            CreateEventData(1),
-            CreateEventData(2)
-        };
-
-        await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit);
-
-        var firstRead = await QueryAsync(streamName);
-
-        var readEvents1 = await QueryAsync(streamName, 1);
-        var readEvents2 = await QueryAllAsync(streamName, firstRead[0].EventPosition);
-
-        var expected = new[]
-        {
-            new StoredEvent(streamName, "Position", 1, commit[1])
-        };
-
-        ShouldBeEquivalentTo(readEvents1, expected);
-        ShouldBeEquivalentTo(readEvents2, expected);
-    }
-
-    [Fact]
     public async Task Should_read_multiple_streams()
     {
         var streamName1 = $"test-{Guid.NewGuid()}";
@@ -322,31 +294,42 @@ public abstract class EventStoreTests<T> where T : IEventStore
     }
 
     [Theory]
+    [InlineData(1, 30)]
     [InlineData(5, 30)]
     [InlineData(5, 300)]
-    public async Task Should_read_latest_events(int commitSize, int count)
+    [InlineData(5, 3000)]
+    public async Task Should_read_events_from_offset(int commits, int count)
     {
         var streamName = $"test-{Guid.NewGuid()}";
 
-        var events = new List<EventData>();
+        var eventsWritten = await AppendEventsAsync(streamName, count, commits);
 
-        for (var i = 0; i < count; i++)
+        var readEvents0 = await QueryAsync(streamName);
+        var readEvents1 = await QueryAsync(streamName, count - 2);
+        var readEvents2 = await QueryAllAsync(streamName, readEvents0[^2].EventPosition);
+
+        var expected = new[]
         {
-            events.Add(CreateEventData(i));
-        }
+            new StoredEvent(streamName, "Position", count - 1, eventsWritten[^1])
+        };
 
-        for (var i = 0; i < events.Count / commitSize; i++)
-        {
-            var commit = events.Skip(i * commitSize).Take(commitSize).ToArray();
+        ShouldBeEquivalentTo(readEvents1, expected);
+        ShouldBeEquivalentTo(readEvents2, expected);
+    }
 
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit);
-        }
+    [Theory]
+    [InlineData(5, 30)]
+    [InlineData(5, 300)]
+    public async Task Should_read_reverse(int commits, int count)
+    {
+        var streamName = $"test-{Guid.NewGuid()}";
 
-        var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
+        var eventsWritten = await AppendEventsAsync(streamName, count, commits);
+        var eventsStored = eventsWritten.Select((x, i) => new StoredEvent(streamName, "Position", i, x)).ToArray();
 
         for (var take = 0; take < count; take += count / 10)
         {
-            var eventsExpected = allExpected.TakeLast(take).ToArray();
+            var eventsExpected = eventsStored.TakeLast(take).ToArray();
             var eventsQueried = await Sut.QueryReverseAsync(streamName, take);
 
             ShouldBeEquivalentTo(eventsQueried, eventsExpected);
@@ -356,32 +339,61 @@ public abstract class EventStoreTests<T> where T : IEventStore
     [Theory]
     [InlineData(5, 30)]
     [InlineData(5, 300)]
-    public async Task Should_read_reverse(int commitSize, int count)
+    [InlineData(5, 3000)]
+    public async Task Should_read_all_reverse_by_name(int commits, int count)
     {
         var streamName = $"test-{Guid.NewGuid()}";
+        var streamFilter = streamName;
 
-        var events = new List<EventData>();
-
-        for (var i = 0; i < count; i++)
-        {
-            events.Add(CreateEventData(i));
-        }
-
-        for (var i = 0; i < events.Count / commitSize; i++)
-        {
-            var commit = events.Skip(i * commitSize).Take(commitSize).ToArray();
-
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit);
-        }
-
-        var allExpected = events.Select((x, i) => new StoredEvent(streamName, "Position", i, events[i])).ToArray();
+        var eventsWritten = await AppendEventsAsync(streamName, count, commits);
+        var eventsStored = eventsWritten.Select((x, i) => new StoredEvent(streamName, "Position", i, x)).ToArray();
 
         for (var take = 0; take < count; take += count / 10)
         {
-            var eventsExpected = allExpected.Reverse().Take(take).ToArray();
+            var eventsExpected = eventsStored.Reverse().Take(take).ToArray();
             var eventsQueried = await Sut.QueryAllReverseAsync(streamName, default, take).ToArrayAsync();
 
             ShouldBeEquivalentTo(eventsQueried, eventsExpected);
+        }
+    }
+
+    [Theory]
+    [InlineData(5, 30)]
+    [InlineData(5, 300)]
+    [InlineData(5, 3000)]
+    public async Task Should_read_all_reverse_by_filter(int commits, int count)
+    {
+        var streamName = $"test-{Guid.NewGuid()}-suffix";
+        var streamFilter = $"^{Regex.Escape(streamName)}";
+
+        var eventsWritten = await AppendEventsAsync(streamName, count, commits);
+        var eventsStored = eventsWritten.Select((x, i) => new StoredEvent(streamName, "Position", i, x)).ToArray();
+
+        for (var take = 0; take < count; take += count / 10)
+        {
+            var eventsExpected = eventsStored.Reverse().Take(take).ToArray();
+            var eventsQueried = await Sut.QueryAllReverseAsync(streamFilter, default, take).ToArrayAsync();
+
+            ShouldBeEquivalentTo(eventsQueried, eventsExpected);
+        }
+    }
+
+    [Theory]
+    [InlineData(5, 30)]
+    [InlineData(5, 300)]
+    [InlineData(5, 3000)]
+    public async Task Should_read_all_reverse(int commits, int count)
+    {
+        var streamName = $"test-{Guid.NewGuid()}-suffix";
+        var streamFilter = ".*";
+
+        await AppendEventsAsync(streamName, count, commits);
+
+        for (var take = 0; take < count; take += count / 10)
+        {
+            var eventsQueried = await Sut.QueryAllReverseAsync(streamFilter, default, take).ToArrayAsync();
+
+            Assert.Equal(take, eventsQueried.Length);
         }
     }
 
@@ -390,13 +402,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
     {
         var streamName = $"test-{Guid.NewGuid()}";
 
-        var events = new[]
-        {
-            CreateEventData(1),
-            CreateEventData(2)
-        };
-
-        await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, events);
+        await AppendEventsAsync(streamName, 2, 1);
 
         IReadOnlyList<StoredEvent>? readEvents = null;
 
@@ -423,13 +429,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
     {
         var streamName = $"test-{Guid.NewGuid()}";
 
-        var events = new[]
-        {
-            CreateEventData(1),
-            CreateEventData(2)
-        };
-
-        await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, events);
+        await AppendEventsAsync(streamName, 2, 1);
 
         IReadOnlyList<StoredEvent>? readEvents = null;
 
@@ -451,9 +451,14 @@ public abstract class EventStoreTests<T> where T : IEventStore
         Assert.Empty(readEvents!);
     }
 
-    private Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long position = EtagVersion.Any)
+    private async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long position = EtagVersion.Any)
     {
-        return Sut.QueryAsync(streamName, position);
+        return await Sut.QueryAsync(streamName, position);
+    }
+
+    private async Task<IReadOnlyList<StoredEvent>?> QueryAllAsync(string? streamFilter = null, string? position = null)
+    {
+        return await Sut.QueryAllAsync(streamFilter, position).ToListAsync();
     }
 
     private static EventData CreateEventData(int i)
@@ -464,18 +469,6 @@ public abstract class EventStoreTests<T> where T : IEventStore
         };
 
         return new EventData($"Type{i}", headers, i.ToString(CultureInfo.InvariantCulture));
-    }
-
-    private async Task<IReadOnlyList<StoredEvent>?> QueryAllAsync(string? streamFilter = null, string? position = null)
-    {
-        var readEvents = new List<StoredEvent>();
-
-        await foreach (var storedEvent in Sut.QueryAllAsync(streamFilter, position))
-        {
-            readEvents.Add(storedEvent);
-        }
-
-        return readEvents;
     }
 
     private async Task<IReadOnlyList<StoredEvent>?> QueryWithSubscriptionAsync(string streamFilter,
@@ -501,11 +494,11 @@ public abstract class EventStoreTests<T> where T : IEventStore
 
                     await Task.Delay(2000, cts.Token);
 
-                    if (subscriber.Events.Count > 0)
+                    if (subscriber.LastEvents.Count > 0)
                     {
                         subscriptionPosition = subscriber.LastPosition;
 
-                        return subscriber.Events;
+                        return subscriber.LastEvents;
                     }
                 }
 
@@ -520,8 +513,27 @@ public abstract class EventStoreTests<T> where T : IEventStore
         }
     }
 
+    private async Task<List<EventData>> AppendEventsAsync(string streamName, int count, int commits = 1)
+    {
+        var events = new List<EventData>();
+
+        for (var i = 0; i < count; i++)
+        {
+            events.Add(CreateEventData(i));
+        }
+
+        for (var i = 0; i < events.Count / commits; i++)
+        {
+            var commit = events.Skip(i * commits).Take(commits).ToArray();
+
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, commit);
+        }
+
+        return events;
+    }
+
     private static void ShouldBeEquivalentTo(IEnumerable<StoredEvent>? actual, params StoredEvent[] expected)
     {
-        actual.Should().BeEquivalentTo(expected, opts => opts.ComparingByMembers<StoredEvent>().Including(x => x.EventStreamNumber));
+        actual.Should().BeEquivalentTo(expected, opts => opts.ComparingByMembers<StoredEvent>().Excluding(x => x.EventPosition));
     }
 }

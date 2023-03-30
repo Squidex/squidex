@@ -7,7 +7,6 @@
 
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 

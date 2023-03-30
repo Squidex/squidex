@@ -34,11 +34,11 @@ public sealed class CommentsResult
                     {
                         var id = deleted.CommentId;
 
-                        if (result.CreatedComments.Any(x => x.Id == id))
+                        if (result.CreatedComments.Exists(x => x.Id == id))
                         {
                             result.CreatedComments.RemoveAll(x => x.Id == id);
                         }
-                        else if (result.UpdatedComments.Any(x => x.Id == id))
+                        else if (result.UpdatedComments.Exists(x => x.Id == id))
                         {
                             result.UpdatedComments.RemoveAll(x => x.Id == id);
                             result.DeletedComments.Add(id);
@@ -75,7 +75,7 @@ public sealed class CommentsResult
                             updated.Text,
                             null);
 
-                        if (result.CreatedComments.Any(x => x.Id == id))
+                        if (result.CreatedComments.Exists(x => x.Id == id))
                         {
                             result.CreatedComments.RemoveAll(x => x.Id == id);
                             result.CreatedComments.Add(comment);

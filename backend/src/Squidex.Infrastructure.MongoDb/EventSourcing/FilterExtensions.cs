@@ -11,6 +11,11 @@ namespace Squidex.Infrastructure.EventSourcing;
 
 internal static class FilterExtensions
 {
+    public static FilterDefinition<MongoEventCommit> ByOffset(long streamPosition)
+    {
+        return Builders<MongoEventCommit>.Filter.Gte(x => x.EventStreamOffset, streamPosition);
+    }
+
     public static FilterDefinition<MongoEventCommit> ByPosition(StreamPosition streamPosition)
     {
         if (streamPosition.IsEndOfCommit)
@@ -27,7 +32,7 @@ internal static class FilterExtensions
     {
         if (StreamFilter.IsAll(streamFilter))
         {
-            return null;
+            return Builders<MongoEventCommit>.Filter.Exists(x => x.EventStream, true);
         }
 
         if (streamFilter.Contains('^', StringComparison.Ordinal))
@@ -57,7 +62,7 @@ internal static class FilterExtensions
         }
     }
 
-    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, StreamPosition lastPosition)
+    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, StreamPosition position)
     {
         var eventStreamOffset = commit.EventStreamOffset;
 
@@ -68,7 +73,7 @@ internal static class FilterExtensions
         {
             eventStreamOffset++;
 
-            if (commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp)
+            if (commitOffset > position.CommitOffset || commitTimestamp > position.Timestamp)
             {
                 var eventData = @event.ToEventData();
                 var eventPosition = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
@@ -80,7 +85,12 @@ internal static class FilterExtensions
         }
     }
 
-    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, long streamPosition = EtagVersion.Empty)
+    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit)
+    {
+        return commit.Filtered(EtagVersion.Empty);
+    }
+
+    public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, long position)
     {
         var eventStreamOffset = commit.EventStreamOffset;
 
@@ -91,7 +101,7 @@ internal static class FilterExtensions
         {
             eventStreamOffset++;
 
-            if (eventStreamOffset >= streamPosition)
+            if (eventStreamOffset > position)
             {
                 var eventData = @event.ToEventData();
                 var eventPosition = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);

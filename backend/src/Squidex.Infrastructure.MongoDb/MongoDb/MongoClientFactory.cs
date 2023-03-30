@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using Squidex.Infrastructure.Json.Objects;
@@ -17,9 +15,6 @@ public static class MongoClientFactory
 {
     public static MongoClient Create(string? connectionString, Action<MongoClientSettings>? configure = null)
     {
-        // Allow all types, independent from the actual assembly.
-        BsonSerializer.TryRegisterSerializer(new ObjectSerializer(type => true));
-
         BsonDefaultConventions.Register();
         BsonDomainIdSerializer.Register();
         BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();

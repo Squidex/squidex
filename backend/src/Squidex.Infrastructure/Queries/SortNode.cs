@@ -7,22 +7,8 @@
 
 namespace Squidex.Infrastructure.Queries;
 
-public sealed class SortNode
+public sealed record SortNode(PropertyPath Path, SortOrder Order)
 {
-    public PropertyPath Path { get; }
-
-    public SortOrder Order { get; set; }
-
-    public SortNode(PropertyPath path, SortOrder order)
-    {
-        Guard.NotNull(path);
-        Guard.Enum(order);
-
-        Path = path;
-
-        Order = order;
-    }
-
     public override string ToString()
     {
         var path = string.Join(".", Path);

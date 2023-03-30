@@ -210,7 +210,7 @@ public sealed class MongoUserStore :
     public async Task<IdentityUser?> FindByLoginAsync(string loginProvider, string providerKey,
         CancellationToken cancellationToken)
     {
-        var result = await Collection.Find(x => x.Logins.Any(y => y.LoginProvider == loginProvider && y.ProviderKey == providerKey)).FirstOrDefaultAsync(cancellationToken);
+        var result = await Collection.Find(x => x.Logins.Exists(y => y.LoginProvider == loginProvider && y.ProviderKey == providerKey)).FirstOrDefaultAsync(cancellationToken);
 
         return result;
     }
@@ -218,7 +218,7 @@ public sealed class MongoUserStore :
     public async Task<IList<IdentityUser>> GetUsersForClaimAsync(Claim claim,
         CancellationToken cancellationToken)
     {
-        var result = await Collection.Find(x => x.Claims.Any(y => y.Type == claim.Type && y.Value == claim.Value)).ToListAsync(cancellationToken);
+        var result = await Collection.Find(x => x.Claims.Exists(y => y.Type == claim.Type && y.Value == claim.Value)).ToListAsync(cancellationToken);
 
         return result.OfType<IdentityUser>().ToList();
     }

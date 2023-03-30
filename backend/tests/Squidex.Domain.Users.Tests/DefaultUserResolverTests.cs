@@ -83,7 +83,7 @@ public class DefaultUserResolverTests
         await sut.SetClaimAsync(id, "my-claim", "my-value", false, ct);
 
         A.CallTo(() => userService.UpdateAsync(id,
-                A<UserValues>.That.Matches(x => x.CustomClaims!.Any(y => y.Type == "my-claim" && y.Value == "my-value")), false, ct))
+                A<UserValues>.That.Matches(x => x.CustomClaims!.Exists(y => y.Type == "my-claim" && y.Value == "my-value")), false, ct))
             .MustHaveHappened();
     }
 
@@ -95,7 +95,7 @@ public class DefaultUserResolverTests
         await sut.SetClaimAsync(id, "my-claim", "my-value", true, ct);
 
         A.CallTo(() => userService.UpdateAsync(id,
-                A<UserValues>.That.Matches(x => x.CustomClaims!.Any(y => y.Type == "my-claim" && y.Value == "my-value")), true, ct))
+                A<UserValues>.That.Matches(x => x.CustomClaims!.Exists(y => y.Type == "my-claim" && y.Value == "my-value")), true, ct))
             .MustHaveHappened();
     }
 

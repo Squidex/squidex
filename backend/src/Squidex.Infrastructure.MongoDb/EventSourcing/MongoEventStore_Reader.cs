@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Infrastructure.MongoDb;
-using EventFilter = MongoDB.Driver.FilterDefinition<Squidex.Infrastructure.EventSourcing.MongoEventCommit>;
 
 #pragma warning disable MA0048 // File name must match type name
 
@@ -59,7 +58,7 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
         }
     }
 
-    public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0,
+    public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
         CancellationToken ct = default)
     {
         Guard.NotNullOrEmpty(streamName);
@@ -69,13 +68,27 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
             var filter =
                 Filter.And(
                     Filter.Eq(x => x.EventStream, streamName),
-                    Filter.Gte(x => x.EventStreamOffset, streamPosition - MaxCommitSize));
+                    Filter.Gte(x => x.EventStreamOffset, afterStreamPosition));
 
             var commits =
-                await Collection.Find(filter).Sort(Sort.Ascending(x => x.Timestamp))
+                await Collection.Find(filter)
                     .ToListAsync(ct);
 
-            var result = commits.SelectMany(x => x.Filtered(streamPosition)).ToList();
+            var result = Convert(commits, afterStreamPosition);
+
+            if ((commits.Count == 0 || commits[0].EventStreamOffset != afterStreamPosition) && afterStreamPosition > EtagVersion.Empty)
+            {
+                filter =
+                    Filter.And(
+                        Filter.Eq(x => x.EventStream, streamName),
+                        Filter.Lt(x => x.EventStreamOffset, afterStreamPosition));
+
+                commits =
+                    await Collection.Find(filter).SortByDescending(x => x.EventStreamOffset).Limit(1)
+                        .ToListAsync(ct);
+
+                result = Convert(commits, afterStreamPosition).Concat(result).ToList();
+            }
 
             return result;
         }
@@ -88,21 +101,13 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
 
         using (Telemetry.Activities.StartActivity("MongoEventStore/QueryManyAsync"))
         {
-            var position = EtagVersion.Empty;
-
-            var filter =
-                Filter.And(
-                    Filter.In(x => x.EventStream, streamNames),
-                    Filter.Gte(x => x.EventStreamOffset, position));
+            var filter = Filter.In(x => x.EventStream, streamNames);
 
             var commits =
-                await Collection.Find(filter).Sort(Sort.Ascending(x => x.Timestamp))
+                await Collection.Find(filter)
                     .ToListAsync(ct);
 
-            var result = commits.GroupBy(x => x.EventStream)
-                .ToDictionary(
-                    x => x.Key,
-                    x => (IReadOnlyList<StoredEvent>)x.SelectMany(y => y.Filtered(position)).ToList());
+            var result = commits.GroupBy(x => x.EventStream).ToDictionary(x => x.Key, Convert);
 
             return result;
         }
@@ -162,11 +167,11 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
 
         var find =
             Collection.Find(filterDefinition)
-                .Limit(take).Sort(Sort.Ascending(x => x.Timestamp).Ascending(x => x.EventStream));
+                .Limit(take);
 
         var taken = 0;
 
-        await foreach (var current in find.ToAsyncEnumerable(ct))
+        await foreach (var current in find.ToAsyncEnumerable(ct).OrderBy(x => x.Timestamp).ThenBy(x => x.EventStream))
         {
             foreach (var @event in current.Filtered(lastPosition))
             {
@@ -182,16 +187,25 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
         }
     }
 
-    private static EventFilter CreateFilter(string? streamFilter, StreamPosition streamPosition)
+    private static IReadOnlyList<StoredEvent> Convert(IEnumerable<MongoEventCommit> commits)
     {
-        var byPosition = FilterExtensions.ByPosition(streamPosition);
-        var byStream = FilterExtensions.ByStream(streamFilter);
+        return commits.OrderBy(x => x.EventStreamOffset).ThenBy(x => x.Timestamp).SelectMany(x => x.Filtered()).ToList();
+    }
 
-        if (byStream != null)
+    private static IReadOnlyList<StoredEvent> Convert(IEnumerable<MongoEventCommit> commits, long streamPosition)
+    {
+        return commits.OrderBy(x => x.EventStreamOffset).ThenBy(x => x.Timestamp).SelectMany(x => x.Filtered(streamPosition)).ToList();
+    }
+
+    private static FilterDefinition<MongoEventCommit> CreateFilter(string? streamFilter, StreamPosition streamPosition)
+    {
+        var filter = FilterExtensions.ByPosition(streamPosition);
+
+        if (streamFilter != null)
         {
-            return Filter.And(byPosition, byStream);
+            return Filter.And(filter, FilterExtensions.ByStream(streamFilter));
         }
 
-        return byPosition;
+        return filter;
     }
 }

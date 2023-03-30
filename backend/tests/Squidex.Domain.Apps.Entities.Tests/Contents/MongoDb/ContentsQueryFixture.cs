@@ -30,27 +30,27 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
 
-public sealed class ContentsQueryFixture : ContentsQueryFixtureBase
+public sealed class ContentsQueryFixture_Default : ContentsQueryFixture
 {
-    public ContentsQueryFixture()
+    public ContentsQueryFixture_Default()
         : base(false)
     {
     }
 }
 
-public sealed class ContentsQueryDedicatedFixture : ContentsQueryFixtureBase
+public sealed class ContentsQueryFixture_Dedicated : ContentsQueryFixture
 {
-    public ContentsQueryDedicatedFixture()
+    public ContentsQueryFixture_Dedicated()
         : base(true)
     {
     }
 }
 
-public abstract class ContentsQueryFixtureBase : IAsyncLifetime
+public abstract class ContentsQueryFixture : IAsyncLifetime
 {
     private readonly int numValues = 10000;
-    private readonly IMongoClient mongoClient;
-    private readonly IMongoDatabase mongoDatabase;
+
+    public IMongoDatabase Database { get; }
 
     public MongoContentRepository ContentRepository { get; }
 
@@ -69,28 +69,26 @@ public abstract class ContentsQueryFixtureBase : IAsyncLifetime
         NamedId.Of(DomainId.Create("741e902c-fdfa-41ad-8e5a-b7cb9d6e3d94"), "my-schema5")
     };
 
-    protected ContentsQueryFixtureBase(bool dedicatedCollections)
+    protected ContentsQueryFixture(bool selfHosting)
     {
         BsonJsonConvention.Register(TestUtils.DefaultOptions());
 
-        mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongodb:configuration"]);
-        mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
+        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongoDb:configuration"]);
+        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
+
+        Database = mongoDatabase;
 
         var services =
             new ServiceCollection()
-                .AddSingleton(Options.Create(new ContentOptions { OptimizeForSelfHosting = dedicatedCollections }))
+                .AddSingleton(Options.Create(new ContentOptions { OptimizeForSelfHosting = selfHosting }))
                 .AddSingleton(CreateAppProvider())
                 .AddSingleton(mongoClient)
                 .AddSingleton(mongoDatabase)
+                .AddSingleton<MongoContentRepository>()
                 .AddLogging()
                 .BuildServiceProvider();
 
         ContentRepository = services.GetRequiredService<MongoContentRepository>();
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
     }
 
     public async Task InitializeAsync()
@@ -98,7 +96,11 @@ public abstract class ContentsQueryFixtureBase : IAsyncLifetime
         await ContentRepository.InitializeAsync(default);
 
         await CreateDataAsync(default);
-        await ClearProfilerAsync(default);
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     private async Task CreateDataAsync(
@@ -128,9 +130,8 @@ public abstract class ContentsQueryFixtureBase : IAsyncLifetime
             }
         }
 
-        var now = SystemClock.Instance.GetCurrentInstant();
-
-        var user = RefToken.User("1");
+        var created = SystemClock.Instance.GetCurrentInstant();
+        var createdBy = RefToken.User("1");
 
         foreach (var appId in AppIds)
         {
@@ -151,12 +152,12 @@ public abstract class ContentsQueryFixtureBase : IAsyncLifetime
                     {
                         Id = DomainId.NewGuid(),
                         AppId = appId,
-                        Created = now,
-                        CreatedBy = user,
+                        Created = created,
+                        CreatedBy = createdBy,
                         CurrentVersion = new ContentVersion(Status.Published, data),
                         IsDeleted = false,
-                        LastModified = now,
-                        LastModifiedBy = user,
+                        LastModified = created,
+                        LastModifiedBy = createdBy,
                         SchemaId = schemaId
                     };
 
@@ -166,26 +167,6 @@ public abstract class ContentsQueryFixtureBase : IAsyncLifetime
         }
 
         await ExecuteBatchAsync(null);
-    }
-
-    private async Task ClearProfilerAsync(
-        CancellationToken ct)
-    {
-        var prefix = mongoDatabase.DatabaseNamespace.DatabaseName;
-
-        foreach (var databaseName in await (await mongoClient.ListDatabaseNamesAsync(ct)).ToListAsync(ct))
-        {
-            if (!databaseName.StartsWith(prefix, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            var database = mongoClient.GetDatabase(databaseName);
-
-            await database.RunCommandAsync<BsonDocument>("{ profile : 0 }", cancellationToken: ct);
-            await database.DropCollectionAsync("system.profile", ct);
-            await database.RunCommandAsync<BsonDocument>("{ profile : 2 }", cancellationToken: ct);
-        }
     }
 
     private static IAppProvider CreateAppProvider()

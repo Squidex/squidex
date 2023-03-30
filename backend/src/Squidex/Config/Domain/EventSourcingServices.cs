@@ -30,7 +30,7 @@ public static class EventSourcingServices
                         var mongoClient = StoreServices.GetMongoClient(mongoConfiguration);
                         var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
-                        return new MongoEventStore(mongoDatabase, c.GetRequiredService<IEventNotifier>());
+                        return new MongoEventStore(mongoDatabase);
                     })
                     .As<IEventStore>();
             },
@@ -60,9 +60,6 @@ public static class EventSourcingServices
 
         services.AddSingletonAs<DefaultEventFormatter>()
             .As<IEventFormatter>();
-
-        services.AddSingletonAs<NoopEventNotifier>()
-            .As<IEventNotifier>();
 
         services.AddSingleton<Func<IEventConsumer, EventConsumerProcessor>>(
             sb => c => ActivatorUtilities.CreateInstance<EventConsumerProcessor>(sb, c));

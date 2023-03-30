@@ -14,8 +14,6 @@ namespace Squidex.Infrastructure.EventSourcing;
 
 public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
 {
-    private readonly IEventNotifier notifier;
-
     public IMongoCollection<BsonDocument> RawCollection
     {
         get => Database.GetCollection<BsonDocument>(CollectionName());
@@ -28,10 +26,9 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
 
     public bool CanUseChangeStreams { get; private set; }
 
-    public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
+    public MongoEventStore(IMongoDatabase database)
         : base(database)
     {
-        this.notifier = notifier;
     }
 
     protected override string CollectionName()
@@ -51,11 +48,8 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
         {
             new CreateIndexModel<MongoEventCommit>(
                 Index
+                    .Ascending(x => x.EventStream)
                     .Ascending(x => x.Timestamp)),
-            new CreateIndexModel<MongoEventCommit>(
-                Index
-                    .Ascending(x => x.Timestamp)
-                    .Ascending(x => x.EventStream)),
             new CreateIndexModel<MongoEventCommit>(
                 Index
                     .Descending(x => x.Timestamp)

@@ -16,7 +16,7 @@ public sealed class BackupState
 
     public void EnsureCanStart()
     {
-        if (Jobs.Any(x => x.Status == JobStatus.Started))
+        if (Jobs.Exists(x => x.Status == JobStatus.Started))
         {
             throw new DomainException(T.Get("backups.alreadyRunning"));
         }
