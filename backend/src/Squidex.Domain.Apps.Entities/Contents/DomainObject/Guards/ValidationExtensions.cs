@@ -93,7 +93,7 @@ public static class ValidationExtensions
             new ContentConverter(
                 operation.Components,
                 operation.Schema.SchemaDef);
-        converter.Add(new AddDefaultValues(operation.Partition(), true));
+        converter.Add(new AddDefaultValues(operation.Partition()) { IgnoreRequiredFields = true });
 
         return converter.Convert(data);
     }

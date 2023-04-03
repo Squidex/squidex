@@ -15,19 +15,16 @@ public sealed class RuleElementPropertyDto
     /// <summary>
     /// The html editor.
     /// </summary>
-    [LocalizedRequired]
     public RuleFieldEditor Editor { get; set; }
 
     /// <summary>
     /// The name of the editor.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>
     /// The label to use.
     /// </summary>
-    [LocalizedRequired]
     public string Display { get; set; }
 
     /// <summary>

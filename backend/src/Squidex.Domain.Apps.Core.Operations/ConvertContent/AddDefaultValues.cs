@@ -8,65 +8,82 @@
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class AddDefaultValues : IContentDataConverter, IContentItemConverter
+public sealed class AddDefaultValues : IContentDataConverter, IContentItemConverter, IContentFieldConverter
 {
     private readonly PartitionResolver partitionResolver;
-    private readonly bool ignoreRequiredFields;
     private readonly IClock clock;
     private Instant now;
 
-    public AddDefaultValues(PartitionResolver partitionResolver, bool ignoreRequiredFields, IClock? clock = null)
+    public bool IgnoreRequiredFields { get; init; }
+
+    public bool IgnoreNonMasterFields { get; init; }
+
+    public AddDefaultValues(PartitionResolver partitionResolver, IClock? clock = null)
     {
         this.partitionResolver = partitionResolver;
-        this.ignoreRequiredFields = ignoreRequiredFields;
+
         this.clock = clock ?? SystemClock.Instance;
     }
 
-    public void ConvertDataAfter(Schema schema, ContentData data)
+    public void ConvertDataBefore(Schema schema, ContentData data)
     {
         foreach (var field in schema.Fields)
         {
-            var fieldData = data.GetOrCreate(field.Name, _ => new ContentFieldData()) ?? new ContentFieldData();
-
-            var partitioning = partitionResolver(field.Partitioning);
-
-            foreach (var partitionKey in partitioning.AllKeys)
+            if (data.TryGetValue(field.Name, out var fieldData) && fieldData != null)
             {
-                Enrich(field, fieldData, partitionKey);
+                continue;
             }
 
-            if (fieldData.Count > 0)
+            if ((field.RawProperties.IsRequired && IgnoreRequiredFields) || !DefaultValueChecker.HasDefaultValue(field))
             {
-                data[field.Name] = fieldData;
+                continue;
             }
+
+            data[field.Name] = new ContentFieldData();
         }
     }
 
-    public JsonObject ConvertItemBefore(IField parentField, JsonObject item, IEnumerable<IField> schema)
+    public ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
+    {
+        var partitioning = partitionResolver(field.Partitioning);
+
+        foreach (var partitionKey in partitioning.AllKeys)
+        {
+            if (!partitioning.IsMaster(partitionKey) && IgnoreNonMasterFields)
+            {
+                continue;
+            }
+
+            Enrich(field, source, partitionKey);
+        }
+
+        return source;
+    }
+
+    public JsonObject ConvertItemBefore(IField parentField, JsonObject source, IEnumerable<IField> schema)
     {
         foreach (var field in schema)
         {
-            Enrich(field, item, field.Name);
+            Enrich(field, source, field.Name);
         }
 
-        return item;
+        return source;
     }
 
     private void Enrich(IField field, Dictionary<string, JsonValue> fieldData, string key)
     {
-        if (fieldData.TryGetValue(key, out _))
+        if (fieldData.TryGetValue(key, out _) || (field.RawProperties.IsRequired && IgnoreRequiredFields))
         {
             return;
         }
 
         var defaultValue = DefaultValueFactory.CreateDefaultValue(field, GetNow(), key);
 
-        if ((field.RawProperties.IsRequired && ignoreRequiredFields) || defaultValue == default)
+        if (defaultValue == default)
         {
             return;
         }

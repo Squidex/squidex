@@ -10,9 +10,11 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models;
 
+[OpenApiRequest]
 public class BulkUpdateContentsJobDto
 {
     /// <summary>

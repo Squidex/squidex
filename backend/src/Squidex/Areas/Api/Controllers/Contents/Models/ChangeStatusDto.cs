@@ -11,9 +11,11 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models;
 
+[OpenApiRequest]
 public sealed class ChangeStatusDto
 {
     /// <summary>

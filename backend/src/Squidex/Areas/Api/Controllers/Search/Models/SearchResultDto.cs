@@ -17,13 +17,11 @@ public class SearchResultDto : Resource
     /// <summary>
     /// The name of the search result.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>
     /// The type of the search result.
     /// </summary>
-    [LocalizedRequired]
     public SearchResultType Type { get; set; }
 
     /// <summary>

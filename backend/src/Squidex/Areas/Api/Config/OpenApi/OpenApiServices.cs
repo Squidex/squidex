@@ -86,6 +86,16 @@ public static class OpenApiServices
 
     private static void ConfigureSchemaSettings(JsonSchemaGeneratorSettings settings, TypeRegistry typeRegistry, bool flatten)
     {
+        settings.AllowReferencesWithProperties = true;
+        settings.DefaultDictionaryValueReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
+        settings.DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
+        settings.FlattenInheritanceHierarchy = flatten;
+        settings.ReflectionService = new ReflectionServices();
+        settings.SchemaNameGenerator = new SchemaNameGenerator();
+        settings.SchemaProcessors.Add(new DiscriminatorProcessor(typeRegistry));
+        settings.SchemaProcessors.Add(new RequiredSchemaProcessor());
+        settings.SchemaType = NJsonSchema.SchemaType.OpenApi3;
+
         settings.TypeMappers = new List<ITypeMapper>
         {
             CreateAnyMap<FilterNode<JsonValue>>(),
@@ -106,14 +116,6 @@ public static class OpenApiServices
             CreateStringMap<RefToken>(),
             CreateStringMap<Status>(),
         };
-
-        settings.AllowReferencesWithProperties = true;
-        settings.DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
-        settings.FlattenInheritanceHierarchy = flatten;
-        settings.SchemaNameGenerator = new SchemaNameGenerator();
-        settings.SchemaProcessors.Add(new DiscriminatorProcessor(typeRegistry));
-        settings.SchemaType = NJsonSchema.SchemaType.OpenApi3;
-        settings.ReflectionService = new ReflectionServices();
     }
 
     private static ITypeMapper CreateObjectMap<T>()

@@ -15,13 +15,11 @@ public sealed class StatusInfoDto
     /// <summary>
     /// The name of the status.
     /// </summary>
-    [LocalizedRequired]
     public Status Status { get; set; }
 
     /// <summary>
     /// The color of the status.
     /// </summary>
-    [LocalizedRequired]
     public string Color { get; set; }
 
     public static StatusInfoDto FromDomain(StatusInfo statusInfo)

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
@@ -16,7 +15,6 @@ public sealed class RolesDto : Resource
     /// <summary>
     /// The roles.
     /// </summary>
-    [LocalizedRequired]
     public RoleDto[] Items { get; set; }
 
     public static RolesDto FromDomain(IAppEntity app, Resources resources)

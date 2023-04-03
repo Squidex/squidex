@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models;
@@ -16,7 +15,6 @@ public sealed class BackupJobsDto : Resource
     /// <summary>
     /// The backups.
     /// </summary>
-    [LocalizedRequired]
     public BackupJobDto[] Items { get; set; }
 
     public static BackupJobsDto FromDomain(IEnumerable<IBackupJob> backups, Resources resources)

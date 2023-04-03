@@ -9,21 +9,24 @@ using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
 
+[OpenApiRequest]
 public sealed class UpdateAppSettingsDto
 {
     /// <summary>
     /// The configured app patterns.
     /// </summary>
-    [Required]
+    [LocalizedRequired]
     public PatternDto[] Patterns { get; set; }
 
     /// <summary>
     /// The configured UI editors.
     /// </summary>
-    [Required]
+    [LocalizedRequired]
     public EditorDto[] Editors { get; set; }
 
     /// <summary>

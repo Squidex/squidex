@@ -18,19 +18,16 @@ public sealed class HistoryEventDto
     /// <summary>
     /// The message for the event.
     /// </summary>
-    [LocalizedRequired]
     public string Message { get; set; }
 
     /// <summary>
     /// The type of the original event.
     /// </summary>
-    [LocalizedRequired]
     public string EventType { get; set; }
 
     /// <summary>
     /// The user who called the action.
     /// </summary>
-    [LocalizedRequired]
     public string Actor { get; set; }
 
     /// <summary>

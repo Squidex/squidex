@@ -9,9 +9,11 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models;
 
+[OpenApiRequest]
 public sealed class ImportContentsDto
 {
     /// <summary>

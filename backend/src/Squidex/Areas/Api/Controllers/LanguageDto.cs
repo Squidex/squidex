@@ -16,19 +16,16 @@ public sealed class LanguageDto
     /// <summary>
     /// The iso code of the language.
     /// </summary>
-    [LocalizedRequired]
     public string Iso2Code { get; set; }
 
     /// <summary>
     /// The english name of the language.
     /// </summary>
-    [LocalizedRequired]
     public string EnglishName { get; set; }
 
     /// <summary>
     /// The native name of the language.
     /// </summary>
-    [LocalizedRequired]
     public string NativeName { get; set; }
 
     public static LanguageDto FromDomain(Language language)

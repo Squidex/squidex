@@ -8,9 +8,11 @@
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Teams.Models;
 
+[OpenApiRequest]
 public sealed class UpdateTeamDto
 {
     /// <summary>

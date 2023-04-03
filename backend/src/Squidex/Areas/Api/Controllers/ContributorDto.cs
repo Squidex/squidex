@@ -20,19 +20,16 @@ public sealed class ContributorDto : Resource
     /// <summary>
     /// The ID of the user that contributes to the app.
     /// </summary>
-    [LocalizedRequired]
     public string ContributorId { get; set; }
 
     /// <summary>
     /// The display name.
     /// </summary>
-    [LocalizedRequired]
     public string ContributorName { get; set; }
 
     /// <summary>
     /// The email address.
     /// </summary>
-    [LocalizedRequired]
     public string ContributorEmail { get; set; }
 
     /// <summary>

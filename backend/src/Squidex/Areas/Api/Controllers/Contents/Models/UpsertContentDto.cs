@@ -10,10 +10,12 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Web;
 using StatusType = Squidex.Domain.Apps.Core.Contents.Status;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models;
 
+[OpenApiRequest]
 public class UpsertContentDto
 {
     /// <summary>

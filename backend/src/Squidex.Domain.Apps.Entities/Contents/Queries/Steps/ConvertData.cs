@@ -126,13 +126,20 @@ public sealed class ConvertData : IContentEnricherStep
             converter.Add(cleanReferences);
         }
 
-        converter.Add(new ResolveInvariant(context.App.Languages));
+        converter.Add(new ResolveFromPreviousPartitioning(context.App.Languages));
+
+        if (!context.IsFrontendClient)
+        {
+            converter.Add(new AddDefaultValues(context.App.PartitionResolver()) { IgnoreNonMasterFields = true });
+        }
 
         converter.Add(
-            new ResolveLanguages(context.App.Languages,
-                context.IsFrontendClient == false &&
-                context.ShouldResolveLanguages(),
-                context.Languages().ToArray()));
+            new ResolveLanguages(
+                context.App.Languages,
+                context.Languages().ToArray())
+            {
+                ResolveFallback = !context.IsFrontendClient && context.ShouldResolveLanguages()
+            });
 
         if (!context.IsFrontendClient)
         {
@@ -144,7 +151,6 @@ public sealed class ConvertData : IContentEnricherStep
             }
 
             converter.Add(new AddSchemaNames(components));
-            converter.Add(new AddDefaultValues(context.App.PartitionResolver(), false));
         }
 
         return converter;

@@ -18,7 +18,6 @@ public sealed class RulesDto : Resource
     /// <summary>
     /// The rules.
     /// </summary>
-    [LocalizedRequired]
     public RuleDto[] Items { get; set; }
 
     /// <summary>

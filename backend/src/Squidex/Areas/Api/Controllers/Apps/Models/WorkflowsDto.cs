@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
@@ -17,13 +16,11 @@ public sealed class WorkflowsDto : Resource
     /// <summary>
     /// The workflow.
     /// </summary>
-    [LocalizedRequired]
     public WorkflowDto[] Items { get; set; }
 
     /// <summary>
     /// The errros that should be fixed.
     /// </summary>
-    [LocalizedRequired]
     public string[] Errors { get; set; }
 
     public static async Task<WorkflowsDto> FromAppAsync(IWorkflowsValidator workflowsValidator, IAppEntity app, Resources resources)

@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers;
 
+[OpenApiRequest]
 public sealed class RenameTagDto
 {
     /// <summary>

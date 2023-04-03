@@ -17,19 +17,16 @@ public sealed class TemplateDto : Resource
     /// <summary>
     /// The name of the template.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>
     /// The title of the template.
     /// </summary>
-    [LocalizedRequired]
     public string Title { get; set; }
 
     /// <summary>
     /// The description of the template.
     /// </summary>
-    [LocalizedRequired]
     public string Description { get; set; }
 
     /// <summary>

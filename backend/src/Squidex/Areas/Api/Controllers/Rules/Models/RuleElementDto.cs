@@ -16,13 +16,11 @@ public sealed class RuleElementDto
     /// <summary>
     /// Describes the action or trigger type.
     /// </summary>
-    [LocalizedRequired]
     public string Description { get; set; }
 
     /// <summary>
     /// The label for the action or trigger type.
     /// </summary>
-    [LocalizedRequired]
     public string Display { get; set; }
 
     /// <summary>
@@ -48,7 +46,6 @@ public sealed class RuleElementDto
     /// <summary>
     /// The properties.
     /// </summary>
-    [LocalizedRequired]
     public RuleElementPropertyDto[] Properties { get; set; }
 
     public static RuleElementDto FromDomain(RuleActionDefinition definition)

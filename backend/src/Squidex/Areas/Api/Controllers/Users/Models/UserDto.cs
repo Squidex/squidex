@@ -18,31 +18,26 @@ public sealed class UserDto : Resource
     /// <summary>
     /// The ID of the user.
     /// </summary>
-    [LocalizedRequired]
     public string Id { get; set; }
 
     /// <summary>
     /// The email of the user. Unique value.
     /// </summary>
-    [LocalizedRequired]
     public string Email { get; set; }
 
     /// <summary>
     /// The display name (usually first name and last name) of the user.
     /// </summary>
-    [LocalizedRequired]
     public string DisplayName { get; set; }
 
     /// <summary>
     /// Determines if the user is locked.
     /// </summary>
-    [LocalizedRequired]
     public bool IsLocked { get; set; }
 
     /// <summary>
     /// Additional permissions for the user.
     /// </summary>
-    [LocalizedRequired]
     public IEnumerable<string> Permissions { get; set; }
 
     public static UserDto FromDomain(IUser user, Resources resources)

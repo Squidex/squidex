@@ -11,22 +11,47 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class ResolveInvariant : IContentFieldConverter
+public sealed class ResolveFromPreviousPartitioning : IContentFieldConverter
 {
     private readonly LanguagesConfig languages;
 
-    public ResolveInvariant(LanguagesConfig languages)
+    public ResolveFromPreviousPartitioning(LanguagesConfig languages)
     {
         this.languages = languages;
     }
 
     public ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
     {
-        if (!field.Partitioning.Equals(Partitioning.Invariant))
+        if (field.Partitioning.Equals(Partitioning.Invariant))
+        {
+            return ResolveInvariant(source);
+        }
+        else
+        {
+            return ResolveLocalized(source);
+        }
+    }
+
+    private ContentFieldData ResolveLocalized(ContentFieldData source)
+    {
+        if (source.TryGetNonNull(languages.Master, out _))
         {
             return source;
         }
 
+        if (source.TryGetNonNull(InvariantPartitioning.Key, out var value))
+        {
+            source = new ContentFieldData
+            {
+                [languages.Master] = value
+            };
+        }
+
+        return source;
+    }
+
+    private ContentFieldData ResolveInvariant(ContentFieldData source)
+    {
         if (source.TryGetNonNull(InvariantPartitioning.Key, out _))
         {
             return source;

@@ -64,20 +64,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(DomainId appId, DomainId parentId,
-        CancellationToken ct = default)
-    {
-        using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/QueryAssetFoldersAsync"))
-        {
-            activity?.SetTag("folderId", parentId);
-
-            var assetFolders = await QueryFoldersCoreAsync(appId, parentId, ct);
-
-            return assetFolders;
-        }
-    }
-
-    public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId,
+    public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId? parentId,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/QueryAssetFoldersAsync"))
@@ -243,7 +230,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IResultList<IAssetFolderEntity>> QueryFoldersCoreAsync(Context context, DomainId parentId,
+    private async Task<IResultList<IAssetFolderEntity>> QueryFoldersCoreAsync(Context context, DomainId? parentId,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -252,18 +239,6 @@ public sealed class AssetQueryService : IAssetQueryService
             combined.CancelAfter(options.TimeoutQuery);
 
             return await assetFolderRepository.QueryAsync(context.App.Id, parentId, combined.Token);
-        }
-    }
-
-    private async Task<IResultList<IAssetFolderEntity>> QueryFoldersCoreAsync(DomainId appId, DomainId parentId,
-        CancellationToken ct)
-    {
-        using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
-        {
-            // Enforce a hard timeout
-            combined.CancelAfter(options.TimeoutQuery);
-
-            return await assetFolderRepository.QueryAsync(appId, parentId, combined.Token);
         }
     }
 

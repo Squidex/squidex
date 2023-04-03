@@ -28,7 +28,6 @@ public sealed class AssetFolderDto : Resource
     /// <summary>
     /// The folder name.
     /// </summary>
-    [LocalizedRequired]
     public string FolderName { get; set; }
 
     /// <summary>

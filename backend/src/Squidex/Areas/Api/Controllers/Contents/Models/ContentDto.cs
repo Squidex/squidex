@@ -27,19 +27,16 @@ public sealed class ContentDto : Resource
     /// <summary>
     /// The user that has created the content item.
     /// </summary>
-    [LocalizedRequired]
     public RefToken CreatedBy { get; set; }
 
     /// <summary>
     /// The user that has updated the content item.
     /// </summary>
-    [LocalizedRequired]
     public RefToken LastModifiedBy { get; set; }
 
     /// <summary>
     /// The data of the content item.
     /// </summary>
-    [LocalizedRequired]
     public object Data { get; set; }
 
     /// <summary>

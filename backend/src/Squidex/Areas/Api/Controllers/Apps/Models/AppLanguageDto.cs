@@ -18,19 +18,16 @@ public sealed class AppLanguageDto : Resource
     /// <summary>
     /// The iso code of the language.
     /// </summary>
-    [LocalizedRequired]
     public string Iso2Code { get; set; }
 
     /// <summary>
     /// The english name of the language.
     /// </summary>
-    [LocalizedRequired]
     public string EnglishName { get; set; }
 
     /// <summary>
     /// The fallback languages.
     /// </summary>
-    [LocalizedRequired]
     public Language[] Fallback { get; set; }
 
     /// <summary>

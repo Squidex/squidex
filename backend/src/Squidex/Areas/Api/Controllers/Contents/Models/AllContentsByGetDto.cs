@@ -11,9 +11,11 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models;
 
+[OpenApiRequest]
 public sealed class AllContentsByGetDto
 {
     /// <summary>

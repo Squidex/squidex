@@ -56,7 +56,6 @@ public sealed class CallsUsageDtoDto
     /// <summary>
     /// The statistics by date and group.
     /// </summary>
-    [LocalizedRequired]
     public Dictionary<string, CallsUsagePerDateDto[]> Details { get; set; }
 
     public static CallsUsageDtoDto FromDomain(Plan plan, ApiStatsSummary summary, Dictionary<string, List<ApiStats>> details)

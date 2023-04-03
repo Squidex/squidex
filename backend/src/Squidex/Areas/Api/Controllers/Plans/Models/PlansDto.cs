@@ -15,7 +15,6 @@ public sealed class PlansDto
     /// <summary>
     /// The available plans.
     /// </summary>
-    [LocalizedRequired]
     public PlanDto[] Plans { get; set; }
 
     /// <summary>

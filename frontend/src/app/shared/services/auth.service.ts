@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Log, User, UserManager } from 'oidc-client-ts';
+import { Log, User, UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { Observable, ReplaySubject } from 'rxjs';
 import { ApiUrlConfig } from '@app/framework';
 
@@ -103,6 +103,7 @@ export class AuthService {
              silent_redirect_uri: apiUrl.buildUrl('client-callback-silent.html'),
               popup_redirect_uri: apiUrl.buildUrl('client-callback-popup.html'),
                        authority: apiUrl.buildUrl('identity-server/'),
+                      userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
         });
 
         this.userManager.events.addUserLoaded(user => {

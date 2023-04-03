@@ -6,10 +6,12 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 using Roles = Squidex.Domain.Apps.Core.Apps.Role;
 
 namespace Squidex.Areas.Api.Controllers;
 
+[OpenApiRequest]
 public sealed class AssignContributorDto
 {
     /// <summary>

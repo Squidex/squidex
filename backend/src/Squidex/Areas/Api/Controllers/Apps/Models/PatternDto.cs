@@ -16,13 +16,11 @@ public sealed class PatternDto
     /// <summary>
     /// The name of the suggestion.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>
     /// The regex pattern.
     /// </summary>
-    [LocalizedRequired]
     public string Regex { get; set; }
 
     /// <summary>

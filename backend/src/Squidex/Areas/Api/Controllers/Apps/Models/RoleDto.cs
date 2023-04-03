@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
@@ -18,7 +17,6 @@ public sealed class RoleDto : Resource
     /// <summary>
     /// The role name.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>
@@ -39,13 +37,11 @@ public sealed class RoleDto : Resource
     /// <summary>
     /// Associated list of permissions.
     /// </summary>
-    [LocalizedRequired]
     public string[] Permissions { get; set; }
 
     /// <summary>
     /// Associated list of UI properties.
     /// </summary>
-    [LocalizedRequired]
     public JsonObject Properties { get; set; }
 
     public static RoleDto FromDomain(Role role, IAppEntity app)

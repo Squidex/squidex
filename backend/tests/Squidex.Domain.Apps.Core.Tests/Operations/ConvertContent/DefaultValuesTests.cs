@@ -57,7 +57,7 @@ public class DefaultValuesTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new AddDefaultValues(languages.ToResolver(), false))
+                .Add(new AddDefaultValues(languages.ToResolver()))
                 .Convert(source);
 
         var expected =
@@ -86,13 +86,10 @@ public class DefaultValuesTests
     }
 
     [Fact]
-    public void Should_skip_required_fields_if_configured_like_that()
+    public void Should_enrich_with_default_values_and_ignore_required_fields()
     {
         var source =
             new ContentData()
-                .AddField("myString",
-                    new ContentFieldData()
-                        .AddLocalized("de", "de-string"))
                 .AddField("myNumber",
                     new ContentFieldData()
                         .AddInvariant(456))
@@ -104,20 +101,60 @@ public class DefaultValuesTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new AddDefaultValues(languages.ToResolver(), true))
+                .Add(new AddDefaultValues(languages.ToResolver()) { IgnoreRequiredFields = true })
                 .Convert(source);
 
         var expected =
             new ContentData()
-                .AddField("myString",
-                    new ContentFieldData()
-                        .AddLocalized("de", "de-string"))
                 .AddField("myNumber",
                     new ContentFieldData()
                         .AddInvariant(456))
                 .AddField("myDatetime",
                     new ContentFieldData()
                         .AddInvariant(now.ToString()))
+                .AddField("myArray",
+                    new ContentFieldData()
+                        .AddInvariant(
+                            JsonValue.Array(
+                                JsonValue.Object()
+                                    .Add("myArrayString", "array-string"))));
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Should_enrich_with_default_values_and_ignore_non_master_fields()
+    {
+        var source =
+            new ContentData()
+                .AddField("myNumber",
+                    new ContentFieldData()
+                        .AddInvariant(456))
+                .AddField("myArray",
+                    new ContentFieldData()
+                        .AddInvariant(
+                            JsonValue.Array(
+                                JsonValue.Object())));
+
+        var actual =
+            new ContentConverter(ResolvedComponents.Empty, schema)
+                .Add(new AddDefaultValues(languages.ToResolver()) { IgnoreNonMasterFields = true })
+                .Convert(source);
+
+        var expected =
+            new ContentData()
+                .AddField("myString",
+                    new ContentFieldData()
+                        .AddLocalized("en", "en-string"))
+                .AddField("myNumber",
+                    new ContentFieldData()
+                        .AddInvariant(456))
+                .AddField("myDatetime",
+                    new ContentFieldData()
+                        .AddInvariant(now.ToString()))
+                .AddField("myBoolean",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.True))
                 .AddField("myArray",
                     new ContentFieldData()
                         .AddInvariant(
@@ -142,7 +179,7 @@ public class DefaultValuesTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new AddDefaultValues(languages.ToResolver(), false))
+                .Add(new AddDefaultValues(languages.ToResolver()))
                 .Convert(source);
 
         var expected =

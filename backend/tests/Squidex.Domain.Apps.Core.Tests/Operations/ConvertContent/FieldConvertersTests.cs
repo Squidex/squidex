@@ -212,7 +212,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveLanguages(languages, true, new[] { Language.DE }))
+                .Add(new ResolveLanguages(languages, new[] { Language.DE }) { ResolveFallback = true })
                 .Convert(source);
 
         var expected =
@@ -248,7 +248,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveLanguages(languages, false))
+                .Add(new ResolveFromPreviousPartitioning(languages))
                 .Convert(source);
 
         var expected =
@@ -284,7 +284,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveLanguages(languages, false, Language.DE))
+                .Add(new ResolveLanguages(languages, Language.DE) { ResolveFallback = true })
                 .Convert(source);
 
         var expected =
@@ -352,7 +352,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveLanguages(languages, true, Language.DE))
+                .Add(new ResolveLanguages(languages, Language.DE) { ResolveFallback = true })
                 .Convert(source);
 
         var expected =
@@ -413,7 +413,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveInvariant(languages))
+                .Add(new ResolveFromPreviousPartitioning(languages))
                 .Convert(source);
 
         var expected =
@@ -449,7 +449,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveInvariant(languages))
+                .Add(new ResolveFromPreviousPartitioning(languages))
                 .Convert(source);
 
         var expected =
@@ -515,7 +515,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveLanguages(config))
+                .Add(new ResolveLanguages(config) { ResolveFallback = true })
                 .Convert(source);
 
         var expected =
@@ -548,7 +548,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveLanguages(languages, true, Language.IT))
+                .Add(new ResolveLanguages(languages, Language.IT) { ResolveFallback = true })
                 .Convert(source);
 
         var expected =
@@ -582,7 +582,7 @@ public class FieldConvertersTests
         var source = new ContentFieldData();
 
         var actual =
-            new ResolveLanguages(languages, true, Array.Empty<Language>())
+            new ResolveLanguages(languages, Array.Empty<Language>()) { ResolveFallback = true }
                 .ConvertFieldAfter(field, source);
 
         Assert.Same(source, actual);
@@ -602,7 +602,6 @@ public class FieldConvertersTests
         Assert.Same(source, actual);
     }
 
-    /*
     [Fact]
     public void Should_add_schema_name_to_component()
     {
@@ -616,22 +615,18 @@ public class FieldConvertersTests
         });
 
         var source =
-            new ContentFieldData()
-                .AddInvariant(
-                    JsonValue.Object()
-                        .Add(Component.Discriminator, componentId));
+            JsonValue.Object()
+                .Add(Component.Discriminator, componentId);
 
         var expected =
-            new ContentFieldData()
-                .AddInvariant(
-                    JsonValue.Object()
-                        .Add(Component.Discriminator, componentId)
-                        .Add("schemaName", component.Name));
+            JsonValue.Object()
+                .Add(Component.Discriminator, componentId)
+                .Add("schemaName", component.Name);
 
-        var actual = FieldConverters.AddSchemaName(components)(data, field);
-
-        var expected = new ContentFieldData();
+        var actual =
+            new AddSchemaNames(components)
+                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
 
         Assert.Equal(expected, actual);
-    }*/
+    }
 }

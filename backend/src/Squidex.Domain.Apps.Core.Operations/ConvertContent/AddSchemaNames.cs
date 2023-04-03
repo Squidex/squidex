@@ -21,30 +21,30 @@ public sealed class AddSchemaNames : IContentItemConverter
         this.components = components;
     }
 
-    public JsonObject ConvertItemBefore(IField parentField, JsonObject item, IEnumerable<IField> schema)
+    public JsonObject ConvertItemBefore(IField parentField, JsonObject source, IEnumerable<IField> schema)
     {
         if (parentField is IArrayField)
         {
-            return item;
+            return source;
         }
 
-        if (item.ContainsKey("schemaName"))
+        if (source.ContainsKey("schemaName"))
         {
-            return item;
+            return source;
         }
 
-        if (!Component.IsValid(item, out var discriminator))
+        if (!Component.IsValid(source, out var discriminator))
         {
-            return item;
+            return source;
         }
 
         var id = DomainId.Create(discriminator);
 
         if (components.TryGetValue(id, out var component))
         {
-            item["schemaName"] = component.Name;
+            source["schemaName"] = component.Name;
         }
 
-        return item;
+        return source;
     }
 }

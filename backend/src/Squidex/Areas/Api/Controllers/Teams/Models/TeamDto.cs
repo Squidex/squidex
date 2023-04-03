@@ -28,7 +28,6 @@ public sealed class TeamDto : Resource
     /// <summary>
     /// The name of the team.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>

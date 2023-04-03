@@ -22,7 +22,6 @@ public sealed class ContributorsDto : Resource
     /// <summary>
     /// The contributors.
     /// </summary>
-    [LocalizedRequired]
     public ContributorDto[] Items { get; set; }
 
     /// <summary>

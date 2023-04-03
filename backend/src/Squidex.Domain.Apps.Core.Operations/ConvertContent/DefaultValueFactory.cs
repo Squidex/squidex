@@ -30,9 +30,7 @@ public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, Def
         Guard.NotNull(field);
         Guard.NotNull(partition);
 
-        var x = field.RawProperties.Accept(Instance, new Args(now, partition));
-
-        return x;
+        return field.RawProperties.Accept(Instance, new Args(now, partition));
     }
 
     public JsonValue Visit(ArrayFieldProperties properties, Args args)

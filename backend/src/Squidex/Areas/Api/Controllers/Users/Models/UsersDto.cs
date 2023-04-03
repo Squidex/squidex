@@ -21,7 +21,6 @@ public sealed class UsersDto : Resource
     /// <summary>
     /// The users.
     /// </summary>
-    [LocalizedRequired]
     public UserDto[] Items { get; set; }
 
     public static UsersDto FromDomain(IEnumerable<IUser> items, long total, Resources resources)

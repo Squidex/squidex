@@ -14,6 +14,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
 
+[OpenApiRequest]
 public sealed class WorkflowDto : Resource
 {
     /// <summary>
@@ -29,7 +30,6 @@ public sealed class WorkflowDto : Resource
     /// <summary>
     /// The workflow steps.
     /// </summary>
-    [LocalizedRequired]
     public Dictionary<Status, WorkflowStepDto> Steps { get; set; }
 
     /// <summary>
