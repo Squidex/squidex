@@ -48,7 +48,7 @@ internal sealed class EmbeddableStringGraphType : ObjectGraphType<string>
 
         if (contentType == null)
         {
-            var union = builder.GetReferenceUnion(fieldInfo, schemaIds);
+            var union = builder.GetContentUnion(fieldInfo.UnionReferenceType, schemaIds);
 
             if (!union.HasType)
             {

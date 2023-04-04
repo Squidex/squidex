@@ -17,6 +17,7 @@ internal sealed class ApplicationQueries : ObjectGraphType
         AddField(SharedTypes.FindAsset);
         AddField(SharedTypes.QueryAssets);
         AddField(SharedTypes.QueryAssetsWithTotal);
+        AddContentQuery(builder);
 
         foreach (var schemaInfo in schemaInfos)
         {
@@ -44,6 +45,18 @@ internal sealed class ApplicationQueries : ObjectGraphType
             Resolver = ContentActions.Find.Resolver,
             Description = $"Find an {schemaInfo.DisplayName} content by id."
         }).WithSchemaId(schemaInfo);
+    }
+
+    private void AddContentQuery(Builder builder)
+    {
+        AddField(new FieldType
+        {
+            Name = "queryContents",
+            Arguments = ContentActions.QueryByIds.Arguments,
+            ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(builder.GetContentUnion("AllContents", null)))),
+            Resolver = ContentActions.QueryByIds.Resolver,
+            Description = "Query content items by IDs across schemeas."
+        });
     }
 
     private void AddContentQueries(Builder builder, SchemaInfo schemaInfo, IGraphType contentType)

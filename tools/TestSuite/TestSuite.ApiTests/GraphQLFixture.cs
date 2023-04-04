@@ -14,6 +14,21 @@ namespace TestSuite.ApiTests;
 
 public sealed class GraphQLFixture : ContentFixture
 {
+    public IContentsClient<DynamicEntity, object> Cities
+    {
+        get => Client.Contents<DynamicEntity, object>("cities");
+    }
+
+    public IContentsClient<DynamicEntity, object> Countries
+    {
+        get => Client.Contents<DynamicEntity, object>("countries");
+    }
+
+    public IContentsClient<DynamicEntity, object> States
+    {
+        get => Client.Contents<DynamicEntity, object>("states");
+    }
+
     public sealed class DynamicEntity : Content<object>
     {
     }
@@ -121,17 +136,16 @@ public sealed class GraphQLFixture : ContentFixture
 
     private async Task CreateContentsAsync()
     {
-        var countriesClient = Client.Contents<DynamicEntity, object>("countries");
-        var countriesResponse = await countriesClient.GetAsync();
+        var countries = await Countries.GetAsync();
 
-        if (countriesResponse.Total > 0)
+        if (countries.Total > 0)
         {
             return;
         }
 
         async Task<string> CreateCityAsync(string name)
         {
-            var citySAData = new
+            var cityData = new
             {
                 name = new
                 {
@@ -139,15 +153,14 @@ public sealed class GraphQLFixture : ContentFixture
                 }
             };
 
-            var citiesClient = Client.Contents<DynamicEntity, object>("cities");
-            var cityResponse = await citiesClient.CreateAsync(citySAData, ContentCreateOptions.AsPublish);
+            var city = await Cities.CreateAsync(cityData, ContentCreateOptions.AsPublish);
 
-            return cityResponse.Id;
+            return city.Id;
         }
 
         async Task<string> CreateStateAsync(string name, string cityId)
         {
-            var citySAData = new
+            var stateData = new
             {
                 name = new
                 {
@@ -159,20 +172,19 @@ public sealed class GraphQLFixture : ContentFixture
                 }
             };
 
-            var statesClient = Client.Contents<DynamicEntity, object>("states");
-            var stateResponse = await statesClient.CreateAsync(citySAData, ContentCreateOptions.AsPublish);
+            var state = await States.CreateAsync(stateData, ContentCreateOptions.AsPublish);
 
-            return stateResponse.Id;
+            return state.Id;
         }
 
-        // STEP 1: Create state. 1
-        var sachsenCapital = await CreateCityAsync("Leipzig");
-        var sachstenState = await CreateStateAsync("Sachsen", sachsenCapital);
+        // STEP 1: Create state 1.
+        var saxonyCapital = await CreateCityAsync("Leipzig");
+        var saxonyState = await CreateStateAsync("Saxony", saxonyCapital);
 
 
-        // STEP 1: Create state. 2
-        var badenWCapital = await CreateCityAsync("Stuttgart");
-        var badenWState = await CreateStateAsync("Baden Württemberg", badenWCapital);
+        // STEP 1: Create state 2.
+        var bavariaCapital = await CreateCityAsync("Munich");
+        var bavariaState = await CreateStateAsync("Bavaria", bavariaCapital);
 
 
         // STEP 3: Create country.
@@ -184,10 +196,10 @@ public sealed class GraphQLFixture : ContentFixture
             },
             states = new
             {
-                iv = new[] { sachstenState, badenWState }
+                iv = new[] { saxonyState, bavariaState }
             }
         };
 
-        await countriesClient.CreateAsync(countryData, ContentCreateOptions.AsPublish);
+        await Countries.CreateAsync(countryData, ContentCreateOptions.AsPublish);
     }
 }

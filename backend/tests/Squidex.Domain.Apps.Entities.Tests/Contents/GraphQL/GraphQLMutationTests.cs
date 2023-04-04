@@ -27,7 +27,7 @@ public class GraphQLMutationTests : GraphQLTestBase
     {
         content = TestContent.Create(contentId, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id, null);
 
-        A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored, A<CancellationToken>._))
+        A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored,A<CancellationToken>._))
             .Returns(commandContext);
     }
 

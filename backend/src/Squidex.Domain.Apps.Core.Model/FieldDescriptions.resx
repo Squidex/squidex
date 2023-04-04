@@ -321,6 +321,9 @@
   <data name="EntityId" xml:space="preserve">
     <value>The ID of the object (usually GUID).</value>
   </data>
+  <data name="EntityIds" xml:space="preserve">
+    <value>The list of IDs.</value>
+  </data>
   <data name="EntityIsDeleted" xml:space="preserve">
     <value>True when deleted.</value>
   </data>

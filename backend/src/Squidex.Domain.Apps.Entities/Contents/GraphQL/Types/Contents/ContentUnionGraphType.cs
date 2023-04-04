@@ -11,16 +11,16 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
-internal sealed class ReferenceUnionGraphType : UnionGraphType
+internal sealed class ContentUnionGraphType : UnionGraphType
 {
     private readonly Dictionary<DomainId, IObjectGraphType> types = new Dictionary<DomainId, IObjectGraphType>();
 
     public bool HasType => types.Count > 0;
 
-    public ReferenceUnionGraphType(Builder builder, FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
+    public ContentUnionGraphType(Builder builder, string name, ReadonlyList<DomainId>? schemaIds)
     {
         // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-        Name = fieldInfo.UnionReferenceType;
+        Name = name;
 
         if (schemaIds?.Any() == true)
         {

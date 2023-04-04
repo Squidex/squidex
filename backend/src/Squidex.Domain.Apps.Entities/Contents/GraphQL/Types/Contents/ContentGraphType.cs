@@ -42,6 +42,7 @@ internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
         AddField(ContentFields.StatusColor);
         AddField(ContentFields.NewStatus);
         AddField(ContentFields.NewStatusColor);
+        AddField(ContentFields.DataDynamic);
         AddField(ContentFields.Url);
 
         var contentDataType = new DataGraphType(builder, schemaInfo);

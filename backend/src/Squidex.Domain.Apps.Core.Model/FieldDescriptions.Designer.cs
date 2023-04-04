@@ -673,6 +673,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The list of IDs..
+        /// </summary>
+        public static string EntityIds {
+            get {
+                return ResourceManager.GetString("EntityIds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to True when deleted..
         /// </summary>
         public static string EntityIsDeleted {

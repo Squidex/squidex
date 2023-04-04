@@ -62,7 +62,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
     }
 
     [Fact]
-    public async Task Should_query_graphql_reference_selectors()
+    public async Task Should_query_graphql_by_reference_selector()
     {
         var query = new
         {
@@ -94,11 +94,11 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x.Data.Name)
                 .Order();
 
-        Assert.Equal(new[] { "Leipzig", "Stuttgart" }, cityNames);
+        Assert.Equal(new[] { "Leipzig", "Munich" }, cityNames);
     }
 
     [Fact]
-    public async Task Should_query_graphql_reference_operator()
+    public async Task Should_query_graphql_by_references_function()
     {
         var query = new
         {
@@ -131,11 +131,11 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x["data"]["name"].Value<string>())
                 .Order();
 
-        Assert.Equal(new[] { "Leipzig", "Stuttgart" }, cityNames);
+        Assert.Equal(new[] { "Leipzig", "Munich" }, cityNames);
     }
 
     [Fact]
-    public async Task Should_query_graphql_reference_operator_with_filter()
+    public async Task Should_query_graphql_by_references_function_and_filter()
     {
         var query = new
         {
@@ -172,7 +172,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
     }
 
     [Fact]
-    public async Task Should_query_graphql_referencing_operator()
+    public async Task Should_query_graphql_by_referencing_function()
     {
         var query = new
         {
@@ -196,18 +196,18 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x["data"]["name"].Value<string>())
                 .Order();
 
-        Assert.Equal(new[] { "Baden Württemberg", "Sachsen" }, stateNames);
+        Assert.Equal(new[] { "Bavaria", "Saxony" }, stateNames);
     }
 
     [Fact]
-    public async Task Should_query_graphql_referencing_operator_with_filter()
+    public async Task Should_query_graphql_by_referencing_function_and_filter()
     {
         var query = new
         {
             query = @"
                 {
                     cities: queryCitiesContents {
-                        states: referencingStatesContents(filter: ""data/name/iv eq 'Sachsen'"") {
+                        states: referencingStatesContents(filter: ""data/name/iv eq 'Saxony'"") {
                             data: flatData {
                                 name
                             }
@@ -224,7 +224,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x["data"]["name"].Value<string>())
                 .Order();
 
-        Assert.Equal(new[] { "Sachsen" }, stateNames);
+        Assert.Equal(new[] { "Saxony" }, stateNames);
     }
 
     [Fact]
@@ -246,6 +246,50 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var response = await httpClient.PostAsync(_.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent());
 
         Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+    }
+
+    [Fact]
+    public async Task Should_query_graphql_by_ids()
+    {
+        var allCities = await _.Cities.GetAsync();
+        var allStates = await _.States.GetAsync();
+
+        var ids = allCities.Items.Select(x => x.Id).Union(allStates.Items.Select(x => x.Id)).ToList();
+
+        var query = new
+        {
+            query = @"
+                query ContentsQuery($ids: [String!]!) {
+                    queryContents(ids: $ids) {
+                        ... on Content {
+                            id
+                        }
+                        ... on Cities {
+                            data: flatData {
+                                name
+                            }
+                        }
+                        ... on States {
+                            data: flatData {
+                                name
+                            }
+                        }
+                    }
+                }",
+            variables = new
+            {
+                ids
+            }
+        };
+
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
+
+        var names =
+            result["queryContents"]
+                .Select(x => x["data"]["name"].Value<string>())
+                .Order();
+
+        Assert.Equal(new[] { "Bavaria", "Leipzig", "Munich", "Saxony" }, names);
     }
 
     [Fact]

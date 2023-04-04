@@ -155,6 +155,14 @@ internal static class ContentFields
         Description = FieldDescriptions.EditToken
     };
 
+    public static readonly FieldType DataDynamic = new FieldType
+    {
+        Name = "data__dynamic",
+        ResolvedType = Scalars.JsonNoop,
+        Resolver = Resolve(x => x.Data),
+        Description = FieldDescriptions.ContentData
+    };
+
     public static readonly FieldType StringFieldText = new FieldType
     {
         Name = "text",

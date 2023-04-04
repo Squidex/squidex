@@ -26,6 +26,7 @@ internal sealed class ContentInterfaceGraphType : InterfaceGraphType<IEnrichedCo
         AddField(ContentFields.StatusColor);
         AddField(ContentFields.NewStatus);
         AddField(ContentFields.NewStatusColor);
+        AddField(ContentFields.DataDynamic);
         AddField(ContentFields.Url);
 
         Description = "The structure of all content types.";
