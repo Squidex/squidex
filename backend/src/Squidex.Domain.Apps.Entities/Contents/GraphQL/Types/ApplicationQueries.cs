@@ -47,18 +47,6 @@ internal sealed class ApplicationQueries : ObjectGraphType
         }).WithSchemaId(schemaInfo);
     }
 
-    private void AddContentQuery(Builder builder)
-    {
-        AddField(new FieldType
-        {
-            Name = "queryContents",
-            Arguments = ContentActions.QueryByIds.Arguments,
-            ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(builder.GetContentUnion("AllContents", null)))),
-            Resolver = ContentActions.QueryByIds.Resolver,
-            Description = "Query content items by IDs across schemeas."
-        });
-    }
-
     private void AddContentQueries(Builder builder, SchemaInfo schemaInfo, IGraphType contentType)
     {
         AddField(new FieldType
@@ -85,5 +73,24 @@ internal sealed class ApplicationQueries : ObjectGraphType
             Resolver = ContentActions.QueryOrReferencing.QueryWithTotal,
             Description = $"Query {schemaInfo.DisplayName} content items with total count."
         }).WithSchemaId(schemaInfo);
+    }
+
+    private void AddContentQuery(Builder builder)
+    {
+        var unionType = builder.GetContentUnion("AllContents", null);
+
+        if (!unionType.HasType)
+        {
+            return;
+        }
+
+        AddField(new FieldType
+        {
+            Name = "queryContents",
+            Arguments = ContentActions.QueryByIds.Arguments,
+            ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(unionType))),
+            Resolver = ContentActions.QueryByIds.Resolver,
+            Description = "Query content items by IDs across schemeas."
+        });
     }
 }

@@ -117,7 +117,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_create_empty_schema()
+    public async Task Should_build_graphql_schema_without_schemas()
     {
         var model = await CreateSut().GetSchemaAsync(TestApp.Default);
 
@@ -125,7 +125,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_create_empty_schema_with_empty_schema()
+    public async Task Should_build_graphql_schema_without_schema()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -138,7 +138,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_create_empty_schema_with_empty_schema_because_ui_field()
+    public async Task Should_build_graphql_schema_on_schema_with_ui_fields_only()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -152,7 +152,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_create_empty_schema_with_empty_schema_because_invalid_field()
+    public async Task Should_build_graphql_schema_on_schema_with_invalid_fields_only()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -166,7 +166,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_create_empty_schema_with_unpublished_schema()
+    public async Task Should_build_graphql_schema_on_unpublished_schema()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -180,7 +180,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_create_schema_with_reserved_schema_name()
+    public async Task Should_build_graphql_schema_on_reserved_schema_name()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -194,7 +194,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_create_schema_with_reserved_field_name()
+    public async Task Should_build_graphql_schema_with_reserved_field_name()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -210,7 +210,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_create_schema_with_invalid_field_name()
+    public async Task Should_build_graphql_schema_on_invalid_field_name()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -226,7 +226,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_create_schema_with_duplicate_field_names()
+    public async Task Should_build_graphql_schema_on_duplicate_field_name()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -244,7 +244,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_not_create_schema_With_invalid_component()
+    public async Task Should_not_build_grapqhl_schema_on_invalid_component()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -262,7 +262,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_not_create_schema_With_invalid_components()
+    public async Task Should_not_build_grapqhl_schema_on_invalid_components()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
@@ -280,7 +280,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_not_create_schema_With_invalid_references()
+    public async Task Should_not_build_grapqhl_schema_on_invalid_references()
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
