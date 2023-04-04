@@ -16,13 +16,11 @@ public sealed class AppSettingsDto : Resource
     /// <summary>
     /// The configured app patterns.
     /// </summary>
-    [LocalizedRequired]
     public PatternDto[] Patterns { get; set; }
 
     /// <summary>
     /// The configured UI editors.
     /// </summary>
-    [LocalizedRequired]
     public EditorDto[] Editors { get; set; }
 
     /// <summary>

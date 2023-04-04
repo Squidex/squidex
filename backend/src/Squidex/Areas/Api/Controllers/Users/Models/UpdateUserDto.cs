@@ -8,9 +8,11 @@
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models;
 
+[OpenApiRequest]
 public sealed class UpdateUserDto
 {
     /// <summary>

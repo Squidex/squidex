@@ -14,15 +14,14 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models;
 public sealed class SimulatedRuleEventsDto : Resource
 {
     /// <summary>
-    /// The simulated rule events.
-    /// </summary>
-    [LocalizedRequired]
-    public SimulatedRuleEventDto[] Items { get; set; }
-
-    /// <summary>
     /// The total number of simulated rule events.
     /// </summary>
     public long Total { get; set; }
+
+    /// <summary>
+    /// The simulated rule events.
+    /// </summary>
+    public SimulatedRuleEventDto[] Items { get; set; }
 
     public static SimulatedRuleEventsDto FromDomain(IList<SimulatedRuleEvent> events)
     {

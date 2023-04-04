@@ -41,7 +41,7 @@ internal sealed class NestedInputGraphType : InputObjectGraphType
 
     public override object ParseDictionary(IDictionary<string, object?> value)
     {
-        var result = new JsonObject();
+        var result = JsonValue.Object();
 
         foreach (var field in Fields)
         {

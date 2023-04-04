@@ -16,13 +16,11 @@ public sealed class EditorDto
     /// <summary>
     /// The name of the editor.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>
     /// The url to the editor.
     /// </summary>
-    [LocalizedRequired]
     public string Url { get; set; }
 
     public static EditorDto FromDomain(Editor editor)

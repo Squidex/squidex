@@ -21,6 +21,7 @@ using Squidex.Web.Pipeline;
 namespace Squidex.Areas.Api.Controllers.Contents;
 
 [SchemaMustBePublished]
+[ApiExplorerSettings(GroupName = nameof(Contents))]
 public sealed class ContentsController : ApiController
 {
     private readonly IContentQueryService contentQuery;

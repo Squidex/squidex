@@ -35,7 +35,7 @@ public class ReferenceFormattingTests
         var formatted = data.FormatReferences(schema, languages);
 
         var expected =
-            new JsonObject()
+            JsonValue.Object()
                 .Add("en", "EN, 12")
                 .Add("de", "DE, 12");
 
@@ -52,7 +52,7 @@ public class ReferenceFormattingTests
         var formatted = data.FormatReferences(schema, languages);
 
         var expected =
-            new JsonObject()
+            JsonValue.Object()
                 .Add("en", "EN")
                 .Add("de", "DE");
 
@@ -69,7 +69,7 @@ public class ReferenceFormattingTests
         var formatted = data.FormatReferences(schema, languages);
 
         var expected =
-            new JsonObject()
+            JsonValue.Object()
                 .Add("en", string.Empty)
                 .Add("de", string.Empty);
 

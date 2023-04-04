@@ -38,7 +38,7 @@ public class GeolocationFieldTests : IClassFixture<TranslationsFixture>
     {
         var sut = Field(new GeolocationFieldProperties());
 
-        var geolocation = new JsonObject()
+        var geolocation = JsonValue.Object()
             .Add("coordinates",
                 JsonValue.Array(
                     JsonValue.Create(12),
@@ -96,7 +96,7 @@ public class GeolocationFieldTests : IClassFixture<TranslationsFixture>
 
     private static JsonValue CreateValue(double lat, double lon)
     {
-        return new JsonObject().Add("latitude", lat).Add("longitude", lon);
+        return JsonValue.Object().Add("latitude", lat).Add("longitude", lon);
     }
 
     private static RootField<GeolocationFieldProperties> Field(GeolocationFieldProperties properties)

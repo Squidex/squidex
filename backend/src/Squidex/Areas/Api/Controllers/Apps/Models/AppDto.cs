@@ -36,7 +36,6 @@ public sealed class AppDto : Resource
     /// <summary>
     /// The name of the app.
     /// </summary>
-    [LocalizedRequired]
     [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
     public string Name { get; set; }
 
@@ -94,7 +93,6 @@ public sealed class AppDto : Resource
     /// <summary>
     /// The properties from the role.
     /// </summary>
-    [LocalizedRequired]
     public JsonObject RoleProperties { get; set; }
 
     public static AppDto FromDomain(IAppEntity app, string userId, bool isFrontend, Resources resources)
@@ -125,7 +123,7 @@ public sealed class AppDto : Resource
         }
         else
         {
-            result.RoleProperties = new JsonObject();
+            result.RoleProperties = JsonValue.Object();
         }
 
         foreach (var (key, value) in resources.Context.UserPrincipal.Claims.GetUIProperties(app.Name))

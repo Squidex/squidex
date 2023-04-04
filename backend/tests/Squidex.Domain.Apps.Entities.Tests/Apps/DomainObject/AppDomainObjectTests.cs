@@ -680,7 +680,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     [Fact]
     public async Task UpdateRole_should_create_events_and_update_role()
     {
-        var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" }, Properties = new JsonObject() };
+        var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" }, Properties = JsonValue.Object() };
 
         await ExecuteCreateAsync();
         await ExecuteAddRoleAsync();

@@ -22,13 +22,11 @@ public sealed class AssetFoldersDto : Resource
     /// <summary>
     /// The assets folders.
     /// </summary>
-    [LocalizedRequired]
     public AssetFolderDto[] Items { get; set; }
 
     /// <summary>
     /// The path to the current folder.
     /// </summary>
-    [LocalizedRequired]
     public AssetFolderDto[] Path { get; set; }
 
     public static AssetFoldersDto FromDomain(IResultList<IAssetFolderEntity> assetFolders, IEnumerable<IAssetFolderEntity> path, Resources resources)

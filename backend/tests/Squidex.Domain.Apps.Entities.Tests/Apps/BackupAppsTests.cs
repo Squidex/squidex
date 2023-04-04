@@ -124,7 +124,7 @@ public class BackupAppsTests : GivenContext
     [Fact]
     public async Task Should_write_user_settings()
     {
-        var settings = new JsonObject();
+        var settings = JsonValue.Object();
 
         var context = CreateBackupContext();
 
@@ -140,7 +140,7 @@ public class BackupAppsTests : GivenContext
     [Fact]
     public async Task Should_read_user_settings()
     {
-        var settings = new JsonObject();
+        var settings = JsonValue.Object();
 
         var context = CreateRestoreContext();
 

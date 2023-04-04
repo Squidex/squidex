@@ -200,7 +200,7 @@ public class ComponentsFieldTests : IClassFixture<TranslationsFixture>
 
         for (var i = 0; i < count; i++)
         {
-            var obj = new JsonObject();
+            var obj = JsonValue.Object();
 
             if (type != null)
             {

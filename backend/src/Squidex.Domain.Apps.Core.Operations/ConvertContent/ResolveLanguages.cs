@@ -12,13 +12,14 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class ResolveLanguages : IContentFieldAfterConverter
+public sealed class ResolveLanguages : IContentFieldConverter
 {
     private readonly LanguagesConfig languages;
-    private readonly bool resolveFallback;
     private readonly HashSet<string> languageCodes;
 
-    public ResolveLanguages(LanguagesConfig languages, bool resolveFallback = true, params Language[] filteredLanguages)
+    public bool ResolveFallback { get; init; }
+
+    public ResolveLanguages(LanguagesConfig languages, params Language[] filteredLanguages)
     {
         this.languages = languages;
 
@@ -35,8 +36,6 @@ public sealed class ResolveLanguages : IContentFieldAfterConverter
         {
             languageCodes.Add(languages.Master);
         }
-
-        this.resolveFallback = resolveFallback;
     }
 
     public ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
@@ -46,15 +45,7 @@ public sealed class ResolveLanguages : IContentFieldAfterConverter
             return source;
         }
 
-        if (source.TryGetNonNull(InvariantPartitioning.Key, out var value))
-        {
-            source = new ContentFieldData
-            {
-                [languages.Master] = value
-            };
-        }
-
-        if (resolveFallback)
+        if (ResolveFallback)
         {
             foreach (var languageCode in languageCodes)
             {
@@ -65,6 +56,11 @@ public sealed class ResolveLanguages : IContentFieldAfterConverter
 
                 foreach (var fallback in languages.GetPriorities(languageCode))
                 {
+                    if (fallback == languageCode)
+                    {
+                        continue;
+                    }
+
                     if (source.TryGetNonNull(fallback, out var fallbackValue))
                     {
                         source[languageCode] = fallbackValue;

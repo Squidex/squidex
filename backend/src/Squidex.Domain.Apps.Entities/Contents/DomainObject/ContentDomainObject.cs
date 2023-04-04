@@ -246,7 +246,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
             c.Data = await operation.ExecuteCreateScriptAsync(c.Data, status, ct);
         }
 
-        operation.GenerateDefaultValues(c.Data);
+        c.Data = operation.GenerateDefaultValues(c.Data);
 
         if (!c.DoNotValidate)
         {

@@ -8,9 +8,11 @@
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models;
 
+[OpenApiRequest]
 public sealed class CreateRuleDto
 {
     /// <summary>

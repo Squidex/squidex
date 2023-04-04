@@ -404,7 +404,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         httpHandler.ShouldBeMethod(HttpMethod.Get);
         httpHandler.ShouldBeUrl("http://squidex.io/");
 
-        var expectedResult = new JsonObject().Add("key", 42);
+        var expectedResult = JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expectedResult, actual);
     }
@@ -438,7 +438,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         httpHandler.ShouldBeHeader("X-Header1", "1");
         httpHandler.ShouldBeHeader("X-Header2", "2");
 
-        var expectedResult = new JsonObject().Add("key", 42);
+        var expectedResult = JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expectedResult, actual);
     }
@@ -465,7 +465,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         httpHandler.ShouldBeMethod(HttpMethod.Delete);
         httpHandler.ShouldBeUrl("http://squidex.io/");
 
-        var expectedResult = new JsonObject().Add("key", 42);
+        var expectedResult = JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expectedResult, actual);
     }
@@ -495,7 +495,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         httpHandler.ShouldBeUrl("http://squidex.io/");
         httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
 
-        var expectedResult = new JsonObject().Add("key", 42);
+        var expectedResult = JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expectedResult, actual);
     }
@@ -525,7 +525,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         httpHandler.ShouldBeUrl("http://squidex.io/");
         httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
 
-        var expectedResult = new JsonObject().Add("key", 42);
+        var expectedResult = JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expectedResult, actual);
     }
@@ -555,7 +555,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         httpHandler.ShouldBeUrl("http://squidex.io/");
         httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
 
-        var expectedResult = new JsonObject().Add("key", 42);
+        var expectedResult = JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expectedResult, actual);
     }

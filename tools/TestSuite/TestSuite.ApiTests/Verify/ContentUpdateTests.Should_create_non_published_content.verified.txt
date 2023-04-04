@@ -1,5 +1,10 @@
 ﻿{
   Data: {
+    Localized: {
+      custom: default,
+      de: default,
+      en: default
+    },
     Number: 1
   },
   NewStatus: ,

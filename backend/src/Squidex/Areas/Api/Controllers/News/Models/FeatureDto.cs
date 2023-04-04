@@ -14,12 +14,10 @@ public sealed class FeatureDto
     /// <summary>
     /// The name of the feature.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>
     /// The description text.
     /// </summary>
-    [LocalizedRequired]
     public string Text { get; set; }
 }

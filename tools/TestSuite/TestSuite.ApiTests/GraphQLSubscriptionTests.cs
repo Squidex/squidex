@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Reactive.Linq;
 using GraphQL;
 using GraphQL.Client.Http;

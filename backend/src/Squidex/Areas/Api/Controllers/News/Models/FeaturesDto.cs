@@ -14,7 +14,6 @@ public class FeaturesDto
     /// <summary>
     /// The latest features.
     /// </summary>
-    [LocalizedRequired]
     public List<FeatureDto> Features { get; } = new List<FeatureDto>();
 
     /// <summary>

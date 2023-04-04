@@ -9,6 +9,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models;
 
@@ -17,13 +18,11 @@ public sealed class RestoreJobDto
     /// <summary>
     /// The uri to load from.
     /// </summary>
-    [LocalizedRequired]
     public Uri Url { get; set; }
 
     /// <summary>
     /// The status log.
     /// </summary>
-    [LocalizedRequired]
     public List<string> Log { get; set; }
 
     /// <summary>

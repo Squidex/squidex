@@ -16,7 +16,6 @@ public sealed class ClientsDto : Resource
     /// <summary>
     /// The clients.
     /// </summary>
-    [LocalizedRequired]
     public ClientDto[] Items { get; set; }
 
     public static ClientsDto FromApp(IAppEntity app, Resources resources)

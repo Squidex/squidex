@@ -207,21 +207,6 @@ public class AssetQueryServiceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_asset_folders_with_appId()
-    {
-        var parentId = DomainId.NewGuid();
-
-        var assetFolders = ResultList.CreateFrom<IAssetFolderEntity>(10);
-
-        A.CallTo(() => assetFolderRepository.QueryAsync(AppId.Id, parentId, A<CancellationToken>._))
-            .Returns(assetFolders);
-
-        var actual = await sut.QueryAssetFoldersAsync(AppId.Id, parentId, CancellationToken);
-
-        Assert.Same(assetFolders, actual);
-    }
-
-    [Fact]
     public async Task Should_find_asset_folder_with_path()
     {
         var folderId1 = DomainId.NewGuid();

@@ -25,7 +25,7 @@ public sealed class RolesSurrogate : Dictionary<string, JsonValue>, ISurrogate<R
             }
 
             var role =
-                new JsonObject()
+                JsonValue.Object()
                     .Add("permissions", permissions)
                     .Add("properties", customRole.Properties);
 
@@ -44,7 +44,7 @@ public sealed class RolesSurrogate : Dictionary<string, JsonValue>, ISurrogate<R
         {
             var (key, value) = x;
 
-            var properties = new JsonObject();
+            var properties = JsonValue.Object();
             var permissions = PermissionSet.Empty;
 
             if (value.Value is JsonArray a)

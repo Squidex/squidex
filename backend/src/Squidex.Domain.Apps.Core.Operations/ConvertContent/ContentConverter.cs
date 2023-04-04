@@ -16,8 +16,8 @@ namespace Squidex.Domain.Apps.Core.ConvertContent;
 
 public sealed class ContentConverter
 {
+    private readonly List<IContentDataConverter> dataConverters = new List<IContentDataConverter>();
     private readonly List<IContentItemConverter> itemConverters = new List<IContentItemConverter>();
-    private readonly List<IContentFieldAfterConverter> fieldAfterConverters = new List<IContentFieldAfterConverter>();
     private readonly List<IContentFieldConverter> fieldConverters = new List<IContentFieldConverter>();
     private readonly List<IContentValueConverter> valueConverters = new List<IContentValueConverter>();
     private readonly ResolvedComponents components;
@@ -31,6 +31,11 @@ public sealed class ContentConverter
 
     public ContentConverter Add(IConverter converter)
     {
+        if (converter is IContentDataConverter contentConverter)
+        {
+            dataConverters.Add(contentConverter);
+        }
+
         if (converter is IContentItemConverter itemConverter)
         {
             itemConverters.Add(itemConverter);
@@ -39,11 +44,6 @@ public sealed class ContentConverter
         if (converter is IContentFieldConverter fieldConverter)
         {
             fieldConverters.Add(fieldConverter);
-        }
-
-        if (converter is IContentFieldAfterConverter fieldAfterConverter)
-        {
-            fieldAfterConverters.Add(fieldAfterConverter);
         }
 
         if (converter is IContentValueConverter valueConverter)
@@ -56,11 +56,15 @@ public sealed class ContentConverter
 
     public ContentData Convert(ContentData content)
     {
-        Guard.NotNull(schema);
-
         // The conversion process assumes that we have ownership of the data and can manipulate it.
         // Clones are only created to save allocations.
         var result = new ContentData(content.Count);
+
+        // Some conversions should be made early, e.g. calculating default values.
+        foreach (var converter in dataConverters)
+        {
+            converter.ConvertDataBefore(schema, content);
+        }
 
         foreach (var (fieldName, fieldData) in content)
         {
@@ -88,34 +92,44 @@ public sealed class ContentConverter
             }
         }
 
+        // Some conversions should be done later.
+        foreach (var converter in dataConverters)
+        {
+            converter.ConvertDataAfter(schema, result);
+        }
+
         return result;
     }
 
-    private ContentFieldData? ConvertField(IRootField field, ContentFieldData? data)
+    private ContentFieldData? ConvertField(IRootField field, ContentFieldData data)
     {
         foreach (var converter in fieldConverters)
         {
-            data = converter.ConvertField(field, data!);
+            var newData = converter.ConvertFieldBefore(field, data);
 
-            if (data == null)
+            if (newData == null)
             {
-                break;
+                return null;
             }
+
+            data = newData;
         }
 
         return data;
     }
 
-    private ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData? data)
+    private ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData data)
     {
-        foreach (var converter in fieldAfterConverters)
+        foreach (var converter in fieldConverters)
         {
-            data = converter.ConvertFieldAfter(field, data!);
+            var newData = converter.ConvertFieldAfter(field, data);
 
-            if (data == null)
+            if (newData == null)
             {
-                break;
+                return null;
             }
+
+            data = newData;
         }
 
         return data;
@@ -206,7 +220,7 @@ public sealed class ContentConverter
             return (true, default);
         }
 
-        return (false, ConvertNested(component.FieldCollection, obj, parent));
+        return (false, ConvertNested(component.FieldCollection, obj, parent, component.Fields));
     }
 
     private (bool Remove, JsonValue) ConvertArrayItem(IArrayField field, JsonValue value)
@@ -216,7 +230,7 @@ public sealed class ContentConverter
             return (true, default);
         }
 
-        return (false, ConvertNested(field.FieldCollection, obj, field));
+        return (false, ConvertNested(field.FieldCollection, obj, field, field.Fields));
     }
 
     private ContentFieldData ConvertValues(IField field, ContentFieldData source)
@@ -244,8 +258,13 @@ public sealed class ContentConverter
         return result ?? source;
     }
 
-    private JsonValue ConvertNested<T>(FieldCollection<T> fields, JsonObject source, IField parent) where T : IField
+    private JsonValue ConvertNested<T>(FieldCollection<T> fields, JsonObject source, IField parent, IEnumerable<IField> fieldSchema) where T : IField
     {
+        foreach (var converter in itemConverters)
+        {
+            source = converter.ConvertItemBefore(parent, source, fieldSchema);
+        }
+
         JsonObject? result = null;
 
         foreach (var (key, oldValue) in source)
@@ -281,7 +300,7 @@ public sealed class ContentConverter
 
         foreach (var converter in itemConverters)
         {
-            result = converter.ConvertItem(parent, result);
+            result = converter.ConvertItemAfter(parent, result, fieldSchema);
         }
 
         return result ?? source;

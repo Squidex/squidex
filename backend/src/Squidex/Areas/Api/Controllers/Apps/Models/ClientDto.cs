@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
@@ -17,19 +16,16 @@ public sealed class ClientDto : Resource
     /// <summary>
     /// The client id.
     /// </summary>
-    [LocalizedRequired]
     public string Id { get; set; }
 
     /// <summary>
     /// The client secret.
     /// </summary>
-    [LocalizedRequired]
     public string Secret { get; set; }
 
     /// <summary>
     /// The client name.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>

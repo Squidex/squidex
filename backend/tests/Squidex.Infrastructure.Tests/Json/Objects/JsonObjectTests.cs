@@ -16,12 +16,12 @@ public class JsonObjectTests
     [Fact]
     public void Should_make_correct_object_equal_comparisons()
     {
-        var obj1a = new JsonObject().Add("key1", 1);
-        var obj1b = new JsonObject().Add("key1", 1);
+        var obj1a = JsonValue.Object().Add("key1", 1);
+        var obj1b = JsonValue.Object().Add("key1", 1);
 
-        var objOtherValue = new JsonObject().Add("key1", 2);
-        var objOtherKey = new JsonObject().Add("key2", 1);
-        var objOtherSize = new JsonObject().Add("key1", 1).Add("key2", 2);
+        var objOtherValue = JsonValue.Object().Add("key1", 2);
+        var objOtherKey = JsonValue.Object().Add("key2", 1);
+        var objOtherSize = JsonValue.Object().Add("key1", 1).Add("key2", 2);
 
         var number = JsonValue.Create(1);
 
@@ -322,7 +322,7 @@ public class JsonObjectTests
     [Fact]
     public void Should_create_objects()
     {
-        var input = new JsonObject().Add("1", 1).Add("2", 2);
+        var input = JsonValue.Object().Add("1", 1).Add("2", 2);
 
         var jsons = new[]
         {
@@ -333,7 +333,7 @@ public class JsonObjectTests
             input
         };
 
-        var actual = new JsonObject().Add("1", 1).Add("2", 2);
+        var actual = JsonValue.Object().Add("1", 1).Add("2", 2);
 
         foreach (var json in jsons)
         {
@@ -406,7 +406,7 @@ public class JsonObjectTests
     [Fact]
     public void Should_clone_object_and_also_children()
     {
-        var source = new JsonObject().Add("1", new JsonArray()).Add("2", new JsonArray());
+        var source = JsonValue.Object().Add("1", new JsonArray()).Add("2", new JsonArray());
 
         var clone = ((JsonValue)source).Clone().AsObject;
 
@@ -471,7 +471,7 @@ public class JsonObjectTests
     [Fact]
     public void Should_return_same_object_if_path_is_null()
     {
-        JsonValue json = new JsonObject().Add("property", 12);
+        JsonValue json = JsonValue.Object().Add("property", 12);
 
         var found = json.TryGetByPath((string?)null, out var actual);
 
@@ -482,7 +482,7 @@ public class JsonObjectTests
     [Fact]
     public void Should_return_same_object_if_path_is_empty()
     {
-        JsonValue json = new JsonObject().Add("property", 12);
+        JsonValue json = JsonValue.Object().Add("property", 12);
 
         var found = json.TryGetByPath(string.Empty, out var actual);
 
@@ -494,11 +494,11 @@ public class JsonObjectTests
     public void Should_return_from_nested_array()
     {
         JsonValue json =
-            new JsonObject()
+            JsonValue.Object()
                 .Add("property",
                     JsonValue.Array(
                         JsonValue.Create(12),
-                        new JsonObject()
+                        JsonValue.Object()
                             .Add("nested", 13)));
 
         var found = json.TryGetByPath("property[1].nested", out var actual);
@@ -511,7 +511,7 @@ public class JsonObjectTests
     public void Should_return_null_if_property_not_found()
     {
         JsonValue json =
-            new JsonObject()
+            JsonValue.Object()
                 .Add("property", 12);
 
         var found = json.TryGetByPath("notfound", out var actual);

@@ -142,7 +142,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
 
     private static JsonValue CreateValue(string? type, string key, JsonValue value, string? discriminator = null)
     {
-        var obj = new JsonObject();
+        var obj = JsonValue.Object();
 
         if (type != null)
         {

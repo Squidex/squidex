@@ -23,13 +23,11 @@ public sealed class ContentsDto : Resource
     /// <summary>
     /// The content items.
     /// </summary>
-    [LocalizedRequired]
     public ContentDto[] Items { get; set; }
 
     /// <summary>
     /// The possible statuses.
     /// </summary>
-    [LocalizedRequired]
     public StatusInfoDto[] Statuses { get; set; }
 
     public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents, Resources resources,

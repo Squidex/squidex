@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Json.Objects;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 #pragma warning disable MA0048 // File name must match type name
 
@@ -17,19 +18,41 @@ public interface IConverter
 {
 }
 
-public interface IContentFieldAfterConverter : IConverter
+public interface IContentDataConverter
 {
-    ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source);
+    void ConvertDataBefore(Schema schema, ContentData source)
+    {
+    }
+
+    void ConvertDataAfter(Schema schema, ContentData source)
+    {
+    }
 }
 
 public interface IContentFieldConverter : IConverter
 {
-    ContentFieldData? ConvertField(IRootField field, ContentFieldData source);
+    ContentFieldData? ConvertFieldBefore(IRootField field, ContentFieldData source)
+    {
+        return source;
+    }
+
+    ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
+    {
+        return source;
+    }
 }
 
 public interface IContentItemConverter : IConverter
 {
-    JsonObject ConvertItem(IField field, JsonObject source);
+    JsonObject ConvertItemBefore(IField parentField, JsonObject source, IEnumerable<IField> schema)
+    {
+        return source;
+    }
+
+    JsonObject ConvertItemAfter(IField parentField, JsonObject source, IEnumerable<IField> schema)
+    {
+        return source;
+    }
 }
 
 public interface IContentValueConverter : IConverter

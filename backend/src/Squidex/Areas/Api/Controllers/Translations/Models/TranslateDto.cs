@@ -7,9 +7,11 @@
 
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Translations.Models;
 
+[OpenApiRequest]
 public sealed class TranslateDto
 {
     /// <summary>

@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using TestUtils = Squidex.Domain.Apps.Core.TestHelpers.TestUtils;
 
@@ -30,10 +31,13 @@ public class ConvertDataTests : GivenContext
     {
         var schemaDef =
             new Schema(SchemaId.Name)
-                .AddReferences(1, "references", Partitioning.Invariant)
-                .AddAssets(2, "assets", Partitioning.Invariant)
+                .AddReferences(1, "references", Partitioning.Invariant,
+                    new ReferencesFieldProperties { DefaultValue = ReadonlyList.Create("default1") })
+                .AddAssets(2, "assets", Partitioning.Invariant,
+                    new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("default2") })
                 .AddArray(3, "array", Partitioning.Invariant, a => a
-                    .AddAssets(31, "nested"));
+                    .AddAssets(31, "nested",
+                        new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("default3") }));
 
         A.CallTo(() => Schema.SchemaDef)
             .Returns(schemaDef);
@@ -49,6 +53,39 @@ public class ConvertDataTests : GivenContext
         await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
 
         Assert.NotNull(content.Data);
+    }
+
+    [Fact]
+    public async Task Should_enrich_with_default_value()
+    {
+        var source =
+            new ContentData()
+                .AddField("array",
+                    new ContentFieldData()
+                        .AddInvariant(
+                            JsonValue.Array(
+                                JsonValue.Object())));
+
+        var content = CreateContent(source);
+
+        var expected =
+            new ContentData()
+                .AddField("references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array("default1")))
+                .AddField("assets",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array("default2")))
+                .AddField("array",
+                    new ContentFieldData()
+                        .AddInvariant(
+                            JsonValue.Array(
+                                JsonValue.Object()
+                                    .Add("nested", JsonValue.Array("default3")))));
+
+        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+
+        Assert.Equal(expected, content.Data);
     }
 
     [Fact]
@@ -73,7 +110,7 @@ public class ConvertDataTests : GivenContext
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("nested", JsonValue.Array(id2)))));
 
         A.CallTo(() => assetRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), CancellationToken))
@@ -109,7 +146,7 @@ public class ConvertDataTests : GivenContext
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject()
+                                JsonValue.Object()
                                     .Add("nested", JsonValue.Array()))));
 
         A.CallTo(() => assetRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), CancellationToken))
@@ -136,7 +173,7 @@ public class ConvertDataTests : GivenContext
                 new ContentFieldData()
                     .AddInvariant(
                         JsonValue.Array(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("nested", JsonValue.Array(id1, id2)))));
     }
 

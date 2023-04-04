@@ -22,7 +22,7 @@ public sealed class ExcludeChangedTypes : IContentFieldConverter, IContentValueC
         this.serializer = serializer;
     }
 
-    public ContentFieldData? ConvertField(IRootField field, ContentFieldData source)
+    public ContentFieldData? ConvertFieldBefore(IRootField field, ContentFieldData source)
     {
         foreach (var (_, value) in source)
         {

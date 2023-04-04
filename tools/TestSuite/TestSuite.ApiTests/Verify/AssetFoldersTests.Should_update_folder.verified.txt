@@ -1,0 +1,17 @@
+﻿{
+  Id: Guid_1,
+  ParentId: Guid_Empty,
+  FolderName: Guid_2,
+  Version: 1,
+  _links: {
+    delete: {
+      Method: DELETE
+    },
+    move: {
+      Method: PUT
+    },
+    update: {
+      Method: PUT
+    }
+  }
+}

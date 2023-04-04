@@ -48,7 +48,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_array_field_with_single_item()
     {
-        var value = JsonValue.Array(new JsonObject());
+        var value = JsonValue.Array(JsonValue.Object());
 
         var field = Fields.Array(1, "field", Partitioning.Invariant);
 
@@ -60,7 +60,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_array_field_with_multiple_items()
     {
-        var value = JsonValue.Array(new JsonObject(), new JsonObject());
+        var value = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
 
         var field = Fields.Array(1, "field", Partitioning.Invariant);
 
@@ -96,7 +96,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_assets_field_with_single_item()
     {
-        var value = JsonValue.Array(new JsonObject());
+        var value = JsonValue.Array(JsonValue.Object());
 
         var field = Fields.Assets(1, "field", Partitioning.Invariant);
 
@@ -108,7 +108,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_assets_field_with_multiple_items()
     {
-        var value = JsonValue.Array(new JsonObject(), new JsonObject());
+        var value = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
 
         var field = Fields.Assets(1, "field", Partitioning.Invariant);
 
@@ -168,7 +168,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_component_field()
     {
-        var value = new JsonObject();
+        var value = JsonValue.Object();
 
         var field = Fields.Component(1, "field", Partitioning.Invariant);
 
@@ -192,7 +192,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_components_field_with_single_item()
     {
-        var value = JsonValue.Array(new JsonObject());
+        var value = JsonValue.Array(JsonValue.Object());
 
         var field = Fields.Components(1, "field", Partitioning.Invariant);
 
@@ -204,7 +204,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_components_field_with_multiple_items()
     {
-        var value = JsonValue.Array(new JsonObject(), new JsonObject());
+        var value = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
 
         var field = Fields.Components(1, "field", Partitioning.Invariant);
 
@@ -228,7 +228,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_geolocation_field_with_correct_data()
     {
-        var value = new JsonObject().Add("latitude", 18.9).Add("longitude", 10.9);
+        var value = JsonValue.Object().Add("latitude", 18.9).Add("longitude", 10.9);
 
         var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
 
@@ -240,7 +240,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_geolocation_field_with_missing_property()
     {
-        var value = new JsonObject().Add("latitude", 18.9);
+        var value = JsonValue.Object().Add("latitude", 18.9);
 
         var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
 
@@ -264,7 +264,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_json_field()
     {
-        var value = new JsonObject();
+        var value = JsonValue.Object();
 
         var field = Fields.Json(1, "field", Partitioning.Invariant);
 
@@ -300,7 +300,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_references_field_with_single_item()
     {
-        var value = JsonValue.Array(new JsonObject());
+        var value = JsonValue.Array(JsonValue.Object());
 
         var field = Fields.References(1, "field", Partitioning.Invariant);
 
@@ -312,7 +312,7 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_references_field_with_multiple_items()
     {
-        var value = JsonValue.Array(new JsonObject(), new JsonObject());
+        var value = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
 
         var field = Fields.References(1, "field", Partitioning.Invariant);
 

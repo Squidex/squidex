@@ -27,13 +27,11 @@ public sealed class RuleDto : Resource
     /// <summary>
     /// The user that has created the rule.
     /// </summary>
-    [LocalizedRequired]
     public RefToken CreatedBy { get; set; }
 
     /// <summary>
     /// The user that has updated the rule.
     /// </summary>
-    [LocalizedRequired]
     public RefToken LastModifiedBy { get; set; }
 
     /// <summary>
@@ -64,13 +62,11 @@ public sealed class RuleDto : Resource
     /// <summary>
     /// The trigger properties.
     /// </summary>
-    [LocalizedRequired]
     public RuleTriggerDto Trigger { get; set; }
 
     /// <summary>
     /// The action properties.
     /// </summary>
-    [LocalizedRequired]
     public RuleAction Action { get; set; }
 
     /// <summary>

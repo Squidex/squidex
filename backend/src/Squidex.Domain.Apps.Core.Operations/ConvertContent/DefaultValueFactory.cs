@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Core.DefaultValues;
+namespace Squidex.Domain.Apps.Core.ConvertContent;
 
 public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, DefaultValueFactory.Args>
 {
@@ -30,9 +30,7 @@ public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, Def
         Guard.NotNull(field);
         Guard.NotNull(partition);
 
-        var x = field.RawProperties.Accept(Instance, new Args(now, partition));
-
-        return x;
+        return field.RawProperties.Accept(Instance, new Args(now, partition));
     }
 
     public JsonValue Visit(ArrayFieldProperties properties, Args args)

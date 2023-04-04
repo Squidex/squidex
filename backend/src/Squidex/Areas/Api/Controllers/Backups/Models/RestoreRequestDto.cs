@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models;
 
+[OpenApiRequest]
 public sealed class RestoreRequestDto
 {
     /// <summary>

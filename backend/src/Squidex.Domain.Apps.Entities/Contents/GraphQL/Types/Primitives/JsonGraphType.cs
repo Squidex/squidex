@@ -59,7 +59,7 @@ public sealed class JsonGraphType : JsonNoopGraphType
 
             case GraphQLObjectValue objectValue:
                 {
-                    var json = new JsonObject();
+                    var json = JsonValue.Object();
 
                     if (objectValue.Fields != null)
                     {
@@ -86,7 +86,7 @@ public sealed class JsonGraphType : JsonNoopGraphType
 
             case IDictionary<string, object> obj:
                 {
-                    var json = new JsonObject();
+                    var json = JsonValue.Object();
 
                     foreach (var (key, value) in obj)
                     {

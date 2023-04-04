@@ -15,7 +15,6 @@ public class TemplateDetailsDto : Resource
     /// <summary>
     /// The details of the template.
     /// </summary>
-    [LocalizedRequired]
     public string Details { get; set; }
 
     public static TemplateDetailsDto FromDomain(string name, string details, Resources resources)

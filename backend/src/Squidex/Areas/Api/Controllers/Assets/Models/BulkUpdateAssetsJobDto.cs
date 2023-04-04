@@ -9,9 +9,11 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models;
 
+[OpenApiRequest]
 public class BulkUpdateAssetsJobDto
 {
     /// <summary>

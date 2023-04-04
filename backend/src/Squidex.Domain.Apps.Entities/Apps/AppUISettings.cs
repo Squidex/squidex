@@ -18,7 +18,7 @@ public sealed class AppUISettings : IAppUISettings, IDeleter
     [CollectionName("UISettings")]
     public sealed class State
     {
-        public JsonObject Settings { get; set; } = new JsonObject();
+        public JsonObject Settings { get; set; } = JsonValue.Object();
 
         public bool Set(JsonObject settings)
         {
@@ -82,7 +82,7 @@ public sealed class AppUISettings : IAppUISettings, IDeleter
                     {
                         if (add)
                         {
-                            found = new JsonObject();
+                            found = JsonValue.Object();
 
                             current[segment] = found;
                         }

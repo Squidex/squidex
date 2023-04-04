@@ -49,11 +49,31 @@ public sealed class AssetFoldersController : ApiController
     [ProducesResponseType(typeof(AssetFoldersDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
     [ApiCosts(1)]
-    public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] DomainId parentId, [FromQuery] AssetFolderScope scope = AssetFolderScope.PathAndItems)
+    public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] DomainId? parentId, [FromQuery] AssetFolderScope scope = AssetFolderScope.PathAndItems)
     {
+        Task<IReadOnlyList<IAssetFolderEntity>> GetAssetPathAsync()
+        {
+            if (scope == AssetFolderScope.Items || parentId == null)
+            {
+                return Task.FromResult<IReadOnlyList<IAssetFolderEntity>>(ReadonlyList.Empty<IAssetFolderEntity>());
+            }
+
+            return assetQuery.FindAssetFolderAsync(Context.App.Id, parentId.Value, HttpContext.RequestAborted);
+        }
+
+        Task<IResultList<IAssetFolderEntity>> GetAssetFoldersAsync()
+        {
+            if (scope == AssetFolderScope.Path)
+            {
+                return Task.FromResult(ResultList.Empty<IAssetFolderEntity>());
+            }
+
+            return assetQuery.QueryAssetFoldersAsync(Context, parentId, HttpContext.RequestAborted);
+        }
+
         var (folders, path) = await AsyncHelper.WhenAll(
-            GetAssetFoldersAsync(parentId, scope),
-            GetAssetPathAsync(parentId, scope));
+            GetAssetFoldersAsync(),
+            GetAssetPathAsync());
 
         var response = Deferred.Response(() =>
         {
@@ -162,25 +182,5 @@ public sealed class AssetFoldersController : ApiController
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
         return AssetFolderDto.FromDomain(context.Result<IAssetFolderEntity>(), Resources);
-    }
-
-    private Task<IReadOnlyList<IAssetFolderEntity>> GetAssetPathAsync(DomainId parentId, AssetFolderScope scope)
-    {
-        if (scope == AssetFolderScope.Items)
-        {
-            return Task.FromResult<IReadOnlyList<IAssetFolderEntity>>(ReadonlyList.Empty<IAssetFolderEntity>());
-        }
-
-        return assetQuery.FindAssetFolderAsync(Context.App.Id, parentId, HttpContext.RequestAborted);
-    }
-
-    private Task<IResultList<IAssetFolderEntity>> GetAssetFoldersAsync(DomainId parentId, AssetFolderScope scope)
-    {
-        if (scope == AssetFolderScope.Path)
-        {
-            return Task.FromResult(ResultList.Empty<IAssetFolderEntity>());
-        }
-
-        return assetQuery.QueryAssetFoldersAsync(Context, parentId, HttpContext.RequestAborted);
     }
 }

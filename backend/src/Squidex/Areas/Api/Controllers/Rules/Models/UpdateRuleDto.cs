@@ -9,9 +9,11 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models;
 
+[OpenApiRequest]
 public sealed class UpdateRuleDto
 {
     /// <summary>

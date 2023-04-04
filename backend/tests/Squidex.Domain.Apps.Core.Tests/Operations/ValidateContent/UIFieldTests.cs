@@ -97,7 +97,7 @@ public class UIFieldTests : IClassFixture<TranslationsFixture>
                 .AddField("myArray", new ContentFieldData()
                     .AddInvariant(
                         JsonValue.Array(
-                            new JsonObject()
+                            JsonValue.Object()
                                 .Add("myUI", default))));
 
         var dataErrors = new List<ValidationError>();

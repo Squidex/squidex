@@ -16,19 +16,16 @@ public sealed class PlanDto
     /// <summary>
     /// The ID of the plan.
     /// </summary>
-    [LocalizedRequired]
     public string Id { get; set; }
 
     /// <summary>
     /// The name of the plan.
     /// </summary>
-    [LocalizedRequired]
     public string Name { get; set; }
 
     /// <summary>
     /// The monthly costs of the plan.
     /// </summary>
-    [LocalizedRequired]
     public string Costs { get; set; }
 
     /// <summary>

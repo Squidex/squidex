@@ -49,7 +49,7 @@ public class RolesJsonTests
                     new PermissionSet(
                         "Permission1",
                         "Permission2"),
-                    new JsonObject()
+                    JsonValue.Object()
                         .Add("Property1", true)
                         .Add("Property2", true));
 

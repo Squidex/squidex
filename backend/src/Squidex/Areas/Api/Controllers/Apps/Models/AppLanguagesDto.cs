@@ -16,7 +16,6 @@ public sealed class AppLanguagesDto : Resource
     /// <summary>
     /// The languages.
     /// </summary>
-    [LocalizedRequired]
     public AppLanguageDto[] Items { get; set; }
 
     public static AppLanguagesDto FromDomain(IAppEntity app, Resources resources)

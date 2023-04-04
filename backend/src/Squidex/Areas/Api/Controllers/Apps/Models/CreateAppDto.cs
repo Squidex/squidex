@@ -8,9 +8,11 @@
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
 
+[OpenApiRequest]
 public sealed class CreateAppDto
 {
     /// <summary>

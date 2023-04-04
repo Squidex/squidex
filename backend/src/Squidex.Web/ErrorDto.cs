@@ -14,7 +14,7 @@ public sealed class ErrorDto
 {
     [LocalizedRequired]
     [Display(Description = "Error message.")]
-    public string? Message { get; set; }
+    public string Message { get; set; }
 
     [Display(Description = "The error code.")]
     public string? ErrorCode { get; set; }

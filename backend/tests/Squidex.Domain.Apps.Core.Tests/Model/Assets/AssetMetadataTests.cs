@@ -96,9 +96,9 @@ public class AssetMetadataTests
         var sut = new AssetMetadata
         {
             ["meta"] =
-                new JsonObject()
+                JsonValue.Object()
                     .Add("nested1",
-                        new JsonObject()
+                        JsonValue.Object()
                             .Add("nested2", 12))
         };
 

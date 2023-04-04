@@ -42,9 +42,9 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
 
         await sut.ValidateAsync(new[]
         {
-            new JsonObject()
+            JsonValue.Object()
                 .Add("myString", "1"),
-            new JsonObject()
+            JsonValue.Object()
                 .Add("myString", "2")
         },
         errors);
@@ -59,9 +59,9 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
 
         await sut.ValidateAsync(new[]
         {
-            new JsonObject()
+            JsonValue.Object()
                 .Add("other", "1"),
-            new JsonObject()
+            JsonValue.Object()
                 .Add("other", "1")
         },
         errors);
@@ -76,9 +76,9 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
 
         await sut.ValidateAsync(new[]
         {
-            new JsonObject()
+            JsonValue.Object()
                 .Add("myString", "1"),
-            new JsonObject()
+            JsonValue.Object()
                 .Add("myString", "1")
         },
         errors);
@@ -94,10 +94,10 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
 
         await sut.ValidateAsync(new[]
         {
-            new JsonObject()
+            JsonValue.Object()
                 .Add("myString", "1")
                 .Add("myNumber", 1),
-            new JsonObject()
+            JsonValue.Object()
                 .Add("myString", "1")
                 .Add("myNumber", 1)
         },

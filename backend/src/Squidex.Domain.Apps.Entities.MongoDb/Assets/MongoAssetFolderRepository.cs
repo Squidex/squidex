@@ -38,7 +38,7 @@ public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<Mon
         }, ct);
     }
 
-    public async Task<IResultList<IAssetFolderEntity>> QueryAsync(DomainId appId, DomainId parentId,
+    public async Task<IResultList<IAssetFolderEntity>> QueryAsync(DomainId appId, DomainId? parentId,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/QueryAsync"))
@@ -53,7 +53,7 @@ public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<Mon
         }
     }
 
-    public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId,
+    public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId? parentId,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/QueryChildIdsAsync"))

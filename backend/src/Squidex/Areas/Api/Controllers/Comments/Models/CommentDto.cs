@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Core.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Comments.Models;
 
@@ -24,19 +23,16 @@ public sealed class CommentDto
     /// <summary>
     /// The time when the comment was created or updated last.
     /// </summary>
-    [LocalizedRequired]
     public Instant Time { get; set; }
 
     /// <summary>
     /// The user who created or updated the comment.
     /// </summary>
-    [LocalizedRequired]
     public RefToken User { get; set; }
 
     /// <summary>
     /// The text of the comment.
     /// </summary>
-    [LocalizedRequired]
     public string Text { get; set; }
 
     /// <summary>

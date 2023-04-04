@@ -31,7 +31,6 @@ public sealed class AssetDto : Resource
     /// <summary>
     /// The file name.
     /// </summary>
-    [LocalizedRequired]
     public string FileName { get; set; }
 
     /// <summary>
@@ -47,25 +46,21 @@ public sealed class AssetDto : Resource
     /// <summary>
     /// The slug.
     /// </summary>
-    [LocalizedRequired]
     public string Slug { get; set; }
 
     /// <summary>
     /// The mime type.
     /// </summary>
-    [LocalizedRequired]
     public string MimeType { get; set; }
 
     /// <summary>
     /// The file type.
     /// </summary>
-    [LocalizedRequired]
     public string FileType { get; set; }
 
     /// <summary>
     /// The formatted text representation of the metadata.
     /// </summary>
-    [LocalizedRequired]
     public string MetadataText { get; set; }
 
     /// <summary>
@@ -76,13 +71,11 @@ public sealed class AssetDto : Resource
     /// <summary>
     /// The asset metadata.
     /// </summary>
-    [LocalizedRequired]
     public AssetMetadata Metadata { get; set; }
 
     /// <summary>
     /// The asset tags.
     /// </summary>
-    [LocalizedRequired]
     public HashSet<string>? Tags { get; set; }
 
     /// <summary>
@@ -103,13 +96,11 @@ public sealed class AssetDto : Resource
     /// <summary>
     /// The user that has created the schema.
     /// </summary>
-    [LocalizedRequired]
     public RefToken CreatedBy { get; set; }
 
     /// <summary>
     /// The user that has updated the asset.
     /// </summary>
-    [LocalizedRequired]
     public RefToken LastModifiedBy { get; set; }
 
     /// <summary>

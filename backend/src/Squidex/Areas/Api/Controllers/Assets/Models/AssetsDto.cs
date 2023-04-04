@@ -22,7 +22,6 @@ public sealed class AssetsDto : Resource
     /// <summary>
     /// The assets.
     /// </summary>
-    [LocalizedRequired]
     public AssetDto[] Items { get; set; }
 
     public static AssetsDto FromDomain(IResultList<IEnrichedAssetEntity> assets, Resources resources)

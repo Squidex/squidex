@@ -37,6 +37,5 @@ public sealed class ScheduleJobDto
     /// <summary>
     /// The user who schedule the content.
     /// </summary>
-    [LocalizedRequired]
     public RefToken ScheduledBy { get; set; }
 }

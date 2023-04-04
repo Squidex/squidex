@@ -30,13 +30,11 @@ public sealed class RuleEventDto : Resource
     /// <summary>
     /// The description.
     /// </summary>
-    [LocalizedRequired]
     public string Description { get; set; }
 
     /// <summary>
     /// The name of the event.
     /// </summary>
-    [LocalizedRequired]
     public string EventName { get; set; }
 
     /// <summary>

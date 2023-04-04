@@ -14,10 +14,7 @@ public interface IAssetQueryService
     Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q q,
         CancellationToken ct = default);
 
-    Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId,
-        CancellationToken ct = default);
-
-    Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(DomainId appId, DomainId parentId,
+    Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId? parentId,
         CancellationToken ct = default);
 
     Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId appId, DomainId id,

@@ -408,9 +408,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject(),
-                                new JsonObject().Add("myNested", 1),
-                                new JsonObject())));
+                                JsonValue.Object(),
+                                JsonValue.Object().Add("myNested", 1),
+                                JsonValue.Object())));
 
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 
@@ -447,7 +447,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
-                                new JsonObject())));
+                                JsonValue.Object())));
 
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 

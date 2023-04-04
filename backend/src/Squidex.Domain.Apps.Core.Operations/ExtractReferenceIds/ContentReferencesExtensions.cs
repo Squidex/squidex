@@ -105,7 +105,7 @@ public static class ContentReferencesExtensions
         Guard.NotNull(schema);
         Guard.NotNull(partitioning);
 
-        var result = new JsonObject();
+        var result = JsonValue.Object();
 
         foreach (var partitionKey in partitioning.AllKeys)
         {
