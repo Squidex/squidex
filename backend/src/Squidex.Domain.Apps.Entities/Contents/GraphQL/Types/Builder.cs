@@ -22,15 +22,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
 internal sealed class Builder
 {
-    private readonly Dictionary<SchemaInfo, ComponentGraphType> componentTypes = new Dictionary<SchemaInfo, ComponentGraphType>(ReferenceEqualityComparer.Instance);
-    private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new Dictionary<SchemaInfo, ContentGraphType>(ReferenceEqualityComparer.Instance);
-    private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
-    private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = new Dictionary<FieldInfo, EmbeddableStringGraphType>();
-    private readonly Dictionary<FieldInfo, ReferenceUnionGraphType> referenceUnionTypes = new Dictionary<FieldInfo, ReferenceUnionGraphType>();
-    private readonly Dictionary<FieldInfo, ComponentUnionGraphType> componentUnionTypes = new Dictionary<FieldInfo, ComponentUnionGraphType>();
-    private readonly Dictionary<FieldInfo, NestedGraphType> nestedTypes = new Dictionary<FieldInfo, NestedGraphType>();
-    private readonly Dictionary<string, EnumerationGraphType?> enumTypes = new Dictionary<string, EnumerationGraphType?>();
-    private readonly Dictionary<string, IGraphType[]> dynamicTypes = new Dictionary<string, IGraphType[]>();
+    private readonly Dictionary<FieldInfo, ComponentUnionGraphType> componentUnionTypes = new ();
+    private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = new ();
+    private readonly Dictionary<FieldInfo, NestedGraphType> nestedTypes = new ();
+    private readonly Dictionary<SchemaInfo, ComponentGraphType> componentTypes = new ();
+    private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new ();
+    private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new ();
+    private readonly Dictionary<string, ContentUnionGraphType> unionTypes = new ();
+    private readonly Dictionary<string, EnumerationGraphType?> enumTypes = new ();
+    private readonly Dictionary<string, IGraphType[]> dynamicTypes = new ();
     private readonly FieldVisitor fieldVisitor;
     private readonly FieldInputVisitor fieldInputVisitor;
     private readonly PartitionResolver partitionResolver;
@@ -186,24 +186,24 @@ internal sealed class Builder
         return dynamicTypes.GetOrAdd(graphQLSchema, x => DynamicSchemaBuilder.ParseTypes(x, typeNames));
     }
 
-    public EmbeddableStringGraphType GetEmbeddableString(FieldInfo fieldInfo, StringFieldProperties properties)
-    {
-        return embeddableStringTypes.GetOrAdd(fieldInfo, x => new EmbeddableStringGraphType(this, x, properties));
-    }
-
     public EnumerationGraphType? GetEnumeration(string name, IEnumerable<string> values)
     {
         return enumTypes.GetOrAdd(name, x => FieldEnumType.TryCreate(name, values));
     }
 
-    public ReferenceUnionGraphType GetReferenceUnion(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
+    public EmbeddableStringGraphType GetEmbeddableString(FieldInfo fieldInfo, StringFieldProperties properties)
     {
-        return referenceUnionTypes.GetOrAdd(fieldInfo, x => new ReferenceUnionGraphType(this, x, schemaIds));
+        return embeddableStringTypes.GetOrAdd(fieldInfo, x => new EmbeddableStringGraphType(this, x, properties));
     }
 
     public ComponentUnionGraphType GetComponentUnion(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
     {
         return componentUnionTypes.GetOrAdd(fieldInfo, x => new ComponentUnionGraphType(this, x, schemaIds));
+    }
+
+    public ContentUnionGraphType GetContentUnion(string name, ReadonlyList<DomainId>? schemaIds)
+    {
+        return unionTypes.GetOrAdd(name, x => new ContentUnionGraphType(this, x, schemaIds));
     }
 
     public NestedGraphType GetNested(FieldInfo fieldInfo)

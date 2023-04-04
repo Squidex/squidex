@@ -154,7 +154,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return dataLoaders.Context!.GetOrAddBatchLoader<DomainId, IEnrichedAssetEntity>(nameof(GetAssetsLoader),
             async (batch, ct) =>
             {
-                var result = await GetReferencedAssetsAsync(new List<DomainId>(batch), ct);
+                var result = await QueryAssetsByIdsAsync(new List<DomainId>(batch), ct);
 
                 return result.ToDictionary(x => x.Id);
             });
@@ -165,7 +165,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return dataLoaders.Context!.GetOrAddBatchLoader<DomainId, IEnrichedContentEntity>(nameof(GetContentsLoader),
             async (batch, ct) =>
             {
-                var result = await GetReferencedContentsAsync(new List<DomainId>(batch), ct);
+                var result = await QueryContentsByIdsAsync(new List<DomainId>(batch), ct);
 
                 return result.ToDictionary(x => x.Id);
             });

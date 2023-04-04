@@ -263,7 +263,7 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
 
         if (contentType == null)
         {
-            var union = builder.GetReferenceUnion(fieldInfo, schemaIds);
+            var union = builder.GetContentUnion(fieldInfo.UnionReferenceType, schemaIds);
 
             if (!union.HasType)
             {

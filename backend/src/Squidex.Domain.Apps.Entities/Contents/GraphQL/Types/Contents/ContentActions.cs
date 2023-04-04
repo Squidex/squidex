@@ -96,6 +96,26 @@ internal static class ContentActions
         });
     }
 
+    public static class QueryByIds
+    {
+        public static readonly QueryArguments Arguments = new QueryArguments
+        {
+            new QueryArgument(Scalars.Strings)
+            {
+                Name = "ids",
+                Description = FieldDescriptions.EntityIds,
+                DefaultValue = null
+            }
+        };
+
+        public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
+        {
+            var contentIds = fieldContext.GetArgument<DomainId[]>("ids");
+
+            return await context.QueryContentsByIdsAsync(contentIds, fieldContext.CancellationToken);
+        });
+    }
+
     public static class QueryOrReferencing
     {
         public static readonly QueryArguments Arguments = new QueryArguments

@@ -90,7 +90,7 @@ public abstract class QueryExecutionContext : Dictionary<string, object?>
         return contents;
     }
 
-    public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IEnumerable<DomainId> ids,
+    public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryAssetsByIdsAsync(IEnumerable<DomainId> ids,
         CancellationToken ct)
     {
         Guard.NotNull(ids);
@@ -111,7 +111,7 @@ public abstract class QueryExecutionContext : Dictionary<string, object?>
         });
     }
 
-    public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IEnumerable<DomainId> ids,
+    public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> QueryContentsByIdsAsync(IEnumerable<DomainId> ids,
         CancellationToken ct)
     {
         Guard.NotNull(ids);
