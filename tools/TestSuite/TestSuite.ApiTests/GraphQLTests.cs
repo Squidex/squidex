@@ -260,7 +260,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         {
             query = @"
                 query ContentsQuery($ids: [String!]!) {
-                    queryContents(ids: $ids) {
+                    queryContentsByIds(ids: $ids) {
                         ... on Content {
                             id
                         }
