@@ -109,7 +109,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         {
             data = new
             {
-                queryContents = new[]
+                queryContentsByIds = new[]
                 {
                     new
                     {
@@ -152,7 +152,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         {
             data = new
             {
-                queryContents = new[]
+                queryContentsByIds = new[]
                 {
                     new
                     {

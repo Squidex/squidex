@@ -308,7 +308,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var names =
-            result["queryContents"]
+            result["queryContentsByIds"]
                 .Select(x => x["data"]["name"].Value<string>())
                 .Order();
 
