@@ -228,6 +228,29 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
     }
 
     [Fact]
+    public async Task Should_query_dynamic_data()
+    {
+        var query = new
+        {
+            query = @"
+                {
+                    cities: queryCitiesContents {
+                        data__dynamic
+                    }
+                }"
+        };
+
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
+
+        var cityNames =
+            result["cities"]
+                .Select(x => x["data__dynamic"]["name"]["iv"].Value<string>())
+                .Order();
+
+        Assert.Equal(new[] { "Leipzig", "Munich" }, cityNames);
+    }
+
+    [Fact]
     public async Task Should_query_correct_content_type_for_graphql()
     {
         var query = new
@@ -260,7 +283,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         {
             query = @"
                 query ContentsQuery($ids: [String!]!) {
-                    queryContents(ids: $ids) {
+                    queryContentsByIds(ids: $ids) {
                         ... on Content {
                             id
                         }
@@ -285,7 +308,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var names =
-            result["queryContents"]
+            result["queryContentsByIds"]
                 .Select(x => x["data"]["name"].Value<string>())
                 .Order();
 

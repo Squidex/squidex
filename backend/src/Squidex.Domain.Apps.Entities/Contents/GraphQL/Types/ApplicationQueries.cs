@@ -86,7 +86,7 @@ internal sealed class ApplicationQueries : ObjectGraphType
 
         AddField(new FieldType
         {
-            Name = "queryContents",
+            Name = "queryContentsByIds",
             Arguments = ContentActions.QueryByIds.Arguments,
             ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(unionType))),
             Resolver = ContentActions.QueryByIds.Resolver,

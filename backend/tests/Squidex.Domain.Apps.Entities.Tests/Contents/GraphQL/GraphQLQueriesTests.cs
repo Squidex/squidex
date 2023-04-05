@@ -86,7 +86,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
 
         var query = CreateQuery(@"
                 query {
-                  queryContents(ids: [""<ID>""]) {
+                  queryContentsByIds(ids: [""<ID>""]) {
                     ... on Content {
                       id
                     }
@@ -109,7 +109,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         {
             data = new
             {
-                queryContents = new[]
+                queryContentsByIds = new[]
                 {
                     new
                     {
@@ -134,7 +134,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
 
         var query = CreateQuery(@"
                 query {
-                  queryContents(ids: [""<ID>""]) {
+                  queryContentsByIds(ids: [""<ID>""]) {
                     ... on Content {
                       data: data__dynamic
                     }
@@ -152,7 +152,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         {
             data = new
             {
-                queryContents = new[]
+                queryContentsByIds = new[]
                 {
                     new
                     {
