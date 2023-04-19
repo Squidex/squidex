@@ -612,6 +612,39 @@ describe('ContentForm', () => {
             expect(array.get(1)!.get('nested42')!.hidden).toBeFalsy();
         });
 
+        it('should hide nested localized fields based on condition', () => {
+            const contentForm = createForm([
+                createField({
+                    id: 4,
+                    properties: createProperties('Array'),
+                    partitioning: 'language',
+                    nested: [
+                        createNestedField({ id: 41, properties: createProperties('Number') }),
+                        createNestedField({ id: 42, properties: createProperties('Number') }),
+                    ],
+                }),
+            ], [{
+                field: 'field4.nested42', action: 'Hide', condition: 'itemData.nested41 > 100',
+            }]);
+
+            const array = contentForm.get(complexSchema.fields[3])!.get(languages[0]) as FieldArrayForm;
+
+            contentForm.load({
+                field4: {
+                    en: [{
+                        nested41: 120,
+                        nested42: 120,
+                    }, {
+                        nested41: 99,
+                        nested42: 99,
+                    }],
+                },
+            });
+
+            expect(array.get(0)!.get('nested42')!.hidden).toBeTruthy();
+            expect(array.get(1)!.get('nested42')!.hidden).toBeFalsy();
+        });
+
         it('should hide components fields based on condition', () => {
             const componentId = MathHelper.guid();
             const component = createSchema({

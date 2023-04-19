@@ -47,7 +47,7 @@
                         titlePosition="top-left">
                         <i cdkDragHandle class="icon-drag2 drag-handle"></i>
 
-                        <span class="item-published me-1" [class.unpublished]="!schema.isPublished" id="schema_{{schema.name}}"></span> {{schema.displayName}}
+                        <span class="item-published me-1" [class.unpublished]="!schema.isPublished" id="schema_{{schema.name}}"></span> {{schema.displayName}} <span class="singleton" *ngIf="schema.type === 'Singleton'">Singleton</span>
                     </a>
                 </li>
             </ng-container>
