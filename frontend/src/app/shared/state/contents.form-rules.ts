@@ -68,7 +68,7 @@ class ComponentRules implements ComponentRules {
 
         if (schema !== this.previouSchema) {
             if (schema) {
-                this.compiledRules = Types.fastMerge(this.parent.getRules(this.form).rules, this.getRelativeRules(this.form, schema));
+                this.compiledRules = Types.fastMerge(this.parentRules.getRules(this.form).rules, this.getRelativeRules(this.form, schema));
             } else {
                 this.compiledRules = EMPTY_RULES;
             }
@@ -80,39 +80,39 @@ class ComponentRules implements ComponentRules {
     constructor(
         private readonly form: RuleForm,
         private readonly parentPath: string,
-        private readonly parent: RulesProvider,
+        private readonly parentRules: RulesProvider,
         private readonly schema: () => SchemaDto | undefined,
     ) {
     }
 
     private getRelativeRules(form: RuleForm, schema: SchemaDto) {
-        const rules = this.parent.compileRules(schema);
+        const rules = this.parentRules.compileRules(schema);
 
         if (rules.length === 0) {
             return EMPTY_RULES;
         }
 
         const pathField = form.fieldPath.substring(this.parentPath.length + 1);
-        const pathSimplified = pathField.replace('.iv.', '.');
+        const pathSimple = getSimplePath(pathField);
 
-        return rules.filter(x => x.field === pathField || x.field === pathSimplified);
+        return rules.filter(x => x.field === pathField || x.field === pathSimple);
     }
 }
 
 export class ComponentRulesProvider implements RulesProvider {
     constructor(
         private readonly parentPath: string,
-        private readonly parent: RulesProvider,
+        private readonly parentRules: RulesProvider,
         private readonly schema: () => SchemaDto | undefined,
     ) {
     }
 
     public compileRules(schema: SchemaDto) {
-        return this.parent.compileRules(schema);
+        return this.parentRules.compileRules(schema);
     }
 
     public getRules(form: RuleForm) {
-        return new ComponentRules(form, this.parentPath, this.parent, this.schema);
+        return new ComponentRules(form, this.parentPath, this.parentRules, this.schema);
     }
 }
 
@@ -148,10 +148,20 @@ export class RootRulesProvider implements RulesProvider {
         }
 
         const pathField = form.fieldPath;
-        const pathSimplified = pathField.replace('.iv.', '.');
+        const pathSimple = getSimplePath(pathField);
 
-        const rules = allRules.filter(x => x.field === pathField || x.field === pathSimplified);
+        const rules = allRules.filter(x => x.field === pathField || x.field === pathSimple);
 
         return { rules };
     }
+}
+
+function getSimplePath(path: string) {
+    const parts = path.split('.');
+
+    if (parts.length >= 2) {
+        parts.splice(1, 1);
+    }
+
+    return parts.join('.');
 }

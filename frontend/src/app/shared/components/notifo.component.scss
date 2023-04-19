@@ -1,6 +1,8 @@
 @import 'mixins';
 @import 'vars';
 
+$nav-link-text: rgba(0, 0, 0, 55%);
+
 :host ::ng-deep {
     .notifo {
         .notifo-notifications-button {
@@ -9,7 +11,7 @@
             margin-top: .125rem;
 
             svg {
-                fill: $color-text;
+                fill: $nav-link-text;
             }
         }
 

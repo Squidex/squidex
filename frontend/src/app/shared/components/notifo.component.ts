@@ -55,7 +55,11 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
             if (!notifo) {
                 notifo = [];
 
-                const options: any = { apiUrl: this.notifoApiUrl, userToken: this.notifoApiKey };
+                const options: any = {
+                    apiUrl: this.notifoApiUrl,
+                    userKey: null,
+                    userToken: this.notifoApiKey,
+                };
 
                 if (this.notifoApiUrl.includes('localhost:5002')) {
                     options.styleUrl = 'https://localhost:3002/notifo-sdk.css';
@@ -70,9 +74,9 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
             const element = this.element?.nativeElement;
 
             if (!this.topic) {
-                notifo.push(['show-notifications', element, { position: 'bottom-right' }]);
+                notifo.push(['show-notifications', element, { position: 'bottom-right', style: 'notifo' }]);
             } else {
-                notifo.push(['show-topic', element, this.topic, { style: 'bell', position: 'bottom-right' }]);
+                notifo.push(['show-topic', element, this.topic, { position: 'bottom-right', style: 'bell' }]);
             }
 
             if (element) {
