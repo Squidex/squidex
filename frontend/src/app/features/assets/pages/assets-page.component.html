@@ -22,7 +22,7 @@
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize"
                             [enableShortcut]="true"
-                            [queries]="queries"
+                            [queries]="listQueries"
                             [queriesTypes]="'common.assets' | sqxTranslate"
                             [query]="assetsState.query | async"
                             (queryChange)="search($event)">
@@ -33,10 +33,10 @@
             </div>
             <div class="col-auto">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isListView" [disabled]="isListView" (click)="changeView(true)">
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="listMode" [disabled]="listMode" (click)="changeView(true)">
                         <i class="icon-list"></i>
                     </button>
-                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!isListView" [disabled]="!isListView" (click)="changeView(false)">
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!listMode" [disabled]="!listMode" (click)="changeView(false)">
                         <i class="icon-grid"></i>
                     </button>
                 </div>
@@ -60,7 +60,7 @@
                     [assetsState]="assetsState"
                     (edit)="editStart($event)"
                     [isDisabled]="false"
-                    [isListView]="isListView"
+                    [isListView]="listMode"
                     [showFolderIcon]="path.length === 0">
                 </sqx-assets-list>
             </div>

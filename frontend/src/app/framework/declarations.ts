@@ -53,6 +53,7 @@ export * from './angular/language-selector.component';
 export * from './angular/layout-container.directive';
 export * from './angular/layout.component';
 export * from './angular/list-view.component';
+export * from './angular/long-hover.directive';
 export * from './angular/loader.component';
 export * from './angular/markdown.directive';
 export * from './angular/modals/dialog-renderer.component';

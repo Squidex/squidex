@@ -143,7 +143,6 @@ public sealed class AccountController : IdentityServerController
 
     [HttpGet]
     [Route("account/login/")]
-    [ClearCookies]
     public Task<IActionResult> Login(string? returnUrl = null)
     {
         return LoginViewAsync(returnUrl, true, false);

@@ -27,6 +27,8 @@
 
 :host ::ng-deep {
     img {
+        background-image: $asset-background;
+        background-size: 10px 10px;
         margin-top: -25px;
         max-height: 50px;
         min-height: 50px;

@@ -397,7 +397,7 @@ describe('StringField', () => {
     it('should format to preview image', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
-        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', true)).toEqual(new HtmlValue('<img src="https://images.unsplash.com/123?x&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=50&fit=max" />'));
+        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', true)).toEqual(new HtmlValue('<img src="https://images.unsplash.com/123?x&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=50&fit=max" />', 'https://images.unsplash.com/123?x'));
     });
 
     it('should not format to preview image if html not allowed', () => {
@@ -409,7 +409,7 @@ describe('StringField', () => {
     it('should not format to preview image if not unsplash image', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
-        expect(FieldFormatter.format(field2, 'https://images.com/123?x', true)).toEqual(new HtmlValue('<img src="https://images.com/123?x" />'));
+        expect(FieldFormatter.format(field2, 'https://images.com/123?x', true)).toEqual(new HtmlValue('<img src="https://images.com/123?x" />', 'https://images.com/123?x'));
     });
 
     it('should return default value from properties', () => {

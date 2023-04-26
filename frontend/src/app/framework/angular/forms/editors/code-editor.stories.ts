@@ -8,7 +8,7 @@
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { moduleMetadata } from '@storybook/angular';
 import { Meta, Story } from '@storybook/angular/types-6-0';
-import { CodeEditorComponent, SqxFrameworkModule } from '@app/framework';
+import { CodeEditorComponent, ScriptCompletions, SqxFrameworkModule } from '@app/framework';
 
 export default {
     title: 'Framework/CodeEditor',
@@ -74,15 +74,18 @@ const SingleLineTemplate: Story<CodeEditorComponent & { model: any }> = (args: C
     `,
 });
 
-const COMPLETIONS = [{
+const COMPLETIONS: ScriptCompletions = [{
     path: 'path1',
     description: 'Test1 Path',
+    type: 'Any',
 }, {
     path: 'path2',
     description: 'Test2 Path',
+    type: 'Array',
 }, {
     path: 'path3',
     description: 'Test3 Path',
+    type: 'String',
 }];
 
 export const Default = Template.bind({});

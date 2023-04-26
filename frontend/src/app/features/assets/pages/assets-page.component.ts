@@ -18,13 +18,12 @@ import { Settings } from '@app/shared/state/settings';
     ],
 })
 export class AssetsPageComponent extends ResourceOwner implements OnInit {
-    public queries = new Queries(this.uiState, 'assets');
-
     public editAsset?: AssetDto;
 
-    public addAssetFolderDialog = new DialogModel();
+    public listQueries = new Queries(this.uiState, 'assets');
+    public listMode = false;
 
-    public isListView = false;
+    public addAssetFolderDialog = new DialogModel();
 
     constructor(
         public readonly assetsRoute: Router2State,
@@ -34,7 +33,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     ) {
         super();
 
-        this.isListView = this.localStore.getBoolean(Settings.Local.ASSETS_MODE);
+        this.listMode = this.localStore.getBoolean(Settings.Local.ASSETS_MODE);
     }
 
     public ngOnInit() {
@@ -84,7 +83,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public changeView(isListView: boolean) {
-        this.isListView = isListView;
+        this.listMode = isListView;
 
         this.localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
     }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { StatefulComponent, TypedSimpleChanges } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
@@ -28,6 +28,9 @@ export class ContentValueComponent extends StatefulComponent<State> {
 
     @Input()
     public fields?: TableSettings;
+
+    @Output()
+    public preview = new EventEmitter<string>();
 
     public get title() {
         return this.isString && this.isPlain ? this.value : undefined;

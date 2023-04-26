@@ -15,6 +15,7 @@ import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldProperti
 export class HtmlValue {
     constructor(
         public readonly html: string,
+        public readonly preview?: string,
     ) {
     }
 }
@@ -52,9 +53,9 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                         const previewMode = field.properties['previewMode'];
 
                         if (previewMode === 'ImageAndFileName') {
-                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50" /> <span>${value[1]}</span>`);
+                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50&mode=Pad" /> <span>${value[1]}</span>`, value[0]);
                         } else if (previewMode === 'Image') {
-                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50" />`);
+                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50&mode=Pad" />`, value[0]);
                         } else {
                             formatted = value[1];
                         }
@@ -63,7 +64,6 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                     }
                 }
             } else {
-                // eslint-disable-next-line no-multi-assign
                 value = formatted = '-';
             }
 

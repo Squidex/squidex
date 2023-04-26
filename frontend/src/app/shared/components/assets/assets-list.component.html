@@ -63,7 +63,8 @@
                 [isDisabled]="isDisabled"
                 [isListView]="isListView"
                 (loadDone)="add(file, $event)"
-                (loadError)="remove(file)">
+                (loadError)="remove(file)"
+                [folderId]="assetsState.parentId">
             </sqx-asset>
 
             <sqx-asset *ngFor="let asset of assets; trackBy: trackByAsset"

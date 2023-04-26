@@ -8,3 +8,9 @@ i {
 .first {
     padding-left: 0;
 }
+
+.btn {
+    &:active {
+        border-color: transparent;
+    }
+}
