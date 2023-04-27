@@ -7,6 +7,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json;
 using NodaTime;
 
 namespace Squidex.Infrastructure.Json.Objects;
@@ -171,6 +172,44 @@ public readonly struct JsonValue : IEquatable<JsonValue>
             return v;
         }
 
+        static JsonValue Parse(JsonElement element)
+        {
+            switch (element.ValueKind)
+            {
+                case JsonValueKind.False:
+                    return False;
+                case JsonValueKind.True:
+                    return True;
+                case JsonValueKind.Number:
+                    return Create(element.GetDouble());
+                case JsonValueKind.String:
+                    return Create(element.GetString());
+                case JsonValueKind.Null:
+                    return Null;
+                case JsonValueKind.Object:
+                    var obj = Object();
+
+                    foreach (var property in element.EnumerateObject())
+                    {
+                        obj.Add(property.Name, Parse(property.Value));
+                    }
+
+                    return obj;
+                case JsonValueKind.Array:
+                    var arr = Array();
+
+                    foreach (var item in element.EnumerateArray())
+                    {
+                        arr.Add(Parse(item));
+                    }
+
+                    return arr;
+                default:
+                    ThrowHelper.NotSupportedException();
+                    return default!;
+            }
+        }
+
         switch (value)
         {
             case Guid typed:
@@ -197,6 +236,10 @@ public readonly struct JsonValue : IEquatable<JsonValue>
                 return typed;
             case JsonObject typed:
                 return typed;
+            case JsonElement typed:
+                return Parse(typed);
+            case JsonDocument typed:
+                return Parse(typed.RootElement);
             case IReadOnlyDictionary<string, object?> typed:
                 return Create(typed);
         }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Users;
@@ -63,8 +64,8 @@ public class SquidexClaimExtensionsTests
 
         Assert.Equal(new[]
         {
-            ("key1", "value1"),
-            ("key2", "value2")
+            ("key1", JsonValue.Create("value1")),
+            ("key2", JsonValue.Create("value2"))
         }, result.ToArray());
     }
 
@@ -83,8 +84,38 @@ public class SquidexClaimExtensionsTests
 
         Assert.Equal(new[]
         {
-            ("key1", "value1"),
-            ("key2", "value2")
+            ("key1", JsonValue.Create("value1")),
+            ("key2", JsonValue.Create("value2"))
+        }, result.ToArray());
+    }
+
+    [Fact]
+    public void Should_extract_and_parse_values()
+    {
+        var source = new[]
+        {
+            new Claim($"{SquidexClaimTypes.UIProperty}", "app1,key1=null"),
+            new Claim($"{SquidexClaimTypes.UIProperty}", "app1,key2=true"),
+            new Claim($"{SquidexClaimTypes.UIProperty}", "app1,key3=false"),
+            new Claim($"{SquidexClaimTypes.UIProperty}", "app1,key4=42"),
+            new Claim($"{SquidexClaimTypes.UIProperty}", "app1,key5=42.5"),
+            new Claim($"{SquidexClaimTypes.UIProperty}", "app1,key6=string1"),
+            new Claim($"{SquidexClaimTypes.UIProperty}", "app1,key7=\"string2\""),
+            new Claim($"{SquidexClaimTypes.UIProperty}", "app1,key8=\"string3\" "),
+        };
+
+        var result = source.GetUIProperties("app1");
+
+        Assert.Equal(new[]
+        {
+            ("key1", JsonValue.Null),
+            ("key2", JsonValue.True),
+            ("key3", JsonValue.False),
+            ("key4", JsonValue.Create(42)),
+            ("key5", JsonValue.Create(42.5)),
+            ("key6", JsonValue.Create("string1")),
+            ("key7", JsonValue.Create("string2")),
+            ("key8", JsonValue.Create("string3")),
         }, result.ToArray());
     }
 }

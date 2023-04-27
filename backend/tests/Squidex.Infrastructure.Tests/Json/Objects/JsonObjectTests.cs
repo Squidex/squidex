@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json;
 using NodaTime;
 
 #pragma warning disable xUnit2004 // Do not use equality check to test for boolean conditions
+#pragma warning disable JSON001 // Invalid JSON pattern
 
 namespace Squidex.Infrastructure.Json.Objects;
 
@@ -540,5 +542,79 @@ public class JsonObjectTests
 
         Assert.False(found);
         Assert.Equal(default, actual);
+    }
+
+    [Fact]
+    public void Should_convert_true_json_element()
+    {
+        var element = JsonValue.Create(JsonDocument.Parse("true").RootElement);
+
+        Assert.Equal(JsonValue.True, element);
+    }
+
+    [Fact]
+    public void Should_convert_false_json_element()
+    {
+        var element = JsonValue.Create(JsonDocument.Parse("false").RootElement);
+
+        Assert.Equal(JsonValue.False, element);
+    }
+
+    [Fact]
+    public void Should_convert_integer_json_element()
+    {
+        var element = JsonValue.Create(JsonDocument.Parse("42").RootElement);
+
+        Assert.Equal(JsonValue.Create(42), element);
+    }
+
+    [Fact]
+    public void Should_convert_number_json_element()
+    {
+        var element = JsonValue.Create(JsonDocument.Parse("42.5").RootElement);
+
+        Assert.Equal(JsonValue.Create(42.5), element);
+    }
+
+    [Fact]
+    public void Should_convert_null_json_element()
+    {
+        var element = JsonValue.Create(JsonDocument.Parse("null").RootElement);
+
+        Assert.Equal(JsonValue.Null, element);
+    }
+
+    [Fact]
+    public void Should_convert_string_json_element()
+    {
+        var element = JsonValue.Create(JsonDocument.Parse("\"string42\"").RootElement);
+
+        Assert.Equal(JsonValue.Create("string42"), element);
+    }
+
+    [Fact]
+    public void Should_convert_array_element()
+    {
+        var element = JsonValue.Create(JsonDocument.Parse("[1,2,3]").RootElement);
+
+        Assert.Equal(
+            JsonValue.Array()
+                .Add(JsonValue.Create(1))
+                .Add(JsonValue.Create(2))
+                .Add(JsonValue.Create(3)),
+            element);
+    }
+
+    [Fact]
+    public void Should_convert_object_element()
+    {
+        var element = JsonValue.Create(JsonDocument.Parse("{ \"key1\": 1, \"key2\": 2, \"key3\": 3 }").RootElement);
+
+        Assert.Equal(
+            JsonValue.Object()
+                .Add("key1", JsonValue.Create(1))
+                .Add("key2", JsonValue.Create(2))
+                .Add("key3", JsonValue.Create(3)),
+            element);
     }
 }

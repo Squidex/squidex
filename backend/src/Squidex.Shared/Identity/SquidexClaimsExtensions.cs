@@ -10,7 +10,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Shared.Identity
@@ -134,9 +136,25 @@ namespace Squidex.Shared.Identity
             }
         }
 
-        public static IEnumerable<(string Name, string Value)> GetUIProperties(this IEnumerable<Claim> user, string app)
+        public static IEnumerable<(string Name, JsonValue Value)> GetUIProperties(this IEnumerable<Claim> user, string app)
         {
             var prefix = $"{SquidexClaimTypes.UIProperty}:{app}:";
+
+            static JsonValue Parse(string value)
+            {
+                value = value.Trim();
+
+                try
+                {
+                    var root = JsonDocument.Parse(value).RootElement;
+
+                    return JsonValue.Create(root);
+                }
+                catch
+                {
+                    return JsonValue.Create(value);
+                }
+            }
 
             foreach (var claim in user)
             {
@@ -146,7 +164,7 @@ namespace Squidex.Shared.Identity
                 {
                     var name = type[prefix.Length..].ToString();
 
-                    yield return (name.Trim(), claim.Value.Trim());
+                    yield return (name.Trim(), Parse(claim.Value));
                 }
                 else if (type.Equals(SquidexClaimTypes.UIProperty, StringComparison.OrdinalIgnoreCase))
                 {
@@ -159,7 +177,7 @@ namespace Squidex.Shared.Identity
 
                     if (match.Success)
                     {
-                        yield return (match.Groups["Key"].Value.Trim(), match.Groups["Value"].Value.Trim());
+                        yield return (match.Groups["Key"].Value.Trim(), Parse(match.Groups["Value"].Value));
                     }
                 }
             }
