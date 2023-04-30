@@ -13,6 +13,7 @@ import { Directive, EventEmitter, HostListener, Input, Output, Renderer2 } from 
 export class LongHoverDirective {
     private timerOut: Function | null = null;
     private timer?: any;
+    private wasHovering = false;
 
     @Output('sqxLongHover')
     public hover = new EventEmitter();
@@ -49,7 +50,11 @@ export class LongHoverDirective {
             return;
         }
 
+        this.wasHovering = false;
+
         this.timer = setTimeout(() => {
+            this.wasHovering = true;
+
             this.hover.emit();
         }, this.duration);
 
@@ -60,8 +65,11 @@ export class LongHoverDirective {
 
     private clearTimer() {
         if (this.timer) {
+            if (this.wasHovering) {
+                this.cancelled.emit();
+            }
+
             clearTimeout(this.timer);
-            this.cancelled.emit();
             this.timer = null;
             this.timerOut?.();
             this.timerOut = null;

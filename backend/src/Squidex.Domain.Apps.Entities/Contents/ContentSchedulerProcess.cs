@@ -61,7 +61,6 @@ public sealed class ContentSchedulerProcess : IBackgroundProcess
             {
                 await TryPublishAsync(content);
             }
-
         }
         catch (Exception ex)
         {

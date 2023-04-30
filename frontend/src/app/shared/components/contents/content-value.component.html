@@ -8,5 +8,18 @@
     </button>
 </ng-container>
 <ng-template #html>
-    <div class="html-value" [innerHTML]="value.html"></div>
+    <div #htmlValue 
+        (sqxLongHover)="show()"
+        (longHoverCancelled)="hide()"
+        [longHoverSelector]="'img'"
+        [longHoverDuration]="1500"
+        [innerHTML]="value.html"
+        class="html-value" >
+    </div>
+
+    <ng-container *sqxModal="previewModal;closeAuto:false">
+        <div class="preview" [sqxAnchoredTo]="htmlValue" anchorX="left-to-left">
+            <img [src]="value.preview" />
+        </div>
+    </ng-container>
 </ng-template>
