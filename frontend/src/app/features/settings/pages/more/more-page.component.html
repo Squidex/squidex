@@ -90,7 +90,7 @@
                             <div class="col-6">
                                 <h5>{{ 'apps.transferTitle' | sqxTranslate }}</h5>
             
-                                <small>{{ 'apps.transferWarning' | sqxTranslate }}</small>
+                                <sqx-form-hint>{{ 'apps.transferWarning' | sqxTranslate }}</sqx-form-hint>
                             </div>
                             <div class="col">
                                 <select class="form-select" formControlName="teamId">
@@ -112,7 +112,7 @@
                         <div class="col">
                             <h5>{{ 'apps.delete' | sqxTranslate }}</h5>
         
-                            <small>{{ 'apps.deleteWarning' | sqxTranslate }}</small>
+                            <sqx-form-hint>{{ 'apps.deleteWarning' | sqxTranslate }}</sqx-form-hint>
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn btn-danger" [disabled]="!isDeletable"

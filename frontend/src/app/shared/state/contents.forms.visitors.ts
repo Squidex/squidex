@@ -57,7 +57,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                         };
 
                         if (previewMode === 'ImageAndFileName') {
-                            formatted = new HtmlValue(buildImage(value[0]) + `<span>${value[1]}</span>`, value[0]);
+                            formatted = new HtmlValue(buildImage(value[0]) + ` <span>${value[1]}</span>`, value[0]);
                         } else if (previewMode === 'Image') {
                             formatted = new HtmlValue(buildImage(value[0]), value[0]);
                         } else {
@@ -211,7 +211,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
 
         if (properties.editor === 'StockPhoto' && this.allowHtml && this.value) {
-            return new HtmlValue(`<img src="${thumbnail(this.value, undefined, 50)}" />`);
+            return new HtmlValue(`<img src="${thumbnail(this.value, undefined, 50)}" />`, this.value);
         }
 
         return this.value;
