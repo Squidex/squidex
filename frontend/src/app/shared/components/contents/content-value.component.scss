@@ -47,6 +47,15 @@
     }
 }
 
+.preview {
+    img {
+        @include box-shadow-outer(0, 3px, 16px, 0.2);
+        background-image: $asset-background;
+        max-width: 300px;
+        max-height: 300px;
+    }
+}
+
 .value-container {
     cursor: default;
     max-height: 10rem;

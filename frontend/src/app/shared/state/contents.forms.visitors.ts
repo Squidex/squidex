@@ -52,10 +52,14 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                     if (value.length === 2) {
                         const previewMode = field.properties['previewMode'];
 
+                        const buildImage = (src: string) => {
+                            return `<img src="${src}?width=50&height=50&mode=Pad" />`;
+                        };
+
                         if (previewMode === 'ImageAndFileName') {
-                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50&mode=Pad" /> <span>${value[1]}</span>`, value[0]);
+                            formatted = new HtmlValue(buildImage(value[0]) + ` <span>${value[1]}</span>`, value[0]);
                         } else if (previewMode === 'Image') {
-                            formatted = new HtmlValue(`<img src="${value[0]}?width=50&height=50&mode=Pad" />`, value[0]);
+                            formatted = new HtmlValue(buildImage(value[0]), value[0]);
                         } else {
                             formatted = value[1];
                         }
@@ -207,7 +211,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
 
         if (properties.editor === 'StockPhoto' && this.allowHtml && this.value) {
-            return new HtmlValue(`<img src="${thumbnail(this.value, undefined, 50)}" />`);
+            return new HtmlValue(`<img src="${thumbnail(this.value, undefined, 50)}" />`, this.value);
         }
 
         return this.value;

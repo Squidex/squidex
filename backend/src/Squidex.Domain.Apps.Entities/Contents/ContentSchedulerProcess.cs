@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using Squidex.ClientLibrary;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Hosting;
@@ -52,11 +53,18 @@ public sealed class ContentSchedulerProcess : IBackgroundProcess
     public async Task PublishAsync(
         CancellationToken ct = default)
     {
-        var now = Clock.GetCurrentInstant();
-
-        await foreach (var content in contentRepository.StreamScheduledWithoutDataAsync(now, SearchScope.All, ct))
+        try
         {
-            await TryPublishAsync(content);
+            var now = Clock.GetCurrentInstant();
+
+            await foreach (var content in contentRepository.StreamScheduledWithoutDataAsync(now, SearchScope.All, ct))
+            {
+                await TryPublishAsync(content);
+            }
+        }
+        catch (Exception ex)
+        {
+            log.LogError(ex, "Failed to query scheduled status changes-");
         }
     }
 

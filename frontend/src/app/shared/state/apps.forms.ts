@@ -26,9 +26,7 @@ export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
 export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, AppDto> {
     constructor() {
         super(new ExtendedFormGroup({
-            teamId: new UntypedFormControl('',
-                Validators.required,
-            ),
+            teamId: new UntypedFormControl(''),
         }));
     }
 }

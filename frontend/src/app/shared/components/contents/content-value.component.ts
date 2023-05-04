@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { StatefulComponent, TypedSimpleChanges } from '@app/framework';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ModalModel, StatefulComponent, TypedSimpleChanges } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
 interface State {
@@ -29,8 +29,7 @@ export class ContentValueComponent extends StatefulComponent<State> {
     @Input()
     public fields?: TableSettings;
 
-    @Output()
-    public preview = new EventEmitter<string>();
+    public previewModal = new ModalModel();
 
     public get title() {
         return this.isString && this.isPlain ? this.value : undefined;
@@ -67,5 +66,17 @@ export class ContentValueComponent extends StatefulComponent<State> {
         }
 
         this.fields?.toggleWrapping(this.field?.name);
+    }
+
+    public show() {
+        if (!Types.is(this.value, HtmlValue) || !this.value.preview) {
+            return;
+        }
+
+        this.previewModal.show();
+    }
+
+    public hide() {
+        this.previewModal.hide();
     }
 }
