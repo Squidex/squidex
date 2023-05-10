@@ -272,6 +272,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['minItems'] = new UntypedFormControl(undefined);
         this.config['minSize'] = new UntypedFormControl(undefined);
         this.config['minWidth'] = new UntypedFormControl(undefined);
+        this.config['previewFormat'] = new UntypedFormControl(undefined);
         this.config['previewMode'] = new UntypedFormControl(undefined);
         this.config['resolveFirst'] = new UntypedFormControl(undefined);
     }

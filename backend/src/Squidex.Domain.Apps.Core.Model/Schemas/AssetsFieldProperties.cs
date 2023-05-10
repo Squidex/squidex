@@ -20,6 +20,8 @@ public sealed record AssetsFieldProperties : FieldProperties
 
     public string? FolderId { get; init; }
 
+    public string? PreviewFormat { get; set; }
+
     public int? MinItems { get; init; }
 
     public int? MaxItems { get; init; }

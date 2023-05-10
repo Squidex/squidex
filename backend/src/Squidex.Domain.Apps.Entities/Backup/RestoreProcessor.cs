@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.IO.Pipelines;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -139,6 +140,7 @@ public sealed partial class RestoreProcessor
                 await LogAsync(run, "  * Restore events and attachments.");
                 await LogAsync(run, "  * Restore all objects like app, schemas and contents");
                 await LogAsync(run, "  * Complete the restore operation for all objects");
+                await LogFlushAsync(run);
 
                 log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.", run.Job.Id, run.Job.Url);
 
@@ -447,5 +449,10 @@ public sealed partial class RestoreProcessor
         }
 
         return state.WriteAsync(100, run.CancellationToken);
+    }
+
+    private Task LogFlushAsync(Run run)
+    {
+        return state.WriteAsync(run.CancellationToken);
     }
 }

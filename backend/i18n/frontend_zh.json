@@ -869,6 +869,8 @@
   "schemas.fieldTypes.assets.folderId": "文件夹",
   "schemas.fieldTypes.assets.folderIdHint": "新资源将上传到的资源文件夹。",
   "schemas.fieldTypes.assets.previewFileName": "仅文件名",
+  "schemas.fieldTypes.assets.previewFormat": "Preview Format",
+  "schemas.fieldTypes.assets.previewFormatHint": "Define custom formatting parameters for preview images. [Documentation](https://docs.squidex.io/02-documentation/developer-guides/api-overview/assets-api#how-to-resize-images)",
   "schemas.fieldTypes.assets.previewImage": "如果不是图像，则只有缩略图或文件名",
   "schemas.fieldTypes.assets.previewImageAndFileName": "缩略图和文件名",
   "schemas.fieldTypes.assets.previewMode": "PreviewMode",

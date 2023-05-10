@@ -869,6 +869,8 @@
   "schemas.fieldTypes.assets.folderId": "Pasta",
   "schemas.fieldTypes.assets.folderIdHint": "A pasta de ficheiros para onde os novos ficheiros serão carregados.",
   "schemas.fieldTypes.assets.previewFileName": "Apenas nome de ficheiro",
+  "schemas.fieldTypes.assets.previewFormat": "Preview Format",
+  "schemas.fieldTypes.assets.previewFormatHint": "Define custom formatting parameters for preview images. [Documentation](https://docs.squidex.io/02-documentation/developer-guides/api-overview/assets-api#how-to-resize-images)",
   "schemas.fieldTypes.assets.previewImage": "Apenas miniatura ou nome de ficheiro se não uma imagem",
   "schemas.fieldTypes.assets.previewImageAndFileName": "Miniatura e nome do ficheiro",
   "schemas.fieldTypes.assets.previewMode": "Pré-visualizaçãoMode",

@@ -32,7 +32,11 @@ public sealed class SchemaCreated : SchemaEvent, IMigrated<IEvent>
 
     public IEvent Migrate()
     {
-        var schema = new Schema(Name, Properties, Singleton ? SchemaType.Singleton : SchemaType.Default);
+        var type = Singleton ?
+            SchemaType.Singleton :
+            SchemaType.Default;
+
+        var schema = new Schema(Name, Properties, type);
 
         if (Publish)
         {

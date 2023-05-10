@@ -26,18 +26,23 @@
 }
 
 :host ::ng-deep {
+    .image {
+        @include truncate;
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        margin-bottom: -8px;
+        margin-top: -8px;
+    }
+
     img {
         background-image: $asset-background;
         background-size: 10px 10px;
-        margin-top: -25px;
-        max-height: 50px;
-        min-height: 50px;
-        position: absolute;
-        top: 50%;
     }
 
     img + span {
-        padding-left: 60px;
+        padding-left: 10px;
     }
 
     .html-value {

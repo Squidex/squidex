@@ -869,6 +869,8 @@
   "schemas.fieldTypes.assets.folderId": "Folder",
   "schemas.fieldTypes.assets.folderIdHint": "The asset folder where the new assets will be uploaded to.",
   "schemas.fieldTypes.assets.previewFileName": "Only file name",
+  "schemas.fieldTypes.assets.previewFormat": "Preview Format",
+  "schemas.fieldTypes.assets.previewFormatHint": "Define custom formatting parameters for preview images. [Documentation](https://docs.squidex.io/02-documentation/developer-guides/api-overview/assets-api#how-to-resize-images)",
   "schemas.fieldTypes.assets.previewImage": "Only thumbnail or file name if not an image",
   "schemas.fieldTypes.assets.previewImageAndFileName": "Thumbnail and file name",
   "schemas.fieldTypes.assets.previewMode": "PreviewMode",

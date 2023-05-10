@@ -35,6 +35,11 @@ public sealed class AssetsFieldPropertiesDto : FieldPropertiesDto
     public string? FolderId { get; set; }
 
     /// <summary>
+    /// The preview format.
+    /// </summary>
+    public string? PreviewFormat { get; set; }
+
+    /// <summary>
     /// The minimum allowed items for the field value.
     /// </summary>
     public int? MinItems { get; set; }
