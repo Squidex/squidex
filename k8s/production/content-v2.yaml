@@ -1,6 +1,6 @@
 ingressHost: squidex-production-v2.learnwithhomer.com
 domain: https://squidex-production-v2.learnwithhomer.com
 adminEmail: squidex-staging-45@homerlearning.com
-S3Bucket: homer-squidex-staging
+S3Bucket: homer-squidex-production
 secretName: production-v2-squidex
 useTransactions: false
