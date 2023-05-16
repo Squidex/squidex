@@ -1,8 +1,9 @@
+{{- if .Values.ingressEnabled -}}
 ---
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: squidex
+  name: squidex-{{ .Values.version }}
   annotations:
     # use the shared ingress-nginx
     kubernetes.io/ingress.class: "nginx"
@@ -25,3 +26,5 @@ spec:
               name: squidex-{{ .Values.version }}
               port:
                 number: 80
+
+{{- end -}}

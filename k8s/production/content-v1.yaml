@@ -1,4 +1,3 @@
-ingressHost: squidex-production.learnwithhomer.com
 domain: https://squidex-production.learnwithhomer.com
 adminEmail: squidex-production@homerlearning.com
 S3Bucket: homer-squidex-production

@@ -17,6 +17,7 @@ def squidex_version = null //Sanitized version of tag without . in the number
 def env = ["staging": "hmr-kops-staging",
            "production": "hmr-kops-production"]
 def environment = null
+def ingressHost = null
 
 pipeline {
   agent any
@@ -24,7 +25,9 @@ pipeline {
     disableConcurrentBuilds()
   }
   parameters {
-    booleanParam(name: 'create_db', defaultValue: true, description: 'Create New MongoDB Environment')
+    booleanParam(name: 'create_db', defaultValue: false, description: 'Create New MongoDB Environment')
+    booleanParam(name: 'createIngress', defaultValue: false, description: 'Create the K8s ingress object')
+    string(name: 'ingressOverride', description: 'Ingress address to use. If left blank will assume squidex-$CLUSTER-v2.learnwithhomer.com')
     string(name: 'tag', description: 'The tag to deploy: ex. 6.7.0', defaultValue: 'latest')
     string(name: 'dbname', description: 'The current mongodb to use (like: homer-squidex-staging or homer-squidex-staging-v2upgrade)', defaultValue: 'none')
     choice(name: 'cluster', choices: ['staging', 'production'], description: 'The Kubernetes Cluster to deploy to') //The names don't quite match but we handle it in a map
@@ -44,6 +47,15 @@ pipeline {
             helm_data_file = "${environment}/${namespace}.yaml"
             squidex_version = tag.replaceAll("\\.","") //We need a DNS friendly value so need to remove dots
             println("The sanitized squidex tag is ${squidex_version}")
+            if (params.createIngress) {
+              if (params.ingressOverride != ''){
+                ingressHost = params.ingressOverride
+              }
+              else {
+                ingressHost = "squidex-${params.cluster}-v2.learnwithhomer.com"
+              }
+              println("The ingress host is ${ingressName}")
+            }
             cluster = env[environment]
             if(!params.create_db) {
               dbname = params.dbname
@@ -82,6 +94,9 @@ pipeline {
           replicas = 1 //Initially the deployment should just be a single pod
           mongoLogin = sh(returnStdout: true, script:"aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region=us-east-1 | jq -r '.\"${environment}_${namespace}_login\"'").trim()
           helmArgs = "--set loggingLevel=${params.logginglevel} --set replicaCount=${replicas} --set imageTag=${tag} --set version=${squidex_version} --set mongoconnectionstring=${mongoLogin} --set mongourl=${mongo_url}"
+          if (params.createIngress) {
+            helmArgs += " --set ingressEnabled=true --set ingressHost=${ingressName}"
+          }
           homerKubernetes.processConfigData(helm_data_file, namespace, cluster, helmArgs, "./squidex")
         }
       }

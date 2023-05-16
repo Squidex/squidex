@@ -14,3 +14,4 @@ elasticAdapterLessonSEQ: true
 contentApiDomain: "content-staging-v2.learnwithhomer.com"
 squidexVideoResizerSecret: "jd8ax4bcpx4l3yxyarxkuc5j4j0i6zkpdwvm9zz7xu0x"
 replicas: 5
+secretName: "staging-v2-squidex"
