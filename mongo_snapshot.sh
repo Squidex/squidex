@@ -37,7 +37,7 @@ export snapshot=`atlas backups snapshots create $origin --desc test-upgrade-back
 atlas backups snapshots watch ${snapshot} --clusterName $origin --projectId ${project} 
 
 #create new cluster
-atlas cluster create squidex-${environment}-${version} --projectId ${project} --provider AWS --region US_EAST_1 --members 3 --tier M20--mdbVersion ${cluster_version} --diskSizeGB 100
+atlas cluster create squidex-${environment}-${version} --projectId ${project} --provider AWS --region US_EAST_1 --members 3 --tier M20 --mdbVersion ${cluster_version} --diskSizeGB 100
 
 #wait for cluster to be ready
 atlas cluster watch squidex-${environment}-${version} --projectId ${project}
