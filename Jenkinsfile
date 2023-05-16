@@ -54,7 +54,7 @@ pipeline {
               else {
                 ingressHost = "squidex-${params.cluster}-v2.learnwithhomer.com"
               }
-              println("The ingress host is ${ingressName}")
+              println("The ingress host is ${ingressHost}")
             }
             cluster = env[environment]
             if(!params.create_db) {
