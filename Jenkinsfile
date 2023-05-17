@@ -47,15 +47,13 @@ pipeline {
             helm_data_file = "${environment}/${namespace}.yaml"
             squidex_version = tag.replaceAll("\\.","") //We need a DNS friendly value so need to remove dots
             println("The sanitized squidex tag is ${squidex_version}")
-            if (params.createIngress) {
-              if (params.ingressOverride != ''){
-                ingressHost = params.ingressOverride
-              }
-              else {
-                ingressHost = "squidex-${params.cluster}-v2.learnwithhomer.com"
-              }
-              println("The ingress host is ${ingressHost}")
+            if (params.ingressOverride != ''){
+              ingressHost = params.ingressOverride
             }
+            else {
+              ingressHost = "squidex-${params.cluster}-v2.learnwithhomer.com"
+            }
+            println("The ingress host is ${ingressHost}")
             cluster = env[environment]
             if(!params.create_db) {
               dbname = params.dbname
@@ -93,7 +91,7 @@ pipeline {
         script {
           replicas = 1 //Initially the deployment should just be a single pod
           mongoLogin = sh(returnStdout: true, script:"aws secretsmanager get-secret-value --secret-id squidex_mongo_build --query SecretString --output text --region=us-east-1 | jq -r '.\"${environment}_${namespace}_login\"'").trim()
-          helmArgs = "--set loggingLevel=${params.logginglevel} --set replicaCount=${replicas} --set imageTag=${tag} --set version=${squidex_version} --set mongoconnectionstring=${mongoLogin} --set mongourl=${mongo_url}"
+          helmArgs = "--set loggingLevel=${params.logginglevel} --set replicaCount=${replicas} --set imageTag=${tag} --set version=${squidex_version} --set mongoconnectionstring=${mongoLogin} --set mongourl=${mongo_url} --set domain=${ingressHost}"
           if (params.createIngress) {
             helmArgs += " --set ingressEnabled=true --set ingressHost=${ingressHost}"
           }
