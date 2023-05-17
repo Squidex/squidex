@@ -1,17 +1,4 @@
-##Content-API
-defaultPathwayID: "e3582b23-084e-4fb0-882b-90406d638641"
-redisHost: "squidex-gql-staging-cluster-v2a.cgi2ni.ng.0001.use1.cache.amazonaws.com"
-s3Bucket: "homer-squidex-staging"
-squidexAppName: "homer-content"
-squidexHost: "https://squidex-staging-v2.learnwithhomer.com"
-squidexClientID: "homer-content:content-api"
-squidexSecret: "rkehxj3gi8voldy0vgmjgmwgvt7vlmnclxmdfcuvzxox"
-squidexVideoResizerClientID: "homer-content:video-resizer"
-videoS3DestinationURI: "s3://homer-squidex-content/"
-videoS3URLBase: "https://d143mhe0b6znzl.cloudfront.net/"
-redisSlaves: "squidex-gql-staging-cluster-v2a-ro.cgi2ni.ng.0001.use1.cache.amazonaws.com"
-elasticAdapterLessonSEQ: true
-contentApiDomain: "content-staging-v2.learnwithhomer.com"
-squidexVideoResizerSecret: "jd8ax4bcpx4l3yxyarxkuc5j4j0i6zkpdwvm9zz7xu0x"
-replicas: 5
+adminEmail: squidex-staging-45@homerlearning.com
+S3Bucket: homer-squidex-staging
+useTransactions: false
 secretName: "staging-v2-squidex"
