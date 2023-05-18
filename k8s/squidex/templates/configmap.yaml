@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: squidex
+  name: squidex-{{ .Values.version }}
 data:
   MONGODB__CONFIGURATION: mongodb+srv://{{ .Values.mongoconnectionstring}}@{{ .Values.mongourl }}/?retryWrites=true&w=majority
-  DOMAIN: {{ .Values.domain }}
+  DOMAIN: https://{{ .Values.domain }}
   ADMIN_EMAIL: {{ .Values.adminEmail }}
   S3_BUCKET: {{ .Values.S3Bucket }}
   CONTENTS__USETRANSACTIONS: "{{ .Values.useTransactions }}"
