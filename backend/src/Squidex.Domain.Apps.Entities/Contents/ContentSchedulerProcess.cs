@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using Squidex.ClientLibrary;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Hosting;
