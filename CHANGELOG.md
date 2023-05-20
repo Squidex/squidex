@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.6.0] - 2023-05-20
+
+### Fixed
+
+* **API**: A lot of fixes to the OpenAPI spec.
+* **Assets**: Use correct parent ID when uploading to folder.
+* **Contents**: Custom preview format for assets in content list.
+* **Contents**: Exception handler for scheduler
+* **Contents**: Fixes field rules for localized fields.
+* **Contents**: Hover effect for assets in content list to show larger version.
+* **Identity**: Do not clear cookies on login to preserve antiforgery tokens.
+* **Notifications**: Spelling errors fixed.
+* **Teams**: Fixed the transfer dialog when removing an app from all teams.
+
+### Changed
+
+* **Events**: Improved performance for queries of events.
+* **UI**: Reduced bundle size.
+* **UI**: Update OIDC Client.
+
+### Added
+
+* **API**: Also document some headers in OpenAPI spec.
+* **Contents**: Default values for component fields.
+* **GraphQL**: New resolver to get contents by id.
+
 ## [7.5.0] - 2023-03-03
 
 ### Fixed
