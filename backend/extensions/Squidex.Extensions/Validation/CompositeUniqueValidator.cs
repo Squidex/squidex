@@ -27,7 +27,7 @@ internal sealed class CompositeUniqueValidator : IValidator
         this.contentRepository = contentRepository;
     }
 
-    public void Validate(object value, ValidationContext context)
+    public void Validate(object? value, ValidationContext context)
     {
         if (value is ContentData data)
         {
@@ -64,11 +64,11 @@ internal sealed class CompositeUniqueValidator : IValidator
         }
     }
 
-    private static ClrValue TryGetValue(IRootField field, ContentData data)
+    private static ClrValue? TryGetValue(IRootField field, ContentData data)
     {
         var value = JsonValue.Null;
 
-        if (data.TryGetValue(field.Name, out var fieldValue))
+        if (data.TryGetValue(field.Name, out var fieldValue) && fieldValue != null)
         {
             if (fieldValue.TryGetValue(InvariantPartitioning.Key, out var temp) && temp != default)
             {

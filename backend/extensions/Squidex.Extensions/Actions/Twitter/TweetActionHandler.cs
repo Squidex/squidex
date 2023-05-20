@@ -30,7 +30,7 @@ public sealed class TweetActionHandler : RuleActionHandler<TweetAction, TweetJob
     {
         var ruleJob = new TweetJob
         {
-            Text = await FormatAsync(action.Text, @event),
+            Text = (await FormatAsync(action.Text, @event))!,
             AccessToken = action.AccessToken,
             AccessSecret = action.AccessSecret
         };

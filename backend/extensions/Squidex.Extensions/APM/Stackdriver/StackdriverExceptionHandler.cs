@@ -50,7 +50,7 @@ internal sealed class StackdriverExceptionHandler : ILogAppender
         httpContextWrapper = new HttpContextWrapper(httpContextAccessor);
     }
 
-    public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception exception)
+    public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
     {
         try
         {

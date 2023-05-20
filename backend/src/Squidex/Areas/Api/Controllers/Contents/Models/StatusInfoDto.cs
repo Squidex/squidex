@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models;
 

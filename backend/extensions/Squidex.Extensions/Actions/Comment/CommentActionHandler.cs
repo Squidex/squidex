@@ -33,7 +33,7 @@ public sealed class CommentActionHandler : RuleActionHandler<CommentAction, Crea
                 AppId = contentEvent.AppId
             };
 
-            ruleJob.Text = await FormatAsync(action.Text, @event);
+            ruleJob.Text = (await FormatAsync(action.Text, @event))!;
 
             if (!string.IsNullOrEmpty(action.Client))
             {

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;

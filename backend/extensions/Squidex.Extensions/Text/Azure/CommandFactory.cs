@@ -33,7 +33,7 @@ public static class CommandFactory
     private static void UpsertTextEntry(UpsertIndexEntry upsert, IList<IndexDocumentsAction<SearchDocument>> batch)
     {
         var geoField = string.Empty;
-        var geoObject = (object)null;
+        var geoObject = (object?)null;
 
         if (upsert.GeoObjects != null)
         {
@@ -56,7 +56,7 @@ public static class CommandFactory
             }
         }
 
-        if (upsert.Texts != null || geoObject != null)
+        if (upsert.Texts != null && geoObject != null)
         {
             var document = new SearchDocument
             {

@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
@@ -136,7 +137,7 @@ internal sealed class QueryByQuery : OperationBase
             Filter.Eq(x => x.IndexedSchemaId, schemaId)
         };
 
-        if (filter?.HasField("dl") != true)
+        if (filter?.HasField(Field.Of<MongoContentEntity>(x => nameof(x.IsDeleted))) != true)
         {
             filters.Add(Filter.Ne(x => x.IsDeleted, true));
         }
@@ -162,31 +163,27 @@ internal sealed class QueryByQuery : OperationBase
 
         var isDefault = false;
 
-        if (query?.HasFilterField("dl") != true)
+        if (query?.Filter?.HasField(Field.Of<MongoContentEntity>(x => nameof(x.IsDeleted))) != true)
         {
             filters.Add(Filter.Ne(x => x.IsDeleted, true));
-
             isDefault = true;
         }
 
         if (query?.Filter != null)
         {
             filters.Add(query.Filter.BuildFilter<MongoContentEntity>());
-
             isDefault = false;
         }
 
         if (reference != default)
         {
             filters.Add(Filter.AnyEq(x => x.ReferencedIds, reference));
-
             isDefault = false;
         }
 
         if (createdBy != null)
         {
             filters.Add(Filter.Eq(x => x.CreatedBy, createdBy));
-
             isDefault = false;
         }
 

@@ -7,28 +7,27 @@
 
 using MongoDB.Driver;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.MongoDb.Queries;
 
 public static class FilterBuilder
 {
-    public static (FilterDefinition<TDocument>? Filter, bool Last) BuildFilter<TDocument>(this ClrQuery query, bool supportsSearch = true)
+    public static (FilterDefinition<T>? Filter, bool Last) BuildFilter<T>(this ClrQuery query, bool supportsSearch = true)
     {
         if (query.FullText != null)
         {
             if (!supportsSearch)
             {
-                throw new ValidationException(T.Get("common.fullTextNotSupported"));
+                throw new ValidationException(Translations.T.Get("common.fullTextNotSupported"));
             }
 
-            return (Builders<TDocument>.Filter.Text(query.FullText), false);
+            return (Builders<T>.Filter.Text(query.FullText), false);
         }
 
         if (query.Filter != null)
         {
-            return (query.Filter.BuildFilter<TDocument>(), true);
+            return (query.Filter.BuildFilter<T>(), true);
         }
 
         return (null, false);

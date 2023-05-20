@@ -9,7 +9,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.History.Models;
 

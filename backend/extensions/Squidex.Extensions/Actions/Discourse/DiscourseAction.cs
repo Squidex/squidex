@@ -46,7 +46,7 @@ public sealed record DiscourseAction : RuleAction
     [Display(Name = "Title", Description = "The optional title when creating new topics.")]
     [Editor(RuleFieldEditor.Text)]
     [Formattable]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     [Display(Name = "Topic", Description = "The optional topic id.")]
     [Editor(RuleFieldEditor.Text)]

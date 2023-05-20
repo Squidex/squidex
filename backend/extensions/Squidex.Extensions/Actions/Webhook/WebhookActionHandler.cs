@@ -48,9 +48,9 @@ public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, Webh
         var ruleJob = new WebhookJob
         {
             Method = action.Method,
-            RequestUrl = await FormatAsync(action.Url.ToString(), @event),
+            RequestUrl = (await FormatAsync(action.Url.ToString(), @event))!,
             RequestSignature = requestSignature,
-            RequestBody = requestBody,
+            RequestBody = requestBody!,
             RequestBodyType = action.PayloadType,
             Headers = await ParseHeadersAsync(action.Headers, @event)
         };
@@ -58,7 +58,7 @@ public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, Webh
         return (ruleText, ruleJob);
     }
 
-    private async Task<Dictionary<string, string>> ParseHeadersAsync(string headers, EnrichedEvent @event)
+    private async Task<Dictionary<string, string>?> ParseHeadersAsync(string? headers, EnrichedEvent @event)
     {
         if (string.IsNullOrWhiteSpace(headers))
         {
@@ -80,7 +80,7 @@ public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, Webh
 
                 headerValue = await FormatAsync(headerValue, @event);
 
-                headersDictionary[headerKey] = headerValue;
+                headersDictionary[headerKey] = headerValue!;
             }
         }
 
@@ -146,7 +146,7 @@ public sealed class WebhookJob
 
     public string RequestBody { get; set; }
 
-    public string RequestBodyType { get; set; }
+    public string? RequestBodyType { get; set; }
 
-    public Dictionary<string, string> Headers { get; set; }
+    public Dictionary<string, string>? Headers { get; set; }
 }

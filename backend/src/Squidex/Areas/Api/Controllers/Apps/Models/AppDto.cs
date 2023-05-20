@@ -21,7 +21,6 @@ using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Web;
-using System.Text.Json;
 
 #pragma warning disable RECS0033 // Convert 'if' to '||' expression
 

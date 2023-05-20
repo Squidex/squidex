@@ -9,11 +9,6 @@ namespace Squidex.Infrastructure.Queries;
 
 public static class QueryExtensions
 {
-    public static bool HasFilterField<T>(this Query<T>? query, string field)
-    {
-        return HasField(query?.Filter, field);
-    }
-
     public static bool HasField<T>(this FilterNode<T>? filter, string field)
     {
         if (filter == null)

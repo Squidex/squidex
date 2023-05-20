@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models;

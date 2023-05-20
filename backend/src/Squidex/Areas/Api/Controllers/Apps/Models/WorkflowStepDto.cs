@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 using NoUpdateType = Squidex.Domain.Apps.Core.Contents.NoUpdate;
 

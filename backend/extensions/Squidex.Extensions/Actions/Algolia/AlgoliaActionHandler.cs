@@ -46,7 +46,7 @@ public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, Algo
 
             var ruleDescription = string.Empty;
             var contentId = entityEvent.Id.ToString();
-            var content = (AlgoliaContent)null;
+            var content = (AlgoliaContent?)null;
 
             if (delete)
             {
@@ -58,7 +58,7 @@ public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, Algo
 
                 try
                 {
-                    string jsonString;
+                    string? jsonString;
 
                     if (!string.IsNullOrEmpty(action.Document))
                     {
@@ -70,7 +70,7 @@ public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, Algo
                         jsonString = ToJson(@event);
                     }
 
-                    content = serializer.Deserialize<AlgoliaContent>(jsonString);
+                    content = serializer.Deserialize<AlgoliaContent>(jsonString!);
                 }
                 catch (Exception ex)
                 {
@@ -92,7 +92,7 @@ public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, Algo
                 ApiKey = action.ApiKey,
                 Content = serializer.Serialize(content, true),
                 ContentId = contentId,
-                IndexName = await FormatAsync(action.IndexName, @event)
+                IndexName = (await FormatAsync(action.IndexName, @event))!
             };
 
             return (ruleDescription, ruleJob);

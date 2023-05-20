@@ -8,9 +8,11 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models;
 
+[OpenApiRequest]
 public abstract class FieldPropertiesDto
 {
     /// <summary>

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Validation;
-
 namespace Squidex.Areas.Api.Controllers.News.Models;
 
 public class FeaturesDto

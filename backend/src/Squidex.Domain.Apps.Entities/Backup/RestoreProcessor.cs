@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO.Pipelines;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -432,7 +431,7 @@ public sealed partial class RestoreProcessor
 
         run.Job.Log.Add($"{now}: {message}");
 
-        return state.WriteAsync(ct: default);
+        return state.WriteAsync(default);
     }
 
     private Task LogAsync(Run run, string message, bool replace = false)

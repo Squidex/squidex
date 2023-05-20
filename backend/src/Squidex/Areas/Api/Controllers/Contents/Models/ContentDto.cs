@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models;

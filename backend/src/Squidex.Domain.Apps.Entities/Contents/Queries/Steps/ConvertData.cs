@@ -136,7 +136,7 @@ public sealed class ConvertData : IContentEnricherStep
         converter.Add(
             new ResolveLanguages(
                 context.App.Languages,
-                context.Languages().ToArray())
+                context.LanguageList().ToArray())
             {
                 ResolveFallback = !context.IsFrontendClient && context.ShouldResolveLanguages()
             });

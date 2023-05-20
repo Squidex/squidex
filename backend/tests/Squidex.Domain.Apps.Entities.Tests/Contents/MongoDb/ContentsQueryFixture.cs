@@ -9,7 +9,6 @@ using System.Globalization;
 using LoremNET;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core;

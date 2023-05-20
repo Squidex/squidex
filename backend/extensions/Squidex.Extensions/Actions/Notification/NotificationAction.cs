@@ -34,9 +34,9 @@ public sealed record NotificationAction : RuleAction
     [Display(Name = "Url", Description = "The optional url to attach to the notification.")]
     [Editor(RuleFieldEditor.Text)]
     [Formattable]
-    public string Url { get; set; }
+    public string? Url { get; set; }
 
     [Display(Name = "Client", Description = "An optional client name.")]
     [Editor(RuleFieldEditor.Text)]
-    public string Client { get; set; }
+    public string? Client { get; set; }
 }

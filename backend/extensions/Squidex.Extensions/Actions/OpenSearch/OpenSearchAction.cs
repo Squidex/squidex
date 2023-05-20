@@ -35,18 +35,18 @@ public sealed record OpenSearchAction : RuleAction
 
     [Display(Name = "Username", Description = "The optional username.")]
     [Editor(RuleFieldEditor.Text)]
-    public string Username { get; set; }
+    public string? Username { get; set; }
 
     [Display(Name = "Password", Description = "The optional password.")]
     [Editor(RuleFieldEditor.Text)]
-    public string Password { get; set; }
+    public string? Password { get; set; }
 
     [Display(Name = "Document", Description = "The optional custom document.")]
     [Editor(RuleFieldEditor.TextArea)]
     [Formattable]
-    public string Document { get; set; }
+    public string? Document { get; set; }
 
     [Display(Name = "Deletion", Description = "The condition when to delete the document.")]
     [Editor(RuleFieldEditor.Text)]
-    public string Delete { get; set; }
+    public string? Delete { get; set; }
 }

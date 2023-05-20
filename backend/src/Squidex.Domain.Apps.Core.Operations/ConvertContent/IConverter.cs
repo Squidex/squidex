@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Json.Objects;
-using static Google.Rpc.Context.AttributeContext.Types;
 
 #pragma warning disable MA0048 // File name must match type name
 

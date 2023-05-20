@@ -13,28 +13,29 @@ using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public static class ContentExtensions
+public static class ContentHeaders
 {
-    private const string HeaderFlatten = "X-Flatten";
-    private const string HeaderLanguages = "X-Languages";
-    private const string HeaderNoCleanup = "X-NoCleanup";
-    private const string HeaderNoEnrichment = "X-NoEnrichment";
-    private const string HeaderNoResolveLanguages = "X-NoResolveLanguages";
-    private const string HeaderResolveFlow = "X-ResolveFlow";
-    private const string HeaderResolveUrls = "X-Resolve-Urls";
-    private const string HeaderUnpublished = "X-Unpublished";
     private static readonly char[] Separators = { ',', ';' };
+
+    public const string Flatten = "X-Flatten";
+    public const string Languages = "X-Languages";
+    public const string NoCleanup = "X-NoCleanup";
+    public const string NoEnrichment = "X-NoEnrichment";
+    public const string NoResolveLanguages = "X-NoResolveLanguages";
+    public const string ResolveFlow = "X-ResolveFlow";
+    public const string ResolveUrls = "X-Resolve-Urls";
+    public const string Unpublished = "X-Unpublished";
 
     public static void AddCacheHeaders(this Context context, IRequestCache cache)
     {
-        cache.AddHeader(HeaderFlatten);
-        cache.AddHeader(HeaderLanguages);
-        cache.AddHeader(HeaderNoCleanup);
-        cache.AddHeader(HeaderNoEnrichment);
-        cache.AddHeader(HeaderNoResolveLanguages);
-        cache.AddHeader(HeaderResolveFlow);
-        cache.AddHeader(HeaderResolveUrls);
-        cache.AddHeader(HeaderUnpublished);
+        cache.AddHeader(Flatten);
+        cache.AddHeader(Languages);
+        cache.AddHeader(NoCleanup);
+        cache.AddHeader(NoEnrichment);
+        cache.AddHeader(NoResolveLanguages);
+        cache.AddHeader(ResolveFlow);
+        cache.AddHeader(ResolveUrls);
+        cache.AddHeader(Unpublished);
     }
 
     public static Status EditingStatus(this IContentEntity content)
@@ -54,67 +55,67 @@ public static class ContentExtensions
 
     public static bool ShouldSkipCleanup(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderNoCleanup);
+        return context.Headers.ContainsKey(NoCleanup);
     }
 
     public static ICloneBuilder WithoutCleanup(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderNoCleanup, value);
+        return builder.WithBoolean(NoCleanup, value);
     }
 
     public static bool ShouldSkipContentEnrichment(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderNoEnrichment);
+        return context.Headers.ContainsKey(NoEnrichment);
     }
 
     public static ICloneBuilder WithoutContentEnrichment(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderNoEnrichment, value);
+        return builder.WithBoolean(NoEnrichment, value);
     }
 
     public static bool ShouldProvideUnpublished(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderUnpublished);
+        return context.Headers.ContainsKey(Unpublished);
     }
 
     public static ICloneBuilder WithUnpublished(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderUnpublished, value);
+        return builder.WithBoolean(Unpublished, value);
     }
 
     public static bool ShouldFlatten(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderFlatten);
+        return context.Headers.ContainsKey(Flatten);
     }
 
     public static ICloneBuilder WithFlatten(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderFlatten, value);
+        return builder.WithBoolean(Flatten, value);
     }
 
     public static bool ShouldResolveFlow(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderResolveFlow);
+        return context.Headers.ContainsKey(ResolveFlow);
     }
 
     public static ICloneBuilder WithResolveFlow(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderResolveFlow, value);
+        return builder.WithBoolean(ResolveFlow, value);
     }
 
     public static bool ShouldResolveLanguages(this Context context)
     {
-        return !context.Headers.ContainsKey(HeaderNoResolveLanguages);
+        return !context.Headers.ContainsKey(NoResolveLanguages);
     }
 
     public static ICloneBuilder WithoutResolveLanguages(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderNoResolveLanguages, value);
+        return builder.WithBoolean(NoResolveLanguages, value);
     }
 
     public static IEnumerable<string> AssetUrls(this Context context)
     {
-        if (context.Headers.TryGetValue(HeaderResolveUrls, out var value))
+        if (context.Headers.TryGetValue(ResolveUrls, out var value))
         {
             return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToHashSet();
         }
@@ -124,12 +125,12 @@ public static class ContentExtensions
 
     public static ICloneBuilder WithAssetUrlsToResolve(this ICloneBuilder builder, IEnumerable<string>? fieldNames)
     {
-        return builder.WithStrings(HeaderResolveUrls, fieldNames);
+        return builder.WithStrings(ResolveUrls, fieldNames);
     }
 
-    public static IEnumerable<Language> Languages(this Context context)
+    public static IEnumerable<Language> LanguageList(this Context context)
     {
-        if (context.Headers.TryGetValue(HeaderLanguages, out var value))
+        if (context.Headers.TryGetValue(Languages, out var value))
         {
             var languages = new HashSet<Language>();
 
@@ -146,6 +147,6 @@ public static class ContentExtensions
 
     public static ICloneBuilder WithLanguages(this ICloneBuilder builder, IEnumerable<string> fieldNames)
     {
-        return builder.WithStrings(HeaderLanguages, fieldNames);
+        return builder.WithStrings(Languages, fieldNames);
     }
 }

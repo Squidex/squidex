@@ -7,7 +7,6 @@
 
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers;
 

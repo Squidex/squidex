@@ -108,7 +108,7 @@ public sealed class KafkaProducer
     {
         if (!string.IsNullOrWhiteSpace(job.Schema))
         {
-            var value = CreateAvroRecord(job.MessageValue, job.Schema);
+            var value = CreateAvroRecord(job.MessageValue!, job.Schema);
 
             var message = new Message<string, GenericRecord> { Value = value };
 
@@ -116,7 +116,7 @@ public sealed class KafkaProducer
         }
         else
         {
-            var message = new Message<string, string> { Value = job.MessageValue };
+            var message = new Message<string, string> { Value = job.MessageValue! };
 
             await ProduceAsync(textProducer, message, job, ct);
         }
@@ -125,7 +125,7 @@ public sealed class KafkaProducer
     private static async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job,
         CancellationToken ct)
     {
-        message.Key = job.MessageKey;
+        message.Key = job.MessageKey!;
 
         if (job.Headers?.Count > 0)
         {
@@ -157,9 +157,7 @@ public sealed class KafkaProducer
 
             var jsonObject = jsonSerializer.Deserialize<JsonObject>(json);
 
-            var result = (GenericRecord)GetValue(jsonObject, schema);
-
-            return result;
+            return (GenericRecord)GetValue(jsonObject, schema)!;
         }
         catch (JsonException ex)
         {
@@ -173,7 +171,7 @@ public sealed class KafkaProducer
         avroProducer?.Dispose();
     }
 
-    private static object GetValue(JsonValue value, Schema schema)
+    private static object? GetValue(JsonValue value, Schema? schema)
     {
         switch (value.Value)
         {
@@ -191,11 +189,11 @@ public sealed class KafkaProducer
                 return s;
             case JsonObject o when IsTypeOrUnionWith(schema, Schema.Type.Map):
                 {
-                    var mapResult = new Dictionary<string, object>();
+                    var mapResult = new Dictionary<string, object?>();
 
                     if (schema is UnionSchema union)
                     {
-                        var map = (MapSchema)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Map);
+                        var map = (MapSchema?)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Map);
 
                         foreach (var (key, childValue) in o)
                         {
@@ -215,11 +213,11 @@ public sealed class KafkaProducer
 
             case JsonObject o when IsTypeOrUnionWith(schema, Schema.Type.Record):
                 {
-                    GenericRecord result = null;
+                    GenericRecord? result = null;
 
                     if (schema is UnionSchema union)
                     {
-                        var record = (RecordSchema)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Record);
+                        var record = (RecordSchema?)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Record);
 
                         result = new GenericRecord(record);
 
@@ -249,11 +247,11 @@ public sealed class KafkaProducer
 
             case JsonArray a when IsTypeOrUnionWith(schema, Schema.Type.Array):
                 {
-                    var result = new List<object>();
+                    var result = new List<object?>();
 
                     if (schema is UnionSchema union)
                     {
-                        var arraySchema = (ArraySchema)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Array);
+                        var arraySchema = (ArraySchema?)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Array);
 
                         foreach (var item in a)
                         {
@@ -275,8 +273,8 @@ public sealed class KafkaProducer
         return null;
     }
 
-    private static bool IsTypeOrUnionWith(Schema schema, Schema.Type expected)
+    private static bool IsTypeOrUnionWith(Schema? schema, Schema.Type expected)
     {
-        return schema.Tag == expected || (schema is UnionSchema union && union.Schemas.Any(x => x.Tag == expected));
+        return schema?.Tag == expected || (schema is UnionSchema union && union.Schemas.Any(x => x.Tag == expected));
     }
 }

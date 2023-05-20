@@ -68,7 +68,7 @@ public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, 
             TypesenseContent content;
             try
             {
-                string jsonString;
+                string? jsonString;
 
                 if (!string.IsNullOrEmpty(action.Document))
                 {
@@ -80,7 +80,7 @@ public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, 
                     jsonString = ToJson(@event);
                 }
 
-                content = serializer.Deserialize<TypesenseContent>(jsonString);
+                content = serializer.Deserialize<TypesenseContent>(jsonString!);
             }
             catch (Exception ex)
             {

@@ -47,7 +47,7 @@ public sealed class ClientWrapper
 
         if (waitSeconds > 10)
         {
-            Console.WriteLine("Waiting {0} seconds to access server", waitSeconds);
+            Console.WriteLine("Waiting {0} seconds to access server.", waitSeconds);
 
             try
             {

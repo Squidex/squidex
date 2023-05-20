@@ -42,9 +42,9 @@ public sealed record AlgoliaAction : RuleAction
     [Display(Name = "Document", Description = "The optional custom document.")]
     [Editor(RuleFieldEditor.TextArea)]
     [Formattable]
-    public string Document { get; set; }
+    public string? Document { get; set; }
 
     [Display(Name = "Deletion", Description = "The condition when to delete the entry.")]
     [Editor(RuleFieldEditor.Text)]
-    public string Delete { get; set; }
+    public string? Delete { get; set; }
 }

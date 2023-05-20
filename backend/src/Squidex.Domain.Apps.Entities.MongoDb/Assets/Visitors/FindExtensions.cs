@@ -47,10 +47,9 @@ public static class FindExtensions
 
         var isDefault = false;
 
-        if (!query.HasFilterField("IsDeleted"))
+        if (query.Filter?.HasField("IsDeleted") != true)
         {
             filters.Add(Filter.Ne(x => x.IsDeleted, true));
-
             isDefault = true;
         }
 

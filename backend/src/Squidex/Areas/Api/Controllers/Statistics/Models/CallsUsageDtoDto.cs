@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure.UsageTracking;
-using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models;
 

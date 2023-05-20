@@ -7,6 +7,8 @@
 
 namespace Squidex.Infrastructure.Queries;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 public sealed record SortNode(PropertyPath Path, SortOrder Order)
 {
     public override string ToString()

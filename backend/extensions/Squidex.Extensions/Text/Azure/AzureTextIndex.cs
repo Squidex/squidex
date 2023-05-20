@@ -70,7 +70,7 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
         await searchClient.IndexDocumentsAsync(batch, cancellationToken: ct);
     }
 
-    public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -83,7 +83,7 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
         return result.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
     }
 
-    public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -157,7 +157,7 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
         {
             if (item != null)
             {
-                var id = DomainId.Create(item.Document["contentId"].ToString());
+                var id = DomainId.Create(item.Document["contentId"].ToString()!);
 
                 result.Add((id, factor * item.Score ?? 0));
             }

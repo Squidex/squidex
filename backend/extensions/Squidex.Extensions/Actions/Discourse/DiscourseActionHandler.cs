@@ -30,9 +30,9 @@ public sealed class DiscourseActionHandler : RuleActionHandler<DiscourseAction, 
     {
         var url = $"{action.Url.ToString().TrimEnd('/')}/posts.json?api_key={action.ApiKey}&api_username={action.ApiUsername}";
 
-        var json = new Dictionary<string, object>
+        var json = new Dictionary<string, object?>
         {
-            ["title"] = await FormatAsync(action.Title, @event)
+            ["title"] = await FormatAsync(action.Title!, @event)
         };
 
         if (action.Topic != null)

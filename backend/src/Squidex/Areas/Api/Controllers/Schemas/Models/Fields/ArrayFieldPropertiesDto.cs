@@ -8,9 +8,11 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 
+[OpenApiRequest]
 public sealed class ArrayFieldPropertiesDto : FieldPropertiesDto
 {
     /// <summary>

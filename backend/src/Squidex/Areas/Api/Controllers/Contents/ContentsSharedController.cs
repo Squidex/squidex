@@ -8,6 +8,7 @@
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -47,6 +48,7 @@ public sealed class ContentsSharedController : ApiController
     [Route("content/{app}/graphql/batch")]
     [ApiPermissionOrAnonymous]
     [ApiCosts(2)]
+    [AcceptHeader_Unpublished]
     [IgnoreCacheFilter]
     public IActionResult GetGraphQL(string app)
     {
@@ -73,6 +75,11 @@ public sealed class ContentsSharedController : ApiController
     [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
+    [AcceptHeader_Flatten]
+    [AcceptHeader_Languages]
+    [AcceptHeader_NoSlowTotal]
+    [AcceptHeader_NoTotal]
+    [AcceptHeader_Unpublished]
     public async Task<IActionResult> GetAllContents(string app, AllContentsByGetDto query)
     {
         var contents = await contentQuery.QueryAsync(Context, (query ?? new AllContentsByGetDto()).ToQuery(Request), HttpContext.RequestAborted);
@@ -100,6 +107,11 @@ public sealed class ContentsSharedController : ApiController
     [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
+    [AcceptHeader_Flatten]
+    [AcceptHeader_Languages]
+    [AcceptHeader_NoSlowTotal]
+    [AcceptHeader_NoTotal]
+    [AcceptHeader_Unpublished]
     public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] AllContentsByPostDto query)
     {
         var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);

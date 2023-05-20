@@ -39,7 +39,7 @@ public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, Sign
     {
         var hubName = await FormatAsync(action.HubName, @event);
 
-        string requestBody;
+        string? requestBody;
 
         if (!string.IsNullOrWhiteSpace(action.Payload))
         {
@@ -53,14 +53,13 @@ public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, Sign
         var target = (await FormatAsync(action.Target, @event)) ?? string.Empty;
 
         var ruleText = $"Send SignalRJob to signalR hub '{hubName}'";
-
         var ruleJob = new SignalRJob
         {
             Action = action.Action,
             ConnectionString = action.ConnectionString,
-            HubName = hubName,
+            HubName = hubName!,
             MethodName = action.MethodName,
-            MethodPayload = requestBody,
+            MethodPayload = requestBody!,
             Targets = target.Split("\n")
         };
 
@@ -102,7 +101,7 @@ public sealed class SignalRJob
 
     public ActionTypeEnum Action { get; set; }
 
-    public string MethodName { get; set; }
+    public string? MethodName { get; set; }
 
     public string MethodPayload { get; set; }
 

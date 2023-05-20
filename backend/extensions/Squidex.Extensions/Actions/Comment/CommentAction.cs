@@ -28,5 +28,5 @@ public sealed record CommentAction : RuleAction
 
     [Display(Name = "Client", Description = "An optional client name.")]
     [Editor(RuleFieldEditor.Text)]
-    public string Client { get; set; }
+    public string? Client { get; set; }
 }

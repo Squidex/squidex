@@ -8,6 +8,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -113,6 +114,9 @@ public sealed class AssetsController : ApiController
     [ProducesResponseType(typeof(AssetsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
     [ApiCosts(1)]
+    [AcceptQuery(false)]
+    [AcceptHeader_NoTotal]
+    [AcceptHeader_NoSlowTotal]
     public async Task<IActionResult> GetAssets(string app, [FromQuery] DomainId? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
     {
         var assets = await assetQuery.QueryAsync(Context, parentId, CreateQuery(ids, q), HttpContext.RequestAborted);
@@ -140,6 +144,8 @@ public sealed class AssetsController : ApiController
     [ProducesResponseType(typeof(AssetsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
     [ApiCosts(1)]
+    [AcceptHeader_NoTotal]
+    [AcceptHeader_NoSlowTotal]
     public async Task<IActionResult> GetAssetsPost(string app, [FromBody] QueryDto query)
     {
         var assets = await assetQuery.QueryAsync(Context, query?.ParentId, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);

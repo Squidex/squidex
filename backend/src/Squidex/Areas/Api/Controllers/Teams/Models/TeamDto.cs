@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 
