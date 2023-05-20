@@ -199,14 +199,13 @@ export const ASSET_PREVIEW_MODES: ReadonlyArray<AssetPreviewMode> = [
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Assets';
 
-    public readonly previewMode: AssetPreviewMode = 'FileName';
-    public readonly defaultValue?: ReadonlyArray<string>;
-    public readonly defaultValues?: DefaultValue<ReadonlyArray<string>>;
     public readonly allowDuplicates?: boolean;
     public readonly allowedExtensions?: ReadonlyArray<string>;
-    public readonly resolveFirst = false;
     public readonly aspectHeight?: number;
     public readonly aspectWidth?: number;
+    public readonly defaultValue?: ReadonlyArray<string>;
+    public readonly defaultValues?: DefaultValue<ReadonlyArray<string>>;
+    public readonly expectedType?: string;
     public readonly folderId?: string;
     public readonly maxHeight?: number;
     public readonly maxItems?: number;
@@ -216,7 +215,9 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly minItems?: number;
     public readonly minSize?: number;
     public readonly minWidth?: number;
-    public readonly expectedType?: string;
+    public readonly previewFormat?: string;
+    public readonly previewMode: AssetPreviewMode = 'FileName';
+    public readonly resolveFirst = false;
 
     public get isSortable() {
         return false;

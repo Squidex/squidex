@@ -25,7 +25,7 @@ public sealed class KafkaActionHandler : RuleActionHandler<KafkaAction, KafkaJob
 
     protected override async Task<(string Description, KafkaJob Data)> CreateJobAsync(EnrichedEvent @event, KafkaAction action)
     {
-        string value, key;
+        string? value, key;
 
         if (!string.IsNullOrEmpty(action.Payload))
         {
@@ -59,7 +59,7 @@ public sealed class KafkaActionHandler : RuleActionHandler<KafkaAction, KafkaJob
         return (Description, ruleJob);
     }
 
-    private async Task<Dictionary<string, string>> ParseHeadersAsync(string headers, EnrichedEvent @event)
+    private async Task<Dictionary<string, string>?> ParseHeadersAsync(string? headers, EnrichedEvent @event)
     {
         if (string.IsNullOrWhiteSpace(headers))
         {
@@ -76,12 +76,12 @@ public sealed class KafkaActionHandler : RuleActionHandler<KafkaAction, KafkaJob
 
             if (indexEqual > 0 && indexEqual < line.Length - 1)
             {
-                var key = line[..indexEqual];
-                var val = line[(indexEqual + 1)..];
+                var headerKey = line[..indexEqual];
+                var headerValue = line[(indexEqual + 1)..];
 
-                val = await FormatAsync(val, @event);
+                headerValue = await FormatAsync(headerValue, @event);
 
-                headersDictionary[key] = val;
+                headersDictionary[headerKey] = headerValue!;
             }
         }
 
@@ -108,15 +108,15 @@ public sealed class KafkaJob
 {
     public string TopicName { get; set; }
 
-    public string MessageKey { get; set; }
+    public string? MessageKey { get; set; }
 
-    public string MessageValue { get; set; }
+    public string? MessageValue { get; set; }
 
-    public string Schema { get; set; }
+    public string? Schema { get; set; }
 
-    public string PartitionKey { get; set; }
+    public string? PartitionKey { get; set; }
 
-    public Dictionary<string, string> Headers { get; set; }
+    public Dictionary<string, string>? Headers { get; set; }
 
     public int PartitionCount { get; set; }
 }

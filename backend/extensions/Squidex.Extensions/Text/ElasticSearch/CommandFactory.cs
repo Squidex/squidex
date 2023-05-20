@@ -31,7 +31,7 @@ public static class CommandFactory
     private static void UpsertEntry(UpsertIndexEntry upsert, List<object> args, string indexName)
     {
         var geoField = string.Empty;
-        var geoObject = (object)null;
+        var geoObject = (object?)null;
 
         if (upsert.GeoObjects != null)
         {
@@ -63,18 +63,21 @@ public static class CommandFactory
 
             var texts = new Dictionary<string, string>();
 
-            foreach (var (key, value) in upsert.Texts)
+            if (upsert.Texts != null)
             {
-                var text = value;
-
-                var languageCode = ElasticSearchIndexDefinition.GetFieldName(key);
-
-                if (texts.TryGetValue(languageCode, out var existing))
+                foreach (var (key, value) in upsert.Texts)
                 {
-                    text = $"{existing} {value}";
-                }
+                    var text = value;
 
-                texts[languageCode] = text;
+                    var languageCode = ElasticSearchIndexDefinition.GetFieldName(key);
+
+                    if (texts.TryGetValue(languageCode, out var existing))
+                    {
+                        text = $"{existing} {value}";
+                    }
+
+                    texts[languageCode] = text;
+                }
             }
 
             args.Add(new

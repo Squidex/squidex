@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Templates.Models;

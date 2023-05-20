@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Amazon.Runtime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;

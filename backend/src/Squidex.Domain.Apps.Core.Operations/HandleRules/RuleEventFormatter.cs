@@ -96,7 +96,7 @@ public class RuleEventFormatter
         return serializer.Serialize(new { type, payload, timestamp }, true);
     }
 
-    public async ValueTask<string?> FormatAsync(string text, EnrichedEvent @event)
+    public async ValueTask<string?> FormatAsync(string? text, EnrichedEvent @event)
     {
         if (string.IsNullOrWhiteSpace(text))
         {

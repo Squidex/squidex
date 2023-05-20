@@ -8,7 +8,6 @@
 using Squidex.Areas.Api.Controllers.Apps;
 using Squidex.Areas.Api.Controllers.Teams;
 using Squidex.Infrastructure.Translations;
-using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;

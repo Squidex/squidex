@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;

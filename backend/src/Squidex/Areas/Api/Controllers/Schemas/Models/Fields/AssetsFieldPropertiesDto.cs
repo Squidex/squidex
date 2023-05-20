@@ -9,9 +9,11 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 
+[OpenApiRequest]
 public sealed class AssetsFieldPropertiesDto : FieldPropertiesDto
 {
     /// <summary>
@@ -33,6 +35,11 @@ public sealed class AssetsFieldPropertiesDto : FieldPropertiesDto
     /// The initial id to the folder.
     /// </summary>
     public string? FolderId { get; set; }
+
+    /// <summary>
+    /// The preview format.
+    /// </summary>
+    public string? PreviewFormat { get; set; }
 
     /// <summary>
     /// The minimum allowed items for the field value.

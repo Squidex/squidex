@@ -11,7 +11,7 @@ namespace Squidex.Extensions.APM.Stackdriver;
 
 public sealed class StackdriverSeverityLogAppender : ILogAppender
 {
-    public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception exception)
+    public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
     {
         var severity = GetSeverity(logLevel);
 

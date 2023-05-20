@@ -61,7 +61,7 @@ public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
         return elasticClient.BulkAsync(args, ct);
     }
 
-    public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -123,7 +123,7 @@ public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
         return await SearchAsync(elasticQuery, ct);
     }
 
-    public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -194,7 +194,7 @@ public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
         {
             var bySchema = new
             {
-                terms = new Dictionary<string, object>
+                terms = new Dictionary<string, object?>
                 {
                     ["schemaId.keyword"] = query.PreferredSchemaId.ToString()
                 }

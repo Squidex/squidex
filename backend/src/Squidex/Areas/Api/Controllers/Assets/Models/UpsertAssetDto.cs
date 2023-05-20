@@ -20,18 +20,19 @@ public sealed class UpsertAssetDto
     /// <summary>
     /// The file to upload.
     /// </summary>
+    [FromForm(Name = "file")]
     public IFormFile File { get; set; }
 
     /// <summary>
     /// The optional parent folder id.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "parentId")]
     public DomainId ParentId { get; set; }
 
     /// <summary>
     /// True to duplicate the asset, event if the file has been uploaded.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "duplicate")]
     public bool Duplicate { get; set; }
 
     public static UpsertAsset ToCommand(AssetTusFile file)

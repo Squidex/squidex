@@ -11,7 +11,6 @@ using Squidex.Areas.Api.Controllers.Teams;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams;
-using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Squidex.Web;
 

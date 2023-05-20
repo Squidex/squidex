@@ -37,7 +37,7 @@ public sealed record AzureQueueAction : RuleAction
     [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
     [Editor(RuleFieldEditor.TextArea)]
     [Formattable]
-    public string Payload { get; set; }
+    public string? Payload { get; set; }
 
     protected override IEnumerable<ValidationError> CustomValidate()
     {

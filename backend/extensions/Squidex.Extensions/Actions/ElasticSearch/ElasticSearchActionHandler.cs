@@ -20,14 +20,14 @@ namespace Squidex.Extensions.Actions.ElasticSearch;
 
 public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearchAction, ElasticSearchJob>
 {
-    private readonly ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient> clients;
+    private readonly ClientPool<(Uri Host, string? Username, string? Password), ElasticLowLevelClient> clients;
     private readonly IScriptEngine scriptEngine;
     private readonly IJsonSerializer serializer;
 
     public ElasticSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer)
         : base(formatter)
     {
-        clients = new ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient>(key =>
+        clients = new ClientPool<(Uri Host, string? Username, string? Password), ElasticLowLevelClient>(key =>
         {
             var config = new ConnectionConfiguration(key.Host);
 
@@ -61,7 +61,7 @@ public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearch
         var ruleText = string.Empty;
         var ruleJob = new ElasticSearchJob
         {
-            IndexName = await FormatAsync(action.IndexName, @event),
+            IndexName = (await FormatAsync(action.IndexName, @event))!,
             ServerHost = action.Host.ToString(),
             ServerUser = action.Username,
             ServerPassword = action.Password,
@@ -79,7 +79,7 @@ public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearch
             ElasticSearchContent content;
             try
             {
-                string jsonString;
+                string? jsonString;
 
                 if (!string.IsNullOrEmpty(action.Document))
                 {
@@ -91,7 +91,7 @@ public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearch
                     jsonString = ToJson(@event);
                 }
 
-                content = serializer.Deserialize<ElasticSearchContent>(jsonString);
+                content = serializer.Deserialize<ElasticSearchContent>(jsonString!);
             }
             catch (Exception ex)
             {
@@ -156,9 +156,9 @@ public sealed class ElasticSearchJob
 {
     public string ServerHost { get; set; }
 
-    public string ServerUser { get; set; }
+    public string? ServerUser { get; set; }
 
-    public string ServerPassword { get; set; }
+    public string? ServerPassword { get; set; }
 
     public string ContentId { get; set; }
 

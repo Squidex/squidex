@@ -7,9 +7,11 @@
 
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Collections;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models;
 
+[OpenApiRequest]
 public sealed class ConfigurePreviewUrlsDto : Dictionary<string, string>
 {
     public ConfigurePreviewUrls ToCommand()

@@ -193,7 +193,8 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, assetWithImageAndFileName);
 
-        expect(result).toEqual({ value: ['url/to/13', 'file13'], formatted: new HtmlValue('<img src="url/to/13?width=50&height=50&mode=Pad" /> <span>file13</span>', 'url/to/13') });
+        expect(result).toEqual({ value: ['url/to/13', 'file13'],
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&" /> <span>file13</span></div>', 'url/to/13') });
     });
 
     it('should resolve image url only from referenced asset', () => {
@@ -209,7 +210,42 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, assetWithImage);
 
-        expect(result).toEqual({ value: ['url/to/13', 'file13'], formatted: new HtmlValue('<img src="url/to/13?width=50&height=50&mode=Pad" />', 'url/to/13') });
+        expect(result).toEqual({ value: ['url/to/13', 'file13'],
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&" /></div>', 'url/to/13') });
+    });
+
+    it('should resolve image url only from referenced asset with custom format', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    en: ['url/to/13', 'file13'],
+                },
+            },
+        };
+
+        const assetWithImage = createField({ properties: createProperties('Assets', { previewMode: 'Image', previewFormat: 'width=100&height=100' }) });
+
+        const result = getContentValue(content, language, assetWithImage);
+
+        expect(result).toEqual({ value: ['url/to/13', 'file13'],
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=100&height=100" /></div>', 'url/to/13') });
+    });
+
+    it('should resolve image url only from referenced asset with merged format', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    en: ['url/to/13', 'file13'],
+                },
+            },
+        };
+
+        const assetWithImage = createField({ properties: createProperties('Assets', { previewMode: 'Image', previewFormat: 'bg=red' }) });
+
+        const result = getContentValue(content, language, assetWithImage);
+
+        expect(result).toEqual({ value: ['url/to/13', 'file13'],
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&bg=red" /></div>', 'url/to/13') });
     });
 
     it('should resolve filename only from referenced asset', () => {

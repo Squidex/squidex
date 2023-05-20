@@ -7,51 +7,51 @@
 
 namespace Squidex.Domain.Apps.Entities;
 
-public static class ContextExtensions
+public static class ContextHeaders
 {
-    private const string HeaderNoTotal = "X-NoTotal";
-    private const string HeaderNoSlowTotal = "X-NoSlowTotal";
-    private const string HeaderNoCacheKeys = "X-NoCacheKeys";
-    private const string HeaderNoScripting = "X-NoScripting";
+    public const string NoTotal = "X-NoTotal";
+    public const string NoSlowTotal = "X-NoSlowTotal";
+    public const string NoCacheKeys = "X-NoCacheKeys";
+    public const string NoScripting = "X-NoScripting";
 
     public static bool ShouldSkipCacheKeys(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderNoCacheKeys);
+        return context.Headers.ContainsKey(NoCacheKeys);
     }
 
     public static ICloneBuilder WithoutCacheKeys(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderNoCacheKeys, value);
+        return builder.WithBoolean(NoCacheKeys, value);
     }
 
     public static bool ShouldSkipScripting(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderNoScripting);
+        return context.Headers.ContainsKey(NoScripting);
     }
 
     public static ICloneBuilder WithoutScripting(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderNoScripting, value);
+        return builder.WithBoolean(NoScripting, value);
     }
 
     public static bool ShouldSkipTotal(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderNoTotal);
+        return context.Headers.ContainsKey(NoTotal);
     }
 
     public static ICloneBuilder WithoutTotal(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderNoTotal, value);
+        return builder.WithBoolean(NoTotal, value);
     }
 
     public static bool ShouldSkipSlowTotal(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderNoSlowTotal);
+        return context.Headers.ContainsKey(NoSlowTotal);
     }
 
     public static ICloneBuilder WithoutSlowTotal(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderNoSlowTotal, value);
+        return builder.WithBoolean(NoSlowTotal, value);
     }
 
     public static ICloneBuilder WithBoolean(this ICloneBuilder builder, string key, bool value)

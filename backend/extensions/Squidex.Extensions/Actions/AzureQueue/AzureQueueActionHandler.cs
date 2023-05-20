@@ -36,7 +36,7 @@ public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction
     {
         var queueName = await FormatAsync(action.Queue, @event);
 
-        string requestBody;
+        string? requestBody;
 
         if (!string.IsNullOrEmpty(action.Payload))
         {
@@ -51,7 +51,7 @@ public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction
         var ruleJob = new AzureQueueJob
         {
             QueueConnectionString = action.ConnectionString,
-            QueueName = queueName,
+            QueueName = queueName!,
             MessageBodyV2 = requestBody
         };
 
@@ -75,5 +75,5 @@ public sealed class AzureQueueJob
 
     public string QueueName { get; set; }
 
-    public string MessageBodyV2 { get; set; }
+    public string? MessageBodyV2 { get; set; }
 }

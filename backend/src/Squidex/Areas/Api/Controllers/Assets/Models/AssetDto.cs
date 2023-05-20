@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models;

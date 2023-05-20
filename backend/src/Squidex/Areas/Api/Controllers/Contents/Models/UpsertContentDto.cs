@@ -27,19 +27,19 @@ public class UpsertContentDto
     /// <summary>
     /// The initial status.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "status")]
     public StatusType? Status { get; set; }
 
     /// <summary>
     /// Makes the update as patch.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "patch")]
     public bool Patch { get; set; }
 
     /// <summary>
     /// True to automatically publish the content.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "publish")]
     [Obsolete("Use 'status' query string now.")]
     public bool Publish { get; set; }
 

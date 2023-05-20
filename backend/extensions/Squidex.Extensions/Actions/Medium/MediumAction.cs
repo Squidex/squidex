@@ -41,16 +41,16 @@ public sealed record MediumAction : RuleAction
     [Display(Name = "Canonical Url", Description = "The original home of this content, if it was originally published elsewhere.")]
     [Editor(RuleFieldEditor.Text)]
     [Formattable]
-    public string CanonicalUrl { get; set; }
+    public string? CanonicalUrl { get; set; }
 
     [Display(Name = "Tags", Description = "The optional comma separated list of tags.")]
     [Editor(RuleFieldEditor.Text)]
     [Formattable]
-    public string Tags { get; set; }
+    public string? Tags { get; set; }
 
     [Display(Name = "Publication Id", Description = "Optional publication id.")]
     [Editor(RuleFieldEditor.Text)]
-    public string PublicationId { get; set; }
+    public string? PublicationId { get; set; }
 
     [Display(Name = "Is Html", Description = "Indicates whether the content is markdown or html.")]
     [Editor(RuleFieldEditor.Text)]

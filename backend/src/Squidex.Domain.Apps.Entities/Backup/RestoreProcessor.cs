@@ -139,6 +139,7 @@ public sealed partial class RestoreProcessor
                 await LogAsync(run, "  * Restore events and attachments.");
                 await LogAsync(run, "  * Restore all objects like app, schemas and contents");
                 await LogAsync(run, "  * Complete the restore operation for all objects");
+                await LogFlushAsync(run);
 
                 log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.", run.Job.Id, run.Job.Url);
 
@@ -430,7 +431,7 @@ public sealed partial class RestoreProcessor
 
         run.Job.Log.Add($"{now}: {message}");
 
-        return state.WriteAsync(ct: default);
+        return state.WriteAsync(default);
     }
 
     private Task LogAsync(Run run, string message, bool replace = false)
@@ -447,5 +448,10 @@ public sealed partial class RestoreProcessor
         }
 
         return state.WriteAsync(100, run.CancellationToken);
+    }
+
+    private Task LogFlushAsync(Run run)
+    {
+        return state.WriteAsync(run.CancellationToken);
     }
 }

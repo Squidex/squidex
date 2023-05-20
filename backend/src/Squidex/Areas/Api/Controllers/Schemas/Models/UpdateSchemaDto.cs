@@ -10,9 +10,11 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models;
 
+[OpenApiRequest]
 public sealed class UpdateSchemaDto
 {
     /// <summary>

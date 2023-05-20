@@ -79,8 +79,6 @@ public static class OpenApiServices
         services.AddOpenApiDocument((settings, services) =>
         {
             ConfigureSchemaSettings(settings, services.GetRequiredService<TypeRegistry>(), false);
-
-            settings.OperationProcessors.Add(new QueryParamsProcessor("/api/apps/{app}/assets"));
         });
     }
 

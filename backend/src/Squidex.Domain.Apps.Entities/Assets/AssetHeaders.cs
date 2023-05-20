@@ -7,9 +7,9 @@
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public static class AssetExtensions
+public static class AssetHeaders
 {
-    private const string HeaderNoEnrichment = "X-NoAssetEnrichment";
+    public const string HeaderNoEnrichment = "X-NoAssetEnrichment";
 
     public static bool ShouldSkipAssetEnrichment(this Context context)
     {

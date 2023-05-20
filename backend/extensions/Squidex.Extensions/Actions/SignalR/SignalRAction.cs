@@ -42,17 +42,17 @@ public sealed record SignalRAction : RuleAction
 
     [Display(Name = "Methode Name", Description = "Set the Name of the hub method received by the customer.")]
     [Editor(RuleFieldEditor.Text)]
-    public string MethodName { get; set; }
+    public string? MethodName { get; set; }
 
     [Display(Name = "Target (Optional)", Description = "Define target users or groups by id or name. One item per line. Not needed for Broadcast action.")]
     [Editor(RuleFieldEditor.TextArea)]
     [Formattable]
-    public string Target { get; set; }
+    public string? Target { get; set; }
 
     [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
     [Editor(RuleFieldEditor.TextArea)]
     [Formattable]
-    public string Payload { get; set; }
+    public string? Payload { get; set; }
 
     protected override IEnumerable<ValidationError> CustomValidate()
     {

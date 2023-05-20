@@ -41,9 +41,9 @@ public sealed record TypesenseAction : RuleAction
     [Display(Name = "Document", Description = "The optional custom document.")]
     [Editor(RuleFieldEditor.TextArea)]
     [Formattable]
-    public string Document { get; set; }
+    public string? Document { get; set; }
 
     [Display(Name = "Deletion", Description = "The condition when to delete the document.")]
     [Editor(RuleFieldEditor.Text)]
-    public string Delete { get; set; }
+    public string? Delete { get; set; }
 }

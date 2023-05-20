@@ -20,14 +20,14 @@ namespace Squidex.Extensions.Actions.OpenSearch;
 
 public sealed class OpenSearchActionHandler : RuleActionHandler<OpenSearchAction, OpenSearchJob>
 {
-    private readonly ClientPool<(Uri Host, string Username, string Password), OpenSearchLowLevelClient> clients;
+    private readonly ClientPool<(Uri Host, string? Username, string? Password), OpenSearchLowLevelClient> clients;
     private readonly IScriptEngine scriptEngine;
     private readonly IJsonSerializer serializer;
 
     public OpenSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer)
         : base(formatter)
     {
-        clients = new ClientPool<(Uri Host, string Username, string Password), OpenSearchLowLevelClient>(key =>
+        clients = new ClientPool<(Uri Host, string? Username, string? Password), OpenSearchLowLevelClient>(key =>
         {
             var config = new ConnectionConfiguration(key.Host);
 
@@ -61,7 +61,7 @@ public sealed class OpenSearchActionHandler : RuleActionHandler<OpenSearchAction
         var ruleText = string.Empty;
         var ruleJob = new OpenSearchJob
         {
-            IndexName = await FormatAsync(action.IndexName, @event),
+            IndexName = (await FormatAsync(action.IndexName, @event))!,
             ServerHost = action.Host.ToString(),
             ServerUser = action.Username,
             ServerPassword = action.Password,
@@ -79,7 +79,7 @@ public sealed class OpenSearchActionHandler : RuleActionHandler<OpenSearchAction
             OpenSearchContent content;
             try
             {
-                string jsonString;
+                string? jsonString;
 
                 if (!string.IsNullOrEmpty(action.Document))
                 {
@@ -91,7 +91,7 @@ public sealed class OpenSearchActionHandler : RuleActionHandler<OpenSearchAction
                     jsonString = ToJson(@event);
                 }
 
-                content = serializer.Deserialize<OpenSearchContent>(jsonString);
+                content = serializer.Deserialize<OpenSearchContent>(jsonString!);
             }
             catch (Exception ex)
             {
@@ -156,9 +156,9 @@ public sealed class OpenSearchJob
 {
     public string ServerHost { get; set; }
 
-    public string ServerUser { get; set; }
+    public string? ServerUser { get; set; }
 
-    public string ServerPassword { get; set; }
+    public string? ServerPassword { get; set; }
 
     public string ContentId { get; set; }
 

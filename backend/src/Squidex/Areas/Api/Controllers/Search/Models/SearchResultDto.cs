@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Search.Models;

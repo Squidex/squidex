@@ -28,7 +28,7 @@ public sealed class CompositeUniqueValidatorFactory : IValidatorsFactory
         }
     }
 
-    private static IEnumerable<string> ValidatorTags(IEnumerable<string> tags)
+    private static IEnumerable<string> ValidatorTags(IEnumerable<string>? tags)
     {
         if (tags == null)
         {

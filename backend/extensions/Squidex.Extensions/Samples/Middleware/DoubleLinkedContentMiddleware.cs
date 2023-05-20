@@ -101,11 +101,11 @@ public sealed class DoubleLinkedContentMiddleware : ICustomCommandMiddleware
         }, ct);
     }
 
-    private static string GetReference(ContentData data)
+    private static string? GetReference(ContentData? data)
     {
-        if (data != null && data.TryGetValue("reference", out ContentFieldData fieldData))
+        if (data != null && data.TryGetValue("reference", out ContentFieldData? fieldData))
         {
-            return fieldData.Values.OfType<JsonArray>().SelectMany(x => x).SingleOrDefault().ToString();
+            return fieldData?.Values.OfType<JsonArray>().SelectMany(x => x).SingleOrDefault().ToString();
         }
 
         return null;

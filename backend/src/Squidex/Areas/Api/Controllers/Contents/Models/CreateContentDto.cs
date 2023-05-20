@@ -24,19 +24,19 @@ public class CreateContentDto
     /// <summary>
     /// The initial status.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "status")]
     public StatusType? Status { get; set; }
 
     /// <summary>
     /// The optional custom content id.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "id")]
     public DomainId? Id { get; set; }
 
     /// <summary>
     /// True to automatically publish the content.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "publish")]
     [Obsolete("Use 'status' query string now.")]
     public bool Publish { get; set; }
 

@@ -50,7 +50,7 @@ public sealed class CreateContentActionHandler : RuleActionHandler<CreateContent
 
         var json = await FormatAsync(action.Data, @event);
 
-        ruleJob.Data = jsonSerializer.Deserialize<ContentData>(json);
+        ruleJob.Data = jsonSerializer.Deserialize<ContentData>(json!);
 
         if (!string.IsNullOrEmpty(action.Client))
         {

@@ -17,13 +17,13 @@ public sealed class DeleteContentDto
     /// <summary>
     /// True to check referrers of this content.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "checkReferrers")]
     public bool CheckReferrers { get; set; }
 
     /// <summary>
     /// True to delete the content permanently.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "permanent")]
     public bool Permanent { get; set; }
 
     public DeleteContent ToCommand(DomainId id)

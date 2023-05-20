@@ -46,7 +46,7 @@ public abstract class RuleActionHandler<TAction, TData> : IRuleActionHandler whe
         return formatter.FormatAsync(uri.ToString(), @event);
     }
 
-    protected ValueTask<string?> FormatAsync(string text, EnrichedEvent @event)
+    protected ValueTask<string?> FormatAsync(string? text, EnrichedEvent @event)
     {
         return formatter.FormatAsync(text, @event);
     }

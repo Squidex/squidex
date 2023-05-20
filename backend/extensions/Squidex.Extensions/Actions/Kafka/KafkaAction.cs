@@ -30,17 +30,17 @@ public sealed record KafkaAction : RuleAction
     [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
     [Editor(RuleFieldEditor.TextArea)]
     [Formattable]
-    public string Payload { get; set; }
+    public string? Payload { get; set; }
 
     [Display(Name = "Key", Description = "The message key, commonly used for partitioning.")]
     [Editor(RuleFieldEditor.Text)]
     [Formattable]
-    public string Key { get; set; }
+    public string? Key { get; set; }
 
     [Display(Name = "Partition Key", Description = "The partition key, only used when we don't want to define partiontionig with key.")]
     [Editor(RuleFieldEditor.Text)]
     [Formattable]
-    public string PartitionKey { get; set; }
+    public string? PartitionKey { get; set; }
 
     [Display(Name = "Partition Count", Description = "Define the number of partitions for specific topic.")]
     [Editor(RuleFieldEditor.Text)]
@@ -49,9 +49,9 @@ public sealed record KafkaAction : RuleAction
     [Display(Name = "Headers (Optional)", Description = "The message headers in the format '[Key]=[Value]', one entry per line.")]
     [Editor(RuleFieldEditor.TextArea)]
     [Formattable]
-    public string Headers { get; set; }
+    public string? Headers { get; set; }
 
     [Display(Name = "Schema (Optional)", Description = "Define a specific AVRO schema in JSON format.")]
     [Editor(RuleFieldEditor.TextArea)]
-    public string Schema { get; set; }
+    public string? Schema { get; set; }
 }

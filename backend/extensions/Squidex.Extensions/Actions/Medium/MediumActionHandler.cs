@@ -58,7 +58,7 @@ public sealed class MediumActionHandler : RuleActionHandler<MediumAction, Medium
         return (Description, ruleJob);
     }
 
-    private async Task<string[]> ParseTagsAsync(EnrichedEvent @event, MediumAction action)
+    private async Task<string[]?> ParseTagsAsync(EnrichedEvent @event, MediumAction action)
     {
         if (string.IsNullOrWhiteSpace(action.Tags))
         {
@@ -69,7 +69,7 @@ public sealed class MediumActionHandler : RuleActionHandler<MediumAction, Medium
         {
             var jsonTags = await FormatAsync(action.Tags, @event);
 
-            return serializer.Deserialize<string[]>(jsonTags);
+            return serializer.Deserialize<string[]>(jsonTags!);
         }
         catch
         {
@@ -90,7 +90,7 @@ public sealed class MediumActionHandler : RuleActionHandler<MediumAction, Medium
         }
         else
         {
-            HttpResponseMessage response = null;
+            HttpResponseMessage? response = null;
 
             var meRequest = BuildGetRequest(job, "/v1/me");
             try
@@ -141,7 +141,7 @@ public sealed class MediumJob
 {
     public string RequestBody { get; set; }
 
-    public string PublicationId { get; set; }
+    public string? PublicationId { get; set; }
 
     public string AccessToken { get; set; }
 }

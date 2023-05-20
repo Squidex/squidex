@@ -14,7 +14,7 @@ namespace Squidex.Extensions.Actions;
 
 public static class RuleHelper
 {
-    public static bool ShouldDelete(this EnrichedEvent @event, IScriptEngine scriptEngine, string expression)
+    public static bool ShouldDelete(this EnrichedEvent @event, IScriptEngine scriptEngine, string? expression)
     {
         if (!string.IsNullOrWhiteSpace(expression))
         {
@@ -40,10 +40,10 @@ public static class RuleHelper
         return @event is EnrichedAssetEvent { Type: EnrichedAssetEventType.Deleted };
     }
 
-    public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null,
+    public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string? requestBody = null,
         CancellationToken ct = default)
     {
-        HttpResponseMessage response = null;
+        HttpResponseMessage? response = null;
         try
         {
             response = await client.SendAsync(request, ct);

@@ -27,25 +27,25 @@ public sealed class AllContentsByGetDto
     /// <summary>
     /// The start of the schedule.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "scheduleFrom")]
     public Instant? ScheduledFrom { get; set; }
 
     /// <summary>
     /// The end of the schedule.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "scheduleTo")]
     public Instant? ScheduledTo { get; set; }
 
     /// <summary>
     /// The ID of the referencing content item.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "referencing")]
     public DomainId? Referencing { get; set; }
 
     /// <summary>
     /// The ID of the reference content item.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "references")]
     public DomainId? References { get; set; }
 
     /// <summary>

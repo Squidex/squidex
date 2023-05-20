@@ -23,8 +23,8 @@ public static class AzureIndexDefinition
         var analyzers =
             typeof(LexicalAnalyzerName)
                 .GetProperties(BindingFlags.Public | BindingFlags.Static)
-                .Select(x => x.GetValue(null))
-                .Select(x => x.ToString())
+                .Select(x => x.GetValue(null)!)
+                .Select(x => x.ToString()!)
                 .OrderBy(x => x)
                 .ToList();
 

@@ -10,7 +10,7 @@ import { DateTime, Types, ValidatorsEx } from '@app/framework';
 import { ContentDto, ContentReferencesValue } from './../services/contents.service';
 import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto } from './../services/schemas.service';
-import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from './../services/schemas.types';
+import { ArrayFieldPropertiesDto, AssetPreviewMode, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from './../services/schemas.types';
 
 export class HtmlValue {
     constructor(
@@ -45,30 +45,37 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                 value = fieldValue;
             }
 
-            let formatted: FieldValue = value!;
+            if (!value) {
+                return { value: '-', formatted: '-' };
+            }
 
-            if (value) {
-                if (isAssets && Types.isArray(value)) {
-                    if (value.length === 2) {
-                        const previewMode = field.properties['previewMode'];
+            let formatted: FieldValue = value;
 
-                        const buildImage = (src: string) => {
-                            return `<img src="${src}?width=50&height=50&mode=Pad" />`;
-                        };
+            if (isAssets && Types.isArray(value)) {
+                if (value.length === 2) {
+                    const buildImage = (src: string) => {
+                        let format = field.properties['previewFormat'] || '';
 
-                        if (previewMode === 'ImageAndFileName') {
-                            formatted = new HtmlValue(buildImage(value[0]) + ` <span>${value[1]}</span>`, value[0]);
-                        } else if (previewMode === 'Image') {
-                            formatted = new HtmlValue(buildImage(value[0]), value[0]);
-                        } else {
-                            formatted = value[1];
+                        if (format.indexOf('width') < 0 || format.indexOf('height') < 0) {
+                            format = `width=50&height=50&mode=Pad&${format}`;
                         }
-                    } else if (value.length === 1) {
-                        formatted = value[0];
+
+                        return `<img src="${src}?${format}" />`;
+                    };
+
+                    switch (field.properties['previewMode'] as AssetPreviewMode) {
+                        case 'ImageAndFileName':
+                            formatted = new HtmlValue(`<div class="image">${buildImage(value[0])} <span>${value[1]}</span></div>`, value[0]);
+                            break;
+                        case 'Image':
+                            formatted = new HtmlValue(`<div class="image">${buildImage(value[0])}</div>`, value[0]);
+                            break;
+                        default:
+                            formatted = value[1];
                     }
+                } else if (value.length === 1) {
+                    formatted = value[0];
                 }
-            } else {
-                value = formatted = '-';
             }
 
             return { value, formatted };
@@ -211,7 +218,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
 
         if (properties.editor === 'StockPhoto' && this.allowHtml && this.value) {
-            return new HtmlValue(`<img src="${thumbnail(this.value, undefined, 50)}" />`, this.value);
+            return new HtmlValue(`<div class="image"><img src="${thumbnail(this.value, undefined, 50)}" /></div>`, this.value);
         }
 
         return this.value;

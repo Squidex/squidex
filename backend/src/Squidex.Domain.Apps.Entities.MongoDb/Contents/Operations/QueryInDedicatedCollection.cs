@@ -151,7 +151,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
             Filter.Exists(x => x.Id)
         };
 
-        if (filter?.HasField("dl") != true)
+        if (filter?.HasField(Field.Of<MongoContentEntity>(x => nameof(x.IsDeleted))) != true)
         {
             filters.Add(Filter.Ne(x => x.IsDeleted, true));
         }
@@ -173,7 +173,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
             Filter.Gt(x => x.Id, default)
         };
 
-        if (query?.HasFilterField("dl") != true)
+        if (query?.Filter?.HasField(Field.Of<MongoContentEntity>(x => nameof(x.IsDeleted))) != true)
         {
             filters.Add(Filter.Ne(x => x.IsDeleted, true));
         }

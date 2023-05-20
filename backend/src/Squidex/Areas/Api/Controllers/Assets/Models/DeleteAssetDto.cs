@@ -19,13 +19,13 @@ public sealed class DeleteAssetDto
     /// <summary>
     /// True to check referrers of this asset.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "checkReferrers")]
     public bool CheckReferrers { get; set; }
 
     /// <summary>
     /// True to delete the asset permanently.
     /// </summary>
-    [FromQuery]
+    [FromQuery(Name = "permanent")]
     public bool Permanent { get; set; }
 
     public DeleteAsset ToCommand(DomainId id)

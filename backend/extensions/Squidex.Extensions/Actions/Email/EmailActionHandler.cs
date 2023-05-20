@@ -29,11 +29,11 @@ public sealed class EmailActionHandler : RuleActionHandler<EmailAction, EmailJob
             ServerHost = action.ServerHost,
             ServerPassword = action.ServerPassword,
             ServerPort = action.ServerPort,
-            ServerUsername = await FormatAsync(action.ServerUsername, @event),
-            MessageFrom = await FormatAsync(action.MessageFrom, @event),
-            MessageTo = await FormatAsync(action.MessageTo, @event),
-            MessageSubject = await FormatAsync(action.MessageSubject, @event),
-            MessageBody = await FormatAsync(action.MessageBody, @event)
+            ServerUsername = (await FormatAsync(action.ServerUsername, @event))!,
+            MessageFrom = (await FormatAsync(action.MessageFrom, @event))!,
+            MessageTo = (await FormatAsync(action.MessageTo, @event))!,
+            MessageSubject = (await FormatAsync(action.MessageSubject, @event))!,
+            MessageBody = (await FormatAsync(action.MessageBody, @event))!
         };
 
         var description = $"Send an email to {action.MessageTo}";

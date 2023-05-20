@@ -142,7 +142,7 @@ public static class ApiExceptionConverter
 
     private static ErrorDto CreateError(int status, string? message = null, string? errorCode = null, IEnumerable<string>? details = null)
     {
-        var error = new ErrorDto { StatusCode = status, Message = message };
+        var error = new ErrorDto { StatusCode = status, Message = message ?? string.Empty };
 
         if (!string.IsNullOrWhiteSpace(errorCode))
         {
