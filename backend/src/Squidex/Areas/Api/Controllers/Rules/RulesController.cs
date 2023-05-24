@@ -405,8 +405,8 @@ public sealed class RulesController : ApiController
     /// Cancels an event.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <param name="id">The event to enqueue.</param>
-    /// <response code="204">Rule deqeued.</response>.
+    /// <param name="id">The event to cancel.</param>
+    /// <response code="204">Rule event cancelled.</response>.
     /// <response code="404">App or rule event not found.</response>.
     [HttpDelete]
     [Route("apps/{app}/rules/events/{id}/")]
@@ -422,7 +422,7 @@ public sealed class RulesController : ApiController
             return NotFound();
         }
 
-        await ruleEventsRepository.CancelByRuleAsync(id, HttpContext.RequestAborted);
+        await ruleEventsRepository.CancelByEventAsync(id, HttpContext.RequestAborted);
 
         return NoContent();
     }
