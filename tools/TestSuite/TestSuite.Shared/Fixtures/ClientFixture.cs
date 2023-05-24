@@ -40,8 +40,10 @@ public class ClientFixture : IAsyncLifetime
         VerifierSettings.IgnoreMembersWithType<DateTimeOffset>();
     }
 
-    public Task<(ISquidexClient, AppDto)> PostAppAsync(string name)
+    public Task<(ISquidexClient, AppDto)> PostAppAsync(string name = null)
     {
+        name ??= Guid.NewGuid().ToString();
+
         var createRequest = new CreateAppDto
         {
             Name = name

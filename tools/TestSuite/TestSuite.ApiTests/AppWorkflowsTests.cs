@@ -17,8 +17,7 @@ namespace TestSuite.ApiTests;
 [UsesVerify]
 public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
 {
-    private readonly string appName = Guid.NewGuid().ToString();
-    private readonly string name = Guid.NewGuid().ToString();
+    private readonly string workflowName = Guid.NewGuid().ToString();
 
     public ClientFixture _ { get; }
 
@@ -31,7 +30,7 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     public async Task Should_create_workflow()
     {
         // STEP 0: Create app.
-        var (app, _) = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync();
 
 
         // STEP 1: Create workflow.
@@ -48,7 +47,7 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     public async Task Should_update_workflow()
     {
         // STEP 0: Create app.
-        var (app, _) = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync();
 
 
         // STEP 0: Create workflow.
@@ -70,11 +69,11 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
                 },
                 ["Published"] = new WorkflowStepDto(),
             },
-            Name = name
+            Name = workflowName
         };
 
         var workflows_2 = await app.Apps.PutWorkflowAsync(workflow.Id, updateRequest);
-        var workflow_2 = workflows_2.Items.Find(x => x.Name == name);
+        var workflow_2 = workflows_2.Items.Find(x => x.Name == workflowName);
 
         Assert.NotNull(workflow_2);
         Assert.NotNull(workflow_2.Name);
@@ -87,7 +86,7 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     public async Task Should_delete_workflow()
     {
         // STEP 0: Create app.
-        var (app, _) = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync();
 
 
         // STEP 0: Create workflow.
@@ -97,7 +96,7 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
         // STEP 1: Delete workflow.
         var workflows_2 = await app.Apps.DeleteWorkflowAsync(workflow.Id);
 
-        Assert.DoesNotContain(workflows_2.Items, x => x.Name == name);
+        Assert.DoesNotContain(workflows_2.Items, x => x.Name == workflowName);
 
         await Verify(workflows_2);
     }
@@ -106,11 +105,11 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     {
         var createRequest = new AddWorkflowDto
         {
-            Name = name
+            Name = workflowName
         };
 
         var workflows = await app.Apps.PostWorkflowAsync(createRequest);
-        var workflow = workflows.Items.Find(x => x.Name == name);
+        var workflow = workflows.Items.Find(x => x.Name == workflowName);
 
         return workflow;
     }

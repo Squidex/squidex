@@ -46,7 +46,7 @@ public class AnonymousTests : IClassFixture<ClientFixture>
 
 
         // STEP 3: Check anonymous permission.
-        var url = $"{_.Client.Options.Url}api/apps/{appName}/settings";
+        var url = $"{_.Client.Options.Url}api/apps/{app.Options.AppName}/settings";
 
         using (var httpClient = new HttpClient())
         {
@@ -89,7 +89,7 @@ public class AnonymousTests : IClassFixture<ClientFixture>
 
 
         // STEP 3: Create a content.
-        var url = $"{_.Client.Options.Url}api/content/{appName}/my-content";
+        var url = $"{_.Client.Options.Url}api/content/{app.Options.AppName}/my-content";
 
         using (var httpClient = new HttpClient())
         {

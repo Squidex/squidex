@@ -462,10 +462,8 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_protect_asset_with_script()
     {
-        var appName = Guid.NewGuid().ToString();
-
         // STEP 0: Create app.
-        var (app, _) = await _.PostAppAsync(appName);
+        var (app, _) = await _.PostAppAsync();
 
 
         // STEP 1: Create folder.
@@ -667,7 +665,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             Filter = "isDeleted eq true"
         });
 
-        Assert.Equal(!permanent, deleted.Items.Any(x => x.Id == asset.Id));
+        Assert.Equal(!permanent, deleted.Items.Exists(x => x.Id == asset.Id));
     }
 
     [Theory]

@@ -144,7 +144,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         // Create a workflow
         var workflowRequest = new AddWorkflowDto
         {
-            Name = appName
+            Name = "workflow"
         };
 
         await app.Apps.PostWorkflowAsync(workflowRequest);

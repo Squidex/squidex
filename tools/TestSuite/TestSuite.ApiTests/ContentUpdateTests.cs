@@ -501,7 +501,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
         var deleted = await _.Contents.GetAsync(q, QueryContext.Default.Unpublished(true));
 
-        Assert.Equal(strategy is Strategies.Deletion.SingleSoft or Strategies.Deletion.BulkSoft, deleted.Items.Any(x => x.Id == content.Id));
+        Assert.Equal(strategy is Strategies.Deletion.SingleSoft or Strategies.Deletion.BulkSoft, deleted.Items.Exists(x => x.Id == content.Id));
     }
 
     [Theory]
