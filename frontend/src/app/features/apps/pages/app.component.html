@@ -24,20 +24,22 @@
             </div>
         </div>
 
-        <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" sqxStopClick #buttonOptions>
-            <i class="icon-dots"></i>
-        </button>
-
-        <ng-container *sqxModal="dropdown;closeAlways:true">
-            <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
-                <a class="dropdown-item dropdown-item-delete"
-                    (sqxConfirmClick)="leave.emit(app)"
-                    confirmTitle="i18n:apps.leaveConfirmTitle"
-                    confirmText="i18n:apps.leaveConfirmText"
-                    confirmRememberKey="leaveApp">
-                    {{ 'apps.leave' | sqxTranslate }}
-                </a>
-            </sqx-dropdown-menu>
+        <ng-container *ngIf="app.canLeave">
+            <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" sqxStopClick #buttonOptions>
+                <i class="icon-dots"></i>
+            </button>
+    
+            <ng-container *sqxModal="dropdown;closeAlways:true">
+                <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
+                    <a class="dropdown-item dropdown-item-delete"
+                        (sqxConfirmClick)="leave.emit(app)"
+                        confirmTitle="i18n:apps.leaveConfirmTitle"
+                        confirmText="i18n:apps.leaveConfirmText"
+                        confirmRememberKey="leaveApp">
+                        {{ 'apps.leave' | sqxTranslate }}
+                    </a>
+                </sqx-dropdown-menu>
+            </ng-container>
         </ng-container>
     </div>
 </div>

@@ -14,7 +14,7 @@ public static class VerifySettings
     [ModuleInitializer]
     public static void Initialize()
     {
-        Verifier.DerivePathInfo((sourceFile, projectDirectory, type, method) =>
+        DerivePathInfo((sourceFile, projectDirectory, type, method) =>
         {
             var path = Path.Combine(projectDirectory, "Verify");
 
