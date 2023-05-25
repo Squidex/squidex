@@ -385,23 +385,6 @@ public sealed class RulesController : ApiController
     }
 
     /// <summary>
-    /// Cancels all events.
-    /// </summary>
-    /// <param name="app">The name of the app.</param>
-    /// <response code="204">Events cancelled.</response>.
-    [HttpDelete]
-    [Route("apps/{app}/rules/events/")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ApiPermissionOrAnonymous(PermissionIds.AppRulesEventsDelete)]
-    [ApiCosts(1)]
-    public async Task<IActionResult> DeleteEvents(string app)
-    {
-        await ruleEventsRepository.CancelByAppAsync(App.Id, HttpContext.RequestAborted);
-
-        return NoContent();
-    }
-
-    /// <summary>
     /// Cancels an event.
     /// </summary>
     /// <param name="app">The name of the app.</param>
@@ -423,6 +406,23 @@ public sealed class RulesController : ApiController
         }
 
         await ruleEventsRepository.CancelByEventAsync(id, HttpContext.RequestAborted);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Cancels all events.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <response code="204">Events cancelled.</response>.
+    [HttpDelete]
+    [Route("apps/{app}/rules/events/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppRulesEventsDelete)]
+    [ApiCosts(1)]
+    public async Task<IActionResult> DeleteEvents(string app)
+    {
+        await ruleEventsRepository.CancelByAppAsync(App.Id, HttpContext.RequestAborted);
 
         return NoContent();
     }
