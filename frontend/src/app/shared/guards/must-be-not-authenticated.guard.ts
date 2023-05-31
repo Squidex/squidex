@@ -7,7 +7,7 @@
 
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { UIOptions } from '@app/framework';
@@ -15,7 +15,6 @@ import { AuthService } from './../services/auth.service';
 
 @Injectable()
 export class MustBeNotAuthenticatedGuard implements CanActivate {
-
     constructor(
         private readonly authService: AuthService,
         private readonly location: Location,
@@ -24,15 +23,15 @@ export class MustBeNotAuthenticatedGuard implements CanActivate {
     ) {
     }
 
-    public canActivate(): Observable<boolean> {
-        const redirect = this.uiOptions.get('redirectToLogin');
+    public canActivate(snapshot: ActivatedRouteSnapshot): Observable<boolean> {
+        const redirect = this.uiOptions.get('redirectToLogin') && !snapshot.queryParams.logout;
 
         return this.authService.userChanges.pipe(
             take(1),
             tap(user => {
                 const redirectPath = this.location.path(true);
 
-                if (redirect) {
+                if (!user && redirect) {
                     this.authService.loginRedirect(redirectPath);
                 } else if (user) {
                     this.router.navigate(['app'], { queryParams: { redirectPath } });

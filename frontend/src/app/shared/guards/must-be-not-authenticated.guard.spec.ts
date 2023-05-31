@@ -37,7 +37,7 @@ describe('MustBeNotAuthenticatedGuard', () => {
         authService.setup(x => x.userChanges)
             .returns(() => of(<any>{}));
 
-        const result = await firstValueFrom(authGuard.canActivate());
+        const result = await firstValueFrom(authGuard.canActivate({} as any));
 
         expect(result!).toBeFalsy();
 
@@ -48,7 +48,7 @@ describe('MustBeNotAuthenticatedGuard', () => {
         authService.setup(x => x.userChanges)
             .returns(() => of(null));
 
-        const result = await firstValueFrom(authGuard.canActivate());
+        const result = await firstValueFrom(authGuard.canActivate({} as any));
 
         expect(result).toBeTruthy();
 
@@ -61,10 +61,23 @@ describe('MustBeNotAuthenticatedGuard', () => {
         authService.setup(x => x.userChanges)
             .returns(() => of(null));
 
-        const result = await firstValueFrom(authGuard.canActivate());
+        const result = await firstValueFrom(authGuard.canActivate({ queryParams: {} } as any));
 
         expect(result).toBeFalsy();
 
         authService.verify(x => x.loginRedirect('/my-path'), Times.once());
+    });
+
+    it('should not redirect after logout', async () => {
+        uiOptions.value.redirectToLogin = true;
+
+        authService.setup(x => x.userChanges)
+            .returns(() => of(null));
+
+        const result = await firstValueFrom(authGuard.canActivate({ queryParams: { logout: true } } as any));
+
+        expect(result).toBeTruthy();
+
+        authService.verify(x => x.loginRedirect('/my-path'), Times.never());
     });
 });

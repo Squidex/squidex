@@ -125,7 +125,7 @@ export function parseError(response: HttpErrorResponse, fallback: string) {
         }
     }
 
-    if (parsed && Types.isString(parsed.message)) {
+    if (parsed && Types.isString(parsed.message) && parsed.message) {
         return new ErrorDto(status, parsed.message, parsed.errorCode, parsed.details, response);
     }
 

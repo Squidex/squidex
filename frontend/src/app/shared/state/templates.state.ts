@@ -37,15 +37,15 @@ export class TemplatesState extends State<Snapshot> {
         super({ templates: [] }, 'Templates');
     }
 
-    public load(isReload = false): Observable<any> {
+    public load(isReload = false, silent = false): Observable<any> {
         if (isReload) {
             this.resetState('Loading Initial');
         }
 
-        return this.loadInternal(isReload);
+        return this.loadInternal(isReload, silent);
     }
 
-    private loadInternal(isReload: boolean): Observable<any> {
+    private loadInternal(isReload: boolean, silent: boolean): Observable<any> {
         this.next({ isLoading: true }, 'Loading Started');
 
         return this.templatesService.getTemplates().pipe(
@@ -63,6 +63,6 @@ export class TemplatesState extends State<Snapshot> {
             finalize(() => {
                 this.next({ isLoading: false }, 'Loading Done');
             }),
-            shareSubscribed(this.dialogs));
+            shareSubscribed(this.dialogs, { silent }));
     }
 }

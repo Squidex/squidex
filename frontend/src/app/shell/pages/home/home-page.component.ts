@@ -8,7 +8,7 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '@app/shared';
+import { AuthService, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-home-page',
@@ -23,6 +23,7 @@ export class HomePageComponent {
         private readonly location: Location,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
+        private readonly uiOptions: UIOptions,
     ) {
     }
 
@@ -31,15 +32,15 @@ export class HomePageComponent {
             this.route.snapshot.queryParams.redirectPath ||
             this.location.path();
 
-        if (this.isInternetExplorer()) {
+        if (this.isInternetExplorer() || this.uiOptions.get('redirectToLogin')) {
             this.authService.loginRedirect(redirectPath);
             return;
         }
 
         try {
-            const path = await this.authService.loginPopup(redirectPath);
+            const path = await this.authService.loginPopup(redirectPath) || '/app';
 
-            this.router.navigateByUrl(path || '/app', { replaceUrl: true });
+            this.router.navigateByUrl(path, { replaceUrl: true });
         } catch {
             this.router.navigate(['/'], { replaceUrl: true });
         }

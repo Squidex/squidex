@@ -17,7 +17,6 @@ namespace TestSuite.ApiTests;
 [UsesVerify]
 public sealed class AppContributorsTests : IClassFixture<ClientFixture>
 {
-    private readonly string appName = Guid.NewGuid().ToString();
     private readonly string email = $"{Guid.NewGuid()}@squidex.io";
 
     public ClientFixture _ { get; }

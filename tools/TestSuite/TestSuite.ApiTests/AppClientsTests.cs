@@ -17,7 +17,6 @@ namespace TestSuite.ApiTests;
 [UsesVerify]
 public sealed class AppClientsTests : IClassFixture<ClientFixture>
 {
-    private readonly string appName = Guid.NewGuid().ToString();
     private readonly string id = Guid.NewGuid().ToString();
     private readonly string clientRole = "Editor";
     private readonly string clientName = "My Client";

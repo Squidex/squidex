@@ -18,7 +18,6 @@ namespace TestSuite.ApiTests;
 public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<WebhookCatcherFixture>
 {
     private readonly string secret = Guid.NewGuid().ToString();
-    private readonly string appName = Guid.NewGuid().ToString();
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
     private readonly string schemaNameRef = $"schema-{Guid.NewGuid()}-ref";
     private readonly string contentString = Guid.NewGuid().ToString();

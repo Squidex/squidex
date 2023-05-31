@@ -98,7 +98,7 @@ export class AppsPageComponent implements OnInit {
                 }
             });
 
-        this.templatesState.load();
+        this.templatesState.load(false, true);
     }
 
     public createNewApp(template?: TemplateDto) {

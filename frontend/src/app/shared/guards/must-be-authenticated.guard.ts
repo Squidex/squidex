@@ -29,14 +29,16 @@ export class MustBeAuthenticatedGuard implements CanActivate {
         return this.authService.userChanges.pipe(
             take(1),
             tap(user => {
-                if (!user) {
-                    const redirectPath = this.location.path(true);
+                if (user) {
+                    return;
+                }
 
-                    if (redirect) {
-                        this.authService.loginRedirect(redirectPath);
-                    } else {
-                        this.router.navigate([''], { queryParams: { redirectPath } });
-                    }
+                const redirectPath = this.location.path(true);
+
+                if (redirect) {
+                    this.authService.loginRedirect(redirectPath);
+                } else {
+                    this.router.navigate([''], { queryParams: { redirectPath } });
                 }
             }),
             map(user => !!user));

@@ -17,8 +17,6 @@ namespace TestSuite.ApiTests;
 [UsesVerify]
 public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
 {
-    private readonly string appName = Guid.NewGuid().ToString();
-
     public ClientFixture _ { get; }
 
     public AppLanguagesTests(ClientFixture fixture)

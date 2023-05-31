@@ -28,8 +28,6 @@ public sealed class TemplatesClient
     {
         var httpClient = httpClientFactory.CreateClient();
 
-        var result = new List<Template>();
-
         foreach (var repository in options.Repositories.OrEmpty())
         {
             var url = $"{repository.ContentUrl}/README.md";
