@@ -24,8 +24,8 @@ public sealed class AtlasTextIndexFixture : IAsyncLifetime
     {
         TestUtils.SetupBson();
 
-        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["atlas:configuration"]);
-        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["atlas:database"]);
+        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["atlas:configuration"]!);
+        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["atlas:database"]!);
 
         var options = TestConfig.Configuration.GetSection("atlas").Get<AtlasOptions>()!;
 

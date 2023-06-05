@@ -18,8 +18,8 @@ public sealed class ElasticSearchTextIndexFixture : IAsyncLifetime
     public ElasticSearchTextIndexFixture()
     {
         Index = new ElasticSearchTextIndex(
-            new ElasticSearchClient(TestConfig.Configuration["elastic:configuration"]),
-            TestConfig.Configuration["elastic:indexName"],
+            new ElasticSearchClient(TestConfig.Configuration["elastic:configuration"]!),
+            TestConfig.Configuration["elastic:indexName"]!,
             TestUtils.DefaultSerializer);
     }
 

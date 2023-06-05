@@ -20,8 +20,8 @@ public sealed class MongoTextIndexFixture : IAsyncLifetime
     {
         TestUtils.SetupBson();
 
-        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongoDb:configuration"]);
-        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
+        var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongoDb:configuration"]!);
+        var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]!);
 
         Index = new MongoTextIndex(mongoDatabase);
     }

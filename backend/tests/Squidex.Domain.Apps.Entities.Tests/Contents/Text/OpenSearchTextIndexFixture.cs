@@ -18,8 +18,8 @@ public sealed class OpenSearchTextIndexFixture : IAsyncLifetime
     public OpenSearchTextIndexFixture()
     {
         Index = new ElasticSearchTextIndex(
-            new OpenSearchClient(TestConfig.Configuration["elastic:configuration"]),
-            TestConfig.Configuration["elastic:indexName"],
+            new OpenSearchClient(TestConfig.Configuration["elastic:configuration"]!),
+            TestConfig.Configuration["elastic:indexName"]!,
             TestUtils.DefaultSerializer);
     }
 

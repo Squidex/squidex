@@ -168,7 +168,10 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
         {
             var program = parser.Parse(script);
 
-            return engine.Evaluate(program);
+            lock (engine)
+            {
+                return engine.Evaluate(program);
+            }
         }
         catch (ArgumentException ex)
         {
