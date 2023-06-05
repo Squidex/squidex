@@ -358,7 +358,7 @@ To make the migration as easy as possible, the default implementation uses Mongo
 * **Identity**: Fix a minor memory leak in a third partyy component.
 * **Monitoring**: Improve health check and collect actual memory usage, not managed memory usage.
 * **Monitoring**: Special setting to collect memory dumps automatically.
-* **Scripting**: Validate content via sscripting.
+* **Scripting**: Validate content via scripting.
 
 ### Added
 
