@@ -65,7 +65,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
             }
         }
 
-        ThrowHelper.JsonException($"Object has no discriminator '{discriminatorName}.");
+        ThrowHelper.JsonException($"Object has no discriminator '{discriminatorName}'.");
         return default!;
     }
 
