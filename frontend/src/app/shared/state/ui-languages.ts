@@ -12,6 +12,9 @@ export module UILanguages {
         iso2Code: 'en',
         localName: 'English',
     }, {
+        iso2Code: 'fr',
+        localName: 'Français',
+    }, {
         iso2Code: 'nl',
         localName: 'Nederlands',
     }, {
