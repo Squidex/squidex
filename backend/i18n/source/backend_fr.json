@@ -395,5 +395,6 @@
   "workflows.publishedIsInitial": "L'étape initiale ne peut pas être publiée.",
   "workflows.publishedNotDefined": "Le workflow doit avoir une étape publiée.",
   "workflows.publishedStepNotFound": "La transition a une cible non valide.",
-  "workflows.schemaOverlap": "Le schéma '{schema}' est couvert par plusieurs workflows."
+  "workflows.schemaOverlap": "Le schéma '{schema}' est couvert par plusieurs workflows.",
+  "test":"test"
 }
