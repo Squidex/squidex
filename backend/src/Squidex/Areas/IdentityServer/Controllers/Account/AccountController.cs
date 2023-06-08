@@ -184,7 +184,7 @@ public sealed class AccountController : IdentityServerController
         {
             var provider = externalProviders[0].AuthenticationScheme;
 
-            var challengeRedirectUrl = Url.Action(nameof(ExternalCallback));
+            var challengeRedirectUrl = Url.Action(nameof(ExternalCallback), new { returnUrl });
             var challengeProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, challengeRedirectUrl);
 
             // Redirect to the external authentication provider.

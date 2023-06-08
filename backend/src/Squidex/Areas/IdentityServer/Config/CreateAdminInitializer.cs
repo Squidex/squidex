@@ -27,7 +27,6 @@ public sealed class CreateAdminInitializer : IInitializable
     public CreateAdminInitializer(IServiceProvider serviceProvider, IOptions<MyIdentityOptions> identityOptions)
     {
         this.serviceProvider = serviceProvider;
-
         this.identityOptions = identityOptions.Value;
     }
 
