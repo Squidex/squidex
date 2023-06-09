@@ -140,7 +140,7 @@ public class Commands
                 throw new ArgumentException("Folder does not exist.", nameof(arguments));
             }
 
-            var supportedLocales = new string[] { "en", "nl", "it", "zh", "pt" };
+            var supportedLocales = new string[] { "en", "nl", "it", "zh", "pt","fr" };
 
             var locales = supportedLocales;
 

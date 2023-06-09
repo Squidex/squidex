@@ -197,7 +197,7 @@
   "clients.connectWizard.javascriptSdkDocumentation": "Documentations for the JavaScript SDK is available: ",
   "clients.connectWizard.javascriptSdkHint": "Install the SDK and establish a connection to this app.",
   "clients.connectWizard.javascriptSdkStep1": "Install the Javascript SDK",
-  "clients.connectWizard.javascriptSdkStep1Download": "The SDK is available on [npm](https://www.npmjs.com/package/@squidex/squidex",
+  "clients.connectWizard.javascriptSdkStep1Download": "The SDK is available on [npm](https://www.npmjs.com/package/@squidex/squidex)",
   "clients.connectWizard.javascriptSdkStep2": "Create a client",
   "clients.connectWizard.manually": "Connetti manualmente",
   "clients.connectWizard.manuallyHint": "Leggi le istruzioni su come stabilire una connessione utilizzando Postman o curl.",
