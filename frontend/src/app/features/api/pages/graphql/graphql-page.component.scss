@@ -12,6 +12,7 @@
         --color-primary: #{hsl-str($color-theme-brand)};
         --color-success: #{hsl-str($color-theme-success)};
         --color-error: #{hsl-str($color-theme-error)};
+        --color-neutral: #{hsl-str($color-text)};
         --border-radius-4: #{$border-radius};
         --border-radius-8: #{$border-radius};
         --border-radius-12: #{$border-radius};
@@ -19,9 +20,24 @@
         .graphiql-sessions {
             border-radius: $border-radius;
         }
+
+        * {
+            box-sizing: content-box;
+        }
     }
 
     .graphiql-logo {
         display: none;
+    }
+}
+
+.btn-options {
+    @include absolute(null, null, 175px, 8px);
+    font-size: 1.2rem;
+    font-weight: normal;
+    width: 44px;
+
+    &:hover {
+        background: rgba(59, 75, 104, 7%);
     }
 }
