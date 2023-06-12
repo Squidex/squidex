@@ -84,6 +84,7 @@ internal sealed class OperationBuilder
         }
 
         operation.Parameters.Add(parameter);
+        operation.SetPositions();
 
         return this;
     }
