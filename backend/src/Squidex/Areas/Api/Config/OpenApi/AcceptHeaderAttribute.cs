@@ -59,8 +59,8 @@ public sealed class AcceptHeader_NoSlowTotal : AcceptHeaderAttribute
 
 public class AcceptHeaderAttribute : OpenApiOperationProcessorAttribute
 {
-    public AcceptHeaderAttribute(string name, string description, JsonObjectType type = JsonObjectType.String)
-        : base(typeof(Processor), name, description, type)
+    public AcceptHeaderAttribute(string name, string description, JsonObjectType schemaType = JsonObjectType.String)
+        : base(typeof(Processor), name, description, schemaType)
     {
     }
 
@@ -68,27 +68,30 @@ public class AcceptHeaderAttribute : OpenApiOperationProcessorAttribute
     {
         private readonly string name;
         private readonly string description;
-        private readonly JsonObjectType type;
+        private readonly JsonObjectType schemaType;
 
-        public Processor(string name, string description, JsonObjectType type)
+        public Processor(string name, string description, JsonObjectType schemaType)
         {
             this.name = name;
             this.description = description;
-            this.type = type;
+            this.schemaType = schemaType;
         }
 
         public bool Process(OperationProcessorContext context)
         {
-            context.OperationDescription.Operation.Parameters.Add(new OpenApiParameter
+            var parameter = new OpenApiParameter
             {
                 Name = name,
                 Kind = OpenApiParameterKind.Header,
                 Schema = new JsonSchema
                 {
-                    Type = type
+                    Type = schemaType
                 },
-                Description = description,
-            });
+                Description = description
+            };
+
+            context.OperationDescription.Operation.Parameters.Add(parameter);
+            context.OperationDescription.Operation.SetPositions();
 
             return true;
         }

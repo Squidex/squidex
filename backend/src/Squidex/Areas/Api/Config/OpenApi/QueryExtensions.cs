@@ -88,5 +88,17 @@ public static class QueryExtensions
             Name = "ids",
             Description = FieldDescriptions.QueryIds
         });
+
+        operation.SetPositions();
+    }
+
+    public static void SetPositions(this OpenApiOperation operation)
+    {
+        var position = 0;
+
+        foreach (var parameter in operation.Parameters)
+        {
+            parameter.Position = position++;
+        }
     }
 }
