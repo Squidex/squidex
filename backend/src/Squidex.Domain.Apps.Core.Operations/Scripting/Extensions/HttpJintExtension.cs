@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Cryptography.Xml;
 using System.Text;
 using Jint;
 using Jint.Native;

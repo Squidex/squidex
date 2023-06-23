@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Diagnostics;
-using System.Linq.Expressions;
 using Esprima;
 using Jint;
 using Jint.Native;

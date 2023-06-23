@@ -7,8 +7,6 @@
 
 using System.Net;
 using System.Text;
-using Amazon.Runtime.Internal;
-using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -383,7 +381,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 });
             ";
 
-        await Assert.ThrowsAsync<DomainException>(() => sut.ExecuteAsync(vars, script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
     }
 
     [Fact]
