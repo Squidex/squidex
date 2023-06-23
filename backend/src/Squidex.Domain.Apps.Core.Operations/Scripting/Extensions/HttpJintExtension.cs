@@ -132,7 +132,7 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
             }
             catch (Exception ex)
             {
-                throw new DomainException(ex.Message);
+                throw new JavaScriptException(ex.Message);
             }
         });
     }
