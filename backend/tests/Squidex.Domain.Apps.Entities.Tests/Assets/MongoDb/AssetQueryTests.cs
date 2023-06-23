@@ -146,9 +146,9 @@ public class AssetQueryTests
     [Fact]
     public void Should_make_query_with_mimeType()
     {
-        var filter = ClrFilter.Eq("mimeType", "text/json");
+        var filter = ClrFilter.Eq("mimeType", "application/json");
 
-        AssertQuery("{ 'mm' : 'text/json' }", filter);
+        AssertQuery("{ 'mm' : 'application/json' }", filter);
     }
 
     [Fact]

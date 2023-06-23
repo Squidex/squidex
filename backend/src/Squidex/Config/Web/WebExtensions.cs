@@ -91,7 +91,7 @@ public static class WebExtensions
 
             var json = serializer.Serialize(response);
 
-            httpContext.Response.Headers[HeaderNames.ContentType] = "text/json";
+            httpContext.Response.Headers[HeaderNames.ContentType] = "application/json";
 
             return httpContext.Response.WriteAsync(json);
         });
