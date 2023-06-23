@@ -9,7 +9,7 @@
   Action: {
     Url: http://squidex.io
   },
-  _links: {
+  Links: {
     delete: {
       Method: DELETE
     },

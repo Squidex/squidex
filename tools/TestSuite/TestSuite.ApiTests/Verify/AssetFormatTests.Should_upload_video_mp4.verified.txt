@@ -22,7 +22,7 @@
   ],
   FileSize: 1055736,
   Type: Video,
-  _links: {
+  Links: {
     content: {
       Method: GET
     },

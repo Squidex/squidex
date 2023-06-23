@@ -6,7 +6,7 @@
   },
   IsPublished: true,
   Scripts: {},
-  _links: {
+  Links: {
     contents: {
       Method: GET
     },

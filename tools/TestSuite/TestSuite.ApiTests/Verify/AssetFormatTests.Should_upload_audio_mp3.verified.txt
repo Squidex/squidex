@@ -20,7 +20,7 @@
   ],
   FileSize: 443926,
   Type: Audio,
-  _links: {
+  Links: {
     content: {
       Method: GET
     },

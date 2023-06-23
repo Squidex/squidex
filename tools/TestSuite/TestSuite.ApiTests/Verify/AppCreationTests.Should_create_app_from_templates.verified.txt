@@ -47,7 +47,7 @@
             IsRequiredOnPublish: false,
             IsHalfWidth: false
           },
-          _links: {
+          Links: {
             delete: {
               Method: DELETE
             },
@@ -84,7 +84,7 @@
             IsRequiredOnPublish: false,
             IsHalfWidth: false
           },
-          _links: {
+          Links: {
             delete: {
               Method: DELETE
             },
@@ -120,7 +120,7 @@
             IsRequiredOnPublish: false,
             IsHalfWidth: false
           },
-          _links: {
+          Links: {
             delete: {
               Method: DELETE
             },
@@ -139,7 +139,7 @@
           }
         }
       ],
-      _links: {
+      Links: {
         contents: {
           Method: GET
         },
@@ -234,7 +234,7 @@
             IsRequiredOnPublish: false,
             IsHalfWidth: false
           },
-          _links: {
+          Links: {
             delete: {
               Method: DELETE
             },
@@ -271,7 +271,7 @@
             IsRequiredOnPublish: false,
             IsHalfWidth: false
           },
-          _links: {
+          Links: {
             delete: {
               Method: DELETE
             },
@@ -307,7 +307,7 @@
             IsRequiredOnPublish: false,
             IsHalfWidth: false
           },
-          _links: {
+          Links: {
             delete: {
               Method: DELETE
             },
@@ -326,7 +326,7 @@
           }
         }
       ],
-      _links: {
+      Links: {
         contents: {
           Method: GET
         },
@@ -375,7 +375,7 @@
       }
     }
   ],
-  _links: {
+  Links: {
     create: {
       Method: POST
     },

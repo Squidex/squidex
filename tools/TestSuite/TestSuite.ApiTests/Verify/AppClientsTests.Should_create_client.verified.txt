@@ -3,7 +3,7 @@
   Name: Guid_1,
   Role: Editor,
   AllowAnonymous: false,
-  _links: {
+  Links: {
     delete: {
       Method: DELETE
     },

@@ -17,7 +17,7 @@
         }
       },
       Initial: Draft,
-      _links: {
+      Links: {
         delete: {
           Method: DELETE
         },
@@ -27,7 +27,7 @@
       }
     }
   ],
-  _links: {
+  Links: {
     create: {
       Method: POST
     },

@@ -3,7 +3,7 @@
   ParentId: Guid_Empty,
   FolderName: Guid_2,
   Version: 1,
-  _links: {
+  Links: {
     delete: {
       Method: DELETE
     },
