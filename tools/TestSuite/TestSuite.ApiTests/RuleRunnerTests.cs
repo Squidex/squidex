@@ -200,7 +200,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             Action = new ScriptRuleActionDto
             {
                 Script = $@"
-                    postJSON('{url}', {{ schemaName: event.schemaId.Name }})
+                    postJSON('{url}', {{ schemaName: event.schemaId.Name }}, function () {{}})
                 "
             },
             Trigger = new ContentChangedRuleTriggerDto
