@@ -167,7 +167,7 @@ public class ValueConvertersTests
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
+                .ConvertItemAfter(field, source, Enumerable.Empty<IField>());
 
         var expected =
             JsonValue.Object()
@@ -196,7 +196,7 @@ public class ValueConvertersTests
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
+                .ConvertItemAfter(field, source, Enumerable.Empty<IField>());
 
         var expected = source;
 
@@ -221,7 +221,7 @@ public class ValueConvertersTests
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
+                .ConvertItemAfter(field, source, Enumerable.Empty<IField>());
 
         var expected = source;
 
@@ -245,7 +245,7 @@ public class ValueConvertersTests
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
+                .ConvertItemAfter(field, source, Enumerable.Empty<IField>());
 
         var expected = source;
 
@@ -265,7 +265,7 @@ public class ValueConvertersTests
 
         var actual =
             new AddSchemaNames(ResolvedComponents.Empty)
-                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
+                .ConvertItemAfter(field, source, Enumerable.Empty<IField>());
 
         var expected = source;
 

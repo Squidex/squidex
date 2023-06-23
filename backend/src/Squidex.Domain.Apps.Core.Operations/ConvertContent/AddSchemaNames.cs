@@ -21,7 +21,7 @@ public sealed class AddSchemaNames : IContentItemConverter
         this.components = components;
     }
 
-    public JsonObject ConvertItemBefore(IField parentField, JsonObject source, IEnumerable<IField> schema)
+    public JsonObject ConvertItemAfter(IField parentField, JsonObject source, IEnumerable<IField> schema)
     {
         if (parentField is IArrayField)
         {
