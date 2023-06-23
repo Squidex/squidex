@@ -576,7 +576,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
         httpHandler.ShouldBeMethod(HttpMethod.Post);
         httpHandler.ShouldBeUrl("http://squidex.io/");
-        httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+        httpHandler.ShouldBeBody("{\"key\":42}", "application/json");
 
         var expectedResult = JsonValue.Object().Add("key", 42);
 
@@ -606,7 +606,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
         httpHandler.ShouldBeMethod(HttpMethod.Put);
         httpHandler.ShouldBeUrl("http://squidex.io/");
-        httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+        httpHandler.ShouldBeBody("{\"key\":42}", "application/json");
 
         var expectedResult = JsonValue.Object().Add("key", 42);
 
