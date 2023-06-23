@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.ClientLibrary.Management;
+using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -61,7 +61,7 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 2: Create again and fail.
-        var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
         {
             return _.Client.Schemas.PostSchemaAsync(createRequest);
         });

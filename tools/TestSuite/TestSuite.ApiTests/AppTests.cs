@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.ClientLibrary.Management;
+using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -71,7 +71,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
             var app_1 = await _.Client.Apps.UploadImageAsync(file);
 
             // Should contain image link.
-            Assert.True(app_1._links.ContainsKey("image"));
+            Assert.True(app_1.Links.ContainsKey("image"));
         }
 
 
@@ -103,7 +103,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
             var app_1 = await _.Client.Apps.UploadImageAsync(file);
 
             // Should contain image link.
-            Assert.True(app_1._links.ContainsKey("image"));
+            Assert.True(app_1.Links.ContainsKey("image"));
         }
 
 
@@ -111,7 +111,7 @@ public sealed class AppTests : IClassFixture<CreatedAppFixture>
         var app_2 = await _.Client.Apps.DeleteImageAsync();
 
         // Should contain image link.
-        Assert.False(app_2._links.ContainsKey("image"));
+        Assert.False(app_2.Links.ContainsKey("image"));
     }
 
     [Fact]

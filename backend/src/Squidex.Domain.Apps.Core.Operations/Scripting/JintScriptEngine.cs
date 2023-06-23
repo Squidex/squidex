@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Diagnostics;
+using System.Linq.Expressions;
 using Esprima;
 using Jint;
 using Jint.Native;
@@ -46,7 +47,8 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
         Guard.NotNull(vars);
         Guard.NotNullOrEmpty(script);
 
-        using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
+        using var combined = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        try
         {
             // Enforce a timeout after a configured time span.
             combined.CancelAfter(timeoutExecution);
@@ -66,6 +68,10 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
             return await context.CompleteAsync() ?? JsonMapper.Map(result);
         }
+        catch (Exception ex)
+        {
+            throw MapException(ex);
+        }
     }
 
     public async Task<ContentData> TransformAsync(DataScriptVars vars, string script, ScriptOptions options = default,
@@ -74,7 +80,8 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
         Guard.NotNull(vars);
         Guard.NotNullOrEmpty(script);
 
-        using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
+        using var combined = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        try
         {
             // Enforce a timeout after a configured time span.
             combined.CancelAfter(timeoutExecution);
@@ -107,6 +114,10 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
             return await context.CompleteAsync() ?? vars.Data!;
         }
+        catch (Exception ex)
+        {
+            throw MapException(ex);
+        }
     }
 
     public JsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default)
@@ -114,14 +125,21 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
         Guard.NotNull(vars);
         Guard.NotNullOrEmpty(script);
 
-        var context =
-            CreateEngine<object>(options, default)
-                .Extend(vars, options)
-                .Extend(extensions);
+        try
+        {
+            var context =
+                CreateEngine<object>(options, default)
+                    .Extend(vars, options)
+                    .Extend(extensions);
 
-        var result = Execute(context.Engine, script);
+            var result = Execute(context.Engine, script);
 
-        return JsonMapper.Map(result);
+            return JsonMapper.Map(result);
+        }
+        catch (Exception ex)
+        {
+            throw MapException(ex);
+        }
     }
 
     private ScriptExecutionContext<T> CreateEngine<T>(ScriptOptions options, CancellationToken ct)
@@ -164,34 +182,28 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
     private JsValue Execute(Engine engine, string script)
     {
-        try
-        {
-            var program = parser.Parse(script);
+        var program = parser.Parse(script);
 
-            lock (engine)
-            {
-                return engine.Evaluate(program);
-            }
-        }
-        catch (ArgumentException ex)
+        lock (engine)
         {
-            throw new ValidationException(T.Get("common.jsParseError", new { error = ex.Message }));
+            return engine.Evaluate(program);
         }
-        catch (JavaScriptException ex)
+    }
+
+    private static Exception MapException(Exception inner)
+    {
+        switch (inner)
         {
-            throw new ValidationException(T.Get("common.jsError", new { message = ex.Message }));
-        }
-        catch (ParserException ex)
-        {
-            throw new ValidationException(T.Get("common.jsError", new { message = ex.Message }));
-        }
-        catch (DomainException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new ValidationException(T.Get("common.jsError", new { message = ex.GetType().Name }), ex);
+            case ArgumentException:
+                return new ValidationException(T.Get("common.jsParseError", new { error = inner.Message }));
+            case JavaScriptException:
+                return new ValidationException(T.Get("common.jsError", new { message = inner.Message }));
+            case ParserException:
+                return new ValidationException(T.Get("common.jsError", new { message = inner.Message }));
+            case DomainException:
+                return inner;
+            default:
+                return new ValidationException(T.Get("common.jsError", new { message = inner.GetType().Name }), inner);
         }
     }
 

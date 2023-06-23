@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.ClientLibrary.Management;
+using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -102,7 +102,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 4: Try to delete role.
-        var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
         {
             return _.Client.Apps.DeleteRoleAsync(roleName);
         });
@@ -137,7 +137,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 4: Try to delete role..
-        var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
         {
             return _.Client.Apps.DeleteRoleAsync(roleName);
         });

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 

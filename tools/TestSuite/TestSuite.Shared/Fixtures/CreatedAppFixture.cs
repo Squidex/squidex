@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.ClientLibrary.Management;
+using Squidex.ClientLibrary;
 
 namespace TestSuite.Fixtures;
 
@@ -26,7 +26,7 @@ public class CreatedAppFixture : ClientFixture
 
                 await Client.Apps.PostLanguageAsync(createRequest);
             }
-            catch (SquidexManagementException ex)
+            catch (SquidexException ex)
             {
                 if (ex.StatusCode != 400)
                 {
@@ -44,7 +44,7 @@ public class CreatedAppFixture : ClientFixture
                     Name = AppName
                 });
             }
-            catch (SquidexManagementException ex)
+            catch (SquidexException ex)
             {
                 if (ex.StatusCode != 400)
                 {

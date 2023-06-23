@@ -10,7 +10,6 @@ using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
 
 namespace TestSuite.ApiTests;

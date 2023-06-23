@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
 
 namespace TestSuite.Fixtures;
@@ -32,7 +31,7 @@ public abstract class TestSchemaWithReferencesFixtureBase : CreatedAppFixture
             {
                 await TestEntityWithReferences.CreateSchemaAsync(Client.Schemas, SchemaName);
             }
-            catch (SquidexManagementException ex)
+            catch (SquidexException ex)
             {
                 if (ex.StatusCode != 400)
                 {
