@@ -6,8 +6,9 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
-using Squidex.Areas.Api.Controllers.News.Models;
 using Squidex.ClientLibrary;
+using FeatureDto = Squidex.Areas.Api.Controllers.News.Models.FeatureDto;
+using FeaturesDto = Squidex.Areas.Api.Controllers.News.Models.FeaturesDto;
 
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
 

@@ -14,7 +14,7 @@
       ],
       IsMaster: false,
       IsOptional: true,
-      _links: {
+      Links: {
         delete: {
           Method: DELETE
         },
@@ -28,7 +28,7 @@
       EnglishName: Italian,
       IsMaster: false,
       IsOptional: false,
-      _links: {
+      Links: {
         delete: {
           Method: DELETE
         },
@@ -38,7 +38,7 @@
       }
     }
   ],
-  _links: {
+  Links: {
     create: {
       Method: POST
     },

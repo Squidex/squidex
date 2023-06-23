@@ -11,13 +11,14 @@ using Jint.Native;
 using Jint.Native.Json;
 using Jint.Runtime;
 using Squidex.Domain.Apps.Core.Properties;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions;
 
 public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
 {
-    private delegate void HttpJson(string url, Action<JsValue> callback, JsValue? headers = null);
-    private delegate void HttpJsonWithBody(string url, JsValue post, Action<JsValue> callback, JsValue? headers = null);
+    private delegate void HttpJson(string url, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
+    private delegate void HttpJsonWithBody(string url, JsValue post, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
     private readonly IHttpClientFactory httpClientFactory;
 
     public HttpJintExtension(IHttpClientFactory httpClientFactory)
@@ -41,27 +42,27 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
             return;
         }
 
-        describe(JsonType.Function, "getJSON(url, callback, headers?)",
+        describe(JsonType.Function, "getJSON(url, callback, headers?, ignoreError?)",
             Resources.ScriptingGetJSON);
 
-        describe(JsonType.Function, "postJSON(url, body, callback, headers?)",
+        describe(JsonType.Function, "postJSON(url, body, callback, headers?, ignoreError?)",
             Resources.ScriptingPostJSON);
 
-        describe(JsonType.Function, "putJSON(url, body, callback, headers?)",
+        describe(JsonType.Function, "putJSON(url, body, callback, headers?, ignoreError?)",
             Resources.ScriptingPutJson);
 
-        describe(JsonType.Function, "patchJSON(url, body, callback, headers?)",
+        describe(JsonType.Function, "patchJSON(url, body, callback, headers?, ignoreError?)",
             Resources.ScriptingPatchJson);
 
-        describe(JsonType.Function, "deleteJSON(url, callback, headers?)",
+        describe(JsonType.Function, "deleteJSON(url, callback, headers?, ignoreError?)",
             Resources.ScriptingDeleteJson);
     }
 
     private void AddMethod(ScriptExecutionContext context, HttpMethod method, string name)
     {
-        var action = new HttpJson((url, callback, headers) =>
+        var action = new HttpJson((url, callback, headers, ignoreError) =>
         {
-            Request(context, method, url, null, callback, headers);
+            Request(context, method, url, null, callback, headers, ignoreError);
         });
 
         context.Engine.SetValue(name, action);
@@ -69,15 +70,15 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
 
     private void AddBodyMethod(ScriptExecutionContext context, HttpMethod method, string name)
     {
-        var action = new HttpJsonWithBody((url, body, callback, headers) =>
+        var action = new HttpJsonWithBody((url, body, callback, headers, ignoreError) =>
         {
-            Request(context, method, url, body, callback, headers);
+            Request(context, method, url, body, callback, headers, ignoreError);
         });
 
         context.Engine.SetValue(name, action);
     }
 
-    private void Request(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers)
+    private void Request(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers, bool ignoreError)
     {
         context.Schedule(async (scheduler, ct) =>
         {
@@ -86,18 +87,52 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
                 throw new JavaScriptException("URL is not valid.");
             }
 
-            var httpClient = httpClientFactory.CreateClient("Jint");
-
-            var request = CreateRequest(context, method, uri, body, headers);
-            var response = await httpClient.SendAsync(request, ct);
-
-            response.EnsureSuccessStatusCode();
-
-            var responseObject = await ParseResponseasync(context, response, ct);
-
-            if (callback != null)
+            if (callback == null)
             {
+                throw new JavaScriptException("Callback is not defined.");
+            }
+
+            try
+            {
+
+                var httpClient = httpClientFactory.CreateClient("Jint");
+
+                var request = CreateRequest(context, method, uri, body, headers);
+                var response = await httpClient.SendAsync(request, ct);
+
+                if (!ignoreError)
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+
+                JsValue responseObject;
+
+                if (ignoreError && !response.IsSuccessStatusCode)
+                {
+                    var responseString = await response.Content.ReadAsStringAsync(ct);
+
+                    responseObject = JsValue.FromObject(context.Engine, new Dictionary<string, object?>
+                    {
+                        ["statusCode"] = (int)response.StatusCode,
+                        ["headers"] =
+                            response.Content.Headers
+                                .Concat(response.Headers)
+                                .Concat(response.TrailingHeaders)
+                                .GroupBy(x => x.Key)
+                                .ToDictionary(x => x.Key, x => x.Last().Value.First()),
+                        ["body"] = responseString,
+                    });
+                }
+                else
+                {
+                    responseObject = await ParseResponseAsync(context, response, ct);
+                }
+
                 scheduler.Run(callback, responseObject);
+            }
+            catch (Exception ex)
+            {
+                throw new JavaScriptException(ex.Message);
             }
         });
     }
@@ -108,13 +143,12 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
 
         if (body != null)
         {
-            var serializer = new JsonSerializer(context.Engine);
+            var jsonWriter = new JsonSerializer(context.Engine);
+            var jsonContent = jsonWriter.Serialize(body, JsValue.Undefined, JsValue.Undefined)?.ToString();
 
-            var json = serializer.Serialize(body, JsValue.Undefined, JsValue.Undefined)?.ToString();
-
-            if (json != null)
+            if (jsonContent != null)
             {
-                request.Content = new StringContent(json, Encoding.UTF8, "text/json");
+                request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
             }
         }
 
@@ -138,7 +172,7 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
         return request;
     }
 
-    private static async Task<JsValue> ParseResponseasync(ScriptExecutionContext context, HttpResponseMessage response,
+    private static async Task<JsValue> ParseResponseAsync(ScriptExecutionContext context, HttpResponseMessage response,
         CancellationToken ct)
     {
         var responseString = await response.Content.ReadAsStringAsync(ct);

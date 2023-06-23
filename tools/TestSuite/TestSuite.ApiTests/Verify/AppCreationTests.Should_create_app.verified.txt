@@ -3,7 +3,7 @@
   Name: Guid_2,
   Version: 2,
   CanAccessContent: true,
-  _links: {
+  Links: {
     assets: {
       Method: GET
     },

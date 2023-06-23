@@ -1,6 +1,6 @@
 ﻿{
   Role: Developer,
-  _links: {
+  Links: {
     delete: {
       Method: DELETE
     },

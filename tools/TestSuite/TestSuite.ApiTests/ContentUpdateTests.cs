@@ -8,7 +8,6 @@
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.EnrichedEvents;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
 
 #pragma warning disable CS0618 // Type or member is obsolete

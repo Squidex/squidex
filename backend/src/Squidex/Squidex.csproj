@@ -54,26 +54,26 @@
     <PackageReference Include="MongoDB.Driver" Version="2.19.0" />
     <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="1.0.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="3.0.0" />
-    <PackageReference Include="NJsonSchema" Version="10.8.0" />
+    <PackageReference Include="NJsonSchema" Version="10.9.0" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.18.2" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.19.0" />
     <PackageReference Include="OpenCover" Version="4.7.1221" PrivateAssets="all" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc7" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc7" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="5.1.19" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="5.4.0" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="5.4.0" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="5.4.0" />
-    <PackageReference Include="Squidex.Assets.ImageMagick" Version="5.4.0" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="5.4.0" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="5.4.0" />
-    <PackageReference Include="Squidex.Assets.S3" Version="5.4.0" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="5.4.0" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="15.0.0" />
-    <PackageReference Include="Squidex.Hosting" Version="5.4.0" />
-    <PackageReference Include="Squidex.Messaging.All" Version="5.4.0" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="5.4.0" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="5.5.0" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="5.5.0" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="5.5.0" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="5.5.0" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="5.5.0" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="5.5.0" />
+    <PackageReference Include="Squidex.Assets.S3" Version="5.5.0" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="5.5.0" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="16.0.0" />
+    <PackageReference Include="Squidex.Hosting" Version="5.5.0" />
+    <PackageReference Include="Squidex.Messaging.All" Version="5.5.0" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="5.5.0" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="4.0.1-dev" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
   </ItemGroup>

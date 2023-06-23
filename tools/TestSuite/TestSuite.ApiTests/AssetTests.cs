@@ -7,7 +7,7 @@
 
 using System.Net;
 using Squidex.Assets;
-using Squidex.ClientLibrary.Management;
+using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -131,7 +131,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 2: Create a new item with a custom id.
-        var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
         {
             return _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id);
         });
@@ -153,7 +153,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         });
 
         // Client library cannot catch this exception properly.
-        Assert.True(ex is HttpRequestException || ex is SquidexManagementException);
+        Assert.True(ex is HttpRequestException || ex is SquidexException);
     }
 
     [Fact]
@@ -354,7 +354,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
                 await _.Client.Assets.PutAssetAsync(asset_1.Id, randomMetadataRequest);
             }
-            catch (SquidexManagementException ex) when (ex.StatusCode is 409 or 412)
+            catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
             {
                 return;
             }
@@ -645,7 +645,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         await _.Client.Assets.DeleteAssetAsync(asset.Id, permanent: permanent);
 
         // Should return 404 when asset deleted.
-        var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
         {
             return _.Client.Assets.GetAssetAsync(asset.Id);
         });

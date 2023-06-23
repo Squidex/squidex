@@ -22,7 +22,7 @@
   FileVersion: 1,
   Type: Image,
   Version: 1,
-  _links: {
+  Links: {
     content: {
       Method: GET
     },

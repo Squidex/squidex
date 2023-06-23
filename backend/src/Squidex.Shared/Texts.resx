@@ -290,7 +290,7 @@
     <value>Initial step</value>
   </data>
   <data name="common.jsError" xml:space="preserve">
-    <value>Failed to execute script with Javascript error: {message}</value>
+    <value>Failed to execute script with Javascript runtime error: {message}</value>
   </data>
   <data name="common.jsNotAllowed" xml:space="preserve">
     <value>Script has forbidden the operation.</value>

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -39,7 +38,7 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
             ContributorId = "test@squidex.io"
         };
 
-        var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
         {
             return app.Apps.PostContributorAsync(createRequest);
         });

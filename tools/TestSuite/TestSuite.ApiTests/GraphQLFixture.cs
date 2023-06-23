@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
@@ -51,7 +50,7 @@ public sealed class GraphQLFixture : ContentFixture
 
                 return response.Id;
             }
-            catch (SquidexManagementException ex)
+            catch (SquidexException ex)
             {
                 if (ex.StatusCode != 400)
                 {

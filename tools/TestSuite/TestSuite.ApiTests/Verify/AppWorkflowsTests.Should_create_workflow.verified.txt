@@ -30,7 +30,7 @@
     }
   },
   Initial: Draft,
-  _links: {
+  Links: {
     delete: {
       Method: DELETE
     },

@@ -12,7 +12,7 @@
     type/3gp
   ],
   FileSize: 1038741,
-  _links: {
+  Links: {
     content: {
       Method: GET
     },

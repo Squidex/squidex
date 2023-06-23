@@ -12,7 +12,7 @@
     type/flv
   ],
   FileSize: 1051185,
-  _links: {
+  Links: {
     content: {
       Method: GET
     },

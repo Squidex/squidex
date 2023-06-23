@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Model;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter

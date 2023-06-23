@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.ClientLibrary.Management;
+using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -66,7 +66,7 @@ public class AppCreationTests : IClassFixture<ClientFixture>
 
 
         // STEP 2: Create again and fail.
-        var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
         {
             return _.PostAppAsync(appName);
         });

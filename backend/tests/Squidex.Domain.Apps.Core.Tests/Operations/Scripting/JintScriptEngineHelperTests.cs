@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Net;
-using Jint.Runtime;
+using System.Text;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -363,7 +363,25 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 });
             ";
 
-        await Assert.ThrowsAsync<JavaScriptException>(() => sut.ExecuteAsync(vars, script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+    }
+
+    [Fact]
+    public async Task Should_throw_exception_if_getJson_request_fails()
+    {
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                var url = 'http://squidex.io';
+
+                postJSON(url, {}, function(actual) {
+                    complete(actual);
+                });
+            ";
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
     }
 
     [Fact]
@@ -379,7 +397,38 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 getJSON(url, null);
             ";
 
-        await Assert.ThrowsAsync<JavaScriptException>(() => sut.ExecuteAsync(vars, script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+    }
+
+    [Fact]
+    public async Task Should_not_throw_exception_if_getJson_request_fails_and_flag_is_true()
+    {
+        SetupRequest(HttpStatusCode.BadRequest);
+
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                var url = 'http://squidex.io/invalid.json';
+
+                postJSON(url, {}, function(actual) {
+                    complete(actual);
+                }, undefined, true);
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        var expectedResult =
+            JsonValue.Object()
+                .Add("statusCode", 400)
+                .Add("headers",
+                    JsonValue.Object()
+                        .Add("Content-Type", "application/json; charset=utf-8")
+                        .Add("Content-Length", "13"))
+                .Add("body", "{ \"key\": 42 }");
+
+        Assert.Equal(expectedResult, actual);
     }
 
     [Fact]
@@ -404,7 +453,9 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         httpHandler.ShouldBeMethod(HttpMethod.Get);
         httpHandler.ShouldBeUrl("http://squidex.io/");
 
-        var expectedResult = JsonValue.Object().Add("key", 42);
+        var expectedResult =
+            JsonValue.Object()
+                .Add("key", 42);
 
         Assert.Equal(expectedResult, actual);
     }
@@ -493,7 +544,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
         httpHandler.ShouldBeMethod(HttpMethod.Patch);
         httpHandler.ShouldBeUrl("http://squidex.io/");
-        httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+        httpHandler.ShouldBeBody("{\"key\":42}", "application/json");
 
         var expectedResult = JsonValue.Object().Add("key", 42);
 
@@ -523,7 +574,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
         httpHandler.ShouldBeMethod(HttpMethod.Post);
         httpHandler.ShouldBeUrl("http://squidex.io/");
-        httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+        httpHandler.ShouldBeBody("{\"key\":42}", "application/json");
 
         var expectedResult = JsonValue.Object().Add("key", 42);
 
@@ -553,18 +604,18 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
         httpHandler.ShouldBeMethod(HttpMethod.Put);
         httpHandler.ShouldBeUrl("http://squidex.io/");
-        httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+        httpHandler.ShouldBeBody("{\"key\":42}", "application/json");
 
         var expectedResult = JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expectedResult, actual);
     }
 
-    private MockupHttpHandler SetupRequest()
+    private MockupHttpHandler SetupRequest(HttpStatusCode statusCode = HttpStatusCode.OK)
     {
-        var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
+        var httpResponse = new HttpResponseMessage(statusCode)
         {
-            Content = new StringContent("{ \"key\": 42 }")
+            Content = new StringContent("{ \"key\": 42 }", Encoding.UTF8, "application/json")
         };
 
         var httpHandler = new MockupHttpHandler(httpResponse);

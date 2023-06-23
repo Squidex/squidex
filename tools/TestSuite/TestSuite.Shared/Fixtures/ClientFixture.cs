@@ -7,7 +7,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using Xunit;
 
 namespace TestSuite.Fixtures;

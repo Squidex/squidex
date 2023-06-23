@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 
@@ -201,7 +200,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             Action = new ScriptRuleActionDto
             {
                 Script = $@"
-                    postJSON('{url}', {{ schemaName: event.schemaId.Name }})
+                    postJSON('{url}', {{ schemaName: event.schemaId.Name }}, function () {{}})
                 "
             },
             Trigger = new ContentChangedRuleTriggerDto

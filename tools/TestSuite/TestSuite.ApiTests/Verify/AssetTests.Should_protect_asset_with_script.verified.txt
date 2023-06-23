@@ -20,7 +20,7 @@
   ],
   FileSize: 19430,
   Type: Image,
-  _links: {
+  Links: {
     content: {
       Method: GET
     },

@@ -625,7 +625,7 @@ public class FieldConvertersTests
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItemBefore(field, source, Enumerable.Empty<IField>());
+                .ConvertItemAfter(field, source, Enumerable.Empty<IField>());
 
         Assert.Equal(expected, actual);
     }

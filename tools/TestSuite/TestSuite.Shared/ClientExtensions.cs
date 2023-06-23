@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary;
-using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 
 namespace TestSuite;
@@ -25,7 +24,7 @@ public static class ClientExtensions
                 {
                     await assetsClient.GetAssetAsync(id, cts.Token);
                 }
-                catch (SquidexManagementException ex) when (ex.StatusCode == 404)
+                catch (SquidexException ex) when (ex.StatusCode == 404)
                 {
                     return true;
                 }
@@ -198,7 +197,7 @@ public static class ClientExtensions
         {
             httpClient.BaseAddress = new Uri(fixture.Url);
 
-            var url = asset._links["content"].Href[1..];
+            var url = asset.Links["content"].Href[1..];
 
             if (version > 0)
             {

@@ -13,7 +13,7 @@
   ],
   HideScheduler: false,
   HideDateTimeModeButton: false,
-  _links: {
+  Links: {
     self: {
       Method: GET
     },

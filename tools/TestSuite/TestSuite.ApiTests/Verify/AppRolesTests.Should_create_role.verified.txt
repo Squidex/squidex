@@ -1,6 +1,6 @@
 ﻿{
   IsDefaultRole: false,
-  _links: {
+  Links: {
     delete: {
       Method: DELETE
     },
