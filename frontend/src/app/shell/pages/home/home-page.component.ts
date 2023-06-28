@@ -38,9 +38,17 @@ export class HomePageComponent {
         }
 
         try {
-            const path = await this.authService.loginPopup(redirectPath) || '/app';
+            let path = await this.authService.loginPopup(redirectPath);
 
-            this.router.navigateByUrl(path, { replaceUrl: true });
+            if (!path) {
+                path = '/app';
+            }
+
+            const success = await this.router.navigateByUrl(path, { replaceUrl: true });
+
+            if (!success) {
+                this.router.navigate(['/app'], { replaceUrl: true });
+            }
         } catch {
             this.router.navigate(['/'], { replaceUrl: true });
         }
