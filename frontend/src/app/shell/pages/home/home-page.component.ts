@@ -44,11 +44,8 @@ export class HomePageComponent {
                 path = '/app';
             }
 
-            const success = await this.router.navigateByUrl(path, { replaceUrl: true });
-
-            if (!success) {
-                this.router.navigate(['/app'], { replaceUrl: true });
-            }
+            await this.router.navigateByUrl(path, { replaceUrl: true }) ||
+            await this.router.navigate(['/app'], { replaceUrl: true });
         } catch {
             this.router.navigate(['/'], { replaceUrl: true });
         }
