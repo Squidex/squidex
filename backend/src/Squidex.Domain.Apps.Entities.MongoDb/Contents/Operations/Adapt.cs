@@ -20,33 +20,17 @@ public static class Adapt
 
     public static IReadOnlyDictionary<string, string> PropertyMap
     {
-        get
-        {
-            if (propertyMap == null)
-            {
-                propertyMap =
-                    BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).AllMemberMaps
-                        .ToDictionary(
-                            x => x.MemberName,
-                            x => x.ElementName,
-                            StringComparer.OrdinalIgnoreCase);
-            }
-
-            return propertyMap;
-        }
+        get => propertyMap ??=
+            BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).AllMemberMaps
+                .ToDictionary(
+                    x => x.MemberName,
+                    x => x.ElementName,
+                    StringComparer.OrdinalIgnoreCase);
     }
 
     public static IReadOnlyDictionary<string, PropertyPath> PathMap
     {
-        get
-        {
-            if (pathMap == null)
-            {
-                pathMap = PropertyMap.ToDictionary(x => x.Key, x => (PropertyPath)x.Value);
-            }
-
-            return pathMap;
-        }
+        get => pathMap ??= PropertyMap.ToDictionary(x => x.Key, x => (PropertyPath)x.Value);
     }
 
     public static PropertyPath MapPath(PropertyPath path)

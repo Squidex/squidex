@@ -49,15 +49,6 @@ public static class AssetServices
         services.AddTransientAs<AssetCache>()
             .As<IAssetCache>();
 
-        services.AddSingletonAs<AssetTusRunner>()
-            .AsSelf();
-
-        services.AddSingletonAs<AssetTusStore>()
-            .As<ITusStore>().As<ITusExpirationStore>();
-
-        services.AddSingletonAs(c => InMemoryFileLockProvider.Instance)
-            .As<ITusFileLockProvider>();
-
         services.AddSingletonAs<RebuildFiles>()
             .AsSelf();
 
@@ -108,6 +99,8 @@ public static class AssetServices
 
         services.AddSingletonAs<SvgAssetMetadataSource>()
             .As<IAssetMetadataSource>();
+
+        services.AddAssetTus();
     }
 
     public static void AddSquidexAssetInfrastructure(this IServiceCollection services, IConfiguration config)
@@ -116,43 +109,27 @@ public static class AssetServices
         {
             ["Default"] = () =>
             {
-                services.AddSingletonAs<NoopAssetStore>()
-                    .AsOptional<IAssetStore>();
+                services.AddFolderAssetStore(config);
             },
             ["Folder"] = () =>
             {
-                var path = config.GetRequiredValue("assetStore:folder:path");
-
-                services.AddSingletonAs(c => new FolderAssetStore(path, c.GetRequiredService<ILogger<FolderAssetStore>>()))
-                    .As<IAssetStore>();
+                services.AddFolderAssetStore(config);
             },
             ["GoogleCloud"] = () =>
             {
-                var options = new GoogleCloudAssetOptions
-                {
-                    BucketName = config.GetRequiredValue("assetStore:googleCloud:bucket")
-                };
-
-                services.AddSingletonAs(c => new GoogleCloudAssetStore(options))
-                    .As<IAssetStore>();
+                services.AddGoogleCloudAssetStore(config);
             },
             ["AzureBlob"] = () =>
             {
-                var options = new AzureBlobAssetOptions
-                {
-                    ConnectionString = config.GetRequiredValue("assetStore:azureBlob:connectionString"),
-                    ContainerName = config.GetRequiredValue("assetStore:azureBlob:containerName")
-                };
-
-                services.AddSingletonAs(c => new AzureBlobAssetStore(options))
-                    .As<IAssetStore>();
+                services.AddAzureBlobAssetStore(config);
             },
             ["AmazonS3"] = () =>
             {
-                var amazonS3Options = config.GetSection("assetStore:amazonS3").Get<AmazonS3AssetOptions>() ?? new ();
-
-                services.AddSingletonAs(c => new AmazonS3AssetStore(amazonS3Options))
-                    .As<IAssetStore>();
+                services.AddAmazonS3AssetStore(config);
+            },
+            ["FTP"] = () =>
+            {
+                services.AddFTPAssetStore(config);
             },
             ["MongoDb"] = () =>
             {
@@ -160,48 +137,17 @@ public static class AssetServices
                 var mongoDatabaseName = config.GetRequiredValue("assetStore:mongoDb:database");
                 var mongoGridFsBucketName = config.GetRequiredValue("assetStore:mongoDb:bucket");
 
-                services.AddSingletonAs(c =>
-                    {
-                        var mongoClient = StoreServices.GetMongoClient(mongoConfiguration);
-                        var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
-
-                        var gridFsbucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
-                        {
-                            BucketName = mongoGridFsBucketName
-                        });
-
-                        return new MongoGridFsAssetStore(gridFsbucket);
-                    })
-                    .As<IAssetStore>();
-            },
-            ["Ftp"] = () =>
-            {
-                var serverHost = config.GetRequiredValue("assetStore:ftp:serverHost");
-                var serverPort = config.GetOptionalValue<int>("assetStore:ftp:serverPort", 21);
-
-                var username = config.GetRequiredValue("assetStore:ftp:username");
-                var password = config.GetRequiredValue("assetStore:ftp:password");
-
-                var options = new FTPAssetOptions
+                services.AddMongoAssetStore(c =>
                 {
-                    Path = config.GetOptionalValue("assetStore:ftp:path", "/")!
-                };
+                    var mongoClient = StoreServices.GetMongoClient(mongoConfiguration);
+                    var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
-                services.AddSingletonAs(c =>
+                    return new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
                     {
-                        var factory = new Func<AsyncFtpClient>(() => new AsyncFtpClient(serverHost, username, password, serverPort));
-
-                        return new FTPAssetStore(factory, options, c.GetRequiredService<ILogger<FTPAssetStore>>());
-                    })
-                    .As<IAssetStore>();
+                        BucketName = mongoGridFsBucketName
+                    });
+                });
             }
-        });
-
-        services.AddSingletonAs<IInitializable>(c =>
-        {
-            var service = c.GetRequiredService<IAssetStore>();
-
-            return new DelegateInitializer(service.GetType().Name, service.InitializeAsync);
         });
     }
 }

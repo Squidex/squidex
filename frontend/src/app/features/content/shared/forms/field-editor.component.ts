@@ -8,7 +8,7 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoValue$, MathHelper, TypedSimpleChanges, Types } from '@app/shared';
+import { AbstractContentForm, AppLanguageDto, DialogModel, EditContentForm, FieldDto, hasNoValue$, MathHelper, TypedSimpleChanges, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-editor[form][formContext][formLevel][formModel][isComparing][language][languages]',
@@ -57,6 +57,8 @@ export class FieldEditorComponent {
     public isEmpty?: Observable<boolean>;
     public isExpanded = false;
 
+    public chatDialog = new DialogModel();
+
     public get field() {
         return this.formModel.field;
     }
@@ -91,5 +93,11 @@ export class FieldEditorComponent {
 
     public unset() {
         this.formModel.unset();
+    }
+
+    public setValue(value: any) {
+        this.formModel.setValue(value);
+
+        this.chatDialog.hide();
     }
 }

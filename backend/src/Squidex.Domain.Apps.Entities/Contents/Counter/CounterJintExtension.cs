@@ -15,8 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter;
 
 public sealed class CounterJintExtension : IJintExtension, IScriptDescriptor
 {
-    private delegate long CounterReset(string name, long value = 0);
-    private delegate void CounterResetV2(string name, Action<JsValue>? callback = null, long value = 0);
+    private delegate long CounterResetDelegate(string name, long value = 0);
+    private delegate void CounterResetV2Delegate(string name, Action<JsValue>? callback = null, long value = 0);
     private readonly ICounterService counterService;
 
     public CounterJintExtension(ICounterService counterService)
@@ -38,7 +38,7 @@ public sealed class CounterJintExtension : IJintExtension, IScriptDescriptor
 
         context.Engine.SetValue("incrementCounter", increment);
 
-        var reset = new CounterReset((name, value) =>
+        var reset = new CounterResetDelegate((name, value) =>
         {
             return Reset(appId, name, value);
         });
@@ -60,27 +60,12 @@ public sealed class CounterJintExtension : IJintExtension, IScriptDescriptor
 
         context.Engine.SetValue("incrementCounterV2", increment);
 
-        var reset = new CounterResetV2((name, callback, value) =>
+        var reset = new CounterResetV2Delegate((name, callback, value) =>
         {
             ResetV2(context, appId, name, callback, value);
         });
 
         context.Engine.SetValue("resetCounterV2", reset);
-    }
-
-    public void Describe(AddDescription describe, ScriptScope scope)
-    {
-        describe(JsonType.Function, "incrementCounter(name)",
-            Resources.ScriptingIncrementCounter);
-
-        describe(JsonType.Function, "incrementCounterV2(name, callback?)",
-            Resources.ScriptingIncrementCounterV2);
-
-        describe(JsonType.Function, "resetCounter(name, value?)",
-            Resources.ScriptingResetCounter);
-
-        describe(JsonType.Function, "resetCounter(name, callback?, value?)",
-            Resources.ScriptingResetCounterV2);
     }
 
     private long Increment(DomainId appId, string name)
@@ -117,5 +102,20 @@ public sealed class CounterJintExtension : IJintExtension, IScriptDescriptor
                 scheduler.Run(callback, JsValue.FromObject(context.Engine, result));
             }
         });
+    }
+
+    public void Describe(AddDescription describe, ScriptScope scope)
+    {
+        describe(JsonType.Function, "incrementCounter(name)",
+            Resources.ScriptingIncrementCounter);
+
+        describe(JsonType.Function, "incrementCounterV2(name, callback?)",
+            Resources.ScriptingIncrementCounterV2);
+
+        describe(JsonType.Function, "resetCounter(name, value?)",
+            Resources.ScriptingResetCounter);
+
+        describe(JsonType.Function, "resetCounter(name, callback?, value?)",
+            Resources.ScriptingResetCounterV2);
     }
 }

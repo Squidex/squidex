@@ -68,7 +68,7 @@ public static class Tokenizer
 
         if (query.Length > 2 && query[2] == ':')
         {
-            textLanguage = query.Substring(0, 2);
+            textLanguage = query[..2];
             textReader.Read();
             textReader.Read();
         }

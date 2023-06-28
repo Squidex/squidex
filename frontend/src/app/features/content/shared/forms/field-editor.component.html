@@ -1,7 +1,11 @@
 <div class="field" [class.expanded]="isExpanded" *ngIf="formModel">
     <div class="buttons-container" *ngIf="canUnset">
         <div class="buttons">
-            <button type="button" class="btn btn-sm btn-outline-secondary force" title="i18n:contents.fieldFullscreen" (click)="toggleExpanded()" tabindex="-1">
+            <button type="button" class="btn btn-sm btn-outline-secondary force" (click)="chatDialog.show()" tabindex="-1">
+                AI
+            </button>
+
+            <button type="button" class="btn btn-sm btn-outline-secondary force ms-1" title="i18n:contents.fieldFullscreen" (click)="toggleExpanded()" tabindex="-1">
                 <i class="icon-fullscreen"></i>
             </button>
     
@@ -244,3 +248,8 @@
         <span [sqxMarkdown]="field.properties.hints" [optional]="true" [inline]="true"></span>
     </sqx-form-hint>
 </div>
+
+
+<ng-container *sqxModal="chatDialog">
+    <sqx-chat-dialog (close)="chatDialog.hide()" (complete)="setValue($event)"></sqx-chat-dialog>
+</ng-container>

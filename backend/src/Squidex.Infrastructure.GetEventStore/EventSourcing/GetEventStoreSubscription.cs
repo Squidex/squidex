@@ -25,6 +25,7 @@ internal sealed class GetEventStoreSubscription : IEventSubscription
         string? prefix,
         string? streamFilter)
     {
+#pragma warning disable MA0134 // Observe result of async calls
         Task.Run(async () =>
         {
             var ct = cts.Token;
@@ -69,6 +70,7 @@ internal sealed class GetEventStoreSubscription : IEventSubscription
                     cancellationToken: ct);
             }
         }, cts.Token);
+#pragma warning restore MA0134 // Observe result of async calls
     }
 
     public void Dispose()

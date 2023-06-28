@@ -20,7 +20,13 @@
         </div>
 
         <div class="table-items-row-details-tab">
-            <div class="help" [innerHTML]="details | async | sqxMarkdown | sqxSafeHtml"></div>
+            <ng-container *ngIf="details | async; let loadedDetails; else loading">
+                <div class="help" [innerHTML]="loadedDetails | sqxMarkdown | sqxSafeHtml"></div>
+            </ng-container>
+
+            <ng-template #loading>
+                <sqx-loader></sqx-loader>
+            </ng-template>
         </div>
     </div>
 </div>

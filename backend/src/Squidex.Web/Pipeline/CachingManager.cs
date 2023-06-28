@@ -16,6 +16,8 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
+#pragma warning disable CA1822 // Mark members as static
+
 namespace Squidex.Web.Pipeline;
 
 public sealed class CachingManager : IRequestCache
@@ -197,7 +199,6 @@ public sealed class CachingManager : IRequestCache
     public CachingManager(IHttpContextAccessor httpContextAccessor, IOptions<CachingOptions> cachingOptions)
     {
         this.httpContextAccessor = httpContextAccessor;
-
         this.cachingOptions = cachingOptions.Value;
 
         stringBuilderPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy

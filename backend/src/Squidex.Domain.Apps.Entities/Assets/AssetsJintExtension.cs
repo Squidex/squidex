@@ -38,36 +38,12 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
     public void ExtendAsync(ScriptExecutionContext context)
     {
-        AddAssetText(context);
-        AddAssetBlurHash(context);
-        AddAsset(context);
+        AddGetAssetText(context);
+        AddGetAssetBlurHash(context);
+        AddGetAssetObject(context);
     }
 
-    public void Describe(AddDescription describe, ScriptScope scope)
-    {
-        if (!scope.HasFlag(ScriptScope.Async))
-        {
-            return;
-        }
-
-        describe(JsonType.Function, "getAsset(ids, callback)",
-            Resources.ScriptingGetAsset,
-            deprecationReason: Resources.ScriptingGetAssetDeprecated);
-
-        describe(JsonType.Function, "getAssetV2(ids, callback)",
-            Resources.ScriptingGetAssetV2);
-
-        describe(JsonType.Function, "getAssets(ids, callback)",
-            Resources.ScriptingGetAssets);
-
-        describe(JsonType.Function, "getAssetText(asset, callback, encoding?)",
-            Resources.ScriptingGetAssetText);
-
-        describe(JsonType.Function, "getAssetBlurHash(asset, callback, x?, y?)",
-            Resources.ScriptingGetBlurHash);
-    }
-
-    private void AddAsset(ScriptExecutionContext context)
+    private void AddGetAssetObject(ScriptExecutionContext context)
     {
         if (!context.TryGetValue<DomainId>("appId", out var appId))
         {
@@ -94,7 +70,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         context.Engine.SetValue("getAssets", getAssets);
     }
 
-    private void AddAssetText(ScriptExecutionContext context)
+    private void AddGetAssetText(ScriptExecutionContext context)
     {
         var action = new GetAssetTextDelegate((references, callback, encoding) =>
         {
@@ -104,7 +80,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         context.Engine.SetValue("getAssetText", action);
     }
 
-    private void AddAssetBlurHash(ScriptExecutionContext context)
+    private void AddGetAssetBlurHash(ScriptExecutionContext context)
     {
         var getBlurHash = new GetBlurHashDelegate((input, callback, componentX, componentY) =>
         {
@@ -116,7 +92,10 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
     private void GetText(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue? encoding)
     {
-        Guard.NotNull(callback);
+        if (callback == null)
+        {
+            throw new JavaScriptException("Callback is not defined.");
+        }
 
         context.Schedule(async (scheduler, ct) =>
         {
@@ -166,7 +145,10 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
     private void GetBlurHash(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue? componentX, JsValue? componentY)
     {
-        Guard.NotNull(callback);
+        if (callback == null)
+        {
+            throw new JavaScriptException("Callback is not defined.");
+        }
 
         context.Schedule(async (scheduler, ct) =>
         {
@@ -229,7 +211,10 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
     private void GetAssets(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
     {
-        Guard.NotNull(callback);
+        if (callback == null)
+        {
+            throw new JavaScriptException("Callback is not defined.");
+        }
 
         context.Schedule(async (scheduler, ct) =>
         {
@@ -310,5 +295,29 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         }
 
         return app;
+    }
+
+    public void Describe(AddDescription describe, ScriptScope scope)
+    {
+        if (!scope.HasFlag(ScriptScope.Async))
+        {
+            return;
+        }
+
+        describe(JsonType.Function, "getAsset(ids, callback)",
+            Resources.ScriptingGetAsset,
+            deprecationReason: Resources.ScriptingGetAssetDeprecated);
+
+        describe(JsonType.Function, "getAssetV2(ids, callback)",
+            Resources.ScriptingGetAssetV2);
+
+        describe(JsonType.Function, "getAssets(ids, callback)",
+            Resources.ScriptingGetAssets);
+
+        describe(JsonType.Function, "getAssetText(asset, callback, encoding?)",
+            Resources.ScriptingGetAssetText);
+
+        describe(JsonType.Function, "getAssetBlurHash(asset, callback, x?, y?)",
+            Resources.ScriptingGetBlurHash);
     }
 }

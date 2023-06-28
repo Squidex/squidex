@@ -47,4 +47,30 @@ describe('TranslationsService', () => {
 
             expect(translation!).toEqual(new TranslationDto('Translated', 'Hallo'));
         }));
+
+    it('should make post request to ask question',
+        inject([TranslationsService, HttpTestingController], (translationsService: TranslationsService, httpMock: HttpTestingController) => {
+            const dto = { prompt: 'My Question' };
+
+            let answers: ReadonlyArray<string>;
+
+            translationsService.ask('my-app', dto).subscribe(result => {
+                answers = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/ask');
+
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush([
+                'Answer1',
+                'Answer2',
+            ]);
+
+            expect(answers!).toEqual([
+                'Answer1',
+                'Answer2',
+            ]);
+        }));
 });

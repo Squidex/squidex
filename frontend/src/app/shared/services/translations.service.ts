@@ -30,6 +30,11 @@ export type TranslateDto = Readonly<{
     targetLanguage: string;
  }>;
 
+ export type AskDto = Readonly<{
+    // The question to ask.
+    prompt: string;
+ }>;
+
 @Injectable()
 export class TranslationsService {
     constructor(
@@ -46,6 +51,13 @@ export class TranslationsService {
                 return parseTranslation(body);
             }),
             pretifyError('i18n:translate.translateFailed'));
+    }
+
+    public ask(appName: string, request: AskDto): Observable<ReadonlyArray<string>> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/ask`);
+
+        return this.http.post<any>(url, request).pipe(
+            pretifyError('i18n:chatBot.questionFailed'));
     }
 }
 

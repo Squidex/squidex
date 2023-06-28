@@ -7,6 +7,7 @@
 
 using System.Net;
 using System.Text;
+using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -15,12 +16,16 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
+using Squidex.Text.ChatBots;
+using Squidex.Text.Translations;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting;
 
 public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 {
     private readonly IHttpClientFactory httpClientFactory = A.Fake<IHttpClientFactory>();
+    private readonly ITranslator translator = A.Fake<ITranslator>();
+    private readonly IChatBot chatBot = A.Fake<IChatBot>();
     private readonly JintScriptEngine sut;
 
     public JintScriptEngineHelperTests()
@@ -30,7 +35,8 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
             new DateTimeJintExtension(),
             new HttpJintExtension(httpClientFactory),
             new StringJintExtension(),
-            new StringWordsJintExtension()
+            new StringWordsJintExtension(),
+            new StringAsyncJintExtension(translator, chatBot)
         };
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
@@ -609,6 +615,148 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         var expectedResult = JsonValue.Object().Add("key", 42);
 
         Assert.Equal(expectedResult, actual);
+    }
+
+    [Fact]
+    public async Task Should_generate_content()
+    {
+        A.CallTo(() => chatBot.AskQuestionAsync("prompt", A<CancellationToken>._))
+            .Returns(new List<string> { "Generated" });
+
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                generate('prompt', function(actual) {
+                    complete(actual);
+                });
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        Assert.Equal("Generated", actual.ToString());
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("''")]
+    [InlineData("' '")]
+    public async Task Should_return_null_string_on_generate_if_prompt_is_invalid(string input)
+    {
+        var vars = new ScriptVars
+        {
+        };
+
+        var script = $@"
+                generate({input}, function(actual) {{
+                    complete(actual);
+                }});
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        Assert.Equal(JsonValue.Null, actual);
+
+        A.CallTo(() => chatBot.AskQuestionAsync(A<string>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_throw_exception_on_generate_if_callback_is_null()
+    {
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                generate('prompt', null);
+            ";
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+    }
+
+    [Fact]
+    public async Task Should_translate_content()
+    {
+        A.CallTo(() => translator.TranslateAsync("text", "en", "it", A<CancellationToken>._))
+            .Returns(TranslationResult.Success("Translated", "it"));
+
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                translate('text', 'en', function(actual) {
+                    complete(actual);
+                }, 'it');
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        Assert.Equal("Translated", actual.ToString());
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("''")]
+    [InlineData("' '")]
+    public async Task Should_return_null_string_on_translate_if_input_is_invalid(string input)
+    {
+        var vars = new ScriptVars
+        {
+        };
+
+        var script = $@"
+                translate({input}, 'en', function(actual) {{
+                    complete(actual);
+                }});
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        Assert.Equal(JsonValue.Null, actual);
+
+        A.CallTo(() => translator.TranslateAsync(A<string>._, A<string>._, A<string>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("''")]
+    [InlineData("' '")]
+    public async Task Should_return_null_string_on_input_if_target_language_is_invalid(string input)
+    {
+        var vars = new ScriptVars
+        {
+        };
+
+        var script = $@"
+                translate('text', {input}, function(actual) {{
+                    complete(actual);
+                }});
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        Assert.Equal(JsonValue.Null, actual);
+
+        A.CallTo(() => translator.TranslateAsync(A<string>._, A<string>._, A<string>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_throw_exception_on_translate_if_callback_is_null()
+    {
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                translate('text', 'en', null);
+            ";
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
     }
 
     private MockupHttpHandler SetupRequest(HttpStatusCode statusCode = HttpStatusCode.OK)

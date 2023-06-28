@@ -14,13 +14,13 @@
     <ProjectReference Include="..\..\src\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="7.3.1" />
-    <PackageReference Include="FluentAssertions" Version="6.10.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.22">
+    <PackageReference Include="FakeItEasy" Version="7.4.0" />
+    <PackageReference Include="FluentAssertions" Version="6.11.0" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.62">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
