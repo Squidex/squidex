@@ -17,8 +17,8 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions;
 
 public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
 {
-    private delegate void HttpJson(string url, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
-    private delegate void HttpJsonWithBody(string url, JsValue post, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
+    private delegate void HttpJsonDelegate(string url, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
+    private delegate void HttpJsonWithBodyDelegate(string url, JsValue post, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
     private readonly IHttpClientFactory httpClientFactory;
 
     public HttpJintExtension(IHttpClientFactory httpClientFactory)
@@ -35,32 +35,9 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
         AddMethod(context, HttpMethod.Get, "getJSON");
     }
 
-    public void Describe(AddDescription describe, ScriptScope scope)
-    {
-        if (!scope.HasFlag(ScriptScope.Async))
-        {
-            return;
-        }
-
-        describe(JsonType.Function, "getJSON(url, callback, headers?, ignoreError?)",
-            Resources.ScriptingGetJSON);
-
-        describe(JsonType.Function, "postJSON(url, body, callback, headers?, ignoreError?)",
-            Resources.ScriptingPostJSON);
-
-        describe(JsonType.Function, "putJSON(url, body, callback, headers?, ignoreError?)",
-            Resources.ScriptingPutJson);
-
-        describe(JsonType.Function, "patchJSON(url, body, callback, headers?, ignoreError?)",
-            Resources.ScriptingPatchJson);
-
-        describe(JsonType.Function, "deleteJSON(url, callback, headers?, ignoreError?)",
-            Resources.ScriptingDeleteJson);
-    }
-
     private void AddMethod(ScriptExecutionContext context, HttpMethod method, string name)
     {
-        var action = new HttpJson((url, callback, headers, ignoreError) =>
+        var action = new HttpJsonDelegate((url, callback, headers, ignoreError) =>
         {
             Request(context, method, url, null, callback, headers, ignoreError);
         });
@@ -70,7 +47,7 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
 
     private void AddBodyMethod(ScriptExecutionContext context, HttpMethod method, string name)
     {
-        var action = new HttpJsonWithBody((url, body, callback, headers, ignoreError) =>
+        var action = new HttpJsonWithBodyDelegate((url, body, callback, headers, ignoreError) =>
         {
             Request(context, method, url, body, callback, headers, ignoreError);
         });
@@ -80,21 +57,20 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
 
     private void Request(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers, bool ignoreError)
     {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            throw new JavaScriptException("URL is not valid.");
+        }
+
+        if (callback == null)
+        {
+            throw new JavaScriptException("Callback is not defined.");
+        }
+
         context.Schedule(async (scheduler, ct) =>
         {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            {
-                throw new JavaScriptException("URL is not valid.");
-            }
-
-            if (callback == null)
-            {
-                throw new JavaScriptException("Callback is not defined.");
-            }
-
             try
             {
-
                 var httpClient = httpClientFactory.CreateClient("Jint");
 
                 var request = CreateRequest(context, method, uri, body, headers);
@@ -185,5 +161,28 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
         ct.ThrowIfCancellationRequested();
 
         return jsonValue;
+    }
+
+    public void Describe(AddDescription describe, ScriptScope scope)
+    {
+        if (!scope.HasFlag(ScriptScope.Async))
+        {
+            return;
+        }
+
+        describe(JsonType.Function, "getJSON(url, callback, headers?, ignoreError?)",
+            Resources.ScriptingGetJSON);
+
+        describe(JsonType.Function, "postJSON(url, body, callback, headers?, ignoreError?)",
+            Resources.ScriptingPostJSON);
+
+        describe(JsonType.Function, "putJSON(url, body, callback, headers?, ignoreError?)",
+            Resources.ScriptingPutJson);
+
+        describe(JsonType.Function, "patchJSON(url, body, callback, headers?, ignoreError?)",
+            Resources.ScriptingPatchJson);
+
+        describe(JsonType.Function, "deleteJSON(url, callback, headers?, ignoreError?)",
+            Resources.ScriptingDeleteJson);
     }
 }

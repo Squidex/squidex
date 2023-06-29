@@ -27,6 +27,7 @@ internal sealed class ComponentGraphType : ObjectGraphType<JsonObject>
         Description = $"The structure of the {schemaInfo.DisplayName} component schema.";
 
         AddField(ContentFields.SchemaId);
+        AddField(ContentFields.SchemaName);
 
         foreach (var fieldInfo in schemaInfo.Fields)
         {

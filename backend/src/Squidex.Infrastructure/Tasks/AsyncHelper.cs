@@ -54,6 +54,7 @@ public static class AsyncHelper
     public static void Batch<TIn>(this Channel<object> source, Channel<object> target, int batchSize, int timeout,
         CancellationToken ct = default)
     {
+#pragma warning disable MA0134 // Observe result of async calls
         Task.Run(async () =>
         {
             var batch = new List<TIn>(batchSize);
@@ -94,5 +95,6 @@ public static class AsyncHelper
 
             await TrySendAsync();
         }, ct).ContinueWith(x => target.Writer.TryComplete(x.Exception));
+#pragma warning restore MA0134 // Observe result of async calls
     }
 }

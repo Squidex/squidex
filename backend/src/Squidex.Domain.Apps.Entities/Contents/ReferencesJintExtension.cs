@@ -54,27 +54,12 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
         context.Engine.SetValue("getReferences", getReferences);
     }
 
-    public void Describe(AddDescription describe, ScriptScope scope)
-    {
-        if (!scope.HasFlag(ScriptScope.Async))
-        {
-            return;
-        }
-
-        describe(JsonType.Function, "getReference(id, callback)",
-            Resources.ScriptingGetReference,
-            deprecationReason: Resources.ScriptingGetReferenceDeprecated);
-
-        describe(JsonType.Function, "getReferenceV2(id, callback)",
-            Resources.ScriptingGetReferenceV2);
-
-        describe(JsonType.Function, "getReferences(ids, callback)",
-            Resources.ScriptingGetReferences);
-    }
-
     private void GetReferences(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
     {
-        Guard.NotNull(callback);
+        if (callback == null)
+        {
+            throw new JavaScriptException("Callback is not defined.");
+        }
 
         context.Schedule(async (scheduler, ct) =>
         {
@@ -110,7 +95,10 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
 
     private void GetReference(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
     {
-        Guard.NotNull(callback);
+        if (callback == null)
+        {
+            throw new JavaScriptException("Callback is not defined.");
+        }
 
         context.Schedule(async (scheduler, ct) =>
         {
@@ -156,5 +144,23 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
         }
 
         return app;
+    }
+
+    public void Describe(AddDescription describe, ScriptScope scope)
+    {
+        if (!scope.HasFlag(ScriptScope.Async))
+        {
+            return;
+        }
+
+        describe(JsonType.Function, "getReference(id, callback)",
+            Resources.ScriptingGetReference,
+            deprecationReason: Resources.ScriptingGetReferenceDeprecated);
+
+        describe(JsonType.Function, "getReferenceV2(id, callback)",
+            Resources.ScriptingGetReferenceV2);
+
+        describe(JsonType.Function, "getReferences(ids, callback)",
+            Resources.ScriptingGetReferences);
     }
 }

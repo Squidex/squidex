@@ -86,6 +86,9 @@ public static class InfrastructureServices
         services.AddSingletonAs<StringWordsJintExtension>()
             .As<IJintExtension>().As<IScriptDescriptor>();
 
+        services.AddSingletonAs<StringAsyncJintExtension>()
+            .As<IJintExtension>().As<IScriptDescriptor>();
+
         services.AddSingletonAs<HttpJintExtension>()
             .As<IJintExtension>().As<IScriptDescriptor>();
 
@@ -127,26 +130,15 @@ public static class InfrastructureServices
 
     public static void AddSquidexTranslation(this IServiceCollection services, IConfiguration config)
     {
-        services.Configure<GoogleCloudTranslationOptions>(config,
-            "translations:googleCloud");
-
-        services.Configure<DeepLOptions>(config,
-            "translations:deepL");
-
         services.Configure<LanguagesOptions>(config,
             "languages");
 
         services.AddSingletonAs<LanguagesInitializer>()
             .AsSelf();
 
-        services.AddSingletonAs(c => new DeepLTranslationService(c.GetRequiredService<IOptions<DeepLOptions>>().Value))
-            .As<ITranslationService>();
-
-        services.AddSingletonAs(c => new GoogleCloudTranslationService(c.GetRequiredService<IOptions<GoogleCloudTranslationOptions>>().Value))
-            .As<ITranslationService>();
-
-        services.AddSingletonAs<Translator>()
-            .As<ITranslator>();
+        services.AddDeepLTranslations(config);
+        services.AddGoogleCloudTranslations(config);
+        services.AddOpenAIChatBot(config);
     }
 
     public static void AddSquidexLocalization(this IServiceCollection services)

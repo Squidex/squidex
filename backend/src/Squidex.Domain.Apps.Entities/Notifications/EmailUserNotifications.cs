@@ -14,6 +14,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
+using System.Globalization;
 
 namespace Squidex.Domain.Apps.Entities.Notifications;
 
@@ -187,12 +188,12 @@ public sealed class EmailUserNotifications : IUserNotifications
 
         if (vars.ApiCallsLimit != null)
         {
-            text = text.Replace("$API_CALLS_LIMIT", vars.ApiCallsLimit.ToString(), StringComparison.Ordinal);
+            text = text.Replace("$API_CALLS_LIMIT", vars.ApiCallsLimit.Value.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
         }
 
         if (vars.ApiCalls != null)
         {
-            text = text.Replace("$API_CALLS", vars.ApiCalls.ToString(), StringComparison.Ordinal);
+            text = text.Replace("$API_CALLS", vars.ApiCalls.Value.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
         }
 
         text = text.Replace("$UI_URL", vars.URL, StringComparison.Ordinal);

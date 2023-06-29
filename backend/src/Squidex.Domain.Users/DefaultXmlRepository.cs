@@ -50,7 +50,9 @@ public sealed class DefaultXmlRepository : IXmlRepository
     {
         var state = new State(element);
 
+#pragma warning disable MA0134 // Observe result of async calls
         store.WriteAsync(new SnapshotWriteJob<State>(DomainId.Create(friendlyName), state, 0));
+#pragma warning restore MA0134 // Observe result of async calls
     }
 
     private async Task<IReadOnlyCollection<XElement>> GetAllElementsAsync()

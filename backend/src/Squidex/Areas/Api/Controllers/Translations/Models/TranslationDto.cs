@@ -15,7 +15,13 @@ public sealed class TranslationDto
     /// <summary>
     /// The result of the translation.
     /// </summary>
-    public TranslationResultCode Result { get; set; }
+    public TranslationStatus Status { get; set; }
+
+    /// <summary>
+    /// The result of the translation.
+    /// </summary>
+    [Obsolete("Use Status property now.")]
+    public TranslationStatus Result => Status;
 
     /// <summary>
     /// The translated text.
@@ -24,6 +30,6 @@ public sealed class TranslationDto
 
     public static TranslationDto FromDomain(TranslationResult translation)
     {
-        return SimpleMapper.Map(translation, new TranslationDto { Result = translation.Code });
+        return SimpleMapper.Map(translation, new TranslationDto());
     }
 }

@@ -67,6 +67,7 @@ public static class StoreServices
                 var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database")!;
                 var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName)!;
 
+                services.AddMongoAssetKeyValueStore();
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(MongoSnapshotStore<>));
 
                 services.AddSingletonAs(c => GetMongoClient(mongoConfiguration))
@@ -110,9 +111,6 @@ public static class StoreServices
 
                 services.AddHealthChecks()
                     .AddCheck<MongoHealthCheck>("MongoDB", tags: new[] { "node" });
-
-                services.AddSingletonAs<MongoAssetKeyValueStore<TusMetadata>>()
-                    .As<IAssetKeyValueStore<TusMetadata>>();
 
                 services.AddSingletonAs<MongoRequestLogRepository>()
                     .As<IRequestLogRepository>();
@@ -208,13 +206,6 @@ public static class StoreServices
 
         services.AddSingleton(typeof(IPersistenceFactory<>),
             typeof(Store<>));
-
-        services.AddSingletonAs<IInitializable>(c =>
-        {
-            var service = c.GetRequiredService<IAssetKeyValueStore<TusMetadata>>();
-
-            return new DelegateInitializer(service.GetType().Name, service.InitializeAsync);
-        });
     }
 
     public static IMongoClient GetMongoClient(string configuration)

@@ -17,8 +17,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent;
 public class ContentConversionTests
 {
     private readonly Schema schema;
-    private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
-    private readonly Language language = Language.DE;
     private readonly ResolvedComponents components;
 
     public ContentConversionTests()

@@ -150,6 +150,9 @@
   <data name="ScriptingFormatTime" xml:space="preserve">
     <value>Formats a JavaScript date object using the specified pattern.</value>
   </data>
+  <data name="ScriptingGenerate" xml:space="preserve">
+    <value>Uses OpenAI or other machine learning platforms to generate content from a prompt.</value>
+  </data>
   <data name="ScriptingGetJSON" xml:space="preserve">
     <value>Makes a GET request to the defined URL and parses the result as JSON. Headers are optional.</value>
   </data>
@@ -194,6 +197,9 @@
   </data>
   <data name="ScriptingToPascalCase" xml:space="preserve">
     <value>Converts a text to PascalCase</value>
+  </data>
+  <data name="ScriptingTranslate" xml:space="preserve">
+    <value>Translate from the source text to the specified language.</value>
   </data>
   <data name="ScriptingWordCount" xml:space="preserve">
     <value>Counts the number of words in a text. Useful in combination with html2Text or markdown2Text.</value>

@@ -9,7 +9,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { VirtualScrollerModule } from 'ngx-virtual-scroller';
 import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, LoadSchemasGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { ArrayEditorComponent, ArrayItemComponent, AssetsEditorComponent, CalendarPageComponent, CommentsPageComponent, ComponentComponent, ComponentSectionComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentExtensionComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentInspectionComponent, ContentPageComponent, ContentReferencesComponent, ContentSectionComponent, ContentsFiltersPageComponent, ContentsPageComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldCopyButtonComponent, FieldEditorComponent, FieldLanguagesComponent, IFrameEditorComponent, PreviewButtonComponent, ReferenceDropdownComponent, ReferenceItemComponent, ReferencesCheckboxesComponent, ReferencesEditorComponent, ReferencesPageComponent, ReferencesTagsComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
+import { ArrayEditorComponent, ArrayItemComponent, AssetsEditorComponent, CalendarPageComponent, ChatDialogComponent, CommentsPageComponent, ComponentComponent, ComponentSectionComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentExtensionComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentInspectionComponent, ContentPageComponent, ContentReferencesComponent, ContentSectionComponent, ContentsFiltersPageComponent, ContentsPageComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldCopyButtonComponent, FieldEditorComponent, FieldLanguagesComponent, IFrameEditorComponent, PreviewButtonComponent, ReferenceDropdownComponent, ReferenceItemComponent, ReferencesCheckboxesComponent, ReferencesEditorComponent, ReferencesPageComponent, ReferencesTagsComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -97,6 +97,7 @@ const routes: Routes = [
         ArrayItemComponent,
         AssetsEditorComponent,
         CalendarPageComponent,
+        ChatDialogComponent,
         CommentsPageComponent,
         ComponentComponent,
         ComponentSectionComponent,
