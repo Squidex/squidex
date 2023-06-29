@@ -16,18 +16,19 @@ internal sealed class ContentInterfaceGraphType : InterfaceGraphType<IEnrichedCo
         // The name is used for equal comparison. Therefore it is important to treat it as readonly.
         Name = "Content";
 
-        AddField(ContentFields.Id);
-        AddField(ContentFields.Version);
-        AddField(ContentFields.Created);
-        AddField(ContentFields.CreatedBy);
-        AddField(ContentFields.LastModified);
-        AddField(ContentFields.LastModifiedBy);
-        AddField(ContentFields.Status);
-        AddField(ContentFields.StatusColor);
-        AddField(ContentFields.NewStatus);
-        AddField(ContentFields.NewStatusColor);
-        AddField(ContentFields.DataDynamic);
-        AddField(ContentFields.Url);
+        AddField(ContentFields.IdNoResolver);
+        AddField(ContentFields.VersionNoResolver);
+        AddField(ContentFields.CreatedNoResolver);
+        AddField(ContentFields.CreatedByNoResolver);
+        AddField(ContentFields.LastModifiedNoResolver);
+        AddField(ContentFields.LastModifiedByNoResolver);
+        AddField(ContentFields.EditTokenNoResolver);
+        AddField(ContentFields.StatusNoResolver);
+        AddField(ContentFields.StatusColorNoResolver);
+        AddField(ContentFields.NewStatusNoResolver);
+        AddField(ContentFields.NewStatusColorNoResolver);
+        AddField(ContentFields.DataDynamicNoResolver);
+        AddField(ContentFields.UrlNoResolver);
 
         Description = "The structure of all content types.";
     }

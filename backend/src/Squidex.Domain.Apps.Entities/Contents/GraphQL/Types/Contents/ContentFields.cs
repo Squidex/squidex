@@ -43,6 +43,8 @@ internal static class ContentFields
         Description = FieldDescriptions.EntityId
     };
 
+    public static readonly FieldType IdNoResolver = Id.WithouthResolver();
+
     public static readonly FieldType Version = new FieldType
     {
         Name = "version",
@@ -50,6 +52,8 @@ internal static class ContentFields
         Resolver = EntityResolvers.Version,
         Description = FieldDescriptions.EntityVersion
     };
+
+    public static readonly FieldType VersionNoResolver = Version.WithouthResolver();
 
     public static readonly FieldType Created = new FieldType
     {
@@ -59,6 +63,8 @@ internal static class ContentFields
         Description = FieldDescriptions.EntityCreated
     };
 
+    public static readonly FieldType CreatedNoResolver = Created.WithouthResolver();
+
     public static readonly FieldType CreatedBy = new FieldType
     {
         Name = "createdBy",
@@ -66,6 +72,8 @@ internal static class ContentFields
         Resolver = EntityResolvers.CreatedBy,
         Description = FieldDescriptions.EntityCreatedBy
     };
+
+    public static readonly FieldType CreatedByNoResolver = CreatedBy.WithouthResolver();
 
     public static readonly FieldType CreatedByUser = new FieldType
     {
@@ -75,6 +83,8 @@ internal static class ContentFields
         Description = FieldDescriptions.EntityCreatedBy
     };
 
+    public static readonly FieldType CreatedByUserNoResolver = CreatedByUser.WithouthResolver();
+
     public static readonly FieldType LastModified = new FieldType
     {
         Name = "lastModified",
@@ -82,6 +92,8 @@ internal static class ContentFields
         Resolver = EntityResolvers.LastModified,
         Description = FieldDescriptions.EntityLastModified
     };
+
+    public static readonly FieldType LastModifiedNoResolver = LastModified.WithouthResolver();
 
     public static readonly FieldType LastModifiedBy = new FieldType
     {
@@ -91,6 +103,8 @@ internal static class ContentFields
         Description = FieldDescriptions.EntityLastModifiedBy
     };
 
+    public static readonly FieldType LastModifiedByNoResolver = LastModifiedBy.WithouthResolver();
+
     public static readonly FieldType LastModifiedByUser = new FieldType
     {
         Name = "lastModifiedByUser",
@@ -98,6 +112,8 @@ internal static class ContentFields
         Resolver = EntityResolvers.LastModifiedByUser,
         Description = FieldDescriptions.EntityLastModifiedBy
     };
+
+    public static readonly FieldType LastModifiedByUserNoResolver = LastModifiedByUser.WithouthResolver();
 
     public static readonly FieldType Status = new FieldType
     {
@@ -107,6 +123,8 @@ internal static class ContentFields
         Description = FieldDescriptions.ContentStatus
     };
 
+    public static readonly FieldType StatusNoResolver = Status.WithouthResolver();
+
     public static readonly FieldType StatusColor = new FieldType
     {
         Name = "statusColor",
@@ -114,6 +132,8 @@ internal static class ContentFields
         Resolver = Resolve(x => x.StatusColor),
         Description = FieldDescriptions.ContentStatusColor
     };
+
+    public static readonly FieldType StatusColorNoResolver = StatusColor.WithouthResolver();
 
     public static readonly FieldType NewStatus = new FieldType
     {
@@ -123,6 +143,8 @@ internal static class ContentFields
         Description = FieldDescriptions.ContentNewStatus
     };
 
+    public static readonly FieldType NewStatusNoResolver = NewStatus.WithouthResolver();
+
     public static readonly FieldType NewStatusColor = new FieldType
     {
         Name = "newStatusColor",
@@ -130,6 +152,8 @@ internal static class ContentFields
         Resolver = Resolve(x => x.NewStatusColor),
         Description = FieldDescriptions.ContentStatusColor
     };
+
+    public static readonly FieldType NewStatusColorNoResolver = NewStatusColor.WithouthResolver();
 
     public static readonly FieldType SchemaId = new FieldType
     {
@@ -139,6 +163,8 @@ internal static class ContentFields
         Description = FieldDescriptions.ContentSchemaId
     };
 
+    public static readonly FieldType SchemaIdNoResolver = SchemaId.WithouthResolver();
+
     public static readonly FieldType Url = new FieldType
     {
         Name = "url",
@@ -146,6 +172,8 @@ internal static class ContentFields
         Resolver = ContentResolvers.Url,
         Description = FieldDescriptions.ContentUrl
     };
+
+    public static readonly FieldType UrlNoResolver = Url.WithouthResolver();
 
     public static readonly FieldType EditToken = new FieldType
     {
@@ -155,6 +183,8 @@ internal static class ContentFields
         Description = FieldDescriptions.EditToken
     };
 
+    public static readonly FieldType EditTokenNoResolver = EditToken.WithouthResolver();
+
     public static readonly FieldType DataDynamic = new FieldType
     {
         Name = "data__dynamic",
@@ -162,6 +192,8 @@ internal static class ContentFields
         Resolver = Resolve(x => x.Data),
         Description = FieldDescriptions.ContentData
     };
+
+    public static readonly FieldType DataDynamicNoResolver = DataDynamic.WithouthResolver();
 
     public static readonly FieldType StringFieldText = new FieldType
     {

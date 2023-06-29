@@ -17,6 +17,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
 public static class SharedExtensions
 {
+    internal static FieldType WithouthResolver(this FieldType source)
+    {
+        return new FieldType
+        {
+            Name = source.Name,
+            ResolvedType = source.ResolvedType,
+            Resolver = null,
+            Description = source.Name
+        };
+    }
+
     internal static string BuildODataQuery(this IResolveFieldContext context)
     {
         var sb = DefaultPools.StringBuilder.Get();

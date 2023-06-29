@@ -17,7 +17,7 @@ internal sealed class ComponentInterfaceGraphType : InterfaceGraphType<JsonObjec
         // The name is used for equal comparison. Therefore it is important to treat it as readonly.
         Name = "Component";
 
-        AddField(ContentFields.SchemaId);
+        AddField(ContentFields.SchemaIdNoResolver);
 
         Description = "The structure of all content types.";
     }
