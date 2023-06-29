@@ -18,6 +18,7 @@ internal sealed class ComponentInterfaceGraphType : InterfaceGraphType<JsonObjec
         Name = "Component";
 
         AddField(ContentFields.SchemaIdNoResolver);
+        AddField(ContentFields.SchemaNameNoResolver);
 
         Description = "The structure of all content types.";
     }

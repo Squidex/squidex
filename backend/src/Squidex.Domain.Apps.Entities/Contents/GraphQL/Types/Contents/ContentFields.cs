@@ -7,6 +7,7 @@
 
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Namotion.Reflection;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
@@ -165,6 +166,16 @@ internal static class ContentFields
 
     public static readonly FieldType SchemaIdNoResolver = SchemaId.WithouthResolver();
 
+    public static readonly FieldType SchemaName = new FieldType
+    {
+        Name = "schemaName",
+        ResolvedType = Scalars.String,
+        Resolver = Resolve(x => GetSchemaName(x)),
+        Description = FieldDescriptions.ContentSchemaName
+    };
+
+    public static readonly FieldType SchemaNameNoResolver = SchemaName.WithouthResolver();
+
     public static readonly FieldType Url = new FieldType
     {
         Name = "url",
@@ -219,5 +230,15 @@ internal static class ContentFields
     private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, T> resolver)
     {
         return Resolvers.Sync(resolver);
+    }
+
+    private static string? GetSchemaName(JsonObject component)
+    {
+        if (component.TryGetValue("schemaName", out var name) && name.Type == JsonValueType.String)
+        {
+            return name.ToString();
+        }
+
+        return null;
     }
 }

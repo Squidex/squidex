@@ -28,7 +28,7 @@ public sealed class AddSchemaNames : IContentItemConverter
             return source;
         }
 
-        if (source.ContainsKey("schemaName"))
+        if (source.ContainsKey(Component.Descriptor))
         {
             return source;
         }
@@ -42,7 +42,7 @@ public sealed class AddSchemaNames : IContentItemConverter
 
         if (components.TryGetValue(id, out var component))
         {
-            source["schemaName"] = component.Name;
+            source[Component.Descriptor] = component.Name;
         }
 
         return source;

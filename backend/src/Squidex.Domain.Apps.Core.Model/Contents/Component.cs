@@ -18,6 +18,8 @@ public sealed record Component(string Type, JsonObject Data, Schema Schema)
 {
     public const string Discriminator = "schemaId";
 
+    public const string Descriptor = "schemaName";
+
     public string Type { get; } = Guard.NotNullOrEmpty(Type);
 
     public Schema Schema { get; } = Guard.NotNull(Schema);
