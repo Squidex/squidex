@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.7.0] - 2023-07-01
+
+### Fixed
+
+* **Json**: Fixed a spelling error in a json converter.
+* **Rules**: Fix API description for rule events.
+* **Rules**: Fix cancellation of rule events.
+* **Scripting**: Expost HTTP exceptions from scripting HTTP helpers.
+* **Scripting**: Propagate exceptions within async code properly.
+* **Scripting**: Use `application/json` instead of `text/json` for HTTP requests.
+* **UI**: Fixes te redirect flow after a user logs out and logs in again.
+
+### Changed
+
+* **API**: Update all client libaries and general libs.
+* **UI**: Addded a loading spinner for the templates screen.
+* **UI**: Only show the leave option for apps, when there is at least one other owner.
+
+### Added
+
+* **API**: Fixes the OpenAI parameter order.
+* **GraphQL**: Add `schemaName` field to components.
+* **Scripting**: New method `generate` to generate content as text using OpenAI.
+* **Scripting**: New method `translate` to translate a given text programmatically.
+* **UI**: Added new translation: French.
+* **UI**: Dialog to select a client in the GraphQL playground.
+* **UI**: New dialog to generate content with OpenAI or other chat platforms.
+
 ## [7.6.1] - 2023-05-24
 
 ### Fixed
