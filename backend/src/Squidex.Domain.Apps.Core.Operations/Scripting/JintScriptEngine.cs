@@ -63,7 +63,7 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
                 context.Complete(JsonMapper.Map(value));
             }));
 
-            var result = Execute(context.Engine, script);
+            var result = Execute(context, script);
 
             return await context.CompleteAsync() ?? JsonMapper.Map(result);
         }
@@ -109,7 +109,7 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
                 }
             }));
 
-            Execute(context.Engine, script);
+            Execute(context, script);
 
             return await context.CompleteAsync() ?? vars.Data!;
         }
@@ -131,7 +131,7 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
                     .Extend(vars, options)
                     .Extend(extensions);
 
-            var result = Execute(context.Engine, script);
+            var result = Execute(context, script);
 
             return JsonMapper.Map(result);
         }
@@ -179,14 +179,11 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
         return new ScriptExecutionContext<T>(engine, ct);
     }
 
-    private JsValue Execute(Engine engine, string script)
+    private JsValue Execute(ScriptExecutionContext context, string script)
     {
-        var program = parser.Parse(script);
+        var parsed = parser.Parse(script);
 
-        lock (engine)
-        {
-            return engine.Evaluate(program);
-        }
+        return context.Evaluate(parsed);
     }
 
     private static Exception MapException(Exception inner)

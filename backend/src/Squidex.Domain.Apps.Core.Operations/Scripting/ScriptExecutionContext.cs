@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Esprima.Ast;
 using Jint;
+using Jint.Native;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
@@ -18,6 +20,8 @@ public abstract class ScriptExecutionContext : ScriptContext
     {
         Engine = engine;
     }
+
+    public abstract JsValue Evaluate(Script program);
 
     public abstract void Schedule(Func<IScheduler, CancellationToken, Task> action);
 }
@@ -49,6 +53,14 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
     public void Complete(T value)
     {
         tcs.TrySetResult(value);
+    }
+
+    public override JsValue Evaluate(Script script)
+    {
+        lock (Engine)
+        {
+            return Engine.Evaluate(script);
+        }
     }
 
     public override void Schedule(Func<IScheduler, CancellationToken, Task> action)
