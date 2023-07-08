@@ -40,7 +40,7 @@ internal sealed class QueryReferrers : OperationBase
     {
         var filter = BuildFilter(appId, reference);
 
-        using (var cursor = await Collection.Find(filter).Limit(take).ToCursorAsync(ct))
+        using (var cursor = await Collection.Find(filter).Limit(take).SelectFields(null).ToCursorAsync(ct))
         {
             while (await cursor.MoveNextAsync(ct))
             {

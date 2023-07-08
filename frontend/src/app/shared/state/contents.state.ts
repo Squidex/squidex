@@ -24,6 +24,9 @@ interface Snapshot extends ListState<Query> {
     // The current contents.
     contents: ReadonlyArray<ContentDto>;
 
+    // The field names to select.
+    fieldNames: ReadonlyArray<string> | null;
+
     // The referencing content id.
     referencing?: string;
 
@@ -98,6 +101,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     ) {
         super({
             contents: [],
+            fieldNames: null,
             page: 0,
             pageSize: 10,
             total: 0,
@@ -119,14 +123,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     private loadContent(id: string | null) {
         return !id ?
             of(null) :
-            of(this.snapshot.contents.find(x => x.id === id)).pipe(
-                switchMap(content => {
-                    if (!content) {
-                        return this.contentsService.getContent(this.appName, this.schemaName, id).pipe(catchError(() => of(null)));
-                    } else {
-                        return of(content);
-                    }
-                }));
+            this.contentsService.getContent(this.appName, this.schemaName, id).pipe(catchError(() => of(null)));
     }
 
     public loadReferences(contentId: string, update: Partial<Snapshot> = {}) {
@@ -143,7 +140,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public load(isReload = false, noSlowTotal = true, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ selectedContent: this.snapshot.selectedContent, ...update }, 'Loading Intial');
+            this.resetState({ selectedContent: this.snapshot.selectedContent, fieldNames: this.snapshot.fieldNames, ...update }, 'Loading Intial');
         }
 
         return this.loadInternal(isReload, noSlowTotal);
@@ -155,6 +152,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
 
         return this.loadInternal(false, true);
+    }
+
+    public setFieldNames(fieldNames: ReadonlyArray<string> | null) {
+        this.next( { fieldNames }, 'Set field names.');
     }
 
     private loadInternal(isReload: boolean, noSlowTotal: boolean) {
@@ -480,13 +481,14 @@ function getStatusQueries(statuses: ReadonlyArray<StatusInfo> | undefined): Read
 
 function createQuery(snapshot: Snapshot, noSlowTotal: boolean) {
     const {
+        fieldNames,
         page,
         pageSize,
         query,
         total,
     } = snapshot;
 
-    const result: any = { take: pageSize, skip: pageSize * page, noSlowTotal };
+    const result: any = { take: pageSize, skip: pageSize * page, noSlowTotal, fieldNames };
 
     if (query) {
         result.query = query;

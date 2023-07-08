@@ -24,7 +24,9 @@ public static class SharedTypes
 
     public static readonly IGraphType EnrichedContentEvent = new EnrichedContentEventGraphType();
 
-    public static readonly CacheDirective MemoryCacheDirective = new CacheDirective();
+    public static readonly CacheDirective CacheDirective = new CacheDirective();
+
+    public static readonly OptimizeFieldQueriesDirective OptimizeFieldQueriesDirective = new OptimizeFieldQueriesDirective();
 
     public static readonly FieldType FindAsset = new FieldType
     {

@@ -31,6 +31,8 @@ public sealed class BackupContents : IBackupHandler
 
     public string Name { get; } = "Contents";
 
+    public int Order => int.MaxValue;
+
     public sealed class Urls
     {
         public string Assets { get; set; }
@@ -190,7 +192,6 @@ public sealed class BackupContents : IBackupHandler
         CancellationToken ct)
     {
         var ids = contentIdsBySchemaId.Values.SelectMany(x => x);
-
         if (ids.Any())
         {
             await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids, BatchSize, ct);

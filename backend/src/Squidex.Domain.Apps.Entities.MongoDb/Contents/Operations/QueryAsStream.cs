@@ -19,7 +19,7 @@ public sealed class QueryAsStream : OperationBase
     {
         var filter = CreateFilter(appId, schemaIds);
 
-        using (var cursor = await Collection.Find(filter).ToCursorAsync(ct))
+        using (var cursor = await Collection.Find(filter).SelectFields(null).ToCursorAsync(ct))
         {
             while (await cursor.MoveNextAsync(ct))
             {

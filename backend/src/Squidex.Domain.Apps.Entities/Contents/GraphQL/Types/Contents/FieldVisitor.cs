@@ -100,16 +100,16 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
 
     private static readonly IFieldResolver Assets = CreateAsyncValueResolver((value, fieldContext, context) =>
     {
-        var cacheDuration = fieldContext.CacheDuration();
+        var ids = value.AsIds();
 
-        return context.GetReferencedAssetsAsync(value, cacheDuration, fieldContext.CancellationToken);
+        return fieldContext.ResolveAssetsAsync(ids);
     });
 
     private static readonly IFieldResolver References = CreateAsyncValueResolver((value, fieldContext, context) =>
     {
-        var cacheDuration = fieldContext.CacheDuration();
+        var ids = value.AsIds();
 
-        return context.GetReferencedContentsAsync(value, cacheDuration, fieldContext.CancellationToken);
+        return fieldContext.ResolveContentsAsync(ids);
     });
 
     private readonly Builder builder;
@@ -265,7 +265,7 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
         {
             var union = builder.GetContentUnion(fieldInfo.UnionReferenceType, schemaIds);
 
-            if (!union.HasType)
+            if (union.SchemaTypes.Count == 0)
             {
                 return null;
             }

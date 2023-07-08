@@ -9,8 +9,9 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, contentsTranslationStatus, ContributorsState, defined, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, UIState } from '@app/shared';
+import { combineLatest, Observable } from 'rxjs';
+import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, contentsTranslationStatus, ContributorsState, defined, isDataField, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, Types, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -27,7 +28,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public schema!: SchemaDto;
 
-    public tableSettings!: TableSettings;
+    public tableSettings!: Observable<TableSettings>;
     public tableViewModal = new ModalModel();
 
     public searchModal = new ModalModel();
@@ -89,29 +90,46 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.languages = languages;
                 }));
 
+        const schema$ =
+            getSchemaName(this.route).pipe(switchMap(() => this.schemasState.selectedSchema.pipe(defined(), take(1), shareReplay(1))));
+
+        const tableSetting$ =
+            schema$.pipe(map(s => new TableSettings(this.uiState, s)), shareReplay(1));
+
+        const tableField$ =
+            tableSetting$.pipe(switchMap(s => s.listFields));
+
+        const tableName$ =
+            tableField$.pipe(map(t => t.map(x => x.name).filter(isDataField).sorted()), distinctUntilChanged(Types.equals));
+
+        this.tableSettings = tableSetting$;
+
         this.own(
-            getSchemaName(this.route).pipe(switchMap(() => this.schemasState.selectedSchema.pipe(defined(), take(1))))
-                .subscribe(schema => {
-                    this.resetSelection();
+            combineLatest([schema$, tableName$])
+                .subscribe(([schema, fieldNames]) => {
+                    if (!this.schema) {
+                        this.resetSelection();
 
-                    this.schema = schema;
+                        this.schema = schema;
 
-                    const initial =
-                        this.contentsRoute.mapTo(this.contentsState)
-                            .withPaging('contents', 10)
-                            .withSynchronizer(QuerySynchronizer.INSTANCE)
-                            .getInitial();
+                        const initial =
+                            this.contentsRoute.mapTo(this.contentsState)
+                                .withPaging('contents', 10)
+                                .withSynchronizer(QuerySynchronizer.INSTANCE)
+                                .getInitial();
 
-                    this.contentsState.load(false, true, initial);
-                    this.contentsRoute.listen();
+                        this.contentsState.load(false, true, { fieldNames, ...initial });
+                        this.contentsRoute.listen();
 
-                    this.tableSettings = new TableSettings(this.uiState, schema);
+                        const languageKey = this.localStore.get(this.languageKey());
+                        const languageItem = this.languages.find(x => x.iso2Code === languageKey);
 
-                    const languageKey = this.localStore.get(this.languageKey());
-                    const language = this.languages.find(x => x.iso2Code === languageKey);
-
-                    if (language) {
-                        this.language = language;
+                        if (languageItem) {
+                            this.language = languageItem;
+                        }
+                    } else {
+                        this.contentsState.setFieldNames(fieldNames);
+                        this.contentsState.load();
                     }
                 }));
 

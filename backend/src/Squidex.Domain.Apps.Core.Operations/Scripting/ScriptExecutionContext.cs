@@ -21,16 +21,21 @@ public abstract class ScriptExecutionContext : ScriptContext
         Engine = engine;
     }
 
-    public abstract JsValue Evaluate(Script program);
+    public abstract JsValue Evaluate(Script script);
 
     public abstract void Schedule(Func<IScheduler, CancellationToken, Task> action);
 }
 
 public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, IScheduler
 {
-    private readonly TaskCompletionSource<T> tcs = new TaskCompletionSource<T>();
+    private readonly TaskCompletionSource<CompletedValue?> tcs = new TaskCompletionSource<CompletedValue?>();
     private readonly CancellationToken cancellationToken;
     private int pendingTasks = 1;
+
+    private sealed class CompletedValue
+    {
+        public T Value { get; init; }
+    }
 
     public bool IsCompleted
     {
@@ -43,16 +48,23 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         this.cancellationToken = cancellationToken;
     }
 
-    public Task<T> CompleteAsync()
+    public async Task<T> WaitForCompletionAsync(Func<T> fallback)
     {
-        TryComplete(default!);
+        TryComplete();
 
-        return tcs.Task.WithCancellation(cancellationToken);
+        var result = await tcs.Task.WithCancellation(cancellationToken);
+
+        if (result == null)
+        {
+            return fallback();
+        }
+
+        return result.Value;
     }
 
     public void Complete(T value)
     {
-        tcs.TrySetResult(value);
+        tcs.TrySetResult(new CompletedValue { Value = value });
     }
 
     public override JsValue Evaluate(Script script)
@@ -77,7 +89,7 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
             {
                 await action(this, cancellationToken);
 
-                TryComplete(default!);
+                TryComplete();
             }
             catch (Exception ex)
             {
@@ -104,7 +116,7 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
                 action();
             }
 
-            TryComplete(default!);
+            TryComplete();
         }
         catch (Exception ex)
         {
@@ -146,7 +158,7 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         Interlocked.Increment(ref pendingTasks);
     }
 
-    private void TryComplete(T result)
+    private void TryComplete(CompletedValue? result = null)
     {
         if (Interlocked.Decrement(ref pendingTasks) <= 0)
         {

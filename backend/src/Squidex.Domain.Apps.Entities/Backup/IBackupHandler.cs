@@ -14,6 +14,8 @@ public interface IBackupHandler
 {
     string Name { get; }
 
+    int Order => 0;
+
     public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
         CancellationToken ct)
     {

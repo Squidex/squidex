@@ -8,16 +8,22 @@
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
 {
+    // We need the schema identity at runtime.
+    public DomainId SchemaId { get; set; }
+
     public ContentGraphType(SchemaInfo schemaInfo)
     {
         // The name is used for equal comparison. Therefore it is important to treat it as readonly.
         Name = schemaInfo.ContentType;
+
+        SchemaId = schemaInfo.Schema.Id;
     }
 
     public void Initialize(Builder builder, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> allSchemas)

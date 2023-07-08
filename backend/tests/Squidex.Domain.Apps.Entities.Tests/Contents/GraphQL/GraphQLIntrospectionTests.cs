@@ -301,6 +301,6 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var type = (IObjectGraphType)graphQLSchema.AllTypes.Single(x => x.Name == schema);
 
-        return (IObjectGraphType?)type.GetField("flatData")?.ResolvedType?.Flatten();
+        return (IObjectGraphType?)type.GetField("flatData")?.ResolvedType?.InnerType();
     }
 }

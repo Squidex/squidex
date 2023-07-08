@@ -12,7 +12,7 @@ import { map } from 'rxjs/operators';
 import { ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
 import { StatusInfo } from './../state/contents.state';
 import { Query, sanitize } from './query';
-import { parseField, RootFieldDto } from './schemas.service';
+import { isDataField, parseField, RootFieldDto } from './schemas.service';
 
 export class ScheduleDto {
     constructor(
@@ -163,6 +163,9 @@ export type ContentsQuery = Readonly<{
 
     // True, to not return the total number of items, if the query would be slow.
     noSlowTotal?: boolean;
+
+    // The field names to query.
+    fieldNames?: ReadonlyArray<string>;
 }>;
 
 export type ContentsByIds = Readonly<{
@@ -369,6 +372,10 @@ function buildHeaders(q: ContentsQuery | undefined) {
     let options = {
         headers: {},
     };
+
+    if (q?.fieldNames) {
+        options.headers['X-Fields'] = q.fieldNames.filter(isDataField).join(',');
+    }
 
     if (q?.noTotal) {
         options.headers['X-NoTotal'] = '1';

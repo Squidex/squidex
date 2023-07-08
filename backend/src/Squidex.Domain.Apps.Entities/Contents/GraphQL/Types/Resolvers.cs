@@ -82,8 +82,8 @@ public static class Resolvers
             command.ExpectedVersion = fieldContext.GetArgument("expectedVersion", EtagVersion.Any);
 
             var commandContext =
-                await context.Resolve<ICommandBus>()
-                    .PublishAsync(command, fieldContext.CancellationToken);
+                await context.Resolve<ICommandBus>().PublishAsync(command,
+                    fieldContext.CancellationToken);
 
             return commandContext.PlainResult!;
         });

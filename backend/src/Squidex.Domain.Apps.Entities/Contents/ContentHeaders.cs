@@ -17,17 +17,19 @@ public static class ContentHeaders
 {
     private static readonly char[] Separators = { ',', ';' };
 
+    public const string Fields = "X-Fields";
     public const string Flatten = "X-Flatten";
-    public const string Languages = "X-Languages";
+    public const string Languages = "Languages";
     public const string NoCleanup = "X-NoCleanup";
     public const string NoEnrichment = "X-NoEnrichment";
     public const string NoResolveLanguages = "X-NoResolveLanguages";
     public const string ResolveFlow = "X-ResolveFlow";
-    public const string ResolveUrls = "X-Resolve-Urls";
+    public const string ResolveUrls = "X-ResolveUrls";
     public const string Unpublished = "X-Unpublished";
 
     public static void AddCacheHeaders(this Context context, IRequestCache cache)
     {
+        cache.AddHeader(Fields);
         cache.AddHeader(Flatten);
         cache.AddHeader(Languages);
         cache.AddHeader(NoCleanup);
@@ -128,25 +130,33 @@ public static class ContentHeaders
         return builder.WithStrings(ResolveUrls, fieldNames);
     }
 
-    public static IEnumerable<Language> LanguageList(this Context context)
+    public static HashSet<string>? FieldsList(this Context context)
+    {
+        if (context.Headers.TryGetValue(Fields, out var value))
+        {
+            return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+        }
+
+        return null;
+    }
+
+    public static ICloneBuilder WithFields(this ICloneBuilder builder, IEnumerable<string> fields)
+    {
+        return builder.WithStrings(Fields, fields);
+    }
+
+    public static HashSet<Language> LanguagesList(this Context context)
     {
         if (context.Headers.TryGetValue(Languages, out var value))
         {
-            var languages = new HashSet<Language>();
-
-            foreach (var iso2Code in value.Split(Separators, StringSplitOptions.RemoveEmptyEntries))
-            {
-                languages.Add(iso2Code);
-            }
-
-            return languages;
+            return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Select(x => (Language)x).ToHashSet();
         }
 
-        return Enumerable.Empty<Language>();
+        return new HashSet<Language>();
     }
 
-    public static ICloneBuilder WithLanguages(this ICloneBuilder builder, IEnumerable<string> fieldNames)
+    public static ICloneBuilder WithLanguages(this ICloneBuilder builder, IEnumerable<string> languages)
     {
-        return builder.WithStrings(Languages, fieldNames);
+        return builder.WithStrings(Languages, languages);
     }
 }

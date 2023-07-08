@@ -64,7 +64,7 @@ internal sealed class QueryByQuery : OperationBase
 
         var (filter, isDefault) = CreateFilter(app.Id, schemas.Select(x => x.Id), query, q.Reference, q.CreatedBy);
 
-        var contentEntities = await Collection.QueryContentsAsync(filter, query, ct);
+        var contentEntities = await Collection.QueryContentsAsync(filter, query, q, ct);
         var contentTotal = (long)contentEntities.Count;
 
         if (contentTotal >= query.Take || query.Skip > 0)
@@ -96,7 +96,7 @@ internal sealed class QueryByQuery : OperationBase
         // Default means that no other filters are applied and we only query by app and schema.
         var (filter, isDefault) = CreateFilter(schema.AppId.Id, Enumerable.Repeat(schema.Id, 1), query, q.Reference, q.CreatedBy);
 
-        var contentEntities = await Collection.QueryContentsAsync(filter, query, ct);
+        var contentEntities = await Collection.QueryContentsAsync(filter, query, q, ct);
         var contentTotal = (long)contentEntities.Count;
 
         if (contentTotal >= query.Take || query.Skip > 0)

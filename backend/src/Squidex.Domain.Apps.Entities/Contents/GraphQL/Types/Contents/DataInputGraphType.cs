@@ -74,7 +74,7 @@ internal sealed class DataInputGraphType : InputObjectGraphType
             {
                 if (source.TryGetValue(field.Name, out var value))
                 {
-                    if (value is IEnumerable<object> list && field.ResolvedType?.Flatten() is IComplexGraphType nestedType)
+                    if (value is IEnumerable<object> list && field.ResolvedType?.InnerType() is IComplexGraphType nestedType)
                     {
                         var array = new JsonArray(list.Count());
 

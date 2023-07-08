@@ -35,7 +35,7 @@ public static class JintExtensions
         return ids;
     }
 
-    internal static ScriptExecutionContext<T> ExtendAsync<T>(this ScriptExecutionContext<T> context,
+    internal static ScriptExecutionContext<T> ExtendWithAsyncFunctions<T>(this ScriptExecutionContext<T> context,
         IEnumerable<IJintExtension> extensions)
     {
         foreach (var extension in extensions)
@@ -46,7 +46,7 @@ public static class JintExtensions
         return context;
     }
 
-    internal static ScriptExecutionContext<T> Extend<T>(this ScriptExecutionContext<T> context,
+    internal static ScriptExecutionContext<T> ExtendWithFunctions<T>(this ScriptExecutionContext<T> context,
         IEnumerable<IJintExtension> extensions)
     {
         foreach (var extension in extensions)
@@ -57,7 +57,7 @@ public static class JintExtensions
         return context;
     }
 
-    internal static ScriptExecutionContext<T> Extend<T>(this ScriptExecutionContext<T> context,
+    internal static ScriptExecutionContext<T> ExtendWithVariables<T>(this ScriptExecutionContext<T> context,
         ScriptVars vars,
         ScriptOptions options)
     {

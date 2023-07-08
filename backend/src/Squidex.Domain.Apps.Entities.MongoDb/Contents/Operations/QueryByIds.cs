@@ -50,7 +50,7 @@ internal sealed class QueryByIds : OperationBase
         // Create a filter from the Ids and ensure that the content ids match to the schema IDs.
         var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), q.Ids.ToHashSet(), query.Filter);
 
-        var contentEntities = await FindContentsAsync(query, filter, ct);
+        var contentEntities = await FindContentsAsync(query, filter, q, ct);
         var contentTotal = (long)contentEntities.Count;
 
         if (contentTotal >= query.Take || query.Skip > 0)
@@ -68,7 +68,7 @@ internal sealed class QueryByIds : OperationBase
         return ResultList.Create(contentTotal, contentEntities);
     }
 
-    private async Task<List<MongoContentEntity>> FindContentsAsync(ClrQuery query, FilterDefinition<MongoContentEntity> filter,
+    private async Task<List<MongoContentEntity>> FindContentsAsync(ClrQuery query, FilterDefinition<MongoContentEntity> filter, Q q,
         CancellationToken ct)
     {
         var result =
@@ -76,6 +76,7 @@ internal sealed class QueryByIds : OperationBase
                 .QuerySort(query)
                 .QuerySkip(query)
                 .QueryLimit(query)
+                .SelectFields(q.Fields)
                 .ToListRandomAsync(Collection, query.Random, ct);
 
         return await result;

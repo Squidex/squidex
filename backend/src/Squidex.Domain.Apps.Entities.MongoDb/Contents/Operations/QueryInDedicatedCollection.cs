@@ -88,7 +88,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
         var filter = CreateFilter(query, q.Reference, q.CreatedBy);
 
         var contentCollection = await GetCollectionAsync(schema.AppId.Id, schema.Id);
-        var contentEntities = await contentCollection.QueryContentsAsync(filter, query, ct);
+        var contentEntities = await contentCollection.QueryContentsAsync(filter, query, q, ct);
         var contentTotal = (long)contentEntities.Count;
 
         if (contentTotal >= query.Take || query.Skip > 0)

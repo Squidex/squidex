@@ -202,7 +202,7 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
         return A<Context>.That.Matches(x =>
             x.App == TestApp.Default &&
             x.ShouldSkipCleanup() &&
-            x.ShouldSkipContentEnrichment() &&
+            x.ShouldSkipAssetEnrichment() &&
             x.UserPrincipal == requestContext.UserPrincipal);
     }
 

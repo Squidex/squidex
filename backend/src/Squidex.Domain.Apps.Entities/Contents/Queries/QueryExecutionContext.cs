@@ -95,41 +95,35 @@ public abstract class QueryExecutionContext : Dictionary<string, object?>
     {
         Guard.NotNull(ids);
 
-        return await AssetCache.CacheOrQueryAsync(ids, async pendingIds =>
+        await maxRequests.WaitAsync(ct);
+        try
         {
-            await maxRequests.WaitAsync(ct);
-            try
-            {
-                var q = Q.Empty.WithIds(pendingIds).WithoutTotal();
+            var q = Q.Empty.WithIds(ids).WithoutTotal();
 
-                return await AssetQuery.QueryAsync(Context, null, q, ct);
-            }
-            finally
-            {
-                maxRequests.Release();
-            }
-        });
+            return await AssetQuery.QueryAsync(Context, null, q, ct);
+        }
+        finally
+        {
+            maxRequests.Release();
+        }
     }
 
-    public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> QueryContentsByIdsAsync(IEnumerable<DomainId> ids,
+    public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> QueryContentsByIdsAsync(IEnumerable<DomainId> ids, HashSet<string>? fields,
         CancellationToken ct)
     {
         Guard.NotNull(ids);
 
-        return await ContentCache.CacheOrQueryAsync(ids, async pendingIds =>
+        await maxRequests.WaitAsync(ct);
+        try
         {
-            await maxRequests.WaitAsync(ct);
-            try
-            {
-                var q = Q.Empty.WithIds(pendingIds).WithoutTotal();
+            var q = Q.Empty.WithIds(ids).WithFields(fields).WithoutTotal();
 
-                return await ContentQuery.QueryAsync(Context, q, ct);
-            }
-            finally
-            {
-                maxRequests.Release();
-            }
-        });
+            return await ContentQuery.QueryAsync(Context, q, ct);
+        }
+        finally
+        {
+            maxRequests.Release();
+        }
     }
 
     public T Resolve<T>() where T : class

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using GraphQL.Resolvers;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
@@ -29,6 +30,16 @@ internal static class EntityResolvers
 
     private static IFieldResolver ResolveUser<TSource>(Func<TSource, RefToken> resolver)
     {
-        return Resolvers.Async<TSource, IUser?>((source, fieldContext, context) => context.FindUserAsync(resolver(source), fieldContext.CancellationToken));
+        return Resolvers.Async<TSource, IUser?>((source, fieldContext, context) =>
+        {
+            var token = resolver(source);
+
+            if (fieldContext.HasOnlyIdField())
+            {
+                return new ValueTask<IUser?>(new ClientUser(token));
+            }
+
+            return context.FindUserAsync(token, fieldContext.CancellationToken);
+        });
     }
 }
