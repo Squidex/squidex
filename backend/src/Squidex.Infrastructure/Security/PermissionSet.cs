@@ -38,7 +38,7 @@ public sealed class PermissionSet : ReadonlyList<Permission>
     public PermissionSet(IList<Permission> permissions)
         : base(permissions)
     {
-        display = new Lazy<string>(() => string.Join(";", this));
+        display = new Lazy<string>(() => string.Join(';', this));
     }
 
     public PermissionSet Add(string permission)

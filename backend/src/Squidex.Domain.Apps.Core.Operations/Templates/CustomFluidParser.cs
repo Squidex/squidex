@@ -9,6 +9,8 @@ using Fluid;
 using Fluid.Ast;
 using Parlot.Fluent;
 
+#pragma warning disable CA1822 // Mark members as static
+
 namespace Squidex.Domain.Apps.Core.Templates;
 
 public sealed class CustomFluidParser : FluidParser

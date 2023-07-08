@@ -63,7 +63,7 @@ public static class EdmModelConverter
 
                             entityPath.Push(fieldName);
 
-                            var typeName = string.Join("_", entityPath.Reverse().Select(x => x.EscapeEdmField().ToPascalCase()));
+                            var typeName = string.Join('_', entityPath.Reverse().Select(x => x.EscapeEdmField().ToPascalCase()));
 
                             var result = model.SchemaElements.OfType<EdmComplexType>().FirstOrDefault(x => x.Name == typeName);
 
@@ -114,11 +114,11 @@ public static class EdmModelConverter
 
     public static string EscapeEdmField(this string field)
     {
-        return field.Replace("-", "_", StringComparison.Ordinal);
+        return field.Replace('-', '_');
     }
 
     public static string UnescapeEdmField(this string field)
     {
-        return field.Replace("_", "-", StringComparison.Ordinal);
+        return field.Replace('_', '-');
     }
 }

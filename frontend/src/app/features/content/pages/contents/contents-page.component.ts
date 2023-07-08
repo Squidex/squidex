@@ -11,7 +11,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, Observable } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, contentsTranslationStatus, ContributorsState, defined, isDataField, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, Types, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, isDataField, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, Types, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -62,6 +62,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         public readonly languagesState: LanguagesState,
         private readonly appsState: AppsState,
         private readonly contributorsState: ContributorsState,
+        private readonly contentsService: ContentsService,
         private readonly localStore: LocalStoreService,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
@@ -180,9 +181,16 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public clone(content: ContentDto) {
-        this.tempService.put(content.data);
+        if (!content) {
+            return;
+        }
 
-        this.router.navigate(['new'], { relativeTo: this.route });
+        this.contentsService.getContent(this.contentsState.appName, this.contentsState.schemaName, content.id)
+            .subscribe(currentContent => {
+                this.tempService.put(currentContent.data);
+
+                this.router.navigate(['new'], { relativeTo: this.route });
+            });
     }
 
     public changeLanguage(language: AppLanguageDto) {

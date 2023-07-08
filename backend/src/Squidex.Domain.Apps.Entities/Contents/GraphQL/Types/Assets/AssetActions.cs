@@ -61,10 +61,9 @@ internal static class AssetActions
         {
             var assetId = fieldContext.GetArgument<DomainId>("id");
 
-            var assets = await fieldContext.ResolveAssetsAsync(new List<DomainId> { assetId });
-            var asset = assets.FirstOrDefault();
-
-            return asset;
+            return await context.GetAssetAsync(assetId,
+                fieldContext.CacheDuration(),
+                fieldContext.CancellationToken);
         });
     }
 

@@ -16,11 +16,9 @@ public sealed class ProfilerCollection
 {
     private readonly IMongoCollection<ProfilerDocument> collection;
 
-    public string CollectionName => "system.profile";
-
     public ProfilerCollection(IMongoDatabase database)
     {
-        collection = database.GetCollection<ProfilerDocument>(CollectionName);
+        collection = database.GetCollection<ProfilerDocument>("system.profile");
     }
 
     public async Task<IReadOnlyList<ProfilerDocument>> GetQueriesAsync(string collectionName,

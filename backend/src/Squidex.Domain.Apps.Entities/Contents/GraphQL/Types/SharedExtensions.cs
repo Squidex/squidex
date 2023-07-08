@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Google.Protobuf.WellKnownTypes;
 using GraphQL;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -23,9 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
 public static class SharedExtensions
 {
-    private static readonly IReadOnlyList<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
-    private static readonly IReadOnlyList<IEnrichedContentEntity> EmptyContents = new List<IEnrichedContentEntity>();
-
     internal static FieldType WithouthResolver(this FieldType source)
     {
         return new FieldType
@@ -109,12 +105,12 @@ public static class SharedExtensions
 
     internal static FieldType WithSchemaId(this FieldType field, SchemaInfo value)
     {
-        return field.WithMetadata(nameof(SchemaId), value.Schema.Id.ToString());
+        return field.WithMetadata(nameof(SchemaId), value.Schema.Id);
     }
 
-    internal static string SchemaId(this FieldType field)
+    internal static DomainId SchemaId(this FieldType field)
     {
-        return field.GetMetadata<string>(nameof(SchemaId))!;
+        return field.GetMetadata<DomainId>(nameof(SchemaId))!;
     }
 
     internal static FieldType WithSchemaNamedId(this FieldType field, SchemaInfo value)
@@ -140,75 +136,6 @@ public static class SharedExtensions
     public static TimeSpan CacheDuration(this IResolveFieldContext context)
     {
         return CacheDirective.CacheDuration(context);
-    }
-
-    public static Task<IReadOnlyList<IEnrichedAssetEntity>> ResolveAssetsAsync(this IResolveFieldContext fieldContext, List<DomainId>? ids)
-    {
-        if (ids == null || ids.Count == 0)
-        {
-            return Task.FromResult(EmptyAssets);
-        }
-
-        var context = (GraphQLExecutionContext)fieldContext.UserContext;
-
-        if (fieldContext.HasOnlyIdField())
-        {
-            var contents = ids.Select(x => (IEnrichedAssetEntity)new AssetEntity
-            {
-                Id = x,
-                Version = 0
-            }).ToList();
-
-            return Task.FromResult<IReadOnlyList<IEnrichedAssetEntity>>(contents);
-        }
-
-        return context.GetAssetsAsync(ids,
-            fieldContext.CacheDuration(),
-            fieldContext.CancellationToken);
-    }
-
-    public static Task<IReadOnlyList<IEnrichedContentEntity>> ResolveContentsAsync(this IResolveFieldContext fieldContext, List<DomainId>? ids)
-    {
-        if (ids == null || ids.Count == 0)
-        {
-            return Task.FromResult(EmptyContents);
-        }
-
-        var context = (GraphQLExecutionContext)fieldContext.UserContext;
-
-        if (fieldContext.HasOnlyIdField())
-        {
-            var schemaId = GetSchemaId(fieldContext);
-
-            var contents = ids.Select(id => (IEnrichedContentEntity)new ContentEntity
-            {
-                Id = id,
-                SchemaId = schemaId
-            }).ToList();
-
-            return Task.FromResult<IReadOnlyList<IEnrichedContentEntity>>(contents);
-        }
-
-        return context.GetContentsAsync(ids,
-            fieldContext.FieldNamesWhenToggled(),
-            fieldContext.CacheDuration(),
-            fieldContext.CancellationToken);
-
-        static NamedId<DomainId> GetSchemaId(IResolveFieldContext fieldContext)
-        {
-            var schemaId = default(DomainId);
-            switch (fieldContext.FieldDefinition.ResolvedType?.InnerType())
-            {
-                case ContentGraphType content:
-                    schemaId = content.SchemaId;
-                    break;
-                case ContentUnionGraphType union:
-                    schemaId = union.SchemaTypes.Keys.First();
-                    break;
-            }
-
-            return NamedId.Of(schemaId, "Unresolved");
-        }
     }
 
     public static List<DomainId>? AsIds(this JsonValue value)
@@ -242,7 +169,7 @@ public static class SharedExtensions
         return context.FieldAst.SelectionSet?.Selections.TrueForAll(x => x is GraphQLField field && field.Name == "id") == true;
     }
 
-    public static HashSet<string>? FieldNamesWhenToggled(this IResolveFieldContext context)
+    public static HashSet<string>? FieldNames(this IResolveFieldContext context)
     {
         if (!OptimizeFieldQueriesDirective.IsApplied(context))
         {

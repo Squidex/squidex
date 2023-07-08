@@ -102,14 +102,19 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
     {
         var ids = value.AsIds();
 
-        return fieldContext.ResolveAssetsAsync(ids);
+        return context.GetAssetsAsync(ids,
+            fieldContext.CacheDuration(),
+            fieldContext.CancellationToken);
     });
 
     private static readonly IFieldResolver References = CreateAsyncValueResolver((value, fieldContext, context) =>
     {
         var ids = value.AsIds();
 
-        return fieldContext.ResolveContentsAsync(ids);
+        return context.GetContentsAsync(ids,
+            fieldContext.FieldNames(),
+            fieldContext.CacheDuration(),
+            fieldContext.CancellationToken);
     });
 
     private readonly Builder builder;

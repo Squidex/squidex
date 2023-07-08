@@ -72,7 +72,7 @@ public static class ContextHeaders
     {
         if (values?.Any() == true)
         {
-            builder.SetHeader(key, string.Join(",", values));
+            builder.SetHeader(key, string.Join(',', values));
         }
         else
         {

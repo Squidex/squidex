@@ -90,7 +90,7 @@ public sealed class PropertyPath : ReadonlyList<string>, IEquatable<string>
 
     public override string ToString()
     {
-        return string.Join(".", this);
+        return string.Join('.', this);
     }
 
     private static PropertyPath Create(IEnumerable<string>? source)

@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 
 public static class JsonMapper
 {
-    private class JsonObjectInstance : ObjectInstance
+    private sealed class JsonObjectInstance : ObjectInstance
     {
         public JsonObjectInstance(Engine engine)
             : base(engine)

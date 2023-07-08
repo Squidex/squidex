@@ -167,8 +167,8 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
     protected static string CreateQuery(string query, DomainId id = default, IEnrichedContentEntity? content = null)
     {
         query = query
-            .Replace("'", "\"", StringComparison.Ordinal)
-            .Replace("`", "\"", StringComparison.Ordinal)
+            .Replace('\'', '"')
+            .Replace('`', '"')
             .Replace("<FIELDS_ASSET>", TestAsset.AllFields, StringComparison.Ordinal)
             .Replace("<FIELDS_CONTENT>", TestContent.AllFields, StringComparison.Ordinal)
             .Replace("<FIELDS_CONTENT_FLAT>", TestContent.AllFlatFields, StringComparison.Ordinal);

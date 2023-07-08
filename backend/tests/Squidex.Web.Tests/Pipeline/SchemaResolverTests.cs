@@ -99,7 +99,7 @@ public class SchemaResolverTests : GivenContext
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(Schema);
+        AssertSchema();
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class SchemaResolverTests : GivenContext
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(Schema);
+        AssertSchema();
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class SchemaResolverTests : GivenContext
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(Schema);
+        AssertSchema();
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public class SchemaResolverTests : GivenContext
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(Schema);
+        AssertSchema();
     }
 
     [Fact]
@@ -168,7 +168,7 @@ public class SchemaResolverTests : GivenContext
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        AssertSchema(Schema);
+        AssertSchema();
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class SchemaResolverTests : GivenContext
         Assert.False(isNextCalled);
     }
 
-    private void AssertSchema(ISchemaEntity schema)
+    private void AssertSchema()
     {
         Assert.Equal(Schema, actionContext.HttpContext.Features.Get<ISchemaFeature>()!.Schema);
         Assert.True(isNextCalled);

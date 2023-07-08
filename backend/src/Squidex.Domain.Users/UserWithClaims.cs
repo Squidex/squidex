@@ -30,7 +30,7 @@ internal sealed class UserWithClaims : IUser
 
     public bool IsLocked
     {
-        get => snapshot.LockoutEnd > DateTime.UtcNow;
+        get => snapshot.LockoutEnd > DateTimeOffset.UtcNow;
     }
 
     public IReadOnlyList<Claim> Claims { get; }

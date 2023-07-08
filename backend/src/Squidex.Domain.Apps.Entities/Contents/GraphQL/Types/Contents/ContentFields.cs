@@ -23,14 +23,19 @@ internal static class ContentFields
     {
         var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedAssetIds(value).ToList();
 
-        return await fieldContext.ResolveAssetsAsync(ids);
+        return await context.GetAssetsAsync(ids,
+            fieldContext.CacheDuration(),
+            fieldContext.CancellationToken);
     });
 
     public static readonly IFieldResolver ResolveStringFieldContents = Resolvers.Async<string, object>(async (value, fieldContext, context) =>
     {
         var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedContentIds(value).ToList();
 
-        return await fieldContext.ResolveContentsAsync(ids);
+        return await context.GetContentsAsync(ids,
+            fieldContext.FieldNames(),
+            fieldContext.CacheDuration(),
+            fieldContext.CancellationToken);
     });
 
     public static readonly FieldType Id = new FieldType

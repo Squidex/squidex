@@ -11,6 +11,8 @@ using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
+#pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
+
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
 public sealed class GraphQLExecutionContext : QueryExecutionContext
@@ -54,9 +56,32 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         }
     }
 
-    public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetAssetsAsync(List<DomainId> ids, TimeSpan cacheDuration,
+    public async Task<IEnrichedAssetEntity?> GetAssetAsync(DomainId id, TimeSpan cacheDuration,
         CancellationToken ct)
     {
+        var assets = await GetAssetsAsync(new List<DomainId> { id }, cacheDuration, ct);
+        var asset = assets.FirstOrDefault();
+
+        return asset;
+    }
+
+    public async Task<IEnrichedContentEntity?> GetContentAsync(DomainId schemaId, DomainId id, HashSet<string>? fields, TimeSpan cacheDuration,
+        CancellationToken ct)
+    {
+        var contents = await GetContentsAsync(new List<DomainId> { id }, fields, cacheDuration, ct);
+        var content = contents.FirstOrDefault(x => x.SchemaId.Id == schemaId);
+
+        return content;
+    }
+
+    public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetAssetsAsync(List<DomainId>? ids, TimeSpan cacheDuration,
+        CancellationToken ct)
+    {
+        if (ids == null || ids.Count == 0)
+        {
+            return EmptyAssets;
+        }
+
         async Task<IReadOnlyList<IEnrichedAssetEntity>> LoadAsync(IEnumerable<DomainId> ids)
         {
             var result = await GetAssetsLoader().LoadAsync(ids).GetResultAsync(ct);
@@ -77,9 +102,14 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return await LoadAsync(ids);
     }
 
-    public async Task<IReadOnlyList<IEnrichedContentEntity>> GetContentsAsync(List<DomainId> ids, HashSet<string>? fields, TimeSpan cacheDuration,
+    public async Task<IReadOnlyList<IEnrichedContentEntity>> GetContentsAsync(List<DomainId>? ids, HashSet<string>? fields, TimeSpan cacheDuration,
         CancellationToken ct)
     {
+        if (ids == null || ids.Count == 0)
+        {
+            return EmptyContents;
+        }
+
         if (cacheDuration > TimeSpan.Zero || fields == null)
         {
             var contents = await ContentCache.CacheOrQueryAsync(ids, async pendingIds =>

@@ -120,7 +120,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
     {
         var actual = CreateAsset();
 
-        SetupSameHashAsset(file.FileName, file.FileSize, out var unused);
+        SetupSameHashAsset(file.FileName, file.FileSize, out var _);
 
         var context =
             await HandleAsync(new CreateAsset { File = file, Duplicate = true },
@@ -174,7 +174,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
     {
         var actual = CreateAsset();
 
-        SetupSameHashAsset(file.FileName, file.FileSize, out var unused);
+        SetupSameHashAsset(file.FileName, file.FileSize, out var _);
 
         var context =
             await HandleAsync(new UpsertAsset { File = file },

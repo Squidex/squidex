@@ -83,26 +83,22 @@ internal static class ContentActions
 
         public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
         {
-            var contentIdentity = fieldContext.GetArgument<DomainId>("id");
-            var contentSchemaId = DomainId.Create(fieldContext.FieldDefinition.SchemaId());
-            var version = fieldContext.GetArgument<int?>("version");
+            var contentId = fieldContext.GetArgument<DomainId>("id");
 
-            if (version >= 0)
+            var contentSchemaId = fieldContext.FieldDefinition.SchemaId();
+            var contentVersion = fieldContext.GetArgument<int?>("version");
+
+            if (contentVersion >= 0)
             {
-                return await context.FindContentAsync(contentSchemaId.ToString(), contentIdentity, version.Value,
+                return await context.FindContentAsync(contentSchemaId.ToString(), contentId, contentVersion.Value,
                     fieldContext.CancellationToken);
             }
             else
             {
-                var contents = await fieldContext.ResolveContentsAsync(new List<DomainId> { contentIdentity });
-                var content = contents.FirstOrDefault();
-
-                if (content?.SchemaId.Id != contentSchemaId)
-                {
-                    content = null;
-                }
-
-                return content;
+                return await context.GetContentAsync(contentSchemaId, contentId,
+                    fieldContext.FieldNames(),
+                    fieldContext.CacheDuration(),
+                    fieldContext.CancellationToken);
             }
         });
     }
@@ -121,9 +117,12 @@ internal static class ContentActions
 
         public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
         {
-            var ids = fieldContext.GetArgument<DomainId[]>("ids");
+            var ids = fieldContext.GetArgument<DomainId[]>("ids").ToList();
 
-            return await fieldContext.ResolveContentsAsync(ids.ToList());
+            return await context.GetContentsAsync(ids,
+                fieldContext.FieldNames(),
+                fieldContext.CacheDuration(),
+                fieldContext.CancellationToken);
         });
     }
 
@@ -170,9 +169,9 @@ internal static class ContentActions
             var q = Q.Empty
                 .WithODataQuery(query)
                 .WithoutTotal()
-                .WithFields(fieldContext.FieldNamesWhenToggled());
+                .WithFields(fieldContext.FieldNames());
 
-            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId().ToString(), q,
                 fieldContext.CancellationToken);
         });
 
@@ -182,9 +181,9 @@ internal static class ContentActions
 
             var q = Q.Empty
                 .WithODataQuery(query)
-                .WithFields(fieldContext.FieldNamesWhenToggled());
+                .WithFields(fieldContext.FieldNames());
 
-            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId().ToString(), q,
                 fieldContext.CancellationToken);
         });
 
@@ -196,9 +195,9 @@ internal static class ContentActions
                 .WithODataQuery(query)
                 .WithReference(source.Id)
                 .WithoutTotal()
-                .WithFields(fieldContext.FieldNamesWhenToggled());
+                .WithFields(fieldContext.FieldNames());
 
-            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId().ToString(), q,
                 fieldContext.CancellationToken);
         });
 
@@ -209,9 +208,9 @@ internal static class ContentActions
             var q = Q.Empty
                 .WithODataQuery(query)
                 .WithReference(source.Id)
-                .WithFields(fieldContext.FieldNamesWhenToggled());
+                .WithFields(fieldContext.FieldNames());
 
-            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId().ToString(), q,
                 fieldContext.CancellationToken);
         });
 
@@ -223,9 +222,9 @@ internal static class ContentActions
                 .WithODataQuery(query)
                 .WithReferencing(source.Id)
                 .WithoutTotal()
-                .WithFields(fieldContext.FieldNamesWhenToggled());
+                .WithFields(fieldContext.FieldNames());
 
-            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId().ToString(), q,
                 fieldContext.CancellationToken);
         });
 
@@ -236,9 +235,9 @@ internal static class ContentActions
             var q = Q.Empty
                 .WithODataQuery(query)
                 .WithReferencing(source.Id)
-                .WithFields(fieldContext.FieldNamesWhenToggled());
+                .WithFields(fieldContext.FieldNames());
 
-            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+            return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId().ToString(), q,
                 fieldContext.CancellationToken);
         });
     }

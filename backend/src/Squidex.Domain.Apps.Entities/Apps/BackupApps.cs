@@ -23,8 +23,10 @@ public sealed class BackupApps : IBackupHandler
     private const string AvatarFile = "Avatar.image";
     private readonly Rebuilder rebuilder;
     private readonly IAppImageStore appImageStore;
+    private readonly IAppProvider appProvider;
     private readonly IAppsIndex appsIndex;
     private readonly IAppUISettings appUISettings;
+    private AppDomainObject? app;
     private string? appReservation;
 
     public string Name { get; } = "Apps";
@@ -32,11 +34,13 @@ public sealed class BackupApps : IBackupHandler
     public BackupApps(
         Rebuilder rebuilder,
         IAppImageStore appImageStore,
+        IAppProvider appProvider,
         IAppsIndex appsIndex,
         IAppUISettings appUISettings)
     {
         this.appsIndex = appsIndex;
         this.appImageStore = appImageStore;
+        this.appProvider = appProvider;
         this.appUISettings = appUISettings;
         this.rebuilder = rebuilder;
     }
@@ -69,18 +73,12 @@ public sealed class BackupApps : IBackupHandler
         switch (@event.Payload)
         {
             case AppCreated appCreated:
-                {
-                    await ReserveAppAsync(context.AppId, appCreated.Name, ct);
-
-                    break;
-                }
+                await ReserveAppAsync(context.AppId, appCreated.Name, ct);
+                break;
 
             case AppImageUploaded:
-                {
-                    await ReadAssetAsync(context.AppId, context.Reader, ct);
-
-                    break;
-                }
+                await ReadAssetAsync(context.AppId, context.Reader, ct);
+                break;
 
             case AppContributorAssigned contributorAssigned:
                 {
@@ -111,6 +109,20 @@ public sealed class BackupApps : IBackupHandler
     public async Task RestoreAsync(RestoreContext context,
         CancellationToken ct)
     {
+        await RestoreAppTemporarilyAsync(context, ct);
+        await RestoreSettingsAsync(context, ct);
+    }
+
+    private async Task RestoreAppTemporarilyAsync(RestoreContext context,
+        CancellationToken ct)
+    {
+        app = await rebuilder.RebuildStateAsync<AppDomainObject, AppDomainObject.State>(context.AppId, ct);
+
+        appProvider.RegisterAppForLocalContext(context.AppId, app!.Snapshot);
+    }
+
+    private async Task RestoreSettingsAsync(RestoreContext context, CancellationToken ct)
+    {
         var json = await context.Reader.ReadJsonAsync<JsonObject>(SettingsFile, ct);
 
         await appUISettings.SetAsync(context.AppId, null, json, ct);
@@ -134,7 +146,10 @@ public sealed class BackupApps : IBackupHandler
 
     public async Task CompleteRestoreAsync(RestoreContext context, string appName)
     {
-        await rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(Enumerable.Repeat(context.AppId, 1), 1, default);
+        if (app != null)
+        {
+            await app.RebuildStateAsync();
+        }
 
         await appsIndex.RemoveReservationAsync(appReservation);
     }

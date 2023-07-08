@@ -17,9 +17,9 @@ public static class RandomHash
         return Guid.NewGuid()
             .ToString().ToSha256Base64()
             .ToLowerInvariant()
-            .Replace("+", "x", StringComparison.Ordinal)
-            .Replace("=", "x", StringComparison.Ordinal)
-            .Replace("/", "x", StringComparison.Ordinal);
+            .Replace('+', 'x')
+            .Replace('=', 'x')
+            .Replace('/', 'x');
     }
 
     public static string Simple()

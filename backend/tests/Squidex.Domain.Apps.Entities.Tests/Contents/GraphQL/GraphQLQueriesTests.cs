@@ -764,10 +764,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     id
                     flatData {
                       myReferences @cache(duration: 1000) {
-                        id,
-                        flatData {
-                          schemaRef1Field
-                        }
+                        id
                       }
                     }
                   }
@@ -799,11 +796,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         {
                             new
                             {
-                                id = contentRefId,
-                                flatData = new
-                                {
-                                    schemaRef1Field = "ref"
-                                }
+                                id = contentRefId
                             }
                         }
                     }
@@ -1158,9 +1151,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         iv {
                           text
                           assets {
-                            id,
-                            fileName,
-                            fileSize
+                            id
                           }
                         }
                       }
@@ -1196,9 +1187,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                 {
                                     new
                                     {
-                                        id = assetRefId,
-                                        fileName = assetRef.FileName,
-                                        fileSize = assetRef.FileSize
+                                        id = assetRefId
                                     }
                                 }
                             }
@@ -1227,9 +1216,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     data {
                       myAssets {
                         iv {
-                          id,
-                          fileName,
-                          fileSize
+                          id
                         }
                       }
                     }
@@ -1261,9 +1248,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                             {
                                 new
                                 {
-                                    id = assetRefId,
-                                    fileName = assetRef.FileName,
-                                    fileSize = assetRef.FileSize
+                                    id = assetRefId
                                 }
                             }
                         }
@@ -1456,118 +1441,5 @@ public class GraphQLQueriesTests : GraphQLTestBase
 
         A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
-    }
-
-    [Fact]
-    public async Task Should_not_fetch_assets_if_only_id_is_queried()
-    {
-        var assetRefId = DomainId.NewGuid();
-
-        var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, assetId: assetRefId);
-
-        var query = CreateQuery(@"
-                query {
-                  findMySchemaContent(id: '<ID>') {
-                    data {
-                      myAssets {
-                        iv {
-                          id
-                        }
-                      }
-                    }
-                  }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
-
-        var expected = new
-        {
-            data = new
-            {
-                findMySchemaContent = new
-                {
-                    data = new
-                    {
-                        myAssets = new
-                        {
-                            iv = new[]
-                            {
-                                new
-                                {
-                                    id = assetRefId
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        };
-
-        AssertResult(expected, actual);
-
-        A.CallTo(assetQuery)
-            .MustNotHaveHappened();
-    }
-
-    [Fact]
-    public async Task Should_not_fetch_references_if_only_id_is_queried()
-    {
-        var contentRefId = DomainId.NewGuid();
-
-        var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
-
-        var query = CreateQuery(@"
-                query {
-                  findMySchemaContent(id: '<ID>') {
-                    data {
-                      myReferences {
-                        iv {
-                          id
-                        }
-                      }
-                    }
-                  }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId),
-                A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
-
-        var expected = new
-        {
-            data = new
-            {
-                findMySchemaContent = new
-                {
-                    data = new
-                    {
-                        myReferences = new
-                        {
-                            iv = new[]
-                            {
-                                new
-                                {
-                                    id = contentRefId
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        };
-
-        AssertResult(expected, actual);
-
-        A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._, A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
     }
 }

@@ -7,12 +7,14 @@
 
 using System.Collections.Concurrent;
 
+#pragma warning disable MA0040 // Forward the CancellationToken parameter to methods that take one
+
 namespace Squidex.Infrastructure.Tasks;
 
 public class SchedulerTests
 {
     private readonly ConcurrentBag<int> actuals = new ConcurrentBag<int>();
-    private Scheduler sut = new Scheduler();
+    private readonly Scheduler sut = new Scheduler();
 
     [Fact]
     public async Task Should_schedule_single_task()

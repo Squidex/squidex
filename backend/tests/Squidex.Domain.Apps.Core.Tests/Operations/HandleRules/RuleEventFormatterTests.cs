@@ -293,6 +293,6 @@ public class RuleEventFormatterTests
 
         Assert.Equal("{'categories':['ref1','ref2','ref3']}", actual?
             .Replace(" ", string.Empty, StringComparison.Ordinal)
-            .Replace("\"", "'", StringComparison.Ordinal));
+            .Replace('"', '\''));
     }
 }

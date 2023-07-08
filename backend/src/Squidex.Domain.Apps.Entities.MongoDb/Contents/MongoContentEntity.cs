@@ -9,6 +9,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
+using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
@@ -127,9 +128,10 @@ public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<Domain
         return state;
     }
 
-    public static async Task<MongoContentEntity> CreatePublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
+    public static async Task<MongoContentEntity> CreatePublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider,
+        CancellationToken ct)
     {
-        var entity = await CreateContentAsync(job.Value.CurrentVersion.Data, job, appProvider);
+        var entity = await CreateContentAsync(job.Value.CurrentVersion.Data, job, appProvider, ct);
 
         entity.ScheduledAt = null;
         entity.ScheduleJob = null;
@@ -138,9 +140,10 @@ public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<Domain
         return entity;
     }
 
-    public static async Task<MongoContentEntity> CreateCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
+    public static async Task<MongoContentEntity> CreateCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider,
+        CancellationToken ct)
     {
-        var entity = await CreateContentAsync(job.Value.Data, job, appProvider);
+        var entity = await CreateContentAsync(job.Value.Data, job, appProvider, ct);
 
         entity.ScheduledAt = job.Value.ScheduleJob?.DueTime;
         entity.ScheduleJob = job.Value.ScheduleJob;
@@ -151,7 +154,8 @@ public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<Domain
         return entity;
     }
 
-    private static async Task<MongoContentEntity> CreateContentAsync(ContentData data, SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider)
+    private static async Task<MongoContentEntity> CreateContentAsync(ContentData data, SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider,
+        CancellationToken ct)
     {
         var entity = SimpleMapper.Map(job.Value, new MongoContentEntity());
 
@@ -162,19 +166,21 @@ public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<Domain
         entity.ReferencedIds ??= new HashSet<DomainId>();
         entity.Version = job.NewVersion;
 
-        var (app, schema) = await appProvider.GetAppWithSchemaAsync(job.Value.AppId.Id, job.Value.SchemaId.Id, true);
+        var (app, schema) = await appProvider.GetAppWithSchemaAsync(entity.IndexedAppId, entity.IndexedSchemaId, true, ct);
 
-        if (schema?.SchemaDef != null && app != null)
+        if (app == null || schema == null)
         {
-            if (data.CanHaveReference())
-            {
-                var components = await appProvider.GetComponentsAsync(schema);
-
-                entity.Data.AddReferencedIds(schema.SchemaDef, entity.ReferencedIds, components);
-            }
-
-            entity.TranslationStatus = TranslationStatus.Create(data, schema.SchemaDef, app.Languages);
+            return entity;
         }
+
+        if (data.CanHaveReference())
+        {
+            var components = await appProvider.GetComponentsAsync(schema, ct: ct);
+
+            entity.Data.AddReferencedIds(schema.SchemaDef, entity.ReferencedIds, components);
+        }
+
+        entity.TranslationStatus = TranslationStatus.Create(data, schema.SchemaDef, app.Languages);
 
         return entity;
     }

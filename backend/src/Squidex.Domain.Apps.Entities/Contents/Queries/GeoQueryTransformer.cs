@@ -35,7 +35,7 @@ internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQ
     {
         if (nodeIn.Value.Value is FilterSphere sphere)
         {
-            var field = string.Join(".", nodeIn.Path.Skip(1));
+            var field = string.Join('.', nodeIn.Path.Skip(1));
 
             var searchQuery = new GeoQuery(args.Schema.Id, field, sphere.Latitude, sphere.Longitude, sphere.Radius, 1000);
             var searchScope = args.Context.Scope();

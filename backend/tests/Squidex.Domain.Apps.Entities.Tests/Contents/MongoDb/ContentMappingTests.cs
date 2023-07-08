@@ -24,7 +24,7 @@ public class ContentMappingTests
         var source = CreateContentWithoutNewVersion();
 
         var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
-        var snapshot = await MongoContentEntity.CreateCompleteAsync(snapshotJob, appProvider);
+        var snapshot = await MongoContentEntity.CreateCompleteAsync(snapshotJob, appProvider, default);
 
         Assert.Equal(source.CurrentVersion.Data, snapshot.Data);
         Assert.Null(snapshot.DraftData);
@@ -43,7 +43,7 @@ public class ContentMappingTests
         var source = CreateContentWithoutNewVersion();
 
         var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
-        var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, appProvider);
+        var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, appProvider, default);
 
         Assert.Equal(source.CurrentVersion.Data, snapshot.Data);
         Assert.Null(snapshot.DraftData);
@@ -58,7 +58,7 @@ public class ContentMappingTests
         var source = CreateContentWithNewVersion();
 
         var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
-        var snapshot = await MongoContentEntity.CreateCompleteAsync(snapshotJob, appProvider);
+        var snapshot = await MongoContentEntity.CreateCompleteAsync(snapshotJob, appProvider, default);
 
         Assert.Equal(source.NewVersion?.Data, snapshot.Data);
         Assert.Equal(source.CurrentVersion.Data, snapshot.DraftData);
@@ -77,7 +77,7 @@ public class ContentMappingTests
         var source = CreateContentWithNewVersion();
 
         var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
-        var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, appProvider);
+        var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, appProvider, default);
 
         Assert.Equal(source.CurrentVersion?.Data, snapshot.Data);
         Assert.Null(snapshot.DraftData);

@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace Squidex.Infrastructure.Json.System;
 
-internal sealed class Constants
+internal static class Constants
 {
     public const string DefaultDiscriminatorProperty = "$type";
 
