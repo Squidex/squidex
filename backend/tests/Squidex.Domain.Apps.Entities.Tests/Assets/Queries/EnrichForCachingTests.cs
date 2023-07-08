@@ -34,6 +34,7 @@ public class EnrichForCachingTests : GivenContext
 
         Assert.Equal(new List<string>
         {
+            "X-Fields",
             "X-Flatten",
             "X-Languages",
             "X-NoCleanup",

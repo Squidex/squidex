@@ -19,7 +19,7 @@ public static class ContentHeaders
 
     public const string Fields = "X-Fields";
     public const string Flatten = "X-Flatten";
-    public const string Languages = "Languages";
+    public const string Languages = "X-Languages";
     public const string NoCleanup = "X-NoCleanup";
     public const string NoEnrichment = "X-NoEnrichment";
     public const string NoResolveLanguages = "X-NoResolveLanguages";
