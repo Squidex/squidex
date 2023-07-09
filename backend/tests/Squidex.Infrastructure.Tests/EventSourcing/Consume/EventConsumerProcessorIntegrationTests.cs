@@ -115,10 +115,12 @@ public abstract class EventConsumerProcessorIntegrationTests
 
             for (var j = 0; j < numEvents; j++)
             {
+#pragma warning disable MA0040 // Forward the CancellationToken parameter to methods that take one
                 await persistence.WriteEventsAsync(new List<Envelope<IEvent>>
                 {
                     Envelope.Create(new MyEvent())
                 });
+#pragma warning restore MA0040 // Forward the CancellationToken parameter to methods that take one
             }
         });
 

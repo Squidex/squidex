@@ -28,7 +28,7 @@ public sealed class StreamMapper
     {
         Guard.NotNullOrEmpty(stream);
 
-        var typeIndex = stream.IndexOf("-", StringComparison.Ordinal);
+        var typeIndex = stream.IndexOf('-', StringComparison.Ordinal);
         var typeName = stream[..typeIndex];
 
         var id = DomainId.Create(stream[(typeIndex + 1)..]);

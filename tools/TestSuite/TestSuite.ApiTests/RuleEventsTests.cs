@@ -93,8 +93,6 @@ public class RuleEventsTests : IClassFixture<ClientFixture>
 
     private async Task<(ISquidexClient App, RuleDto)> CreateAppAndRuleAsync()
     {
-        var appName = Guid.NewGuid().ToString();
-
         var (app, _) = await _.PostAppAsync();
 
         var createRule = new CreateRuleDto

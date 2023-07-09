@@ -11,6 +11,7 @@ using Namotion.Reflection;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -20,20 +21,21 @@ internal static class ContentFields
 {
     public static readonly IFieldResolver ResolveStringFieldAssets = Resolvers.Async<string, object>(async (value, fieldContext, context) =>
     {
-        var cacheDuration = fieldContext.CacheDuration();
-
         var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedAssetIds(value).ToList();
 
-        return await context.GetAssetsAsync(ids, cacheDuration, fieldContext.CancellationToken);
+        return await context.GetAssetsAsync(ids,
+            fieldContext.CacheDuration(),
+            fieldContext.CancellationToken);
     });
 
     public static readonly IFieldResolver ResolveStringFieldContents = Resolvers.Async<string, object>(async (value, fieldContext, context) =>
     {
-        var cacheDuration = fieldContext.CacheDuration();
-
         var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedContentIds(value).ToList();
 
-        return await context.GetContentsAsync(ids, cacheDuration, fieldContext.CancellationToken);
+        return await context.GetContentsAsync(ids,
+            fieldContext.FieldNames(),
+            fieldContext.CacheDuration(),
+            fieldContext.CancellationToken);
     });
 
     public static readonly FieldType Id = new FieldType

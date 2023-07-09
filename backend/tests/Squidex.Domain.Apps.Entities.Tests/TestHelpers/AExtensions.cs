@@ -27,6 +27,11 @@ public static class AExtensions
         return that.Matches(x => x.Ids != null && x.Ids.SetEquals(ids));
     }
 
+    public static Q HasFields(this INegatableArgumentConstraintManager<Q> that, IEnumerable<string> fields)
+    {
+        return that.Matches(x => x.Fields != null && x.Fields.SetEquals(fields.ToHashSet()));
+    }
+
     public static Q HasIds(this INegatableArgumentConstraintManager<Q> that, IEnumerable<DomainId> ids)
     {
         return that.Matches(x => x.Ids != null && x.Ids.SetEquals(ids.ToHashSet()));

@@ -628,7 +628,7 @@ public sealed class MongoUserStore :
     public Task ReplaceCodesAsync(IdentityUser user, IEnumerable<string> recoveryCodes,
         CancellationToken cancellationToken)
     {
-        ((MongoUser)user).ReplaceToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(";", recoveryCodes));
+        ((MongoUser)user).ReplaceToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(';', recoveryCodes));
 
         return Task.CompletedTask;
     }
@@ -643,7 +643,7 @@ public sealed class MongoUserStore :
         {
             var updatedCodes = new List<string>(splitCodes.Where(s => s != code));
 
-            ((MongoUser)user).ReplaceToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(";", updatedCodes));
+            ((MongoUser)user).ReplaceToken(InternalLoginProvider, RecoveryCodeTokenName, string.Join(';', updatedCodes));
 
             return Task.FromResult(true);
         }

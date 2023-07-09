@@ -246,7 +246,9 @@ public abstract class EventStoreTests<T> where T : IEventStore
                         CreateEventData(i * j)
                     };
 
+#pragma warning disable MA0040 // Forward the CancellationToken parameter to methods that take one
                     await Sut.AppendAsync(Guid.NewGuid(), fullStreamName, EtagVersion.Any, commit1);
+#pragma warning restore MA0040 // Forward the CancellationToken parameter to methods that take one
                 }
             });
         });

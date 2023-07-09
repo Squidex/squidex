@@ -51,4 +51,6 @@ public interface IAppProvider
 
     Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id,
         CancellationToken ct = default);
+
+    void RegisterAppForLocalContext(DomainId appId, IAppEntity app);
 }

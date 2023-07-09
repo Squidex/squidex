@@ -344,7 +344,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         }
     }
 
-    public async Task RebuildStateAsync(
+    public async virtual Task RebuildStateAsync(
         CancellationToken ct = default)
     {
         await EnsureLoadedAsync(ct);

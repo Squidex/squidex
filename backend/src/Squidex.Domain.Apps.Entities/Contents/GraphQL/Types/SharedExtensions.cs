@@ -8,9 +8,14 @@
 using GraphQL;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQLParser;
+using GraphQLParser.AST;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Directives;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
@@ -100,12 +105,12 @@ public static class SharedExtensions
 
     internal static FieldType WithSchemaId(this FieldType field, SchemaInfo value)
     {
-        return field.WithMetadata(nameof(SchemaId), value.Schema.Id.ToString());
+        return field.WithMetadata(nameof(SchemaId), value.Schema.Id);
     }
 
-    internal static string SchemaId(this FieldType field)
+    internal static DomainId SchemaId(this FieldType field)
     {
-        return field.GetMetadata<string>(nameof(SchemaId))!;
+        return field.GetMetadata<DomainId>(nameof(SchemaId))!;
     }
 
     internal static FieldType WithSchemaNamedId(this FieldType field, SchemaInfo value)
@@ -118,16 +123,11 @@ public static class SharedExtensions
         return field.GetMetadata<NamedId<DomainId>>(nameof(SchemaNamedId))!;
     }
 
-    internal static IGraphType? Flatten(this QueryArgument type)
-    {
-        return type.ResolvedType?.Flatten();
-    }
-
-    public static IGraphType? Flatten(this IGraphType type)
+    public static IGraphType? InnerType(this IGraphType type)
     {
         if (type is IProvideResolvedType provider)
         {
-            return provider.ResolvedType?.Flatten();
+            return provider.ResolvedType?.InnerType();
         }
 
         return type;
@@ -135,15 +135,151 @@ public static class SharedExtensions
 
     public static TimeSpan CacheDuration(this IResolveFieldContext context)
     {
-        var cacheDirective = context.GetDirective("cache");
+        return CacheDirective.CacheDuration(context);
+    }
 
-        if (cacheDirective != null)
+    public static List<DomainId>? AsIds(this JsonValue value)
+    {
+        try
         {
-            var duration = cacheDirective.GetArgument<int>("duration");
+            List<DomainId>? result = null;
 
-            return TimeSpan.FromSeconds(duration);
+            if (value.Value is JsonArray a)
+            {
+                foreach (var item in a)
+                {
+                    if (item.Value is string id)
+                    {
+                        result ??= new List<DomainId>();
+                        result.Add(DomainId.Create(id));
+                    }
+                }
+            }
+
+            return result;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static bool HasOnlyIdField(this IResolveFieldContext context)
+    {
+        return context.FieldAst.SelectionSet?.Selections.TrueForAll(x => x is GraphQLField field && field.Name == "id") == true;
+    }
+
+    public static HashSet<string>? FieldNames(this IResolveFieldContext context)
+    {
+        if (!OptimizeFieldQueriesDirective.IsApplied(context))
+        {
+            return null;
         }
 
-        return TimeSpan.Zero;
+        return new FieldNameResolver(context.Document, context.Schema).Iterate(context.FieldAst, context.FieldDefinition.ResolvedType);
+    }
+
+    private sealed class FieldNameResolver
+    {
+        private readonly GraphQLDocument document;
+        private readonly ISchema schema;
+        private HashSet<string>? fieldNames = new HashSet<string>();
+        private IComplexGraphType? currentParent;
+
+        public FieldNameResolver(GraphQLDocument document, ISchema schema)
+        {
+            this.document = document;
+            this.schema = schema;
+        }
+
+        public HashSet<string>? Iterate(GraphQLField field, IGraphType? type)
+        {
+            currentParent = ResolveDataParent(type);
+
+            IterateContent(field.SelectionSet);
+            return fieldNames;
+        }
+
+        private void IterateContent(GraphQLSelectionSet? selection)
+        {
+            if (selection == null)
+            {
+                return;
+            }
+
+            foreach (var selectedField in selection.Selections)
+            {
+                switch (selectedField)
+                {
+                    case GraphQLField field when field.Name == "data":
+                        IterateData(field.SelectionSet);
+                        break;
+                    case GraphQLField field when field.Name == "flatData":
+                        IterateData(field.SelectionSet);
+                        break;
+                    case GraphQLField field when field.Name == "data__dynamic":
+                        fieldNames = null;
+                        return;
+                    case GraphQLFragmentSpread spread:
+                        var fragment = document.FindFragmentDefinition(spread.FragmentName.Name);
+
+                        IterateContent(fragment?.SelectionSet);
+                        break;
+
+                    case GraphQLInlineFragment inline when inline.TypeCondition != null:
+                        currentParent = ResolveDataParent(schema.AllTypes.FirstOrDefault(x => x.Name == inline.TypeCondition.Type.Name()));
+
+                        IterateContent(inline.SelectionSet);
+                        break;
+                }
+            }
+        }
+
+        private void IterateData(GraphQLSelectionSet? selection)
+        {
+            if (selection == null)
+            {
+                return;
+            }
+
+            foreach (var selectedField in selection.Selections)
+            {
+                switch (selectedField)
+                {
+                    case GraphQLField field when currentParent != null:
+                        // The GraphQL field might be different from the schema name. Therefore we need the field type.
+                        var fieldType = currentParent.Fields.Find(field.Name.StringValue);
+
+                        if (fieldType != null)
+                        {
+                            // Resolve the schema name from the GraphQL field.
+                            fieldNames?.Add(fieldType.SourceName());
+                        }
+
+                        break;
+                    case GraphQLFragmentSpread spread:
+                        var fragment = document.FindFragmentDefinition(spread.FragmentName.Name);
+
+                        IterateData(fragment?.SelectionSet);
+                        break;
+                }
+            }
+        }
+
+        private static IComplexGraphType? ResolveDataParent(IGraphType? type)
+        {
+            if (type?.InnerType() is not IComplexGraphType complexType)
+            {
+                return null;
+            }
+
+            // We need to resolve the schema names from the GraphQL field name and the flatData type has this information.
+            if (complexType?.Fields.Find("flatData")?.ResolvedType?.InnerType() is not IComplexGraphType dataParent)
+            {
+                return null;
+            }
+
+            return dataParent;
+        }
     }
 }

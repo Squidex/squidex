@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks.Dataflow;
+using Google.Api;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Caching;
@@ -35,6 +36,19 @@ public class Rebuilder
         this.domainObjectFactory = domainObjectFactory;
         this.localCache = localCache;
         this.log = log;
+    }
+
+    public virtual async Task<T> RebuildStateAsync<T, TState>(DomainId id,
+        CancellationToken ct = default)
+        where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+    {
+        var store = serviceProvider.GetRequiredService<IStore<TState>>();
+
+        var domainObject = domainObjectFactory.Create<T, TState>(id, store);
+
+        await domainObject.EnsureLoadedAsync(ct);
+
+        return domainObject;
     }
 
     public virtual Task RebuildAsync<T, TState>(string filter, int batchSize,

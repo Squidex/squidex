@@ -9,22 +9,21 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
 
-public class ContentMappingTests
+public class ContentMappingTests : GivenContext
 {
-    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-
     [Fact]
     public async Task Should_map_content_without_new_version_to_draft()
     {
         var source = CreateContentWithoutNewVersion();
 
         var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
-        var snapshot = await MongoContentEntity.CreateCompleteAsync(snapshotJob, appProvider);
+        var snapshot = await MongoContentEntity.CreateCompleteAsync(snapshotJob, AppProvider, default);
 
         Assert.Equal(source.CurrentVersion.Data, snapshot.Data);
         Assert.Null(snapshot.DraftData);
@@ -43,7 +42,7 @@ public class ContentMappingTests
         var source = CreateContentWithoutNewVersion();
 
         var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
-        var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, appProvider);
+        var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, AppProvider, default);
 
         Assert.Equal(source.CurrentVersion.Data, snapshot.Data);
         Assert.Null(snapshot.DraftData);
@@ -58,7 +57,7 @@ public class ContentMappingTests
         var source = CreateContentWithNewVersion();
 
         var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
-        var snapshot = await MongoContentEntity.CreateCompleteAsync(snapshotJob, appProvider);
+        var snapshot = await MongoContentEntity.CreateCompleteAsync(snapshotJob, AppProvider, default);
 
         Assert.Equal(source.NewVersion?.Data, snapshot.Data);
         Assert.Equal(source.CurrentVersion.Data, snapshot.DraftData);
@@ -77,7 +76,7 @@ public class ContentMappingTests
         var source = CreateContentWithNewVersion();
 
         var snapshotJob = new SnapshotWriteJob<ContentDomainObject.State>(source.UniqueId, source, source.Version);
-        var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, appProvider);
+        var snapshot = await MongoContentEntity.CreatePublishedAsync(snapshotJob, AppProvider, default);
 
         Assert.Equal(source.CurrentVersion?.Data, snapshot.Data);
         Assert.Null(snapshot.DraftData);
@@ -86,10 +85,8 @@ public class ContentMappingTests
         Assert.False(snapshot.IsSnapshot);
     }
 
-    private static ContentDomainObject.State CreateContentWithoutNewVersion()
+    private ContentDomainObject.State CreateContentWithoutNewVersion()
     {
-        var user = RefToken.User("1");
-
         var data =
             new ContentData()
                 .AddField("my-field",
@@ -101,25 +98,23 @@ public class ContentMappingTests
         var state = new ContentDomainObject.State
         {
             Id = DomainId.NewGuid(),
-            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+            AppId = AppId,
             Created = time,
-            CreatedBy = user,
+            CreatedBy = User,
             CurrentVersion = new ContentVersion(Status.Archived, data),
             IsDeleted = true,
             LastModified = time,
-            LastModifiedBy = user,
-            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Published, user, time),
-            SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema"),
+            LastModifiedBy = User,
+            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Published, User, time),
+            SchemaId = SchemaId,
             Version = 42
         };
 
         return state;
     }
 
-    private static ContentDomainObject.State CreateContentWithNewVersion()
+    private ContentDomainObject.State CreateContentWithNewVersion()
     {
-        var user = RefToken.User("1");
-
         var data =
             new ContentData()
                 .AddField("my-field",
@@ -137,16 +132,16 @@ public class ContentMappingTests
         var state = new ContentDomainObject.State
         {
             Id = DomainId.NewGuid(),
-            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
+            AppId = AppId,
             Created = time,
-            CreatedBy = user,
+            CreatedBy = User,
             CurrentVersion = new ContentVersion(Status.Archived, data),
             IsDeleted = true,
             LastModified = time,
-            LastModifiedBy = user,
+            LastModifiedBy = User,
             NewVersion = new ContentVersion(Status.Published, newData),
-            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Published, user, time),
-            SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema"),
+            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Published, User, time),
+            SchemaId = SchemaId,
             Version = 42
         };
 

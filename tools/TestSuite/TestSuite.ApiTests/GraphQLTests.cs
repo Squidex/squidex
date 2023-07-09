@@ -336,13 +336,14 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         Assert.Equal(new string[]
         {
             "Auth-State",
+            "X-Fields",
             "X-Flatten",
             "X-Languages",
             "X-NoCleanup",
             "X-NoEnrichment",
             "X-NoResolveLanguages",
-            "X-Resolve-Urls",
             "X-ResolveFlow",
+            "X-ResolveUrls",
             "X-Unpublished"
         }, response.Headers.Vary.Order().ToArray());
     }

@@ -25,7 +25,7 @@ public sealed class AlwaysAddScopeHandler : IOpenIddictServerHandler<ProcessSign
         {
             var scopes = context.AccessTokenPrincipal?.GetScopes() ?? ImmutableArray<string>.Empty;
 
-            context.Response.Scope = string.Join(" ", scopes);
+            context.Response.Scope = string.Join(' ', scopes);
         }
 
         return default;

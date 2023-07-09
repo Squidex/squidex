@@ -7,6 +7,7 @@
 
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
@@ -79,7 +80,7 @@ internal sealed class ApplicationQueries : ObjectGraphType
     {
         var unionType = builder.GetContentUnion("AllContents", null);
 
-        if (!unionType.HasType)
+        if (unionType.SchemaTypes.Count == 0)
         {
             return;
         }

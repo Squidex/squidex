@@ -20,6 +20,6 @@ public sealed class DefaultBackupHandlerFactory : IBackupHandlerFactory
 
     public IEnumerable<IBackupHandler> CreateMany()
     {
-        return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>();
+        return serviceProvider.GetRequiredService<IEnumerable<IBackupHandler>>().OrderBy(x => x.Order);
     }
 }

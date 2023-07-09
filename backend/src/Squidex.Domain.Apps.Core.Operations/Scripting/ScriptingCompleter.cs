@@ -464,11 +464,6 @@ public sealed class ScriptingCompleter
             Add(JsonType.Function, name, description);
         }
 
-        private void AddObject(string? name, string? description)
-        {
-            Add(JsonType.Object, name, description);
-        }
-
         private void AddString(string? name, string? description)
         {
             Add(JsonType.String, name, description);

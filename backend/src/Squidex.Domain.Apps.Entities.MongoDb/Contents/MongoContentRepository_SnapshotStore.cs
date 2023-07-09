@@ -133,13 +133,13 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
                 if (isValid && ShouldWritePublished(job.Value))
                 {
                     await collectionPublished.AddCollectionsAsync(
-                        await MongoContentEntity.CreatePublishedAsync(job, appProvider), add, ct);
+                        await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct), add, ct);
                 }
 
                 if (isValid)
                 {
                     await collectionComplete.AddCollectionsAsync(
-                        await MongoContentEntity.CreateCompleteAsync(job, appProvider), add, ct);
+                        await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct), add, ct);
                 }
             }
 
@@ -163,7 +163,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
     {
         if (ShouldWritePublished(job.Value))
         {
-            var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
+            var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct));
 
             await collectionPublished.UpsertAsync(entityJob, ct);
         }
@@ -178,7 +178,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
     {
         if (ShouldWritePublished(job.Value))
         {
-            var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider));
+            var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct));
 
             await collectionPublished.UpsertVersionedAsync(session, entityJob, ct);
         }
@@ -191,7 +191,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
     private async Task UpsertCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
         CancellationToken ct)
     {
-        var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider));
+        var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct));
 
         await collectionComplete.UpsertAsync(entityJob, ct);
     }
@@ -199,7 +199,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
     private async Task UpsertVersionedCompleteAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
         CancellationToken ct)
     {
-        var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider));
+        var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct));
 
         await collectionComplete.UpsertVersionedAsync(session, entityJob, ct);
     }

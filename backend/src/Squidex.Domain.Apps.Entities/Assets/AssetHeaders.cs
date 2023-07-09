@@ -9,15 +9,15 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public static class AssetHeaders
 {
-    public const string HeaderNoEnrichment = "X-NoAssetEnrichment";
+    public const string NoEnrichment = "X-NoAssetEnrichment";
 
     public static bool ShouldSkipAssetEnrichment(this Context context)
     {
-        return context.Headers.ContainsKey(HeaderNoEnrichment);
+        return context.Headers.ContainsKey(NoEnrichment);
     }
 
     public static ICloneBuilder WithoutAssetEnrichment(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(HeaderNoEnrichment, value);
+        return builder.WithBoolean(NoEnrichment, value);
     }
 }

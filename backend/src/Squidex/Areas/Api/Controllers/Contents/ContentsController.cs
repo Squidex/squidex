@@ -79,11 +79,12 @@ public sealed class ContentsController : ApiController
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [AcceptQuery(true)]
-    [AcceptHeader_Flatten]
-    [AcceptHeader_Languages]
-    [AcceptHeader_NoSlowTotal]
-    [AcceptHeader_NoTotal]
-    [AcceptHeader_Unpublished]
+    [AcceptHeader.Fields]
+    [AcceptHeader.Flatten]
+    [AcceptHeader.Languages]
+    [AcceptHeader.NoSlowTotal]
+    [AcceptHeader.NoTotal]
+    [AcceptHeader.Unpublished]
     public async Task<IActionResult> GetContents(string app, string schema, [FromQuery] string? ids = null, [FromQuery] string? q = null)
     {
         var contents = await contentQuery.QueryAsync(Context, schema, CreateQuery(ids, q), HttpContext.RequestAborted);
@@ -112,11 +113,12 @@ public sealed class ContentsController : ApiController
     [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
-    [AcceptHeader_Flatten]
-    [AcceptHeader_Languages]
-    [AcceptHeader_NoSlowTotal]
-    [AcceptHeader_NoTotal]
-    [AcceptHeader_Unpublished]
+    [AcceptHeader.Fields]
+    [AcceptHeader.Flatten]
+    [AcceptHeader.Languages]
+    [AcceptHeader.NoSlowTotal]
+    [AcceptHeader.NoTotal]
+    [AcceptHeader.Unpublished]
     public async Task<IActionResult> GetContentsPost(string app, string schema, [FromBody] QueryDto query)
     {
         var contents = await contentQuery.QueryAsync(Context, schema, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
@@ -146,9 +148,10 @@ public sealed class ContentsController : ApiController
     [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
-    [AcceptHeader_Flatten]
-    [AcceptHeader_Languages]
-    [AcceptHeader_Unpublished]
+    [AcceptHeader.Fields]
+    [AcceptHeader.Flatten]
+    [AcceptHeader.Languages]
+    [AcceptHeader.Unpublished]
     public async Task<IActionResult> GetContent(string app, string schema, DomainId id, long version = EtagVersion.Any)
     {
         var content = await contentQuery.FindAsync(Context, schema, id, version, HttpContext.RequestAborted);
@@ -209,11 +212,12 @@ public sealed class ContentsController : ApiController
     [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
-    [AcceptHeader_Flatten]
-    [AcceptHeader_Languages]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_NoSlowTotal]
-    [AcceptHeader_NoTotal]
+    [AcceptHeader.Fields]
+    [AcceptHeader.Flatten]
+    [AcceptHeader.Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.NoSlowTotal]
+    [AcceptHeader.NoTotal]
     public async Task<IActionResult> GetReferences(string app, string schema, DomainId id, [FromQuery] string? q = null)
     {
         var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReferencing(id), HttpContext.RequestAborted);
@@ -243,11 +247,12 @@ public sealed class ContentsController : ApiController
     [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
-    [AcceptHeader_Flatten]
-    [AcceptHeader_Languages]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_NoSlowTotal]
-    [AcceptHeader_NoTotal]
+    [AcceptHeader.Fields]
+    [AcceptHeader.Flatten]
+    [AcceptHeader.Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.NoSlowTotal]
+    [AcceptHeader.NoTotal]
     public async Task<IActionResult> GetReferencing(string app, string schema, DomainId id, [FromQuery] string? q = null)
     {
         var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReference(id), HttpContext.RequestAborted);
@@ -276,8 +281,8 @@ public sealed class ContentsController : ApiController
     [Route("content/{app}/{schema}/{id}/{version}/")]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsReadOwn)]
     [ApiCosts(1)]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
     [Obsolete("Use ID endpoint with version query.")]
     public async Task<IActionResult> GetContentVersion(string app, string schema, DomainId id, int version)
     {
@@ -312,8 +317,8 @@ public sealed class ContentsController : ApiController
     [Route("content/{app}/{schema}/")]
     [ProducesResponseType(typeof(ContentDto), StatusCodes.Status201Created)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsCreate)]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
     [ApiCosts(1)]
     public async Task<IActionResult> PostContent(string app, string schema, CreateContentDto request)
     {
@@ -400,8 +405,8 @@ public sealed class ContentsController : ApiController
     [Route("content/{app}/{schema}/{id}/")]
     [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsUpsert)]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
     [ApiCosts(1)]
     public async Task<IActionResult> PostUpsertContent(string app, string schema, DomainId id, UpsertContentDto request)
     {
@@ -429,8 +434,8 @@ public sealed class ContentsController : ApiController
     [Route("content/{app}/{schema}/{id}/")]
     [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsUpdateOwn)]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
     [ApiCosts(1)]
     public async Task<IActionResult> PutContent(string app, string schema, DomainId id, [FromBody] ContentData request)
     {
@@ -458,8 +463,8 @@ public sealed class ContentsController : ApiController
     [Route("content/{app}/{schema}/{id}/")]
     [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsUpdateOwn)]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
     [ApiCosts(1)]
     public async Task<IActionResult> PatchContent(string app, string schema, DomainId id, [FromBody] ContentData request)
     {
@@ -487,8 +492,8 @@ public sealed class ContentsController : ApiController
     [Route("content/{app}/{schema}/{id}/status/")]
     [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsChangeStatusOwn)]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
     [ApiCosts(1)]
     public async Task<IActionResult> PutContentStatus(string app, string schema, DomainId id, [FromBody] ChangeStatusDto request)
     {
@@ -515,8 +520,8 @@ public sealed class ContentsController : ApiController
     [Route("content/{app}/{schema}/{id}/status/")]
     [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsChangeStatusOwn)]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
     [ApiCosts(1)]
     public async Task<IActionResult> DeleteContentStatus(string app, string schema, DomainId id)
     {
@@ -542,8 +547,8 @@ public sealed class ContentsController : ApiController
     [Route("content/{app}/{schema}/{id}/draft/")]
     [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsVersionCreateOwn)]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
     [ApiCosts(1)]
     public async Task<IActionResult> CreateDraft(string app, string schema, DomainId id)
     {
@@ -569,8 +574,8 @@ public sealed class ContentsController : ApiController
     [Route("content/{app}/{schema}/{id}/draft/")]
     [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsVersionDeleteOwn)]
-    [AcceptHeader_Unpublished]
-    [AcceptHeader_Languages]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
     [ApiCosts(1)]
     public async Task<IActionResult> DeleteVersion(string app, string schema, DomainId id)
     {

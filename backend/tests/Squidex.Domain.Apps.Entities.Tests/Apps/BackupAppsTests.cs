@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Assets;
-using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -25,11 +24,12 @@ public class BackupAppsTests : GivenContext
     private readonly IAppsIndex appsIndex = A.Fake<IAppsIndex>();
     private readonly IAppUISettings appUISettings = A.Fake<IAppUISettings>();
     private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
+    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly BackupApps sut;
 
     public BackupAppsTests()
     {
-        sut = new BackupApps(rebuilder, appImageStore, appsIndex, appUISettings);
+        sut = new BackupApps(rebuilder, appImageStore, appProvider, appsIndex, appUISettings);
     }
 
     [Fact]
@@ -58,7 +58,16 @@ public class BackupAppsTests : GivenContext
     [Fact]
     public async Task Should_complete_reservation_with_previous_token()
     {
+        var appObject = A.Fake<AppDomainObject>();
+        var appState = new AppDomainObject.State();
+
         var context = CreateRestoreContext();
+
+        A.CallTo(() => appObject.Snapshot)
+            .Returns(appState);
+
+        A.CallTo(() => rebuilder.RebuildStateAsync<AppDomainObject, AppDomainObject.State>(context.AppId, CancellationToken))
+            .Returns(appObject);
 
         A.CallTo(() => appsIndex.ReserveAsync(AppId.Id, AppId.Name, CancellationToken))
             .Returns("Reservation");
@@ -68,12 +77,13 @@ public class BackupAppsTests : GivenContext
             Name = AppId.Name
         }), context, CancellationToken);
 
+        await sut.RestoreAsync(context, CancellationToken);
         await sut.CompleteRestoreAsync(context, AppId.Name);
 
         A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", default))
             .MustHaveHappened();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(A<IEnumerable<DomainId>>.That.Is(AppId.Id), 1, default))
+        A.CallTo(() => appObject.RebuildStateAsync(default))
             .MustHaveHappened();
     }
 
@@ -134,6 +144,26 @@ public class BackupAppsTests : GivenContext
         await sut.BackupAsync(context, CancellationToken);
 
         A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, settings, CancellationToken))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_register_app_to_provider()
+    {
+        var appObject = A.Fake<AppDomainObject>();
+        var appState = new AppDomainObject.State();
+
+        var context = CreateRestoreContext();
+
+        A.CallTo(() => appObject.Snapshot)
+            .Returns(appState);
+
+        A.CallTo(() => rebuilder.RebuildStateAsync<AppDomainObject, AppDomainObject.State>(context.AppId, CancellationToken))
+            .Returns(appObject);
+
+        await sut.RestoreAsync(context, CancellationToken);
+
+        A.CallTo(() => appProvider.RegisterAppForLocalContext(context.AppId, appObject.Snapshot))
             .MustHaveHappened();
     }
 

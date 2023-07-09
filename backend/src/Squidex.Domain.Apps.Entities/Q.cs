@@ -20,6 +20,8 @@ public record Q
 
     public IReadOnlyList<DomainId>? Ids { get; init; }
 
+    public IReadOnlySet<string>? Fields { get; init; }
+
     public DomainId Referencing { get; init; }
 
     public DomainId Reference { get; init; }
@@ -91,14 +93,29 @@ public record Q
         return this with { Ids = ids?.ToList() };
     }
 
-    public Q WithIds(IEnumerable<DomainId> ids)
+    public Q WithIds(IEnumerable<DomainId>? ids)
     {
         return this with { Ids = ids?.ToList() };
+    }
+
+    public Q WithFields(params string[] fields)
+    {
+        return this with { Fields = fields?.ToHashSet() };
+    }
+
+    public Q WithFields(IEnumerable<string>? fields)
+    {
+        return this with { Fields = fields?.ToHashSet() };
     }
 
     public Q WithSchedule(Instant from, Instant to)
     {
         return this with { ScheduledFrom = from, ScheduledTo = to };
+    }
+
+    public Q WithFields(string? fields)
+    {
+        return this with { Fields = fields?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToHashSet() };
     }
 
     public Q WithIds(string? ids)
@@ -110,9 +127,9 @@ public record Q
 
         var idsList = new List<DomainId>();
 
-        if (!string.IsNullOrEmpty(ids))
+        if (ids.Length > 0)
         {
-            foreach (var id in ids.Split(','))
+            foreach (var id in ids.Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 idsList.Add(DomainId.Create(id));
             }

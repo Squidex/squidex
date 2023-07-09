@@ -50,7 +50,7 @@ internal sealed class EmbeddableStringGraphType : ObjectGraphType<string>
         {
             var union = builder.GetContentUnion(fieldInfo.UnionReferenceType, schemaIds);
 
-            if (!union.HasType)
+            if (union.SchemaTypes.Count == 0)
             {
                 return default;
             }

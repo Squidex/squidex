@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using GraphQL;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -23,5 +24,19 @@ public sealed class CacheDirective : Directive
             Description = "Cache duration in seconds.",
             DefaultValue = 600
         });
+    }
+
+    public static TimeSpan CacheDuration(IResolveFieldContext context)
+    {
+        var cacheDirective = context.GetDirective("cache");
+
+        if (cacheDirective != null)
+        {
+            var duration = cacheDirective.GetArgument<int>("duration");
+
+            return TimeSpan.FromSeconds(duration);
+        }
+
+        return TimeSpan.Zero;
     }
 }

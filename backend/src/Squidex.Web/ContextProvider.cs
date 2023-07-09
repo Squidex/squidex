@@ -21,10 +21,7 @@ public sealed class ContextProvider : IContextProvider
         {
             if (httpContextAccessor.HttpContext == null)
             {
-                if (asyncLocal.Value == null)
-                {
-                    asyncLocal.Value = Context.Anonymous(null!);
-                }
+                asyncLocal.Value ??= Context.Anonymous(null!);
 
                 return asyncLocal.Value;
             }

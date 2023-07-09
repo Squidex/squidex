@@ -13,7 +13,7 @@ public sealed record SortNode(PropertyPath Path, SortOrder Order)
 {
     public override string ToString()
     {
-        var path = string.Join(".", Path);
+        var path = string.Join('.', Path);
 
         return $"{path} {Order}";
     }

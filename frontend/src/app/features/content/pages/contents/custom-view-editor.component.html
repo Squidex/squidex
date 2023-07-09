@@ -17,7 +17,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" checked (click)="removeField(field)" id="field_{{field}}" [disabled]="!field">
                 <label class="form-check-label" for="field_{{field}}">
-                    {{field.label | sqxTranslate}} ({{field.name}})
+                    {{(field.title || field.label) | sqxTranslate}}: <code>{{field.name}}</code>
                 </label>
             </div>
         </div>
@@ -33,7 +33,7 @@
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" (click)="addField(field)" id="field_{{field}}">
                     <label class="form-check-label" for="field_{{field}}">
-                        {{field.label | sqxTranslate}} ({{field.name}})
+                        {{(field.title || field.label) | sqxTranslate}}: <code>{{field.name}}</code>
                     </label>
                 </div>
             </div>

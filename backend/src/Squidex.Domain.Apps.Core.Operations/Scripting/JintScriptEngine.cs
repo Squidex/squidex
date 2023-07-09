@@ -53,10 +53,10 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
             combined.CancelAfter(timeoutExecution);
 
             var context =
-                CreateEngine<JsonValue?>(options, combined.Token)
-                    .Extend(vars, options)
-                    .Extend(extensions)
-                    .ExtendAsync(extensions);
+                CreateEngine<JsonValue>(options, combined.Token)
+                    .ExtendWithVariables(vars, options)
+                    .ExtendWithFunctions(extensions)
+                    .ExtendWithAsyncFunctions(extensions);
 
             context.Engine.SetValue("complete", new Action<JsValue?>(value =>
             {
@@ -65,7 +65,7 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
             var result = Execute(context, script);
 
-            return await context.CompleteAsync() ?? JsonMapper.Map(result);
+            return await context.WaitForCompletionAsync(() => JsonMapper.Map(result));
         }
         catch (Exception ex)
         {
@@ -79,6 +79,8 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
         Guard.NotNull(vars);
         Guard.NotNullOrEmpty(script);
 
+        var data = vars.Data!;
+
         using var combined = CancellationTokenSource.CreateLinkedTokenSource(ct);
         try
         {
@@ -87,13 +89,13 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
             var context =
                     CreateEngine<ContentData>(options, combined.Token)
-                        .Extend(vars, options)
-                        .Extend(extensions)
-                        .ExtendAsync(extensions);
+                        .ExtendWithVariables(vars, options)
+                        .ExtendWithFunctions(extensions)
+                        .ExtendWithAsyncFunctions(extensions);
 
             context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
             {
-                context.Complete(vars.Data!);
+                context.Complete(data!);
             }));
 
             context.Engine.SetValue("replace", new Action(() =>
@@ -111,7 +113,7 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
             Execute(context, script);
 
-            return await context.CompleteAsync() ?? vars.Data!;
+            return await context.WaitForCompletionAsync(() => data);
         }
         catch (Exception ex)
         {
@@ -128,8 +130,8 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
         {
             var context =
                 CreateEngine<object>(options, default)
-                    .Extend(vars, options)
-                    .Extend(extensions);
+                    .ExtendWithVariables(vars, options)
+                    .ExtendWithFunctions(extensions);
 
             var result = Execute(context, script);
 

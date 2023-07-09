@@ -58,7 +58,7 @@ public class Query<TValue>
         if (FullText != null)
         {
             sb.AppendIfNotEmpty("; ");
-            sb.Append($"FullText: '{FullText.Replace("'", "\'", StringComparison.Ordinal)}'");
+            sb.Append($"FullText: '{FullText.Replace('\'', '\'')}'");
         }
 
         if (Skip > 0)

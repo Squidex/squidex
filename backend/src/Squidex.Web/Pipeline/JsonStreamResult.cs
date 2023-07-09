@@ -57,9 +57,7 @@ public sealed class JsonStreamResult<T> : ActionResult
     private static void DisableResponseBuffering(HttpContext context)
     {
         var bufferingFeature = context.Features.Get<IHttpResponseBodyFeature>();
-        if (bufferingFeature != null)
-        {
-            bufferingFeature.DisableBuffering();
-        }
+
+        bufferingFeature?.DisableBuffering();
     }
 }

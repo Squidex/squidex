@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
@@ -17,6 +18,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 
 public static class Extensions
 {
+    private static Dictionary<string, string> propertyMap;
+
+    public static IReadOnlyDictionary<string, string> PropertyMap
+    {
+        get => propertyMap ??=
+            BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).AllMemberMaps
+                .Where(x =>
+                    x.MemberName != nameof(MongoContentEntity.DraftData) &&
+                    x.MemberName != nameof(MongoContentEntity.Data))
+                .ToDictionary(
+                    x => x.MemberName,
+                    x => x.ElementName,
+                    StringComparer.OrdinalIgnoreCase);
+    }
+
     public sealed class StatusOnly
     {
         [BsonId]
@@ -56,7 +72,7 @@ public static class Extensions
             query.Sort[1].Order == SortOrder.Ascending;
     }
 
-    public static async Task<List<MongoContentEntity>> QueryContentsAsync(this IMongoCollection<MongoContentEntity> collection, FilterDefinition<MongoContentEntity> filter, ClrQuery query,
+    public static async Task<List<MongoContentEntity>> QueryContentsAsync(this IMongoCollection<MongoContentEntity> collection, FilterDefinition<MongoContentEntity> filter, ClrQuery query, Q q,
         CancellationToken ct)
     {
         if (query.Skip > 0 && !query.IsSatisfiedByIndex())
@@ -98,6 +114,7 @@ public static class Extensions
                     .QuerySkip(query)
                     .QueryLimit(query)
                     .Lookup<IdOnly, MongoContentEntity, IdOnly>(collection, x => x.Id, x => x.DocumentId, x => x.Joined)
+                    .SelectFields(q.Fields)
                     .ToListAsync(ct);
 
             return joined.Select(x => x.Joined[0]).ToList();
@@ -108,6 +125,7 @@ public static class Extensions
                 .QuerySort(query)
                 .QuerySkip(query)
                 .QueryLimit(query)
+                .SelectFields(q.Fields)
                 .ToListRandomAsync(collection, query.Random, ct);
 
         return await result;
@@ -125,5 +143,42 @@ public static class Extensions
                 .Include(x => x.IndexedSchemaId)
                 .Include(x => x.Status))
             .ToListAsync(ct);
+    }
+
+    public static IFindFluent<T, T> SelectFields<T>(this IFindFluent<T, T> find, IEnumerable<string>? fields)
+    {
+        return find.Project<T>(BuildProjection<T>(fields));
+    }
+
+    public static IAggregateFluent<T> SelectFields<T>(this IAggregateFluent<T> find, IEnumerable<string>? fields)
+    {
+        return find.Project<T>(BuildProjection<T>(fields));
+    }
+
+    private static ProjectionDefinition<T> BuildProjection<T>(IEnumerable<string>? fields)
+    {
+        var projector = Builders<T>.Projection;
+        var projections = new List<ProjectionDefinition<T>>();
+
+        if (fields?.Any() == true)
+        {
+            var dataField = Field.Of<MongoContentEntity>(x => nameof(x.Data));
+
+            foreach (var field in fields)
+            {
+                projections.Add(projector.Include($"{dataField}.{field}"));
+            }
+
+            foreach (var field in PropertyMap.Values)
+            {
+                projections.Add(projector.Include(field));
+            }
+        }
+        else
+        {
+            projections.Add(projector.Exclude(Field.Of<MongoContentEntity>(x => nameof(x.DraftData))));
+        }
+
+        return projector.Combine(projections);
     }
 }

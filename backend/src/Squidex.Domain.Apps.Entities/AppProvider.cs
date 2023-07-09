@@ -213,6 +213,11 @@ public sealed class AppProvider : IAppProvider
         return rules.Find(x => x.Id == id);
     }
 
+    public void RegisterAppForLocalContext(DomainId appId, IAppEntity app)
+    {
+        localCache.Add(AppCacheKey(appId), app);
+    }
+
     public async Task<T?> GetOrCreate<T>(object key, Func<Task<T?>> creator) where T : class
     {
         if (localCache.TryGetValue(key, out var value))

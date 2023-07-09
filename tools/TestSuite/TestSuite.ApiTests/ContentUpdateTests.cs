@@ -733,7 +733,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
                 await _.Contents.UpdateAsync(content.Id, new TestEntityData
                 {
                     Number = i
-                });
+                }, ct: ct);
             }
             catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
             {
@@ -771,7 +771,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
                 await _.Contents.UpsertAsync(content.Id, new TestEntityData
                 {
                     Number = i
-                });
+                }, ct: ct);
             }
             catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
             {

@@ -227,7 +227,7 @@ public static class Strategies
         }
     }
 
-    private class MyContent : Content<object>
+    private sealed class MyContent : Content<object>
     {
     }
 }

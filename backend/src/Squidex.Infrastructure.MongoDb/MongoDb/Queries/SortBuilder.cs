@@ -33,7 +33,7 @@ public static class SortBuilder
 
     public static SortDefinition<T> OrderBy<T>(SortNode sort)
     {
-        var propertyName = string.Join(".", sort.Path);
+        var propertyName = string.Join('.', sort.Path);
 
         if (sort.Order == SortOrder.Ascending)
         {

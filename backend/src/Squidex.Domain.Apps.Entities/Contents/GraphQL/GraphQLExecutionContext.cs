@@ -9,8 +9,9 @@ using GraphQL.DataLoader;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Users;
+
+#pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
@@ -36,7 +37,8 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
 
         Context = context.Clone(b => b
             .WithoutCleanup()
-            .WithoutContentEnrichment());
+            .WithoutContentEnrichment()
+            .WithoutAssetEnrichment());
     }
 
     public async ValueTask<IUser?> FindUserAsync(RefToken refToken,
@@ -54,35 +56,22 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         }
     }
 
-    public async Task<IEnrichedAssetEntity?> FindAssetAsync(DomainId id,
+    public async Task<IEnrichedAssetEntity?> GetAssetAsync(DomainId id, TimeSpan cacheDuration,
         CancellationToken ct)
     {
-        var dataLoader = GetAssetsLoader();
+        var assets = await GetAssetsAsync(new List<DomainId> { id }, cacheDuration, ct);
+        var asset = assets.FirstOrDefault();
 
-        return await dataLoader.LoadAsync(id).GetResultAsync(ct);
+        return asset;
     }
 
-    public async Task<IContentEntity?> FindContentAsync(DomainId schemaId, DomainId id,
+    public async Task<IEnrichedContentEntity?> GetContentAsync(DomainId schemaId, DomainId id, HashSet<string>? fields, TimeSpan cacheDuration,
         CancellationToken ct)
     {
-        var dataLoader = GetContentsLoader();
-
-        var content = await dataLoader.LoadAsync(id).GetResultAsync(ct);
-
-        if (content?.SchemaId.Id != schemaId)
-        {
-            content = null;
-        }
+        var contents = await GetContentsAsync(new List<DomainId> { id }, fields, cacheDuration, ct);
+        var content = contents.FirstOrDefault(x => x.SchemaId.Id == schemaId);
 
         return content;
-    }
-
-    public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(JsonValue value, TimeSpan cacheDuration,
-        CancellationToken ct)
-    {
-        var ids = ParseIds(value);
-
-        return GetAssetsAsync(ids, cacheDuration, ct);
     }
 
     public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetAssetsAsync(List<DomainId>? ids, TimeSpan cacheDuration,
@@ -113,15 +102,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return await LoadAsync(ids);
     }
 
-    public Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(JsonValue value, TimeSpan cacheDuration,
-        CancellationToken ct)
-    {
-        var ids = ParseIds(value);
-
-        return GetContentsAsync(ids, cacheDuration, ct);
-    }
-
-    public async Task<IReadOnlyList<IEnrichedContentEntity>> GetContentsAsync(List<DomainId>? ids, TimeSpan cacheDuration,
+    public async Task<IReadOnlyList<IEnrichedContentEntity>> GetContentsAsync(List<DomainId>? ids, HashSet<string>? fields, TimeSpan cacheDuration,
         CancellationToken ct)
     {
         if (ids == null || ids.Count == 0)
@@ -129,24 +110,23 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
             return EmptyContents;
         }
 
-        async Task<IReadOnlyList<IEnrichedContentEntity>> LoadAsync(IEnumerable<DomainId> ids)
-        {
-            var result = await GetContentsLoader().LoadAsync(ids).GetResultAsync(ct);
-
-            return result?.NotNull().ToList() ?? EmptyContents;
-        }
-
-        if (cacheDuration > TimeSpan.Zero)
+        if (cacheDuration > TimeSpan.Zero || fields == null)
         {
             var contents = await ContentCache.CacheOrQueryAsync(ids, async pendingIds =>
             {
-                return await LoadAsync(pendingIds);
+                var result = await GetContentsLoader().LoadAsync(ids).GetResultAsync(ct);
+
+                return result?.NotNull().ToList() ?? EmptyContents;
             }, cacheDuration);
 
             return contents.ToList();
         }
+        else
+        {
+            var contents = await GetContentsLoaderWithFields().LoadAsync(ids.Select(x => (x, fields))).GetResultAsync(ct);
 
-        return await LoadAsync(ids);
+            return contents?.NotNull().ToList() ?? EmptyContents;
+        }
     }
 
     private IDataLoader<DomainId, IEnrichedAssetEntity> GetAssetsLoader()
@@ -165,9 +145,22 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return dataLoaders.Context!.GetOrAddBatchLoader<DomainId, IEnrichedContentEntity>(nameof(GetContentsLoader),
             async (batch, ct) =>
             {
-                var result = await QueryContentsByIdsAsync(new List<DomainId>(batch), ct);
+                var result = await QueryContentsByIdsAsync(batch, null, ct);
 
                 return result.ToDictionary(x => x.Id);
+            });
+    }
+
+    private IDataLoader<(DomainId Id, HashSet<string> Fields), IEnrichedContentEntity> GetContentsLoaderWithFields()
+    {
+        return dataLoaders.Context!.GetOrAddBatchLoader<(DomainId Id, HashSet<string> Fields), IEnrichedContentEntity>(nameof(GetContentsLoader),
+            async (batch, ct) =>
+            {
+                var fields = batch.SelectMany(x => x.Fields).ToHashSet();
+
+                var result = await QueryContentsByIdsAsync(batch.Select(x => x.Id), fields, ct);
+
+                return result.ToDictionary(x => (x.Id, fields));
             });
     }
 
@@ -180,31 +173,5 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
 
                 return result;
             });
-    }
-
-    private static List<DomainId>? ParseIds(JsonValue value)
-    {
-        try
-        {
-            List<DomainId>? result = null;
-
-            if (value.Value is JsonArray a)
-            {
-                foreach (var item in a)
-                {
-                    if (item.Value is string id)
-                    {
-                        result ??= new List<DomainId>();
-                        result.Add(DomainId.Create(id));
-                    }
-                }
-            }
-
-            return result;
-        }
-        catch
-        {
-            return null;
-        }
     }
 }

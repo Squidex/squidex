@@ -15,7 +15,8 @@ internal sealed class ContentUnionGraphType : UnionGraphType
 {
     private readonly Dictionary<DomainId, IObjectGraphType> types = new Dictionary<DomainId, IObjectGraphType>();
 
-    public bool HasType => types.Count > 0;
+    // We need the schema identity at runtime.
+    public IReadOnlyDictionary<DomainId, IObjectGraphType> SchemaTypes => types;
 
     public ContentUnionGraphType(Builder builder, string name, ReadonlyList<DomainId>? schemaIds)
     {
@@ -42,7 +43,7 @@ internal sealed class ContentUnionGraphType : UnionGraphType
             }
         }
 
-        if (HasType)
+        if (SchemaTypes.Count > 0)
         {
             foreach (var type in types)
             {

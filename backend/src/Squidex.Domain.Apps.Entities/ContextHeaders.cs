@@ -9,10 +9,10 @@ namespace Squidex.Domain.Apps.Entities;
 
 public static class ContextHeaders
 {
-    public const string NoTotal = "X-NoTotal";
-    public const string NoSlowTotal = "X-NoSlowTotal";
     public const string NoCacheKeys = "X-NoCacheKeys";
     public const string NoScripting = "X-NoScripting";
+    public const string NoSlowTotal = "X-NoSlowTotal";
+    public const string NoTotal = "X-NoTotal";
 
     public static bool ShouldSkipCacheKeys(this Context context)
     {
@@ -72,7 +72,7 @@ public static class ContextHeaders
     {
         if (values?.Any() == true)
         {
-            builder.SetHeader(key, string.Join(",", values));
+            builder.SetHeader(key, string.Join(',', values));
         }
         else
         {
