@@ -342,8 +342,8 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
             "X-NoCleanup",
             "X-NoEnrichment",
             "X-NoResolveLanguages",
-            "X-ResolveUrls",
             "X-ResolveFlow",
+            "X-ResolveUrls",
             "X-Unpublished"
         }, response.Headers.Vary.Order().ToArray());
     }
