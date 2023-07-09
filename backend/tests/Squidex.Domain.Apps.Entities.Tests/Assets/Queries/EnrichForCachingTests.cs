@@ -41,7 +41,7 @@ public class EnrichForCachingTests : GivenContext
             "X-NoEnrichment",
             "X-NoResolveLanguages",
             "X-ResolveFlow",
-            "X-Resolve-Urls",
+            "X-ResolveUrls",
             "X-Unpublished"
         }, headers);
     }
