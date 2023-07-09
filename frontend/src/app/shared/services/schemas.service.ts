@@ -171,7 +171,7 @@ export class SchemaDto {
         function tableField(rootField: RootFieldDto) {
             const label = rootField.displayName;
 
-            return { name: rootField.name, label, title: label, rootField };
+            return { name: rootField.name, label, rootField };
         }
 
         if (fields) {
