@@ -118,6 +118,7 @@ public sealed class BackupApps : IBackupHandler
     {
         app = await rebuilder.RebuildStateAsync<AppDomainObject, AppDomainObject.State>(context.AppId, ct);
 
+        // The app is only available in the context of the restore, so there is nothing to clear.
         appProvider.RegisterAppForLocalContext(context.AppId, app!.Snapshot);
     }
 
@@ -159,6 +160,7 @@ public sealed class BackupApps : IBackupHandler
     {
         try
         {
+            // Ignore errors when writing assets, because they are not that relevant.
             await using (var stream = await writer.OpenBlobAsync(AvatarFile, ct))
             {
                 await appImageStore.DownloadAsync(appId, stream, ct);
@@ -174,6 +176,7 @@ public sealed class BackupApps : IBackupHandler
     {
         try
         {
+            // Ignore errors when writing assets, because they are not that relevant.
             await using (var stream = await reader.OpenBlobAsync(AvatarFile, ct))
             {
                 await appImageStore.UploadAsync(appId, stream, ct);
