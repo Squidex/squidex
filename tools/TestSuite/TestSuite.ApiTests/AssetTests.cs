@@ -352,7 +352,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                     }
                 };
 
-                await _.Client.Assets.PutAssetAsync(asset_1.Id, randomMetadataRequest);
+                await _.Client.Assets.PutAssetAsync(asset_1.Id, randomMetadataRequest, ct);
             }
             catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
             {

@@ -115,8 +115,8 @@ public sealed class AssetsController : ApiController
     [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
     [ApiCosts(1)]
     [AcceptQuery(false)]
-    [AcceptHeader_NoTotal]
-    [AcceptHeader_NoSlowTotal]
+    [AcceptHeader.NoTotal]
+    [AcceptHeader.NoSlowTotal]
     public async Task<IActionResult> GetAssets(string app, [FromQuery] DomainId? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
     {
         var assets = await assetQuery.QueryAsync(Context, parentId, CreateQuery(ids, q), HttpContext.RequestAborted);
@@ -144,8 +144,8 @@ public sealed class AssetsController : ApiController
     [ProducesResponseType(typeof(AssetsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppAssetsRead)]
     [ApiCosts(1)]
-    [AcceptHeader_NoTotal]
-    [AcceptHeader_NoSlowTotal]
+    [AcceptHeader.NoTotal]
+    [AcceptHeader.NoSlowTotal]
     public async Task<IActionResult> GetAssetsPost(string app, [FromBody] QueryDto query)
     {
         var assets = await assetQuery.QueryAsync(Context, query?.ParentId, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);

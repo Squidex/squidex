@@ -170,13 +170,12 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
 
         // Fallback language must be removed.
         Assert.Empty(language_2_IT.Fallback);
-
         Assert.Equal(new string[] { "en", "it" }, languages_2.Items.Select(x => x.Iso2Code).ToArray());
 
         await Verify(languages_2);
     }
 
-    private async Task AddLanguageAsync(ISquidexClient app, string code)
+    private static async Task AddLanguageAsync(ISquidexClient app, string code)
     {
         var createRequest = new AddLanguageDto
         {
