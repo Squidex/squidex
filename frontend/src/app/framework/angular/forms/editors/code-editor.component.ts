@@ -27,7 +27,7 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodeEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, FocusComponent {
+export class CodeEditorComponent extends StatefulControlComponent<{}, any> implements AfterViewInit, FocusComponent {
     private aceEditor: any;
     private aceTools: any;
     private valueChanged = new Subject();
@@ -55,6 +55,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
 
     @Input()
     public singleLine = false;
+
+    @Input()
+    public snippets = true;
 
     @Input()
     public wordWrap = false;
@@ -87,7 +90,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             this.setMode();
         }
 
-        if (changes.height || changes.maxLines || changes.singleLine) {
+        if (changes.height || changes.maxLines || changes.singleLine || changes.snippets) {
             this.setOptions();
         }
 
@@ -96,7 +99,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
         }
     }
 
-    public writeValue(obj: string) {
+    public writeValue(obj: any) {
         try {
             if (Types.isNull(obj) || Types.isUndefined(obj)) {
                 this.value = '';
@@ -285,7 +288,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             autoScrollEditorIntoView: this.singleLine,
             enableBasicAutocompletion: !!this.aceTools,
             enableLiveAutocompletion: !!this.aceTools,
-            enableSnippets: !!this.aceTools && !this.singleLine,
+            enableSnippets: !!this.aceTools && !this.singleLine && this.snippets,
             highlightActiveLine: !this.singleLine,
             maxLines,
             minLines,

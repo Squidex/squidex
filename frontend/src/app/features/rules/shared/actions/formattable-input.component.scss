@@ -30,6 +30,8 @@ sqx-code-editor {
 
         &.active {
             color: $color-black;
+            font-family: inherit;
+            font-weight: 500;
         }
     }
 }

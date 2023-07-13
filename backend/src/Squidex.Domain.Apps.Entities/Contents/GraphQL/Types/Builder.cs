@@ -48,8 +48,6 @@ internal sealed class Builder
 
     public IInterfaceGraphType ComponentInterface { get; } = new ComponentInterfaceGraphType();
 
-    public List<SchemaInfo> Schemas { get; private set; } 
-
     public Builder(IAppEntity app, GraphQLOptions options)
     {
         partitionResolver = app.PartitionResolver();
@@ -66,9 +64,9 @@ internal sealed class Builder
         allSchemas.AddRange(SchemaInfo.Build(schemas, typeNames).Where(x => x.Fields.Count > 0));
 
         // Only published normal schemas (not components are used for entities).
-        Schemas = allSchemas.Where(x => x.Schema.SchemaDef.IsPublished && x.Schema.SchemaDef.Type != SchemaType.Component).ToList();
+        var normalSchemas = allSchemas.Where(x => x.Schema.SchemaDef.IsPublished && x.Schema.SchemaDef.Type != SchemaType.Component).ToList();
 
-        foreach (var schemaInfo in Schemas)
+        foreach (var schemaInfo in normalSchemas)
         {
             var contentType = new ContentGraphType(schemaInfo);
 
@@ -76,7 +74,7 @@ internal sealed class Builder
             contentResultTypes[schemaInfo] = new ContentResultGraphType(contentType, schemaInfo);
         }
 
-        foreach (var schemaInfo in Schemas)
+        foreach (var schemaInfo in normalSchemas)
         {
             var componentType = new ComponentGraphType(schemaInfo);
 
@@ -85,7 +83,7 @@ internal sealed class Builder
 
         var newSchema = new GraphQLSchema
         {
-            Query = new ApplicationQueries(this, Schemas)
+            Query = new ApplicationQueries(this, normalSchemas)
         };
 
         newSchema.RegisterType(ComponentInterface);
@@ -94,9 +92,9 @@ internal sealed class Builder
         newSchema.Directives.Register(SharedTypes.CacheDirective);
         newSchema.Directives.Register(SharedTypes.OptimizeFieldQueriesDirective);
 
-        if (Schemas.Any())
+        if (normalSchemas.Any())
         {
-            var mutations = new ApplicationMutations(this, Schemas);
+            var mutations = new ApplicationMutations(this, normalSchemas);
 
             if (mutations.Fields.Count > 0)
             {
@@ -111,7 +109,7 @@ internal sealed class Builder
 
         foreach (var (schemaInfo, contentType) in contentTypes)
         {
-            contentType.Initialize(this, schemaInfo, Schemas);
+            contentType.Initialize(this, schemaInfo, normalSchemas);
         }
 
         foreach (var (schemaInfo, componentType) in componentTypes)
