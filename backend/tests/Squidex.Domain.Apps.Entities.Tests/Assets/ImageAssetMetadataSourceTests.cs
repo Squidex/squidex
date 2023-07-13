@@ -43,6 +43,9 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset { File = file };
 
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
+            .Returns(Task.FromResult<ImageInfo?>(null));
+
         await sut.EnhanceAsync(command, CancellationToken);
 
         Assert.Empty(command.Tags);
