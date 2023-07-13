@@ -85,7 +85,7 @@ services:
       - mongo
 
   resizer:
-    image: squidex/resizer:dev-40
+    image: squidex/resizer:1.3.0
     networks:
       - internal
     depends_on:
