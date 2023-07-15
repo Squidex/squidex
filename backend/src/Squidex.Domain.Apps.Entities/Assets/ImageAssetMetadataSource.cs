@@ -36,9 +36,11 @@ public sealed class ImageAssetMetadataSource : IAssetMetadataSource
 
             if (imageInfo != null)
             {
-                var isSwapped = imageInfo.Orientation > ImageOrientation.TopLeft;
+                var needsFix =
+                    imageInfo.HasSensitiveMetadata ||
+                    imageInfo.Orientation > ImageOrientation.TopLeft;
 
-                if (command.File != null && isSwapped)
+                if (command.File != null && needsFix)
                 {
                     var tempFile = TempAssetFile.Create(command.File);
 
@@ -46,7 +48,7 @@ public sealed class ImageAssetMetadataSource : IAssetMetadataSource
                     {
                         await using (var tempStream = tempFile.OpenWrite())
                         {
-                            await assetThumbnailGenerator.FixOrientationAsync(uploadStream, mimeType, tempStream, ct);
+                            await assetThumbnailGenerator.FixAsync(uploadStream, mimeType, tempStream, ct);
                         }
                     }
 
@@ -60,7 +62,7 @@ public sealed class ImageAssetMetadataSource : IAssetMetadataSource
                     command.File = tempFile;
                 }
 
-                if (command.Type == AssetType.Unknown || isSwapped)
+                if (command.Type == AssetType.Unknown || needsFix)
                 {
                     command.Type = AssetType.Image;
 

@@ -51,7 +51,7 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
         var file = new NoopAssetFile();
 
         A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
-            .Returns(new ImageInfo(100, 100, ImageOrientation.None, ImageFormat.PNG));
+            .Returns(new ImageInfo(ImageFormat.PNG, 100, 100, ImageOrientation.None, false));
 
         await HandleAsync(new UploadAppImage { File = file }, None.Value);
 

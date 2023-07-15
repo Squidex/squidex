@@ -6,16 +6,16 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, forwardRef, Input, ViewChild } from '@angular/core';
-import { ControlValueAccessor, DefaultValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CodeEditorComponent, ScriptCompletions, Types } from '@app/framework';
+
+type TemplateMode = 'Text' | 'Script' | 'Liquid';
+
+const TEMPLATE_MODES: ReadonlyArray<TemplateMode> = ['Text', 'Script', 'Liquid'];
 
 export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormattableInputComponent), multi: true,
 };
-
-type TemplateMode = 'Text' | 'Script' | 'Liquid';
-
-const MODES: ReadonlyArray<TemplateMode> = ['Text', 'Script', 'Liquid'];
 
 @Component({
     selector: 'sqx-formattable-input[type]',
@@ -37,91 +37,70 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
     @Input()
     public completion: ScriptCompletions | undefined | null;
 
-    @ViewChild(DefaultValueAccessor)
-    public inputEditor!: DefaultValueAccessor;
-
     @ViewChild(CodeEditorComponent)
     public codeEditor!: CodeEditorComponent;
 
     public disabled = false;
 
-    public modes = MODES;
+    public modes = TEMPLATE_MODES;
     public mode: TemplateMode = 'Text';
 
-    public aceMode = 'ace/editor/text';
-
-    public get actualCompletion() {
-        return this.mode === 'Script' ? this.completion : null;
-    }
-
-    public get valueAccessor(): ControlValueAccessor {
-        return this.codeEditor || this.inputEditor;
-    }
+    public editorMode = 'ace/mode/text';
+    public editorCompletion?: ScriptCompletions | undefined | null;
 
     public ngAfterViewInit() {
-        this.valueAccessor.registerOnChange((value: any) => {
+        this.codeEditor.registerOnChange((value: any) => {
             this.value = value;
 
-            this.fnChanged(this.convertValue(value));
+            this.fnChanged(getValueFromMode(value, this.mode));
         });
 
-        this.valueAccessor.registerOnTouched(() => {
+        this.codeEditor.registerOnTouched(() => {
             this.fnTouched();
         });
 
-        this.valueAccessor.writeValue(this.value);
+        this.codeEditor.writeValue(this.value);
     }
 
     public writeValue(obj: any) {
-        let mode: TemplateMode = 'Text';
+        const { value, mode } = getModeFromValue(obj);
 
-        if (Types.isString(obj)) {
-            this.value = obj;
-
-            if (obj.endsWith(')')) {
-                const lower = obj.toLowerCase();
-
-                if (lower.startsWith('liquid(')) {
-                    this.value = obj.substring(7, obj.length - 1);
-
-                    mode = 'Liquid';
-                } else if (lower.startsWith('script(')) {
-                    this.value = obj.substring(7, obj.length - 1);
-
-                    mode = 'Script';
-                }
-            }
-        } else {
-            this.value = undefined;
-        }
+        this.value = value;
 
         this.setMode(mode, false);
-
-        this.valueAccessor?.writeValue(this.value);
+        this.codeEditor?.writeValue(value);
     }
 
     public setDisabledState(isDisabled: boolean) {
-        this.disabled = isDisabled;
+        this.setDisabled(isDisabled);
+        this.codeEditor?.setDisabledState?.(isDisabled);
+    }
 
-        this.valueAccessor?.setDisabledState?.(isDisabled);
+    private setDisabled(isDisabled: boolean) {
+        this.disabled = isDisabled;
     }
 
     public setMode(mode: TemplateMode, emit = true) {
-        if (this.mode !== mode) {
-            this.mode = mode;
+        if (this.mode === mode) {
+            return;
+        }
 
-            if (mode === 'Script') {
-                this.aceMode = 'ace/mode/javascript';
-            } else if (mode === 'Liquid') {
-                this.aceMode = 'ace/mode/liquid';
-            } else {
-                this.aceMode = 'ace/editor/text';
-            }
+        if (mode === 'Script') {
+            this.editorMode = 'ace/mode/javascript';
+            this.editorCompletion = this.completion;
+        } else if (mode === 'Liquid') {
+            this.editorMode = 'ace/mode/liquid';
+            this.editorCompletion = this.completion?.filter(x => x.type !== 'Function');
+        } else {
+            this.editorMode = 'ace/mode/text';
+            this.editorCompletion = this.completion?.filter(x => x.type !== 'Function');
+        }
 
-            if (emit) {
-                this.fnChanged(this.convertValue(this.value));
-                this.fnTouched();
-            }
+        this.mode = mode;
+
+        if (emit) {
+            this.fnChanged(getValueFromMode(this.value, mode));
+            this.fnTouched();
         }
     }
 
@@ -132,23 +111,45 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
     public registerOnTouched(fn: any) {
         this.fnTouched = fn;
     }
+}
 
-    private convertValue(value: string | undefined) {
-        if (!value) {
-            return value;
-        }
-
-        value = value.trim();
-
-        switch (this.mode) {
-            case 'Liquid': {
-                return `Liquid(${value})`;
-            }
-            case 'Script': {
-                return `Script(${value})`;
-            }
-        }
-
+function getValueFromMode(value: string | undefined, mode: TemplateMode) {
+    if (!value) {
         return value;
     }
+
+    value = value.trim();
+
+    switch (mode) {
+        case 'Liquid': {
+            return `Liquid(${value})`;
+        }
+        case 'Script': {
+            `Script(${value})`;
+        }
+    }
+
+    return value;
+}
+
+function getModeFromValue(value: any): { value: string | undefined; mode: TemplateMode } {
+    if (!Types.isString(value) || !value) {
+        return { value, mode: 'Text' };
+    }
+
+    if (value.endsWith(')')) {
+        const lower = value.toLowerCase();
+
+        if (lower.startsWith('liquid(')) {
+            value = value.substring(7, value.length - 1);
+
+            return { value, mode: 'Liquid' };
+        } else if (lower.startsWith('script(')) {
+            value = value.substring(7, value.length - 1);
+
+            return { value, mode: 'Script' };
+        }
+    }
+
+    return { value, mode: 'Text' };
 }

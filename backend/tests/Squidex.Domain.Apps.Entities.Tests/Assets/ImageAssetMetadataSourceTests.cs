@@ -43,6 +43,9 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset { File = file };
 
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
+            .Returns(Task.FromResult<ImageInfo?>(null));
+
         await sut.EnhanceAsync(command, CancellationToken);
 
         Assert.Empty(command.Tags);
@@ -54,7 +57,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
         var command = new CreateAsset { File = file };
 
         A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
-            .Returns(new ImageInfo(800, 600, ImageOrientation.None, ImageFormat.PNG));
+            .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.None, false));
 
         await sut.EnhanceAsync(command, CancellationToken);
 
@@ -62,7 +65,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
         Assert.Equal(600, command.Metadata.GetPixelHeight());
         Assert.Equal(AssetType.Image, command.Type);
 
-        A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, A<CancellationToken>._))
+        A.CallTo(() => assetThumbnailGenerator.FixAsync(stream, file.MimeType, A<Stream>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -72,10 +75,10 @@ public class ImageAssetMetadataSourceTests : GivenContext
         var command = new CreateAsset { File = file };
 
         A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
-            .Returns(new ImageInfo(800, 600, ImageOrientation.None, ImageFormat.PNG));
+            .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.None, false));
 
         A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
-            .Returns(new ImageInfo(600, 800, ImageOrientation.BottomRight, ImageFormat.PNG)).Once();
+            .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.BottomRight, false)).Once();
 
         await sut.EnhanceAsync(command, CancellationToken);
 
@@ -83,7 +86,28 @@ public class ImageAssetMetadataSourceTests : GivenContext
         Assert.Equal(600, command.Metadata.GetPixelHeight());
         Assert.Equal(AssetType.Image, command.Type);
 
-        A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
+        A.CallTo(() => assetThumbnailGenerator.FixAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_fix_image_if_it_contains_sensitive_metadata()
+    {
+        var command = new CreateAsset { File = file };
+
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
+            .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.None, false));
+
+        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
+            .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.None, true)).Once();
+
+        await sut.EnhanceAsync(command, CancellationToken);
+
+        Assert.Equal(800, command.Metadata.GetPixelWidth());
+        Assert.Equal(600, command.Metadata.GetPixelHeight());
+        Assert.Equal(AssetType.Image, command.Type);
+
+        A.CallTo(() => assetThumbnailGenerator.FixAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
             .MustHaveHappened();
     }
 

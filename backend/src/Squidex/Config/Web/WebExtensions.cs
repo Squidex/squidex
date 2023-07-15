@@ -32,7 +32,7 @@ public static class WebExtensions
 
     public static IApplicationBuilder UseSquidexLocalization(this IApplicationBuilder app)
     {
-        var supportedCultures = new[] { "en", "nl", "it", "zh", "pt","fr" };
+        var supportedCultures = new[] { "en", "nl", "it", "zh", "pt", "fr" };
 
         var localizationOptions = new RequestLocalizationOptions()
             .SetDefaultCulture(supportedCultures[0])
@@ -93,7 +93,7 @@ public static class WebExtensions
 
             httpContext.Response.Headers[HeaderNames.ContentType] = "application/json";
 
-            return httpContext.Response.WriteAsync(json);
+            return httpContext.Response.WriteAsync(json, httpContext.RequestAborted);
         });
 
         app.UseHealthChecks("/readiness", new HealthCheckOptions
