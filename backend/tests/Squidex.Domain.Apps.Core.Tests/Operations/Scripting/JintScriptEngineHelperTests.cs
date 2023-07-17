@@ -621,7 +621,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     public async Task Should_generate_content()
     {
         A.CallTo(() => chatBot.AskQuestionAsync("prompt", A<CancellationToken>._))
-            .Returns(new List<string> { "Generated" });
+            .Returns(new ChatBotResult { Choices = new List<string> { "Generated" } });
 
         var vars = new ScriptVars
         {
@@ -680,7 +680,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     public async Task Should_translate_content()
     {
         A.CallTo(() => translator.TranslateAsync("text", "en", "it", A<CancellationToken>._))
-            .Returns(TranslationResult.Success("Translated", "it"));
+            .Returns(TranslationResult.Success("Translated", "it", 0));
 
         var vars = new ScriptVars
         {

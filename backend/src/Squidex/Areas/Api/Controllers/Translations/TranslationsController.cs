@@ -65,7 +65,7 @@ public sealed class TranslationsController : ApiController
     public async Task<IActionResult> PostQuestion(string app, [FromBody] AskDto request)
     {
         var result = await chatBot.AskQuestionAsync(request.Prompt, HttpContext.RequestAborted);
-        var response = result;
+        var response = result.Choices;
 
         return Ok(response);
     }

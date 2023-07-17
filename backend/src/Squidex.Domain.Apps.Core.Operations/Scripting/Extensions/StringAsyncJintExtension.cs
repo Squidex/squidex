@@ -61,9 +61,9 @@ public sealed class StringAsyncJintExtension : IJintExtension, IScriptDescriptor
                     return;
                 }
 
-                var choices = await chatBot.AskQuestionAsync(prompt, ct);
+                var result = await chatBot.AskQuestionAsync(prompt, ct);
 
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, choices.FirstOrDefault()));
+                scheduler.Run(callback, JsValue.FromObject(context.Engine, result.Choices.FirstOrDefault()));
             }
             catch (Exception ex)
             {
