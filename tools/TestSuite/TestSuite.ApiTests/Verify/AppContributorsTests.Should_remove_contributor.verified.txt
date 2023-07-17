@@ -1,5 +1,5 @@
 ﻿{
-  MaxContributors: -1,
+  MaxContributors: 2,
   Links: {
     create: {
       Method: POST
