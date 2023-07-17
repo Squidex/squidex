@@ -31,13 +31,12 @@ public static class PluginExtensions
 
     public static IMvcBuilder AddSquidexPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
     {
-        var pluginManager = new PluginManager();
+        var pluginManager = PluginManager.Instance;
+        var pluginOptions = config.Get<PluginOptions>();
 
-        var options = config.Get<PluginOptions>();
-
-        if (options?.Plugins != null)
+        if (pluginOptions?.Plugins != null)
         {
-            foreach (var path in options.Plugins)
+            foreach (var path in pluginOptions.Plugins)
             {
                 var pluginAssembly = pluginManager.Load(path, SharedAssemblies);
 
@@ -47,15 +46,20 @@ public static class PluginExtensions
 
         pluginManager.ConfigureServices(mvcBuilder.Services, config);
 
-        mvcBuilder.Services.AddSingleton(pluginManager);
-
         return mvcBuilder;
     }
 
     public static void UsePlugins(this IApplicationBuilder app)
     {
-        var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
+        var pluginManager = PluginManager.Instance;
 
         pluginManager.Log(app.ApplicationServices.GetRequiredService<ISemanticLog>());
+    }
+
+    public static void AddSquidexPluginsPost(this IServiceCollection services, IConfiguration config)
+    {
+        var pluginManager = PluginManager.Instance;
+
+        pluginManager.ConfigureServicesPost(services, config);
     }
 }

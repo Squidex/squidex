@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
@@ -14,7 +15,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
-using System.Globalization;
 
 namespace Squidex.Domain.Apps.Entities.Notifications;
 

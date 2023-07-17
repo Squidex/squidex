@@ -19,6 +19,8 @@ public sealed class PluginManager : DisposableObjectBase
     private readonly HashSet<IPlugin> loadedPlugins = new HashSet<IPlugin>();
     private readonly List<(string Plugin, string Action, Exception Exception)> exceptions = new List<(string, string, Exception)>();
 
+    public static readonly PluginManager Instance = new PluginManager();
+
     protected override void DisposeObject(bool disposing)
     {
         if (disposing)
@@ -99,6 +101,17 @@ public sealed class PluginManager : DisposableObjectBase
         foreach (var plugin in loadedPlugins)
         {
             plugin.ConfigureServices(services, config);
+        }
+    }
+
+    public void ConfigureServicesPost(IServiceCollection services, IConfiguration config)
+    {
+        Guard.NotNull(services);
+        Guard.NotNull(config);
+
+        foreach (var plugin in loadedPlugins)
+        {
+            plugin.ConfigureServicesPost(services, config);
         }
     }
 

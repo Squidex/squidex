@@ -71,6 +71,9 @@ public sealed class Startup
         services.AddSquidexTelemetry(config);
         services.AddSquidexTranslation(config);
         services.AddSquidexUsageTracking(config);
+
+        // Run last to override and wrap existing services.
+        services.AddSquidexPluginsPost(config);
     }
 
     public void Configure(IApplicationBuilder app)
