@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using LoremNET;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -66,6 +67,25 @@ public class CommentsCommandMiddlewareTests : GivenContext
         var command = CreateCommentsCommand(new CreateComment
         {
             Text = "Hi @mail1@squidex.io, @mail2@squidex.io and @notfound@squidex.io",
+            IsMention = false
+        });
+
+        var context = CrateCommandContext(command);
+
+        await sut.HandleAsync(context, CancellationToken);
+
+        Assert.Equal(command.Mentions, new[] { "id1", "id2" });
+    }
+
+    [Fact]
+    public async Task Should_enrich_with_mentioned_user_ids_if_found_and_long_text()
+    {
+        SetupUser("id1", "mail1@squidex.io");
+        SetupUser("id2", "mail2@squidex.io");
+
+        var command = CreateCommentsCommand(new CreateComment
+        {
+            Text = $"Hi @mail1@squidex.io, @mail2@squidex.io and @notfound@squidex.io {Lorem.Paragraph(200, 10)}",
             IsMention = false
         });
 

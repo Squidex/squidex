@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject;
 
 public sealed class CommentsCommandMiddleware : AggregateCommandMiddleware<CommentsCommandBase, CommentsStream>
 {
-    private static readonly Regex MentionRegex = new Regex(@"@(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*", RegexOptions.Compiled | RegexOptions.ExplicitCapture, TimeSpan.FromMilliseconds(100));
+    private static readonly Regex MentionRegex = new Regex(@"@(?=.{1,64}@)[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*", RegexOptions.Compiled | RegexOptions.ExplicitCapture, TimeSpan.FromMilliseconds(100));
     private readonly IUserResolver userResolver;
 
     public CommentsCommandMiddleware(IDomainObjectFactory domainObjectFactory, IUserResolver userResolver)
@@ -44,29 +44,33 @@ public sealed class CommentsCommandMiddleware : AggregateCommandMiddleware<Comme
 
     private async Task MentionUsersAsync(CommentTextCommand command)
     {
-        if (!string.IsNullOrWhiteSpace(command.Text))
+        if (string.IsNullOrWhiteSpace(command.Text))
         {
-            var emails = MentionRegex.Matches(command.Text).Select(x => x.Value[1..]).ToArray();
+            return;
+        }
 
-            if (emails.Length > 0)
+        var emails = MentionRegex.Matches(command.Text).Select(x => x.Value[1..]).ToArray();
+
+        if (emails.Length == 0)
+        {
+            return;
+        }
+
+        var mentions = new List<string>();
+
+        foreach (var email in emails)
+        {
+            var user = await userResolver.FindByIdOrEmailAsync(email);
+
+            if (user != null)
             {
-                var mentions = new List<string>();
-
-                foreach (var email in emails)
-                {
-                    var user = await userResolver.FindByIdOrEmailAsync(email);
-
-                    if (user != null)
-                    {
-                        mentions.Add(user.Id);
-                    }
-                }
-
-                if (mentions.Count > 0)
-                {
-                    command.Mentions = mentions.ToArray();
-                }
+                mentions.Add(user.Id);
             }
+        }
+
+        if (mentions.Count > 0)
+        {
+            command.Mentions = mentions.ToArray();
         }
     }
 }

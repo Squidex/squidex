@@ -52,10 +52,10 @@ export class ChatDialogComponent extends StatefulComponent<State> {
         this.translator.ask(this.appsState.appName, { prompt: this.snapshot.chatQuestion })
             .subscribe({
                 next: chatAnswers => {
-                    this.next({ chatAnswers });
+                    this.next({ chatAnswers, isRunning: false });
                 },
                 error: () => {
-                    this.next({ chatAnswers: [] });
+                    this.next({ chatAnswers: [], isRunning: false });
                 },
                 complete: () => {
                     this.next({ isRunning: false });

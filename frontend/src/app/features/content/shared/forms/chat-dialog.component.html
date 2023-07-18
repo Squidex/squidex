@@ -31,7 +31,7 @@
                 <h4 class="mt-4">{{ 'chat.answers' | sqxTranslate }}</h4>
     
                 <div *ngIf="snapshot.chatAnswers?.length === 0">
-                    {{ 'chat.noAnswers' | sqxTranslate }}
+                    <small class="text-muted">{{ 'chat.answersEmpty' | sqxTranslate }}</small>
                 </div>
 
                 <div class="row g-2 answer" *ngFor="let answer of (snapshot.chatAnswers || [])">

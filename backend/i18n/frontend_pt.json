@@ -166,6 +166,8 @@
   "backups.started": "O reforço começou, pode levar vários minutos para ser concluído.",
   "backups.startedLabel": "Começou",
   "backups.startFailed": "Falhou em começar o backup.",
+  "chat.answers": "Answers",
+  "chat.answersEmpty": "The ChatBot does not provide an answer or has not been configured yet.",
   "chat.ask": "Ask",
   "chat.description": "Use the ChatBot (usually OpenAI) to generate content. Just write a prompt and describe, what you need.\n\n\nAlso add the desired format (for example Markdown or HTML) to your prompt, dependending on the editor that you use.",
   "chat.prompt": "Describe the content you want to generate",
