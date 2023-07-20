@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Squidex.Domain.Apps.Core</RootNamespace>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>11.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
 	<NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Fluid.Core" Version="2.4.0" />
 	<PackageReference Include="GeoJSON.Net" Version="1.2.19" />
-	<PackageReference Include="Jint" Version="3.0.0-beta-2046" />
+	<PackageReference Include="Jint" Version="3.0.0-beta-2049" />
 	<PackageReference Include="Meziantou.Analyzer" Version="2.0.62">
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

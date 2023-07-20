@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
-internal sealed class AssetMetadataWrapper : IDictionary<string, object?>
+public sealed class AssetMetadataWrapper : IDictionary<string, object?>
 {
     private readonly AssetMetadata metadata;
 

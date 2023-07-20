@@ -41,7 +41,7 @@ public static class ContentsServices
         services.AddTransientAs<CounterService>()
             .As<ICounterService>().As<IDeleter>();
 
-        services.AddTransientAs<ContentCache>()
+        services.AddSingletonAs<ContentCache>()
             .As<IContentCache>();
 
         services.AddSingletonAs<DefaultValidatorsFactory>()

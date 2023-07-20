@@ -46,7 +46,7 @@ public static class AssetServices
         services.AddTransientAs<AssetTagsDeleter>()
             .As<IDeleter>();
 
-        services.AddTransientAs<AssetCache>()
+        services.AddSingletonAs<AssetCache>()
             .As<IAssetCache>();
 
         services.AddSingletonAs<RebuildFiles>()

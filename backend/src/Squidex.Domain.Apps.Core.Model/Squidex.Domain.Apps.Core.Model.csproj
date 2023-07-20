@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Squidex.Domain.Apps.Core</RootNamespace>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>11.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
 	<NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>

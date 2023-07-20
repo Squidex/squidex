@@ -23,7 +23,7 @@ public class AssetsFluidExtensionTests : GivenContext
 {
     private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-    private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
+    private readonly IAssetThumbnailGenerator assetGenerator = A.Fake<IAssetThumbnailGenerator>();
     private readonly FluidTemplateEngine sut;
 
     public AssetsFluidExtensionTests()
@@ -33,7 +33,7 @@ public class AssetsFluidExtensionTests : GivenContext
                 .AddSingleton(AppProvider)
                 .AddSingleton(assetFileStore)
                 .AddSingleton(assetQuery)
-                .AddSingleton(assetThumbnailGenerator)
+                .AddSingleton(assetGenerator)
                 .BuildServiceProvider();
 
         var extensions = new IFluidExtension[]
@@ -146,7 +146,7 @@ public class AssetsFluidExtensionTests : GivenContext
     [Fact]
     public async Task Should_not_resolve_text_if_too_big()
     {
-        var (vars, _) = SetupAssetVars(1_000_000);
+        var (vars, _) = SetupAssetVars(10_000_000);
 
         var template = @"
                 {% assign ref = event.data.assets.iv[0] | asset %}
@@ -221,7 +221,7 @@ public class AssetsFluidExtensionTests : GivenContext
     [Fact]
     public async Task Should_not_resolve_blur_hash_if_too_big()
     {
-        var (vars, _) = SetupAssetVars(1_000_000);
+        var (vars, _) = SetupAssetVars(10_000_000);
 
         var template = @"
                 {% assign ref = event.data.assets.iv[0] | asset %}
@@ -251,7 +251,7 @@ public class AssetsFluidExtensionTests : GivenContext
             ";
 
         var expected = $@"
-                Text: NoImage
+                Text: 
             ";
 
         var actual = await sut.RenderAsync(template, vars);
@@ -296,7 +296,7 @@ public class AssetsFluidExtensionTests : GivenContext
 
     private void SetupBlurHash(AssetRef asset, string hash)
     {
-        A.CallTo(() => assetThumbnailGenerator.ComputeBlurHashAsync(A<Stream>._, asset.MimeType, A<BlurOptions>._, A<CancellationToken>._))
+        A.CallTo(() => assetGenerator.ComputeBlurHashAsync(A<Stream>._, asset.MimeType, A<BlurOptions>._, A<CancellationToken>._))
             .Returns(hash);
     }
 

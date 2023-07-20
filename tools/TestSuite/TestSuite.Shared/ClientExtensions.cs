@@ -242,6 +242,18 @@ public static class ClientExtensions
         }
     }
 
+    public static async Task<AssetDto> UpdateFileAsync(this IAssetsClient assetsClients, string id, string path, string fileType, string fileName = null)
+    {
+        var fileInfo = new FileInfo(path);
+
+        await using (var stream = fileInfo.OpenRead())
+        {
+            var upload = new FileParameter(stream, fileName ?? fileInfo.Name, fileType);
+
+            return await assetsClients.PutAssetContentAsync(id, upload);
+        }
+    }
+
     public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient assetsClients, int size, string parentId = null, string id = null)
     {
         using (var stream = RandomAsset(size))

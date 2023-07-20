@@ -165,13 +165,14 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
 
         var filterDefinition = CreateFilter(streamFilter, lastPosition);
 
+
         var find =
             Collection.Find(filterDefinition)
                 .Limit(take);
 
         var taken = 0;
 
-        await foreach (var current in find.ToAsyncEnumerable(ct).OrderBy(x => x.Timestamp).ThenBy(x => x.EventStream))
+        await foreach (var current in find.ToAsyncEnumerable(ct))
         {
             foreach (var @event in current.Filtered(lastPosition))
             {

@@ -18,7 +18,7 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
 {
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
-    private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
+    private readonly IAssetThumbnailGenerator assetGenerator = A.Fake<IAssetThumbnailGenerator>();
     private readonly AppCommandMiddleware sut;
 
     public sealed class MyCommand : SquidexCommand
@@ -32,7 +32,7 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
 
     public AppCommandMiddlewareTests()
     {
-        sut = new AppCommandMiddleware(domainObjectFactory, appImageStore, assetThumbnailGenerator, ApiContextProvider);
+        sut = new AppCommandMiddleware(domainObjectFactory, appImageStore, assetGenerator, ApiContextProvider);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
     {
         var file = new NoopAssetFile();
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
+        A.CallTo(() => assetGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(ImageFormat.PNG, 100, 100, ImageOrientation.None, false));
 
         await HandleAsync(new UploadAppImage { File = file }, None.Value);
@@ -66,7 +66,7 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
 
         var command = new UploadAppImage { File = file };
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
+        A.CallTo(() => assetGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
             .Returns(Task.FromResult<ImageInfo?>(null));
 
         await Assert.ThrowsAsync<ValidationException>(() => HandleAsync(sut, command, CancellationToken));

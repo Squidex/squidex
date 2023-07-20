@@ -99,7 +99,7 @@ public sealed class AssetContentQueryDto
     [FromQuery(Name = "format")]
     public ImageFormat? Format { get; set; }
 
-    public ResizeOptions ToResizeOptions(IAssetEntity asset, IAssetThumbnailGenerator assetThumbnailGenerator, HttpRequest request)
+    public ResizeOptions ToResizeOptions(IAssetEntity asset, IAssetThumbnailGenerator assetGenerator, HttpRequest request)
     {
         Guard.NotNull(asset);
 
@@ -111,12 +111,12 @@ public sealed class AssetContentQueryDto
         result.FocusY = y;
         result.TargetWidth = Width;
         result.TargetHeight = Height;
-        result.Format = GetFormat(asset, assetThumbnailGenerator, request);
+        result.Format = GetFormat(asset, assetGenerator, request);
 
         return result;
     }
 
-    private ImageFormat? GetFormat(IAssetEntity asset, IAssetThumbnailGenerator assetThumbnailGenerator, HttpRequest request)
+    private ImageFormat? GetFormat(IAssetEntity asset, IAssetThumbnailGenerator assetGenerator, HttpRequest request)
     {
         if (Format.HasValue || !Auto)
         {
@@ -132,7 +132,7 @@ public sealed class AssetContentQueryDto
 
             request.Headers.TryGetValue("Accept", out var accept);
 
-            return accept.Any(x => x?.Contains(mimeType, StringComparison.OrdinalIgnoreCase) == true) && assetThumbnailGenerator.CanReadAndWrite(mimeType);
+            return accept.Any(x => x?.Contains(mimeType, StringComparison.OrdinalIgnoreCase) == true) && assetGenerator.CanReadAndWrite(mimeType);
         }
 #if ENABLE_AVIF
         if (Accepts("image/avif"))

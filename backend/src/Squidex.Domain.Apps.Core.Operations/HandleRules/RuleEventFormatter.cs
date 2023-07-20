@@ -23,11 +23,11 @@ using ValueTaskSupplement;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
-public class RuleEventFormatter
+public partial class RuleEventFormatter
 {
     private const string GlobalFallback = "null";
-    private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-    private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+    private static readonly Regex RegexPatternOld = RegexPatternOldFactory();
+    private static readonly Regex RegexPatternNew = RegexPatternNewFactory();
     private readonly IJsonSerializer serializer;
     private readonly IEnumerable<IRuleEventFormatter> formatters;
     private readonly ITemplateEngine templateEngine;
@@ -392,4 +392,10 @@ public class RuleEventFormatter
 
         return false;
     }
+
+    [GeneratedRegex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled | RegexOptions.ExplicitCapture)]
+    private static partial Regex RegexPatternOldFactory();
+
+    [GeneratedRegex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled | RegexOptions.ExplicitCapture)]
+    private static partial Regex RegexPatternNewFactory();
 }

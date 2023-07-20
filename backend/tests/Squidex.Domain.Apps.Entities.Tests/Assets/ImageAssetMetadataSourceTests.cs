@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public class ImageAssetMetadataSourceTests : GivenContext
 {
-    private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
+    private readonly IAssetThumbnailGenerator assetGenerator = A.Fake<IAssetThumbnailGenerator>();
     private readonly MemoryStream stream = new MemoryStream();
     private readonly AssetFile file;
     private readonly ImageAssetMetadataSource sut;
@@ -24,7 +24,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         file = new DelegateAssetFile("MyImage.png", "image/png", 1024, () => stream);
 
-        sut = new ImageAssetMetadataSource(assetThumbnailGenerator);
+        sut = new ImageAssetMetadataSource(assetGenerator);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
 
         await sut.EnhanceAsync(command, CancellationToken);
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
+        A.CallTo(() => assetGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -43,7 +43,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset { File = file };
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
+        A.CallTo(() => assetGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
             .Returns(Task.FromResult<ImageInfo?>(null));
 
         await sut.EnhanceAsync(command, CancellationToken);
@@ -56,7 +56,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset { File = file };
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
+        A.CallTo(() => assetGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.None, false));
 
         await sut.EnhanceAsync(command, CancellationToken);
@@ -65,7 +65,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
         Assert.Equal(600, command.Metadata.GetPixelHeight());
         Assert.Equal(AssetType.Image, command.Type);
 
-        A.CallTo(() => assetThumbnailGenerator.FixAsync(stream, file.MimeType, A<Stream>._, A<CancellationToken>._))
+        A.CallTo(() => assetGenerator.FixAsync(stream, file.MimeType, A<Stream>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -74,10 +74,10 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset { File = file };
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
+        A.CallTo(() => assetGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.None, false));
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
+        A.CallTo(() => assetGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.BottomRight, false)).Once();
 
         await sut.EnhanceAsync(command, CancellationToken);
@@ -86,7 +86,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
         Assert.Equal(600, command.Metadata.GetPixelHeight());
         Assert.Equal(AssetType.Image, command.Type);
 
-        A.CallTo(() => assetThumbnailGenerator.FixAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
+        A.CallTo(() => assetGenerator.FixAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -95,10 +95,10 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset { File = file };
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
+        A.CallTo(() => assetGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.None, false));
 
-        A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
+        A.CallTo(() => assetGenerator.GetImageInfoAsync(stream, file.MimeType, CancellationToken))
             .Returns(new ImageInfo(ImageFormat.PNG, 800, 600, ImageOrientation.None, true)).Once();
 
         await sut.EnhanceAsync(command, CancellationToken);
@@ -107,7 +107,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
         Assert.Equal(600, command.Metadata.GetPixelHeight());
         Assert.Equal(AssetType.Image, command.Type);
 
-        A.CallTo(() => assetThumbnailGenerator.FixAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
+        A.CallTo(() => assetGenerator.FixAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
             .MustHaveHappened();
     }
 

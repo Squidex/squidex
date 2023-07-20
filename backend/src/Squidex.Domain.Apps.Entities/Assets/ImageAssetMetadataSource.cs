@@ -13,11 +13,11 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public sealed class ImageAssetMetadataSource : IAssetMetadataSource
 {
-    private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+    private readonly IAssetThumbnailGenerator assetGenerator;
 
-    public ImageAssetMetadataSource(IAssetThumbnailGenerator assetThumbnailGenerator)
+    public ImageAssetMetadataSource(IAssetThumbnailGenerator assetGenerator)
     {
-        this.assetThumbnailGenerator = assetThumbnailGenerator;
+        this.assetGenerator = assetGenerator;
     }
 
     public async Task EnhanceAsync(UploadAssetCommand command,
@@ -31,7 +31,7 @@ public sealed class ImageAssetMetadataSource : IAssetMetadataSource
 
             await using (var uploadStream = command.File.OpenRead())
             {
-                imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, mimeType, ct);
+                imageInfo = await assetGenerator.GetImageInfoAsync(uploadStream, mimeType, ct);
             }
 
             if (imageInfo != null)
@@ -48,13 +48,13 @@ public sealed class ImageAssetMetadataSource : IAssetMetadataSource
                     {
                         await using (var tempStream = tempFile.OpenWrite())
                         {
-                            await assetThumbnailGenerator.FixAsync(uploadStream, mimeType, tempStream, ct);
+                            await assetGenerator.FixAsync(uploadStream, mimeType, tempStream, ct);
                         }
                     }
 
                     await using (var tempStream = tempFile.OpenRead())
                     {
-                        imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(tempStream, mimeType, ct) ?? imageInfo;
+                        imageInfo = await assetGenerator.GetImageInfoAsync(tempStream, mimeType, ct) ?? imageInfo;
                     }
 
                     await command.File.DisposeAsync();

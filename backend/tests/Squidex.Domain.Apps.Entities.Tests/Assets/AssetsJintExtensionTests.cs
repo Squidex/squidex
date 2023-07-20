@@ -16,17 +16,20 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
 public class AssetsJintExtensionTests : GivenContext, IClassFixture<TranslationsFixture>
 {
+    private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
     private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-    private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
+    private readonly IAssetThumbnailGenerator assetGenerator = A.Fake<IAssetThumbnailGenerator>();
     private readonly JintScriptEngine sut;
 
     public AssetsJintExtensionTests()
@@ -34,9 +37,10 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
         var serviceProvider =
             new ServiceCollection()
                 .AddSingleton(AppProvider)
+                .AddSingleton(commandBus)
                 .AddSingleton(assetFileStore)
                 .AddSingleton(assetQuery)
-                .AddSingleton(assetThumbnailGenerator)
+                .AddSingleton(assetGenerator)
                 .BuildServiceProvider();
 
         var extensions = new IJintExtension[]
@@ -170,7 +174,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
     [Fact]
     public async Task Should_not_resolve_text_if_too_big()
     {
-        var (vars, _) = SetupAssetsVars(1, 1_000_000);
+        var (vars, _) = SetupAssetsVars(1, 10_000_000);
 
         var expected = @"
                 Text: ErrorTooBig
@@ -209,7 +213,10 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
 
         var vars = new ScriptVars
         {
-            ["event"] = @event
+            ["event"] = @event,
+            ["appId"] = AppId.Id,
+            ["appName"] = AppId.Name,
+            ["user"] = new ClaimsPrincipal(),
         };
 
         var expected = @"
@@ -256,7 +263,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
     [Fact]
     public async Task Should_not_resolve_blur_hash_if_too_big()
     {
-        var (vars, assets) = SetupAssetsVars(1, 1_000_000);
+        var (vars, assets) = SetupAssetsVars(1, 10_000_000);
 
         SetupBlurHash(assets[0].ToRef(), "Hash");
 
@@ -319,7 +326,10 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
 
         var vars = new ScriptVars
         {
-            ["event"] = @event
+            ["event"] = @event,
+            ["appId"] = AppId.Id,
+            ["appName"] = AppId.Name,
+            ["user"] = new ClaimsPrincipal(),
         };
 
         var expected = @"
@@ -338,9 +348,47 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
 
+    [Fact]
+    public async Task Should_update_asset_from_event()
+    {
+        var @event = new EnrichedAssetEvent
+        {
+            Id = DomainId.NewGuid(),
+            AssetType = AssetType.Image,
+            FileVersion = 0,
+            FileSize = 100,
+            Metadata = new AssetMetadata
+            {
+                [AssetMetadata.PixelWidth] = 100,
+                [AssetMetadata.PixelHeight] = 50,
+            },
+            AppId = AppId
+        };
+
+        var vars = new ScriptVars
+        {
+            ["event"] = @event,
+            ["appId"] = AppId.Id,
+            ["appName"] = AppId.Name,
+            ["user"] = new ClaimsPrincipal(),
+        };
+
+        var script = @"
+                var metadata = { ...event.metadata, newValue: 42 };
+
+                updateAsset(event, metadata);
+            ";
+
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
+
+        A.CallTo(() => commandBus.PublishAsync(
+                A<AnnotateAsset>.That.Matches(x => x.AssetId == @event.Id && x.Metadata!.Count == 3), default))
+            .MustHaveHappened();
+    }
+
     private void SetupBlurHash(AssetRef asset, string hash)
     {
-        A.CallTo(() => assetThumbnailGenerator.ComputeBlurHashAsync(A<Stream>._, asset.MimeType, A<BlurOptions>._, A<CancellationToken>._))
+        A.CallTo(() => assetGenerator.ComputeBlurHashAsync(A<Stream>._, asset.MimeType, A<BlurOptions>._, A<CancellationToken>._))
             .Returns(hash);
     }
 

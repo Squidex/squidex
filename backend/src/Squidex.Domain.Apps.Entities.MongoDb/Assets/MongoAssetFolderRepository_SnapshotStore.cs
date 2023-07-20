@@ -27,8 +27,9 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
     IAsyncEnumerable<SnapshotResult<AssetFolderDomainObject.State>> ISnapshotStore<AssetFolderDomainObject.State>.ReadAllAsync(
         CancellationToken ct)
     {
-        return Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct)
-            .Select(x => new SnapshotResult<AssetFolderDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
+        var documents = Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct);
+
+        return documents.Select(x => new SnapshotResult<AssetFolderDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
     }
 
     async Task<SnapshotResult<AssetFolderDomainObject.State>> ISnapshotStore<AssetFolderDomainObject.State>.ReadAsync(DomainId key,

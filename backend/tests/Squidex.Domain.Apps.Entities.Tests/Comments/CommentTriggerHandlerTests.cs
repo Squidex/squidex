@@ -30,10 +30,10 @@ public class CommentTriggerHandlerTests
 
     public CommentTriggerHandlerTests()
     {
-        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
+        A.CallTo((object)(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default)))
             .Returns(true);
 
-        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
+        A.CallTo((object)(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default)))
             .Returns(false);
 
         sut = new CommentTriggerHandler(scriptEngine, userResolver);

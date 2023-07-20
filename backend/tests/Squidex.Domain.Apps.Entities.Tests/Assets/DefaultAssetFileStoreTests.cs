@@ -98,7 +98,7 @@ public class DefaultAssetFileStoreTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_upload_temporary_filet_to_store()
+    public async Task Should_upload_temporary_file_to_store()
     {
         var stream = new MemoryStream();
 
@@ -121,6 +121,17 @@ public class DefaultAssetFileStoreTests : GivenContext
         await sut.UploadAsync(AppId.Id, assetId, assetFileVersion, suffix, stream, true, CancellationToken);
 
         A.CallTo(() => assetStore.UploadAsync(fullName, stream, true, CancellationToken))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_download_temporary_file_to_store()
+    {
+        var stream = new MemoryStream();
+
+        await sut.DownloadAsync("Temp", stream, CancellationToken);
+
+        A.CallTo(() => assetStore.DownloadAsync("Temp", stream, default, CancellationToken))
             .MustHaveHappened();
     }
 

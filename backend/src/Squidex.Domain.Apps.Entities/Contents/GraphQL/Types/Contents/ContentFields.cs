@@ -19,23 +19,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal static class ContentFields
 {
-    public static readonly IFieldResolver ResolveStringFieldAssets = Resolvers.Async<string, object>(async (value, fieldContext, context) =>
+    public static readonly IFieldResolver ResolveStringFieldAssets = Resolvers.Sync<string, object>((value, fieldContext, context) =>
     {
         var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedAssetIds(value).ToList();
 
-        return await context.GetAssetsAsync(ids,
-            fieldContext.CacheDuration(),
-            fieldContext.CancellationToken);
+        return context.GetAssets(ids,
+            fieldContext.CacheDuration());
     });
 
-    public static readonly IFieldResolver ResolveStringFieldContents = Resolvers.Async<string, object>(async (value, fieldContext, context) =>
+    public static readonly IFieldResolver ResolveStringFieldContents = Resolvers.Sync<string, object>((value, fieldContext, context) =>
     {
         var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedContentIds(value).ToList();
 
-        return await context.GetContentsAsync(ids,
+        return context.GetContents(ids,
             fieldContext.FieldNames(),
-            fieldContext.CacheDuration(),
-            fieldContext.CancellationToken);
+            fieldContext.CacheDuration());
     });
 
     public static readonly FieldType Id = new FieldType

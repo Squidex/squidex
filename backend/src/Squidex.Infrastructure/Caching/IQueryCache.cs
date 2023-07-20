@@ -7,11 +7,9 @@
 
 namespace Squidex.Infrastructure.Caching;
 
-public interface IQueryCache<TKey, T> where TKey : notnull where T : class, IWithId<TKey>
+public interface IQueryCache<TKey, T> where TKey : notnull
 {
-    void SetMany(IEnumerable<(TKey, T?)> results,
-        TimeSpan? permanentDuration = null);
+    void Set(TKey key, T item, TimeSpan cacheDuration);
 
-    Task<List<T>> CacheOrQueryAsync(IEnumerable<TKey> keys, Func<IEnumerable<TKey>, Task<IEnumerable<T>>> query,
-        TimeSpan? permanentDuration = null);
+    bool TryGet(TKey key, out T result);
 }

@@ -24,17 +24,17 @@ public sealed class AppImageController : ApiController
 {
     private readonly IAppImageStore appImageStore;
     private readonly IAssetStore assetStore;
-    private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+    private readonly IAssetThumbnailGenerator assetGenerator;
 
     public AppImageController(ICommandBus commandBus,
         IAppImageStore appImageStore,
         IAssetStore assetStore,
-        IAssetThumbnailGenerator assetThumbnailGenerator)
+        IAssetThumbnailGenerator assetGenerator)
         : base(commandBus)
     {
         this.appImageStore = appImageStore;
         this.assetStore = assetStore;
-        this.assetThumbnailGenerator = assetThumbnailGenerator;
+        this.assetGenerator = assetGenerator;
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class AppImageController : ApiController
                 {
                     await using (var resizeStream = assetResized.OpenWrite())
                     {
-                        await assetThumbnailGenerator.CreateThumbnailAsync(originalStream, mimeType, resizeStream, resizeOptions, ct);
+                        await assetGenerator.CreateThumbnailAsync(originalStream, mimeType, resizeStream, resizeOptions, ct);
                     }
                 }
             }

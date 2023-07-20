@@ -15,21 +15,21 @@ public sealed class EventScriptVars : ScriptVars
 {
     public DomainId AppId
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     public string AppName
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     public ClaimsPrincipal User
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     public EnrichedEvent Event
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 }

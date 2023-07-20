@@ -15,42 +15,47 @@ public sealed class AssetScriptVars : ScriptVars
     [FieldDescription(nameof(FieldDescriptions.AppId))]
     public DomainId AppId
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.EntityId))]
     public DomainId AssetId
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AppName))]
     public string AppName
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.Operation))]
     public string Operation
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.Command))]
     public AssetCommandScriptVars Command
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.Asset))]
     public AssetEntityScriptVars Asset
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.User))]
     public ClaimsPrincipal? User
     {
-        set => SetValue(value);
+        set => SetInitial(value);
+    }
+
+    public string? FileId
+    {
+        set => SetInitial(value);
     }
 }

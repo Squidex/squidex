@@ -81,6 +81,8 @@ public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest
 
         var find = Collection.Find(x => x.Key == key && x.Timestamp >= timestampStart && x.Timestamp < timestampEnd);
 
-        return find.ToAsyncEnumerable(ct).Select(x => x.ToRequest());
+        var documents = find.ToAsyncEnumerable(ct);
+
+        return documents.Select(x => x.ToRequest());
     }
 }

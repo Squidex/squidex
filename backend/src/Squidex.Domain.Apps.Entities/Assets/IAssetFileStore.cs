@@ -26,6 +26,9 @@ public interface IAssetFileStore
     Task UploadAsync(DomainId appId, DomainId id, long fileVersion, string? suffix, Stream stream, bool overwrite = true,
         CancellationToken ct = default);
 
+    Task DownloadAsync(string tempFile, Stream stream,
+        CancellationToken ct = default);
+
     Task DownloadAsync(DomainId appId, DomainId id, long fileVersion, string? suffix, Stream stream, BytesRange range = default,
         CancellationToken ct = default);
 

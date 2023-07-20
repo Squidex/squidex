@@ -6,20 +6,21 @@
 // ==========================================================================
 
 using GraphQL.DataLoader;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Cache;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
-
-#pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
 public sealed class GraphQLExecutionContext : QueryExecutionContext
 {
-    private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
-    private static readonly List<IEnrichedContentEntity> EmptyContents = new List<IEnrichedContentEntity>();
+    private static readonly EmptyDataLoaderResult<IEnrichedAssetEntity> EmptyAssets = new EmptyDataLoaderResult<IEnrichedAssetEntity>();
+    private static readonly EmptyDataLoaderResult<IEnrichedContentEntity> EmptyContents = new EmptyDataLoaderResult<IEnrichedContentEntity>();
     private readonly IDataLoaderContextAccessor dataLoaders;
+    private readonly GraphQLOptions options;
 
     public override Context Context { get; }
 
@@ -30,7 +31,8 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         IContentQueryService contentQuery,
         IContentCache contentCache,
         IServiceProvider serviceProvider,
-        Context context)
+        Context context,
+        IOptions<GraphQLOptions> options)
         : base(assetQuery, assetCache, contentQuery, contentCache, serviceProvider)
     {
         this.dataLoaders = dataLoaders;
@@ -39,6 +41,8 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
             .WithoutCleanup()
             .WithoutContentEnrichment()
             .WithoutAssetEnrichment());
+
+        this.options = options.Value;
     }
 
     public async ValueTask<IUser?> FindUserAsync(RefToken refToken,
@@ -56,104 +60,82 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         }
     }
 
-    public async Task<IEnrichedAssetEntity?> GetAssetAsync(DomainId id, TimeSpan cacheDuration,
-        CancellationToken ct)
+    public IDataLoaderResult<IEnrichedContentEntity?> GetContent(DomainId schemaId, DomainId id, long version)
     {
-        var assets = await GetAssetsAsync(new List<DomainId> { id }, cacheDuration, ct);
-        var asset = assets.FirstOrDefault();
+        return dataLoaders.Context!.GetOrAddLoader(nameof(GetContent), ct =>
+        {
+            return FindContentAsync(schemaId.ToString(), id, version, ct);
+        }).LoadAsync();
+    }
+
+    public IDataLoaderResult<IEnrichedAssetEntity?> GetAsset(DomainId id,
+        TimeSpan cacheDuration)
+    {
+        var assets = GetAssets(new List<DomainId> { id }, cacheDuration);
+        var asset = assets.Select(x => x.FirstOrDefault());
 
         return asset;
     }
 
-    public async Task<IEnrichedContentEntity?> GetContentAsync(DomainId schemaId, DomainId id, HashSet<string>? fields, TimeSpan cacheDuration,
-        CancellationToken ct)
+    public IDataLoaderResult<IEnrichedContentEntity?> GetContent(DomainId schemaId, DomainId id, HashSet<string>? fields,
+        TimeSpan cacheDuration)
     {
-        var contents = await GetContentsAsync(new List<DomainId> { id }, fields, cacheDuration, ct);
-        var content = contents.FirstOrDefault(x => x.SchemaId.Id == schemaId);
+        var contents = GetContents(new List<DomainId> { id }, fields, cacheDuration);
+        var content = contents.Select(x => x.FirstOrDefault(x => x.SchemaId.Id == schemaId));
 
         return content;
     }
 
-    public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetAssetsAsync(List<DomainId>? ids, TimeSpan cacheDuration,
-        CancellationToken ct)
+    public IDataLoaderResult<IEnrichedAssetEntity[]> GetAssets(List<DomainId>? ids, TimeSpan cacheDuration)
     {
         if (ids == null || ids.Count == 0)
         {
             return EmptyAssets;
         }
 
-        async Task<IReadOnlyList<IEnrichedAssetEntity>> LoadAsync(IEnumerable<DomainId> ids)
-        {
-            var result = await GetAssetsLoader().LoadAsync(ids).GetResultAsync(ct);
-
-            return result?.NotNull().ToList() ?? EmptyAssets;
-        }
-
-        if (cacheDuration > TimeSpan.Zero)
-        {
-            var assets = await AssetCache.CacheOrQueryAsync(ids, async pendingIds =>
-            {
-                return await LoadAsync(pendingIds);
-            }, cacheDuration);
-
-            return assets;
-        }
-
-        return await LoadAsync(ids);
+        return GetAssetsLoader().LoadAsync(BuildKeys(ids, cacheDuration)).Then(x => x.NotNull().ToArray());
     }
 
-    public async Task<IReadOnlyList<IEnrichedContentEntity>> GetContentsAsync(List<DomainId>? ids, HashSet<string>? fields, TimeSpan cacheDuration,
-        CancellationToken ct)
+    public IDataLoaderResult<IEnrichedContentEntity[]> GetContents(List<DomainId>? ids, HashSet<string>? fields, TimeSpan cacheDuration)
     {
         if (ids == null || ids.Count == 0)
         {
             return EmptyContents;
         }
 
-        if (cacheDuration > TimeSpan.Zero || fields == null)
+        if (fields == null)
         {
-            var contents = await ContentCache.CacheOrQueryAsync(ids, async pendingIds =>
-            {
-                var result = await GetContentsLoader().LoadAsync(ids).GetResultAsync(ct);
-
-                return result?.NotNull().ToList() ?? EmptyContents;
-            }, cacheDuration);
-
-            return contents.ToList();
+            return GetContentsLoader().LoadAsync(BuildKeys(ids, cacheDuration)).Then(x => x.NotNull().ToArray());
         }
-        else
-        {
-            var contents = await GetContentsLoaderWithFields().LoadAsync(ids.Select(x => (x, fields))).GetResultAsync(ct);
 
-            return contents?.NotNull().ToList() ?? EmptyContents;
-        }
+        return GetContentsLoaderWithFields().LoadAsync(BuildKeys(ids, fields)).Then(x => x.NotNull().ToArray());
     }
 
-    private IDataLoader<DomainId, IEnrichedAssetEntity> GetAssetsLoader()
+    private IDataLoader<CacheableId<DomainId>, IEnrichedAssetEntity> GetAssetsLoader()
     {
-        return dataLoaders.Context!.GetOrAddBatchLoader<DomainId, IEnrichedAssetEntity>(nameof(GetAssetsLoader),
+        return dataLoaders.Context!.GetOrAddCachingLoader(AssetCache, nameof(GetAssetsLoader),
             async (batch, ct) =>
             {
-                var result = await QueryAssetsByIdsAsync(new List<DomainId>(batch), ct);
+                var result = await QueryAssetsByIdsAsync(batch, ct);
 
                 return result.ToDictionary(x => x.Id);
-            });
+            }, maxBatchSize: options.DataLoaderBatchSize);
     }
 
-    private IDataLoader<DomainId, IEnrichedContentEntity> GetContentsLoader()
+    private IDataLoader<CacheableId<DomainId>, IEnrichedContentEntity> GetContentsLoader()
     {
-        return dataLoaders.Context!.GetOrAddBatchLoader<DomainId, IEnrichedContentEntity>(nameof(GetContentsLoader),
+        return dataLoaders.Context!.GetOrAddCachingLoader(ContentCache, nameof(GetContentsLoader),
             async (batch, ct) =>
             {
                 var result = await QueryContentsByIdsAsync(batch, null, ct);
 
                 return result.ToDictionary(x => x.Id);
-            });
+            }, maxBatchSize: options.DataLoaderBatchSize);
     }
 
     private IDataLoader<(DomainId Id, HashSet<string> Fields), IEnrichedContentEntity> GetContentsLoaderWithFields()
     {
-        return dataLoaders.Context!.GetOrAddBatchLoader<(DomainId Id, HashSet<string> Fields), IEnrichedContentEntity>(nameof(GetContentsLoader),
+        return dataLoaders.Context!.GetOrAddNonCachingBatchLoader<(DomainId Id, HashSet<string> Fields), IEnrichedContentEntity>(nameof(GetContentsLoaderWithFields),
             async (batch, ct) =>
             {
                 var fields = batch.SelectMany(x => x.Fields).ToHashSet();
@@ -161,7 +143,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
                 var result = await QueryContentsByIdsAsync(batch.Select(x => x.Id), fields, ct);
 
                 return result.ToDictionary(x => (x.Id, fields));
-            });
+            }, maxBatchSize: options.DataLoaderBatchSize);
     }
 
     private IDataLoader<string, IUser> GetUserLoader()
@@ -173,5 +155,31 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
 
                 return result;
             });
+    }
+
+    private static (DomainId, HashSet<string>?)[] BuildKeys(List<DomainId> ids, HashSet<string>? fields)
+    {
+        // Use manual loops and arrays to avoid allocations.
+        var keys = new (DomainId, HashSet<string>)[ids.Count];
+
+        for (var i = 0; i < ids.Count; i++)
+        {
+            keys[i] = (ids[0], fields);
+        }
+
+        return keys;
+    }
+
+    private static CacheableId<DomainId>[] BuildKeys(List<DomainId> ids, TimeSpan cacheDuration)
+    {
+        // Use manual loops and arrays to avoid allocations.
+        var keys = new CacheableId<DomainId>[ids.Count];
+
+        for (var i = 0; i < ids.Count; i++)
+        {
+            keys[i] = new CacheableId<DomainId>(ids[i], cacheDuration);
+        }
+
+        return keys;
     }
 }

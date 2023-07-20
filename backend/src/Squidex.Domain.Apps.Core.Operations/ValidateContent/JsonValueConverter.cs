@@ -265,7 +265,16 @@ public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonErro
         }
         else if (o.TryGetValue(Component.Discriminator, out found) && found.Value is string discriminator)
         {
-            id = DomainId.Create(discriminator);
+            if (Guid.TryParseExact(discriminator, "N", out _))
+            {
+                id = DomainId.Create(discriminator);
+            }
+            else
+            {
+                id = components.FirstOrDefault(x => x.Value.Name == discriminator).Key;
+            }
+
+            o[Component.Discriminator] = id;
         }
         else if (allowedIds?.Count == 1)
         {

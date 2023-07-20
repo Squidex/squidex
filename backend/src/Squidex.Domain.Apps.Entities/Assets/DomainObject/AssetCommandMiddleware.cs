@@ -69,11 +69,12 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
     private async Task UploadWithDuplicateCheckAsync(CommandContext context, UploadAssetCommand command, bool duplicate, NextDelegate next,
         CancellationToken ct)
     {
-        var tempFile = context.ContextId.ToString();
+        // Add the file Id to the command, so we can access it later in the script.
+        command.FileId = context.ContextId.ToString();
 
         try
         {
-            await EnrichWithHashAndUploadAsync(command, tempFile, ct);
+            await EnrichWithHashAndUploadAsync(command, command.FileId, ct);
 
             if (!duplicate)
             {
@@ -99,25 +100,26 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
         }
         finally
         {
-            await assetFileStore.DeleteAsync(tempFile, ct);
+            await assetFileStore.DeleteAsync(command.FileId, ct);
         }
     }
 
     private async Task UploadAndHandleAsync(CommandContext context, UploadAssetCommand command, NextDelegate next,
         CancellationToken ct)
     {
-        var tempFile = context.ContextId.ToString();
+        // Add the file Id to the command, so we can access it later in the script.
+        command.FileId = context.ContextId.ToString();
 
         try
         {
-            await EnrichWithHashAndUploadAsync(command, tempFile, ct);
+            await EnrichWithHashAndUploadAsync(command, command.FileId, ct);
             await EnrichWithMetadataAsync(command, ct);
 
             await base.HandleAsync(context, next, ct);
         }
         finally
         {
-            await assetFileStore.DeleteAsync(tempFile, ct);
+            await assetFileStore.DeleteAsync(command.FileId, ct);
         }
     }
 
