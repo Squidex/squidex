@@ -165,9 +165,8 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
 
         var filterDefinition = CreateFilter(streamFilter, lastPosition);
 
-
         var find =
-            Collection.Find(filterDefinition)
+            Collection.Find(filterDefinition).SortBy(x => x.Timestamp).ThenByDescending(x => x.EventStream)
                 .Limit(take);
 
         var taken = 0;
