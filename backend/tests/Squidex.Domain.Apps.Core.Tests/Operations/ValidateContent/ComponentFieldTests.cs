@@ -128,6 +128,19 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
     }
 
     [Fact]
+    public async Task Should_resolve_schema_id_from_name_id_id()
+    {
+        var (_, sut, components) = Field(new ComponentFieldProperties { SchemaId = schemaId1 });
+
+        var value = CreateValue("my-component", "componentField", 1);
+
+        await sut.ValidateAsync(value, errors, components: components);
+
+        Assert.Empty(errors);
+        Assert.Equal(value.AsObject[Component.Discriminator].AsString, schemaId1.ToString());
+    }
+
+    [Fact]
     public async Task Should_resolve_schema_from_single_component()
     {
         var (_, sut, components) = Field(new ComponentFieldProperties { SchemaId = schemaId1 });

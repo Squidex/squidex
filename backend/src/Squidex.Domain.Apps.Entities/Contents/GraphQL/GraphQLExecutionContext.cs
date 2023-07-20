@@ -72,7 +72,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         TimeSpan cacheDuration)
     {
         var assets = GetAssets(new List<DomainId> { id }, cacheDuration);
-        var asset = assets.Select(x => x.FirstOrDefault());
+        var asset = assets.Then(x => x.FirstOrDefault());
 
         return asset;
     }
@@ -81,12 +81,13 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         TimeSpan cacheDuration)
     {
         var contents = GetContents(new List<DomainId> { id }, fields, cacheDuration);
-        var content = contents.Select(x => x.FirstOrDefault(x => x.SchemaId.Id == schemaId));
+        var content = contents.Then(x => x.FirstOrDefault(x => x.SchemaId.Id == schemaId));
 
         return content;
     }
 
-    public IDataLoaderResult<IEnrichedAssetEntity[]> GetAssets(List<DomainId>? ids, TimeSpan cacheDuration)
+    public IDataLoaderResult<IEnrichedAssetEntity[]> GetAssets(List<DomainId>? ids,
+        TimeSpan cacheDuration)
     {
         if (ids == null || ids.Count == 0)
         {
@@ -96,7 +97,8 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return GetAssetsLoader().LoadAsync(BuildKeys(ids, cacheDuration)).Then(x => x.NotNull().ToArray());
     }
 
-    public IDataLoaderResult<IEnrichedContentEntity[]> GetContents(List<DomainId>? ids, HashSet<string>? fields, TimeSpan cacheDuration)
+    public IDataLoaderResult<IEnrichedContentEntity[]> GetContents(List<DomainId>? ids, HashSet<string>? fields,
+        TimeSpan cacheDuration)
     {
         if (ids == null || ids.Count == 0)
         {
@@ -157,7 +159,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
             });
     }
 
-    private static (DomainId, HashSet<string>?)[] BuildKeys(List<DomainId> ids, HashSet<string>? fields)
+    private static (DomainId, HashSet<string>)[] BuildKeys(List<DomainId> ids, HashSet<string> fields)
     {
         // Use manual loops and arrays to avoid allocations.
         var keys = new (DomainId, HashSet<string>)[ids.Count];

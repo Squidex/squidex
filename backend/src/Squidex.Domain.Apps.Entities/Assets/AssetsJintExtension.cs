@@ -352,5 +352,8 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
         describe(JsonType.Function, "getAssetBlurHash(asset, callback, x?, y?)",
             Resources.ScriptingGetBlurHash);
+
+        describe(JsonType.Function, "updateAsset(asset, metadata)",
+            Resources.ScriptingUpdateAsset);
     }
 }

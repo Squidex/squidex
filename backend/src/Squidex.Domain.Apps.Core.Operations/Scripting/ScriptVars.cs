@@ -108,9 +108,10 @@ public class ScriptVars : IReadOnlyDictionary<string, object?>
         return false;
     }
 
-    public void SetInitial(object? value, [CallerMemberName] string? key = null)
+    public ScriptVars SetInitial(object? value, [CallerMemberName] string? key = null)
     {
         Set(key, value, true);
+        return this;
     }
 
     public T GetValue<T>([CallerMemberName] string? key = null)

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections;
 using System.Globalization;
 using Jint;
 using Jint.Native;
@@ -126,7 +127,7 @@ public static class JsonMapper
             return result;
         }
 
-        if (value is ObjectWrapper wrapper)
+        if (value is ObjectWrapper wrapper && wrapper.Target is not IDictionary)
         {
             return JsonValue.Create(wrapper.Target);
         }

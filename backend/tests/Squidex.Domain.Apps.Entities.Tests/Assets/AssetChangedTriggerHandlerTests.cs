@@ -30,10 +30,10 @@ public class AssetChangedTriggerHandlerTests : GivenContext
 
     public AssetChangedTriggerHandlerTests()
     {
-        A.CallTo((object)(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default)))
+        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
             .Returns(true);
 
-        A.CallTo((object)(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default)))
+        A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "false", default))
             .Returns(false);
 
         sut = new AssetChangedTriggerHandler(scriptEngine, assetLoader, assetRepository);

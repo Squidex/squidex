@@ -256,31 +256,33 @@ public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonErro
 
         var id = DomainId.Empty;
 
-        if (o.TryGetValue("schemaName", out var found) && found.Value is string schemaName)
+        if (o.TryGetValue(Component.Descriptor, out var found) && found.Value is string schemaName)
         {
             id = components.FirstOrDefault(x => x.Value.Name == schemaName).Key;
-
-            o.Remove("schemaName");
-            o[Component.Discriminator] = id;
         }
         else if (o.TryGetValue(Component.Discriminator, out found) && found.Value is string discriminator)
         {
-            if (Guid.TryParseExact(discriminator, "N", out _))
+            if (Guid.TryParseExact(discriminator, "D", out _))
             {
                 id = DomainId.Create(discriminator);
             }
             else
             {
-                id = components.FirstOrDefault(x => x.Value.Name == discriminator).Key;
-            }
+                var componentEntry = components.FirstOrDefault(x => x.Value.Name == discriminator);
 
-            o[Component.Discriminator] = id;
+                if (componentEntry.Value != null)
+                {
+                    id = componentEntry.Key;
+                }
+                else
+                {
+                    id = DomainId.Create(discriminator);
+                }
+            }
         }
         else if (allowedIds?.Count == 1)
         {
             id = allowedIds[0];
-
-            o[Component.Discriminator] = id;
         }
 
         if (id == default)
@@ -295,6 +297,9 @@ public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonErro
 
         var data = new JsonObject(o);
 
+        o[Component.Discriminator] = id;
+
+        data.Remove(Component.Descriptor);
         data.Remove(Component.Discriminator);
 
         return (new Component(id.ToString(), data, schema), null);

@@ -159,4 +159,7 @@
   <data name="ScriptingResetCounterV2" xml:space="preserve">
     <value>Resets the counter with the given name to zero.</value>
   </data>
+  <data name="ScriptingUpdateAsset" xml:space="preserve">
+    <value>Update the metadata of the asset.</value>
+  </data>
 </root>

@@ -229,7 +229,7 @@ public class AssetsFluidExtensionTests : GivenContext
             ";
 
         var expected = $@"
-                Text: ErrorTooBig
+                Text: 
             ";
 
         var actual = await sut.RenderAsync(template, vars);

@@ -383,7 +383,7 @@ public sealed class SchemasController : ApiController
 
     private Task<ISchemaEntity?> GetSchemaAsync(string schema)
     {
-        if (Guid.TryParse(schema, out var guid))
+        if (Guid.TryParseExact(schema, "D", out var guid))
         {
             var schemaId = DomainId.Create(guid);
 
