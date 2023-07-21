@@ -82,6 +82,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
             var command = new AnnotateAsset
             {
+                FromRule = true,
                 AppId = asset.AppId,
                 Actor = RefToken.Client("Script"),
                 AssetId = asset.Id,

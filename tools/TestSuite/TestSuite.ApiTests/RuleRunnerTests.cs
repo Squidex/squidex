@@ -47,11 +47,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         {
             Action = new WebhookRuleActionDto
             {
-                SharedSecret = secret,
-                Method = WebhookMethod.POST,
-                Payload = null,
-                PayloadType = null,
-                Url = new Uri(url)
+                Url = new Uri(url),
+                // Also test the secret in this case.
+                SharedSecret = secret
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -66,12 +64,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         await CreateContentAsync(app);
 
         // Get requests.
-        var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
-        var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
+        var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost() && x.HasContent(schemaName));
 
-        Assert.NotNull(request);
-        Assert.NotNull(request.Headers["X-Signature"]);
-        Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
+        AssertRequest(request);
 
 
         // STEP 4: Get events.
@@ -123,9 +118,6 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         {
             Action = new WebhookRuleActionDto
             {
-                Method = WebhookMethod.POST,
-                Url = new Uri(url),
-                PayloadType = null,
                 Payload = @$"Script(
                     getReferences(event.data.{TestEntityWithReferencesData.ReferencesField}.iv, function (references) {{
                         var payload = {{
@@ -135,6 +127,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
                         complete(payload);
                     }});
                 )",
+                Url = new Uri(url),
+                // Also test the secret in this case.
+                SharedSecret = secret
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -169,10 +164,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
 
         // Get requests.
-        var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
-        var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains(updatedString, StringComparison.OrdinalIgnoreCase) && x.Content.Contains(updateEvent, StringComparison.OrdinalIgnoreCase));
+        var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost() && x.HasContent(updatedString) && x.HasContent(updateEvent));
 
-        Assert.NotNull(request);
+        AssertRequest(request);
 
 
         // STEP 4: Get events.
@@ -216,8 +210,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         await CreateContentAsync(app);
 
         // Get requests.
-        var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
-        var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
+        var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost() && x.HasContent(schemaName));
 
         Assert.NotNull(request);
 
@@ -246,11 +239,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         {
             Action = new WebhookRuleActionDto
             {
-                SharedSecret = secret,
-                Method = WebhookMethod.POST,
-                Payload = null,
-                PayloadType = null,
-                Url = new Uri(url)
+                Url = new Uri(url),
+                // Also test the secret in this case.
+                SharedSecret = secret
             },
             Trigger = new AssetChangedRuleTriggerDto()
         };
@@ -259,15 +250,12 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
 
         // STEP 3: Create test asset.
-        await CreateAssetAsync(app);
+        var asset = await CreateAssetAsync(app);
 
         // Get requests.
-        var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
-        var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains("logo-squared", StringComparison.OrdinalIgnoreCase));
+        var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost() && x.HasContent(asset.FileName));
 
-        Assert.NotNull(request);
-        Assert.NotNull(request.Headers["X-Signature"]);
-        Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
+        AssertRequest(request);
 
 
         // STEP 4: Get events.
@@ -276,6 +264,45 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
         Assert.Single(eventsAll.Items);
         Assert.Single(eventsRule.Items);
+    }
+
+    [Fact]
+    public async Task Should_run_rules_on_asset_and_update_metadata()
+    {
+        // STEP 0: Create app.
+        var (app, _) = await _.PostAppAsync();
+
+
+        // STEP 1: Start webhook session.
+        var (url, sessionId) = await webhookCatcher.CreateSessionAsync();
+
+
+        // STEP 2: Create rule.
+        var createRule = new CreateRuleDto
+        {
+            Action = new ScriptRuleActionDto
+            {
+                Script = @"
+                    getAssetBlurHash(event, function (blurHash) {
+                        var metadata = { ...event.metadata, blurHash };
+
+                        updateAsset(event, metadata);
+                    });
+                    "
+            },
+            Trigger = new AssetChangedRuleTriggerDto()
+        };
+
+        var rule = await app.Rules.PostRuleAsync(createRule);
+
+
+        // STEP 3: Create test asset.
+        var asset = await CreateAssetAsync(app);
+
+        // Get asset
+        var found = await app.Assets.PollAsync(x => x.Id == asset.Id && x.Metadata.ContainsKey("blurHash"));
+
+        Assert.NotNull(found);
     }
 
     [Fact]
@@ -294,11 +321,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         {
             Action = new WebhookRuleActionDto
             {
-                SharedSecret = secret,
-                Method = WebhookMethod.POST,
-                Payload = null,
-                PayloadType = null,
-                Url = new Uri(url)
+                Url = new Uri(url),
+                // Also test the secret in this case.
+                SharedSecret = secret
             },
             Trigger = new SchemaChangedRuleTriggerDto()
         };
@@ -310,12 +335,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         await TestEntity.CreateSchemaAsync(app.Schemas, schemaName);
 
         // Get requests.
-        var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromMinutes(2));
-        var request = requests.FirstOrDefault(x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
+        var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost() && x.HasContent(schemaName));
 
-        Assert.NotNull(request);
-        Assert.NotNull(request.Headers["X-Signature"]);
-        Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
+        AssertRequest(request);
 
 
         // STEP 4: Get events.
@@ -342,11 +364,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         {
             Action = new WebhookRuleActionDto
             {
-                SharedSecret = secret,
-                Method = WebhookMethod.POST,
-                Payload = null,
-                PayloadType = null,
-                Url = new Uri(url)
+                Url = new Uri(url),
+                // Also test the secret in this case.
+                SharedSecret = secret
             },
             Trigger = new ManualRuleTriggerDto()
         };
@@ -358,12 +378,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         await app.Rules.TriggerRuleAsync(rule.Id);
 
         // Get requests.
-        var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromSeconds(30));
-        var request = requests.FirstOrDefault(x => x.Method == "POST");
+        var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost());
 
-        Assert.NotNull(request);
-        Assert.NotNull(request.Headers["X-Signature"]);
-        Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
+        AssertRequest(request);
 
 
         // STEP 4: Get events.
@@ -392,10 +409,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         {
             Action = new WebhookRuleActionDto
             {
-                Method = WebhookMethod.POST,
-                Payload = null,
-                PayloadType = null,
-                Url = new Uri(url)
+                Url = new Uri(url),
+                // Also test the secret in this case.
+                SharedSecret = secret
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -417,9 +433,9 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         await app.Rules.PutRuleRunAsync(rule.Id, fromSnapshots);
 
         // Get requests.
-        var requests = await webhookCatcher.WaitForRequestsAsync(sessionId, TimeSpan.FromSeconds(30));
+        var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost() && x.HasContent(schemaName));
 
-        Assert.Contains(requests, x => x.Method == "POST" && x.Content.Contains(schemaName, StringComparison.OrdinalIgnoreCase));
+        AssertRequest(request);
     }
 
     private async Task CreateContentAsync(ISquidexClient app)
@@ -435,7 +451,7 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         });
     }
 
-    private static async Task CreateAssetAsync(ISquidexClient app)
+    private static async Task<AssetDto> CreateAssetAsync(ISquidexClient app)
     {
         // Upload a test asset
         var fileInfo = new FileInfo("Assets/logo-squared.png");
@@ -444,7 +460,15 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         {
             var upload = new FileParameter(stream, fileInfo.Name, "image/png");
 
-            await app.Assets.PostAssetAsync(file: upload);
+            return await app.Assets.PostAssetAsync(file: upload);
         }
+    }
+
+    private void AssertRequest(WebhookRequest request)
+    {
+        Assert.NotNull(request);
+        Assert.NotNull(request.Headers["X-Signature"]);
+
+        Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
     }
 }

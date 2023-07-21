@@ -378,10 +378,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 4: Check tags.
-        var tags = await _.Client.Assets.WaitForTagsAsync(tag1, TimeSpan.FromMinutes(2));
+        var tags = await _.Client.Assets.PollTagAsync(tag1);
 
         Assert.Contains(tag1, tags);
         Assert.Contains(tag2, tags);
+
         Assert.Equal(1, tags[tag1]);
         Assert.Equal(1, tags[tag2]);
 
@@ -676,7 +677,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         await _.Client.Assets.DeleteAssetFolderAsync(folder_1.Id);
 
         // Ensure that asset in folder is deleted.
-        Assert.True(await _.Client.Assets.WaitForDeletionAsync(asset_1.Id, TimeSpan.FromSeconds(30)));
+        Assert.True(await _.Client.Assets.PollForDeletionAsync(asset_1.Id));
 
         // Ensure that other asset is not deleted.
         Assert.NotNull(await _.Client.Assets.GetAssetAsync(asset_2.Id));

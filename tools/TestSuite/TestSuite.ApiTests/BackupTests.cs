@@ -45,8 +45,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         // STEP 2: Create backup.
         await app.Backups.PostBackupAsync();
 
-        var backups = await app.Backups.WaitForBackupsAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
-        var backup = backups.FirstOrDefault(x => x.Status is JobStatus.Completed or JobStatus.Failed);
+        var backup = await app.Backups.PollAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, backup?.Status);
 
@@ -65,7 +64,7 @@ public class BackupTests : IClassFixture<ClientFixture>
 
 
         // STEP 4: Wait for the backup.
-        var restore = await app.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
+        var restore = await app.Backups.PollRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, restore?.Status);
     }
@@ -87,8 +86,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         // STEP 2: Create backup.
         await app.Backups.PostBackupAsync();
 
-        var backups = await app.Backups.WaitForBackupsAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
-        var backup = backups.FirstOrDefault(x => x.Status is JobStatus.Completed or JobStatus.Failed);
+        var backup = await app.Backups.PollAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, backup?.Status);
 
@@ -111,7 +109,7 @@ public class BackupTests : IClassFixture<ClientFixture>
 
 
         // STEP 5: Wait for the backup.
-        var restore = await app.Backups.WaitForRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed, TimeSpan.FromMinutes(2));
+        var restore = await app.Backups.PollRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, restore?.Status);
     }

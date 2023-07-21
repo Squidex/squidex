@@ -50,9 +50,9 @@ public class SearchTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Search for schema.
-        var result = await _.Client.Search.WaitForSearchAsync(schemaName, x => x.Type == SearchResultType.Content, TimeSpan.FromSeconds(30));
+        var result = await _.Client.Search.PollAsync(schemaName, x => x.Type == SearchResultType.Content);
 
-        Assert.NotEmpty(result);
+        Assert.NotNull(result);
     }
 
     [Fact]
@@ -70,9 +70,9 @@ public class SearchTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Search for schema.
-        var result = await _.Client.Search.WaitForSearchAsync(contentString, x => x.Type == SearchResultType.Content, TimeSpan.FromSeconds(30));
+        var result = await _.Client.Search.PollAsync(contentString, x => x.Type == SearchResultType.Content);
 
-        Assert.NotEmpty(result);
+        Assert.NotNull(result);
     }
 
     [Theory]
