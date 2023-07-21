@@ -221,7 +221,7 @@ public sealed class ContentQueryService : IContentQueryService
 
         var canCache = !context.IsFrontendClient;
 
-        if (Guid.TryParse(schemaIdOrName, out var guid))
+        if (Guid.TryParseExact(schemaIdOrName, "D", out var guid))
         {
             var schemaId = DomainId.Create(guid);
 

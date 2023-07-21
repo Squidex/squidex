@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
-public abstract class ScriptExecutionContext : ScriptContext
+public abstract class ScriptExecutionContext : ScriptVars
 {
     public Engine Engine { get; }
 

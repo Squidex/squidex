@@ -26,7 +26,7 @@ public sealed class CounterJintExtension : IJintExtension, IScriptDescriptor
 
     public void Extend(ScriptExecutionContext context)
     {
-        if (!context.TryGetValue<DomainId>("appId", out var appId))
+        if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
         {
             return;
         }
@@ -48,7 +48,7 @@ public sealed class CounterJintExtension : IJintExtension, IScriptDescriptor
 
     public void ExtendAsync(ScriptExecutionContext context)
     {
-        if (!context.TryGetValue<DomainId>("appId", out var appId))
+        if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
         {
             return;
         }

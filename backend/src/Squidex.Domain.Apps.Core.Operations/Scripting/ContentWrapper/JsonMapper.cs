@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections;
 using System.Globalization;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
+using Jint.Runtime.Interop;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -123,6 +125,11 @@ public static class JsonMapper
             }
 
             return result;
+        }
+
+        if (value is ObjectWrapper wrapper && wrapper.Target is not IDictionary)
+        {
+            return JsonValue.Create(wrapper.Target);
         }
 
         if (value.IsObject())

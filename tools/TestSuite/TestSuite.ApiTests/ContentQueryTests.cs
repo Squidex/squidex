@@ -362,7 +362,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     {
         var q = new ContentQuery { Search = "2" };
 
-        var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
+        var items = await _.Contents.PollAsync(q, x => true);
 
         AssertItems(items, 1, new[] { 2 });
     }
@@ -378,7 +378,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
+        var items = await _.Contents.PollAsync(q, x => true);
 
         AssertItems(items, 1, new[] { 2 });
     }
@@ -388,7 +388,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     {
         var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(103 3)') lt 1000" };
 
-        var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
+        var items = await _.Contents.PollAsync(q, x => true);
 
         AssertItems(items, 1, new[] { 3 });
     }
@@ -414,7 +414,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
+        var items = await _.Contents.PollAsync(q, x => true);
 
         AssertItems(items, 1, new[] { 3 });
     }
@@ -424,7 +424,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     {
         var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(104 4)') lt 1000" };
 
-        var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
+        var items = await _.Contents.PollAsync(q, x => true);
 
         AssertItems(items, 1, new[] { 4 });
     }
@@ -499,7 +499,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var items = await _.Contents.WaitForContentAsync(q, x => true, TimeSpan.FromSeconds(30));
+        var items = await _.Contents.PollAsync(q, x => true);
 
         AssertItems(items, 1, new[] { 4 });
     }

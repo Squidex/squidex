@@ -29,12 +29,12 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
 
     public void ExtendAsync(ScriptExecutionContext context)
     {
-        if (!context.TryGetValue<DomainId>("appId", out var appId))
+        if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
         {
             return;
         }
 
-        if (!context.TryGetValue<ClaimsPrincipal>("user", out var user))
+        if (!context.TryGetValueIfExists<ClaimsPrincipal>("user", out var user))
         {
             return;
         }

@@ -537,10 +537,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     [Fact]
     public void Should_not_allow_to_overwrite_initial_var()
     {
-        var vars = new ScriptVars
-        {
-            ["value"] = 13
-        };
+        var vars = new ScriptVars().SetInitial(13, "value");
 
         const string script = @"
                 ctx.value = ctx.value * 2;

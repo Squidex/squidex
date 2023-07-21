@@ -17,66 +17,77 @@ public sealed class AssetEntityScriptVars : ScriptVars
     [FieldDescription(nameof(FieldDescriptions.AssetParentId))]
     public DomainId ParentId
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetFileHash))]
     public string? FileHash
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetFileName))]
     public string? FileName
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetSlug))]
     public string? FileSlug
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetMimeType))]
     public string? MimeType
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetParentPath))]
     public Array? ParentPath
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetMetadata))]
     public AssetMetadata? Metadata
     {
-        set => SetValue(value != null ? new ReadOnlyDictionary<string, JsonValue>(value) : null);
+        set => SetInitial(value != null ? new ReadOnlyDictionary<string, JsonValue>(value) : null);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetTags))]
     public HashSet<string>? Tags
     {
-        set => SetValue(value != null ? new ReadOnlyCollection<string>(value.ToList()) : null);
+        set => SetInitial(value != null ? new ReadOnlyCollection<string>(value.ToList()) : null);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetFileSize))]
     public long FileSize
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetFileVersion))]
     public long FileVersion
     {
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetIsProtected))]
     public bool? IsProtected
     {
-        set => SetValue(value);
+        set => SetInitial(value);
+    }
+
+    [FieldDescription(nameof(FieldDescriptions.AssetType))]
+    public AssetType Type
+    {
+        set => SetInitial(value);
+    }
+
+    public string? FileId
+    {
+        set => SetInitial(value);
     }
 }

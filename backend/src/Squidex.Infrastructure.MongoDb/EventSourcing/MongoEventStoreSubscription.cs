@@ -143,10 +143,9 @@ public sealed class MongoEventStoreSubscription : IEventSubscription
         if (byStream != null)
         {
             var filterBuilder = Builders<ChangeStreamDocument<MongoEventCommit>>.Filter;
+            var filterExpression = filterBuilder.Or(filterBuilder.Ne(x => x.OperationType, ChangeStreamOperationType.Insert), byStream);
 
-            var filter = filterBuilder.Or(filterBuilder.Ne(x => x.OperationType, ChangeStreamOperationType.Insert), byStream);
-
-            return result.Match(filter);
+            return result.Match(filterExpression);
         }
 
         return result;

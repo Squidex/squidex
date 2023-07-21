@@ -98,23 +98,21 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
         }
     });
 
-    private static readonly IFieldResolver Assets = CreateAsyncValueResolver((value, fieldContext, context) =>
+    private static readonly IFieldResolver Assets = CreateValueResolver((value, fieldContext, context) =>
     {
         var ids = value.AsIds();
 
-        return context.GetAssetsAsync(ids,
-            fieldContext.CacheDuration(),
-            fieldContext.CancellationToken);
+        return context.GetAssets(ids,
+            fieldContext.CacheDuration());
     });
 
-    private static readonly IFieldResolver References = CreateAsyncValueResolver((value, fieldContext, context) =>
+    private static readonly IFieldResolver References = CreateValueResolver((value, fieldContext, context) =>
     {
         var ids = value.AsIds();
 
-        return context.GetContentsAsync(ids,
+        return context.GetContents(ids,
             fieldContext.FieldNames(),
-            fieldContext.CacheDuration(),
-            fieldContext.CancellationToken);
+            fieldContext.CacheDuration());
     });
 
     private readonly Builder builder;

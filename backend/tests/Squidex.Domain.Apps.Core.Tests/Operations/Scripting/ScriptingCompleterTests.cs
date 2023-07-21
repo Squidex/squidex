@@ -101,6 +101,7 @@ public class ScriptingCompleterTests
                 "ctx.asset.parentId",
                 "ctx.asset.parentPath",
                 "ctx.asset.tags",
+                "ctx.asset.type",
                 "ctx.assetId",
                 "ctx.command",
                 "ctx.command.fileHash",

@@ -378,10 +378,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 4: Check tags.
-        var tags = await _.Client.Assets.WaitForTagsAsync(tag1, TimeSpan.FromMinutes(2));
+        var tags = await _.Client.Assets.PollTagAsync(tag1);
 
         Assert.Contains(tag1, tags);
         Assert.Contains(tag2, tags);
+
         Assert.Equal(1, tags[tag1]);
         Assert.Equal(1, tags[tag2]);
 
@@ -479,7 +480,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         var asset_1 = await app.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", parentId: folder.Id);
 
 
-        // STEP 3: Download asset.
+        // STEP 3: Download asset before script.
         await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
         {
             var downloaded = await _.DownloadAsync(asset_1);
@@ -514,6 +515,56 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         }
 
         await Verify(asset_1);
+    }
+
+    [Fact]
+    public async Task Should_compute_blur_hash_script()
+    {
+        // STEP 0: Create app.
+        var (app, _) = await _.PostAppAsync();
+
+
+        // STEP 1: Create folder.
+        var folderRequest = new CreateAssetFolderDto
+        {
+            FolderName = "folder"
+        };
+
+        var folder = await app.Assets.PostAssetFolderAsync(folderRequest);
+
+
+        // STEP 2: Set script to calculate blur hash
+        var scriptsRequest = new UpdateAssetScriptsDto
+        {
+            Create = @"
+                if (ctx.asset.type === 'Image') {
+                    getAssetBlurHash(ctx.asset, function (hash) {
+                        ctx.command.metadata['blurHash'] = hash;
+                    });
+                }",
+            Update = @"
+                if (ctx.asset.type === 'Image') {
+                    getAssetBlurHash(ctx.asset, function (hash) {
+                        ctx.command.metadata['blurHash'] = hash;
+                    });
+                }"
+        };
+
+        await app.Apps.PutAssetScriptsAsync(scriptsRequest);
+
+
+        // STEP 3: Create asset.
+        var asset_1 = await app.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png", parentId: folder.Id);
+
+
+        // STEP 4: Create asset.
+        var asset_2 = await app.Assets.UpdateFileAsync(asset_1.Id, "Assets/logo-wide.png", "image/png");
+
+        Assert.NotNull(asset_1.Metadata["blurHash"]);
+        Assert.NotNull(asset_2.Metadata["blurHash"]);
+        Assert.NotEqual(asset_1.Metadata["blurHash"], asset_2.Metadata["blurHash"]);
+
+        await Verify(asset_2);
     }
 
     [Fact]
@@ -626,7 +677,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         await _.Client.Assets.DeleteAssetFolderAsync(folder_1.Id);
 
         // Ensure that asset in folder is deleted.
-        Assert.True(await _.Client.Assets.WaitForDeletionAsync(asset_1.Id, TimeSpan.FromSeconds(30)));
+        Assert.True(await _.Client.Assets.PollForDeletionAsync(asset_1.Id));
 
         // Ensure that other asset is not deleted.
         Assert.NotNull(await _.Client.Assets.GetAssetAsync(asset_2.Id));

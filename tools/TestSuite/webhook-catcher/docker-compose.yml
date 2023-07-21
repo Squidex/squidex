@@ -1,0 +1,13 @@
+version: '3'
+services:
+  webhookcatcher:
+    image: tarampampam/webhook-tester
+    command: serve --port 1026
+    ports:
+      - "1026:1026"
+    networks:
+      - internal
+    
+networks:
+  internal:
+    driver: bridge

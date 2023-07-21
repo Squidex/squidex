@@ -76,7 +76,7 @@ public static class JintExtensions
         {
             foreach (var (key, item) in vars)
             {
-                engine.SetValue(key, item.Value!);
+                engine.SetValue(key, item);
             }
         }
 

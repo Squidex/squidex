@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.Text;
+using Fluid.Values;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -18,46 +20,62 @@ using Squidex.Infrastructure.ObjectPool;
 namespace Squidex.Domain.Apps.Entities.Assets;
 
 public record struct AssetRef(
-    DomainId AppId,
+    NamedId<DomainId> AppId,
     DomainId Id,
     long FileVersion,
     long FileSize,
     string MimeType,
+    string? FileId,
     AssetType Type);
 
 public static class Transformations
 {
+    private const int MaxSize = 4 * 1024 * 1024;
+    private const string ErrorNoAsset = "NoAsset";
+    private const string ErrorTooBig = "ErrorTooBig";
+
     public static AssetRef ToRef(this EnrichedAssetEvent @event)
     {
         return new AssetRef(
-            @event.AppId.Id,
+            @event.AppId,
             @event.Id,
             @event.FileVersion,
             @event.FileSize,
             @event.MimeType,
+            null,
             @event.AssetType);
     }
 
     public static AssetRef ToRef(this IAssetEntity asset)
     {
         return new AssetRef(
-            asset.AppId.Id,
+            asset.AppId,
             asset.Id,
             asset.FileVersion,
             asset.FileSize,
             asset.MimeType,
+            null,
             asset.Type);
     }
 
-    public static async Task<string> GetTextAsync(this AssetRef asset, string? encoding,
-        IAssetFileStore assetFileStore,
+    public static async Task<string> GetTextAsync(this AssetRef asset, string? encoding, IServiceProvider services,
         CancellationToken ct = default)
     {
+        if (asset == default)
+        {
+            return ErrorNoAsset;
+        }
+
+        if (asset.FileSize > MaxSize)
+        {
+            return ErrorTooBig;
+        }
+
+        var assetFileStore = services.GetRequiredService<IAssetFileStore>();
+
         using (var stream = DefaultPools.MemoryStream.GetStream())
         {
-            await assetFileStore.DownloadAsync(asset.AppId, asset.Id, asset.FileVersion, null, stream, default, ct);
-
-            stream.Position = 0;
+            await DownloadAsync(asset, assetFileStore, stream, ct);
 
             var bytes = stream.ToArray();
 
@@ -75,18 +93,41 @@ public static class Transformations
         }
     }
 
-    public static async Task<string?> GetBlurHashAsync(this AssetRef asset, BlurOptions options,
-        IAssetFileStore assetFileStore,
-        IAssetThumbnailGenerator assetThumbnails,
+    public static async Task<string?> GetBlurHashAsync(this AssetRef asset, BlurOptions options, IServiceProvider services,
         CancellationToken ct = default)
     {
+        if (asset == default)
+        {
+            return ErrorNoAsset;
+        }
+
+        if (asset.FileSize > MaxSize || asset.Type != AssetType.Image)
+        {
+            return null;
+        }
+
+        var assetFileStore = services.GetRequiredService<IAssetFileStore>();
+        var assetGenerator = services.GetRequiredService<IAssetThumbnailGenerator>();
+
         using (var stream = DefaultPools.MemoryStream.GetStream())
         {
-            await assetFileStore.DownloadAsync(asset.AppId, asset.Id, asset.FileVersion, null, stream, default, ct);
+            await DownloadAsync(asset, assetFileStore, stream, ct);
 
-            stream.Position = 0;
-
-            return await assetThumbnails.ComputeBlurHashAsync(stream, asset.MimeType, options, ct);
+            return await assetGenerator.ComputeBlurHashAsync(stream, asset.MimeType, options, ct);
         }
+    }
+
+    private static async Task DownloadAsync(AssetRef asset, IAssetFileStore assetFileStore, MemoryStream stream, CancellationToken ct)
+    {
+        if (asset.FileId != null)
+        {
+            await assetFileStore.DownloadAsync(asset.FileId, stream, ct);
+        }
+        else
+        {
+            await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, null, stream, default, ct);
+        }
+
+        stream.Position = 0;
     }
 }

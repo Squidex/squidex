@@ -65,8 +65,6 @@ public abstract class QueryExecutionContext : Dictionary<string, object?>
             maxRequests.Release();
         }
 
-        AssetCache.SetMany(assets.Select(x => (x.Id, x))!);
-
         return assets;
     }
 
@@ -84,8 +82,6 @@ public abstract class QueryExecutionContext : Dictionary<string, object?>
         {
             maxRequests.Release();
         }
-
-        ContentCache.SetMany(contents.Select(x => (x.Id, x))!);
 
         return contents;
     }

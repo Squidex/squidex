@@ -11,7 +11,6 @@ using Fluid.Ast;
 using Fluid.Values;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Assets;
-using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Infrastructure;
@@ -21,9 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public sealed class AssetsFluidExtension : IFluidExtension
 {
-    private static readonly FluidValue ErrorNoAsset = new StringValue("NoAsset");
-    private static readonly FluidValue ErrorNoImage = new StringValue("NoImage");
-    private static readonly FluidValue ErrorTooBig = new StringValue("ErrorTooBig");
     private readonly IServiceProvider serviceProvider;
 
     public AssetsFluidExtension(IServiceProvider serviceProvider)
@@ -85,91 +81,60 @@ public sealed class AssetsFluidExtension : IFluidExtension
     {
         options.Filters.AddFilter("assetText", async (input, arguments, context) =>
         {
-            if (input is not ObjectValue objectValue)
-            {
-                return ErrorNoAsset;
-            }
+            TryGetAssetRef(input, out var asset);
 
-            async Task<FluidValue> ResolveAssetTextAsync(AssetRef asset)
-            {
-                if (asset.FileSize > 256_000)
-                {
-                    return ErrorTooBig;
-                }
+            var encoding = arguments.At(0).ToStringValue()?.ToUpperInvariant();
+            var encoded = await asset.GetTextAsync(encoding, serviceProvider, default);
 
-                var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
-
-                var encoding = arguments.At(0).ToStringValue()?.ToUpperInvariant();
-                var encoded = await asset.GetTextAsync(encoding, assetFileStore, default);
-
-                return new StringValue(encoded);
-            }
-
-            switch (objectValue.ToObjectValue())
-            {
-                case IAssetEntity asset:
-                    return await ResolveAssetTextAsync(asset.ToRef());
-
-                case EnrichedAssetEvent @event:
-                    return await ResolveAssetTextAsync(@event.ToRef());
-            }
-
-            return ErrorNoAsset;
+            return new StringValue(encoded);
         });
 
         options.Filters.AddFilter("assetBlurHash", async (input, arguments, context) =>
         {
-            if (input is not ObjectValue objectValue)
+            TryGetAssetRef(input, out var asset);
+
+            var options = new BlurOptions();
+
+            var arg0 = arguments.At(0);
+            var arg1 = arguments.At(1);
+
+            if (arg0.Type == FluidValues.Number)
             {
-                return ErrorNoAsset;
+                options.ComponentX = (int)arg0.ToNumberValue();
             }
 
-            async Task<FluidValue> ResolveAssetHashAsync(AssetRef asset)
+            if (arg1.Type == FluidValues.Number)
             {
-                if (asset.FileSize > 512_000)
-                {
-                    return ErrorTooBig;
-                }
-
-                if (asset.Type != AssetType.Image)
-                {
-                    return ErrorNoImage;
-                }
-
-                var options = new BlurOptions();
-
-                var arg0 = arguments.At(0);
-                var arg1 = arguments.At(1);
-
-                if (arg0.Type == FluidValues.Number)
-                {
-                    options.ComponentX = (int)arg0.ToNumberValue();
-                }
-
-                if (arg1.Type == FluidValues.Number)
-                {
-                    options.ComponentX = (int)arg1.ToNumberValue();
-                }
-
-                var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
-                var assetThumbnailGenerator = serviceProvider.GetRequiredService<IAssetThumbnailGenerator>();
-
-                var blur = await asset.GetBlurHashAsync(options, assetFileStore, assetThumbnailGenerator, default);
-
-                return new StringValue(blur);
+                options.ComponentX = (int)arg1.ToNumberValue();
             }
 
-            switch (objectValue.ToObjectValue())
-            {
-                case IAssetEntity asset:
-                    return await ResolveAssetHashAsync(asset.ToRef());
+            var blur = await asset.GetBlurHashAsync(options, serviceProvider, default);
 
-                case EnrichedAssetEvent @event:
-                    return await ResolveAssetHashAsync(@event.ToRef());
-            }
-
-            return ErrorNoAsset;
+            return new StringValue(blur);
         });
+    }
+
+    private static bool TryGetAssetRef(FluidValue input, out AssetRef assetRef)
+    {
+        assetRef = default;
+
+        if (input is not ObjectValue objectValue)
+        {
+            return false;
+        }
+
+        switch (objectValue.ToObjectValue())
+        {
+            case IAssetEntity asset:
+                assetRef = asset.ToRef();
+                return true;
+
+            case EnrichedAssetEvent @event:
+                assetRef = @event.ToRef();
+                return true;
+        }
+
+        return true;
     }
 
     private static async Task<IAssetEntity?> ResolveAssetAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)

@@ -11,5 +11,7 @@ public sealed class GraphQLOptions
 {
     public int CacheDuration { get; set; } = 10 * 60;
 
+    public int DataLoaderBatchSize { get; set; } = 1000;
+
     public bool EnableSubscriptions { get; set; } = true;
 }

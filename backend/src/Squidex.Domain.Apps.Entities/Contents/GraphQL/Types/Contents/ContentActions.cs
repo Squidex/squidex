@@ -81,7 +81,7 @@ internal static class ContentActions
             }
         };
 
-        public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
+        public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
         {
             var contentId = fieldContext.GetArgument<DomainId>("id");
 
@@ -90,15 +90,13 @@ internal static class ContentActions
 
             if (contentVersion >= 0)
             {
-                return await context.FindContentAsync(contentSchemaId.ToString(), contentId, contentVersion.Value,
-                    fieldContext.CancellationToken);
+                return context.GetContent(contentSchemaId, contentId, contentVersion.Value);
             }
             else
             {
-                return await context.GetContentAsync(contentSchemaId, contentId,
+                return context.GetContent(contentSchemaId, contentId,
                     fieldContext.FieldNames(),
-                    fieldContext.CacheDuration(),
-                    fieldContext.CancellationToken);
+                    fieldContext.CacheDuration());
             }
         });
     }
@@ -115,14 +113,13 @@ internal static class ContentActions
             }
         };
 
-        public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
+        public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
         {
             var ids = fieldContext.GetArgument<DomainId[]>("ids").ToList();
 
-            return await context.GetContentsAsync(ids,
+            return context.GetContents(ids,
                 fieldContext.FieldNames(),
-                fieldContext.CacheDuration(),
-                fieldContext.CancellationToken);
+                fieldContext.CacheDuration());
         });
     }
 

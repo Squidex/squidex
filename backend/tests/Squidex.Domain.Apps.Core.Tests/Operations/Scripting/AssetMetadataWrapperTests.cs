@@ -6,18 +6,19 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
+namespace Squidex.Domain.Apps.Core.Operations.Scripting;
 
-public class ScriptMetadataWrapperTests
+public class AssetMetadataWrapperTests
 {
     private readonly AssetMetadata metadata = new AssetMetadata();
-    private readonly ScriptMetadataWrapper sut;
+    private readonly AssetMetadataWrapper sut;
 
-    public ScriptMetadataWrapperTests()
+    public AssetMetadataWrapperTests()
     {
-        sut = new ScriptMetadataWrapper(metadata);
+        sut = new AssetMetadataWrapper(metadata);
     }
 
     [Fact]

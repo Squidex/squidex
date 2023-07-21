@@ -8,6 +8,7 @@
 using System.Security.Claims;
 using Jint;
 using Jint.Native;
+using Jint.Native.Object;
 using Jint.Runtime;
 using Jint.Runtime.Interop;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,17 +16,19 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
 public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 {
-    private static readonly JsString ErrorNoAsset = new JsString(nameof(ErrorNoAsset));
-    private static readonly JsString ErrorTooBig = new JsString(nameof(ErrorTooBig));
+    private delegate void UpdateAssetDelegate(JsValue asset, JsValue metadata);
     private delegate void GetAssetsDelegate(JsValue references, Action<JsValue> callback);
     private delegate void GetAssetTextDelegate(JsValue asset, Action<JsValue> callback, JsValue? encoding);
     private delegate void GetBlurHashDelegate(JsValue asset, Action<JsValue> callback, JsValue? componentX, JsValue? componentY);
@@ -41,16 +44,64 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         AddGetAssetText(context);
         AddGetAssetBlurHash(context);
         AddGetAssetObject(context);
+        AddUpdateAsset(context);
     }
 
-    private void AddGetAssetObject(ScriptExecutionContext context)
+    private void AddUpdateAsset(ScriptExecutionContext context)
     {
-        if (!context.TryGetValue<DomainId>("appId", out var appId))
+        if (!context.TryGetValueIfExists<ClaimsPrincipal>("user", out var user))
         {
             return;
         }
 
-        if (!context.TryGetValue<ClaimsPrincipal>("user", out var user))
+        var updateAsset = new UpdateAssetDelegate((asset, metadata) =>
+        {
+            UpdateAsset(context, user, asset, metadata);
+        });
+
+        context.Engine.SetValue("updateAsset", updateAsset);
+    }
+
+    private void UpdateAsset(ScriptExecutionContext context, ClaimsPrincipal user, JsValue input, JsValue metadata)
+    {
+        context.Schedule(async (scheduler, ct) =>
+        {
+            if (!TryGetAssetRef(context, input, out var asset) || metadata is not ObjectInstance metadataObj)
+            {
+                return;
+            }
+
+            var commandBus = serviceProvider.GetRequiredService<ICommandBus>();
+
+            var assetMetadata = new AssetMetadata();
+
+            foreach (var (key, value) in metadataObj.GetOwnProperties())
+            {
+                assetMetadata[key.AsString()] = JsonMapper.Map(value.Value);
+            }
+
+            var command = new AnnotateAsset
+            {
+                FromRule = true,
+                AppId = asset.AppId,
+                Actor = RefToken.Client("Script"),
+                AssetId = asset.Id,
+                Metadata = assetMetadata,
+                User = user,
+            };
+
+            await commandBus.PublishAsync(command, default);
+        });
+    }
+
+    private void AddGetAssetObject(ScriptExecutionContext context)
+    {
+        if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
+        {
+            return;
+        }
+
+        if (!context.TryGetValueIfExists<ClaimsPrincipal>("user", out var user))
         {
             return;
         }
@@ -99,46 +150,16 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
         context.Schedule(async (scheduler, ct) =>
         {
-            if (input is not ObjectWrapper objectWrapper)
+            TryGetAssetRef(context, input, out var asset);
+            try
             {
-                scheduler.Run(callback, ErrorNoAsset);
-                return;
+                var text = await asset.GetTextAsync(encoding?.ToString(), serviceProvider, ct);
+
+                scheduler.Run(callback, text);
             }
-
-            async Task ResolveAssetText(AssetRef asset)
+            catch
             {
-                if (asset.FileSize > 256_000)
-                {
-                    scheduler.Run(callback, ErrorTooBig);
-                    return;
-                }
-
-                var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
-                try
-                {
-                    var text = await asset.GetTextAsync(encoding?.ToString(), assetFileStore, ct);
-
-                    scheduler.Run(callback, text);
-                }
-                catch
-                {
-                    scheduler.Run(callback, JsValue.Null);
-                }
-            }
-
-            switch (objectWrapper.Target)
-            {
-                case IAssetEntity asset:
-                    await ResolveAssetText(asset.ToRef());
-                    break;
-
-                case EnrichedAssetEvent e:
-                    await ResolveAssetText(e.ToRef());
-                    break;
-
-                default:
-                    scheduler.Run(callback, ErrorNoAsset);
-                    break;
+                scheduler.Run(callback, JsValue.Null);
             }
         });
     }
@@ -152,59 +173,29 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
         context.Schedule(async (scheduler, ct) =>
         {
-            if (input is not ObjectWrapper objectWrapper)
+            TryGetAssetRef(context, input, out var asset);
+
+            var options = new BlurOptions();
+
+            if (componentX?.IsNumber() == true)
             {
-                scheduler.Run(callback, ErrorNoAsset);
-                return;
+                options.ComponentX = (int)componentX.AsNumber();
             }
 
-            async Task ResolveHashAsync(AssetRef asset)
+            if (componentY?.IsNumber() == true)
             {
-                if (asset.FileSize > 512_000 || asset.Type != AssetType.Image)
-                {
-                    scheduler.Run(callback, JsValue.Null);
-                    return;
-                }
-
-                var options = new BlurOptions();
-
-                if (componentX?.IsNumber() == true)
-                {
-                    options.ComponentX = (int)componentX.AsNumber();
-                }
-
-                if (componentY?.IsNumber() == true)
-                {
-                    options.ComponentX = (int)componentY.AsNumber();
-                }
-
-                var assetGenerator = serviceProvider.GetRequiredService<IAssetThumbnailGenerator>();
-                var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
-                try
-                {
-                    var hash = await asset.GetBlurHashAsync(options, assetFileStore, assetGenerator, ct);
-
-                    scheduler.Run(callback, hash);
-                }
-                catch
-                {
-                    scheduler.Run(callback, JsValue.Null);
-                }
+                options.ComponentX = (int)componentY.AsNumber();
             }
 
-            switch (objectWrapper.Target)
+            try
             {
-                case IAssetEntity asset:
-                    await ResolveHashAsync(asset.ToRef());
-                    break;
+                var hash = await asset.GetBlurHashAsync(options, serviceProvider, ct);
 
-                case EnrichedAssetEvent @event:
-                    await ResolveHashAsync(@event.ToRef());
-                    break;
-
-                default:
-                    scheduler.Run(callback, ErrorNoAsset);
-                    break;
+                scheduler.Run(callback, hash);
+            }
+            catch
+            {
+                scheduler.Run(callback, JsValue.Null);
             }
         });
     }
@@ -282,6 +273,49 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         });
     }
 
+    private static bool TryGetAssetRef(ScriptExecutionContext context, JsValue input, out AssetRef assetRef)
+    {
+        assetRef = default;
+
+        if (input is not ObjectWrapper objectWrapper)
+        {
+            return false;
+        }
+
+        switch (objectWrapper.Target)
+        {
+            case IAssetEntity asset:
+                assetRef = asset.ToRef();
+                return true;
+
+            case EnrichedAssetEvent @event:
+                assetRef = @event.ToRef();
+                return true;
+
+            case AssetEntityScriptVars vars:
+                if (!context.TryGetValueIfExists<string>(nameof(AssetScriptVars.AppName), out var appName) ||
+                    !context.TryGetValueIfExists<DomainId>(nameof(AssetScriptVars.AppId), out var appId) ||
+                    !context.TryGetValueIfExists<DomainId>(nameof(AssetScriptVars.AssetId), out var assetId))
+                {
+                    return false;
+                }
+
+                context.TryGetValueIfExists<string?>(nameof(AssetScriptVars.FileId), out var fileId);
+
+                assetRef = new AssetRef(
+                    NamedId.Of(appId, appName),
+                    assetId,
+                    vars.GetValue<long>(nameof(AssetEntityScriptVars.FileVersion)),
+                    vars.GetValue<long>(nameof(AssetEntityScriptVars.FileSize)),
+                    vars.GetValue<string>(nameof(AssetEntityScriptVars.MimeType)),
+                    fileId,
+                    vars.GetValue<AssetType>(nameof(AssetEntityScriptVars.Type)));
+                return true;
+        }
+
+        return true;
+    }
+
     private async Task<IAppEntity> GetAppAsync(DomainId appId,
         CancellationToken ct)
     {
@@ -319,5 +353,8 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
         describe(JsonType.Function, "getAssetBlurHash(asset, callback, x?, y?)",
             Resources.ScriptingGetBlurHash);
+
+        describe(JsonType.Function, "updateAsset(asset, metadata)",
+            Resources.ScriptingUpdateAsset);
     }
 }

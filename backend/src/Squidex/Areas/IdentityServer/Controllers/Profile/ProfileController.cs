@@ -30,19 +30,19 @@ public sealed class ProfileController : IdentityServerController
 {
     private readonly IUserPictureStore userPictureStore;
     private readonly IUserService userService;
-    private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+    private readonly IAssetThumbnailGenerator assetGenerator;
     private readonly MyIdentityOptions identityOptions;
 
     public ProfileController(
         IOptions<MyIdentityOptions> identityOptions,
         IUserPictureStore userPictureStore,
         IUserService userService,
-        IAssetThumbnailGenerator assetThumbnailGenerator)
+        IAssetThumbnailGenerator assetGenerator)
     {
         this.identityOptions = identityOptions.Value;
         this.userPictureStore = userPictureStore;
         this.userService = userService;
-        this.assetThumbnailGenerator = assetThumbnailGenerator;
+        this.assetGenerator = assetGenerator;
     }
 
     [HttpGet]
@@ -183,7 +183,7 @@ public sealed class ProfileController : IdentityServerController
             {
                 await using (var resizeStream = assetResized.OpenWrite())
                 {
-                    await assetThumbnailGenerator.CreateThumbnailAsync(originalStream, file.ContentType, resizeStream, resizeOptions, ct);
+                    await assetGenerator.CreateThumbnailAsync(originalStream, file.ContentType, resizeStream, resizeOptions, ct);
                 }
             }
         }

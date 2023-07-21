@@ -29,20 +29,20 @@ public sealed class AssetContentController : ApiController
     private readonly IAssetFileStore assetFileStore;
     private readonly IAssetQueryService assetQuery;
     private readonly IAssetLoader assetLoader;
-    private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+    private readonly IAssetThumbnailGenerator assetGenerator;
 
     public AssetContentController(
         ICommandBus commandBus,
         IAssetFileStore assetFileStore,
         IAssetQueryService assetQuery,
         IAssetLoader assetLoader,
-        IAssetThumbnailGenerator assetThumbnailGenerator)
+        IAssetThumbnailGenerator assetGenerator)
         : base(commandBus)
     {
         this.assetFileStore = assetFileStore;
         this.assetQuery = assetQuery;
         this.assetLoader = assetLoader;
-        this.assetThumbnailGenerator = assetThumbnailGenerator;
+        this.assetGenerator = assetGenerator;
     }
 
     /// <summary>
@@ -138,13 +138,13 @@ public sealed class AssetContentController : ApiController
             Response.Headers[HeaderNames.CacheControl] = $"public,max-age={request.CacheDuration}";
         }
 
-        var resizeOptions = request.ToResizeOptions(asset, assetThumbnailGenerator, HttpContext.Request);
+        var resizeOptions = request.ToResizeOptions(asset, assetGenerator, HttpContext.Request);
 
         var contentLength = (long?)null;
         var contentCallback = (FileCallback?)null;
         var contentType = asset.MimeType;
 
-        if (asset.Type == AssetType.Image && assetThumbnailGenerator.IsResizable(asset.MimeType, resizeOptions, out var destinationMimeType))
+        if (asset.Type == AssetType.Image && assetGenerator.IsResizable(asset.MimeType, resizeOptions, out var destinationMimeType))
         {
             contentType = destinationMimeType!;
 
@@ -224,7 +224,7 @@ public sealed class AssetContentController : ApiController
                 {
                     await using (var resizeStream = assetResized.OpenWrite())
                     {
-                        await assetThumbnailGenerator.CreateThumbnailAsync(originalStream, asset.MimeType, resizeStream, resizeOptions);
+                        await assetGenerator.CreateThumbnailAsync(originalStream, asset.MimeType, resizeStream, resizeOptions);
                     }
                 }
             }

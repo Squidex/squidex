@@ -57,13 +57,12 @@ internal static class AssetActions
             }
         };
 
-        public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
+        public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
         {
             var assetId = fieldContext.GetArgument<DomainId>("id");
 
-            return await context.GetAssetAsync(assetId,
-                fieldContext.CacheDuration(),
-                fieldContext.CancellationToken);
+            return context.GetAsset(assetId,
+                fieldContext.CacheDuration());
         });
     }
 

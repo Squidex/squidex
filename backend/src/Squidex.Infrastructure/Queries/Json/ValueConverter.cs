@@ -240,7 +240,7 @@ public static class ValueConverter
 
         if (value.Value is string s)
         {
-            if (Guid.TryParse(s, out result))
+            if (Guid.TryParseExact(s, "D", out result))
             {
                 return true;
             }
@@ -301,7 +301,7 @@ public static class ValueConverter
                 return true;
             case string s:
                 {
-                    if (Guid.TryParse(s, out var guid))
+                    if (Guid.TryParseExact(s, "D", out var guid))
                     {
                         result = guid;
 

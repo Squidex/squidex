@@ -69,13 +69,14 @@ public sealed class ScriptAsset : IAssetEnricherStep
             AssetId = asset.Id,
             Asset = new AssetEntityScriptVars
             {
-                Metadata = asset.Metadata,
+                Type = asset.Type,
                 FileHash = asset.FileHash,
                 FileName = asset.FileName,
                 FileSize = asset.FileSize,
                 FileSlug = asset.Slug,
                 FileVersion = asset.FileVersion,
                 IsProtected = asset.IsProtected,
+                Metadata = asset.Metadata,
                 MimeType = asset.MimeType,
                 ParentId = asset.ParentId,
                 ParentPath = null,

@@ -185,5 +185,14 @@ namespace Squidex.Domain.Apps.Entities.Properties {
                 return ResourceManager.GetString("ScriptingResetCounterV2", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update the metadata of the asset..
+        /// </summary>
+        internal static string ScriptingUpdateAsset {
+            get {
+                return ResourceManager.GetString("ScriptingUpdateAsset", resourceCulture);
+            }
+        }
     }
 }

@@ -68,7 +68,7 @@ public sealed class SchemaResolver : IAsyncActionFilter
     {
         var canCache = !user.IsInClient(DefaultClients.Frontend);
 
-        if (Guid.TryParse(schemaIdOrName, out var guid))
+        if (Guid.TryParseExact(schemaIdOrName, "D", out var guid))
         {
             var schemaId = DomainId.Create(guid);
 

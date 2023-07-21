@@ -14,6 +14,6 @@ public class DataScriptVars : ScriptVars
     public virtual ContentData? Data
     {
         get => GetValue<ContentData?>();
-        set => SetValue(value);
+        set => SetInitial(value);
     }
 }

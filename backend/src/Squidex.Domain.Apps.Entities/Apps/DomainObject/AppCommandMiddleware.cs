@@ -16,15 +16,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 public sealed class AppCommandMiddleware : AggregateCommandMiddleware<AppCommandBase, AppDomainObject>
 {
     private readonly IAppImageStore appImageStore;
-    private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+    private readonly IAssetThumbnailGenerator assetGenerator;
     private readonly IContextProvider contextProvider;
 
     public AppCommandMiddleware(IDomainObjectFactory domainObjectFactory,
-        IAppImageStore appImageStore, IAssetThumbnailGenerator assetThumbnailGenerator, IContextProvider contextProvider)
+        IAppImageStore appImageStore, IAssetThumbnailGenerator assetGenerator, IContextProvider contextProvider)
         : base(domainObjectFactory)
     {
         this.appImageStore = appImageStore;
-        this.assetThumbnailGenerator = assetThumbnailGenerator;
+        this.assetGenerator = assetGenerator;
         this.contextProvider = contextProvider;
     }
 
@@ -57,7 +57,7 @@ public sealed class AppCommandMiddleware : AggregateCommandMiddleware<AppCommand
 
         await using (var uploadStream = file.OpenRead())
         {
-            var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, file.MimeType, ct);
+            var image = await assetGenerator.GetImageInfoAsync(uploadStream, file.MimeType, ct);
 
             if (image == null)
             {

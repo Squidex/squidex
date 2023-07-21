@@ -65,7 +65,7 @@ public sealed class EnrichedAssetEvent : EnrichedUserEventBase, IEnrichedEntityE
     public AssetType AssetType { get; set; }
 
     [FieldDescription(nameof(FieldDescriptions.AssetMetadata))]
-    public AssetMetadata Metadata { get; }
+    public AssetMetadata Metadata { get; set; }
 
     [FieldDescription(nameof(FieldDescriptions.AssetIsImage))]
     public bool IsImage

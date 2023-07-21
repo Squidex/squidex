@@ -22,7 +22,7 @@ internal sealed class WritableContext : ObjectInstance
 
         foreach (var (key, item) in vars)
         {
-            base.Set(key, FromObject(engine, item.Value), this);
+            base.Set(key, FromObject(engine, item), this);
         }
     }
 

@@ -107,6 +107,17 @@ public static class WebServices
             builder.AddSchema<DummySchema>();
             builder.AddSystemTextJson();
             builder.AddDataLoader();
+            builder.ConfigureExecutionOptions(options =>
+            {
+                var logger = options.RequestServices!.GetRequiredService<ILogger<GraphQLHttpMiddleware>>();
+
+                options.UnhandledExceptionDelegate = ctx =>
+                {
+                    logger.LogError(ctx.Exception, "GraphQL error in field {field}", ctx.FieldContext?.FieldAst?.Name);
+
+                    return Task.CompletedTask;
+                };
+            });
         });
 
         services.AddSingletonAs<DummySchema>()

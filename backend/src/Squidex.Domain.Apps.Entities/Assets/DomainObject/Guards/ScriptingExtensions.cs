@@ -36,6 +36,7 @@ public static class ScriptingExtensions
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = new AssetScriptVars
         {
+            FileId = create.FileId,
             // Tags and metadata are mutable and can be changed from the scripts, but not replaced.
             Command = new AssetCommandScriptVars
             {
@@ -52,7 +53,23 @@ public static class ScriptingExtensions
             Operation = "Create"
         };
 
-        await ExecuteScriptAsync(operation, script, vars, ct);
+        var asset = new AssetEntityScriptVars
+        {
+            Type = create.Type,
+            FileHash = create.FileHash,
+            FileName = create.File.FileName,
+            FileSlug = create.File.FileName.Slugify(),
+            FileSize = create.File.FileSize,
+            FileVersion = 0,
+            IsProtected = false,
+            Metadata = create.Metadata,
+            MimeType = create.File.MimeType,
+            ParentId = create.ParentId,
+            ParentPath = await GetPathAsync(operation, create.ParentId, ct),
+            Tags = create.Tags
+        };
+
+        await ExecuteScriptAsync(operation, script, vars, asset, ct);
     }
 
     public static Task ExecuteUpdateScriptAsync(this AssetOperation operation, UpdateAsset update,
@@ -68,6 +85,7 @@ public static class ScriptingExtensions
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = new AssetScriptVars
         {
+            FileId = update.FileId,
             // Tags and metadata are mutable and can be changed from the scripts, but not replaced.
             Command = new AssetCommandScriptVars
             {
@@ -81,7 +99,7 @@ public static class ScriptingExtensions
             Operation = "Update"
         };
 
-        return ExecuteScriptAsync(operation, script, vars, ct);
+        return ExecuteScriptAsync(operation, script, vars, null, ct);
     }
 
     public static Task ExecuteAnnotateScriptAsync(this AssetOperation operation, AnnotateAsset annotate,
@@ -109,7 +127,7 @@ public static class ScriptingExtensions
             Operation = "Annotate"
         };
 
-        return ExecuteScriptAsync(operation, script, vars, ct);
+        return ExecuteScriptAsync(operation, script, vars, null, ct);
     }
 
     public static async Task ExecuteMoveScriptAsync(this AssetOperation operation, MoveAsset move,
@@ -135,7 +153,7 @@ public static class ScriptingExtensions
             Operation = "Move"
         };
 
-        await ExecuteScriptAsync(operation, script, vars, ct);
+        await ExecuteScriptAsync(operation, script, vars, null, ct);
     }
 
     public static Task ExecuteDeleteScriptAsync(this AssetOperation operation, DeleteAsset delete,
@@ -158,30 +176,29 @@ public static class ScriptingExtensions
             Operation = "Delete"
         };
 
-        return ExecuteScriptAsync(operation, script, vars, ct);
+        return ExecuteScriptAsync(operation, script, vars, null, ct);
     }
 
-    private static async Task ExecuteScriptAsync(AssetOperation operation, string script, AssetScriptVars vars,
+    private static async Task ExecuteScriptAsync(AssetOperation operation, string script, AssetScriptVars vars, AssetEntityScriptVars? asset,
         CancellationToken ct)
     {
         var snapshot = operation.Snapshot;
 
-        var parentPath = await GetPathAsync(operation, snapshot.ParentId, ct);
-
         // Script vars are just wrappers over dictionaries for better performance.
-        var asset = new AssetEntityScriptVars
+        asset ??= new AssetEntityScriptVars
         {
-            Metadata = snapshot.Metadata,
+            Type = snapshot.Type,
             FileHash = snapshot.FileHash,
             FileName = snapshot.FileName,
             FileSize = snapshot.FileSize,
             FileSlug = snapshot.Slug,
             FileVersion = snapshot.FileVersion,
             IsProtected = snapshot.IsProtected,
+            Metadata = snapshot.Metadata,
             MimeType = snapshot.MimeType,
             ParentId = snapshot.ParentId,
-            ParentPath = parentPath,
-            Tags = snapshot.Tags
+            ParentPath = await GetPathAsync(operation, snapshot.ParentId, ct),
+            Tags = snapshot.Tags,
         };
 
         vars.AppId = operation.App.Id;

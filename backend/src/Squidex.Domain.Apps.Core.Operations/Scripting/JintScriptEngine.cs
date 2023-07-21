@@ -190,18 +190,23 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
     private static Exception MapException(Exception inner)
     {
+        static Exception BuildException(string errorKey, string message, Exception? inner = null)
+        {
+            return new ValidationException(T.Get(errorKey, new { message }), inner);
+        }
+
         switch (inner)
         {
             case ArgumentException:
-                return new ValidationException(T.Get("common.jsParseError", new { error = inner.Message }));
+                return BuildException("common.jsParseError", inner.Message);
             case JavaScriptException:
-                return new ValidationException(T.Get("common.jsError", new { message = inner.Message }));
+                return BuildException("common.jsError", inner.Message);
             case ParserException:
-                return new ValidationException(T.Get("common.jsError", new { message = inner.Message }));
+                return BuildException("common.jsError", inner.Message);
             case DomainException:
                 return inner;
             default:
-                return new ValidationException(T.Get("common.jsError", new { message = inner.GetType().Name }), inner);
+                return BuildException("common.jsError", inner.GetType().Name, inner);
         }
     }
 

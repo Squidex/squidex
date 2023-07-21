@@ -109,31 +109,4 @@ public sealed class WebhookCatcherClient
 
         return result;
     }
-
-    public async Task<WebhookRequest[]> WaitForRequestsAsync(string sessionId, TimeSpan timeout)
-    {
-        var requests = Array.Empty<WebhookRequest>();
-
-        try
-        {
-            using var cts = new CancellationTokenSource(timeout);
-
-            while (!cts.IsCancellationRequested)
-            {
-                requests = await GetRequestsAsync(sessionId, cts.Token);
-
-                if (requests.Length > 0)
-                {
-                    break;
-                }
-
-                await Task.Delay(50, cts.Token);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-        }
-
-        return requests;
-    }
 }

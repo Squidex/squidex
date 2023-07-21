@@ -88,6 +88,12 @@ public sealed class DefaultAssetFileStore : IAssetFileStore, IDeleter
         }
     }
 
+    public Task DownloadAsync(string tempFile, Stream stream,
+        CancellationToken ct = default)
+    {
+        return assetStore.DownloadAsync(tempFile, stream, default, ct);
+    }
+
     public Task UploadAsync(DomainId appId, DomainId id, long fileVersion, string? suffix, Stream stream, bool overwrite = true,
         CancellationToken ct = default)
     {
