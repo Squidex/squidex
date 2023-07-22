@@ -159,7 +159,9 @@ public sealed class ResolveReferences : IContentEnricherStep
             return EmptyContents;
         }
 
+        // Ensure that we reset the fields to not use the field selection from the parent query.
         var queryContext = context.Clone(b => b
+            .WithFields(null)
             .WithoutContentEnrichment(true)
             .WithoutTotal());
 

@@ -5,16 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Concurrent;
-using System.Threading.Tasks.Dataflow;
-using Microsoft.Extensions.Logging;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
@@ -27,299 +22,239 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
 {
     private readonly IContentQueryService contentQuery;
     private readonly IContextProvider contextProvider;
-    private readonly ILogger<ContentsBulkUpdateCommandMiddleware> log;
-
-    private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command,
-        CancellationToken CancellationToken);
 
     private sealed record BulkTask(
-        ICommandBus Bus,
-        NamedId<DomainId> SchemaId,
+        BulkUpdateJob BulkJob,
+        BulkUpdateContents Bulk,
         int JobIndex,
-        BulkUpdateJob CommandJob,
-        BulkUpdateContents Command,
-        ConcurrentBag<BulkUpdateResultItem> Results,
-        CancellationToken Aborted);
+        ContentCommand? Command)
+    {
+        public BulkUpdateResultItem? Result { get; private set; }
+
+        public BulkTask SetResult(Exception? exception = null)
+        {
+            var id = Command?.ContentId ?? BulkJob.Id;
+
+            Result = new BulkUpdateResultItem(id, JobIndex, exception);
+            return this;
+        }
+
+        public static BulkTask Failed(BulkUpdateJob bulkJob, BulkUpdateContents bulk, int jobIndex, Exception exception)
+        {
+            return new BulkTask(bulkJob, bulk, jobIndex, null).SetResult(exception);
+        }
+    }
 
     public ContentsBulkUpdateCommandMiddleware(
         IContentQueryService contentQuery,
-        IContextProvider contextProvider,
-        ILogger<ContentsBulkUpdateCommandMiddleware> log)
+        IContextProvider contextProvider)
     {
         this.contentQuery = contentQuery;
         this.contextProvider = contextProvider;
-
-        this.log = log;
     }
 
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {
-        if (context.Command is BulkUpdateContents bulkUpdates)
-        {
-            if (bulkUpdates.Jobs?.Length > 0)
-            {
-                var executionOptions = new ExecutionDataflowBlockOptions
-                {
-                    MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
-                };
-
-                // Each job can create one or more commands.
-                var createCommandsBlock = new TransformManyBlock<BulkTask, BulkTaskCommand>(async task =>
-                {
-                    try
-                    {
-                        return await CreateCommandsAsync(task);
-                    }
-                    catch (OperationCanceledException ex)
-                    {
-                        // Dataflow swallows operation cancelled exception.
-                        throw new AggregateException(ex);
-                    }
-                }, executionOptions);
-
-                // Execute the commands in batches.
-                var executeCommandBlock = new ActionBlock<BulkTaskCommand>(async command =>
-                {
-                    try
-                    {
-                        await ExecuteCommandAsync(command);
-                    }
-                    catch (OperationCanceledException ex)
-                    {
-                        // Dataflow swallows operation cancelled exception.
-                        throw new AggregateException(ex);
-                    }
-                }, executionOptions);
-
-                createCommandsBlock.BidirectionalLinkTo(executeCommandBlock);
-
-                contextProvider.Context.Change(b => b
-                    .WithoutContentEnrichment()
-                    .WithoutCleanup()
-                    .WithUnpublished(true)
-                    .WithoutTotal());
-
-                var results = new ConcurrentBag<BulkUpdateResultItem>();
-
-                for (var i = 0; i < bulkUpdates.Jobs.Length; i++)
-                {
-                    var task = new BulkTask(
-                        context.CommandBus,
-                        bulkUpdates.SchemaId,
-                        i,
-                        bulkUpdates.Jobs[i],
-                        bulkUpdates,
-                        results,
-                        ct);
-
-                    if (!await createCommandsBlock.SendAsync(task, ct))
-                    {
-                        break;
-                    }
-                }
-
-                createCommandsBlock.Complete();
-
-                // Wait for all commands to be executed.
-                await executeCommandBlock.Completion;
-
-                context.Complete(new BulkUpdateResult(results));
-            }
-            else
-            {
-                context.Complete(new BulkUpdateResult());
-            }
-        }
-        else
+        if (context.Command is not BulkUpdateContents bulkUpdates)
         {
             await next(context, ct);
+            return;
         }
+
+        if (bulkUpdates.Jobs == null || bulkUpdates.Jobs.Length == 0)
+        {
+            context.Complete(new BulkUpdateResult());
+            return;
+        }
+
+        contextProvider.Context.Change(b => b
+            .WithoutContentEnrichment()
+            .WithoutCleanup()
+            .WithUnpublished(true)
+            .WithoutTotal());
+
+        var tasks = await bulkUpdates.Jobs.SelectManyAsync((job, i, ct) => CreateTasksAsync(job, bulkUpdates, i, ct), ct);
+
+        // Group the items by id, so that we do not run jobs in parallel on the same entity.
+        var groupedTasks = tasks.GroupBy(x => x.Command?.ContentId).ToList();
+
+        await Parallel.ForEachAsync(groupedTasks, ct, async (group, ct) =>
+        {
+            foreach (var task in group)
+            {
+                await ExecuteCommandAsync(context.CommandBus, task, ct);
+            }
+        });
+
+        context.Complete(new BulkUpdateResult(tasks.Select(x => x.Result).NotNull()));
     }
 
-    private async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
+    private static async Task ExecuteCommandAsync(ICommandBus commandBus, BulkTask task,
+        CancellationToken ct)
     {
-        var (task, id, command, ct) = bulkCommand;
+        if (task.Result != null || task.Command == null)
+        {
+            return;
+        }
 
         try
         {
-            await task.Bus.PublishAsync(command, ct);
-
-            task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex));
+            await commandBus.PublishAsync(task.Command, ct);
+            task.SetResult();
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to execute content bulk job with index {index} of type {type}.",
-                task.JobIndex,
-                task.CommandJob.Type);
-
-            task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
+            task.SetResult(ex);
         }
     }
 
-    private async Task<IEnumerable<BulkTaskCommand>> CreateCommandsAsync(BulkTask task)
+    private async Task<IEnumerable<BulkTask>> CreateTasksAsync(
+        BulkUpdateJob bulkJob,
+        BulkUpdateContents bulk,
+        int jobIndex,
+        CancellationToken ct)
     {
         // The task parallel pipeline does not allow async-enumerable.
-        var commands = new List<BulkTaskCommand>();
+        var tasks = new List<BulkTask>();
         try
         {
+            var schemaId = bulk.SchemaId;
+
             // Check whether another schema is defined for the current job and override the schema id if necessary.
-            var overridenSchema = task.CommandJob.Schema;
-
-            if (!string.IsNullOrWhiteSpace(overridenSchema))
+            if (!string.IsNullOrWhiteSpace(bulkJob.Schema))
             {
-                var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, overridenSchema, task.Aborted);
+                var schema = await contentQuery.GetSchemaOrThrowAsync(contextProvider.Context, bulkJob.Schema, ct);
 
-                // Task is immutable, so we have to create a copy.
-                task = task with { SchemaId = schema.NamedId() };
+                schemaId = schema.NamedId();
             }
 
             // The bulk command can be invoke in a schema controller or without a schema controller, therefore the name might be null.
-            if (task.SchemaId == null || task.SchemaId.Id == default)
+            if (schemaId == null || schemaId.Id == default)
             {
-                throw new DomainObjectNotFoundException("undefined");
+                tasks.Add(BulkTask.Failed(bulkJob, bulk, jobIndex, new DomainObjectNotFoundException("undefined")));
+                return tasks;
             }
 
-            var resolvedIds = await FindIdAsync(task, task.SchemaId.Name);
+            var resolvedIds = await FindIdAsync(schemaId, bulkJob, ct);
 
             if (resolvedIds.Length == 0)
             {
-                throw new DomainObjectNotFoundException("undefined");
+                tasks.Add(BulkTask.Failed(bulkJob, bulk, jobIndex, new DomainObjectNotFoundException("undefined")));
+                return tasks;
             }
 
             foreach (var id in resolvedIds)
             {
-                try
-                {
-                    var command = CreateCommand(task);
-
-                    command.ContentId = id;
-                    commands.Add(new BulkTaskCommand(task, id, command, task.Aborted));
-                }
-                catch (Exception ex)
-                {
-                    log.LogError(ex, "Failed to create content bulk job with index {index} of type {type}.",
-                        task.JobIndex,
-                        task.CommandJob.Type);
-
-                    task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
-                }
+                tasks.Add(CreateTask(id, schemaId, bulkJob, bulk, jobIndex));
             }
         }
         catch (Exception ex)
         {
-            task.Results.Add(new BulkUpdateResultItem(task.CommandJob.Id, task.JobIndex, ex));
+            tasks.Add(BulkTask.Failed(bulkJob, bulk, jobIndex, ex));
         }
 
-        return commands;
+        return tasks;
     }
 
-    private ContentCommand CreateCommand(BulkTask task)
+    private BulkTask CreateTask(
+        DomainId id,
+        NamedId<DomainId> schemaId,
+        BulkUpdateJob bulkJob,
+        BulkUpdateContents bulk,
+        int jobIndex)
     {
-        var job = task.CommandJob;
-
-        switch (job.Type)
+        try
         {
-            case BulkUpdateContentType.Create:
-                {
-                    var command = new CreateContent();
+            switch (bulkJob.Type)
+            {
+                case BulkUpdateContentType.Create:
+                    return CreateTask<CreateContent>(id, schemaId, bulkJob, bulk, jobIndex,
+                        PermissionIds.AppContentsCreate);
 
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppContentsCreate);
-                    return command;
-                }
+                case BulkUpdateContentType.Update:
+                    return CreateTask<UpdateContent>(id, schemaId, bulkJob, bulk, jobIndex,
+                        PermissionIds.AppContentsUpdateOwn);
 
-            case BulkUpdateContentType.Update:
-                {
-                    var command = new UpdateContent();
+                case BulkUpdateContentType.Upsert:
+                    return CreateTask<UpsertContent>(id, schemaId, bulkJob, bulk, jobIndex,
+                        PermissionIds.AppContentsUpsert);
 
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppContentsUpdateOwn);
-                    return command;
-                }
+                case BulkUpdateContentType.Patch:
+                    return CreateTask<PatchContent>(id, schemaId, bulkJob, bulk, jobIndex,
+                        PermissionIds.AppContentsUpdateOwn);
 
-            case BulkUpdateContentType.Upsert:
-                {
-                    var command = new UpsertContent();
+                case BulkUpdateContentType.Validate:
+                    return CreateTask<ValidateContent>(id, schemaId, bulkJob, bulk, jobIndex,
+                        PermissionIds.AppContentsReadOwn);
 
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppContentsUpsert);
-                    return command;
-                }
+                case BulkUpdateContentType.ChangeStatus:
+                    return CreateTask<ChangeContentStatus>(id, schemaId, bulkJob, bulk, jobIndex,
+                        PermissionIds.AppContentsChangeStatusOwn);
 
-            case BulkUpdateContentType.Patch:
-                {
-                    var command = new PatchContent();
+                case BulkUpdateContentType.Delete:
+                    return CreateTask<DeleteContent>(id, schemaId, bulkJob, bulk, jobIndex,
+                        PermissionIds.AppContentsDeleteOwn);
 
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppContentsUpdateOwn);
-                    return command;
-                }
-
-            case BulkUpdateContentType.Validate:
-                {
-                    var command = new ValidateContent();
-
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppContentsReadOwn);
-                    return command;
-                }
-
-            case BulkUpdateContentType.ChangeStatus:
-                {
-                    var command = new ChangeContentStatus { Status = job.Status ?? Status.Draft };
-
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppContentsChangeStatusOwn);
-                    return command;
-                }
-
-            case BulkUpdateContentType.Delete:
-                {
-                    var command = new DeleteContent();
-
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppContentsDeleteOwn);
-                    return command;
-                }
-
-            default:
-                ThrowHelper.NotSupportedException();
-                return default!;
+                default:
+                    return BulkTask.Failed(bulkJob, bulk, jobIndex, new NotSupportedException());
+            }
         }
-    }
-
-    private void EnrichAndCheckPermission<T>(BulkTask task, T command, string permissionId) where T : ContentCommand
-    {
-        SimpleMapper.Map(task.Command, command);
-        SimpleMapper.Map(task.CommandJob, command);
-
-        if (!contextProvider.Context.Allows(permissionId, command.SchemaId.Name))
+        catch (Exception ex)
         {
-            throw new DomainForbiddenException("Forbidden");
+            return BulkTask.Failed(bulkJob, bulk, jobIndex, ex);
         }
-
-        command.SchemaId = task.SchemaId;
-        command.ExpectedVersion = task.Command.ExpectedVersion;
     }
 
-    private async Task<DomainId[]> FindIdAsync(BulkTask task, string schema)
+    private BulkTask CreateTask<T>(
+        DomainId id,
+        NamedId<DomainId> schemaId,
+        BulkUpdateJob bulkJob,
+        BulkUpdateContents bulk,
+        int jobIndex,
+        string permissionId) where T : ContentCommand, new()
     {
-        var id = task.CommandJob.Id;
+        if (!contextProvider.Context.Allows(permissionId, schemaId.Name))
+        {
+            return BulkTask.Failed(bulkJob, bulk, jobIndex, new DomainForbiddenException("Forbidden"));
+        }
+
+        var command = new T();
+
+        SimpleMapper.Map(bulk, command);
+        SimpleMapper.Map(bulkJob, command);
+
+        command.ContentId = id;
+        command.SchemaId = schemaId;
+
+        return new BulkTask(bulkJob, bulk, jobIndex, command);
+    }
+
+    private async Task<DomainId[]> FindIdAsync(NamedId<DomainId> schemaId, BulkUpdateJob bulkJob,
+        CancellationToken ct)
+    {
+        var id = bulkJob.Id;
 
         if (id != null)
         {
             return new[] { id.Value };
         }
 
-        if (task.CommandJob.Query != null)
+        if (bulkJob.Query != null)
         {
-            task.CommandJob.Query.Take = task.CommandJob.ExpectedCount;
+            bulkJob.Query.Take = bulkJob.ExpectedCount;
 
-            var existingQuery = Q.Empty.WithJsonQuery(task.CommandJob.Query);
-            var existingResult = await contentQuery.QueryAsync(contextProvider.Context, schema, existingQuery, task.Aborted);
+            var existingQuery = Q.Empty.WithJsonQuery(bulkJob.Query);
+            var existingResult = await contentQuery.QueryAsync(contextProvider.Context, schemaId.Id.ToString(), existingQuery, ct);
 
-            if (existingResult.Total > task.CommandJob.ExpectedCount)
+            if (existingResult.Total > bulkJob.ExpectedCount)
             {
                 throw new DomainException(T.Get("contents.bulkInsertQueryNotUnique"));
             }
 
             // Upsert means that we either update the content if we find it or that we create a new one.
             // Therefore we create a new ID if we cannot find the ID for the query.
-            if (existingResult.Count == 0 && task.CommandJob.Type == BulkUpdateContentType.Upsert)
+            if (existingResult.Count == 0 && bulkJob.Type == BulkUpdateContentType.Upsert)
             {
                 return new[] { DomainId.NewGuid() };
             }
@@ -327,7 +262,7 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
             return existingResult.Select(x => x.Id).ToArray();
         }
 
-        if (task.CommandJob.Type is BulkUpdateContentType.Create or BulkUpdateContentType.Upsert)
+        if (bulkJob.Type is BulkUpdateContentType.Create or BulkUpdateContentType.Upsert)
         {
             return new[] { DomainId.NewGuid() };
         }

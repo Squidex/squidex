@@ -137,10 +137,14 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
                 {
                     await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion, null, ct);
                 }
-                catch (AssetAlreadyExistsException) when (context.Command is not UpsertAsset)
+                catch (AssetAlreadyExistsException)
                 {
-                    throw;
+                    if (context.Command is not UpsertAsset)
+                    {
+                        throw;
+                    }
                 }
+
             }
 
             if (payload is not IEnrichedAssetEntity)

@@ -122,6 +122,7 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
 
             var requestContext =
                 new Context(user, app).Clone(b => b
+                    .WithFields(null)
                     .WithoutContentEnrichment()
                     .WithUnpublished()
                     .WithoutTotal());

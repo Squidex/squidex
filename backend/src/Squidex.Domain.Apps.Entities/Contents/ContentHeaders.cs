@@ -140,7 +140,7 @@ public static class ContentHeaders
         return null;
     }
 
-    public static ICloneBuilder WithFields(this ICloneBuilder builder, IEnumerable<string> fields)
+    public static ICloneBuilder WithFields(this ICloneBuilder builder, IEnumerable<string>? fields)
     {
         return builder.WithStrings(Fields, fields);
     }

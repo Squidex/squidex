@@ -63,7 +63,7 @@ public class RuleDequeuerWorkerTests
         A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._, default))
             .Throws(new InvalidOperationException());
 
-        await sut.HandleAsync(@event);
+        await sut.HandleAsync(@event, default);
 
         A.CallTo(log).Where(x => x.Method.Name == "Log")
             .MustHaveHappened();
@@ -86,8 +86,8 @@ public class RuleDequeuerWorkerTests
             });
 
         await Task.WhenAll(
-            sut.HandleAsync(event1),
-            sut.HandleAsync(event2));
+            sut.HandleAsync(event1, default),
+            sut.HandleAsync(event2, default));
 
         A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._, default))
             .MustHaveHappenedOnceExactly();
@@ -115,7 +115,7 @@ public class RuleDequeuerWorkerTests
 
         var now = clock.GetCurrentInstant();
 
-        await sut.HandleAsync(@event);
+        await sut.HandleAsync(@event, default);
 
         if (actual == RuleResult.Failed)
         {

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -91,31 +92,46 @@ public static class CollectionExtensions
         return source.Count == other.Count && source.Intersect(other).Count() == other.Count;
     }
 
-    public static IEnumerable<IEnumerable<TSource>> Batch<TSource>(this IEnumerable<TSource> source, int size)
+    public static IEnumerable<List<T>> Batch<T>(this IEnumerable<T> source, int size)
     {
-        TSource[]? bucket = null;
-
-        var bucketIndex = 0;
+        List<T>? bucket = null;
 
         foreach (var item in source)
         {
-            bucket ??= new TSource[size];
-            bucket[bucketIndex++] = item;
+            bucket ??= new List<T>(size);
 
-            if (bucketIndex != size)
+            if (bucket.Count == size)
             {
-                continue;
+                yield return bucket;
+                bucket = null;
             }
-
-            yield return bucket;
-
-            bucket = null;
-            bucketIndex = 0;
         }
 
-        if (bucket != null && bucketIndex > 0)
+        if (bucket?.Count > 0)
         {
-            yield return bucket.Take(bucketIndex);
+            yield return bucket;
+        }
+    }
+
+    public static async IAsyncEnumerable<List<T>> Batch<T>(this IAsyncEnumerable<T> source, int size,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        List<T>? bucket = null;
+
+        await foreach (var item in source.WithCancellation(ct))
+        {
+            bucket ??= new List<T>(size);
+
+            if (bucket.Count == size)
+            {
+                yield return bucket;
+                bucket = null;
+            }
+        }
+
+        if (bucket?.Count > 0)
+        {
+            yield return bucket;
         }
     }
 
@@ -470,5 +486,27 @@ public static class CollectionExtensions
                 }
             }
         }
+    }
+
+    public static async Task<IReadOnlyCollection<TResult>> SelectManyAsync<T, TResult>(this IEnumerable<T> source, Func<T, int, CancellationToken, Task<IEnumerable<TResult>>> selector,
+        CancellationToken ct = default)
+    {
+        var result = new ConcurrentBag<TResult>();
+
+        var sourceWithIndex = source.Select((x, i) => (Item: x, Index: i));
+
+        await Parallel.ForEachAsync(sourceWithIndex,
+            ct,
+            async (item, ct) =>
+            {
+                var createdItems = await selector(item.Item, item.Index, ct);
+
+                foreach (var created in createdItems)
+                {
+                    result.Add(created);
+                }
+            });
+
+        return result;
     }
 }

@@ -94,6 +94,7 @@ public sealed class ReferencesFluidExtension : IFluidExtension
 
         var requestContext =
             Context.Admin(app).Clone(b => b
+                .WithFields(null)
                 .WithoutContentEnrichment()
                 .WithUnpublished()
                 .WithoutTotal());

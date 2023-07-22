@@ -30,9 +30,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
 
     public ContentsBulkUpdateCommandMiddlewareTests()
     {
-        var log = A.Fake<ILogger<ContentsBulkUpdateCommandMiddleware>>();
-
-        sut = new ContentsBulkUpdateCommandMiddleware(contentQuery, contextProvider, log);
+        sut = new ContentsBulkUpdateCommandMiddleware(contentQuery, contextProvider);
     }
 
     [Fact]
@@ -85,7 +83,8 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
                     x.ShouldSkipCleanup() &&
                     x.ShouldSkipContentEnrichment() &&
                     x.ShouldSkipTotal()),
-                schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), CancellationToken))
+                schemaId.Id.ToString(),
+                A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
 
         var command = BulkCommand(BulkUpdateContentType.ChangeStatus, new BulkUpdateJob { Query = query });
@@ -111,7 +110,9 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
                     x.ShouldSkipCleanup() &&
                     x.ShouldSkipContentEnrichment() &&
                     x.ShouldSkipTotal()),
-                schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), CancellationToken))
+                schemaId.Id.ToString(),
+                A<Q>.That.Matches(x => x.JsonQuery == query),
+                A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(1, CreateContent(id)));
 
         var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Query = query, Data = data });
@@ -122,7 +123,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), CancellationToken))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -141,7 +142,9 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
                     x.ShouldSkipCleanup() &&
                     x.ShouldSkipContentEnrichment() &&
                     x.ShouldSkipTotal()),
-                schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), CancellationToken))
+                schemaId.Id.ToString(),
+                A<Q>.That.Matches(x => x.JsonQuery == query),
+                A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(2,
                 CreateContent(id1),
                 CreateContent(id2)));
@@ -157,11 +160,11 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id2 && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id1), CancellationToken))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id1), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id2), CancellationToken))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id2), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -180,7 +183,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), CancellationToken))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -199,7 +202,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), CancellationToken))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -218,7 +221,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), CancellationToken))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -237,7 +240,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), CancellationToken))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -256,7 +259,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<CreateContent>.That.Matches(x => x.ContentId == id && x.Data == data), CancellationToken))
+                A<CreateContent>.That.Matches(x => x.ContentId == id && x.Data == data), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -293,7 +296,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data), CancellationToken))
+                A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -330,7 +333,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<PatchContent>.That.Matches(x => x.ContentId == id && x.Data == data), CancellationToken))
+                A<PatchContent>.That.Matches(x => x.ContentId == id && x.Data == data), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -367,7 +370,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == null), CancellationToken))
+                A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == null), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -386,7 +389,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time), CancellationToken))
+                A<ChangeContentStatus>.That.Matches(x => x.ContentId == id && x.DueTime == time), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -423,7 +426,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<ValidateContent>.That.Matches(x => x.ContentId == id), CancellationToken))
+                A<ValidateContent>.That.Matches(x => x.ContentId == id), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -460,7 +463,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<DeleteContent>.That.Matches(x => x.ContentId == id), CancellationToken))
+                A<DeleteContent>.That.Matches(x => x.ContentId == id), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -487,7 +490,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
     {
         SetupContext(PermissionIds.AppContentsDeleteOwn);
 
-        A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(A<Context>._, schemaCustomId.Name, CancellationToken))
+        A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(A<Context>._, schemaCustomId.Name, A<CancellationToken>._))
             .Returns(Mocks.Schema(AppId, schemaCustomId));
 
         var (id, _, _) = CreateTestData(false);
@@ -500,7 +503,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), CancellationToken))
+                A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -522,7 +525,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainObjectNotFoundException);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), CancellationToken))
+                A<DeleteContent>.That.Matches(x => x.SchemaId == schemaCustomId), A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 

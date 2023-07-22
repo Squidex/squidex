@@ -5,15 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Concurrent;
-using System.Threading.Tasks.Dataflow;
-using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
@@ -24,201 +20,140 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 public sealed class AssetsBulkUpdateCommandMiddleware : ICommandMiddleware
 {
     private readonly IContextProvider contextProvider;
-    private readonly ILogger<AssetsBulkUpdateCommandMiddleware> log;
-
-    private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command,
-        CancellationToken CancellationToken);
 
     private sealed record BulkTask(
-        ICommandBus Bus,
+        BulkUpdateJob BulkJob,
+        BulkUpdateAssets Bulk,
         int JobIndex,
-        BulkUpdateJob CommandJob,
-        BulkUpdateAssets Command,
-        ConcurrentBag<BulkUpdateResultItem> Results,
-        CancellationToken Aborted);
+        AssetCommand? Command)
+    {
+        public BulkUpdateResultItem? Result { get; private set; }
 
-    public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider, ILogger<AssetsBulkUpdateCommandMiddleware> log)
+        public BulkTask SetResult(Exception? exception = null)
+        {
+            var id = Command?.AssetId ?? BulkJob.Id;
+
+            Result = new BulkUpdateResultItem(id, JobIndex, exception);
+            return this;
+        }
+
+        public static BulkTask Failed(BulkUpdateJob bulkJob, BulkUpdateAssets bulk, int jobIndex, Exception exception)
+        {
+            return new BulkTask(bulkJob, bulk, jobIndex, null).SetResult(exception);
+        }
+    }
+
+    public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider)
     {
         this.contextProvider = contextProvider;
-
-        this.log = log;
     }
 
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {
-        if (context.Command is BulkUpdateAssets bulkUpdates)
-        {
-            if (bulkUpdates.Jobs?.Length > 0)
-            {
-                var executionOptions = new ExecutionDataflowBlockOptions
-                {
-                    MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2)
-                };
-
-                // Each job can create exactly one command.
-                var createCommandsBlock = new TransformBlock<BulkTask, BulkTaskCommand?>(task =>
-                {
-                    try
-                    {
-                        return CreateCommand(task);
-                    }
-                    catch (OperationCanceledException ex)
-                    {
-                        // Dataflow swallows operation cancelled exception.
-                        throw new AggregateException(ex);
-                    }
-                }, executionOptions);
-
-                // Execute the commands in batches
-                var executeCommandBlock = new ActionBlock<BulkTaskCommand?>(async command =>
-                {
-                    try
-                    {
-                        if (command != null)
-                        {
-                            await ExecuteCommandAsync(command);
-                        }
-                    }
-                    catch (OperationCanceledException ex)
-                    {
-                        // Dataflow swallows operation cancelled exception.
-                        throw new AggregateException(ex);
-                    }
-                }, executionOptions);
-
-                createCommandsBlock.BidirectionalLinkTo(executeCommandBlock);
-
-                contextProvider.Context.Change(b => b
-                    .WithoutAssetEnrichment()
-                    .WithoutCleanup()
-                    .WithUnpublished(true)
-                    .WithoutTotal());
-
-                var results = new ConcurrentBag<BulkUpdateResultItem>();
-
-                for (var i = 0; i < bulkUpdates.Jobs.Length; i++)
-                {
-                    var task = new BulkTask(
-                        context.CommandBus,
-                        i,
-                        bulkUpdates.Jobs[i],
-                        bulkUpdates,
-                        results,
-                        ct);
-
-                    if (!await createCommandsBlock.SendAsync(task, ct))
-                    {
-                        break;
-                    }
-                }
-
-                createCommandsBlock.Complete();
-
-                // Wait for all commands to be executed.
-                await executeCommandBlock.Completion;
-
-                context.Complete(new BulkUpdateResult(results));
-            }
-            else
-            {
-                context.Complete(new BulkUpdateResult());
-            }
-        }
-        else
+        if (context.Command is not BulkUpdateAssets bulkUpdates)
         {
             await next(context, ct);
+            return;
         }
+
+        if (bulkUpdates.Jobs == null || bulkUpdates.Jobs.Length == 0)
+        {
+            context.Complete(new BulkUpdateResult());
+            return;
+        }
+
+        contextProvider.Context.Change(b => b
+            .WithoutAssetEnrichment()
+            .WithoutCleanup()
+            .WithUnpublished(true)
+            .WithoutTotal());
+
+        var tasks = bulkUpdates.Jobs.Select((job, i) => CreateTask(job, bulkUpdates, i)).ToList();
+
+        // Group the items by id, so that we do not run jobs in parallel on the same entity.
+        var groupedTasks = tasks.GroupBy(x => x.BulkJob.Id).ToList();
+
+        await Parallel.ForEachAsync(groupedTasks, ct, async (group, ct) =>
+        {
+            foreach (var task in group)
+            {
+                await ExecuteCommandAsync(context.CommandBus, task, ct);
+            }
+        });
+
+        context.Complete(new BulkUpdateResult(tasks.Select(x => x.Result).NotNull()));
     }
 
-    private async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
+    private static async Task ExecuteCommandAsync(ICommandBus commandBus, BulkTask task,
+        CancellationToken ct)
     {
-        var (task, id, command, ct) = bulkCommand;
+        if (task.Result != null || task.Command == null)
+        {
+            return;
+        }
+
         try
         {
-            await task.Bus.PublishAsync(command, ct);
-
-            task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex));
+            await commandBus.PublishAsync(task.Command, ct);
+            task.SetResult();
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to execute asset bulk job with index {index} of type {type}.",
-                task.JobIndex,
-                task.CommandJob.Type);
-
-            task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
+            task.SetResult(ex);
         }
     }
 
-    private BulkTaskCommand? CreateCommand(BulkTask task)
+    private BulkTask CreateTask(
+        BulkUpdateJob bulkJob,
+        BulkUpdateAssets bulk,
+        int jobIndex)
     {
-        var id = task.CommandJob.Id;
         try
         {
-            var command = CreateCommandCore(task);
+            switch (bulkJob.Type)
+            {
+                case BulkUpdateAssetType.Annotate:
+                    return CreateTask<AnnotateAsset>(bulkJob, bulk, jobIndex,
+                        PermissionIds.AppAssetsUpdate);
 
-            // Set the asset id here in case we have another way to resolve ids.
-            command.AssetId = id;
+                case BulkUpdateAssetType.Move:
+                    return CreateTask<MoveAsset>(bulkJob, bulk, jobIndex,
+                        PermissionIds.AppAssetsUpdate);
 
-            return new BulkTaskCommand(task, id, command, task.Aborted);
+                case BulkUpdateAssetType.Delete:
+                    return CreateTask<DeleteAsset>(bulkJob, bulk, jobIndex,
+                        PermissionIds.AppAssetsDelete);
+
+                default:
+                    return BulkTask.Failed(bulkJob, bulk, jobIndex, new NotSupportedException());
+            }
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to execute asset bulk job with index {index} of type {type}.",
-                task.JobIndex,
-                task.CommandJob.Type);
-
-            task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
-            return null;
+            return BulkTask.Failed(bulkJob, bulk, jobIndex, ex);
         }
     }
 
-    private AssetCommand CreateCommandCore(BulkTask task)
+    private BulkTask CreateTask<T>(
+        BulkUpdateJob bulkJob,
+        BulkUpdateAssets bulk,
+        int jobIndex,
+        string permissionId) where T : AssetCommand, new()
     {
-        var job = task.CommandJob;
-
-        switch (job.Type)
-        {
-            case BulkUpdateAssetType.Annotate:
-                {
-                    var command = new AnnotateAsset();
-
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppAssetsUpdate);
-                    return command;
-                }
-
-            case BulkUpdateAssetType.Move:
-                {
-                    var command = new MoveAsset();
-
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppAssetsUpdate);
-                    return command;
-                }
-
-            case BulkUpdateAssetType.Delete:
-                {
-                    var command = new DeleteAsset();
-
-                    EnrichAndCheckPermission(task, command, PermissionIds.AppAssetsDelete);
-                    return command;
-                }
-
-            default:
-                ThrowHelper.NotSupportedException();
-                return default!;
-        }
-    }
-
-    private void EnrichAndCheckPermission<T>(BulkTask task, T command, string permissionId) where T : AssetCommand
-    {
-        SimpleMapper.Map(task.Command, command);
-        SimpleMapper.Map(task.CommandJob, command);
-
         if (!contextProvider.Context.Allows(permissionId))
         {
-            throw new DomainForbiddenException("Forbidden");
+            return BulkTask.Failed(bulkJob, bulk, jobIndex, new DomainForbiddenException("Forbidden"));
         }
 
-        command.ExpectedVersion = task.Command.ExpectedVersion;
+        var command = new T();
+
+        SimpleMapper.Map(bulk, command);
+        SimpleMapper.Map(bulkJob, command);
+
+        command.ExpectedVersion = bulk.ExpectedVersion;
+        command.AssetId = bulkJob.Id;
+
+        return new BulkTask(bulkJob, bulk, jobIndex, command);
     }
 }

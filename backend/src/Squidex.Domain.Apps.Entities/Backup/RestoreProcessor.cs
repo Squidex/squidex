@@ -5,6 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -285,67 +288,54 @@ public sealed partial class RestoreProcessor
     private async Task ReadEventsAsync(Run run,
         CancellationToken ct)
     {
-        const int BatchSize = 100;
+        var events = HandleEventsAsync(run, ct).Batch(100, ct).Buffered(2, ct);
 
         var handled = 0;
 
-        var writeBlock = new ActionBlock<(string, Envelope<IEvent>)[]>(async batch =>
+        await Parallel.ForEachAsync(events, new ParallelOptions
         {
-            try
-            {
-                var commits = new List<EventCommit>(batch.Length);
-
-                foreach (var (stream, @event) in batch)
-                {
-                    var offset = run.StreamMapper.GetStreamOffset(stream);
-
-                    commits.Add(EventCommit.Create(stream, offset, @event, eventFormatter));
-                }
-
-                await eventStore.AppendUnsafeAsync(commits, ct);
-
-                handled += commits.Count;
-
-                await LogAsync(run, $"Reading {run.Reader.ReadEvents}/{handled} events and {run.Reader.ReadAttachments} attachments completed.", true);
-            }
-            catch (OperationCanceledException ex)
-            {
-                // Dataflow swallows operation cancelled exception.
-                throw new AggregateException(ex);
-            }
-        }, new ExecutionDataflowBlockOptions
-        {
+            CancellationToken = ct,
+            // The event store cannot insert events in parallel.
             MaxDegreeOfParallelism = 1,
-            MaxMessagesPerTask = 1,
-            BoundedCapacity = 2
-        });
-
-        var batchBlock = new BatchBlock<(string, Envelope<IEvent>)>(BatchSize, new GroupingDataflowBlockOptions
+        },
+        async (batch, ct) =>
         {
-            BoundedCapacity = BatchSize * 2
+            var commits =
+                batch.Select(item =>
+                    EventCommit.Create(
+                        item.Stream,
+                        item.Offset,
+                        item.Event,
+                        eventFormatter));
+
+            await eventStore.AppendUnsafeAsync(commits, ct);
+
+            // Just in case we use parallel inserts later.
+            Interlocked.Increment(ref handled);
+
+            await LogAsync(run, $"Reading {run.Reader.ReadEvents}/{handled} events and {run.Reader.ReadAttachments} attachments completed.", true);
         });
-
-        batchBlock.BidirectionalLinkTo(writeBlock);
-
-        await foreach (var job in run.Reader.ReadEventsAsync(eventStreamNames, eventFormatter, ct))
-        {
-            var newStream = await HandleEventAsync(run, job.Stream, job.Event, ct);
-
-            if (newStream != null)
-            {
-                if (!await batchBlock.SendAsync((newStream, job.Event), ct))
-                {
-                    break;
-                }
-            }
-        }
-
-        batchBlock.Complete();
-
-        await writeBlock.Completion;
     }
 
-    private async Task<string?> HandleEventAsync(Run run, string stream, Envelope<IEvent> @event,
+    private async IAsyncEnumerable<(string Stream, long Offset, Envelope<IEvent> Event)> HandleEventsAsync(Run run,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        var @events = run.Reader.ReadEventsAsync(eventStreamNames, eventFormatter, ct);
+
+        await foreach (var (stream, @event) in events.WithCancellation(ct))
+        {
+            var (newStream, handled) = await HandleEventAsync(run, stream, @event, ct);
+
+            if (handled)
+            {
+                var offset = run.StreamMapper.GetStreamOffset(newStream);
+
+                yield return (newStream, offset, @event);
+            }
+        }
+    }
+
+    private async Task<(string StreamName, bool Handled)> HandleEventAsync(Run run, string stream, Envelope<IEvent> @event,
         CancellationToken ct = default)
     {
         if (@event.Payload is AppCreated appCreated)
@@ -390,11 +380,11 @@ public sealed partial class RestoreProcessor
         {
             if (!await handler.RestoreEventAsync(@event, run.Context, ct))
             {
-                return null;
+                return (newStream, false);
             }
         }
 
-        return newStream;
+        return (newStream, true);
     }
 
     private async Task CreateContextAsync(Run run, DomainId previousAppId,
