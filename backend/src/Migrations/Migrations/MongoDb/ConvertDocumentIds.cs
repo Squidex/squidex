@@ -87,7 +87,8 @@ public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
 
         await collectionV2.DeleteManyAsync(FindAll, ct);
 
-        var batches = collectionV1.Find(FindAll).ToAsyncEnumerable(ct).Buffered(1000, ct).Batch(500, ct);
+        // Run batch first, because it is cheaper as it has less items.
+        var batches = collectionV1.Find(FindAll).ToAsyncEnumerable(ct).Batch(500, ct).Buffered(2, ct);
 
         await Parallel.ForEachAsync(batches, ct, async (batch, ct) =>
         {

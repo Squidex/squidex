@@ -288,6 +288,7 @@ public sealed partial class RestoreProcessor
     private async Task ReadEventsAsync(Run run,
         CancellationToken ct)
     {
+        // Run batch first, because it is cheaper as it has less items.
         var events = HandleEventsAsync(run, ct).Batch(100, ct).Buffered(2, ct);
 
         var handled = 0;

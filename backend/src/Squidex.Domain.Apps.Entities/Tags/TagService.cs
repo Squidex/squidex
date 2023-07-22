@@ -311,7 +311,8 @@ public sealed class TagService : ITagService
     public async Task ClearAsync(
         CancellationToken ct = default)
     {
-        var batches = persistenceFactory.Snapshots.ReadAllAsync(ct).Buffered(1000).Batch(500, ct);
+        // Run batch first, because it is cheaper as it has less items.
+        var batches = persistenceFactory.Snapshots.ReadAllAsync(ct).Batch(500, ct).Buffered(2);
 
         await Parallel.ForEachAsync(batches, ct, async (batch, ct) =>
         {
