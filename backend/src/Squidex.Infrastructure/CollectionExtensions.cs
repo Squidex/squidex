@@ -121,6 +121,7 @@ public static class CollectionExtensions
         await foreach (var item in source.WithCancellation(ct))
         {
             bucket ??= new List<T>(size);
+            bucket.Add(item);
 
             if (bucket.Count == size)
             {

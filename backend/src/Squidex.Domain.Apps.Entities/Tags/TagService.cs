@@ -312,11 +312,12 @@ public sealed class TagService : ITagService
         CancellationToken ct = default)
     {
         // Run batch first, because it is cheaper as it has less items.
-        var batches = persistenceFactory.Snapshots.ReadAllAsync(ct).Batch(500, ct).Buffered(2);
+        var batches = persistenceFactory.Snapshots.ReadAllAsync(ct).Batch(500, ct).Buffered(2, ct: ct);
 
         await Parallel.ForEachAsync(batches, ct, async (batch, ct) =>
         {
-            var jobs = batch.Where(x => x.Value.Clear()).Select(x => new SnapshotWriteJob<State>(x.Key, x.Value, x.Version));
+            // Convert to list for the tests, actually not needed.
+            var jobs = batch.Where(x => x.Value.Clear()).Select(x => new SnapshotWriteJob<State>(x.Key, x.Value, x.Version)).ToList();
 
             await persistenceFactory.Snapshots.WriteManyAsync(jobs, ct);
         });

@@ -96,7 +96,7 @@ public class Rebuilder
 
         using (localCache.StartContext())
         {
-            // Run batch first, because it is cheaper.
+            // Run batch first, because it is cheaper as it has less items.
             var batches = source.Where(handledIds.Add).Batch(batchSize, ct).Buffered(2, ct);
 
             await Parallel.ForEachAsync(batches, ct, async (batch, ct) =>
