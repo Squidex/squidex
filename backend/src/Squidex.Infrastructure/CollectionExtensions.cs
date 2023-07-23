@@ -99,6 +99,7 @@ public static class CollectionExtensions
         foreach (var item in source)
         {
             bucket ??= new List<T>(size);
+            bucket.Add(item);
 
             if (bucket.Count == size)
             {
@@ -114,7 +115,7 @@ public static class CollectionExtensions
     }
 
     public static async IAsyncEnumerable<List<T>> Batch<T>(this IAsyncEnumerable<T> source, int size,
-        [EnumeratorCancellation] CancellationToken ct)
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
         List<T>? bucket = null;
 

@@ -32,6 +32,32 @@ public static class SimpleMapper
         }
     }
 
+    private sealed class NullablePropertyMapper : PropertyMapper
+    {
+        private readonly object defaultValue;
+
+        public NullablePropertyMapper(
+            PropertyAccessor sourceAccessor,
+            PropertyAccessor targetAccessor,
+            object defaultValue)
+            : base(sourceAccessor, targetAccessor)
+        {
+            this.defaultValue = defaultValue;
+        }
+
+        public override void MapProperty(object source, object target, CultureInfo culture)
+        {
+            var value = GetValue(source);
+
+            if (value == null)
+            {
+                value = defaultValue;
+            }
+
+            SetValue(target, value);
+        }
+    }
+
     private sealed class ConversionPropertyMapper : PropertyMapper
     {
         private readonly Type targetType;
@@ -171,6 +197,13 @@ public static class SimpleMapper
                         new PropertyAccessor(sourceProperty),
                         new PropertyAccessor(targetProperty)));
                 }
+                else if (IsNullableOf(sourceType, targetType))
+                {
+                    Mappers.Add(new NullablePropertyMapper(
+                        new PropertyAccessor(sourceProperty),
+                        new PropertyAccessor(targetProperty),
+                        Activator.CreateInstance(targetType)!));
+                }
                 else
                 {
                     var converter = TypeDescriptor.GetConverter(targetType);
@@ -190,6 +223,13 @@ public static class SimpleMapper
                             targetType));
                     }
                 }
+            }
+
+            static bool IsNullableOf(Type type, Type wrappedType)
+            {
+                return type.IsGenericType &&
+                    type.GetGenericTypeDefinition() == typeof(Nullable<>) &&
+                    type.GenericTypeArguments[0] == wrappedType;
             }
         }
 
