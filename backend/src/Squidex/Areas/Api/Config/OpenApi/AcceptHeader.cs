@@ -22,7 +22,7 @@ public class AcceptHeader
     public sealed class UnpublishedAttribute : BaseAttribute
     {
         public UnpublishedAttribute()
-            : base(ContentHeaders.Unpublished, "Return unpublished content items.", JsonObjectType.Boolean)
+            : base(ContentHeaders.KeyUnpublished, "Return unpublished content items.", JsonObjectType.Boolean)
         {
         }
     }
@@ -30,7 +30,7 @@ public class AcceptHeader
     public sealed class FieldsAttribute : BaseAttribute
     {
         public FieldsAttribute()
-            : base(ContentHeaders.Fields, "The list of content fields (comma-separated).", JsonObjectType.String)
+            : base(ContentHeaders.KeyFields, "The list of content fields (comma-separated).", JsonObjectType.String)
         {
         }
     }
@@ -38,7 +38,7 @@ public class AcceptHeader
     public sealed class FlattenAttribute : BaseAttribute
     {
         public FlattenAttribute()
-            : base(ContentHeaders.Flatten, "Provide the data as flat object.", JsonObjectType.Boolean)
+            : base(ContentHeaders.KeyFlatten, "Provide the data as flat object.", JsonObjectType.Boolean)
         {
         }
     }
@@ -46,7 +46,7 @@ public class AcceptHeader
     public sealed class LanguagesAttribute : BaseAttribute
     {
         public LanguagesAttribute()
-            : base(ContentHeaders.Languages, "The list of languages to resolve (comma-separated).")
+            : base(ContentHeaders.KeyLanguages, "The list of languages to resolve (comma-separated).")
         {
         }
     }
@@ -54,7 +54,7 @@ public class AcceptHeader
     public sealed class NoTotalAttribute : BaseAttribute
     {
         public NoTotalAttribute()
-            : base(ContextHeaders.NoTotal, "Do not return the total amount.", JsonObjectType.Boolean)
+            : base(ContextHeaders.KeyNoTotal, "Do not return the total amount.", JsonObjectType.Boolean)
         {
         }
     }
@@ -62,7 +62,7 @@ public class AcceptHeader
     public sealed class NoSlowTotalAttribute : BaseAttribute
     {
         public NoSlowTotalAttribute()
-            : base(ContextHeaders.NoSlowTotal, "Do not return the total amount, if it would be slow.", JsonObjectType.Boolean)
+            : base(ContextHeaders.KeyNoSlowTotal, "Do not return the total amount, if it would be slow.", JsonObjectType.Boolean)
         {
         }
     }

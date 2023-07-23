@@ -17,10 +17,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
 public sealed class GraphQLExecutionContext : QueryExecutionContext
 {
+    private const int MaxBatchSize = 5000;
+    private const int MinBatchSize = 1;
     private static readonly EmptyDataLoaderResult<IEnrichedAssetEntity> EmptyAssets = new EmptyDataLoaderResult<IEnrichedAssetEntity>();
     private static readonly EmptyDataLoaderResult<IEnrichedContentEntity> EmptyContents = new EmptyDataLoaderResult<IEnrichedContentEntity>();
     private readonly IDataLoaderContextAccessor dataLoaders;
     private readonly GraphQLOptions options;
+    private readonly int batchSize;
 
     public override Context Context { get; }
 
@@ -38,11 +41,22 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         this.dataLoaders = dataLoaders;
 
         Context = context.Clone(b => b
-            .WithoutCleanup()
-            .WithoutContentEnrichment()
-            .WithoutAssetEnrichment());
+            .WithNoCleanup()
+            .WithNoEnrichment()
+            .WithNoAssetEnrichment());
 
         this.options = options.Value;
+
+        batchSize = Context.BatchSize();
+
+        if (batchSize == 0)
+        {
+            batchSize = options.Value.DataLoaderBatchSize;
+        }
+        else
+        {
+            batchSize = Math.Max(MinBatchSize, Math.Min(MaxBatchSize, batchSize));
+        }
     }
 
     public async ValueTask<IUser?> FindUserAsync(RefToken refToken,
@@ -121,7 +135,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
                 var result = await QueryAssetsByIdsAsync(batch, ct);
 
                 return result.ToDictionary(x => x.Id);
-            }, maxBatchSize: options.DataLoaderBatchSize);
+            }, maxBatchSize: batchSize);
     }
 
     private IDataLoader<CacheableId<DomainId>, IEnrichedContentEntity> GetContentsLoader()
@@ -132,7 +146,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
                 var result = await QueryContentsByIdsAsync(batch, null, ct);
 
                 return result.ToDictionary(x => x.Id);
-            }, maxBatchSize: options.DataLoaderBatchSize);
+            }, maxBatchSize: batchSize);
     }
 
     private IDataLoader<(DomainId Id, HashSet<string> Fields), IEnrichedContentEntity> GetContentsLoaderWithFields()
@@ -145,7 +159,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
                 var result = await QueryContentsByIdsAsync(batch.Select(x => x.Id), fields, ct);
 
                 return result.ToDictionary(x => (x.Id, fields));
-            }, maxBatchSize: options.DataLoaderBatchSize);
+            }, maxBatchSize: batchSize);
     }
 
     private IDataLoader<string, IUser> GetUserLoader()

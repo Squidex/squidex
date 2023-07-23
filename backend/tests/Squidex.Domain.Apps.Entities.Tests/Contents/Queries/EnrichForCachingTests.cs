@@ -67,7 +67,7 @@ public class EnrichForCachingTests : GivenContext
     [Fact]
     public async Task Should_not_add_cache_headers_if_disabled()
     {
-        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutCacheKeys()), CancellationToken);
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithNoCacheKeys()), CancellationToken);
 
         A.CallTo(() => requestCache.AddHeader(A<string>._))
             .MustNotHaveHappened();
@@ -78,7 +78,7 @@ public class EnrichForCachingTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutCacheKeys()), Enumerable.Repeat(content, 1), SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithNoCacheKeys()), Enumerable.Repeat(content, 1), SchemaProvider(), CancellationToken);
 
         A.CallTo(() => requestCache.AddHeader(A<string>._))
             .MustNotHaveHappened();

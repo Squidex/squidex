@@ -60,7 +60,7 @@ public sealed class ConvertData : IContentEnricherStep
     private async Task<ValueReferencesConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
-        if (context.ShouldSkipCleanup())
+        if (context.NoCleanup())
         {
             return null;
         }
@@ -136,14 +136,14 @@ public sealed class ConvertData : IContentEnricherStep
         converter.Add(
             new ResolveLanguages(
                 context.App.Languages,
-                context.LanguagesList().ToArray())
+                context.Languages().ToArray())
             {
-                ResolveFallback = !context.IsFrontendClient && context.ShouldResolveLanguages()
+                ResolveFallback = !context.IsFrontendClient && !context.NoResolveLanguages()
             });
 
         if (!context.IsFrontendClient)
         {
-            var assetUrls = context.AssetUrls().ToList();
+            var assetUrls = context.ResolveUrls().ToList();
 
             if (assetUrls.Count > 0)
             {

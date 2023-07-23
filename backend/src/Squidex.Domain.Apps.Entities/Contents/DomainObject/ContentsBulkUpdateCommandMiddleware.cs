@@ -69,10 +69,10 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
         }
 
         contextProvider.Context.Change(b => b
-            .WithoutContentEnrichment()
-            .WithoutCleanup()
+            .WithNoEnrichment()
+            .WithNoCleanup()
             .WithUnpublished(true)
-            .WithoutTotal());
+            .WithNoTotal());
 
         var tasks = await bulkUpdates.Jobs.SelectManyAsync((job, i, ct) => CreateTasksAsync(job, bulkUpdates, i, ct), ct);
 

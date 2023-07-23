@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 #pragma warning disable IDE0060 // Remove unused parameter
 
@@ -15,34 +16,32 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 
 public static class ContentHeaders
 {
-    private static readonly char[] Separators = { ',', ';' };
-
-    public const string Fields = "X-Fields";
-    public const string Flatten = "X-Flatten";
-    public const string Languages = "X-Languages";
-    public const string NoCleanup = "X-NoCleanup";
-    public const string NoEnrichment = "X-NoEnrichment";
-    public const string NoResolveLanguages = "X-NoResolveLanguages";
-    public const string ResolveFlow = "X-ResolveFlow";
-    public const string ResolveUrls = "X-ResolveUrls";
-    public const string Unpublished = "X-Unpublished";
+    public const string KeyFields = "X-Fields";
+    public const string KeyFlatten = "X-Flatten";
+    public const string KeyLanguages = "X-Languages";
+    public const string KeyNoCleanup = "X-NoCleanup";
+    public const string KeyNoEnrichment = "X-NoEnrichment";
+    public const string KeyNoResolveLanguages = "X-NoResolveLanguages";
+    public const string KeyResolveFlow = "X-ResolveFlow";
+    public const string KeyResolveUrls = "X-ResolveUrls";
+    public const string KeyUnpublished = "X-Unpublished";
 
     public static void AddCacheHeaders(this Context context, IRequestCache cache)
     {
-        cache.AddHeader(Fields);
-        cache.AddHeader(Flatten);
-        cache.AddHeader(Languages);
-        cache.AddHeader(NoCleanup);
-        cache.AddHeader(NoEnrichment);
-        cache.AddHeader(NoResolveLanguages);
-        cache.AddHeader(ResolveFlow);
-        cache.AddHeader(ResolveUrls);
-        cache.AddHeader(Unpublished);
+        cache.AddHeader(KeyFields);
+        cache.AddHeader(KeyFlatten);
+        cache.AddHeader(KeyLanguages);
+        cache.AddHeader(KeyNoCleanup);
+        cache.AddHeader(KeyNoEnrichment);
+        cache.AddHeader(KeyNoResolveLanguages);
+        cache.AddHeader(KeyResolveFlow);
+        cache.AddHeader(KeyResolveUrls);
+        cache.AddHeader(KeyUnpublished);
     }
 
-    public static Status EditingStatus(this IContentEntity content)
+    public static SearchScope Scope(this Context context)
     {
-        return content.NewStatus ?? content.Status;
+        return context.Unpublished() || context.IsFrontendClient ? SearchScope.All : SearchScope.Published;
     }
 
     public static bool IsPublished(this IContentEntity content)
@@ -50,113 +49,93 @@ public static class ContentHeaders
         return content.EditingStatus() == Status.Published;
     }
 
-    public static SearchScope Scope(this Context context)
+    public static bool NoCleanup(this Context context)
     {
-        return context.ShouldProvideUnpublished() || context.IsFrontendClient ? SearchScope.All : SearchScope.Published;
+        return context.AsBoolean(KeyNoCleanup);
     }
 
-    public static bool ShouldSkipCleanup(this Context context)
+    public static ICloneBuilder WithNoCleanup(this ICloneBuilder builder, bool value = true)
     {
-        return context.Headers.ContainsKey(NoCleanup);
+        return builder.WithBoolean(KeyNoCleanup, value);
     }
 
-    public static ICloneBuilder WithoutCleanup(this ICloneBuilder builder, bool value = true)
+    public static bool NoEnrichment(this Context context)
     {
-        return builder.WithBoolean(NoCleanup, value);
+        return context.AsBoolean(KeyNoEnrichment);
     }
 
-    public static bool ShouldSkipContentEnrichment(this Context context)
+    public static ICloneBuilder WithNoEnrichment(this ICloneBuilder builder, bool value = true)
     {
-        return context.Headers.ContainsKey(NoEnrichment);
+        return builder.WithBoolean(KeyNoEnrichment, value);
     }
 
-    public static ICloneBuilder WithoutContentEnrichment(this ICloneBuilder builder, bool value = true)
+    public static bool Unpublished(this Context context)
     {
-        return builder.WithBoolean(NoEnrichment, value);
-    }
-
-    public static bool ShouldProvideUnpublished(this Context context)
-    {
-        return context.Headers.ContainsKey(Unpublished);
+        return context.AsBoolean(KeyUnpublished);
     }
 
     public static ICloneBuilder WithUnpublished(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(Unpublished, value);
+        return builder.WithBoolean(KeyUnpublished, value);
     }
 
-    public static bool ShouldFlatten(this Context context)
+    public static bool Flatten(this Context context)
     {
-        return context.Headers.ContainsKey(Flatten);
+        return context.AsBoolean(KeyFlatten);
     }
 
     public static ICloneBuilder WithFlatten(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(Flatten, value);
+        return builder.WithBoolean(KeyFlatten, value);
     }
 
-    public static bool ShouldResolveFlow(this Context context)
+    public static bool ResolveFlow(this Context context)
     {
-        return context.Headers.ContainsKey(ResolveFlow);
+        return context.AsBoolean(KeyResolveFlow);
     }
 
     public static ICloneBuilder WithResolveFlow(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(ResolveFlow, value);
+        return builder.WithBoolean(KeyResolveFlow, value);
     }
 
-    public static bool ShouldResolveLanguages(this Context context)
+    public static bool NoResolveLanguages(this Context context)
     {
-        return !context.Headers.ContainsKey(NoResolveLanguages);
+        return context.AsBoolean(KeyNoResolveLanguages);
     }
 
-    public static ICloneBuilder WithoutResolveLanguages(this ICloneBuilder builder, bool value = true)
+    public static ICloneBuilder WithNoResolveLanguages(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(NoResolveLanguages, value);
+        return builder.WithBoolean(KeyNoResolveLanguages, value);
     }
 
-    public static IEnumerable<string> AssetUrls(this Context context)
+    public static IEnumerable<string> ResolveUrls(this Context context)
     {
-        if (context.Headers.TryGetValue(ResolveUrls, out var value))
-        {
-            return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToHashSet();
-        }
-
-        return Enumerable.Empty<string>();
+        return context.AsStrings(KeyResolveUrls);
     }
 
-    public static ICloneBuilder WithAssetUrlsToResolve(this ICloneBuilder builder, IEnumerable<string>? fieldNames)
+    public static ICloneBuilder WithResolveUrls(this ICloneBuilder builder, IEnumerable<string>? fieldNames)
     {
-        return builder.WithStrings(ResolveUrls, fieldNames);
+        return builder.WithStrings(KeyResolveUrls, fieldNames);
     }
 
-    public static HashSet<string>? FieldsList(this Context context)
+    public static HashSet<string>? Fields(this Context context)
     {
-        if (context.Headers.TryGetValue(Fields, out var value))
-        {
-            return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).ToHashSet();
-        }
-
-        return null;
+        return context.AsStrings(KeyFields).ToHashSet();
     }
 
     public static ICloneBuilder WithFields(this ICloneBuilder builder, IEnumerable<string>? fields)
     {
-        return builder.WithStrings(Fields, fields);
+        return builder.WithStrings(KeyFields, fields);
     }
 
-    public static HashSet<Language> LanguagesList(this Context context)
+    public static HashSet<Language> Languages(this Context context)
     {
-        if (context.Headers.TryGetValue(Languages, out var value))
-        {
-            return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Select(x => (Language)x).ToHashSet();
-        }
-
-        return new HashSet<Language>();
+        return context.AsStrings(KeyFields).Select(Language.GetLanguage).ToHashSet();
     }
 
     public static ICloneBuilder WithLanguages(this ICloneBuilder builder, IEnumerable<string> languages)
     {
-        return builder.WithStrings(Languages, languages);
+        return builder.WithStrings(KeyLanguages, languages);
     }
 }

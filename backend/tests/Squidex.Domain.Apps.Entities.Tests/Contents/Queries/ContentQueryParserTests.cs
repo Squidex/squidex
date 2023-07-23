@@ -44,7 +44,7 @@ public class ContentQueryParserTests : GivenContext
     [Fact]
     public async Task Should_skip_total_if_set_in_context()
     {
-        var q = await sut.ParseAsync(ApiContext.Clone(b => b.WithoutTotal()), Q.Empty, ct: CancellationToken);
+        var q = await sut.ParseAsync(ApiContext.Clone(b => b.WithNoTotal()), Q.Empty, ct: CancellationToken);
 
         Assert.True(q.NoTotal);
     }

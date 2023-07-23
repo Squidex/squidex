@@ -97,7 +97,7 @@ public sealed class ScriptContent : IContentEnricherStep
     {
         // We need a special permission to disable scripting for security reasons, if the script removes sensible data.
         var shouldScript =
-            !context.ShouldSkipScripting() ||
+            !context.NoScripting() ||
             !context.UserPermissions.Allows(PermissionIds.ForApp(PermissionIds.AppNoScripting, context.App.Name));
 
         return !context.IsFrontendClient && shouldScript;

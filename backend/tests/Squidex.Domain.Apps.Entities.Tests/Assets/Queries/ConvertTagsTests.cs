@@ -38,7 +38,7 @@ public class ConvertTagsTests : GivenContext
     {
         var asset = new AssetEntity();
 
-        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutAssetEnrichment()), Enumerable.Repeat(asset, 1), CancellationToken);
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithNoAssetEnrichment()), Enumerable.Repeat(asset, 1), CancellationToken);
 
         Assert.Null(asset.TagNames);
     }

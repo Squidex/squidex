@@ -82,7 +82,7 @@ public class ResolveAssetsTests : GivenContext
         };
 
         A.CallTo(() => assetQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id), CancellationToken))
+                A<Context>.That.Matches(x => x.NoAssetEnrichment() && x.NoTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id), CancellationToken))
             .Returns(ResultList.CreateFrom(4, doc1, doc2));
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
@@ -114,7 +114,7 @@ public class ResolveAssetsTests : GivenContext
         };
 
         A.CallTo(() => assetQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id, img1.Id, img2.Id), CancellationToken))
+                A<Context>.That.Matches(x => x.NoAssetEnrichment() && x.NoTotal()), null, A<Q>.That.HasIds(doc1.Id, doc2.Id, img1.Id, img2.Id), CancellationToken))
             .Returns(ResultList.CreateFrom(4, img1, img2, doc1, doc2));
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
@@ -164,7 +164,7 @@ public class ResolveAssetsTests : GivenContext
             CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
         };
 
-        await sut.EnrichAsync(FrontendContext.Clone(b => b.WithoutContentEnrichment(true)), contents, schemaProvider, CancellationToken);
+        await sut.EnrichAsync(FrontendContext.Clone(b => b.WithNoEnrichment(true)), contents, schemaProvider, CancellationToken);
 
         Assert.Null(contents[0].ReferenceData);
 
@@ -204,7 +204,7 @@ public class ResolveAssetsTests : GivenContext
         Assert.NotNull(contents[0].ReferenceData);
 
         A.CallTo(() => assetQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipAssetEnrichment() && x.ShouldSkipTotal()), null, A<Q>.That.HasIds(id1), A<CancellationToken>._))
+                A<Context>.That.Matches(x => x.NoAssetEnrichment() && x.NoTotal()), null, A<Q>.That.HasIds(id1), A<CancellationToken>._))
             .MustHaveHappened();
     }
 

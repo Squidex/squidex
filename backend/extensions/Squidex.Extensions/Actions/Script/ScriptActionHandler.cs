@@ -44,7 +44,7 @@ public sealed class ScriptActionHandler : RuleActionHandler<ScriptAction, Script
             AppName = job.Event.AppId.Name,
         };
 
-        if (job.Event is EnrichedUserEventBase userEvent)
+        if (job.Event is EnrichedUserEventBase)
         {
             vars.User = AllPrinicpal();
         }

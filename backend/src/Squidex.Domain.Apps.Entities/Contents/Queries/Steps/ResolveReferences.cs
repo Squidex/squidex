@@ -162,8 +162,8 @@ public sealed class ResolveReferences : IContentEnricherStep
         // Ensure that we reset the fields to not use the field selection from the parent query.
         var queryContext = context.Clone(b => b
             .WithFields(null)
-            .WithoutContentEnrichment(true)
-            .WithoutTotal());
+            .WithNoEnrichment(true)
+            .WithNoTotal());
 
         var references = await ContentQuery.QueryAsync(queryContext, Q.Empty.WithIds(ids).WithoutTotal(), ct);
 
@@ -172,6 +172,6 @@ public sealed class ResolveReferences : IContentEnricherStep
 
     private static bool ShouldEnrich(Context context)
     {
-        return context.IsFrontendClient && !context.ShouldSkipContentEnrichment();
+        return context.IsFrontendClient && !context.NoEnrichment();
     }
 }

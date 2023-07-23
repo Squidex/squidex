@@ -64,10 +64,10 @@ public sealed class AssetsBulkUpdateCommandMiddleware : ICommandMiddleware
         }
 
         contextProvider.Context.Change(b => b
-            .WithoutAssetEnrichment()
-            .WithoutCleanup()
+            .WithNoAssetEnrichment()
+            .WithNoCleanup()
             .WithUnpublished(true)
-            .WithoutTotal());
+            .WithNoTotal());
 
         var tasks = bulkUpdates.Jobs.Select((job, i) => CreateTask(job, bulkUpdates, i)).ToList();
 

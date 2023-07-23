@@ -28,7 +28,7 @@ public class CalculateTokensTests : GivenContext
     {
         var asset = CreateAsset();
 
-        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutAssetEnrichment()), Enumerable.Repeat(asset, 1), default);
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithNoAssetEnrichment()), Enumerable.Repeat(asset, 1), default);
 
         Assert.Null(asset.EditToken);
     }

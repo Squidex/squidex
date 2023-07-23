@@ -62,6 +62,7 @@ public sealed class ContentsSearchSource : ISearchSource
             return result;
         }
 
+        // Resolve the app ID once, because we loop over the results.
         var appId = context.App.NamedId();
 
         var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).WithoutTotal(), ct);

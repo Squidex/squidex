@@ -60,13 +60,13 @@ public class ContentQueryParser
             WithPaging(query, q);
 
             q = q.WithQuery(query);
-            q = q.WithFields(context.FieldsList());
+            q = q.WithFields(context.Fields());
 
-            if (context.ShouldSkipTotal())
+            if (context.NoTotal())
             {
                 q = q.WithoutTotal();
             }
-            else if (context.ShouldSkipSlowTotal())
+            else if (context.NoSlowTotal())
             {
                 q = q.WithoutSlowTotal();
             }

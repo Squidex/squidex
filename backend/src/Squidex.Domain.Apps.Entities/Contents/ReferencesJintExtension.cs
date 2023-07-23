@@ -83,9 +83,10 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
 
             var requestContext =
                 new Context(user, app).Clone(b => b
-                    .WithoutContentEnrichment()
+                .WithFields(null)
+                    .WithNoEnrichment()
                     .WithUnpublished()
-                    .WithoutTotal());
+                    .WithNoTotal());
 
             var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
 
@@ -123,9 +124,9 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
             var requestContext =
                 new Context(user, app).Clone(b => b
                     .WithFields(null)
-                    .WithoutContentEnrichment()
+                    .WithNoEnrichment()
                     .WithUnpublished()
-                    .WithoutTotal());
+                    .WithNoTotal());
 
             var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
 

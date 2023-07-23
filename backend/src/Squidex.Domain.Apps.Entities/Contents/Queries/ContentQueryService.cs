@@ -52,9 +52,9 @@ public sealed class ContentQueryService : IContentQueryService
 
         // Skip all expensive operations when we call the enricher.
         context = context.Clone(b => b
-            .WithoutScripting()
-            .WithoutCacheKeys()
-            .WithoutContentEnrichment());
+            .WithNoScripting()
+            .WithNoCacheKeys()
+            .WithNoEnrichment());
 
         // We run this query without a timeout because it is meant for long running background operations.
         var contents = contentRepository.StreamAll(context.App.Id, HashSet.Of(schema.Id), context.Scope(), ct);

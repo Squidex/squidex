@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Reflection;
 
 public static class SimpleMapper
 {
-    private struct MappingContext
+    private readonly record struct MappingContext
     {
         required public CultureInfo Culture { get; init; }
 

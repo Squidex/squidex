@@ -80,9 +80,9 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
 
         A.CallTo(() => contentQuery.QueryAsync(
                 A<Context>.That.Matches(x =>
-                    x.ShouldSkipCleanup() &&
-                    x.ShouldSkipContentEnrichment() &&
-                    x.ShouldSkipTotal()),
+                    x.NoCleanup() &&
+                    x.NoEnrichment() &&
+                    x.NoTotal()),
                 schemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
@@ -107,9 +107,9 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
 
         A.CallTo(() => contentQuery.QueryAsync(
                 A<Context>.That.Matches(x =>
-                    x.ShouldSkipCleanup() &&
-                    x.ShouldSkipContentEnrichment() &&
-                    x.ShouldSkipTotal()),
+                    x.NoCleanup() &&
+                    x.NoEnrichment() &&
+                    x.NoTotal()),
                 schemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.JsonQuery == query),
                 A<CancellationToken>._))
@@ -139,9 +139,9 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
 
         A.CallTo(() => contentQuery.QueryAsync(
                 A<Context>.That.Matches(x =>
-                    x.ShouldSkipCleanup() &&
-                    x.ShouldSkipContentEnrichment() &&
-                    x.ShouldSkipTotal()),
+                    x.NoCleanup() &&
+                    x.NoEnrichment() &&
+                    x.NoTotal()),
                 schemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.JsonQuery == query),
                 A<CancellationToken>._))

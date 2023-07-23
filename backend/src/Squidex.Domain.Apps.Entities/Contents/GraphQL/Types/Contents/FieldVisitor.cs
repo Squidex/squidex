@@ -322,24 +322,4 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
             return null;
         });
     }
-
-    private static IFieldResolver CreateAsyncValueResolver<T>(AsyncValueResolver<T> valueResolver)
-    {
-        return Resolvers.Async<IReadOnlyDictionary<string, JsonValue>, object?>(async (source, fieldContext, context) =>
-        {
-            var key = fieldContext.FieldDefinition.SourceName();
-
-            if (source.TryGetValue(key, out var value))
-            {
-                if (value == JsonValue.Null)
-                {
-                    return null;
-                }
-
-                return await valueResolver(value, fieldContext, context);
-            }
-
-            return null;
-        });
-    }
 }

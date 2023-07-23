@@ -5,53 +5,82 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
+
 namespace Squidex.Domain.Apps.Entities;
 
 public static class ContextHeaders
 {
-    public const string NoCacheKeys = "X-NoCacheKeys";
-    public const string NoScripting = "X-NoScripting";
-    public const string NoSlowTotal = "X-NoSlowTotal";
-    public const string NoTotal = "X-NoTotal";
+    private static readonly char[] Separators = { ',', ';' };
 
-    public static bool ShouldSkipCacheKeys(this Context context)
+    public const string KeyBatchSize = "X-BatchSize";
+    public const string KeyNoCacheKeys = "X-NoCacheKeys";
+    public const string KeyNoScripting = "X-NoScripting";
+    public const string KeyNoSlowTotal = "X-NoSlowTotal";
+    public const string KeyNoTotal = "X-NoTotal";
+
+    public static int BatchSize(this Context context)
     {
-        return context.Headers.ContainsKey(NoCacheKeys);
+        return context.AsNumber(KeyBatchSize);
     }
 
-    public static ICloneBuilder WithoutCacheKeys(this ICloneBuilder builder, bool value = true)
+    public static ICloneBuilder WithBatchSize(this ICloneBuilder builder, int value)
     {
-        return builder.WithBoolean(NoCacheKeys, value);
+        return builder.WithNumber(KeyBatchSize, value);
     }
 
-    public static bool ShouldSkipScripting(this Context context)
+    public static bool NoCacheKeys(this Context context)
     {
-        return context.Headers.ContainsKey(NoScripting);
+        return context.AsBoolean(KeyNoCacheKeys);
     }
 
-    public static ICloneBuilder WithoutScripting(this ICloneBuilder builder, bool value = true)
+    public static ICloneBuilder WithNoCacheKeys(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(NoScripting, value);
+        return builder.WithBoolean(KeyNoCacheKeys, value);
     }
 
-    public static bool ShouldSkipTotal(this Context context)
+    public static bool NoScripting(this Context context)
     {
-        return context.Headers.ContainsKey(NoTotal);
+        return context.AsBoolean(KeyNoScripting);
     }
 
-    public static ICloneBuilder WithoutTotal(this ICloneBuilder builder, bool value = true)
+    public static ICloneBuilder WithNoScripting(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(NoTotal, value);
+        return builder.WithBoolean(KeyNoScripting, value);
     }
 
-    public static bool ShouldSkipSlowTotal(this Context context)
+    public static bool NoTotal(this Context context)
     {
-        return context.Headers.ContainsKey(NoSlowTotal);
+        return context.AsBoolean(KeyNoTotal);
     }
 
-    public static ICloneBuilder WithoutSlowTotal(this ICloneBuilder builder, bool value = true)
+    public static ICloneBuilder WithNoTotal(this ICloneBuilder builder, bool value = true)
     {
-        return builder.WithBoolean(NoSlowTotal, value);
+        return builder.WithBoolean(KeyNoTotal, value);
+    }
+
+    public static bool NoSlowTotal(this Context context)
+    {
+        return context.AsBoolean(KeyNoSlowTotal);
+    }
+
+    public static ICloneBuilder WithNoSlowTotal(this ICloneBuilder builder, bool value = true)
+    {
+        return builder.WithBoolean(KeyNoSlowTotal, value);
+    }
+
+    public static ICloneBuilder WithNumber(this ICloneBuilder builder, string key, int value)
+    {
+        if (value != 0)
+        {
+            builder.SetHeader(key, value.ToString(CultureInfo.InvariantCulture));
+        }
+        else
+        {
+            builder.Remove(key);
+        }
+
+        return builder;
     }
 
     public static ICloneBuilder WithBoolean(this ICloneBuilder builder, string key, bool value)
@@ -80,5 +109,30 @@ public static class ContextHeaders
         }
 
         return builder;
+    }
+
+    public static bool AsBoolean(this Context context, string key)
+    {
+        return context.Headers.ContainsKey(key);
+    }
+
+    public static int AsNumber(this Context context, string key)
+    {
+        if (context.Headers.TryGetValue(key, out var value) && int.TryParse(value, CultureInfo.InvariantCulture, out var result))
+        {
+            return result;
+        }
+
+        return 0;
+    }
+
+    public static IEnumerable<string> AsStrings(this Context context, string key)
+    {
+        if (context.Headers.TryGetValue(key, out var value))
+        {
+            return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Distinct();
+        }
+
+        return Enumerable.Empty<string>();
     }
 }

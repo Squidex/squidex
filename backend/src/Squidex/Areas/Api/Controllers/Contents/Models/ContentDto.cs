@@ -121,7 +121,7 @@ public sealed class ContentDto : Resource
             SchemaName = content.SchemaId.Name
         });
 
-        if (resources.Context.ShouldFlatten())
+        if (resources.Context.Flatten())
         {
             response.Data = content.Data.ToFlatten();
         }

@@ -154,7 +154,7 @@ public sealed class AssetsFluidExtension : IFluidExtension
 
         var requestContext =
             Context.Admin(app).Clone(b => b
-                .WithoutTotal());
+                .WithNoTotal());
 
         var asset = await assetQuery.FindAsync(requestContext, domainId);
 

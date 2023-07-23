@@ -54,11 +54,11 @@ public class AssetQueryParser
 
             q = q.WithQuery(query);
 
-            if (context.ShouldSkipTotal())
+            if (context.NoTotal())
             {
                 q = q.WithoutTotal();
             }
-            else if (context.ShouldSkipSlowTotal())
+            else if (context.NoSlowTotal())
             {
                 q = q.WithoutSlowTotal();
             }

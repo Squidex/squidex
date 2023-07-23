@@ -201,8 +201,8 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
     {
         return A<Context>.That.Matches(x =>
             x.App == TestApp.Default &&
-            x.ShouldSkipCleanup() &&
-            x.ShouldSkipAssetEnrichment() &&
+            x.NoCleanup() &&
+            x.NoAssetEnrichment() &&
             x.UserPrincipal == requestContext.UserPrincipal);
     }
 
@@ -210,8 +210,8 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
     {
         return A<Context>.That.Matches(x =>
             x.App == TestApp.Default &&
-            x.ShouldSkipCleanup() &&
-            x.ShouldSkipContentEnrichment() &&
+            x.NoCleanup() &&
+            x.NoEnrichment() &&
             x.UserPrincipal == requestContext.UserPrincipal);
     }
 }
