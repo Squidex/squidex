@@ -15,6 +15,13 @@ namespace Squidex.Infrastructure.Reflection;
 
 public static class SimpleMapper
 {
+    private struct MappingContext
+    {
+        required public CultureInfo Culture { get; init; }
+
+        required public bool NullableAsOptional { get; init; }
+    }
+
     private sealed class StringConversionPropertyMapper : PropertyMapper
     {
         public StringConversionPropertyMapper(
@@ -24,7 +31,7 @@ public static class SimpleMapper
         {
         }
 
-        public override void MapProperty(object source, object target, CultureInfo culture)
+        public override void MapProperty(object source, object target, ref MappingContext context)
         {
             var value = GetValue(source);
 
@@ -34,24 +41,31 @@ public static class SimpleMapper
 
     private sealed class NullablePropertyMapper : PropertyMapper
     {
-        private readonly object defaultValue;
+        private readonly object? defaultValue;
 
         public NullablePropertyMapper(
             PropertyAccessor sourceAccessor,
             PropertyAccessor targetAccessor,
-            object defaultValue)
+            object? defaultValue)
             : base(sourceAccessor, targetAccessor)
         {
             this.defaultValue = defaultValue;
         }
 
-        public override void MapProperty(object source, object target, CultureInfo culture)
+        public override void MapProperty(object source, object target, ref MappingContext context)
         {
             var value = GetValue(source);
 
             if (value == null)
             {
-                value = defaultValue;
+                if (context.NullableAsOptional)
+                {
+                    return;
+                }
+                else
+                {
+                    value = defaultValue;
+                }
             }
 
             SetValue(target, value);
@@ -71,7 +85,7 @@ public static class SimpleMapper
             this.targetType = targetType;
         }
 
-        public override void MapProperty(object source, object target, CultureInfo culture)
+        public override void MapProperty(object source, object target, ref MappingContext context)
         {
             var value = GetValue(source);
 
@@ -82,7 +96,7 @@ public static class SimpleMapper
 
             try
             {
-                var converted = Convert.ChangeType(value, targetType, culture);
+                var converted = Convert.ChangeType(value, targetType, context.Culture);
 
                 SetValue(target, converted);
             }
@@ -106,7 +120,7 @@ public static class SimpleMapper
             this.converter = converter;
         }
 
-        public override void MapProperty(object source, object target, CultureInfo culture)
+        public override void MapProperty(object source, object target, ref MappingContext context)
         {
             var value = GetValue(source);
 
@@ -117,7 +131,7 @@ public static class SimpleMapper
 
             try
             {
-                var converted = converter.ConvertFrom(null, culture, value);
+                var converted = converter.ConvertFrom(null, context.Culture, value);
 
                 SetValue(target, converted);
             }
@@ -139,7 +153,7 @@ public static class SimpleMapper
             this.targetAccessor = targetAccessor;
         }
 
-        public virtual void MapProperty(object source, object target, CultureInfo culture)
+        public virtual void MapProperty(object source, object target, ref MappingContext context)
         {
             var value = GetValue(source);
 
@@ -202,7 +216,7 @@ public static class SimpleMapper
                     Mappers.Add(new NullablePropertyMapper(
                         new PropertyAccessor(sourceProperty),
                         new PropertyAccessor(targetProperty),
-                        Activator.CreateInstance(targetType)!));
+                        Activator.CreateInstance(targetType)));
                 }
                 else
                 {
@@ -233,13 +247,13 @@ public static class SimpleMapper
             }
         }
 
-        public static TTarget MapClass(TSource source, TTarget destination, CultureInfo culture)
+        public static TTarget MapClass(TSource source, TTarget destination, ref MappingContext context)
         {
             for (var i = 0; i < Mappers.Count; i++)
             {
                 var mapper = Mappers[i];
 
-                mapper.MapProperty(source, destination, culture);
+                mapper.MapProperty(source, destination, ref context);
             }
 
             return destination;
@@ -250,10 +264,10 @@ public static class SimpleMapper
         where TSource : class
         where TTarget : class
     {
-        return Map(source, target, CultureInfo.CurrentCulture);
+        return Map(source, target, CultureInfo.CurrentCulture, true);
     }
 
-    public static TTarget Map<TSource, TTarget>(TSource source, TTarget target, CultureInfo culture)
+    public static TTarget Map<TSource, TTarget>(TSource source, TTarget target, CultureInfo culture, bool nullableAsOptional)
         where TSource : class
         where TTarget : class
     {
@@ -261,6 +275,12 @@ public static class SimpleMapper
         Guard.NotNull(culture);
         Guard.NotNull(target);
 
-        return ClassMapper<TSource, TTarget>.MapClass(source, target, culture);
+        var context = new MappingContext
+        {
+            Culture = culture,
+            NullableAsOptional = nullableAsOptional
+        };
+
+        return ClassMapper<TSource, TTarget>.MapClass(source, target, ref context);
     }
 }
