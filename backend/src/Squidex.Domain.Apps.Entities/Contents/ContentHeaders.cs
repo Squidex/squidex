@@ -131,7 +131,7 @@ public static class ContentHeaders
 
     public static HashSet<Language> Languages(this Context context)
     {
-        return context.AsStrings(KeyFields).Select(Language.GetLanguage).ToHashSet();
+        return context.AsStrings(KeyLanguages).Select(Language.GetLanguage).ToHashSet();
     }
 
     public static ICloneBuilder WithLanguages(this ICloneBuilder builder, IEnumerable<string> languages)
