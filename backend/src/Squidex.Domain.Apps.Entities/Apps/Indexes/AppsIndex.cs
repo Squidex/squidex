@@ -241,15 +241,21 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
     private Task InvalidateItAsync(DomainId id, string name)
     {
-        return appCache.RemoveAsync(
+        // Do not use cancellation here as we already so far.
+        return appCache.RemoveAsync(new[]
+        {
             GetCacheKey(id),
-            GetCacheKey(name));
+            GetCacheKey(name)
+        });
     }
 
     private Task CacheItAsync(IAppEntity app)
     {
-        return Task.WhenAll(
-            appCache.AddAsync(GetCacheKey(app.Id), app, CacheDuration),
-            appCache.AddAsync(GetCacheKey(app.Name), app, CacheDuration));
+        // Do not use cancellation here as we already so far.
+        return appCache.AddAsync(new[]
+        {
+            new KeyValuePair<string, object?>(GetCacheKey(app.Id), app),
+            new KeyValuePair<string, object?>(GetCacheKey(app.Name), app),
+        }, CacheDuration);
     }
 }

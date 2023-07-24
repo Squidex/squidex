@@ -18,7 +18,7 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent;
 
-public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonError? Error), JsonValueConverter.Args>
+public sealed class JsonValueConverter : IFieldPropertiesVisitor<(object? Result, JsonError? Error), JsonValueConverter.Args>
 {
     private static readonly JsonValueConverter Instance = new JsonValueConverter();
 
@@ -36,45 +36,45 @@ public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonErro
 
         var args = new Args(value, serializer, components);
 
-        return field.Accept(Instance, args);
+        return field.RawProperties.Accept(Instance, args);
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(JsonFieldProperties properties, Args args)
     {
         return (args.Value, null);
     }
 
-    public (object? Result, JsonError? Error) Visit(IArrayField field, Args args)
+    public (object? Result, JsonError? Error) Visit(ArrayFieldProperties properties, Args args)
     {
         return ConvertToObjectList(args.Value);
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<AssetsFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(AssetsFieldProperties properties, Args args)
     {
         return ConvertToIdList(args.Value);
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<ComponentFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(ComponentFieldProperties properties, Args args)
     {
-        return ConvertToComponent(args.Value, args.Components, field.Properties.SchemaIds);
+        return ConvertToComponent(args.Value, args.Components, properties.SchemaIds);
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<ComponentsFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(ComponentsFieldProperties properties, Args args)
     {
-        return ConvertToComponentList(args.Value, args.Components, field.Properties.SchemaIds);
+        return ConvertToComponentList(args.Value, args.Components, properties.SchemaIds);
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<ReferencesFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(ReferencesFieldProperties properties, Args args)
     {
         return ConvertToIdList(args.Value);
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<TagsFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(TagsFieldProperties properties, Args args)
     {
         return ConvertToStringList(args.Value);
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<BooleanFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(BooleanFieldProperties properties, Args args)
     {
         if (args.Value.Value is bool b)
         {
@@ -84,7 +84,7 @@ public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonErro
         return (null, new JsonError(T.Get("contents.invalidBoolean")));
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<NumberFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(NumberFieldProperties properties, Args args)
     {
         if (args.Value.Value is double d)
         {
@@ -94,7 +94,7 @@ public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonErro
         return (null, new JsonError(T.Get("contents.invalidNumber")));
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<StringFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(StringFieldProperties properties, Args args)
     {
         if (args.Value.Value is string s)
         {
@@ -104,12 +104,12 @@ public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonErro
         return (null, new JsonError(T.Get("contents.invalidString")));
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<UIFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(UIFieldProperties properties, Args args)
     {
         return (args.Value, null);
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<DateTimeFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(DateTimeFieldProperties properties, Args args)
     {
         if (args.Value.Value is string s)
         {
@@ -126,7 +126,7 @@ public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonErro
         return (null, new JsonError(T.Get("contents.invalidString")));
     }
 
-    public (object? Result, JsonError? Error) Visit(IField<GeolocationFieldProperties> field, Args args)
+    public (object? Result, JsonError? Error) Visit(GeolocationFieldProperties properties, Args args)
     {
         var result = GeoJsonValue.TryParse(args.Value, args.Serializer, out var value);
 

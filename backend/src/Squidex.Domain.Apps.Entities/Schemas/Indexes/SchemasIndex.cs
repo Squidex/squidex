@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Caching;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
@@ -42,7 +43,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
             foreach (var schema in schemas.Where(IsValid))
             {
-                await InvalidateItAsync(appId, schema.Id, schema.SchemaDef.Name);
+                await CacheItAsync(schema);
             }
 
             return schemas.Where(IsValid).ToList();
@@ -221,15 +222,21 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
     private Task InvalidateItAsync(DomainId appId, DomainId id, string name)
     {
-        return schemaCache.RemoveAsync(
+        // Do not use cancellation here as we already so far.
+        return schemaCache.RemoveAsync(new[]
+        {
             GetCacheKey(appId, id),
-            GetCacheKey(appId, name));
+            GetCacheKey(appId, name)
+        });
     }
 
     private Task CacheItAsync(ISchemaEntity schema)
     {
-        return Task.WhenAll(
-            schemaCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.Id), schema, CacheDuration),
-            schemaCache.AddAsync(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema, CacheDuration));
+        // Do not use cancellation here as we already so far.
+        return schemaCache.AddAsync(new[]
+        {
+            new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Id), schema),
+            new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema),
+        }, CacheDuration);
     }
 }

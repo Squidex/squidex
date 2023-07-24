@@ -70,7 +70,9 @@ internal sealed class ComponentGraphType : ObjectGraphType<JsonObject>
                 return false;
             }
 
-            return Component.IsValid(json, out var discriminator) && discriminator == schemaId;
+            JsonValue current = json;
+
+            return Component.IsValid(current, out var discriminator) && discriminator == schemaId;
         };
     }
 }
