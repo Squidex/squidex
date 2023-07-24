@@ -94,9 +94,10 @@ public sealed class ReferencesFluidExtension : IFluidExtension
 
         var requestContext =
             Context.Admin(app).Clone(b => b
-                .WithoutContentEnrichment()
+                .WithFields(null)
+                .WithNoEnrichment()
                 .WithUnpublished()
-                .WithoutTotal());
+                .WithNoTotal());
 
         var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(domainId));
 

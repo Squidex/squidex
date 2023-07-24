@@ -332,4 +332,36 @@ public class CollectionExtensionsTests
 
         Assert.Equal(source, targetItems);
     }
+
+    [Fact]
+    public void Should_batch()
+    {
+        var source = new[] { 1, 2, 3, 4, 5 };
+
+        var actual = source.Batch(2).ToArray();
+
+        actual.Should().BeEquivalentTo(
+            new[]
+            {
+                new List<int> { 1, 2 },
+                new List<int> { 3, 4 },
+                new List<int> { 5 },
+            });
+    }
+
+    [Fact]
+    public async Task Should_batch_async()
+    {
+        var source = new[] { 1, 2, 3, 4, 5 };
+
+        var actual = await source.ToAsyncEnumerable().Batch(2).ToArrayAsync();
+
+        actual.Should().BeEquivalentTo(
+            new[]
+            {
+                new List<int> { 1, 2 },
+                new List<int> { 3, 4 },
+                new List<int> { 5 },
+            });
+    }
 }

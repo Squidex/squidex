@@ -32,7 +32,7 @@ public class EnrichWithMetadataTextTests : GivenContext
     {
         var asset = new AssetEntity();
 
-        await sut.EnrichAsync(ApiContext.Clone(b => b.WithoutAssetEnrichment()), Enumerable.Repeat(asset, 1), CancellationToken);
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithNoAssetEnrichment()), Enumerable.Repeat(asset, 1), CancellationToken);
 
         A.CallTo(() => assetMetadataSource1.Format(A<IAssetEntity>._))
             .MustNotHaveHappened();

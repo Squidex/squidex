@@ -22,9 +22,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests : GivenContext
 
     public AssetsBulkUpdateCommandMiddlewareTests()
     {
-        var log = A.Fake<ILogger<AssetsBulkUpdateCommandMiddleware>>();
-
-        sut = new AssetsBulkUpdateCommandMiddleware(contextProvider, log);
+        sut = new AssetsBulkUpdateCommandMiddleware(contextProvider);
     }
 
     [Fact]
@@ -61,7 +59,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual);
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
-        A.CallTo(() => commandBus.PublishAsync(A<AnnotateAsset>.That.Matches(x => x.AssetId == id && x.FileName == "file"), CancellationToken))
+        A.CallTo(() => commandBus.PublishAsync(A<AnnotateAsset>.That.Matches(x => x.AssetId == id && x.FileName == "file"), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -97,7 +95,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual);
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
-        A.CallTo(() => commandBus.PublishAsync(A<MoveAsset>.That.Matches(x => x.AssetId == id), CancellationToken))
+        A.CallTo(() => commandBus.PublishAsync(A<MoveAsset>.That.Matches(x => x.AssetId == id), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -134,7 +132,7 @@ public class AssetsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<DeleteAsset>.That.Matches(x => x.AssetId == id), CancellationToken))
+                A<DeleteAsset>.That.Matches(x => x.AssetId == id), A<CancellationToken>._))
             .MustHaveHappened();
     }
 

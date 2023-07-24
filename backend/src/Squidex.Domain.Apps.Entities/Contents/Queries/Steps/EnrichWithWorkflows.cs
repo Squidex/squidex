@@ -105,6 +105,6 @@ public sealed class EnrichWithWorkflows : IContentEnricherStep
 
     private static bool ShouldEnrichWithStatuses(Context context)
     {
-        return context.IsFrontendClient || context.ShouldResolveFlow();
+        return context.IsFrontendClient || context.ResolveFlow();
     }
 }

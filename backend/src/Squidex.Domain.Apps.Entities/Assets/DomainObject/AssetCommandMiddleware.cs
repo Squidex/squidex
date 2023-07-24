@@ -128,25 +128,30 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
     {
         var payload = await base.EnrichResultAsync(context, result, ct);
 
-        if (payload is IAssetEntity asset)
+        if (payload is not IAssetEntity asset)
         {
-            if (result.IsChanged && context.Command is UploadAssetCommand)
+            return payload;
+        }
+
+        if (result.IsChanged && context.Command is UploadAssetCommand)
+        {
+            var tempFile = context.ContextId.ToString();
+            try
             {
-                var tempFile = context.ContextId.ToString();
-                try
-                {
-                    await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion, null, ct);
-                }
-                catch (AssetAlreadyExistsException) when (context.Command is not UpsertAsset)
+                await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion, null, ct);
+            }
+            catch (AssetAlreadyExistsException)
+            {
+                if (context.Command is not UpsertAsset)
                 {
                     throw;
                 }
             }
+        }
 
-            if (payload is not IEnrichedAssetEntity)
-            {
-                payload = await assetEnricher.EnrichAsync(asset, contextProvider.Context, ct);
-            }
+        if (payload is not IEnrichedAssetEntity)
+        {
+            payload = await assetEnricher.EnrichAsync(asset, contextProvider.Context, ct);
         }
 
         return payload;

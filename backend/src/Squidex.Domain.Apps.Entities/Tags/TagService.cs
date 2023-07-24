@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks.Dataflow;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
@@ -312,48 +311,15 @@ public sealed class TagService : ITagService
     public async Task ClearAsync(
         CancellationToken ct = default)
     {
-        var writerBlock = new ActionBlock<SnapshotResult<State>[]>(async batch =>
-        {
-            try
-            {
-                var isChanged = !batch.All(x => !x.Value.Clear());
+        // Run batch first, because it is cheaper as it has less items.
+        var batches = persistenceFactory.Snapshots.ReadAllAsync(ct).Batch(500, ct).Buffered(2, ct: ct);
 
-                if (isChanged)
-                {
-                    var jobs = batch.Select(x => new SnapshotWriteJob<State>(x.Key, x.Value, x.Version));
-
-                    await persistenceFactory.Snapshots.WriteManyAsync(jobs, ct);
-                }
-            }
-            catch (OperationCanceledException ex)
-            {
-                // Dataflow swallows operation cancelled exception.
-                throw new AggregateException(ex);
-            }
-        },
-        new ExecutionDataflowBlockOptions
+        await Parallel.ForEachAsync(batches, ct, async (batch, ct) =>
         {
-            BoundedCapacity = 2,
-            MaxDegreeOfParallelism = 1,
-            MaxMessagesPerTask = 1,
+            // Convert to list for the tests, actually not needed.
+            var jobs = batch.Where(x => x.Value.Clear()).Select(x => new SnapshotWriteJob<State>(x.Key, x.Value, x.Version)).ToList();
+
+            await persistenceFactory.Snapshots.WriteManyAsync(jobs, ct);
         });
-
-        // Create batches of 500 items to clear the tag count for better performance.
-        var batchBlock = new BatchBlock<SnapshotResult<State>>(500, new GroupingDataflowBlockOptions
-        {
-            BoundedCapacity = 500
-        });
-
-        batchBlock.BidirectionalLinkTo(writerBlock);
-
-        await foreach (var state in persistenceFactory.Snapshots.ReadAllAsync(ct))
-        {
-            // Uses back-propagation to not query additional items from the database, when queue is full.
-            await batchBlock.SendAsync(state, ct);
-        }
-
-        batchBlock.Complete();
-
-        await writerBlock.Completion;
     }
 }

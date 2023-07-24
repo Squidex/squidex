@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
@@ -72,9 +71,6 @@ public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
     private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameV1,
         CancellationToken ct)
     {
-        const int SizeOfBatch = 1000;
-        const int SizeOfQueue = 10;
-
         string collectionNameV2;
 
         collectionNameV2 = $"{collectionNameV1}2";
@@ -91,80 +87,46 @@ public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
 
         await collectionV2.DeleteManyAsync(FindAll, ct);
 
-        var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
-        {
-            BoundedCapacity = SizeOfQueue * SizeOfBatch
-        });
+        // Run batch first, because it is cheaper as it has less items.
+        var batches = collectionV1.Find(FindAll).ToAsyncEnumerable(ct).Batch(500, ct).Buffered(2, ct);
 
-        var writeOptions = new BulkWriteOptions
+        await Parallel.ForEachAsync(batches, ct, async (batch, ct) =>
         {
-            IsOrdered = false
-        };
+            var writes = new List<WriteModel<BsonDocument>>();
 
-        var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
-        {
-            try
+            foreach (var document in batch)
             {
-                var writes = new List<WriteModel<BsonDocument>>();
+                var appId = document["_ai"].AsString;
 
-                foreach (var document in batch)
+                var documentIdOld = document["_id"].AsString;
+
+                if (documentIdOld.Contains("--", StringComparison.OrdinalIgnoreCase))
                 {
-                    var appId = document["_ai"].AsString;
+                    var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
 
-                    var documentIdOld = document["_id"].AsString;
-
-                    if (documentIdOld.Contains("--", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
-
-                        documentIdOld = documentIdOld[(index + 2)..];
-                    }
-
-                    var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();
-
-                    document["id"] = documentIdOld;
-                    document["_id"] = documentIdNew;
-
-                    extraAction?.Invoke(document);
-
-                    var filter = Filter.Eq("_id", documentIdNew);
-
-                    writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
-                    {
-                        IsUpsert = true
-                    });
+                    documentIdOld = documentIdOld[(index + 2)..];
                 }
 
-                if (writes.Count > 0)
+                var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();
+
+                document["id"] = documentIdOld;
+                document["_id"] = documentIdNew;
+
+                extraAction?.Invoke(document);
+
+                var filter = Filter.Eq("_id", documentIdNew);
+
+                writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
                 {
-                    await collectionV2.BulkWriteAsync(writes, writeOptions, ct);
-                }
+                    IsUpsert = true
+                });
             }
-            catch (OperationCanceledException ex)
+
+            if (writes.Count > 0)
             {
-                // Dataflow swallows operation cancelled exception.
-                throw new AggregateException(ex);
+                await collectionV2.BulkWriteAsync(writes, BulkUnordered, ct);
             }
-        }, new ExecutionDataflowBlockOptions
-        {
-            MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
-            MaxMessagesPerTask = 1,
-            BoundedCapacity = SizeOfQueue
         });
-
-        batchBlock.BidirectionalLinkTo(actionBlock);
-
-        await foreach (var document in collectionV1.Find(FindAll).ToAsyncEnumerable(ct: ct))
-        {
-            if (!await batchBlock.SendAsync(document, ct))
-            {
-                break;
-            }
-        }
-
-        batchBlock.Complete();
-
-        await actionBlock.Completion;
     }
 
     private static void ConvertParentId(BsonDocument document)

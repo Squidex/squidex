@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
-using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 public sealed class RuleDequeuerWorker : IBackgroundProcess
 {
     private readonly ConcurrentDictionary<DomainId, bool> executing = new ConcurrentDictionary<DomainId, bool>();
-    private readonly ITargetBlock<IRuleEventEntity> requestBlock;
+    private readonly PartitionedScheduler<IRuleEventEntity> requestScheduler;
     private readonly IRuleEventRepository ruleEventRepository;
     private readonly IRuleService ruleService;
     private readonly IRuleUsageTracker ruleUsageTracker;
@@ -42,9 +41,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
         this.ruleUsageTracker = ruleUsageTracker;
         this.log = log;
 
-        requestBlock =
-            new PartitionedActionBlock<IRuleEventEntity>(HandleAsync, x => x.Job.ExecutionPartition,
-                new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32, BoundedCapacity = 32 });
+        requestScheduler = new PartitionedScheduler<IRuleEventEntity>(HandleAsync, 32, 2);
     }
 
     public Task StartAsync(
@@ -60,9 +57,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
     {
         await (timer?.StopAsync() ?? Task.CompletedTask);
 
-        requestBlock.Complete();
-
-        await requestBlock.Completion;
+        await requestScheduler.CompleteAsync();
     }
 
     public async Task QueryAsync(
@@ -72,7 +67,10 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
         {
             var now = Clock.GetCurrentInstant();
 
-            await ruleEventRepository.QueryPendingAsync(now, requestBlock.SendAsync, ct);
+            await ruleEventRepository.QueryPendingAsync(now, async @event =>
+            {
+                await requestScheduler.ScheduleAsync(@event.Job.ExecutionPartition, @event, ct);
+            }, ct);
         }
         catch (Exception ex)
         {
@@ -80,7 +78,8 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
         }
     }
 
-    public async Task HandleAsync(IRuleEventEntity @event)
+    public async Task HandleAsync(IRuleEventEntity @event,
+        CancellationToken ct)
     {
         if (!executing.TryAdd(@event.Id, false))
         {
@@ -91,7 +90,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
         {
             var job = @event.Job;
 
-            var (response, elapsed) = await ruleService.InvokeAsync(job.ActionName, job.ActionData);
+            var (response, elapsed) = await ruleService.InvokeAsync(job.ActionName, job.ActionData, ct);
 
             var jobDelay = ComputeJobDelay(response.Status, @event, job);
             var jobResult = ComputeJobResult(response.Status, jobDelay);
@@ -108,11 +107,11 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
                 JobResult = jobResult
             };
 
-            await ruleEventRepository.UpdateAsync(@event.Job, update);
+            await ruleEventRepository.UpdateAsync(@event.Job, update, default);
 
             if (response.Status == RuleResult.Failed)
             {
-                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateOnly(), 0, 0, 1);
+                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateOnly(), 0, 0, 1, default);
 
                 log.LogWarning(response.Exception, "Failed to execute rule event with rule id {ruleId}/{description}.",
                     @event.Job.RuleId,
@@ -120,7 +119,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
             }
             else
             {
-                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateOnly(), 0, 1, 0);
+                await ruleUsageTracker.TrackAsync(job.AppId, job.RuleId, now.ToDateOnly(), 0, 1, 0, default);
             }
         }
         catch (Exception ex)

@@ -95,7 +95,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), A<CancellationToken>._))
+                A<Context>.That.Matches(x => x.NoEnrichment() && x.NoTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, default);
@@ -134,7 +134,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), CancellationToken))
+                A<Context>.That.Matches(x => x.NoEnrichment() && x.NoTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), CancellationToken))
             .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
@@ -187,7 +187,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), CancellationToken))
+                A<Context>.That.Matches(x => x.NoEnrichment() && x.NoTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), CancellationToken))
             .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
@@ -249,7 +249,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
             CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
         };
 
-        await sut.EnrichAsync(FrontendContext.Clone(b => b.WithoutContentEnrichment(true)), contents, schemaProvider, CancellationToken);
+        await sut.EnrichAsync(FrontendContext.Clone(b => b.WithNoEnrichment(true)), contents, schemaProvider, CancellationToken);
 
         Assert.Null(contents[0].ReferenceData);
 

@@ -61,6 +61,6 @@ public sealed class EnrichForCaching : IContentEnricherStep
 
     private static bool ShouldEnrich(Context context)
     {
-        return !context.ShouldSkipCacheKeys();
+        return !context.NoCacheKeys();
     }
 }

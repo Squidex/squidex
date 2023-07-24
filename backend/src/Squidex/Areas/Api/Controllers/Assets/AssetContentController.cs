@@ -62,7 +62,7 @@ public sealed class AssetContentController : ApiController
     [AllowAnonymous]
     public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, AssetContentQueryDto request, string? more = null)
     {
-        var requestContext = Context.Clone(b => b.WithoutAssetEnrichment());
+        var requestContext = Context.Clone(b => b.WithNoAssetEnrichment());
 
         var asset = await assetQuery.FindAsync(requestContext, DomainId.Create(idOrSlug), ct: HttpContext.RequestAborted);
 
@@ -90,7 +90,7 @@ public sealed class AssetContentController : ApiController
     [Obsolete("Use overload with app name")]
     public async Task<IActionResult> GetAssetContent(DomainId id, AssetContentQueryDto request)
     {
-        var requestContext = Context.Clone(b => b.WithoutAssetEnrichment());
+        var requestContext = Context.Clone(b => b.WithNoAssetEnrichment());
 
         var asset = await assetQuery.FindGlobalAsync(requestContext, id, HttpContext.RequestAborted);
 

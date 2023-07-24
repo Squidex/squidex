@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks.Dataflow;
-
 namespace Squidex.Infrastructure.Tasks;
 
 public class PartitionedActionBlockTests
@@ -23,31 +21,24 @@ public class PartitionedActionBlockTests
             lists[i] = new List<int>();
         }
 
-        var block = new PartitionedActionBlock<(int P, int V)>(x =>
+        var scheduler = new PartitionedScheduler<(int Partition, int Value)>((item, ct) =>
         {
             Random.Shared.Next(10);
 
-            lists[x.P].Add(x.V);
+            lists[item.Partition].Add(item.Value);
 
             return Task.CompletedTask;
-        }, x => x.P, new ExecutionDataflowBlockOptions
-        {
-            MaxDegreeOfParallelism = 100,
-            MaxMessagesPerTask = 1,
-            BoundedCapacity = 100
-        });
+        }, 32, 10000);
 
-        for (var i = 0; i < Partitions; i++)
+        for (var partition = 0; partition < Partitions; partition++)
         {
-            for (var j = 0; j < 10; j++)
+            for (var value = 0; value < 10; value++)
             {
-                await block.SendAsync((i, j));
+                await scheduler.ScheduleAsync(partition, (partition, value));
             }
         }
 
-        block.Complete();
-
-        await block.Completion;
+        await scheduler.CompleteAsync();
 
         foreach (var list in lists)
         {

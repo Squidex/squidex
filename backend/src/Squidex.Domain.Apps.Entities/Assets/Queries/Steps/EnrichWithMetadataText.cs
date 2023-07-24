@@ -22,7 +22,7 @@ public sealed class EnrichWithMetadataText : IAssetEnricherStep
     public Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
         CancellationToken ct)
     {
-        if (context.ShouldSkipAssetEnrichment())
+        if (context.NoAssetEnrichment())
         {
             return Task.CompletedTask;
         }

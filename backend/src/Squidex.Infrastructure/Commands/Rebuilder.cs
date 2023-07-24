@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks.Dataflow;
-using Google.Api;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Caching;
@@ -93,75 +91,40 @@ public class Rebuilder
     {
         var store = serviceProvider.GetRequiredService<IStore<TState>>();
 
-        var parallelism = Environment.ProcessorCount;
-
         var handledIds = new HashSet<DomainId>();
         var handlerErrors = 0;
 
         using (localCache.StartContext())
         {
-            var workerBlock = new ActionBlock<DomainId[]>(async ids =>
+            // Run batch first, because it is cheaper as it has less items.
+            var batches = source.Where(handledIds.Add).Batch(batchSize, ct).Buffered(2, ct);
+
+            await Parallel.ForEachAsync(batches, ct, async (batch, ct) =>
             {
-                try
+                await using (var context = store.WithBatchContext(typeof(T)))
                 {
-                    await using (var context = store.WithBatchContext(typeof(T)))
+                    await context.LoadAsync(batch);
+
+                    foreach (var id in batch)
                     {
-                        await context.LoadAsync(ids);
-
-                        foreach (var id in ids)
+                        try
                         {
-                            try
-                            {
-                                var domainObject = domainObjectFactory.Create<T, TState>(id, context);
+                            var domainObject = domainObjectFactory.Create<T, TState>(id, context);
 
-                                await domainObject.RebuildStateAsync(ct);
-                            }
-                            catch (DomainObjectNotFoundException)
-                            {
-                                return;
-                            }
-                            catch (Exception ex)
-                            {
-                                log.LogWarning(ex, "Found corrupt domain object of type {type} with ID {id}.", typeof(T), id);
-                                Interlocked.Increment(ref handlerErrors);
-                            }
+                            await domainObject.RebuildStateAsync(ct);
+                        }
+                        catch (DomainObjectNotFoundException)
+                        {
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            log.LogWarning(ex, "Found corrupt domain object of type {type} with ID {id}.", typeof(T), id);
+                            Interlocked.Increment(ref handlerErrors);
                         }
                     }
                 }
-                catch (OperationCanceledException ex)
-                {
-                    // Dataflow swallows operation cancelled exception.
-                    throw new AggregateException(ex);
-                }
-            },
-            new ExecutionDataflowBlockOptions
-            {
-                MaxDegreeOfParallelism = parallelism,
-                MaxMessagesPerTask = 10,
-                BoundedCapacity = parallelism
             });
-
-            var batchBlock = new BatchBlock<DomainId>(batchSize, new GroupingDataflowBlockOptions
-            {
-                BoundedCapacity = batchSize
-            });
-
-            batchBlock.BidirectionalLinkTo(workerBlock);
-
-            await foreach (var id in source.WithCancellation(ct))
-            {
-                if (handledIds.Add(id))
-                {
-                    if (!await batchBlock.SendAsync(id, ct))
-                    {
-                        break;
-                    }
-                }
-            }
-
-            batchBlock.Complete();
-
-            await workerBlock.Completion;
         }
 
         var errorRate = (double)handlerErrors / handledIds.Count;

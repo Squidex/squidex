@@ -50,7 +50,7 @@ public sealed class RuleEnricher : IRuleEnricher
             }
 
             // Sometimes we just want to skip this for performance reasons.
-            var enrichCacheKeys = !context.ShouldSkipCacheKeys();
+            var enrichCacheKeys = !context.NoCacheKeys();
 
             foreach (var group in results.GroupBy(x => x.AppId.Id))
             {

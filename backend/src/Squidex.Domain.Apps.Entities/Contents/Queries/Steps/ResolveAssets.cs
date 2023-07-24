@@ -131,8 +131,8 @@ public sealed class ResolveAssets : IContentEnricherStep
         }
 
         var queryContext = context.Clone(b => b
-            .WithoutAssetEnrichment(true)
-            .WithoutTotal());
+            .WithNoAssetEnrichment(true)
+            .WithNoTotal());
 
         var assets = await assetQuery.QueryAsync(queryContext, null, Q.Empty.WithIds(ids), ct);
 
@@ -149,6 +149,6 @@ public sealed class ResolveAssets : IContentEnricherStep
 
     private static bool ShouldEnrich(Context context)
     {
-        return context.IsFrontendClient && !context.ShouldSkipContentEnrichment();
+        return context.IsFrontendClient && !context.NoEnrichment();
     }
 }

@@ -5,7 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks.Dataflow;
+using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 
 namespace Squidex.Infrastructure.Tasks;
 
@@ -55,28 +56,60 @@ public static class TaskExtensions
         }
     }
 
-#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
-    public static async void BidirectionalLinkTo<T>(this ISourceBlock<T> source, ITargetBlock<T> target)
-#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+    public static async IAsyncEnumerable<T> Buffered<T>(this IAsyncEnumerable<T> source, int capacity,
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
-        source.LinkTo(target, new DataflowLinkOptions
+        var bufferChannel = Channel.CreateBounded<T>(new BoundedChannelOptions(capacity)
         {
-            PropagateCompletion = true
+            SingleWriter = true,
+            SingleReader = true,
         });
+
+        using var bufferCompletion = new CancellationTokenSource();
+
+        var producer = Task.Run(async () =>
+        {
+            try
+            {
+                await foreach (var item in source.WithCancellation(bufferCompletion.Token).ConfigureAwait(false))
+                {
+                    await bufferChannel.Writer.WriteAsync(item, bufferCompletion.Token).ConfigureAwait(false);
+                }
+            }
+            catch (ChannelClosedException)
+            {
+                // Ignore
+            }
+            catch (OperationCanceledException)
+            {
+                // Ignore
+            }
+            finally
+            {
+                bufferChannel.Writer.TryComplete();
+            }
+        }, bufferCompletion.Token);
 
         try
         {
-            await target.Completion.ConfigureAwait(false);
-        }
-        catch
-        {
-            // We do not want to change the stacktrace of the exception.
-            return;
-        }
+            await foreach (T item in bufferChannel.Reader.ReadAllAsync(ct).ConfigureAwait(false))
+            {
+                yield return item;
 
-        if (target.Completion.IsFaulted && target.Completion.Exception != null)
+                ct.ThrowIfCancellationRequested();
+            }
+
+            await producer.ConfigureAwait(false); // Propagate possible source error
+        }
+        finally
         {
-            source.Fault(target.Completion.Exception.Flatten());
+            if (!producer.IsCompleted)
+            {
+                bufferCompletion.Cancel();
+                bufferChannel.Writer.TryComplete();
+
+                await Task.WhenAny(producer).ConfigureAwait(false);
+            }
         }
     }
 }

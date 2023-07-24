@@ -11,6 +11,10 @@ namespace Squidex.Infrastructure.Reflection;
 
 public class SimpleMapperTests
 {
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+    public record struct ValueType(int Value);
+#pragma warning restore SA1313 // Parameter names should begin with lower-case letter
+
     public class Class1Base<T1>
     {
         public T1 P1 { get; set; }
@@ -91,7 +95,6 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<long, long>
         {
-            P1 = 6,
             P2 = 8
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<int, int>());
@@ -101,11 +104,10 @@ public class SimpleMapperTests
     }
 
     [Fact]
-    public void Should_map_from_nullable()
+    public void Should_map_from_convertible_nullable()
     {
         var obj1 = new Class1<long?, long?>
         {
-            P1 = 6,
             P2 = 8
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<long, long>());
@@ -115,11 +117,23 @@ public class SimpleMapperTests
     }
 
     [Fact]
-    public void Should_map_to_nullable()
+    public void Should_map_from_nullable()
+    {
+        var obj1 = new Class1<ValueType?, ValueType?>
+        {
+            P2 = new ValueType(8)
+        };
+        var obj2 = SimpleMapper.Map(obj1, new Class2<ValueType, ValueType>());
+
+        Assert.Equal(new ValueType(8), obj2.P2);
+        Assert.Equal(new ValueType(0), obj2.P3);
+    }
+
+    [Fact]
+    public void Should_map_to_convertible_nullable()
     {
         var obj1 = new Class1<long, long>
         {
-            P1 = 6,
             P2 = 8
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<long?, long?>());
@@ -129,11 +143,23 @@ public class SimpleMapperTests
     }
 
     [Fact]
+    public void Should_map_to_nullable()
+    {
+        var obj1 = new Class1<ValueType, ValueType>
+        {
+            P2 = new ValueType(8)
+        };
+        var obj2 = SimpleMapper.Map(obj1, new Class2<ValueType?, ValueType?>());
+
+        Assert.Equal(new ValueType(8), obj2.P2);
+        Assert.Null(obj2.P3);
+    }
+
+    [Fact]
     public void Should_map_if_convertible_is_null()
     {
         var obj1 = new Class1<int?, int?>
         {
-            P1 = null,
             P2 = null
         };
         var obj2 = SimpleMapper.Map(obj1, new Class1<int, int>());
@@ -147,7 +173,6 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<RefToken, RefToken>
         {
-            P1 = RefToken.User("1"),
             P2 = RefToken.User("2")
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<string, string>());
@@ -161,7 +186,6 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<long, long>
         {
-            P1 = long.MaxValue,
             P2 = long.MaxValue
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<int, int>());
@@ -171,19 +195,22 @@ public class SimpleMapperTests
     }
 
     [Fact]
-    public void Should_ignore_write_only()
+    public void Should_ignore_read_only()
     {
-        var obj1 = new Writeonly<int>();
-        var obj2 = SimpleMapper.Map(obj1, new Class1<int, int>());
+        var obj1 = new Class1<int, int>
+        {
+            P1 = 10
+        };
+        var obj2 = SimpleMapper.Map(obj1, new Readonly<int>());
 
         Assert.Equal(0, obj2.P1);
     }
 
     [Fact]
-    public void Should_ignore_read_only()
+    public void Should_ignore_write_only()
     {
-        var obj1 = new Class1<int, int> { P1 = 10 };
-        var obj2 = SimpleMapper.Map(obj1, new Readonly<int>());
+        var obj1 = new Writeonly<int>();
+        var obj2 = SimpleMapper.Map(obj1, new Class1<int, int>());
 
         Assert.Equal(0, obj2.P1);
     }

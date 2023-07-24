@@ -137,7 +137,7 @@ public class ScriptAssetTests : GivenContext
     private Context ContextWithNoScript()
     {
         var contextPermission = PermissionIds.ForApp(PermissionIds.AppNoScripting, App.Name).Id;
-        var contextInstance = CreateContext(false, contextPermission).Clone(b => b.WithoutScripting());
+        var contextInstance = CreateContext(false, contextPermission).Clone(b => b.WithNoScripting());
 
         return contextInstance;
     }

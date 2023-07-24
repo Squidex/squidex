@@ -439,7 +439,11 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
     private void Create(CreateContent command, Status status)
     {
-        Raise(command, new ContentCreated { Status = status });
+        var @event = SimpleMapper.Map(command, new ContentCreated());
+
+        @event.Status = status;
+
+        RaiseEvent(Envelope.Create(@event));
     }
 
     private void Update(ContentCommand command, ContentData data)

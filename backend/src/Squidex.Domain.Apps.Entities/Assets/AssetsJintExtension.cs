@@ -229,7 +229,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
             var requestContext =
                 new Context(user, app).Clone(b => b
-                    .WithoutTotal());
+                    .WithNoTotal());
 
             var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
 
@@ -264,7 +264,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
             var requestContext =
                 new Context(user, app).Clone(b => b
-                    .WithoutTotal());
+                    .WithNoTotal());
 
             var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
 
