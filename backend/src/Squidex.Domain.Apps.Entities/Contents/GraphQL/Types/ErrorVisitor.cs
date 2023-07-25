@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using GraphQL;
-using GraphQL.Resolvers;
-using GraphQL.Types;
 using GraphQL.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,104 +14,31 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
-internal sealed class ErrorVisitor : BaseSchemaNodeVisitor
+internal static class ErrorVisitor
 {
-    public static readonly ErrorVisitor Instance = new ErrorVisitor();
-
-    internal sealed class ErrorResolver : IFieldResolver
+    public static void HandleError(this ExecutionOptions options, IServiceProvider services)
     {
-        private readonly IFieldResolver inner;
-
-        public ErrorResolver(IFieldResolver inner)
+        options.UnhandledExceptionDelegate = context =>
         {
-            this.inner = inner;
-        }
+            var log = services.GetRequiredService<ILoggerFactory>().CreateLogger("GraphQL");
 
-        public async ValueTask<object?> ResolveAsync(IResolveFieldContext context)
-        {
-            try
+            var fieldName = context.FieldContext?.FieldDefinition?.Name;
+
+            if (!string.IsNullOrWhiteSpace(fieldName))
             {
-                return await inner.ResolveAsync(context);
+                log.LogError(context.OriginalException, "Failed to resolve field {field}.", fieldName);
             }
-            catch (ValidationException ex)
+            else
             {
-                throw new ExecutionError(ex.Message);
-            }
-            catch (DomainException ex)
-            {
-                throw new ExecutionError(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                var logFactory = context.RequestServices!.GetRequiredService<ILoggerFactory>();
-
-                logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
-                throw;
-            }
-        }
-    }
-
-    internal sealed class ErrorSourceStreamResolver : ISourceStreamResolver
-    {
-        private readonly ISourceStreamResolver inner;
-
-        public ErrorSourceStreamResolver(ISourceStreamResolver inner)
-        {
-            this.inner = inner;
-        }
-
-        public async ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context)
-        {
-            try
-            {
-                return await inner.ResolveAsync(context);
-            }
-            catch (ValidationException ex)
-            {
-                throw new ExecutionError(ex.Message);
-            }
-            catch (DomainException ex)
-            {
-                throw new ExecutionError(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                var logFactory = context.RequestServices!.GetRequiredService<ILoggerFactory>();
-
-                logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
-                throw;
-            }
-        }
-    }
-
-    private ErrorVisitor()
-    {
-    }
-
-    public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
-    {
-        if (type.Name.StartsWith("__", StringComparison.Ordinal))
-        {
-            return;
-        }
-
-        if (field.StreamResolver != null)
-        {
-            if (field.StreamResolver is ErrorSourceStreamResolver)
-            {
-                return;
+                log.LogError(context.OriginalException, "Failed to resolve execute query.");
             }
 
-            field.StreamResolver = new ErrorSourceStreamResolver(field.StreamResolver);
-        }
-        else
-        {
-            if (field.Resolver is ErrorResolver)
+            if (context.OriginalException is ValidationException or DomainException)
             {
-                return;
+                context.Exception = new ExecutionError(context.OriginalException.Message);
             }
 
-            field.Resolver = new ErrorResolver(field.Resolver ?? NameFieldResolver.Instance);
-        }
+            return Task.CompletedTask;
+        };
     }
 }

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using GraphQL.Resolvers;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 

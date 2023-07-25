@@ -35,7 +35,14 @@ public sealed record Component(string Type, JsonObject Data, Schema Schema)
             return false;
         }
 
-        if (!o.TryGetValue(Discriminator, out var found) || found.Value is not string s)
+        return IsValid(o, out discriminator);
+    }
+
+    public static bool IsValid(JsonObject obj, [MaybeNullWhen(false)] out string discriminator)
+    {
+        discriminator = null!;
+
+        if (!obj.TryGetValue(Discriminator, out var found) || found.Value is not string s)
         {
             return false;
         }

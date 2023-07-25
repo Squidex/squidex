@@ -10,7 +10,6 @@ using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser;
 using GraphQLParser.AST;
-using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Directives;
 using Squidex.Domain.Apps.Entities.Schemas;

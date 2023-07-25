@@ -132,7 +132,7 @@ public sealed class ContentQueryService : IContentQueryService
 
             if (q.Ids is { Count: > 0 })
             {
-                contents = contents.SortSet(x => x.Id, q.Ids);
+                contents = contents.Sorted(x => x.Id, q.Ids);
             }
 
             return await TransformAsync(context, contents, ct);
@@ -166,7 +166,7 @@ public sealed class ContentQueryService : IContentQueryService
 
             if (q.Ids is { Count: > 0 })
             {
-                contents = contents.SortSet(x => x.Id, q.Ids);
+                contents = contents.Sorted(x => x.Id, q.Ids);
             }
 
             return await TransformAsync(context, contents, ct);

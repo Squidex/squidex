@@ -100,7 +100,7 @@ public static class TestAsset
             {
                 id = asset.CreatedBy.Identifier,
                 email = $"{asset.CreatedBy.Identifier}@email.com",
-                displayName = $"name_{asset.CreatedBy.Identifier}"
+                displayName = $"{asset.CreatedBy.Identifier}name"
             },
             editToken = $"token_{asset.Id}",
             lastModified = asset.LastModified,

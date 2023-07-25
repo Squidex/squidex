@@ -186,7 +186,7 @@ public sealed class AssetQueryService : IAssetQueryService
 
             if (q.Ids is { Count: > 0 })
             {
-                assets = assets.SortSet(x => x.Id, q.Ids);
+                assets = assets.Sorted(x => x.Id, q.Ids);
             }
 
             return await TransformAsync(context, assets, ct);

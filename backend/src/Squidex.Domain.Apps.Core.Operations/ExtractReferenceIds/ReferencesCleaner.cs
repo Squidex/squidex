@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds;
 
-internal sealed class ReferencesCleaner : IFieldVisitor<JsonValue, ReferencesCleaner.Args>
+internal sealed class ReferencesCleaner : IFieldPropertiesVisitor<JsonValue, ReferencesCleaner.Args>
 {
     private static readonly ReferencesCleaner Instance = new ReferencesCleaner();
 
@@ -27,70 +27,70 @@ internal sealed class ReferencesCleaner : IFieldVisitor<JsonValue, ReferencesCle
     {
         var args = new Args(value, validIds);
 
-        return field.Accept(Instance, args);
+        return field.RawProperties.Accept(Instance, args);
     }
 
-    public JsonValue Visit(IField<AssetsFieldProperties> field, Args args)
+    public JsonValue Visit(ArrayFieldProperties properties, Args args)
+    {
+        return args.Value;
+    }
+
+    public JsonValue Visit(AssetsFieldProperties properties, Args args)
     {
         return CleanIds(args);
     }
 
-    public JsonValue Visit(IField<ReferencesFieldProperties> field, Args args)
+    public JsonValue Visit(ReferencesFieldProperties properties, Args args)
     {
         return CleanIds(args);
     }
 
-    public JsonValue Visit(IField<BooleanFieldProperties> field, Args args)
+    public JsonValue Visit(BooleanFieldProperties properties, Args args)
     {
         return args.Value;
     }
 
-    public JsonValue Visit(IField<ComponentFieldProperties> field, Args args)
+    public JsonValue Visit(ComponentFieldProperties properties, Args args)
     {
         return args.Value;
     }
 
-    public JsonValue Visit(IField<ComponentsFieldProperties> field, Args args)
+    public JsonValue Visit(ComponentsFieldProperties properties, Args args)
     {
         return args.Value;
     }
 
-    public JsonValue Visit(IField<DateTimeFieldProperties> field, Args args)
+    public JsonValue Visit(DateTimeFieldProperties properties, Args args)
     {
         return args.Value;
     }
 
-    public JsonValue Visit(IField<GeolocationFieldProperties> field, Args args)
+    public JsonValue Visit(GeolocationFieldProperties properties, Args args)
     {
         return args.Value;
     }
 
-    public JsonValue Visit(IField<JsonFieldProperties> field, Args args)
+    public JsonValue Visit(JsonFieldProperties properties, Args args)
     {
         return args.Value;
     }
 
-    public JsonValue Visit(IField<NumberFieldProperties> field, Args args)
+    public JsonValue Visit(NumberFieldProperties properties, Args args)
     {
         return args.Value;
     }
 
-    public JsonValue Visit(IField<StringFieldProperties> field, Args args)
+    public JsonValue Visit(StringFieldProperties properties, Args args)
     {
         return args.Value;
     }
 
-    public JsonValue Visit(IField<TagsFieldProperties> field, Args args)
+    public JsonValue Visit(TagsFieldProperties properties, Args args)
     {
         return args.Value;
     }
 
-    public JsonValue Visit(IField<UIFieldProperties> field, Args args)
-    {
-        return args.Value;
-    }
-
-    public JsonValue Visit(IArrayField field, Args args)
+    public JsonValue Visit(UIFieldProperties properties, Args args)
     {
         return args.Value;
     }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -22,7 +21,9 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_introspect()
     {
-        const string query = @"
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query IntrospectionQuery {
                   __schema {
                     queryType {
@@ -107,9 +108,9 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
                       }
                     }
                   }
-                }";
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query, OperationName = "IntrospectionQuery" });
+                }",
+            OperationName = "IntrospectionQuery"
+        });
 
         var json = serializer.Serialize(actual);
 

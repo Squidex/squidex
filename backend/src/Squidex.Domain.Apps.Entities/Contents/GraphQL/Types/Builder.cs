@@ -127,7 +127,6 @@ internal sealed class Builder
             newSchema.RegisterType(customType);
         }
 
-        newSchema.RegisterVisitor(ErrorVisitor.Instance);
         newSchema.Initialize();
 
         return newSchema;

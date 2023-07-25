@@ -48,4 +48,55 @@ public static class ResultList
     {
         return new Impl<T>(items.ToList(), total);
     }
+
+    public static IResultList<T> Sorted<T, TKey>(this IResultList<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where TKey : notnull where T : class
+    {
+        if (input.Count == 0)
+        {
+            return Empty<T>();
+        }
+
+        var result = new List<T>(ids.Count);
+
+        if (input.Count >= 5)
+        {
+            var dictionary = new Dictionary<TKey, T>(input.Count);
+
+            foreach (var item in input)
+            {
+                dictionary[idProvider(item)] = item;
+            }
+
+            foreach (var id in ids)
+            {
+                if (dictionary.TryGetValue(id, out var item))
+                {
+                    result.Add(item);
+                }
+            }
+        }
+        else
+        {
+            foreach (var id in ids)
+            {
+                T? item = null;
+
+                foreach (var candidate in input)
+                {
+                    if (Equals(id, idProvider(candidate)))
+                    {
+                        item = candidate;
+                        break;
+                    }
+                }
+
+                if (item != null)
+                {
+                    result.Add(item);
+                }
+            }
+        }
+
+        return Create(input.Total, result);
+    }
 }

@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent;
 
-public sealed class JsonValueValidator : IFieldVisitor<bool, JsonValueValidator.Args>
+public sealed class JsonValueValidator : IFieldPropertiesVisitor<bool, JsonValueValidator.Args>
 {
     private static readonly JsonValueValidator Instance = new JsonValueValidator();
 
@@ -33,35 +33,35 @@ public sealed class JsonValueValidator : IFieldVisitor<bool, JsonValueValidator.
 
         var args = new Args(value, serializer);
 
-        return field.Accept(Instance, args);
+        return field.RawProperties.Accept(Instance, args);
     }
 
-    public bool Visit(IArrayField field, Args args)
+    public bool Visit(ArrayFieldProperties properties, Args args)
     {
         return IsValidObjectList(args.Value);
     }
 
-    public bool Visit(IField<AssetsFieldProperties> field, Args args)
+    public bool Visit(AssetsFieldProperties properties, Args args)
     {
         return IsValidStringList(args.Value);
     }
 
-    public bool Visit(IField<BooleanFieldProperties> field, Args args)
+    public bool Visit(BooleanFieldProperties properties, Args args)
     {
         return args.Value.Value is bool;
     }
 
-    public bool Visit(IField<ComponentFieldProperties> field, Args args)
+    public bool Visit(ComponentFieldProperties properties, Args args)
     {
         return IsValidComponent(args.Value);
     }
 
-    public bool Visit(IField<ComponentsFieldProperties> field, Args args)
+    public bool Visit(ComponentsFieldProperties properties, Args args)
     {
         return IsValidComponentList(args.Value);
     }
 
-    public bool Visit(IField<DateTimeFieldProperties> field, Args args)
+    public bool Visit(DateTimeFieldProperties properties, Args args)
     {
         if (args.Value.Value is string s)
         {
@@ -73,39 +73,39 @@ public sealed class JsonValueValidator : IFieldVisitor<bool, JsonValueValidator.
         return false;
     }
 
-    public bool Visit(IField<GeolocationFieldProperties> field, Args args)
+    public bool Visit(GeolocationFieldProperties properties, Args args)
     {
         var result = GeoJsonValue.TryParse(args.Value, args.Serializer, out _);
 
         return result == GeoJsonParseResult.Success;
     }
 
-    public bool Visit(IField<JsonFieldProperties> field, Args args)
+    public bool Visit(JsonFieldProperties properties, Args args)
     {
         return true;
     }
 
-    public bool Visit(IField<NumberFieldProperties> field, Args args)
+    public bool Visit(NumberFieldProperties properties, Args args)
     {
         return args.Value.Value is double;
     }
 
-    public bool Visit(IField<ReferencesFieldProperties> field, Args args)
+    public bool Visit(ReferencesFieldProperties properties, Args args)
     {
         return IsValidStringList(args.Value);
     }
 
-    public bool Visit(IField<StringFieldProperties> field, Args args)
+    public bool Visit(StringFieldProperties properties, Args args)
     {
         return args.Value.Value is string;
     }
 
-    public bool Visit(IField<TagsFieldProperties> field, Args args)
+    public bool Visit(TagsFieldProperties properties, Args args)
     {
         return IsValidStringList(args.Value);
     }
 
-    public bool Visit(IField<UIFieldProperties> field, Args args)
+    public bool Visit(UIFieldProperties properties, Args args)
     {
         return true;
     }
