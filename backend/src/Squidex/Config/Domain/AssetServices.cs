@@ -5,19 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentFTP;
 using MongoDB.Driver.GridFS;
-using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
-using Squidex.Hosting;
 using Squidex.Infrastructure.EventSourcing;
-using tusdotnet.FileLocks;
-using tusdotnet.Interfaces;
 
 namespace Squidex.Config.Domain;
 

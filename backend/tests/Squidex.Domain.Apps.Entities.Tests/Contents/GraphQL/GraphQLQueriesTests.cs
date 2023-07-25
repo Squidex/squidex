@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -20,7 +19,10 @@ public class GraphQLQueriesTests : GraphQLTestBase
     [InlineData(" ")]
     public async Task Should_return_error_empty_query(string query)
     {
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = query
+        });
 
         var expected = new
         {
@@ -50,19 +52,24 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        var query = CreateQuery(@"
-                query {
-                  queryMySchemaContents(search: ""Hello"") {
-                    <FIELDS_CONTENT_FLAT>
-                  }
-                }");
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                 A<Q>.That.Matches(x => x.QueryAsOdata == "?$skip=0&$search=\"Hello\"" && x.NoTotal),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(0, content));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  queryMySchemaContents(search: 'Hello') {
+                    {fields}
+                  }
+                }",
+            Args = new
+            {
+                fields = TestContent.AllFlatFields
+            }
+        });
 
         var expected = new
         {
@@ -84,9 +91,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIds(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  queryContentsByIds(ids: [""<ID>""]) {
+                  queryContentsByIds(ids: ['{contentId}']) {
                     ... on Content {
                       id
                     }
@@ -96,14 +110,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIds(contentId),
-                A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(0, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -132,21 +144,26 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        var query = CreateQuery(@"
-                query {
-                  queryContentsByIds(ids: [""<ID>""]) {
-                    ... on Content {
-                      data: data__dynamic
-                    }
-                  }
-                }", contentId);
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIds(contentId),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(0, content));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  queryContentsByIds(ids: ['{contentId}']) {
+                    ... on Content {
+                      data: data__dynamic
+                    }
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -168,13 +185,6 @@ public class GraphQLQueriesTests : GraphQLTestBase
     [Fact]
     public async Task Should_return_multiple_assets_if_querying_assets()
     {
-        var query = CreateQuery(@"
-                query {
-                  queryAssets(filter: 'my-query', top: 30, skip: 5) {
-                    <FIELDS_ASSET>
-                  }
-                }");
-
         var asset = TestAsset.Create(DomainId.NewGuid());
 
         A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
@@ -182,7 +192,19 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(0, asset));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  queryAssets(filter: 'my-query', top: 30, skip: 5) {
+                    {fields}
+                  }
+                }",
+            Args = new
+            {
+                fields = TestAsset.AllFields
+            }
+        });
 
         var expected = new
         {
@@ -201,16 +223,6 @@ public class GraphQLQueriesTests : GraphQLTestBase
     [Fact]
     public async Task Should_return_multiple_assets_with_total_if_querying_assets_with_total()
     {
-        var query = CreateQuery(@"
-                query {
-                  queryAssetsWithTotal(filter: 'my-query', top: 30, skip: 5) {
-                    total
-                    items {
-                      <FIELDS_ASSET>
-                    }
-                  }
-                }");
-
         var asset = TestAsset.Create(DomainId.NewGuid());
 
         A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
@@ -218,7 +230,22 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(10, asset));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  queryAssetsWithTotal(filter: 'my-query', top: 30, skip: 5) {
+                    total
+                    items {
+                      {fields}
+                    }
+                  }
+                }",
+            Args = new
+            {
+                fields = TestAsset.AllFields
+            }
+        });
 
         var expected = new
         {
@@ -243,20 +270,25 @@ public class GraphQLQueriesTests : GraphQLTestBase
     {
         var assetId = DomainId.NewGuid();
 
-        var query = CreateQuery(@"
-                query {
-                  findAsset(id: '<ID>') {
-                    id,
-                    version
-                  }
-                }", assetId);
-
         A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
                 A<Q>.That.HasIdsWithoutTotal(assetId),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom<IEnrichedAssetEntity>(1));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findAsset(id: '{assetId}') {
+                    id,
+                    version
+                  }
+                }",
+            Args = new
+            {
+                assetId
+            }
+        });
 
         var expected = new
         {
@@ -275,19 +307,25 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var assetId = DomainId.NewGuid();
         var asset = TestAsset.Create(assetId);
 
-        var query = CreateQuery(@"
-                query {
-                  findAsset(id: '<ID>') {
-                    <FIELDS_ASSET>
-                  }
-                }", assetId);
-
         A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
                 A<Q>.That.HasIdsWithoutTotal(assetId),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(1, asset));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findAsset(id: '{assetId}') {
+                    {fields}
+                  }
+                }",
+            Args = new
+            {
+                assetId,
+                fields = TestAsset.AllFields
+            }
+        });
 
         var expected = new
         {
@@ -306,19 +344,24 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        var query = CreateQuery(@"
-                query {
-                  queryMySchemaContents(top: 30, skip: 5) {
-                    <FIELDS_CONTENT_FLAT>
-                  }
-                }");
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                 A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(0, content));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  queryMySchemaContents(top: 30, skip: 5) {
+                    {fields}
+                  }
+                }",
+            Args = new
+            {
+                fields = TestContent.AllFlatFields
+            }
+        });
 
         var expected = new
         {
@@ -340,19 +383,24 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        var query = CreateQuery(@"
-                query {
-                  queryMySchemaContents(top: 30, skip: 5) {
-                    <FIELDS_CONTENT>
-                  }
-                }");
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                 A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(0, content));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  queryMySchemaContents(top: 30, skip: 5) {
+                    {fields}
+                  }
+                }",
+            Args = new
+            {
+                fields = TestContent.AllFields
+            }
+        });
 
         var expected = new
         {
@@ -374,22 +422,27 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        var query = CreateQuery(@"
-                query {
-                  queryMySchemaContentsWithTotal(top: 30, skip: 5) {
-                    total
-                    items {
-                      <FIELDS_CONTENT>
-                    }
-                  }
-                }");
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                 A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && !x.NoTotal),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(10, content));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  queryMySchemaContentsWithTotal(top: 30, skip: 5) {
+                    total
+                    items {
+                      {fields}
+                    }
+                  }
+                }",
+            Args = new
+            {
+                fields = TestContent.AllFields
+            }
+        });
 
         var expected = new
         {
@@ -414,20 +467,25 @@ public class GraphQLQueriesTests : GraphQLTestBase
     {
         var contentId = DomainId.NewGuid();
 
-        var query = CreateQuery(@"
-                query {
-                  findMySchemaContent(id: '<ID>') {
-                    id,
-                    version
-                  }
-                }", contentId);
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}') {
+                    id,
+                    version
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -446,20 +504,25 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.CreateRef(TestSchemas.Ref1Id, contentId, "ref1-field", "ref1");
 
-        var query = CreateQuery(@"
-                query {
-                  findMySchemaContent(id: '<ID>') {
-                    id,
-                    version
-                  }
-                }", contentId);
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(10, content));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}') {
+                    id,
+                    version
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -478,19 +541,25 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        var query = CreateQuery(@"
-                query {
-                  findMySchemaContent(id: '<ID>') {
-                    <FIELDS_CONTENT>
-                  }
-                }", contentId);
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(1, content));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}') {
+                    {fields}
+                  }
+                }",
+            Args = new
+            {
+                contentId,
+                fields = TestContent.AllFields
+            }
+        });
 
         var expected = new
         {
@@ -509,18 +578,24 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        var query = CreateQuery(@"
-                query {
-                  findMySchemaContent(id: '<ID>', version: 3) {
-                    <FIELDS_CONTENT>
-                  }
-                }", contentId);
-
         A.CallTo(() => contentQuery.FindAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(), contentId, 3,
                 A<CancellationToken>._))
             .Returns(content);
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}', version: 3) {
+                    {fields}
+                  }
+                }",
+            Args = new
+            {
+                contentId,
+                fields = TestContent.AllFields
+            }
+        });
 
         var expected = new
         {
@@ -542,9 +617,21 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, contentRef));
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMySchemaContent(id: '<ID>') {
+                  findMySchemaContent(id: '{contentId}') {
                     id
                     data {
                       myEmbeds {
@@ -566,19 +653,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentRefId),
-                A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(0, contentRef));
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId),
-                A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -627,9 +707,21 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, contentRef));
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMySchemaContent(id: '<ID>') {
+                  findMySchemaContent(id: '{contentId}') {
                     id
                     data {
                       myReferences {
@@ -644,19 +736,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentRefId),
-                A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(0, contentRef));
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId),
-                A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -701,18 +786,6 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
 
-        var query = CreateQuery(@"
-                query {
-                  findMySchemaContent(id: '<ID>') {
-                    id
-                    flatData {
-                      myReferences {
-                        id
-                      }
-                    }
-                  }
-                }", contentId);
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentRefId),
                 A<CancellationToken>._))
@@ -723,7 +796,24 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(1, content));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}') {
+                    id
+                    flatData {
+                      myReferences {
+                        id
+                      }
+                    }
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -758,18 +848,6 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
 
-        var query = CreateQuery(@"
-                query {
-                  findMySchemaContent(id: '<ID>') {
-                    id
-                    flatData {
-                      myReferences @cache(duration: 1000) {
-                        id
-                      }
-                    }
-                  }
-                }", contentId);
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentRefId),
                 A<CancellationToken>._))
@@ -780,8 +858,27 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(1, content));
 
-        var actual1 = await ExecuteAsync(new ExecutionOptions { Query = query });
-        var actual2 = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var query = new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}') {
+                    id
+                    flatData {
+                      myReferences @cache(duration: 1000) {
+                        id
+                      }
+                    }
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        };
+
+        var actual1 = await ExecuteAsync(query);
+        var actual2 = await ExecuteAsync(query);
 
         var expected = new
         {
@@ -822,9 +919,21 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, contentRef));
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
+                A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && x.NoTotal),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMyRefSchema1Content(id: '<ID>') {
+                  findMyRefSchema1Content(id: '{contentId}') {
                     id
                     referencingMySchemaContents(top: 30, skip: 5) {
                       id
@@ -835,18 +944,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentRefId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, contentRef));
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
-                A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && x.NoTotal),
-                A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId = contentRefId
+            }
+        });
 
         var expected = new
         {
@@ -885,9 +988,21 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, contentRef));
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
+                A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && !x.NoTotal),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(10, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMyRefSchema1Content(id: '<ID>') {
+                  findMyRefSchema1Content(id: '{contentId}') {
                     id
                     referencingMySchemaContentsWithTotal(top: 30, skip: 5) {
                       total
@@ -901,18 +1016,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentRefId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, contentRef));
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
-                A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && !x.NoTotal),
-                A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(10, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId = contentRefId
+            }
+        });
 
         var expected = new
         {
@@ -955,18 +1064,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
 
-        var query = CreateQuery(@"
-                query {
-                  findMySchemaContent(id: '<ID>') {
-                    id
-                    referencesMyRefSchema1Contents(top: 30, skip: 5) {
-                      id
-                    }
-                  }
-                }", contentId);
-
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(1, content));
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), contentRef.SchemaId.Id.ToString(),
@@ -974,7 +1074,22 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(1, contentRef));
 
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}') {
+                    id
+                    referencesMyRefSchema1Contents(top: 30, skip: 5) {
+                      id
+                    }
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -1006,9 +1121,21 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), contentRef.SchemaId.Id.ToString(),
+                A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Referencing == contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(10, contentRef));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMySchemaContent(id: '<ID>') {
+                  findMySchemaContent(id: '{contentId}') {
                     id
                     referencesMyRefSchema1ContentsWithTotal(top: 30, skip: 5) {
                       total
@@ -1017,18 +1144,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), contentRef.SchemaId.Id.ToString(),
-                A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Referencing == contentId),
-                A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(10, contentRef));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -1064,9 +1185,21 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, contentRef));
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMySchemaContent(id: '<ID>') {
+                  findMySchemaContent(id: '{contentId}') {
                     id
                     data {
                       myUnion {
@@ -1086,17 +1219,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(0, contentRef));
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -1142,9 +1270,21 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, assetId: assetRefId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
+                A<Q>.That.HasIdsWithoutTotal(assetRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, assetRef));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMySchemaContent(id: '<ID>') {
+                  findMySchemaContent(id: '{contentId}') {
                     id
                     data {
                       myEmbeds {
@@ -1157,17 +1297,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
-                A<Q>.That.HasIdsWithoutTotal(assetRefId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(0, assetRef));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -1209,9 +1344,21 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, assetId: assetRefId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
+                A<Q>.That.HasIdsWithoutTotal(assetRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, assetRef));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMySchemaContent(id: '<ID>') {
+                  findMySchemaContent(id: '{contentId}') {
                     id
                     data {
                       myAssets {
@@ -1221,17 +1368,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
-                A<Q>.That.HasIdsWithoutTotal(assetRefId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(0, assetRef));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {
@@ -1266,9 +1408,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, data: new ContentData());
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMySchemaContent(id: '<ID>') {
+                  findMySchemaContent(id: '{contentId}') {
                     id
                     version
                     created
@@ -1282,13 +1431,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var json = serializer.Serialize(actual);
 
@@ -1298,7 +1446,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
     [Fact]
     public async Task Should_query_only_selected_fields()
     {
-        var query = CreateQuery(@"
+        await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
                   queryMySchemaContents @optimizeFieldQueries {
                     data {
@@ -1307,9 +1457,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }");
-
-        await ExecuteAsync(new ExecutionOptions { Query = query });
+                }"
+        });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                 A<Q>.That.HasFields(new[] { "my-number" }),
@@ -1320,16 +1469,17 @@ public class GraphQLQueriesTests : GraphQLTestBase
     [Fact]
     public async Task Should_query_only_selected_flat_fields()
     {
-        var query = CreateQuery(@"
+        await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
                   queryMySchemaContents @optimizeFieldQueries {
                     flatData {
                       myNumber
                     }
                   }
-                }");
-
-        await ExecuteAsync(new ExecutionOptions { Query = query });
+                }"
+        });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                 A<Q>.That.HasFields(new[] { "my-number" }),
@@ -1340,7 +1490,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
     [Fact]
     public async Task Should_query_all_fields_when_directive_not_applied()
     {
-        var query = CreateQuery(@"
+        await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
                   queryMySchemaContents {
                     data {
@@ -1349,9 +1501,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }");
-
-        await ExecuteAsync(new ExecutionOptions { Query = query });
+                }"
+        });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                 A<Q>.That.Matches(x => x.Fields == null),
@@ -1362,7 +1513,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
     [Fact]
     public async Task Should_query_all_fields_when_dynamic_data_is_queried()
     {
-        var query = CreateQuery(@"
+        await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
                   queryMySchemaContents @optimizeFieldQueries {
                     flatData {
@@ -1370,9 +1523,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     }
                     data__dynamic
                   }
-                }");
-
-        await ExecuteAsync(new ExecutionOptions { Query = query });
+                }"
+        });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                 A<Q>.That.Matches(x => x.Fields == null),
@@ -1383,18 +1535,19 @@ public class GraphQLQueriesTests : GraphQLTestBase
     [Fact]
     public async Task Should_query_all_fields_across_schemas()
     {
-        var query = CreateQuery(@"
+        await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  queryContentsByIds(ids: [""42""]) @optimizeFieldQueries {
+                  queryContentsByIds(ids: ['42']) @optimizeFieldQueries {
                     ...on MySchema {
                       flatData {
                         myNumber
                       }
                     }
                   }
-                }");
-
-        await ExecuteAsync(new ExecutionOptions { Query = query });
+                }"
+        });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasFields(new[] { "my-number" }),
@@ -1408,20 +1561,26 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        var query = CreateQuery(@"
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
                 query {
-                  findMySchemaContent(id: '<ID>') {
+                  findMySchemaContent(id: '{contentId}') {
                     createdByUser {
                       id
                     }
                   }
-                }", contentId);
-
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
-                A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content));
-
-        var actual = await ExecuteAsync(new ExecutionOptions { Query = query });
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
 
         var expected = new
         {

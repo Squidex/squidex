@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 
 #pragma warning disable IDE0060 // Remove unused parameter
 

@@ -8,17 +8,12 @@
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using GraphQLParser;
-using GraphQLParser.AST;
 using NodaTime;
-using Squidex.CLI.Commands.Models;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Directives;
 using Squidex.Infrastructure;
 using Squidex.Shared;
 

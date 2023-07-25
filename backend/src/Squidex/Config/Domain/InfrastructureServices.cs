@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.News;
@@ -27,8 +26,6 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline.Robots;
 using Squidex.Shared;
-using Squidex.Text.Translations;
-using Squidex.Text.Translations.GoogleCloud;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 

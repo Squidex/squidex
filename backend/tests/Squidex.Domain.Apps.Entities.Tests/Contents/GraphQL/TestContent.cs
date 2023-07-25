@@ -7,7 +7,6 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -149,7 +148,7 @@ public static class TestContent
             url
             flatData {
               myJson
-              myJsonValue: myJson(path: ""value"")
+              myJsonValue: myJson(path: 'value')
               myJson2 {
                 __typename
                 rootString,
@@ -375,7 +374,7 @@ public static class TestContent
             {
                 id = content.CreatedBy.Identifier,
                 email = $"{content.CreatedBy.Identifier}@email.com",
-                displayName = $"name_{content.CreatedBy.Identifier}"
+                displayName = $"{content.CreatedBy.Identifier}name"
             },
             editToken = $"token_{content.Id}",
             lastModified = content.LastModified,
@@ -407,7 +406,7 @@ public static class TestContent
             {
                 id = content.CreatedBy.Identifier,
                 email = $"{content.CreatedBy.Identifier}@email.com",
-                displayName = $"name_{content.CreatedBy.Identifier}"
+                displayName = $"{content.CreatedBy.Identifier}name"
             },
             editToken = $"token_{content.Id}",
             lastModified = content.LastModified,

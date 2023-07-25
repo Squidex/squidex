@@ -7,7 +7,6 @@
 
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Text.RegularExpressions;
 using GraphQL;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
@@ -25,7 +24,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Messaging.Subscriptions;
-using Squidex.Shared;
 using Squidex.Shared.Users;
 
 #pragma warning disable SA1401 // Fields must be private
@@ -43,6 +41,11 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
     protected readonly Context requestContext;
     private CachingGraphQLResolver? sut;
 
+    protected class QueryOptions
+    {
+        public string Query { get; set; }
+    }
+
     protected GraphQLTestBase()
     {
         A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, default))
@@ -50,7 +53,11 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
             {
                 var ids = x.GetArgument<string[]>(0)!;
 
-                var users = ids.Select(id => UserMocks.User(id, $"{id}@email.com", $"name_{id}"));
+                var users = ids.Select(id =>
+                    UserMocks.User(
+                        id,
+                        $"{id}@email.com",
+                        $"{id}name"));
 
                 return Task.FromResult(users.ToDictionary(x => x.Id));
             });
@@ -66,34 +73,19 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
         Assert.Equal(isonOutputExpected, jsonOutputResult);
     }
 
-    protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
-    {
-        return ExecuteCoreAsync(options, requestContext);
-    }
-
-    protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, string permissionId)
-    {
-        return ExecuteCoreAsync(options, BuildContext(permissionId));
-    }
-
-    protected async Task<ExecutionResult> ExecuteCoreAsync(ExecutionOptions options, Context context)
+    protected Task<ExecutionResult> ExecuteAsync(TestQuery query)
     {
         // Use a shared instance to test caching.
         sut ??= CreateSut(TestSchemas.Default, TestSchemas.Ref1, TestSchemas.Ref2);
 
-        // Provide the context to the test if services need to be resolved.
-        var graphQLContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context)!;
+        var options = query.ToOptions(sut.Services);
 
-        options.UserContext = graphQLContext;
+        return ExecuteAsync(sut, options);
+    }
 
-        // Register data loader and other listeners.
-        foreach (var listener in sut.Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
-        {
-            options.Listeners.Add(listener);
-        }
-
-        // Enrich the context with the schema.
-        await sut.ExecuteAsync(options, x => Task.FromResult<ExecutionResult>(null!));
+    private static async Task<ExecutionResult> ExecuteAsync(CachingGraphQLResolver resolver, ExecutionOptions options)
+    {
+        await resolver.ExecuteAsync(options, x => Task.FromResult<ExecutionResult>(null!));
 
         var actual = await new DocumentExecuter().ExecuteAsync(options);
 
@@ -111,13 +103,6 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
         return actual;
     }
 
-    private static Context BuildContext(string permissionId)
-    {
-        var permission = PermissionIds.ForApp(permissionId, TestApp.Default.Name, TestSchemas.DefaultId.Name).Id;
-
-        return new Context(Mocks.FrontendUser(permission: permission), TestApp.Default);
-    }
-
     protected CachingGraphQLResolver CreateSut(params ISchemaEntity[] schemas)
     {
         var appProvider = A.Fake<IAppProvider>();
@@ -127,9 +112,10 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
 
         var serviceProvider =
             new ServiceCollection()
-                .AddLogging()
-                .AddMemoryCache()
-                .AddBackgroundCache()
+                .AddLogging(options =>
+                {
+                    options.AddDebug();
+                })
                 .Configure<AssetOptions>(x =>
                 {
                     x.CanCache = true;
@@ -153,6 +139,8 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
                     A.Fake<ILoggerFactory>())
                 .AddSingleton(
                     A.Fake<ISchemasHash>())
+                .AddMemoryCache()
+                .AddBackgroundCache()
                 .AddSingleton(appProvider)
                 .AddSingleton(assetQuery)
                 .AddSingleton(commandBus)
@@ -164,54 +152,19 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
         return ActivatorUtilities.CreateInstance<CachingGraphQLResolver>(serviceProvider);
     }
 
-    protected static string CreateQuery(string query, DomainId id = default, IEnrichedContentEntity? content = null)
-    {
-        query = query
-            .Replace('\'', '"')
-            .Replace('`', '"')
-            .Replace("<FIELDS_ASSET>", TestAsset.AllFields, StringComparison.Ordinal)
-            .Replace("<FIELDS_CONTENT>", TestContent.AllFields, StringComparison.Ordinal)
-            .Replace("<FIELDS_CONTENT_FLAT>", TestContent.AllFlatFields, StringComparison.Ordinal);
-
-        if (id != default)
-        {
-            query = query.Replace("<ID>", id.ToString(), StringComparison.Ordinal);
-        }
-
-        if (query.Contains("<DATA>", StringComparison.Ordinal) && content != null)
-        {
-            var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
-
-            // Json is not the same as the input format of graphql, therefore we need to convert it.
-            var dataJson = TestUtils.DefaultSerializer.Serialize(data, true);
-
-            // Use properties without quotes.
-            dataJson = Regex.Replace(dataJson, "\"([^\"]+)\":", x => $"{x.Groups[1].Value}:");
-
-            // Use enum values whithout quotes.
-            dataJson = Regex.Replace(dataJson, "\"Enum([A-Za-z]+)\"", x => $"Enum{x.Groups[1].Value}");
-
-            query = query.Replace("<DATA>", dataJson, StringComparison.Ordinal);
-        }
-
-        return query;
-    }
-
-    protected Context MatchsAssetContext()
+    protected static Context MatchsAssetContext()
     {
         return A<Context>.That.Matches(x =>
             x.App == TestApp.Default &&
             x.NoCleanup() &&
-            x.NoAssetEnrichment() &&
-            x.UserPrincipal == requestContext.UserPrincipal);
+            x.NoAssetEnrichment());
     }
 
-    protected Context MatchsContentContext()
+    protected static Context MatchsContentContext()
     {
         return A<Context>.That.Matches(x =>
             x.App == TestApp.Default &&
             x.NoCleanup() &&
-            x.NoEnrichment() &&
-            x.UserPrincipal == requestContext.UserPrincipal);
+            x.NoEnrichment());
     }
 }

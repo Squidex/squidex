@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using GraphQL.DataLoader;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
 #pragma warning disable MA0048 // File name must match type name

@@ -9,7 +9,6 @@ using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
-using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;

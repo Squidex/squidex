@@ -7,7 +7,6 @@
 
 using System.Net;
 using System.Text;
-using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Scripting;

@@ -7,8 +7,6 @@
 
 using GraphQL.DataLoader;
 using Squidex.Infrastructure.Caching;
-using Squidex.Infrastructure.Translations;
-using TagLib.IFD.Tags;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Cache;
 
