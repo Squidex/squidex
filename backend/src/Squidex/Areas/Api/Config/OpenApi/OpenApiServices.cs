@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.Text.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using NJsonSchema.Generation.TypeMappers;
@@ -64,7 +66,13 @@ public static class OpenApiServices
 
         services.AddSingleton(c =>
         {
-            var settings = new OpenApiDocumentGeneratorSettings();
+            var settings = new OpenApiDocumentGeneratorSettings
+            {
+                SerializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                }
+            };
 
             ConfigureSchemaSettings(settings, c.GetRequiredService<TypeRegistry>(), true);
 

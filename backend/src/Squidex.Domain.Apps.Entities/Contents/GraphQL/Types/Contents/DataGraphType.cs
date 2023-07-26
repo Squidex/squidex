@@ -33,24 +33,26 @@ internal sealed class DataGraphType : ObjectGraphType<ContentData>
 
                 foreach (var partitionKey in partitioning.AllKeys)
                 {
-                    fieldGraphType.AddField(new FieldType
+                    fieldGraphType.AddField(new FieldTypeWithSourceName
                     {
                         Name = partitionKey.EscapePartition(),
                         Arguments = ContentActions.Json.Arguments,
                         ResolvedType = Scalars.Json,
                         Resolver = FieldVisitor.JsonPath,
-                        Description = fieldInfo.Field.RawProperties.Hints
-                    }).WithSourceName(partitionKey);
+                        Description = fieldInfo.Field.RawProperties.Hints,
+                        SourceName = partitionKey
+                    });
                 }
 
                 fieldGraphType.Description = $"The dynamic structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content type.";
 
-                AddField(new FieldType
+                AddField(new FieldTypeWithSourceName
                 {
                     Name = fieldInfo.FieldNameDynamic,
                     ResolvedType = fieldGraphType,
-                    Resolver = ContentResolvers.Field
-                }).WithSourceName(fieldInfo);
+                    Resolver = ContentResolvers.Field,
+                    SourceName = fieldInfo.Field.Name
+                });
             }
 
             var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
@@ -65,24 +67,26 @@ internal sealed class DataGraphType : ObjectGraphType<ContentData>
 
                 foreach (var partitionKey in partitioning.AllKeys)
                 {
-                    fieldGraphType.AddField(new FieldType
+                    fieldGraphType.AddField(new FieldTypeWithSourceName
                     {
                         Name = partitionKey.EscapePartition(),
                         Arguments = args,
                         ResolvedType = resolvedType,
                         Resolver = resolver,
-                        Description = fieldInfo.Field.RawProperties.Hints
-                    }).WithSourceName(partitionKey);
+                        Description = fieldInfo.Field.RawProperties.Hints,
+                        SourceName = partitionKey
+                    });
                 }
 
                 fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content type.";
 
-                AddField(new FieldType
+                AddField(new FieldTypeWithSourceName
                 {
                     Name = fieldInfo.FieldName,
                     ResolvedType = fieldGraphType,
-                    Resolver = ContentResolvers.Field
-                }).WithSourceName(fieldInfo);
+                    Resolver = ContentResolvers.Field,
+                    SourceName = fieldInfo.Field.Name,
+                });
             }
         }
 

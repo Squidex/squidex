@@ -78,7 +78,6 @@ public static class SharedExtensions
         try
         {
             NameValidator.ValidateDefault(name!, type);
-
             return true;
         }
         catch
@@ -87,39 +86,34 @@ public static class SharedExtensions
         }
     }
 
-    internal static FieldType WithSourceName(this FieldType field, string value)
-    {
-        return field.WithMetadata(nameof(SourceName), value);
-    }
-
-    internal static FieldType WithSourceName(this FieldType field, FieldInfo value)
-    {
-        return field.WithMetadata(nameof(SourceName), value.Field.Name);
-    }
-
     internal static string SourceName(this FieldType field)
     {
-        return field.GetMetadata<string>(nameof(SourceName))!;
-    }
+        if (field is FieldTypeWithSourceName typed)
+        {
+            return typed.SourceName;
+        }
 
-    internal static FieldType WithSchemaId(this FieldType field, SchemaInfo value)
-    {
-        return field.WithMetadata(nameof(SchemaId), value.Schema.Id);
+        throw new InvalidOperationException("Invalid field type");
     }
 
     internal static DomainId SchemaId(this FieldType field)
     {
-        return field.GetMetadata<DomainId>(nameof(SchemaId))!;
-    }
+        if (field is FieldTypeWithSchemaId typed)
+        {
+            return typed.SchemaId;
+        }
 
-    internal static FieldType WithSchemaNamedId(this FieldType field, SchemaInfo value)
-    {
-        return field.WithMetadata(nameof(SchemaNamedId), value.Schema.NamedId());
+        throw new InvalidOperationException("Invalid field type");
     }
 
     internal static NamedId<DomainId> SchemaNamedId(this FieldType field)
     {
-        return field.GetMetadata<NamedId<DomainId>>(nameof(SchemaNamedId))!;
+        if (field is FieldTypeWithSchemaNamedId typed)
+        {
+            return typed.SchemaId;
+        }
+
+        throw new InvalidOperationException("Invalid field type");
     }
 
     public static IGraphType? InnerType(this IGraphType type)

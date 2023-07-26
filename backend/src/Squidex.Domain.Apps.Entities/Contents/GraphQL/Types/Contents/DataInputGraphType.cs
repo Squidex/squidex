@@ -40,23 +40,25 @@ internal sealed class DataInputGraphType : InputObjectGraphType
 
             foreach (var partitionKey in partitioning.AllKeys)
             {
-                fieldGraphType.AddField(new FieldType
+                fieldGraphType.AddField(new FieldTypeWithSourceName
                 {
                     Name = partitionKey.EscapePartition(),
                     ResolvedType = resolvedType,
                     Resolver = null,
-                    Description = fieldInfo.Field.RawProperties.Hints
-                }).WithSourceName(partitionKey);
+                    Description = fieldInfo.Field.RawProperties.Hints,
+                    SourceName = partitionKey
+                });
             }
 
             fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content input type.";
 
-            AddField(new FieldType
+            AddField(new FieldTypeWithSourceName
             {
                 Name = fieldInfo.FieldName,
                 ResolvedType = fieldGraphType,
-                Resolver = null
-            }).WithSourceName(fieldInfo);
+                Resolver = null,
+                SourceName = fieldInfo.Field.Name,
+            });
         }
 
         Description = $"The structure of the {schemaInfo.DisplayName} data input type.";

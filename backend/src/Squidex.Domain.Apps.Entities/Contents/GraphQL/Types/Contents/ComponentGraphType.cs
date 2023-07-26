@@ -33,28 +33,30 @@ internal sealed class ComponentGraphType : ObjectGraphType<JsonObject>
         {
             if (fieldInfo.Field.IsComponentLike())
             {
-                AddField(new FieldType
+                AddField(new FieldTypeWithSourceName
                 {
                     Name = fieldInfo.FieldNameDynamic,
                     Arguments = ContentActions.Json.Arguments,
                     ResolvedType = Scalars.Json,
                     Resolver = FieldVisitor.JsonPath,
-                    Description = fieldInfo.Field.RawProperties.Hints
-                }).WithSourceName(fieldInfo);
+                    Description = fieldInfo.Field.RawProperties.Hints,
+                    SourceName = fieldInfo.Field.Name
+                });
             }
 
             var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
 
             if (resolvedType != null && resolver != null)
             {
-                AddField(new FieldType
+                AddField(new FieldTypeWithSourceName
                 {
                     Name = fieldInfo.FieldName,
                     Arguments = args,
                     ResolvedType = resolvedType,
                     Resolver = resolver,
-                    Description = fieldInfo.Field.RawProperties.Hints
-                }).WithSourceName(fieldInfo);
+                    Description = fieldInfo.Field.RawProperties.Hints,
+                    SourceName = fieldInfo.Field.Name
+                });
             }
         }
 
