@@ -37,26 +37,28 @@ internal sealed class ApplicationQueries : ObjectGraphType
 
     private void AddContentFind(SchemaInfo schemaInfo, IGraphType contentType)
     {
-        AddField(new FieldType
+        AddField(new FieldTypeWithSchemaId
         {
             Name = $"find{schemaInfo.TypeName}Content",
             Arguments = ContentActions.Find.Arguments,
             ResolvedType = contentType,
             Resolver = ContentActions.Find.Resolver,
-            Description = $"Find an {schemaInfo.DisplayName} content by id."
-        }).WithSchemaId(schemaInfo);
+            Description = $"Find an {schemaInfo.DisplayName} content by id.",
+            SchemaId = schemaInfo.Schema.Id
+        });
     }
 
     private void AddContentQueries(Builder builder, SchemaInfo schemaInfo, IGraphType contentType)
     {
-        AddField(new FieldType
+        AddField(new FieldTypeWithSchemaId
         {
             Name = $"query{schemaInfo.TypeName}Contents",
             Arguments = ContentActions.QueryOrReferencing.Arguments,
             ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
             Resolver = ContentActions.QueryOrReferencing.Query,
-            Description = $"Query {schemaInfo.DisplayName} content items."
-        }).WithSchemaId(schemaInfo);
+            Description = $"Query {schemaInfo.DisplayName} content items.",
+            SchemaId = schemaInfo.Schema.Id
+        });
 
         var contentResultTyp = builder.GetContentResultType(schemaInfo);
 
@@ -65,14 +67,15 @@ internal sealed class ApplicationQueries : ObjectGraphType
             return;
         }
 
-        AddField(new FieldType
+        AddField(new FieldTypeWithSchemaId
         {
             Name = $"query{schemaInfo.TypeName}ContentsWithTotal",
             Arguments = ContentActions.QueryOrReferencing.Arguments,
             ResolvedType = contentResultTyp,
             Resolver = ContentActions.QueryOrReferencing.QueryWithTotal,
-            Description = $"Query {schemaInfo.DisplayName} content items with total count."
-        }).WithSchemaId(schemaInfo);
+            Description = $"Query {schemaInfo.DisplayName} content items with total count.",
+            SchemaId = schemaInfo.Schema.Id
+        });
     }
 
     private void AddContentQuery(Builder builder)

@@ -22,28 +22,30 @@ internal sealed class NestedGraphType : ObjectGraphType<JsonObject>
         {
             if (nestedFieldInfo.Field.IsComponentLike())
             {
-                AddField(new FieldType
+                AddField(new FieldTypeWithSourceName
                 {
                     Name = nestedFieldInfo.FieldNameDynamic,
                     Arguments = ContentActions.Json.Arguments,
                     ResolvedType = Scalars.Json,
                     Resolver = FieldVisitor.JsonPath,
-                    Description = nestedFieldInfo.Field.RawProperties.Hints
-                }).WithSourceName(nestedFieldInfo);
+                    Description = nestedFieldInfo.Field.RawProperties.Hints,
+                    SourceName = nestedFieldInfo.Field.Name
+                });
             }
 
             var (resolvedType, resolver, args) = builder.GetGraphType(nestedFieldInfo);
 
             if (resolvedType != null && resolver != null)
             {
-                AddField(new FieldType
+                AddField(new FieldTypeWithSourceName
                 {
                     Name = nestedFieldInfo.FieldName,
                     Arguments = args,
                     ResolvedType = resolvedType,
                     Resolver = resolver,
-                    Description = nestedFieldInfo.Field.RawProperties.Hints
-                }).WithSourceName(nestedFieldInfo);
+                    Description = nestedFieldInfo.Field.RawProperties.Hints,
+                    SourceName = nestedFieldInfo.Field.Name
+                });
             }
         }
 

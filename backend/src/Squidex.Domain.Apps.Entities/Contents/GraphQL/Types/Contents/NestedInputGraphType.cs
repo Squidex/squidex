@@ -27,13 +27,14 @@ internal sealed class NestedInputGraphType : InputObjectGraphType
                 continue;
             }
 
-            AddField(new FieldType
+            AddField(new FieldTypeWithSourceName
             {
                 Name = nestedFieldInfo.FieldName,
                 ResolvedType = resolvedType,
                 Resolver = null,
-                Description = nestedFieldInfo.Field.RawProperties.Hints
-            }).WithSourceName(nestedFieldInfo);
+                Description = nestedFieldInfo.Field.RawProperties.Hints,
+                SourceName = nestedFieldInfo.Field.Name,
+            });
         }
 
         Description = $"The structure of the {fieldInfo.DisplayName} nested schema.";

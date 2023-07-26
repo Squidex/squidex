@@ -95,14 +95,15 @@ internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
     {
         var contentType = builder.GetContentType(referencingSchemaInfo);
 
-        AddField(new FieldType
+        AddField(new FieldTypeWithSchemaId
         {
             Name = $"referencing{referencingSchemaInfo.TypeName}Contents",
             Arguments = ContentActions.QueryOrReferencing.Arguments,
             ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
             Resolver = ContentActions.QueryOrReferencing.Referencing,
-            Description = $"Query {referencingSchemaInfo.DisplayName} content items."
-        }).WithSchemaId(referencingSchemaInfo);
+            Description = $"Query {referencingSchemaInfo.DisplayName} content items.",
+            SchemaId = referencingSchemaInfo.Schema.Id
+        });
 
         var contentResultTyp = builder.GetContentResultType(referencingSchemaInfo);
 
@@ -111,28 +112,30 @@ internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
             return;
         }
 
-        AddField(new FieldType
+        AddField(new FieldTypeWithSchemaId
         {
             Name = $"referencing{referencingSchemaInfo.TypeName}ContentsWithTotal",
             Arguments = ContentActions.QueryOrReferencing.Arguments,
             ResolvedType = contentResultTyp,
             Resolver = ContentActions.QueryOrReferencing.ReferencingWithTotal,
-            Description = $"Query {referencingSchemaInfo.DisplayName} content items with total count."
-        }).WithSchemaId(referencingSchemaInfo);
+            Description = $"Query {referencingSchemaInfo.DisplayName} content items with total count.",
+            SchemaId = referencingSchemaInfo.Schema.Id
+        });
     }
 
     private void AddReferencesQueries(Builder builder, SchemaInfo referencesSchemaInfo)
     {
         var contentType = builder.GetContentType(referencesSchemaInfo);
 
-        AddField(new FieldType
+        AddField(new FieldTypeWithSchemaId
         {
             Name = $"references{referencesSchemaInfo.TypeName}Contents",
             Arguments = ContentActions.QueryOrReferencing.Arguments,
             ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
             Resolver = ContentActions.QueryOrReferencing.References,
-            Description = $"Query {referencesSchemaInfo.DisplayName} content items."
-        }).WithSchemaId(referencesSchemaInfo);
+            Description = $"Query {referencesSchemaInfo.DisplayName} content items.",
+            SchemaId = referencesSchemaInfo.Schema.Id
+        });
 
         var contentResultTyp = builder.GetContentResultType(referencesSchemaInfo);
 
@@ -141,14 +144,15 @@ internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
             return;
         }
 
-        AddField(new FieldType
+        AddField(new FieldTypeWithSchemaId
         {
             Name = $"references{referencesSchemaInfo.TypeName}ContentsWithTotal",
             Arguments = ContentActions.QueryOrReferencing.Arguments,
             ResolvedType = contentResultTyp,
             Resolver = ContentActions.QueryOrReferencing.ReferencesWithTotal,
-            Description = $"Query {referencesSchemaInfo.DisplayName} content items with total count."
-        }).WithSchemaId(referencesSchemaInfo);
+            Description = $"Query {referencesSchemaInfo.DisplayName} content items with total count.",
+            SchemaId = referencesSchemaInfo.Schema.Id
+        });
     }
 
     private static bool IsReference(SchemaInfo from, SchemaInfo to)
