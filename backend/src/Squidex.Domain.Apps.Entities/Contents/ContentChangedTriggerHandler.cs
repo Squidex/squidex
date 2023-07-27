@@ -91,14 +91,14 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
             yield break;
         }
 
-        // When the content has just been created, it cannot be referenced by another content. Therefore we can skip it.
+        // When the content has just been created, it cannot be referenced by another content. Therefore we can skip it.1
         if (enrichedEvent.Type == EnrichedContentEventType.Created)
         {
             yield break;
         }
 
         // This method is only called once per event, therefore we check all rules.
-        if (!context.Rules.Values.Any(r => TriggerReferences(enrichedEvent, r)))
+        if (!context.Rules.Select(x => x.Value.Trigger).OfType<ContentChangedTriggerV2>().Any(t => MatchesAnySchema(t.ReferencedSchemas, enrichedEvent)))
         {
             yield break;
         }
