@@ -242,17 +242,6 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
         return MatchesAnySchema(typed.Schemas, @event);
     }
 
-    private bool TriggerReferences(EnrichedEvent @event, Rule rule)
-    {
-        // This method is only called once per event, therefore we could also have other rules.
-        if (rule.Trigger is not ContentChangedTriggerV2 contentTrigger)
-        {
-            return false;
-        }
-
-        return MatchesAnySchema(contentTrigger.ReferencedSchemas, @event);
-    }
-
     private bool MatchesAnySchema(ReadonlyList<SchemaCondition>? schemas, EnrichedEvent @event)
     {
         if (schemas == null)
