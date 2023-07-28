@@ -8,6 +8,7 @@
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -22,7 +23,7 @@ public class GraphQLMutationTests : GraphQLTestBase
 
     public GraphQLMutationTests()
     {
-        content = TestContent.Create(contentId, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id, null);
+        content = TestContent.Create(contentId, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id, null);
 
         A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored, A<CancellationToken>._))
             .Returns(commandContext);
@@ -93,7 +94,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id),
+                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id),
             },
             Permission = PermissionIds.AppContentsCreate
         });
@@ -111,7 +112,7 @@ public class GraphQLMutationTests : GraphQLTestBase
         A.CallTo(() => commandBus.PublishAsync(
                 A<CreateContent>.That.Matches(x =>
                     x.ExpectedVersion == EtagVersion.Any &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId()) &&
                     x.Status == Status.Published &&
                     x.Data.Equals(content.Data)),
                 A<CancellationToken>._))
@@ -138,7 +139,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
+                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id)
             },
             Permission = PermissionIds.AppContentsCreate
         });
@@ -157,7 +158,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 A<CreateContent>.That.Matches(x =>
                     x.ExpectedVersion == EtagVersion.Any &&
                     x.ContentId == contentId &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId()) &&
                     x.Status == Status.Published &&
                     x.Data.Equals(content.Data)),
                 A<CancellationToken>._))
@@ -234,7 +235,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
+                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id)
             },
             Permission = PermissionIds.AppContentsUpdateOwn
         });
@@ -253,7 +254,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 A<UpdateContent>.That.Matches(x =>
                     x.ContentId == contentId &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId()) &&
                     x.Data.Equals(content.Data)),
                 A<CancellationToken>._))
             .MustHaveHappened();
@@ -325,7 +326,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
+                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id)
             },
             Permission = PermissionIds.AppContentsUpsert
         });
@@ -344,7 +345,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 A<UpsertContent>.That.Matches(x =>
                     x.ContentId == contentId &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId()) &&
                     x.Status == Status.Published &&
                     x.Data.Equals(content.Data)),
                 A<CancellationToken>._))
@@ -421,7 +422,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
+                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id)
             },
             Permission = PermissionIds.AppContentsUpdateOwn
         });
@@ -440,7 +441,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 A<PatchContent>.That.Matches(x =>
                     x.ContentId == contentId &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId()) &&
                     x.Data.Equals(content.Data)),
                 A<CancellationToken>._))
             .MustHaveHappened();
@@ -534,7 +535,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                     x.ContentId == contentId &&
                     x.DueTime == dueTime &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId()) &&
                     x.Status == Status.Published),
                 A<CancellationToken>._))
             .MustHaveHappened();
@@ -576,7 +577,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                     x.ContentId == contentId &&
                     x.DueTime == null &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId()) &&
                     x.Status == Status.Published),
                 A<CancellationToken>._))
             .MustHaveHappened();
@@ -618,7 +619,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                     x.ContentId == contentId &&
                     x.DueTime == null &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId()) &&
                     x.Status == Status.Published),
                 A<CancellationToken>._))
             .MustHaveHappened();
@@ -708,7 +709,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 A<DeleteContent>.That.Matches(x =>
                     x.ContentId == contentId &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(TestSchemas.DefaultId)),
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId())),
                 A<CancellationToken>._))
             .MustHaveHappened();
     }

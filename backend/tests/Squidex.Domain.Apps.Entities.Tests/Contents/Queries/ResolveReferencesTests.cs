@@ -21,14 +21,14 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
 {
     private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
     private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
-    private readonly NamedId<DomainId> refSchemaId1 = NamedId.Of(DomainId.NewGuid(), "my-ref1");
-    private readonly NamedId<DomainId> refSchemaId2 = NamedId.Of(DomainId.NewGuid(), "my-ref2");
+    private readonly NamedId<DomainId> referenceSchemaId1 = NamedId.Of(DomainId.NewGuid(), "my-ref1");
+    private readonly NamedId<DomainId> referenceSchemaId2 = NamedId.Of(DomainId.NewGuid(), "my-ref2");
     private readonly ProvideSchema schemaProvider;
     private readonly ResolveReferences sut;
 
     public ResolveReferencesTests()
     {
-        var refSchemaDef =
+        var referencedSchemaDef =
             new Schema("my-ref")
                 .AddString(1, "name", Partitioning.Invariant,
                     new StringFieldProperties())
@@ -43,14 +43,14 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                     ResolveReference = true,
                     MinItems = 1,
                     MaxItems = 1,
-                    SchemaId = refSchemaId1.Id
+                    SchemaId = referenceSchemaId1.Id
                 })
                 .AddReferences(2, "ref2", Partitioning.Invariant, new ReferencesFieldProperties
                 {
                     ResolveReference = true,
                     MinItems = 1,
                     MaxItems = 1,
-                    SchemaId = refSchemaId2.Id
+                    SchemaId = referenceSchemaId2.Id
                 })
                 .SetFieldsInLists("ref1", "ref2");
 
@@ -63,13 +63,13 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
             {
                 return Task.FromResult((Schema, ResolvedComponents.Empty));
             }
-            else if (x == refSchemaId1.Id)
+            else if (x == referenceSchemaId1.Id)
             {
-                return Task.FromResult((Mocks.Schema(AppId, refSchemaId1, refSchemaDef), ResolvedComponents.Empty));
+                return Task.FromResult((Mocks.Schema(AppId, referenceSchemaId1.Id, referencedSchemaDef), ResolvedComponents.Empty));
             }
-            else if (x == refSchemaId2.Id)
+            else if (x == referenceSchemaId2.Id)
             {
-                return Task.FromResult((Mocks.Schema(AppId, refSchemaId2, refSchemaDef), ResolvedComponents.Empty));
+                return Task.FromResult((Mocks.Schema(AppId, referenceSchemaId2.Id, referencedSchemaDef), ResolvedComponents.Empty));
             }
             else
             {
@@ -83,10 +83,10 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     [Fact]
     public async Task Should_add_referenced_id_and_as_dependency()
     {
-        var ref1_1 = CreateRefContent(DomainId.NewGuid(), 1, "ref1_1", 13, refSchemaId1);
-        var ref1_2 = CreateRefContent(DomainId.NewGuid(), 2, "ref1_2", 17, refSchemaId1);
-        var ref2_1 = CreateRefContent(DomainId.NewGuid(), 3, "ref2_1", 23, refSchemaId2);
-        var ref2_2 = CreateRefContent(DomainId.NewGuid(), 4, "ref2_2", 29, refSchemaId2);
+        var ref1_1 = CreateRefContent(DomainId.NewGuid(), 1, "ref1_1", 13, referenceSchemaId1);
+        var ref1_2 = CreateRefContent(DomainId.NewGuid(), 2, "ref1_2", 17, referenceSchemaId1);
+        var ref2_1 = CreateRefContent(DomainId.NewGuid(), 3, "ref2_1", 23, referenceSchemaId2);
+        var ref2_2 = CreateRefContent(DomainId.NewGuid(), 4, "ref2_2", 29, referenceSchemaId2);
 
         var contents = new[]
         {
@@ -100,10 +100,10 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, default);
 
-        A.CallTo(() => requestCache.AddDependency(DomainId.Combine(AppId, refSchemaId1.Id), 0))
+        A.CallTo(() => requestCache.AddDependency(DomainId.Combine(AppId, referenceSchemaId1.Id), 0))
             .MustHaveHappened();
 
-        A.CallTo(() => requestCache.AddDependency(DomainId.Combine(AppId, refSchemaId2.Id), 0))
+        A.CallTo(() => requestCache.AddDependency(DomainId.Combine(AppId, referenceSchemaId2.Id), 0))
             .MustHaveHappened();
 
         A.CallTo(() => requestCache.AddDependency(ref1_1.UniqueId, ref1_1.Version))
@@ -122,10 +122,10 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     [Fact]
     public async Task Should_enrich_with_reference_data()
     {
-        var ref1_1 = CreateRefContent(DomainId.NewGuid(), 1, "ref1_1", 13, refSchemaId1);
-        var ref1_2 = CreateRefContent(DomainId.NewGuid(), 2, "ref1_2", 17, refSchemaId1);
-        var ref2_1 = CreateRefContent(DomainId.NewGuid(), 3, "ref2_1", 23, refSchemaId2);
-        var ref2_2 = CreateRefContent(DomainId.NewGuid(), 3, "ref2_2", 29, refSchemaId2);
+        var ref1_1 = CreateRefContent(DomainId.NewGuid(), 1, "ref1_1", 13, referenceSchemaId1);
+        var ref1_2 = CreateRefContent(DomainId.NewGuid(), 2, "ref1_2", 17, referenceSchemaId1);
+        var ref2_1 = CreateRefContent(DomainId.NewGuid(), 3, "ref2_1", 23, referenceSchemaId2);
+        var ref2_2 = CreateRefContent(DomainId.NewGuid(), 3, "ref2_2", 29, referenceSchemaId2);
 
         var contents = new[]
         {
@@ -175,10 +175,10 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     [Fact]
     public async Task Should_not_enrich_if_content_has_more_items()
     {
-        var ref1_1 = CreateRefContent(DomainId.NewGuid(), 1, "ref1_1", 13, refSchemaId1);
-        var ref1_2 = CreateRefContent(DomainId.NewGuid(), 2, "ref1_2", 17, refSchemaId1);
-        var ref2_1 = CreateRefContent(DomainId.NewGuid(), 3, "ref2_1", 23, refSchemaId2);
-        var ref2_2 = CreateRefContent(DomainId.NewGuid(), 4, "ref2_2", 29, refSchemaId2);
+        var ref1_1 = CreateRefContent(DomainId.NewGuid(), 1, "ref1_1", 13, referenceSchemaId1);
+        var ref1_2 = CreateRefContent(DomainId.NewGuid(), 2, "ref1_2", 17, referenceSchemaId1);
+        var ref2_1 = CreateRefContent(DomainId.NewGuid(), 3, "ref2_1", 23, referenceSchemaId2);
+        var ref2_2 = CreateRefContent(DomainId.NewGuid(), 4, "ref2_2", 29, referenceSchemaId2);
 
         var contents = new[]
         {

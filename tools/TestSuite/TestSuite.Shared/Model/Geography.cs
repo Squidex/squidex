@@ -41,4 +41,13 @@ public sealed class City
 public sealed class CityData
 {
     public string Name { get; set; }
+
+    public LocationData TopLocation { get; set; }
+
+    public List<LocationData> Locations { get; set; }
+}
+
+public sealed class LocationData
+{
+    public string Name { get; set; }
 }

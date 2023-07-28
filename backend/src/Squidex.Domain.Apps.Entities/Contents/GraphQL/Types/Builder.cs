@@ -48,6 +48,8 @@ internal sealed class Builder
 
     public IInterfaceGraphType ComponentInterface { get; } = new ComponentInterfaceGraphType();
 
+    public FieldMap FieldMap { get; private set; }
+
     public Builder(IAppEntity app, GraphQLOptions options)
     {
         partitionResolver = app.PartitionResolver();
@@ -64,7 +66,7 @@ internal sealed class Builder
         allSchemas.AddRange(SchemaInfo.Build(schemas, typeNames).Where(x => x.Fields.Count > 0));
 
         // Only published normal schemas (not components are used for entities).
-        var normalSchemas = allSchemas.Where(x => x.Schema.SchemaDef.IsPublished && x.Schema.SchemaDef.Type != SchemaType.Component).ToList();
+        var normalSchemas = allSchemas.Where(IsNormalSchema).ToList();
 
         foreach (var schemaInfo in normalSchemas)
         {
@@ -74,7 +76,7 @@ internal sealed class Builder
             contentResultTypes[schemaInfo] = new ContentResultGraphType(contentType, schemaInfo);
         }
 
-        foreach (var schemaInfo in normalSchemas)
+        foreach (var schemaInfo in allSchemas)
         {
             var componentType = new ComponentGraphType(schemaInfo);
 
@@ -91,6 +93,8 @@ internal sealed class Builder
 
         newSchema.Directives.Register(SharedTypes.CacheDirective);
         newSchema.Directives.Register(SharedTypes.OptimizeFieldQueriesDirective);
+
+        FieldMap = new FieldMap(allSchemas);
 
         if (normalSchemas.Any())
         {
@@ -130,6 +134,11 @@ internal sealed class Builder
         newSchema.Initialize();
 
         return newSchema;
+    }
+
+    private static bool IsNormalSchema(SchemaInfo schema)
+    {
+        return schema.Schema.SchemaDef.IsPublished && schema.Schema.SchemaDef.Type != SchemaType.Component;
     }
 
     public FieldGraphSchema GetGraphType(FieldInfo fieldInfo)

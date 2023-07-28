@@ -39,18 +39,29 @@ public static class Mocks
         return app;
     }
 
-    public static ISchemaEntity Schema(NamedId<DomainId> appId, NamedId<DomainId> schemaId, Schema? schemaDef = null)
+    public static ISchemaEntity Schema(NamedId<DomainId> appId, NamedId<DomainId> schemaId)
     {
-        var schema = A.Fake<ISchemaEntity>();
+        var schemaEntity = A.Fake<ISchemaEntity>();
+        var schemaDef = new Schema(schemaId.Name).Publish();
 
-        schemaDef ??= new Schema(schemaId.Name).Publish();
+        A.CallTo(() => schemaEntity.Id).Returns(schemaId.Id);
+        A.CallTo(() => schemaEntity.AppId).Returns(appId);
+        A.CallTo(() => schemaEntity.SchemaDef).Returns(schemaDef);
+        A.CallTo(() => schemaEntity.UniqueId).Returns(DomainId.Combine(appId, schemaId.Id));
 
-        A.CallTo(() => schema.Id).Returns(schemaId.Id);
-        A.CallTo(() => schema.AppId).Returns(appId);
-        A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
-        A.CallTo(() => schema.UniqueId).Returns(DomainId.Combine(appId, schemaId.Id));
+        return schemaEntity;
+    }
 
-        return schema;
+    public static ISchemaEntity Schema(NamedId<DomainId> appId, DomainId schemaId, Schema schemaDef)
+    {
+        var schemaEntity = A.Fake<ISchemaEntity>();
+
+        A.CallTo(() => schemaEntity.Id).Returns(schemaId);
+        A.CallTo(() => schemaEntity.AppId).Returns(appId);
+        A.CallTo(() => schemaEntity.SchemaDef).Returns(schemaDef);
+        A.CallTo(() => schemaEntity.UniqueId).Returns(DomainId.Combine(appId, schemaId));
+
+        return schemaEntity;
     }
 
     public static ITeamEntity Team(DomainId teamId, string teamName)

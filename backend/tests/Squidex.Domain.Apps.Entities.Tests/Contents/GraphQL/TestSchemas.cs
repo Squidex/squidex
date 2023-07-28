@@ -16,26 +16,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
 public static class TestSchemas
 {
-    public static readonly NamedId<DomainId> DefaultId = NamedId.Of(DomainId.NewGuid(), "my-schema");
-    public static readonly NamedId<DomainId> Ref1Id = NamedId.Of(DomainId.NewGuid(), "my-ref-schema1");
-    public static readonly NamedId<DomainId> Ref2Id = NamedId.Of(DomainId.NewGuid(), "my-ref-schema2");
-
     public static readonly ISchemaEntity Default;
-    public static readonly ISchemaEntity Ref1;
-    public static readonly ISchemaEntity Ref2;
+    public static readonly ISchemaEntity Reference1;
+    public static readonly ISchemaEntity Reference2;
+    public static readonly ISchemaEntity Component;
 
     static TestSchemas()
     {
-        Ref1 = Mocks.Schema(TestApp.DefaultId, Ref1Id,
-            new Schema(Ref1Id.Name)
-                .Publish()
-                .AddString(1, "schemaRef1Field", Partitioning.Invariant));
-
-        Ref2 = Mocks.Schema(TestApp.DefaultId, Ref2Id,
-            new Schema(Ref2Id.Name)
-                .Publish()
-                .AddString(1, "schemaRef2Field", Partitioning.Invariant));
-
         var enums = ReadonlyList.Create("EnumA", "EnumB", "EnumC");
 
         var jsonSchema = @"
@@ -56,8 +43,22 @@ public static class TestSchemas
                     nestedArray: [String]
                 }";
 
-        Default = Mocks.Schema(TestApp.DefaultId, DefaultId,
-            new Schema(DefaultId.Name)
+        Component = Mocks.Schema(TestApp.DefaultId, DomainId.NewGuid(),
+            new Schema("my-component", type: SchemaType.Component)
+                .AddString(1, "component-field", Partitioning.Invariant));
+
+        Reference1 = Mocks.Schema(TestApp.DefaultId, DomainId.NewGuid(),
+            new Schema("my-reference1")
+                .Publish()
+                .AddString(1, "reference1-field", Partitioning.Invariant));
+
+        Reference2 = Mocks.Schema(TestApp.DefaultId, DomainId.NewGuid(),
+            new Schema("my-reference2")
+                .Publish()
+                .AddString(1, "reference2-field", Partitioning.Invariant));
+
+        Default = Mocks.Schema(TestApp.DefaultId, DomainId.NewGuid(),
+            new Schema("my-schema")
                 .Publish()
                 .AddJson(1, "my-json", Partitioning.Invariant,
                     new JsonFieldProperties())
@@ -78,15 +79,15 @@ public static class TestSchemas
                 .AddDateTime(9, "my-datetime", Partitioning.Invariant,
                     new DateTimeFieldProperties())
                 .AddReferences(10, "my-references", Partitioning.Invariant,
-                    new ReferencesFieldProperties { SchemaId = Ref1Id.Id })
+                    new ReferencesFieldProperties { SchemaId = Reference1.Id })
                 .AddReferences(11, "my-union", Partitioning.Invariant,
                     new ReferencesFieldProperties())
                 .AddGeolocation(12, "my-geolocation", Partitioning.Invariant,
                     new GeolocationFieldProperties())
                 .AddComponent(13, "my-component", Partitioning.Invariant,
-                    new ComponentFieldProperties { SchemaId = Ref1Id.Id })
+                    new ComponentFieldProperties { SchemaId = Component.Id })
                 .AddComponents(14, "my-components", Partitioning.Invariant,
-                    new ComponentsFieldProperties { SchemaIds = ReadonlyList.Create(Ref1.Id, Ref2.Id) })
+                    new ComponentsFieldProperties { SchemaIds = ReadonlyList.Create(Reference1.Id, Reference2.Id, Component.Id) })
                 .AddTags(15, "my-tags", Partitioning.Invariant,
                     new TagsFieldProperties())
                 .AddTags(16, "my-tags-enum", Partitioning.Invariant,
@@ -97,7 +98,7 @@ public static class TestSchemas
                     .AddNumber(122, "nested-number",
                         new NumberFieldProperties()))
                 .AddString(17, "my-embeds", Partitioning.Invariant,
-                    new StringFieldProperties { IsEmbeddable = true, SchemaIds = ReadonlyList.Create(Ref1.Id, Ref2.Id) })
+                    new StringFieldProperties { IsEmbeddable = true, SchemaIds = ReadonlyList.Create(Reference1.Id, Reference2.Id) })
                 .SetScripts(new SchemaScripts { Query = "<query-script>" }));
     }
 }

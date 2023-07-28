@@ -6,16 +6,15 @@
 // ==========================================================================
 
 using GraphQL.Types;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal sealed class DataInputGraphType : InputObjectGraphType
 {
+    private readonly FieldMap fieldMap;
+
     public DataInputGraphType(Builder builder, SchemaInfo schemaInfo)
     {
         // The name is used for equal comparison. Therefore it is important to treat it as readonly.
@@ -62,52 +61,12 @@ internal sealed class DataInputGraphType : InputObjectGraphType
         }
 
         Description = $"The structure of the {schemaInfo.DisplayName} data input type.";
+
+        fieldMap = builder.FieldMap;
     }
 
     public override object ParseDictionary(IDictionary<string, object?> value)
     {
-        var result = new ContentData();
-
-        static ContentFieldData ToFieldData(IDictionary<string, object> source, IComplexGraphType type)
-        {
-            var result = new ContentFieldData();
-
-            foreach (var field in type.Fields)
-            {
-                if (source.TryGetValue(field.Name, out var value))
-                {
-                    if (value is IEnumerable<object> list && field.ResolvedType?.InnerType() is IComplexGraphType nestedType)
-                    {
-                        var array = new JsonArray(list.Count());
-
-                        foreach (var item in list)
-                        {
-                            if (item is JsonValue { Value: JsonObject } nested)
-                            {
-                                array.Add(nested);
-                            }
-                        }
-
-                        result[field.SourceName()] = array;
-                    }
-                    else
-                    {
-                        result[field.SourceName()] = JsonGraphType.ParseJson(value);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        foreach (var field in Fields)
-        {
-            if (field.ResolvedType is IComplexGraphType complexType && value.TryGetValue(field.Name, out var fieldValue) && fieldValue is IDictionary<string, object> nested)
-            {
-                result[field.SourceName()] = ToFieldData(nested, complexType);
-            }
-        }
-
-        return result;
+        return fieldMap.MapData(this, value);
     }
 }

@@ -119,6 +119,6 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
 
     private ISchemaEntity CreateSchema(string name, SchemaType type = SchemaType.Default)
     {
-        return Mocks.Schema(AppId, NamedId.Of(DomainId.NewGuid(), name), new Schema(name, type: type));
+        return Mocks.Schema(AppId, DomainId.NewGuid(), new Schema(name, type: type));
     }
 }

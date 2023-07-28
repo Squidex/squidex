@@ -192,6 +192,6 @@ public class DefaultContentWorkflowTests
             ValidateOnPublish = validateOnPublish
         });
 
-        return Mocks.Schema(NamedId.Of(DomainId.NewGuid(), "my-app"), NamedId.Of(DomainId.NewGuid(), schema.Name), schema);
+        return Mocks.Schema(NamedId.Of(DomainId.NewGuid(), "my-app"), DomainId.NewGuid(), schema);
     }
 }
