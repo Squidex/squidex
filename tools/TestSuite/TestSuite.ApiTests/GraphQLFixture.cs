@@ -63,6 +63,23 @@ public sealed class GraphQLFixture : ContentFixture
             }
         }
 
+        var createLocationRequest = new CreateSchemaDto
+        {
+            Name = "location",
+            Fields = new List<UpsertSchemaFieldDto>
+            {
+                new UpsertSchemaFieldDto
+                {
+                    Name = "name",
+                    Properties = new StringFieldPropertiesDto()
+                }
+            },
+            Type = SchemaType.Component
+        };
+
+        var locationsId = await CreateSchemaAsync(createLocationRequest);
+
+
         // STEP 1: Create cities schema.
         var createCitiesRequest = new CreateSchemaDto
         {
@@ -73,6 +90,28 @@ public sealed class GraphQLFixture : ContentFixture
                 {
                     Name = "name",
                     Properties = new StringFieldPropertiesDto()
+                },
+                new UpsertSchemaFieldDto
+                {
+                    Name = "topLocation",
+                    Properties = new ComponentFieldPropertiesDto
+                    {
+                        SchemaIds = new List<string>
+                        {
+                            locationsId
+                        }
+                    }
+                },
+                new UpsertSchemaFieldDto
+                {
+                    Name = "locations",
+                    Properties = new ComponentsFieldPropertiesDto
+                    {
+                        SchemaIds = new List<string>
+                        {
+                            locationsId
+                        }
+                    }
                 }
             },
             IsPublished = true
@@ -149,6 +188,27 @@ public sealed class GraphQLFixture : ContentFixture
                 name = new
                 {
                     iv = name
+                },
+                topLocation = new
+                {
+                    iv = new
+                    {
+                        name = $"{name} Top Location"
+                    }
+                },
+                locations = new
+                {
+                    iv = new[]
+                    {
+                        new
+                        {
+                            name = $"{name} Location 1",
+                        },
+                        new
+                        {
+                            name = $"{name} Location 2",
+                        }
+                    }
                 }
             };
 

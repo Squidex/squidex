@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 
@@ -502,7 +503,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_return_null_if_single_content_from_another_schema()
     {
         var contentId = DomainId.NewGuid();
-        var content = TestContent.CreateRef(TestSchemas.Ref1Id, contentId, "ref1-field", "ref1");
+        var content = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentId, "reference1-field", "reference1");
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),
@@ -612,7 +613,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_embedded_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -641,9 +642,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
                             ... on Content {
                               id
                             }
-                            ... on MyRefSchema1 {
+                            ... on MyReference1 {
                               data {
-                                schemaRef1Field {
+                                reference1Field {
                                   iv
                                 }
                               }
@@ -681,9 +682,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                         id = contentRefId,
                                         data = new
                                         {
-                                            schemaRef1Field = new
+                                            reference1Field = new
                                             {
-                                                iv = "ref1"
+                                                iv = "reference1"
                                             }
                                         }
                                     }
@@ -702,7 +703,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_referenced_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -728,7 +729,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         iv {
                           id
                           data {
-                            schemaRef1Field {
+                            reference1Field {
                               iv
                             }
                           }
@@ -761,9 +762,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                     id = contentRefId,
                                     data = new
                                     {
-                                        schemaRef1Field = new
+                                        reference1Field = new
                                         {
-                                            iv = "ref1"
+                                            iv = "reference1"
                                         }
                                     }
                                 }
@@ -781,7 +782,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_referenced_contents_from_flat_data_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -843,7 +844,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_cache_referenced_contents_from_flat_data_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -914,7 +915,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_referencing_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "ref1-field", "ref1");
+        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -933,7 +934,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         {
             Query = @"
                 query {
-                  findMyRefSchema1Content(id: '{contentId}') {
+                  findMyReference1Content(id: '{contentId}') {
                     id
                     referencingMySchemaContents(top: 30, skip: 5) {
                       id
@@ -955,7 +956,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         {
             data = new
             {
-                findMyRefSchema1Content = new
+                findMyReference1Content = new
                 {
                     id = contentRefId,
                     referencingMySchemaContents = new[]
@@ -983,7 +984,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_referencing_contents_with_total_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "ref1-field", "ref1");
+        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -1002,7 +1003,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         {
             Query = @"
                 query {
-                  findMyRefSchema1Content(id: '{contentId}') {
+                  findMyReference1Content(id: '{contentId}') {
                     id
                     referencingMySchemaContentsWithTotal(top: 30, skip: 5) {
                       total
@@ -1027,7 +1028,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         {
             data = new
             {
-                findMyRefSchema1Content = new
+                findMyReference1Content = new
                 {
                     id = contentRefId,
                     referencingMySchemaContentsWithTotal = new
@@ -1059,7 +1060,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_references_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "ref1-field", "ref1");
+        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -1080,7 +1081,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 query {
                   findMySchemaContent(id: '{contentId}') {
                     id
-                    referencesMyRefSchema1Contents(top: 30, skip: 5) {
+                    referencesMyReference1Contents(top: 30, skip: 5) {
                       id
                     }
                   }
@@ -1098,7 +1099,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 findMySchemaContent = new
                 {
                     id = contentId,
-                    referencesMyRefSchema1Contents = new[]
+                    referencesMyReference1Contents = new[]
                     {
                         new
                         {
@@ -1116,7 +1117,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_references_contents_with_total_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "ref1-field", "ref1");
+        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -1137,7 +1138,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 query {
                   findMySchemaContent(id: '{contentId}') {
                     id
-                    referencesMyRefSchema1ContentsWithTotal(top: 30, skip: 5) {
+                    referencesMyReference1ContentsWithTotal(top: 30, skip: 5) {
                       total
                       items {
                         id
@@ -1158,7 +1159,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 findMySchemaContent = new
                 {
                     id = contentId,
-                    referencesMyRefSchema1ContentsWithTotal = new
+                    referencesMyReference1ContentsWithTotal = new
                     {
                         total = 10,
                         items = new[]
@@ -1180,7 +1181,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_union_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -1207,9 +1208,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
                           ... on Content {
                             id
                           }
-                          ... on MyRefSchema1 {
+                          ... on MyReference1 {
                             data {
-                              schemaRef1Field {
+                              reference1Field {
                                 iv
                               }
                             }
@@ -1244,12 +1245,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                     id = contentRefId,
                                     data = new
                                     {
-                                        schemaRef1Field = new
+                                        reference1Field = new
                                         {
-                                            iv = "ref1"
+                                            iv = "reference1"
                                         }
                                     },
-                                    __typename = "MyRefSchema1"
+                                    __typename = "MyReference1"
                                 }
                             }
                         }

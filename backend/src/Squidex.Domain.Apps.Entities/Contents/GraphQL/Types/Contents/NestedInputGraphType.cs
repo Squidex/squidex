@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using GraphQL.Types;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal sealed class NestedInputGraphType : InputObjectGraphType
 {
+    private readonly FieldMap fieldMap;
+
     public NestedInputGraphType(Builder builder, FieldInfo fieldInfo)
     {
         // The name is used for equal comparison. Therefore it is important to treat it as readonly.
@@ -38,20 +38,12 @@ internal sealed class NestedInputGraphType : InputObjectGraphType
         }
 
         Description = $"The structure of the {fieldInfo.DisplayName} nested schema.";
+
+        fieldMap = builder.FieldMap;
     }
 
     public override object ParseDictionary(IDictionary<string, object?> value)
     {
-        var result = JsonValue.Object();
-
-        foreach (var field in Fields)
-        {
-            if (value.TryGetValue(field.Name, out var fieldValue))
-            {
-                result[field.SourceName()] = JsonGraphType.ParseJson(fieldValue);
-            }
-        }
-
-        return new JsonValue(result);
+        return fieldMap.MapNested(this, value);
     }
 }

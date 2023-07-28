@@ -417,7 +417,7 @@ public class DynamicContentWorkflowTests : GivenContext
             ValidateOnPublish = validateOnPublish
         });
 
-        return Mocks.Schema(AppId, simpleSchemaId, schema);
+        return Mocks.Schema(AppId, simpleSchemaId.Id, schema);
     }
 
     private ContentEntity CreateContent(Status status, int value, bool simple = false)

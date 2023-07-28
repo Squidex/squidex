@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Net.Http.Json;
+using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Utils;
@@ -59,6 +60,80 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
 
         Assert.Equal(1, result["findMyWritesContent"]["flatData"]["json"]["value"].Value<int>());
         Assert.Equal(2, result["findMyWritesContent"]["flatData"]["json"]["obj"]["value"].Value<int>());
+    }
+
+    [Fact]
+    public async Task Should_query_graphql_with_components()
+    {
+        var query = new
+        {
+            query = @"
+                {
+                    cities: queryCitiesContents {
+                        data: flatData {
+                            name,
+                            topLocation {
+                                name
+                            },
+                            locations {
+                                name
+                            }
+                        }
+                    }
+                }"
+        };
+
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
+
+        var cities = result["cities"].ToObject<List<City>>();
+
+        cities.Should().BeEquivalentTo(new List<City>
+        {
+            new City
+            {
+                Data = new CityData
+                {
+                    Name = "Leipzig",
+                    TopLocation = new LocationData
+                    {
+                        Name = "Leipzig Top Location"
+                    },
+                    Locations = new List<LocationData>
+                    {
+                        new LocationData
+                        {
+                            Name = "Leipzig Location 1"
+                        },
+                        new LocationData
+                        {
+                            Name = "Leipzig Location 2"
+                        }
+                    }
+                }
+            },
+            new City
+            {
+                Data = new CityData
+                {
+                    Name = "Munich",
+                    TopLocation = new LocationData
+                    {
+                        Name = "Munich Top Location"
+                    },
+                    Locations = new List<LocationData>
+                    {
+                        new LocationData
+                        {
+                            Name = "Munich Location 1"
+                        },
+                        new LocationData
+                        {
+                            Name = "Munich Location 2"
+                        }
+                    }
+                }
+            }
+        });
     }
 
     [Fact]

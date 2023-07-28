@@ -35,19 +35,19 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     public GuardContentTests()
     {
         normalUnpublishedSchema =
-            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name));
+            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name));
 
         normalSchema =
-            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name).Publish());
+            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name).Publish());
 
         singletonUnpublishedSchema =
-            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name, type: SchemaType.Singleton));
+            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name, type: SchemaType.Singleton));
 
         singletonSchema =
-            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name, type: SchemaType.Singleton).Publish());
+            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name, type: SchemaType.Singleton).Publish());
 
         componentSchema =
-            Mocks.Schema(AppId, SchemaId, new Schema(SchemaId.Name, type: SchemaType.Component).Publish());
+            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name, type: SchemaType.Component).Publish());
     }
 
     [Fact]

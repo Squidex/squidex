@@ -35,7 +35,7 @@ public class AppProviderExtensionsTests : GivenContext
     public async Task Should_resolve_self_as_component()
     {
         var schema =
-            Mocks.Schema(AppId, schemaId,
+            Mocks.Schema(AppId, schemaId.Id,
                 new Schema(schemaId.Name)
                     .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
                     {
@@ -60,7 +60,7 @@ public class AppProviderExtensionsTests : GivenContext
             .Returns(component);
 
         var schema =
-            Mocks.Schema(AppId, schemaId,
+            Mocks.Schema(AppId, schemaId.Id,
                 new Schema(schemaId.Name)
                     .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
                     {
@@ -82,7 +82,7 @@ public class AppProviderExtensionsTests : GivenContext
             .Returns(component);
 
         var schema =
-            Mocks.Schema(AppId, schemaId,
+            Mocks.Schema(AppId, schemaId.Id,
                 new Schema(schemaId.Name)
                     .AddComponents(1, "1", Partitioning.Invariant, new ComponentsFieldProperties
                     {
@@ -104,7 +104,7 @@ public class AppProviderExtensionsTests : GivenContext
             .Returns(component);
 
         var schema =
-            Mocks.Schema(AppId, schemaId,
+            Mocks.Schema(AppId, schemaId.Id,
                 new Schema(schemaId.Name)
                     .AddArray(1, "1", Partitioning.Invariant, a => a
                         .AddComponent(2, "2", new ComponentFieldProperties
@@ -122,7 +122,7 @@ public class AppProviderExtensionsTests : GivenContext
     public async Task Should_resolve_self_referencing_component()
     {
         var component =
-            Mocks.Schema(AppId, componentId1,
+            Mocks.Schema(AppId, componentId1.Id,
                 new Schema(componentId1.Name)
                     .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
                     {
@@ -133,7 +133,7 @@ public class AppProviderExtensionsTests : GivenContext
             .Returns(component);
 
         var schema =
-            Mocks.Schema(AppId, schemaId,
+            Mocks.Schema(AppId, schemaId.Id,
                 new Schema(schemaId.Name)
                     .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
                     {
@@ -150,7 +150,7 @@ public class AppProviderExtensionsTests : GivenContext
     public async Task Should_resolve_component_of_component()
     {
         var component1 =
-            Mocks.Schema(AppId, componentId1,
+            Mocks.Schema(AppId, componentId1.Id,
                 new Schema(componentId1.Name)
                     .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
                     {
@@ -158,7 +158,7 @@ public class AppProviderExtensionsTests : GivenContext
                     }));
 
         var component2 =
-            Mocks.Schema(AppId, componentId2,
+            Mocks.Schema(AppId, componentId2.Id,
                 new Schema(componentId2.Name)
                     .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
                     {
@@ -172,7 +172,7 @@ public class AppProviderExtensionsTests : GivenContext
             .Returns(component2);
 
         var schema =
-            Mocks.Schema(AppId, schemaId,
+            Mocks.Schema(AppId, schemaId.Id,
                 new Schema(schemaId.Name)
                     .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
                     {

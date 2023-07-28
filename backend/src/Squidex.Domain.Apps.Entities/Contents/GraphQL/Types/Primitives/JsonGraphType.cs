@@ -23,8 +23,10 @@ public sealed class JsonGraphType : JsonNoopGraphType
         return ParseJson(value);
     }
 
-    public static JsonValue ParseJson(object? input)
+    public static JsonValue ParseJson(object? input, Func<object, IReadOnlyDictionary<string, string>?>? keyMap = null)
     {
+        keyMap ??= x => null;
+
         switch (input)
         {
             case GraphQLBooleanValue booleanValue:
@@ -44,7 +46,7 @@ public sealed class JsonGraphType : JsonNoopGraphType
 
             case GraphQLListValue listValue:
                 {
-                    var json = new JsonArray();
+                    var json = new JsonArray(listValue.Values?.Count ?? 0);
 
                     if (listValue.Values != null)
                     {
@@ -59,13 +61,22 @@ public sealed class JsonGraphType : JsonNoopGraphType
 
             case GraphQLObjectValue objectValue:
                 {
-                    var json = JsonValue.Object();
+                    var json = new JsonObject(objectValue.Fields?.Count ?? 0);
 
                     if (objectValue.Fields != null)
                     {
+                        var map = keyMap(objectValue);
+
                         foreach (var field in objectValue.Fields)
                         {
-                            json[field.Name.ToString()] = ParseJson(field.Value);
+                            var sourceField = field.Name.ToString();
+
+                            if (map?.TryGetValue(sourceField, out var temp) == true)
+                            {
+                                sourceField = temp;
+                            }
+
+                            json[sourceField] = ParseJson(field.Value);
                         }
                     }
 
@@ -74,7 +85,7 @@ public sealed class JsonGraphType : JsonNoopGraphType
 
             case IEnumerable<object> list:
                 {
-                    var json = new JsonArray();
+                    var json = new JsonArray(list.Count());
 
                     foreach (var item in list)
                     {
@@ -86,11 +97,23 @@ public sealed class JsonGraphType : JsonNoopGraphType
 
             case IDictionary<string, object> obj:
                 {
-                    var json = JsonValue.Object();
+                    var json = new JsonObject(obj.Count);
 
-                    foreach (var (key, value) in obj)
+                    if (obj.Count > 0)
                     {
-                        json[key] = ParseJson(value);
+                        var map = keyMap(obj);
+
+                        foreach (var (key, value) in obj)
+                        {
+                            var sourceField = key;
+
+                            if (map?.TryGetValue(sourceField, out var temp) == true)
+                            {
+                                sourceField = temp;
+                            }
+
+                            json[sourceField] = ParseJson(value);
+                        }
                     }
 
                     return json;

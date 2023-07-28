@@ -221,12 +221,10 @@ public abstract class ContentsQueryFixture : IAsyncLifetime
             new Schema("my-schema")
                 .AddField(Fields.Number(1, "value", Partitioning.Invariant));
 
-        var schema =
+        return
             Mocks.Schema(
                 NamedId.Of(appId, "my-app"),
-                NamedId.Of(schemaId, "my-schema"),
+                schemaId,
                 schemaDef);
-
-        return schema;
     }
 }

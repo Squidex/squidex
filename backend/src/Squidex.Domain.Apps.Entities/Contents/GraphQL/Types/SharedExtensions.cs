@@ -10,9 +10,7 @@ using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser;
 using GraphQLParser.AST;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Directives;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.ObjectPool;
@@ -93,7 +91,7 @@ public static class SharedExtensions
             return typed.SourceName;
         }
 
-        throw new InvalidOperationException("Invalid field type");
+        return field.Name;
     }
 
     internal static DomainId SchemaId(this FieldType field)
@@ -124,6 +122,25 @@ public static class SharedExtensions
         }
 
         return type;
+    }
+
+    public static bool TryGetValue(this GraphQLObjectValue source, string fieldName, out object value)
+    {
+        value = null!;
+
+        if (source.Fields != null)
+        {
+            foreach (var field in source.Fields)
+            {
+                if (field.Name == fieldName)
+                {
+                    value = field.Value;
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static TimeSpan CacheDuration(this IResolveFieldContext context)

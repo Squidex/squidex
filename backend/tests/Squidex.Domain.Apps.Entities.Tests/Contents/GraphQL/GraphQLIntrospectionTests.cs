@@ -130,7 +130,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "content"),
+                DomainId.NewGuid(),
                 new Schema("content").Publish());
 
         var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
@@ -143,7 +143,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "content"),
+                DomainId.NewGuid(),
                 new Schema("content").Publish()
                     .AddUI(1, "ui", Partitioning.Invariant));
 
@@ -157,7 +157,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "content"),
+                DomainId.NewGuid(),
                 new Schema("content").Publish()
                     .AddComponent(1, "component", Partitioning.Invariant));
 
@@ -171,7 +171,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "content"),
+                DomainId.NewGuid(),
                 new Schema("content")
                     .AddString(1, "myField", Partitioning.Invariant));
 
@@ -185,7 +185,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "content"),
+                DomainId.NewGuid(),
                 new Schema("content").Publish()
                     .AddString(1, "myField", Partitioning.Invariant));
 
@@ -199,7 +199,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                DomainId.NewGuid(),
                 new Schema("my-schema").Publish()
                     .AddString(1, "content", Partitioning.Invariant));
 
@@ -215,7 +215,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                DomainId.NewGuid(),
                 new Schema("my-schema").Publish()
                     .AddString(1, "2-field", Partitioning.Invariant));
 
@@ -231,7 +231,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                DomainId.NewGuid(),
                 new Schema("my-schema").Publish()
                     .AddString(1, "my-field", Partitioning.Invariant)
                     .AddString(2, "my_field", Partitioning.Invariant));
@@ -249,7 +249,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                DomainId.NewGuid(),
                 new Schema("my-schema").Publish()
                     .AddComponent(1, "my-component", Partitioning.Invariant,
                         new ComponentFieldProperties())
@@ -267,7 +267,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                DomainId.NewGuid(),
                 new Schema("my-schema").Publish()
                     .AddComponents(1, "my-components", Partitioning.Invariant,
                         new ComponentsFieldProperties())
@@ -285,7 +285,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     {
         var schema =
             Mocks.Schema(TestApp.DefaultId,
-                NamedId.Of(DomainId.NewGuid(), "my-schema"),
+                DomainId.NewGuid(),
                 new Schema("my-schema").Publish()
                     .AddReferences(1, "my-references", Partitioning.Invariant,
                         new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })

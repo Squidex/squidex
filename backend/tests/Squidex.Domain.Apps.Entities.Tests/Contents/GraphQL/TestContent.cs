@@ -7,6 +7,7 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -88,7 +89,7 @@ public static class TestContent
                 iv {
                   schemaId
                   schemaName
-                  schemaRef1Field
+                  componentField
                 }
               }
               myComponents__Dynamic {
@@ -97,15 +98,20 @@ public static class TestContent
               myComponents {
                 iv {
                   __typename
-                  ... on MyRefSchema1Component {
+                  ... on MyReference1Component {
                     schemaId
                     schemaName
-                    schemaRef1Field
+                    reference1Field
                   }
-                  ... on MyRefSchema2Component {
+                  ... on MyReference2Component {
                     schemaId
                     schemaName
-                    schemaRef2Field
+                    reference2Field
+                  }
+                  ... on MyComponentComponent {
+                    schemaId
+                    schemaName
+                    componentField
                   }
                 }
               }
@@ -176,20 +182,25 @@ public static class TestContent
               myComponent {
                 schemaId
                 schemaName
-                schemaRef1Field
+                componentField
               }
               myComponents__Dynamic
               myComponents {
                 __typename
-                ... on MyRefSchema1Component {
+                ... on MyReference1Component {
                   schemaId
                   schemaName
-                  schemaRef1Field
+                  reference1Field
                 }
-                ... on MyRefSchema2Component {
+                ... on MyReference2Component {
                   schemaId
                   schemaName
-                  schemaRef2Field
+                  reference2Field
+                }
+                ... on MyComponentComponent {
+                  schemaId
+                  schemaName
+                  componentField
                 }
               }
               myTags
@@ -249,21 +260,25 @@ public static class TestContent
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Object()
-                                .Add(Component.Discriminator, TestSchemas.Ref1.Id)
-                                .Add(Component.Descriptor, TestSchemas.Ref1.SchemaDef.Name)
-                                .Add("schemaRef1Field", "Component1")))
+                                .Add(Component.Discriminator, TestSchemas.Component.Id)
+                                .Add(Component.Descriptor, TestSchemas.Component.SchemaDef.Name)
+                                .Add("component-field", "Component1")))
                 .AddField("my-components",
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array(
                                 JsonValue.Object()
-                                    .Add(Component.Discriminator, TestSchemas.Ref1.Id)
-                                    .Add(Component.Descriptor, TestSchemas.Ref1.SchemaDef.Name)
-                                    .Add("schemaRef1Field", "Component1"),
+                                    .Add(Component.Discriminator, TestSchemas.Reference1.Id)
+                                    .Add(Component.Descriptor, TestSchemas.Reference1.SchemaDef.Name)
+                                    .Add("reference1-field", "Component1"),
                                 JsonValue.Object()
-                                    .Add(Component.Discriminator, TestSchemas.Ref2.Id)
-                                    .Add(Component.Descriptor, TestSchemas.Ref2.SchemaDef.Name)
-                                    .Add("schemaRef2Field", "Component2"))))
+                                    .Add(Component.Discriminator, TestSchemas.Reference2.Id)
+                                    .Add(Component.Descriptor, TestSchemas.Reference2.SchemaDef.Name)
+                                    .Add("reference2-field", "Component2"),
+                                JsonValue.Object()
+                                    .Add(Component.Discriminator, TestSchemas.Component.Id)
+                                    .Add(Component.Descriptor, TestSchemas.Component.SchemaDef.Name)
+                                    .Add("component-field", "Component3"))))
                 .AddField("my-json",
                     new ContentFieldData()
                         .AddInvariant(
@@ -321,7 +336,7 @@ public static class TestContent
             LastModified = now,
             LastModifiedBy = RefToken.Client("client1"),
             Data = data,
-            SchemaId = TestSchemas.DefaultId,
+            SchemaId = TestSchemas.Default.NamedId(),
             Status = Status.Draft,
             StatusColor = "red",
             NewStatus = Status.Published,
@@ -492,9 +507,9 @@ public static class TestContent
             {
                 iv = new Dictionary<string, object>
                 {
-                    ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                    ["schemaRef1Field"] = "Component1"
+                    ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["componentField"] = "Component1"
                 }
             },
             ["myComponents"] = new
@@ -503,15 +518,21 @@ public static class TestContent
                 {
                     new Dictionary<string, object>
                     {
-                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                        ["schemaRef1Field"] = "Component1"
+                        ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
+                        ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                        ["reference1Field"] = "Component1"
                     },
                     new Dictionary<string, object>
                     {
-                        ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Ref2.SchemaDef.Name,
-                        ["schemaRef2Field"] = "Component2"
+                        ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
+                        ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                        ["reference2Field"] = "Component2"
+                    },
+                    new Dictionary<string, object>
+                    {
+                        ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                        ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                        ["componentField"] = "Component3"
                     }
                 }
             },
@@ -659,18 +680,18 @@ public static class TestContent
             {
                 iv = new Dictionary<string, object>
                 {
-                    ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                    ["schemaRef1Field"] = "Component1"
+                    ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["component-field"] = "Component1"
                 }
             },
             ["myComponent"] = new
             {
                 iv = new Dictionary<string, object>
                 {
-                    ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                    ["schemaRef1Field"] = "Component1"
+                    ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["componentField"] = "Component1"
                 }
             },
             ["myComponents__Dynamic"] = new
@@ -679,15 +700,21 @@ public static class TestContent
                 {
                     new Dictionary<string, object>
                     {
-                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                        ["schemaRef1Field"] = "Component1"
+                        ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
+                        ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                        ["reference1-field"] = "Component1"
                     },
                     new Dictionary<string, object>
                     {
-                        ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Ref2.SchemaDef.Name,
-                        ["schemaRef2Field"] = "Component2"
+                        ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
+                        ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                        ["reference2-field"] = "Component2"
+                    },
+                    new Dictionary<string, object>
+                    {
+                        ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                        ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                        ["component-field"] = "Component3"
                     }
                 }
             },
@@ -697,17 +724,24 @@ public static class TestContent
                 {
                     new Dictionary<string, object>
                     {
-                        ["__typename"] = "MyRefSchema1Component",
-                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                        ["schemaRef1Field"] = "Component1"
+                        ["__typename"] = "MyReference1Component",
+                        ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
+                        ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                        ["reference1Field"] = "Component1"
                     },
                     new Dictionary<string, object>
                     {
-                        ["__typename"] = "MyRefSchema2Component",
-                        ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Ref2.SchemaDef.Name,
-                        ["schemaRef2Field"] = "Component2"
+                        ["__typename"] = "MyReference2Component",
+                        ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
+                        ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                        ["reference2Field"] = "Component2"
+                    },
+                    new Dictionary<string, object>
+                    {
+                        ["__typename"] = "MyComponentComponent",
+                        ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                        ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                        ["componentField"] = "Component3"
                     }
                 }
             },
@@ -788,46 +822,59 @@ public static class TestContent
             },
             ["myComponent__Dynamic"] = new Dictionary<string, object>
             {
-                ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                ["schemaRef1Field"] = "Component1"
+                ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                ["component-field"] = "Component1"
             },
             ["myComponent"] = new Dictionary<string, object>
             {
-                ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                ["schemaRef1Field"] = "Component1"
+                ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                ["componentField"] = "Component1"
             },
             ["myComponents__Dynamic"] = new[]
             {
                 new Dictionary<string, object>
                 {
-                    ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                    ["schemaRef1Field"] = "Component1"
+                    ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
+                    ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                    ["reference1-field"] = "Component1"
                 },
                 new Dictionary<string, object>
                 {
-                    ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Ref2.SchemaDef.Name,
-                    ["schemaRef2Field"] = "Component2"
+                    ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
+                    ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                    ["reference2-field"] = "Component2"
+                },
+                new Dictionary<string, object>
+                {
+                    ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["component-field"] = "Component3"
                 }
             },
             ["myComponents"] = new object[]
             {
                 new Dictionary<string, object>
                 {
-                    ["__typename"] = "MyRefSchema1Component",
-                    ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Ref1.SchemaDef.Name,
-                    ["schemaRef1Field"] = "Component1"
+                    ["__typename"] = "MyReference1Component",
+                    ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
+                    ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                    ["reference1Field"] = "Component1"
                 },
                 new Dictionary<string, object>
                 {
-                    ["__typename"] = "MyRefSchema2Component",
-                    ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Ref2.SchemaDef.Name,
-                    ["schemaRef2Field"] = "Component2"
+                    ["__typename"] = "MyReference2Component",
+                    ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
+                    ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                    ["reference2Field"] = "Component2"
+                },
+                new Dictionary<string, object>
+                {
+                    ["__typename"] = "MyComponentComponent",
+                    ["schemaId"] = TestSchemas.Component.Id.ToString(),
+                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["componentField"] = "Component3"
                 }
             },
             ["myTags"] = new[]
