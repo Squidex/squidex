@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
 public sealed class CachingGraphQLResolver : IConfigureExecution
 {
-    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
     private readonly IBackgroundCache cache;
     private readonly ISchemasHash schemasHash;
     private readonly IServiceProvider serviceProvider;
@@ -68,14 +67,14 @@ public sealed class CachingGraphQLResolver : IConfigureExecution
 
     private Task<CacheEntry> GetModelEntryAsync(IAppEntity app)
     {
-        if (options.CacheDuration <= 0)
+        if (options.CacheDuration <= TimeSpan.Zero)
         {
             return CreateModelAsync(app);
         }
 
         var cacheKey = CreateCacheKey(app.Id, app.Version.ToString(CultureInfo.InvariantCulture));
 
-        return cache.GetOrCreateAsync(cacheKey, CacheDuration, async entry =>
+        return cache.GetOrCreateAsync(cacheKey, options.CacheDuration, async entry =>
         {
             return await CreateModelAsync(app);
         },

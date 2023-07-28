@@ -9,7 +9,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
 public sealed class GraphQLOptions
 {
-    public int CacheDuration { get; set; } = 10 * 60;
+    public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
 
     public int DataLoaderBatchSize { get; set; } = 1000;
 
