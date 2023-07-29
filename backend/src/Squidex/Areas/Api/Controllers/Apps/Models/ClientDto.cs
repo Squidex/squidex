@@ -50,9 +50,7 @@ public sealed class ClientDto : Resource
 
     public static ClientDto FromClient(string id, AppClient client)
     {
-        var result = SimpleMapper.Map(client, new ClientDto { Id = id });
-
-        return result;
+        return SimpleMapper.Map(client, new ClientDto { Id = id });
     }
 
     public ClientDto CreateLinks(Resources resources)

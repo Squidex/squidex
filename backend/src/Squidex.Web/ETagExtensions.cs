@@ -40,18 +40,15 @@ public static class ETagExtensions
     {
         using (var hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
         {
-            hasher.AppendData(BitConverter.GetBytes(total));
+            hasher.AppendLong(total);
 
             foreach (var item in entities)
             {
-                hasher.AppendData(Encoding.Default.GetBytes(item.UniqueId.ToString()));
-                hasher.AppendData(BitConverter.GetBytes(item.Version));
+                hasher.AppendString(item.UniqueId.ToString());
+                hasher.AppendLong(item.Version);
             }
 
-            var cacheBuffer = hasher.GetHashAndReset();
-            var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty, StringComparison.Ordinal).ToUpperInvariant();
-
-            return cacheString;
+            return hasher.GetHexStringAndReset();
         }
     }
 

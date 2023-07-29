@@ -74,6 +74,26 @@ public sealed class SystemJsonSerializer : IJsonSerializer
         }
     }
 
+    public byte[] SerializeToBytes<T>(T value, bool indented = false)
+    {
+        return SerializeToBytes(value, typeof(T), indented);
+    }
+
+    public byte[] SerializeToBytes(object? value, Type type, bool indented = false)
+    {
+        try
+        {
+            var options = indented ? optionsIndented : optionsNormal;
+
+            return JsonSerializer.SerializeToUtf8Bytes(value, type, options);
+        }
+        catch (SystemJsonException ex)
+        {
+            ThrowHelper.JsonException(ex.Message, ex);
+            return default!;
+        }
+    }
+
     public void Serialize<T>(T value, Stream stream, bool indented = false)
     {
         Serialize(value, typeof(T), stream, indented);

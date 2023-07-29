@@ -232,9 +232,9 @@ internal static class ContentFields
 
     private static string? GetSchemaName(JsonObject component)
     {
-        if (component.TryGetValue("schemaName", out var name) && name.Type == JsonValueType.String)
+        if (component.TryGetValue("schemaName", out var value) && value.Value is string name)
         {
-            return name.ToString();
+            return name;
         }
 
         return null;

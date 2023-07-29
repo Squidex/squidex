@@ -7,6 +7,7 @@
 
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
@@ -36,7 +37,7 @@ public sealed class AssetEnricher : IAssetEnricher
         Guard.NotNull(assets);
         Guard.NotNull(context);
 
-        using (Telemetry.Activities.StartActivity("AssetEnricher/EnrichAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("AssetEnricher/EnrichAsync"))
         {
             var results = new List<AssetEntity>();
 
@@ -72,6 +73,8 @@ public sealed class AssetEnricher : IAssetEnricher
                     }
                 }
             }
+
+            activity?.SetTag("numItems", results.Count);
 
             return results;
         }

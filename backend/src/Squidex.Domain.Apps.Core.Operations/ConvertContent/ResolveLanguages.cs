@@ -14,14 +14,13 @@ namespace Squidex.Domain.Apps.Core.ConvertContent;
 
 public sealed class ResolveLanguages : IContentFieldConverter
 {
-    private readonly LanguagesConfig languages;
-    private readonly HashSet<string> languageCodes;
+    private readonly Dictionary<string, string[]> languagesWithFallbacks;
 
     public bool ResolveFallback { get; init; }
 
     public ResolveLanguages(LanguagesConfig languages, params Language[] filteredLanguages)
     {
-        this.languages = languages;
+        HashSet<string> languageCodes;
 
         if (filteredLanguages?.Length > 0)
         {
@@ -36,6 +35,11 @@ public sealed class ResolveLanguages : IContentFieldConverter
         {
             languageCodes.Add(languages.Master);
         }
+
+        languagesWithFallbacks =
+            languageCodes.ToDictionary(
+                language => language,
+                language => languages.GetPriorities(language).Where(l => l != language).ToArray());
     }
 
     public ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
@@ -47,20 +51,15 @@ public sealed class ResolveLanguages : IContentFieldConverter
 
         if (ResolveFallback)
         {
-            foreach (var languageCode in languageCodes)
+            foreach (var (languageCode, fallbacks) in languagesWithFallbacks)
             {
                 if (source.TryGetNonNull(languageCode, out _))
                 {
                     continue;
                 }
 
-                foreach (var fallback in languages.GetPriorities(languageCode))
+                foreach (var fallback in fallbacks)
                 {
-                    if (fallback == languageCode)
-                    {
-                        continue;
-                    }
-
                     if (source.TryGetNonNull(fallback, out var fallbackValue))
                     {
                         source[languageCode] = fallbackValue;
@@ -76,7 +75,7 @@ public sealed class ResolveLanguages : IContentFieldConverter
 
             foreach (var (key, _) in source)
             {
-                if (!languageCodes.Contains(key))
+                if (!languagesWithFallbacks.ContainsKey(key))
                 {
                     source.Remove(key);
                     isRemoved = true;

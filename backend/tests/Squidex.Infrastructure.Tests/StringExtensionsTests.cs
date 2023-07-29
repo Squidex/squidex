@@ -78,22 +78,6 @@ public class StringExtensionsTests
         Assert.Equal("Hello \\\"World\\\"", actual);
     }
 
-    [Fact]
-    public void Should_calculate_hex_code_from_empty_array()
-    {
-        var actual = Array.Empty<byte>().ToHexString();
-
-        Assert.Equal(string.Empty, actual);
-    }
-
-    [Fact]
-    public void Should_calculate_hex_code_from_byte_array()
-    {
-        var actual = new byte[] { 0x00, 0x01, 0xFF, 0x1A, 0x2B, 0x3C }.ToHexString();
-
-        Assert.Equal("0001FF1A2B3C", actual);
-    }
-
     [Theory]
     [InlineData("", "")]
     [InlineData(" ", "")]

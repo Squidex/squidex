@@ -42,9 +42,9 @@ public sealed class CalculateTokens : IAssetEnricherStep
                 u = url
             };
 
-            var json = serializer.Serialize(token);
+            var json = serializer.SerializeToBytes(token);
 
-            asset.EditToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
+            asset.EditToken = Convert.ToBase64String(json);
         }
 
         return Task.CompletedTask;

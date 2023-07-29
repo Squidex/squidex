@@ -31,9 +31,6 @@ public sealed class JsonValueConverter : IFieldPropertiesVisitor<(object? Result
     public static (object? Result, JsonError? Error) ConvertValue(IField field, JsonValue value, IJsonSerializer serializer,
         ResolvedComponents components)
     {
-        Guard.NotNull(field);
-        Guard.NotNull(value);
-
         var args = new Args(value, serializer, components);
 
         return field.RawProperties.Accept(Instance, args);

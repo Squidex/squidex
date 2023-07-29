@@ -38,9 +38,9 @@ public sealed class CalculateTokens : IContentEnricherStep
                 u = url
             };
 
-            var json = serializer.Serialize(token);
+            var json = serializer.SerializeToBytes(token);
 
-            content.EditToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
+            content.EditToken = Convert.ToBase64String(json);
         }
 
         return Task.CompletedTask;

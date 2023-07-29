@@ -27,10 +27,9 @@ public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, Def
 
     public static JsonValue CreateDefaultValue(IField field, Instant now, string partition)
     {
-        Guard.NotNull(field);
-        Guard.NotNull(partition);
+        var args = new Args(now, partition);
 
-        return field.RawProperties.Accept(Instance, new Args(now, partition));
+        return field.RawProperties.Accept(Instance, args);
     }
 
     public JsonValue Visit(ArrayFieldProperties properties, Args args)

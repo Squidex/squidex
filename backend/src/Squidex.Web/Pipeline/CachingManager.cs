@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Buffers;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,6 +24,7 @@ namespace Squidex.Web.Pipeline;
 public sealed class CachingManager : IRequestCache
 {
     public const string SurrogateKeySizeHeader = "X-SurrogateKeys";
+    private const int MaxStackSize = 256;
     private const int MaxAllowedKeysSize = 20000;
     private readonly ObjectPool<StringBuilder> stringBuilderPool;
     private readonly CachingOptions cachingOptions;
@@ -60,10 +62,13 @@ public sealed class CachingManager : IRequestCache
             slimLock.EnterWriteLock();
             try
             {
-                keys.Add(key);
+                if (!keys.Add(key))
+                {
+                    return;
+                }
 
-                hasher.AppendData(Encoding.Default.GetBytes(key));
-                hasher.AppendData(BitConverter.GetBytes(version));
+                hasher.AppendString(key);
+                hasher.AppendLong(version);
 
                 hasDependency = true;
             }
@@ -85,7 +90,7 @@ public sealed class CachingManager : IRequestCache
             slimLock.EnterWriteLock();
             try
             {
-                hasher.AppendData(Encoding.Default.GetBytes(formatted));
+                hasher.AppendString(formatted);
 
                 hasDependency = true;
             }
@@ -113,10 +118,7 @@ public sealed class CachingManager : IRequestCache
                 {
                     using (Telemetry.Activities.StartActivity("CalculateEtag"))
                     {
-                        var cacheBuffer = hasher.GetHashAndReset();
-                        var cacheString = cacheBuffer.ToHexString();
-
-                        response.Headers.Add(HeaderNames.ETag, cacheString);
+                        response.Headers.Add(HeaderNames.ETag, hasher.GetHexStringAndReset());
                     }
                 }
 

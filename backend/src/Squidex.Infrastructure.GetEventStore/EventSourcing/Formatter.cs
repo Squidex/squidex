@@ -73,8 +73,8 @@ public static class Formatter
     {
         var payload = Encoding.UTF8.GetBytes(eventData.Payload);
 
-        var headersJson = serializer.Serialize(eventData.Headers);
-        var headersBytes = Encoding.UTF8.GetBytes(headersJson);
+        var headersJson = serializer.SerializeToBytes(eventData.Headers);
+        var headersBytes = headersJson;
 
         return new EventStoreData(Uuid.FromGuid(Guid.NewGuid()), eventData.Type, payload, headersBytes);
     }

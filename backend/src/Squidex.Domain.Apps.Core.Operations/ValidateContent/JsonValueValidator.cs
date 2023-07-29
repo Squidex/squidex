@@ -117,6 +117,11 @@ public sealed class JsonValueValidator : IFieldPropertiesVisitor<bool, JsonValue
             return false;
         }
 
+        if (a.Count == 0)
+        {
+            return true;
+        }
+
         foreach (var item in a)
         {
             if (item.Value is not string)
@@ -133,6 +138,11 @@ public sealed class JsonValueValidator : IFieldPropertiesVisitor<bool, JsonValue
         if (value.Value is not JsonArray a)
         {
             return false;
+        }
+
+        if (a.Count == 0)
+        {
+            return true;
         }
 
         foreach (var item in a)

@@ -45,28 +45,6 @@ public static class StringExtensions
         return !string.IsNullOrWhiteSpace(value) ? value.Trim() : fallback;
     }
 
-    public static string ToHexString(this byte[] data)
-    {
-        unchecked
-        {
-            var hex = new char[data.Length * 2];
-
-            int n = 0;
-            for (int i = 0; i < data.Length; i++)
-            {
-                byte b = data[i];
-
-                byte b1 = (byte)(b >> 4);
-                byte b2 = (byte)(b & 0xF);
-
-                hex[n++] = (b1 < 10) ? (char)('0' + b1) : (char)('A' + (b1 - 10));
-                hex[n++] = (b2 < 10) ? (char)('0' + b2) : (char)('A' + (b2 - 10));
-            }
-
-            return new string(hex);
-        }
-    }
-
     public static string JoinNonEmpty(string separator, params string?[] parts)
     {
         Guard.NotNull(separator);

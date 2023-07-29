@@ -46,7 +46,7 @@ public sealed class ContentEnricher : IContentEnricher
     private async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichInternalAsync(IEnumerable<IContentEntity> contents, bool cloneData, Context context,
         CancellationToken ct)
     {
-        using (Telemetry.Activities.StartActivity("ContentEnricher/EnrichInternalAsync"))
+        using (var activity = Telemetry.Activities.StartActivity("ContentEnricher/EnrichInternalAsync"))
         {
             var results = new List<ContentEntity>();
 
@@ -109,6 +109,8 @@ public sealed class ContentEnricher : IContentEnricher
                     }
                 }
             }
+
+            activity?.SetTag("numItems", results.Count);
 
             return results;
         }
