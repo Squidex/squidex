@@ -6,77 +6,98 @@
 // ==========================================================================
 
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Squidex.Infrastructure.Reflection.Internal;
 
-public sealed class PropertyAccessor
+public static class PropertyAccessor
 {
-    private interface IPropertyAccessor
+    public delegate TValue Getter<TSource, TValue>(TSource source);
+
+    public delegate void Setter<TSource, TValue>(TSource source, TValue value);
+
+    public static Getter<TSource, TValue> CreateGetter<TSource, TValue>(PropertyInfo propertyInfo)
     {
-        object? Get(object target);
-
-        void Set(object target, object? value);
-    }
-
-    private sealed class PropertyWrapper<TObject, TValue> : IPropertyAccessor
-    {
-        private readonly Func<TObject, TValue> getMethod;
-        private readonly Action<TObject, TValue> setMethod;
-
-        public PropertyWrapper(PropertyInfo propertyInfo)
+        if (!propertyInfo.CanRead)
         {
-            if (propertyInfo.CanRead)
-            {
-                getMethod = (Func<TObject, TValue>)propertyInfo.GetGetMethod(true)!.CreateDelegate(typeof(Func<TObject, TValue>));
-            }
-            else
-            {
-                getMethod = x => throw new NotSupportedException();
-            }
-
-            if (propertyInfo.CanWrite)
-            {
-                setMethod = (Action<TObject, TValue>)propertyInfo.GetSetMethod(true)!.CreateDelegate(typeof(Action<TObject, TValue>));
-            }
-            else
-            {
-                setMethod = (x, y) => throw new NotSupportedException();
-            }
+            return x => throw new NotSupportedException();
         }
 
-        public object? Get(object source)
+        var bakingField =
+            propertyInfo.DeclaringType!.GetField($"<{propertyInfo.Name}>k__BackingField",
+                BindingFlags.NonPublic |
+                BindingFlags.Instance);
+
+        var propertyGetMethod = propertyInfo.GetGetMethod()!;
+
+        var getMethod = new DynamicMethod(propertyGetMethod.Name, typeof(TValue), new[] { typeof(TSource) }, true);
+        var getGenerator = getMethod.GetILGenerator();
+
+        // Load this to stack.
+        getGenerator.Emit(OpCodes.Ldarg_0);
+
+        if (bakingField != null && !propertyGetMethod.IsVirtual)
         {
-            return getMethod((TObject)source);
+            // Get field directly.
+            getGenerator.Emit(OpCodes.Ldfld, bakingField);
+        }
+        else if (propertyGetMethod.IsVirtual)
+        {
+            // Call the virtual property.
+            getGenerator.Emit(OpCodes.Callvirt, propertyGetMethod);
+        }
+        else
+        {
+            // Call the non virtual property.
+            getGenerator.Emit(OpCodes.Call, propertyGetMethod);
         }
 
-        public void Set(object source, object? value)
+        getGenerator.Emit(OpCodes.Ret);
+
+        return getMethod.CreateDelegate<Getter<TSource, TValue>>();
+    }
+
+    public static Setter<TSource, TValue> CreateSetter<TSource, TValue>(PropertyInfo propertyInfo)
+    {
+        if (!propertyInfo.CanWrite)
         {
-            setMethod((TObject)source, (TValue)value!);
+            return (x, y) => throw new NotSupportedException();
         }
-    }
 
-    private readonly IPropertyAccessor internalAccessor;
+        var bakingField =
+            propertyInfo.DeclaringType!.GetField($"<{propertyInfo.Name}>k__BackingField",
+                BindingFlags.NonPublic |
+                BindingFlags.Instance);
 
-    public PropertyAccessor(PropertyInfo propertyInfo)
-    {
-        Guard.NotNull(propertyInfo);
+        var propertySetMethod = propertyInfo.GetSetMethod()!;
 
-        var type = typeof(PropertyWrapper<,>).MakeGenericType(propertyInfo.DeclaringType!, propertyInfo.PropertyType);
+        var setMethod = new DynamicMethod(propertySetMethod.Name, null, new[] { typeof(TSource), typeof(TValue) }, true);
+        var setGenerator = setMethod.GetILGenerator();
 
-        internalAccessor = (IPropertyAccessor)Activator.CreateInstance(type, propertyInfo)!;
-    }
+        // Load this to stack.
+        setGenerator.Emit(OpCodes.Ldarg_0);
 
-    public object? Get(object target)
-    {
-        Guard.NotNull(target);
+        // Load argument to stack.
+        setGenerator.Emit(OpCodes.Ldarg_1);
 
-        return internalAccessor.Get(target);
-    }
+        if (bakingField != null && !propertySetMethod.IsVirtual)
+        {
+            // Set the baking field directly.
+            setGenerator.Emit(OpCodes.Stfld, bakingField);
+        }
+        else if (propertySetMethod.IsVirtual)
+        {
+            // Call the virtual property.
+            setGenerator.Emit(OpCodes.Callvirt, propertySetMethod);
+        }
+        else
+        {
+            // Call the non virtual property.
+            setGenerator.Emit(OpCodes.Call, propertySetMethod);
+        }
 
-    public void Set(object target, object? value)
-    {
-        Guard.NotNull(target);
+        setGenerator.Emit(OpCodes.Ret);
 
-        internalAccessor.Set(target, value);
+        return setMethod.CreateDelegate<Setter<TSource, TValue>>();
     }
 }
