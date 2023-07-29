@@ -5,6 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Cryptography;
+using System.Text;
+
 namespace Squidex.Infrastructure;
 
 public class HashExtensionsTests
@@ -93,6 +96,17 @@ public class HashExtensionsTests
         AssertHashFromBytes(HashExtensions.ToSha256Base64, length);
     }
 
+    [Fact]
+    public void Should_convert_same_hash_as_webhook_utils()
+    {
+        var input = $"{Guid.NewGuid()}{new string('0', 100)}{Guid.NewGuid()}";
+
+        var hash1 = WebhookHash(input);
+        var hash2 = input.ToSha256Base64();
+
+        Assert.Equal(hash1, hash2);
+    }
+
     private delegate string HashFromBytes(ReadOnlySpan<byte> source);
 
     private static void AssertHashFromBytes(HashFromBytes hasher, int length)
@@ -151,5 +165,18 @@ public class HashExtensionsTests
         }
 
         return input;
+    }
+
+    private static string WebhookHash(string value)
+    {
+        using (var sha = SHA256.Create())
+        {
+            var bytesArray = Encoding.UTF8.GetBytes(value);
+            var bytesHash = sha.ComputeHash(bytesArray);
+
+            var result = Convert.ToBase64String(bytesHash);
+
+            return result;
+        }
     }
 }

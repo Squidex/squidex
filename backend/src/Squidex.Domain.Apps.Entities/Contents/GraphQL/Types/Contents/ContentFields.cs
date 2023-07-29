@@ -234,7 +234,7 @@ internal static class ContentFields
     {
         if (component.TryGetValue("schemaName", out var value) && value.Value is string name)
         {
-            return value;
+            return name;
         }
 
         return null;

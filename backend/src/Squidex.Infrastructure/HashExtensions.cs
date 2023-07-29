@@ -96,7 +96,7 @@ public static class HashExtensions
         {
             var written = encoding.GetBytes(source, destination);
 
-            return ToHashed(destination, algorithm, hashSize, encode);
+            return ToHashed(destination[..written], algorithm, hashSize, encode);
         }
 
         return result;
