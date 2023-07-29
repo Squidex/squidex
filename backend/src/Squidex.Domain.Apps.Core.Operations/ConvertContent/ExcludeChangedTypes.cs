@@ -52,13 +52,6 @@ public sealed class ExcludeChangedTypes : IContentFieldConverter, IContentValueC
 
     private bool IsChangedType(IField field, JsonValue source)
     {
-        try
-        {
-            return !JsonValueValidator.IsValid(field, source, serializer);
-        }
-        catch
-        {
-            return true;
-        }
+        return !JsonValueValidator.IsValid(field, source, serializer);
     }
 }

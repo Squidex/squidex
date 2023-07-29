@@ -62,6 +62,6 @@ public class TranslationStatus : Dictionary<string, int>
 
     private static bool IsValidValue(JsonValue? value)
     {
-        return value != null && value.Value.Type != JsonValueType.Null;
+        return value != null && value.Value.Value != null;
     }
 }

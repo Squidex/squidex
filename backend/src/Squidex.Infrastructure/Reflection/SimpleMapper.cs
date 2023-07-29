@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Reflection.Internal;
 
 namespace Squidex.Infrastructure.Reflection;
 
-public static partial class SimpleMapper
+public static class SimpleMapper
 {
     internal readonly record struct MappingContext
     {

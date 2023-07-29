@@ -9,9 +9,9 @@ namespace Squidex.Infrastructure.Json.Objects;
 
 public enum JsonValueType
 {
+    Null,
     Array,
     Boolean,
-    Null,
     Number,
     Object,
     String
