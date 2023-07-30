@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.8.0] - 2023-07-30
+
+### Fixed
+
+* **API**: Reduced memory allocations when computing hashes.
+* **API**: Reduced memory usage for GraphQL schemas.
+* **Comments**: Fixed mentions for longer comments.
+* **GraphQL**: Use the data loaders correctly, which increases performance up to factor 5, depending on the queries.
+* **OpenAPI**: Use camel-casing for shared models for content APIs, e.g. `ErrorDto`.
+
+### Changed
+
+* **Assets**: Remove all metadata when uploading an image.
+* **General**: Rework of asynchronous background processes.
+* **GraphQL**: Only query the selected fields from MongoDB to increase performance.
+* **UI**: Fixes autocompletion for Liquid templates.
+
+### Added
+
+* **API**: New header to only query the selected fields from MongoDB to increase performance.
+
 ## [7.7.0] - 2023-07-01
 
 ### Fixed
