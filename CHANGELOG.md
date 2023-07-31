@@ -35,7 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * **Scripting**: Expost HTTP exceptions from scripting HTTP helpers.
 * **Scripting**: Propagate exceptions within async code properly.
 * **Scripting**: Use `application/json` instead of `text/json` for HTTP requests.
-* **UI**: Fixes te redirect flow after a user logs out and logs in again.
+* **UI**: Fixes the redirect flow after a user logs out and logs in again.
 
 ### Changed
 
