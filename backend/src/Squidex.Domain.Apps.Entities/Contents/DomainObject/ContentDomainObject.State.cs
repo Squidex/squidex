@@ -81,8 +81,8 @@ public partial class ContentDomainObject
 
                         NewVersion = new ContentVersion(e.Status, newData);
 
+                        // Implictely cancels any pending update jobs.
                         ScheduleJob = null;
-
                         break;
                     }
 
@@ -90,8 +90,8 @@ public partial class ContentDomainObject
                     {
                         NewVersion = null;
 
+                        // Implictely cancels any pending update jobs.
                         ScheduleJob = null;
-
                         break;
                     }
 
@@ -123,14 +123,12 @@ public partial class ContentDomainObject
                 case ContentSchedulingCancelled:
                     {
                         ScheduleJob = null;
-
                         break;
                     }
 
                 case ContentStatusScheduled e:
                     {
                         ScheduleJob = ScheduleJob.Build(e.Status, e.Actor, e.DueTime);
-
                         break;
                     }
 
@@ -151,7 +149,6 @@ public partial class ContentDomainObject
                 case ContentDeleted:
                     {
                         IsDeleted = true;
-
                         break;
                     }
             }

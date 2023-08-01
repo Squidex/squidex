@@ -39,14 +39,24 @@ public partial class TeamDomainObject : DomainObject<TeamDomainObject.State>
         return false;
     }
 
-    protected override bool CanAcceptCreation(ICommand command)
-    {
-        return command is TeamCommandBase;
-    }
-
     protected override bool CanAccept(ICommand command)
     {
-        return command is TeamCommand update && Equals(update?.TeamId, Snapshot.Id);
+        return command is TeamCommand c && Equals(c.TeamId, Snapshot.Id);
+    }
+
+    protected override bool CanAccept(ICommand command, DomainObjectState state)
+    {
+        switch (state)
+        {
+            case DomainObjectState.Undefined:
+                return command is CreateTeam;
+            case DomainObjectState.Empty:
+                return command is CreateTeam;
+            case DomainObjectState.Created:
+                return command is not CreateTeam;
+            default:
+                return false;
+        }
     }
 
     public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -55,7 +65,7 @@ public partial class TeamDomainObject : DomainObject<TeamDomainObject.State>
         switch (command)
         {
             case CreateTeam create:
-                return CreateReturn(create, c =>
+                return ApplyReturn(create, c =>
                 {
                     GuardTeam.CanCreate(c);
 
@@ -65,7 +75,7 @@ public partial class TeamDomainObject : DomainObject<TeamDomainObject.State>
                 }, ct);
 
             case UpdateTeam update:
-                return UpdateReturn(update, c =>
+                return ApplyReturn(update, c =>
                 {
                     GuardTeam.CanUpdate(c);
 
@@ -75,7 +85,7 @@ public partial class TeamDomainObject : DomainObject<TeamDomainObject.State>
                 }, ct);
 
             case AssignContributor assignContributor:
-                return UpdateReturnAsync(assignContributor, async (c, ct) =>
+                return ApplyReturnAsync(assignContributor, async (c, ct) =>
                 {
                     await GuardTeamContributors.CanAssign(c, Snapshot, Users);
 
@@ -85,7 +95,7 @@ public partial class TeamDomainObject : DomainObject<TeamDomainObject.State>
                 }, ct);
 
             case RemoveContributor removeContributor:
-                return UpdateReturn(removeContributor, c =>
+                return ApplyReturn(removeContributor, c =>
                 {
                     GuardTeamContributors.CanRemove(c, Snapshot);
 
@@ -95,7 +105,7 @@ public partial class TeamDomainObject : DomainObject<TeamDomainObject.State>
                 }, ct);
 
             case ChangePlan changePlan:
-                return UpdateReturnAsync(changePlan, async (c, ct) =>
+                return ApplyReturnAsync(changePlan, async (c, ct) =>
                 {
                     GuardTeam.CanChangePlan(c, BillingPlans);
 

@@ -24,7 +24,6 @@ public class DomainObjectTests
         ct = cts.Token;
 
         state = new TestState<MyDomainState>(id);
-
         sut = new MyDomainObject(id, state.PersistenceFactory);
     }
 
@@ -136,7 +135,7 @@ public class DomainObjectTests
     [Fact]
     public async Task Should_throw_exception_if_writing_causes_inconsistent_state_exception()
     {
-        sut.Recreate = false;
+        sut.RecreateCommand = false;
 
         SetupCreated(2);
 
@@ -149,7 +148,7 @@ public class DomainObjectTests
     [Fact]
     public async Task Should_throw_exception_if_writing_causes_inconsistent_state_exception_and_deleted()
     {
-        sut.Recreate = false;
+        sut.RecreateCommand = false;
 
         SetupCreated(2);
         SetupDeleted();
@@ -163,7 +162,7 @@ public class DomainObjectTests
     [Fact]
     public async Task Should_recreate_with_create_command_if_deleted_before()
     {
-        sut.Recreate = true;
+        sut.RecreateCommand = true;
         sut.RecreateEvent = true;
 
         SetupCreated(2);
@@ -175,7 +174,7 @@ public class DomainObjectTests
         var actual = await sut.ExecuteAsync(new CreateAuto { Value = 4 }, ct);
 
         A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), ct))
-            .MustHaveHappenedANumberOfTimesMatching(x => x == 3);
+            .MustHaveHappenedANumberOfTimesMatching(x => x == 2);
 
         A.CallTo(() => state.Persistence.ReadAsync(A<long>._, ct))
             .MustHaveHappened();
@@ -191,7 +190,7 @@ public class DomainObjectTests
     [Fact]
     public async Task Should_throw_exception_if_recreation_with_create_command_is_not_allowed()
     {
-        sut.Recreate = false;
+        sut.RecreateCommand = false;
 
         SetupCreated(2);
         SetupDeleted();
@@ -199,13 +198,13 @@ public class DomainObjectTests
         A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
             .Throws(new InconsistentStateException(2, -1)).Once();
 
-        await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto(), ct));
+        await Assert.ThrowsAsync<DomainObjectDeletedException>(() => sut.ExecuteAsync(new CreateAuto(), ct));
     }
 
     [Fact]
     public async Task Should_recreate_with_upsert_command_if_deleted_before()
     {
-        sut.Recreate = true;
+        sut.RecreateCommand = true;
         sut.RecreateEvent = true;
 
         SetupCreated(2);
@@ -217,7 +216,7 @@ public class DomainObjectTests
         var actual = await sut.ExecuteAsync(new Upsert { Value = 4 }, ct);
 
         A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>.That.Matches(x => x.Count == 1), ct))
-            .MustHaveHappenedANumberOfTimesMatching(x => x == 3);
+            .MustHaveHappenedANumberOfTimesMatching(x => x == 2);
 
         A.CallTo(() => state.Persistence.ReadAsync(A<long>._, ct))
             .MustHaveHappened();
@@ -233,7 +232,7 @@ public class DomainObjectTests
     [Fact]
     public async Task Should_throw_exception_if_recreation_with_upsert_command_is_not_allowed()
     {
-        sut.Recreate = false;
+        sut.RecreateCommand = false;
 
         SetupCreated(2);
         SetupDeleted();
@@ -337,10 +336,14 @@ public class DomainObjectTests
     }
 
     [Fact]
-    public async Task Should_throw_exception_on_create_command_is_rejected_due_to_version_conflict()
+    public async Task Should_throw_exception_if_create_command_is_rejected_due_to_version_conflict()
     {
         A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
-            .Throws(new InconsistentStateException(4, EtagVersion.Empty));
+            .Invokes(() =>
+            {
+                SetupCreated(4);
+                throw new InconsistentStateException(4, EtagVersion.Empty);
+            });
 
         await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto(), ct));
     }
@@ -351,12 +354,6 @@ public class DomainObjectTests
         await sut.ExecuteAsync(new CreateAuto(), ct);
 
         await Assert.ThrowsAsync<DomainObjectConflictException>(() => sut.ExecuteAsync(new CreateAuto(), ct));
-    }
-
-    [Fact]
-    public async Task Should_throw_exception_if_create_command_not_accepted()
-    {
-        await Assert.ThrowsAsync<DomainException>(() => sut.ExecuteAsync(new CreateAuto { Value = 99 }, ct));
     }
 
     [Fact]
@@ -441,14 +438,13 @@ public class DomainObjectTests
     }
 
     [Fact]
-    public async Task Should_write_events_to_delete_stream_on_delete()
+    public async Task Should_write_events_to_delete_stream_on_permanent_delete()
     {
         SetupCreated(4);
-        SetupDeleted();
 
         var deleteStream = A.Fake<IPersistence<MyDomainState>>();
 
-        A.CallTo(() => state.PersistenceFactory.WithEventSourcing(typeof(MyDomainObject), DomainId.Combine(id, DomainId.Create("deleted")), null))
+        A.CallTo(() => state.PersistenceFactory.WithSnapshots(typeof(MyDomainObject), DomainId.Combine(id, DomainId.Create("deleted")), null))
             .Returns(deleteStream);
 
         await sut.ExecuteAsync(new DeletePermanent(), ct);
@@ -459,7 +455,32 @@ public class DomainObjectTests
             .MustHaveHappened();
 
         A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
-            .MustHaveHappenedOnceExactly();
+            .MustNotHaveHappened();
+
+        A.CallTo(() => deleteStream.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, A<CancellationToken>._))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_write_events_to_delete_stream_on_permanent_delete_if_already_deleted()
+    {
+        SetupCreated(4);
+        SetupDeleted();
+
+        var deleteStream = A.Fake<IPersistence<MyDomainState>>();
+
+        A.CallTo(() => state.PersistenceFactory.WithSnapshots(typeof(MyDomainObject), DomainId.Combine(id, DomainId.Create("deleted")), null))
+            .Returns(deleteStream);
+
+        await sut.ExecuteAsync(new DeletePermanent(), ct);
+
+        AssertSnapshot(sut.Snapshot, 0, EtagVersion.Empty, false);
+
+        A.CallTo(() => state.Persistence.DeleteAsync(ct))
+            .MustHaveHappened();
+
+        A.CallTo(() => state.Persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, ct))
+            .MustNotHaveHappened();
 
         A.CallTo(() => deleteStream.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -494,7 +515,7 @@ public class DomainObjectTests
 
     private void SetupDeleted()
     {
-        sut.ExecuteAsync(new Delete(), ct).Wait(ct);
+        state.AddEvent(new Deleted());
     }
 
     private void SetupCreated(int value)

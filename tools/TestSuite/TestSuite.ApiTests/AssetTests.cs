@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using System.Net;
-using Squidex.Assets;
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
+using TestSuite.Utils;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
@@ -78,7 +78,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
-            await UploadInChunksAsync(fileParameter);
+            await _.Client.Assets.UploadInChunksAsync(progress, fileParameter);
 
             Assert.Null(progress.Exception);
             Assert.NotEmpty(progress.Progress);
@@ -219,7 +219,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
-            await UploadInChunksAsync(fileParameter, asset_1.Id);
+            await _.Client.Assets.UploadInChunksAsync(progress, fileParameter, asset_1.Id);
 
             Assert.Null(progress.Exception);
             Assert.NotEmpty(progress.Progress);
@@ -738,146 +738,48 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         Assert.NotEqual(asset_1.FileSize, asset_2.FileSize);
     }
 
-    private async Task UploadInChunksAsync(FileParameter fileParameter, string id = null)
+    [Fact]
+    public async Task Should_recover_deleted_asset()
     {
-        var pausingStream = new PauseStream(fileParameter.Data, 0.25);
-        var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType)
-        {
-            ContentLength = fileParameter.Data.Length
-        };
+        // STEP 0: Create app.
+        var (client, _) = await _.PostAppAsync();
 
-        await using (pausingFile.Data)
-        {
-            using var cts = new CancellationTokenSource(5000);
 
-            while (progress.Asset == null && progress.Exception == null && !cts.IsCancellationRequested)
+        // STEP 1: Create asset.
+        var asset_1 = await client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+        // STEP 2: Delete asset.
+        await client.Assets.DeleteAssetAsync(asset_1.Id);
+
+
+        // STEP 3: Query and recreate asset.
+        var assets = await client.Assets.GetAssetsAsync(new AssetQuery
+        {
+            Query = new
             {
-                pausingStream.Reset();
-
-                await _.Client.Assets.UploadAssetAsync(pausingFile, progress.AsOptions(id), cts.Token);
-                progress.Uploaded();
+                filter = new
+                {
+                    path = "isDeleted",
+                    op = "eq",
+                    value = true,
+                }
             }
-        }
-    }
+        });
 
-    public class ProgressHandler : IAssetProgressHandler
-    {
-        public string FileId { get; private set; } = Guid.NewGuid().ToString();
+        Assert.NotEmpty(assets.Items);
 
-        public List<int> Progress { get; } = new List<int>();
-
-        public List<int> Uploads { get; } = new List<int>();
-
-        public Exception Exception { get; private set; }
-
-        public AssetDto Asset { get; private set; }
-
-        public AssetUploadOptions AsOptions(string id = null)
+        foreach (var asset in assets.Items)
         {
-            var options = default(AssetUploadOptions);
-            options.ProgressHandler = this;
-            options.FileId = FileId;
-            options.Id = id;
+            var content = await client.Assets.GetAssetContentBySlugAsync(asset.Id, string.Empty, deleted: true);
 
-            return options;
+            await client.Assets.PostAssetAsync(id: asset.Id, file: new FileParameter(content.Stream, asset.FileName, asset.MimeType));
         }
 
-        public void Uploaded()
-        {
-            Uploads.Add(Progress.LastOrDefault());
-        }
 
-        public Task OnCompletedAsync(AssetUploadCompletedEvent @event,
-            CancellationToken ct)
-        {
-            Asset = @event.Asset;
-            return Task.CompletedTask;
-        }
+        // STEP 4: Query recreated asset.
+        var asset_2 = await client.Assets.GetAssetAsync(asset_1.Id);
 
-        public Task OnCreatedAsync(AssetUploadCreatedEvent @event,
-            CancellationToken ct)
-        {
-            FileId = @event.FileId;
-            return Task.CompletedTask;
-        }
-
-        public Task OnProgressAsync(AssetUploadProgressEvent @event,
-            CancellationToken ct)
-        {
-            Progress.Add(@event.Progress);
-            return Task.CompletedTask;
-        }
-
-        public Task OnFailedAsync(AssetUploadExceptionEvent @event,
-            CancellationToken ct)
-        {
-            Exception = @event.Exception;
-            return Task.CompletedTask;
-        }
-    }
-
-    public class PauseStream : DelegateStream
-    {
-        private readonly int maxLength;
-        private long totalRead;
-        private long totalRemaining;
-        private long seekStart;
-
-        public override long Length
-        {
-            get => Math.Min(maxLength, totalRemaining);
-        }
-
-        public override long Position
-        {
-            get => base.Position - seekStart;
-            set => throw new NotSupportedException();
-        }
-
-        public PauseStream(Stream innerStream, double pauseAfter)
-            : base(innerStream)
-        {
-            maxLength = (int)Math.Floor(innerStream.Length * pauseAfter) + 1;
-
-            totalRemaining = innerStream.Length;
-        }
-
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            var position = seekStart = base.Seek(offset, origin);
-
-            totalRemaining = base.Length - position;
-
-            return position;
-        }
-
-        public void Reset()
-        {
-            totalRead = 0;
-        }
-
-        public override async ValueTask<int> ReadAsync(Memory<byte> buffer,
-            CancellationToken cancellationToken = default)
-        {
-            var remaining = Length - totalRead;
-
-            if (remaining <= 0)
-            {
-                return 0;
-            }
-
-            if (remaining < buffer.Length)
-            {
-                var remainingBytes = (int)remaining;
-
-                buffer = buffer[..remainingBytes];
-            }
-
-            var bytesRead = await base.ReadAsync(buffer, cancellationToken);
-
-            totalRead += bytesRead;
-
-            return bytesRead;
-        }
+        Assert.NotNull(asset_2);
     }
 }

@@ -7,6 +7,7 @@
 
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
+using TestSuite.Utils;
 
 namespace TestSuite;
 
@@ -309,7 +310,29 @@ public static class ClientExtensions
         return temp;
     }
 
-    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string path, AssetDto asset, string fileName = null)
+    public static async Task UploadInChunksAsync(this IAssetsClient client, ProgressHandler progress,  FileParameter fileParameter, string id = null)
+    {
+        var pausingStream = new PauseStream(fileParameter.Data, 0.25);
+        var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType)
+        {
+            ContentLength = fileParameter.Data.Length
+        };
+
+        await using (pausingFile.Data)
+        {
+            using var cts = new CancellationTokenSource(5000);
+
+            while (progress.Asset == null && progress.Exception == null && !cts.IsCancellationRequested)
+            {
+                pausingStream.Reset();
+
+                await client.UploadAssetAsync(pausingFile, progress.AsOptions(id), cts.Token);
+                progress.Uploaded();
+            }
+        }
+    }
+
+    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient client, string path, AssetDto asset, string fileName = null)
     {
         var fileInfo = new FileInfo(path);
 
@@ -317,11 +340,11 @@ public static class ClientExtensions
         {
             var upload = new FileParameter(stream, fileName ?? fileInfo.Name, asset.MimeType);
 
-            return await assetsClients.PutAssetContentAsync(asset.Id, upload);
+            return await client.PutAssetContentAsync(asset.Id, upload);
         }
     }
 
-    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient assetsClients, string path, string fileType, string fileName = null, string parentId = null, string id = null)
+    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient client, string path, string fileType, string fileName = null, string parentId = null, string id = null)
     {
         var fileInfo = new FileInfo(path);
 
@@ -329,11 +352,11 @@ public static class ClientExtensions
         {
             var upload = new FileParameter(stream, fileName ?? fileInfo.Name, fileType);
 
-            return await assetsClients.PostAssetAsync(parentId, id, true, upload);
+            return await client.PostAssetAsync(parentId, id, true, upload);
         }
     }
 
-    public static async Task<AssetDto> UpdateFileAsync(this IAssetsClient assetsClients, string id, string path, string fileType, string fileName = null)
+    public static async Task<AssetDto> UpdateFileAsync(this IAssetsClient client, string id, string path, string fileType, string fileName = null)
     {
         var fileInfo = new FileInfo(path);
 
@@ -341,17 +364,17 @@ public static class ClientExtensions
         {
             var upload = new FileParameter(stream, fileName ?? fileInfo.Name, fileType);
 
-            return await assetsClients.PutAssetContentAsync(id, upload);
+            return await client.PutAssetContentAsync(id, upload);
         }
     }
 
-    public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient assetsClients, int size, string parentId = null, string id = null)
+    public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient client, int size, string parentId = null, string id = null)
     {
         using (var stream = RandomAsset(size))
         {
             var upload = new FileParameter(stream, RandomName(".txt"), "text/csv");
 
-            return await assetsClients.PostAssetAsync(parentId, id, true, upload);
+            return await client.PostAssetAsync(parentId, id, true, upload);
         }
     }
 

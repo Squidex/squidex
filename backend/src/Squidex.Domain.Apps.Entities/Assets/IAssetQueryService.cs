@@ -23,10 +23,10 @@ public interface IAssetQueryService
     Task<IEnrichedAssetEntity?> FindByHashAsync(Context context, string hash, string fileName, long fileSize,
         CancellationToken ct = default);
 
-    Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, long version = EtagVersion.Any,
+    Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, bool allowDeleted = false, long version = EtagVersion.Any,
        CancellationToken ct = default);
 
-    Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug,
+    Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug, bool allowDeleted = false,
         CancellationToken ct = default);
 
     Task<IEnrichedAssetEntity?> FindGlobalAsync(Context context, DomainId id,

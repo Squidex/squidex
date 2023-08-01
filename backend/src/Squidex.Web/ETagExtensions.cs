@@ -7,7 +7,6 @@
 
 using System.Globalization;
 using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;

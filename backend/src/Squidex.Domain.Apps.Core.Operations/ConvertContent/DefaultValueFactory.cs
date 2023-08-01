@@ -8,7 +8,6 @@
 using System.Globalization;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter

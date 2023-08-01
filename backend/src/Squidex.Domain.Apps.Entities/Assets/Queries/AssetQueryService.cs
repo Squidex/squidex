@@ -99,7 +99,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    public async Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug,
+    public async Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug, bool allowDeleted = false,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -108,7 +108,7 @@ public sealed class AssetQueryService : IAssetQueryService
         {
             activity?.SetTag("slug", slug);
 
-            var asset = await FindBySlugCoreAsync(context, slug, ct);
+            var asset = await FindBySlugCoreAsync(context, slug, allowDeleted, ct);
 
             if (asset == null)
             {
@@ -139,7 +139,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    public async Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, long version = EtagVersion.Any,
+    public async Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, bool allowDeleted = false, long version = EtagVersion.Any,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -156,7 +156,7 @@ public sealed class AssetQueryService : IAssetQueryService
             }
             else
             {
-                asset = await FindCoreAsync(context, id, ct);
+                asset = await FindCoreAsync(context, id, allowDeleted, ct);
             }
 
             if (asset == null)
@@ -278,7 +278,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IAssetEntity?> FindBySlugCoreAsync(Context context, string slug,
+    private async Task<IAssetEntity?> FindBySlugCoreAsync(Context context, string slug, bool allowDeleted,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -286,7 +286,7 @@ public sealed class AssetQueryService : IAssetQueryService
             // Enforce a hard timeout
             combined.CancelAfter(options.TimeoutFind);
 
-            return await assetRepository.FindAssetBySlugAsync(context.App.Id, slug, combined.Token);
+            return await assetRepository.FindAssetBySlugAsync(context.App.Id, slug, allowDeleted, combined.Token);
         }
     }
 
@@ -302,7 +302,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IAssetEntity?> FindCoreAsync(Context context, DomainId id,
+    private async Task<IAssetEntity?> FindCoreAsync(Context context, DomainId id, bool allowDeleted,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -310,7 +310,7 @@ public sealed class AssetQueryService : IAssetQueryService
             // Enforce a hard timeout
             combined.CancelAfter(options.TimeoutFind);
 
-            return await assetRepository.FindAssetAsync(context.App.Id, id, combined.Token);
+            return await assetRepository.FindAssetAsync(context.App.Id, id, allowDeleted, combined.Token);
         }
     }
 }
