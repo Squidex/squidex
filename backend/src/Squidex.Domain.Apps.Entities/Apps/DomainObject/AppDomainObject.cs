@@ -61,7 +61,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
             case DomainObjectState.Created:
                 return command is not CreateApp;
             default:
-                return true;
+                return false;
         }
     }
 
