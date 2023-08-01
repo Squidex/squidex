@@ -36,16 +36,24 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
         return Snapshot.IsDeleted;
     }
 
-    protected override bool CanAcceptCreation(ICommand command)
-    {
-        return command is AssetFolderCommandBase;
-    }
-
     protected override bool CanAccept(ICommand command)
     {
-        return command is AssetFolderCommand assetFolderCommand &&
-            Equals(assetFolderCommand.AppId, Snapshot.AppId) &&
-            Equals(assetFolderCommand.AssetFolderId, Snapshot.Id);
+        return command is AssetFolderCommand c && c.AppId == Snapshot.AppId && c.AssetFolderId == Snapshot.Id;
+    }
+
+    protected override bool CanAccept(ICommand command, DomainObjectState state)
+    {
+        switch (state)
+        {
+            case DomainObjectState.Undefined:
+                return command is CreateAssetFolder;
+            case DomainObjectState.Empty:
+                return command is CreateAssetFolder;
+            case DomainObjectState.Created:
+                return command is not CreateAssetFolder;
+            default:
+                return false;
+        }
     }
 
     public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -54,7 +62,7 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
         switch (command)
         {
             case CreateAssetFolder create:
-                return CreateReturnAsync(create, async (c, ct) =>
+                return ApplyReturnAsync(create, async (c, ct) =>
                 {
                     await CreateCore(c, ct);
 
@@ -62,7 +70,7 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
                 }, ct);
 
             case MoveAssetFolder move:
-                return UpdateReturnAsync(move, async (c, ct) =>
+                return ApplyReturnAsync(move, async (c, ct) =>
                 {
                     await MoveCore(c, ct);
 
@@ -70,7 +78,7 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
                 }, ct);
 
             case RenameAssetFolder rename:
-                return UpdateReturnAsync(rename, async (c, ct) =>
+                return ApplyReturnAsync(rename, async (c, ct) =>
                 {
                     await RenameCore(c);
 
@@ -78,7 +86,7 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
                 }, ct);
 
             case DeleteAssetFolder delete:
-                return Update(delete, c =>
+                return Apply(delete, c =>
                 {
                     Delete(c);
                 }, ct);

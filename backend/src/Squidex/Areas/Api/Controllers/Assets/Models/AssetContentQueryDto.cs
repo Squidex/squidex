@@ -94,6 +94,12 @@ public sealed class AssetContentQueryDto
     public bool Force { get; set; }
 
     /// <summary>
+    /// Also return deleted content items.
+    /// </summary>
+    [FromQuery(Name = "deleted")]
+    public bool Deleted { get; set; }
+
+    /// <summary>
     /// True to force a new resize even if it already stored.
     /// </summary>
     [FromQuery(Name = "format")]

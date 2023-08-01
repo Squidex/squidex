@@ -206,28 +206,26 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         }
     }
 
-    public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug,
+    public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug, bool allowDeleted,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetBySlugAsync"))
         {
             var assetEntity =
-                await Collection.Find(x => x.IndexedAppId == appId && x.Slug == slug && !x.IsDeleted)
+                await Collection.Find(BuildFilter(appId, slug, allowDeleted))
                     .FirstOrDefaultAsync(ct);
 
             return assetEntity;
         }
     }
 
-    public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id,
+    public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id, bool allowDeleted,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetAsync"))
         {
-            var documentId = DomainId.Combine(appId, id);
-
             var assetEntity =
-                await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
+                await Collection.Find(BuildFilter(appId, id, allowDeleted))
                     .FirstOrDefaultAsync(ct);
 
             return assetEntity;
@@ -254,6 +252,30 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         return Filter.And(
             Filter.In(x => x.DocumentId, documentIds),
             Filter.Ne(x => x.IsDeleted, true));
+    }
+
+    private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, string slug, bool allowDeleted)
+    {
+        var filter = Filter.And(Filter.Eq(x => x.IndexedAppId, appId), Filter.Eq(x => x.Slug, slug));
+
+        if (!allowDeleted)
+        {
+            filter = Filter.And(filter, Filter.Ne(x => x.IsDeleted, true));
+        }
+
+        return filter;
+    }
+
+    private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, DomainId id, bool allowDeleted)
+    {
+        var filter = Filter.Eq(x => x.DocumentId, DomainId.Combine(appId, id));
+
+        if (!allowDeleted)
+        {
+            filter = Filter.And(filter, Filter.Ne(x => x.IsDeleted, true));
+        }
+
+        return filter;
     }
 
     private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, DomainId parentId)

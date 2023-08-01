@@ -39,6 +39,29 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         get => snapshot.Version;
     }
 
+    public DomainObjectState ObjectState
+    {
+        get
+        {
+            if (!isLoaded)
+            {
+                return DomainObjectState.Undefined;
+            }
+
+            if (IsDeleted(Snapshot))
+            {
+                return DomainObjectState.Deleted;
+            }
+
+            if (Version <= EtagVersion.Empty)
+            {
+                return DomainObjectState.Empty;
+            }
+
+            return DomainObjectState.Created;
+        }
+    }
+
     protected DomainObject(DomainId uniqueId, IPersistenceFactory<T> persistenceFactory,
         ILogger log)
     {
@@ -170,6 +193,8 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
     {
         Guard.NotNull(handler);
 
+        await EnsureCommandAsync(command, ct);
+
         var previousSnapshot = Snapshot;
         var previousVersion = Version;
         try
@@ -207,10 +232,14 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         }
     }
 
-    private async Task<CommandResult> UpsertCoreAsync<TCommand>(TCommand command, Func<TCommand, CancellationToken, Task<object?>> handler, bool isCreation,
+    private async Task<CommandResult> UpsertCoreAsync<TCommand>(TCommand command, Func<TCommand, CancellationToken, Task<object?>> handler,
         CancellationToken ct) where TCommand : ICommand
     {
         Guard.NotNull(handler);
+
+        var isDryRun = !isLoaded && CanAccept(command, DomainObjectState.Undefined);
+
+        await EnsureCommandAsync(command, ct);
 
         var previousSnapshot = Snapshot;
         var previousVersion = Version;
@@ -225,35 +254,29 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
             }
             catch (InconsistentStateException ex)
             {
+                if (!isDryRun)
+                {
+                    throw new DomainObjectVersionException(uniqueId.ToString(), ex.VersionCurrent, ex.VersionExpected, ex);
+                }
+
                 // Start from the previous, unchanged snapshot.
                 snapshot = previousSnapshot;
 
                 // Create commands do not load the domain object for performance reasons, therefore we ensure it is loaded.
                 await EnsureLoadedAsync(ct);
 
-                var isDeleted = IsDeleted(Snapshot);
+                previousVersion = Version;
+                previousSnapshot = Snapshot;
 
-                if (isDeleted && isCreation && CanRecreate())
-                {
-                    foreach (var @event in uncomittedEvents)
-                    {
-                        ApplyEvent(@event, Snapshot, Version, false, true);
-                    }
+                // Run the validation again, because we could not make some checks before.
+                EnsureCommand(command);
 
-                    await WriteAsync(events, ct);
-                }
-                else if (isDeleted)
+                foreach (var @event in uncomittedEvents)
                 {
-                    throw new DomainObjectDeletedException(uniqueId.ToString());
+                    ApplyEvent(@event, Snapshot, Version, false, true);
                 }
-                else if (isCreation)
-                {
-                    throw new DomainObjectConflictException(uniqueId.ToString());
-                }
-                else
-                {
-                    throw new DomainObjectVersionException(uniqueId.ToString(), ex.VersionCurrent, ex.VersionExpected, ex);
-                }
+
+                await WriteAsync(events, ct);
             }
 
             isLoaded = true;
@@ -271,14 +294,46 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         }
     }
 
-    protected virtual bool CanAcceptCreation(ICommand command)
+    private async Task EnsureCommandAsync<TCommand>(TCommand command,
+        CancellationToken ct) where TCommand : ICommand
     {
-        return true;
+        if (!isLoaded && !CanAccept(command, DomainObjectState.Undefined))
+        {
+            await EnsureLoadedAsync(ct);
+        }
+
+        if (isLoaded)
+        {
+            EnsureCommand(command);
+        }
     }
 
-    protected virtual bool CanAccept(ICommand command)
+    private void EnsureCommand<TCommand>(TCommand command) where TCommand : ICommand
     {
-        return true;
+        if (ObjectState > DomainObjectState.Empty && !CanAccept(command))
+        {
+            throw new DomainException("Invalid command.");
+        }
+
+        if (!CanAccept(command, ObjectState))
+        {
+            if (IsDeleted(Snapshot))
+            {
+                throw new DomainObjectDeletedException(uniqueId.ToString());
+            }
+
+            if (Version <= EtagVersion.Empty)
+            {
+                throw new DomainObjectNotFoundException(uniqueId.ToString());
+            }
+
+            throw new DomainObjectConflictException(uniqueId.ToString());
+        }
+
+        if (Version > EtagVersion.Empty && command.ExpectedVersion > EtagVersion.Any && Version != command.ExpectedVersion)
+        {
+            throw new DomainObjectVersionException(uniqueId.ToString(), Version, command.ExpectedVersion);
+        }
     }
 
     protected virtual bool IsDeleted(T snapshot)
@@ -286,12 +341,17 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         return false;
     }
 
-    protected virtual bool CanRecreate()
+    protected virtual bool IsRecreation(IEvent @event)
     {
         return false;
     }
 
-    protected virtual bool CanRecreate(IEvent @event)
+    protected virtual bool CanAccept(ICommand command)
+    {
+        return false;
+    }
+
+    protected virtual bool CanAccept(ICommand command, DomainObjectState state)
     {
         return false;
     }
@@ -300,7 +360,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
     {
         if (IsDeleted(snapshot))
         {
-            if (!CanRecreate(@event.Payload))
+            if (!IsRecreation(@event.Payload))
             {
                 return default;
             }

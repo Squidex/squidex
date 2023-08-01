@@ -48,7 +48,7 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
     {
         var random = _.RandomValue();
 
-        var asset = await _.AssetRepository.FindAssetBySlugAsync(_.RandomAppId(), random);
+        var asset = await _.AssetRepository.FindAssetBySlugAsync(_.RandomAppId(), random, false);
 
         // The Slug is random here, as it does not really matter.
         Assert.NotNull(asset);

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure.Json;
 

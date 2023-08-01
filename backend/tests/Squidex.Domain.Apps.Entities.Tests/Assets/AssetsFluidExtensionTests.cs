@@ -321,7 +321,7 @@ public class AssetsFluidExtensionTests : GivenContext
             AppId = AppId
         };
 
-        A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId, EtagVersion.Any, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId, false, EtagVersion.Any, A<CancellationToken>._))
             .Returns(asset);
 
         var vars = new TemplateVars
@@ -349,10 +349,10 @@ public class AssetsFluidExtensionTests : GivenContext
             AppId = AppId
         };
 
-        A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId1, EtagVersion.Any, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId1, false, EtagVersion.Any, A<CancellationToken>._))
             .Returns(asset1);
 
-        A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId2, EtagVersion.Any, A<CancellationToken>._))
+        A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId2, false, EtagVersion.Any, A<CancellationToken>._))
             .Returns(asset2);
 
         var vars = new TemplateVars

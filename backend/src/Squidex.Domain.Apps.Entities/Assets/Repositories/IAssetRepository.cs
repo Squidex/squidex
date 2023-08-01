@@ -26,12 +26,12 @@ public interface IAssetRepository
     Task<IAssetEntity?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize,
         CancellationToken ct = default);
 
-    Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug,
+    Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug, bool allowDeleted,
         CancellationToken ct = default);
 
     Task<IAssetEntity?> FindAssetAsync(DomainId id,
         CancellationToken ct = default);
 
-    Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id,
+    Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id, bool allowDeleted,
         CancellationToken ct = default);
 }

@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.TestHelpers;
 
 public sealed class MyDomainObject : DomainObject<MyDomainState>
 {
-    public bool Recreate { get; set; }
+    public bool RecreateCommand { get; set; }
 
     public bool RecreateEvent { get; set; }
 
@@ -25,28 +25,23 @@ public sealed class MyDomainObject : DomainObject<MyDomainState>
     {
     }
 
-    protected override bool CanRecreate(IEvent @event)
+    protected override bool IsRecreation(IEvent @event)
     {
         return RecreateEvent && @event is ValueChanged;
     }
 
-    protected override bool CanRecreate()
+    protected override bool IsDeleted(MyDomainState snapshot)
     {
-        return Recreate;
-    }
-
-    protected override bool CanAcceptCreation(ICommand command)
-    {
-        if (command is CreateAuto update)
-        {
-            return update.Value != 99;
-        }
-
-        return true;
+        return snapshot.IsDeleted;
     }
 
     protected override bool CanAccept(ICommand command)
     {
+        if (command is CreateAuto create)
+        {
+            return create.Value != 99;
+        }
+
         if (command is UpdateAuto update)
         {
             return update.Value != 99;
@@ -55,9 +50,36 @@ public sealed class MyDomainObject : DomainObject<MyDomainState>
         return true;
     }
 
-    protected override bool IsDeleted(MyDomainState snapshot)
+    protected override bool CanAccept(ICommand command, DomainObjectState state)
     {
-        return snapshot.IsDeleted;
+        static bool CanCreate(ICommand command)
+        {
+            return
+                command is CreateAuto ||
+                command is CreateCustom ||
+                command is Upsert;
+        }
+
+        static bool CanUpdate(ICommand command)
+        {
+            return
+                command is UpdateAuto ||
+                command is UpdateCustom ||
+                command is Delete ||
+                command is DeletePermanent;
+        }
+
+        switch (state)
+        {
+            case DomainObjectState.Undefined:
+                return CanCreate(command);
+            case DomainObjectState.Empty:
+                return CanCreate(command);
+            case DomainObjectState.Deleted:
+                return (CanCreate(command) && RecreateCommand) || command is DeletePermanent;
+            default:
+                return CanUpdate(command);
+        }
     }
 
     public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -66,19 +88,19 @@ public sealed class MyDomainObject : DomainObject<MyDomainState>
         switch (command)
         {
             case Upsert c:
-                return Upsert(c, createAuto =>
+                return Apply(c, createAuto =>
                 {
                     RaiseEvent(new ValueChanged { Value = createAuto.Value });
                 }, ct);
 
             case CreateAuto c:
-                return Create(c, createAuto =>
+                return Apply(c, createAuto =>
                 {
                     RaiseEvent(new ValueChanged { Value = createAuto.Value });
                 }, ct);
 
             case CreateCustom c:
-                return CreateReturn(c, createCustom =>
+                return ApplyReturn(c, createCustom =>
                 {
                     RaiseEvent(new ValueChanged { Value = createCustom.Value });
 
@@ -86,13 +108,13 @@ public sealed class MyDomainObject : DomainObject<MyDomainState>
                 }, ct);
 
             case UpdateAuto c:
-                return Update(c, updateAuto =>
+                return Apply(c, updateAuto =>
                 {
                     RaiseEvent(new ValueChanged { Value = updateAuto.Value });
                 }, ct);
 
             case UpdateCustom c:
-                return UpdateReturn(c, updateCustom =>
+                return ApplyReturn(c, updateCustom =>
                 {
                     RaiseEvent(new ValueChanged { Value = updateCustom.Value });
 
@@ -100,7 +122,7 @@ public sealed class MyDomainObject : DomainObject<MyDomainState>
                 }, ct);
 
             case Delete c:
-                return Update(c, delete =>
+                return Apply(c, delete =>
                 {
                     RaiseEvent(new Deleted());
                 }, ct);

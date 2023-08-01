@@ -142,10 +142,6 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
             }
             catch (AssetAlreadyExistsException)
             {
-                if (context.Command is not UpsertAsset)
-                {
-                    throw;
-                }
             }
         }
 
