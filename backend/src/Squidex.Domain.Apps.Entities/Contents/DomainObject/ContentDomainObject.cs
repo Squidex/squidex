@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -40,27 +41,27 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
         return snapshot.IsDeleted;
     }
 
-    protected override bool CanAcceptCreation(ICommand command)
-    {
-        return command is ContentCommandBase;
-    }
-
-    protected override bool CanRecreate()
-    {
-        return true;
-    }
-
-    protected override bool CanRecreate(IEvent @event)
+    protected override bool IsRecreation(IEvent @event)
     {
         return @event is ContentCreated;
     }
 
     protected override bool CanAccept(ICommand command)
     {
-        return command is ContentCommand contentCommand &&
-            Equals(contentCommand.AppId, Snapshot.AppId) &&
-            Equals(contentCommand.SchemaId, Snapshot.SchemaId) &&
-            Equals(contentCommand.ContentId, Snapshot.Id);
+        return command is ContentCommand c && c.AppId == Snapshot.AppId && c.SchemaId == Snapshot.SchemaId && c.ContentId == Snapshot.Id;
+    }
+
+    protected override bool CanAccept(ICommand command, DomainObjectState state)
+    {
+        switch (state)
+        {
+            case DomainObjectState.Deleted:
+                return command is CreateContent or UpsertContent or DeleteContent { Permanent: true };
+            case DomainObjectState.Empty:
+                return command is CreateContent or UpsertContent;
+            default:
+                return command is not CreateContent;
+        }
     }
 
     public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -69,7 +70,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
         switch (command)
         {
             case UpsertContent upsertContent:
-                return UpsertReturnAsync(upsertContent, async (c, ct) =>
+                return ApplyReturnAsync(upsertContent, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -95,7 +96,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 }, ct);
 
             case CreateContent createContent:
-                return CreateReturnAsync(createContent, async (c, ct) =>
+                return ApplyReturnAsync(createContent, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -114,7 +115,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 }, ct);
 
             case ValidateContent validate:
-                return UpdateReturnAsync(validate, async (c, ct) =>
+                return ApplyReturnAsync(validate, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -124,7 +125,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 }, ct);
 
             case CreateContentDraft createDraft:
-                return UpdateReturnAsync(createDraft, async (c, ct) =>
+                return ApplyReturnAsync(createDraft, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -134,7 +135,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 }, ct);
 
             case DeleteContentDraft deleteDraft:
-                return UpdateReturnAsync(deleteDraft, async (c, ct) =>
+                return ApplyReturnAsync(deleteDraft, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -144,7 +145,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 }, ct);
 
             case PatchContent patchContent:
-                return UpdateReturnAsync(patchContent, async (c, ct) =>
+                return ApplyReturnAsync(patchContent, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -154,7 +155,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 }, ct);
 
             case UpdateContent updateContent:
-                return UpdateReturnAsync(updateContent, async (c, ct) =>
+                return ApplyReturnAsync(updateContent, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -164,7 +165,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 }, ct);
 
             case CancelContentSchedule cancelContentSchedule:
-                return UpdateReturnAsync(cancelContentSchedule, async (c, ct) =>
+                return ApplyReturnAsync(cancelContentSchedule, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -174,7 +175,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 }, ct);
 
             case ChangeContentStatus changeContentStatus:
-                return UpdateReturnAsync(changeContentStatus, async (c, ct) =>
+                return ApplyReturnAsync(changeContentStatus, async (c, ct) =>
                 {
                     try
                     {
@@ -213,7 +214,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                 }, ct);
 
             case DeleteContent deleteContent:
-                return UpdateAsync(deleteContent, async (c, ct) =>
+                return ApplyAsync(deleteContent, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 

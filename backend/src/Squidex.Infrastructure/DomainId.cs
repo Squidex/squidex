@@ -55,7 +55,7 @@ public readonly struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
 
     public override bool Equals(object? obj)
     {
-        return obj is DomainId status && Equals(status);
+        return obj is DomainId id && Equals(id);
     }
 
     public bool Equals(DomainId other)

@@ -7,7 +7,6 @@
 
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 

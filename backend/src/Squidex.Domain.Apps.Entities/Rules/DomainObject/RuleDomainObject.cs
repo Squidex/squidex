@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -37,16 +38,22 @@ public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
         return snapshot.IsDeleted;
     }
 
-    protected override bool CanAcceptCreation(ICommand command)
-    {
-        return command is RuleCommandBase;
-    }
-
     protected override bool CanAccept(ICommand command)
     {
-        return command is RuleCommand ruleCommand &&
-            ruleCommand.AppId.Equals(Snapshot.AppId) &&
-            ruleCommand.RuleId.Equals(Snapshot.Id);
+        return command is RuleCommand c && c.AppId.Equals(Snapshot.AppId) && c.RuleId.Equals(Snapshot.Id);
+    }
+
+    protected override bool CanAccept(ICommand command, DomainObjectState state)
+    {
+        switch (state)
+        {
+            case DomainObjectState.Empty:
+                return command is CreateRule;
+            case DomainObjectState.Created:
+                return command is not CreateRule;
+            default:
+                return false;
+        }
     }
 
     public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -55,7 +62,7 @@ public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
         switch (command)
         {
             case CreateRule createRule:
-                return CreateReturnAsync(createRule, async (c, ct) =>
+                return ApplyReturnAsync(createRule, async (c, ct) =>
                 {
                     await GuardRule.CanCreate(c, AppProvider());
 
@@ -65,7 +72,7 @@ public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
                 }, ct);
 
             case UpdateRule updateRule:
-                return UpdateReturnAsync(updateRule, async (c, ct) =>
+                return ApplyReturnAsync(updateRule, async (c, ct) =>
                 {
                     await GuardRule.CanUpdate(c, Snapshot, AppProvider());
 
@@ -75,7 +82,7 @@ public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
                 }, ct);
 
             case EnableRule enable:
-                return UpdateReturn(enable, c =>
+                return ApplyReturn(enable, c =>
                 {
                     Enable(c);
 
@@ -83,7 +90,7 @@ public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
                 }, ct);
 
             case DisableRule disable:
-                return UpdateReturn(disable, c =>
+                return ApplyReturn(disable, c =>
                 {
                     Disable(c);
 
@@ -91,13 +98,13 @@ public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
                 }, ct);
 
             case DeleteRule delete:
-                return Update(delete, c =>
+                return Apply(delete, c =>
                 {
                     Delete(c);
                 }, ct);
 
             case TriggerRule triggerRule:
-                return UpdateReturnAsync(triggerRule, async (c, ct) =>
+                return ApplyReturnAsync(triggerRule, async (c, ct) =>
                 {
                     await Trigger(triggerRule);
 

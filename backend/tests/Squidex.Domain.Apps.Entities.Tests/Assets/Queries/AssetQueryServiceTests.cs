@@ -45,10 +45,10 @@ public class AssetQueryServiceTests : GivenContext
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetBySlugAsync(AppId.Id, "slug", A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetBySlugAsync(AppId.Id, "slug", true, A<CancellationToken>._))
             .Returns(asset);
 
-        var actual = await sut.FindBySlugAsync(ApiContext, "slug", CancellationToken);
+        var actual = await sut.FindBySlugAsync(ApiContext, "slug", true, CancellationToken);
 
         AssertAsset(asset, actual);
     }
@@ -58,10 +58,10 @@ public class AssetQueryServiceTests : GivenContext
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetBySlugAsync(AppId.Id, "slug", A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetBySlugAsync(AppId.Id, "slug", false, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetEntity?>(null));
 
-        var actual = await sut.FindBySlugAsync(ApiContext, "slug", CancellationToken);
+        var actual = await sut.FindBySlugAsync(ApiContext, "slug", false, CancellationToken);
 
         Assert.Null(actual);
     }
@@ -71,7 +71,7 @@ public class AssetQueryServiceTests : GivenContext
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetAsync(AppId.Id, asset.Id, A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetAsync(AppId.Id, asset.Id, false, A<CancellationToken>._))
             .Returns(asset);
 
         var actual = await sut.FindAsync(ApiContext, asset.Id, ct: CancellationToken);
@@ -84,7 +84,7 @@ public class AssetQueryServiceTests : GivenContext
     {
         var asset = CreateAsset(DomainId.NewGuid());
 
-        A.CallTo(() => assetRepository.FindAssetAsync(AppId.Id, asset.Id, A<CancellationToken>._))
+        A.CallTo(() => assetRepository.FindAssetAsync(AppId.Id, asset.Id, false, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetEntity?>(null));
 
         var actual = await sut.FindAsync(ApiContext, asset.Id, ct: CancellationToken);
@@ -100,7 +100,7 @@ public class AssetQueryServiceTests : GivenContext
         A.CallTo(() => assetLoader.GetAsync(AppId.Id, asset.Id, 2, A<CancellationToken>._))
             .Returns(asset);
 
-        var actual = await sut.FindAsync(ApiContext, asset.Id, 2, CancellationToken);
+        var actual = await sut.FindAsync(ApiContext, asset.Id, false, 2, CancellationToken);
 
         AssertAsset(asset, actual);
     }
@@ -113,7 +113,7 @@ public class AssetQueryServiceTests : GivenContext
         A.CallTo(() => assetLoader.GetAsync(AppId.Id, asset.Id, 2, A<CancellationToken>._))
             .Returns(Task.FromResult<IAssetEntity?>(null));
 
-        var actual = await sut.FindAsync(ApiContext, asset.Id, 2, CancellationToken);
+        var actual = await sut.FindAsync(ApiContext, asset.Id, false, 2, CancellationToken);
 
         Assert.Null(actual);
     }

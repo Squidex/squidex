@@ -8,8 +8,10 @@
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.EventSynchronization;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards;
+using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
@@ -34,16 +36,22 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
         return snapshot.IsDeleted;
     }
 
-    protected override bool CanAcceptCreation(ICommand command)
-    {
-        return command is SchemaCommandBase;
-    }
-
     protected override bool CanAccept(ICommand command)
     {
-        return command is SchemaCommand schemaCommand &&
-            Equals(schemaCommand.AppId, Snapshot.AppId) &&
-            Equals(schemaCommand.SchemaId?.Id, Snapshot.Id);
+        return command is SchemaCommand c && Equals(c.AppId, Snapshot.AppId) && Equals(c.SchemaId?.Id, Snapshot.Id);
+    }
+
+    protected override bool CanAccept(ICommand command, DomainObjectState state)
+    {
+        switch (state)
+        {
+            case DomainObjectState.Empty:
+                return command is CreateSchema;
+            case DomainObjectState.Created:
+                return command is not CreateSchema;
+            default:
+                return false;
+        }
     }
 
     public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -52,7 +60,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
         switch (command)
         {
             case AddField addField:
-                return UpdateReturn(addField, c =>
+                return ApplyReturn(addField, c =>
                 {
                     GuardSchemaField.CanAdd(c, Snapshot.SchemaDef);
 
@@ -62,7 +70,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case CreateSchema createSchema:
-                return CreateReturn(createSchema, c =>
+                return ApplyReturn(createSchema, c =>
                 {
                     GuardSchema.CanCreate(c);
 
@@ -72,7 +80,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case SynchronizeSchema synchronize:
-                return UpdateReturn(synchronize, c =>
+                return ApplyReturn(synchronize, c =>
                 {
                     GuardSchema.CanSynchronize(c);
 
@@ -82,7 +90,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case DeleteField deleteField:
-                return UpdateReturn(deleteField, c =>
+                return ApplyReturn(deleteField, c =>
                 {
                     GuardSchemaField.CanDelete(deleteField, Snapshot.SchemaDef);
 
@@ -92,7 +100,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case LockField lockField:
-                return UpdateReturn(lockField, c =>
+                return ApplyReturn(lockField, c =>
                 {
                     GuardSchemaField.CanLock(lockField, Snapshot.SchemaDef);
 
@@ -102,7 +110,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case HideField hideField:
-                return UpdateReturn(hideField, c =>
+                return ApplyReturn(hideField, c =>
                 {
                     GuardSchemaField.CanHide(c, Snapshot.SchemaDef);
 
@@ -112,7 +120,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case ShowField showField:
-                return UpdateReturn(showField, c =>
+                return ApplyReturn(showField, c =>
                 {
                     GuardSchemaField.CanShow(c, Snapshot.SchemaDef);
 
@@ -122,7 +130,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case DisableField disableField:
-                return UpdateReturn(disableField, c =>
+                return ApplyReturn(disableField, c =>
                 {
                     GuardSchemaField.CanDisable(c, Snapshot.SchemaDef);
 
@@ -132,7 +140,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case EnableField enableField:
-                return UpdateReturn(enableField, c =>
+                return ApplyReturn(enableField, c =>
                 {
                     GuardSchemaField.CanEnable(c, Snapshot.SchemaDef);
 
@@ -142,7 +150,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case UpdateField updateField:
-                return UpdateReturn(updateField, c =>
+                return ApplyReturn(updateField, c =>
                 {
                     GuardSchemaField.CanUpdate(c, Snapshot.SchemaDef);
 
@@ -152,7 +160,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case ReorderFields reorderFields:
-                return UpdateReturn(reorderFields, c =>
+                return ApplyReturn(reorderFields, c =>
                 {
                     GuardSchema.CanReorder(c, Snapshot.SchemaDef);
 
@@ -162,7 +170,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case ConfigureFieldRules configureFieldRules:
-                return UpdateReturn(configureFieldRules, c =>
+                return ApplyReturn(configureFieldRules, c =>
                 {
                     GuardSchema.CanConfigureFieldRules(c);
 
@@ -172,7 +180,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case ConfigurePreviewUrls configurePreviewUrls:
-                return UpdateReturn(configurePreviewUrls, c =>
+                return ApplyReturn(configurePreviewUrls, c =>
                 {
                     GuardSchema.CanConfigurePreviewUrls(c);
 
@@ -182,7 +190,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case ConfigureUIFields configureUIFields:
-                return UpdateReturn(configureUIFields, c =>
+                return ApplyReturn(configureUIFields, c =>
                 {
                     GuardSchema.CanConfigureUIFields(c, Snapshot.SchemaDef);
 
@@ -192,7 +200,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case ChangeCategory changeCategory:
-                return UpdateReturn(changeCategory, c =>
+                return ApplyReturn(changeCategory, c =>
                 {
                     ChangeCategory(c);
 
@@ -200,7 +208,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case UpdateSchema update:
-                return UpdateReturn(update, c =>
+                return ApplyReturn(update, c =>
                 {
                     Update(c);
 
@@ -208,7 +216,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case PublishSchema publish:
-                return UpdateReturn(publish, c =>
+                return ApplyReturn(publish, c =>
                 {
                     Publish(c);
 
@@ -216,7 +224,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case UnpublishSchema unpublish:
-                return UpdateReturn(unpublish, c =>
+                return ApplyReturn(unpublish, c =>
                 {
                     Unpublish(c);
 
@@ -224,7 +232,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case ConfigureScripts configureScripts:
-                return UpdateReturn(configureScripts, c =>
+                return ApplyReturn(configureScripts, c =>
                 {
                     ConfigureScripts(c);
 
@@ -232,10 +240,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
                 }, ct);
 
             case DeleteSchema deleteSchema:
-                return Update(deleteSchema, c =>
-                {
-                    Delete(c);
-                }, ct);
+                return Apply(deleteSchema, Delete, ct);
 
             default:
                 ThrowHelper.NotSupportedException();

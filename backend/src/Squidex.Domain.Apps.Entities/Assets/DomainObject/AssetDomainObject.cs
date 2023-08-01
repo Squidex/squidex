@@ -36,26 +36,29 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
         return snapshot.IsDeleted;
     }
 
-    protected override bool CanRecreate()
-    {
-        return true;
-    }
-
-    protected override bool CanRecreate(IEvent @event)
+    protected override bool IsRecreation(IEvent @event)
     {
         return @event is AssetCreated;
     }
 
-    protected override bool CanAcceptCreation(ICommand command)
-    {
-        return command is AssetCommandBase;
-    }
-
     protected override bool CanAccept(ICommand command)
     {
-        return command is AssetCommand assetCommand &&
-            Equals(assetCommand.AppId, Snapshot.AppId) &&
-            Equals(assetCommand.AssetId, Snapshot.Id);
+        return command is AssetCommand c && c.AppId == Snapshot.AppId && c.AssetId == Snapshot.Id;
+    }
+
+    protected override bool CanAccept(ICommand command, DomainObjectState state)
+    {
+        switch (state)
+        {
+            case DomainObjectState.Undefined:
+                return command is CreateAsset;
+            case DomainObjectState.Empty:
+                return command is CreateAsset or UpsertAsset;
+            case DomainObjectState.Deleted:
+                return command is CreateAsset or UpsertAsset or DeleteAsset { Permanent: true };
+            default:
+                return true;
+        }
     }
 
     public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -64,7 +67,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
         switch (command)
         {
             case UpsertAsset upsert:
-                return UpsertReturnAsync(upsert, async (c, ct) =>
+                return ApplyReturnAsync(upsert, async (c, ct) =>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -86,7 +89,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 }, ct);
 
             case CreateAsset create:
-                return CreateReturnAsync(create, async (c, ct) =>
+                return ApplyReturnAsync(create, async (c, ct) =>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -101,7 +104,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 }, ct);
 
             case AnnotateAsset annotate:
-                return UpdateReturnAsync(annotate, async (c, ct) =>
+                return ApplyReturnAsync(annotate, async (c, ct) =>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -111,7 +114,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 }, ct);
 
             case UpdateAsset update:
-                return UpdateReturnAsync(update, async (c, ct) =>
+                return ApplyReturnAsync(update, async (c, ct) =>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -121,7 +124,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 }, ct);
 
             case MoveAsset move:
-                return UpdateReturnAsync(move, async (c, ct) =>
+                return ApplyReturnAsync(move, async (c, ct) =>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
@@ -139,7 +142,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                 }, ct);
 
             case DeleteAsset delete:
-                return UpdateAsync(delete, async (c, ct) =>
+                return ApplyAsync(delete, async (c, ct) =>
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 

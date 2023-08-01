@@ -40,14 +40,27 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
         return snapshot.IsDeleted;
     }
 
-    protected override bool CanAcceptCreation(ICommand command)
-    {
-        return command is AppCommandBase;
-    }
-
     protected override bool CanAccept(ICommand command)
     {
-        return command is AppCommand update && Equals(update?.AppId?.Id, Snapshot.Id);
+        if (Snapshot.Id == default)
+        {
+            return true;
+        }
+
+        return command is AppCommandBase c && c.AggregateId == Snapshot.Id;
+    }
+
+    protected override bool CanAccept(ICommand command, DomainObjectState state)
+    {
+        switch (state)
+        {
+            case DomainObjectState.Empty:
+                return command is CreateApp;
+            case DomainObjectState.Created:
+                return command is not CreateApp;
+            default:
+                return false;
+        }
     }
 
     public override Task<CommandResult> ExecuteAsync(IAggregateCommand command,
@@ -56,7 +69,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
         switch (command)
         {
             case CreateApp create:
-                return CreateReturn(create, c =>
+                return ApplyReturn(create, c =>
                 {
                     GuardApp.CanCreate(c);
 
@@ -66,7 +79,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case UpdateApp update:
-                return UpdateReturn(update, c =>
+                return ApplyReturn(update, c =>
                 {
                     GuardApp.CanUpdate(c);
 
@@ -76,7 +89,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case TransferToTeam transfer:
-                return UpdateReturnAsync(transfer, async (c, ct) =>
+                return ApplyReturnAsync(transfer, async (c, ct) =>
                 {
                     await GuardApp.CanTransfer(c, Snapshot, AppProvider, ct);
 
@@ -86,7 +99,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case UpdateAppSettings updateSettings:
-                return UpdateReturn(updateSettings, c =>
+                return ApplyReturn(updateSettings, c =>
                 {
                     GuardApp.CanUpdateSettings(c);
 
@@ -96,7 +109,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case UploadAppImage uploadImage:
-                return UpdateReturn(uploadImage, c =>
+                return ApplyReturn(uploadImage, c =>
                 {
                     GuardApp.CanUploadImage(c);
 
@@ -106,7 +119,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case RemoveAppImage removeImage:
-                return UpdateReturn(removeImage, c =>
+                return ApplyReturn(removeImage, c =>
                 {
                     GuardApp.CanRemoveImage(c);
 
@@ -116,7 +129,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case ConfigureAssetScripts configureAssetScripts:
-                return UpdateReturn(configureAssetScripts, c =>
+                return ApplyReturn(configureAssetScripts, c =>
                 {
                     GuardApp.CanUpdateAssetScripts(c);
 
@@ -126,7 +139,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case AssignContributor assignContributor:
-                return UpdateReturnAsync(assignContributor, async (c, ct) =>
+                return ApplyReturnAsync(assignContributor, async (c, ct) =>
                 {
                     var (plan, _, _) = await UsageGate.GetPlanForAppAsync(Snapshot, false, ct);
 
@@ -138,7 +151,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case RemoveContributor removeContributor:
-                return UpdateReturn(removeContributor, c =>
+                return ApplyReturn(removeContributor, c =>
                 {
                     GuardAppContributors.CanRemove(c, Snapshot);
 
@@ -148,7 +161,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case AttachClient attachClient:
-                return UpdateReturn(attachClient, c =>
+                return ApplyReturn(attachClient, c =>
                 {
                     GuardAppClients.CanAttach(c, Snapshot);
 
@@ -158,7 +171,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case UpdateClient updateClient:
-                return UpdateReturn(updateClient, c =>
+                return ApplyReturn(updateClient, c =>
                 {
                     GuardAppClients.CanUpdate(c, Snapshot);
 
@@ -168,7 +181,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case RevokeClient revokeClient:
-                return UpdateReturn(revokeClient, c =>
+                return ApplyReturn(revokeClient, c =>
                 {
                     GuardAppClients.CanRevoke(c, Snapshot);
 
@@ -178,7 +191,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case AddWorkflow addWorkflow:
-                return UpdateReturn(addWorkflow, c =>
+                return ApplyReturn(addWorkflow, c =>
                 {
                     GuardAppWorkflows.CanAdd(c);
 
@@ -188,7 +201,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case UpdateWorkflow updateWorkflow:
-                return UpdateReturn(updateWorkflow, c =>
+                return ApplyReturn(updateWorkflow, c =>
                 {
                     GuardAppWorkflows.CanUpdate(c, Snapshot);
 
@@ -198,7 +211,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case DeleteWorkflow deleteWorkflow:
-                return UpdateReturn(deleteWorkflow, c =>
+                return ApplyReturn(deleteWorkflow, c =>
                 {
                     GuardAppWorkflows.CanDelete(c, Snapshot);
 
@@ -208,7 +221,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case AddLanguage addLanguage:
-                return UpdateReturn(addLanguage, c =>
+                return ApplyReturn(addLanguage, c =>
                 {
                     GuardAppLanguages.CanAdd(c, Snapshot);
 
@@ -218,7 +231,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case RemoveLanguage removeLanguage:
-                return UpdateReturn(removeLanguage, c =>
+                return ApplyReturn(removeLanguage, c =>
                 {
                     GuardAppLanguages.CanRemove(c, Snapshot);
 
@@ -228,7 +241,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case UpdateLanguage updateLanguage:
-                return UpdateReturn(updateLanguage, c =>
+                return ApplyReturn(updateLanguage, c =>
                 {
                     GuardAppLanguages.CanUpdate(c, Snapshot);
 
@@ -238,7 +251,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case AddRole addRole:
-                return UpdateReturn(addRole, c =>
+                return ApplyReturn(addRole, c =>
                 {
                     GuardAppRoles.CanAdd(c, Snapshot);
 
@@ -248,7 +261,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case DeleteRole deleteRole:
-                return UpdateReturn(deleteRole, c =>
+                return ApplyReturn(deleteRole, c =>
                 {
                     GuardAppRoles.CanDelete(c, Snapshot);
 
@@ -258,7 +271,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case UpdateRole updateRole:
-                return UpdateReturn(updateRole, c =>
+                return ApplyReturn(updateRole, c =>
                 {
                     GuardAppRoles.CanUpdate(c, Snapshot);
 
@@ -268,7 +281,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case DeleteApp delete:
-                return UpdateAsync(delete, async (c, ct) =>
+                return ApplyAsync(delete, async (c, ct) =>
                 {
                     await BillingManager.UnsubscribeAsync(c.Actor.Identifier, Snapshot, default);
 
@@ -276,7 +289,7 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
                 }, ct);
 
             case ChangePlan changePlan:
-                return UpdateReturnAsync(changePlan, async (c, ct) =>
+                return ApplyReturnAsync(changePlan, async (c, ct) =>
                 {
                     GuardApp.CanChangePlan(c, Snapshot, BillingPlans);
 
