@@ -45,6 +45,8 @@ public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDo
     {
         switch (state)
         {
+            case DomainObjectState.Undefined:
+                return command is CreateAssetFolder;
             case DomainObjectState.Empty:
                 return command is CreateAssetFolder;
             case DomainObjectState.Created:

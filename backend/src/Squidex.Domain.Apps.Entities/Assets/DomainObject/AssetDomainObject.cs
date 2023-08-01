@@ -57,7 +57,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
             case DomainObjectState.Deleted:
                 return command is CreateAsset or UpsertAsset or DeleteAsset { Permanent: true };
             default:
-                return true;
+                return command is not CreateAsset;
         }
     }
 

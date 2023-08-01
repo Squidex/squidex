@@ -8,10 +8,8 @@
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.EventSynchronization;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards;
-using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
@@ -45,6 +43,8 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
     {
         switch (state)
         {
+            case DomainObjectState.Undefined:
+                return command is CreateSchema;
             case DomainObjectState.Empty:
                 return command is CreateSchema;
             case DomainObjectState.Created:

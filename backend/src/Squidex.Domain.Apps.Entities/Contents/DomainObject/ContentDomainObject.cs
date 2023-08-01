@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -55,6 +54,8 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
     {
         switch (state)
         {
+            case DomainObjectState.Undefined:
+                return command is CreateContent;
             case DomainObjectState.Deleted:
                 return command is CreateContent or UpsertContent or DeleteContent { Permanent: true };
             case DomainObjectState.Empty:

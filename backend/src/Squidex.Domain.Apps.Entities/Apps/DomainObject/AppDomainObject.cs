@@ -54,12 +54,14 @@ public partial class AppDomainObject : DomainObject<AppDomainObject.State>
     {
         switch (state)
         {
+            case DomainObjectState.Undefined:
+                return command is CreateApp;
             case DomainObjectState.Empty:
                 return command is CreateApp;
             case DomainObjectState.Created:
                 return command is not CreateApp;
             default:
-                return false;
+                return true;
         }
     }
 

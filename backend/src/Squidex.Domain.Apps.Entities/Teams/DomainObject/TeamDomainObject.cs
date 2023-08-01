@@ -48,6 +48,8 @@ public partial class TeamDomainObject : DomainObject<TeamDomainObject.State>
     {
         switch (state)
         {
+            case DomainObjectState.Undefined:
+                return command is CreateTeam;
             case DomainObjectState.Empty:
                 return command is CreateTeam;
             case DomainObjectState.Created:
