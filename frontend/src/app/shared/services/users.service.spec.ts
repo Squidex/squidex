@@ -26,6 +26,16 @@ describe('UsersService', () => {
         httpMock.verify();
     }));
 
+    it('should make post request to update profile',
+        inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
+            usersService.postUser({ answers: {} }).subscribe();
+
+            const req = httpMock.expectOne('http://service/p/api/user');
+
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+        }));
+
     it('should make get request to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
             let users: ReadonlyArray<UserDto>;

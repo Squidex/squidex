@@ -25,6 +25,7 @@ public sealed class UsersController : ApiController
     private static readonly byte[] AvatarBytes;
     private readonly IHttpClientFactory httpClientFactory;
     private readonly IUserPictureStore userPictureStore;
+    private readonly IUserService userService;
     private readonly IUserResolver userResolver;
     private readonly ILogger<UsersController> log;
 
@@ -45,13 +46,14 @@ public sealed class UsersController : ApiController
         IHttpClientFactory httpClientFactory,
         IUserPictureStore userPictureStore,
         IUserResolver userResolver,
+        IUserService userService,
         ILogger<UsersController> log)
         : base(commandBus)
     {
         this.httpClientFactory = httpClientFactory;
         this.userPictureStore = userPictureStore;
+        this.userService = userService;
         this.userResolver = userResolver;
-
         this.log = log;
     }
 
@@ -68,6 +70,22 @@ public sealed class UsersController : ApiController
         var response = ResourcesDto.FromDomain(Resources);
 
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Update the user profile.
+    /// </summary>
+    /// <param name="request">The values to update.</param>
+    /// <response code="204">User updated.</response>.
+    [HttpPost]
+    [Route("user")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ApiPermission]
+    public async Task<IActionResult> PostUser([FromBody] UpdateProfileDto request)
+    {
+        await userService.UpdateAsync(UserId, request.ToValues(), true, HttpContext.RequestAborted);
+
+        return NoContent();
     }
 
     /// <summary>

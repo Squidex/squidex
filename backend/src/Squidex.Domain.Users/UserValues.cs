@@ -35,4 +35,6 @@ public sealed class UserValues
     public List<Claim>? CustomClaims { get; set; }
 
     public List<(string Name, string Value)>? Properties { get; set; }
+
+    public Dictionary<string, string>? Answers { get; set; }
 }

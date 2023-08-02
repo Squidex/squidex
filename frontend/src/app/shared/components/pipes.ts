@@ -192,7 +192,7 @@ export class UserPictureRefPipe extends UserAsyncPipe implements OnDestroy, Pipe
             if (type === 'subject') {
                 return users.getUser(id).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
             } else {
-                return of('./images/client.png');
+                return of('./images/squid.svg');
             }
         });
     }

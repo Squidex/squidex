@@ -125,6 +125,14 @@ internal static class UserManagerExtensions
             }
         }
 
+        if (values.Answers != null)
+        {
+            foreach (var (name, value) in values.Answers.Where(x => !string.IsNullOrWhiteSpace(x.Value)))
+            {
+                AddClaim(SquidexClaimTypes.Answer, $"{name}={value}");
+            }
+        }
+
         if (values.CustomClaims != null)
         {
             foreach (var group in values.CustomClaims.GroupBy(x => x.Type))

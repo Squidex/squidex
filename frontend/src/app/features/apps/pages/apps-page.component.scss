@@ -11,6 +11,19 @@
     overflow-y: auto;
 }
 
+.squid {
+    @include circle(60px);
+    background: $color-white;
+
+    &.bordered {
+        border: 1px solid $color-border;
+    }
+
+    img {
+        max-height: 80%;
+    }
+}
+
 :host ::ng-deep {
     .card {
         @include hover-visible('.deeplinks', inline);

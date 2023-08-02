@@ -2,10 +2,19 @@
 
 <div class="panel-container page" *ngIf="authState.userChanges | async; let user">  
     <div class="apps-section">
-        <h1 class="apps-title">{{ 'apps.welcomeTitle' | sqxTranslate: { user: user.displayName } }}</h1>
+        <div class="row g-3">
+            <div class="col-auto">
+                <div class="squid d-flex align-items-center justify-content-center bordered">
+                    <img src="./images/squid.svg">
+                </div>
+            </div>
+            <div class="col">
+                <h1 class="apps-title">{{ 'apps.welcomeTitle' | sqxTranslate: { user: user.displayName } }}</h1>
 
-        <div class="subtext">
-            {{ 'apps.welcomeSubtitle' | sqxTranslate }}
+                <div class="subtext">
+                    {{ 'apps.welcomeSubtitle' | sqxTranslate }}
+                </div>
+            </div>
         </div>
     </div>
 

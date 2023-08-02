@@ -3,9 +3,18 @@
 <ng-container *ngIf="selectedApp | async; let app">
     <div class="dashboard" @fade>
         <div class="dashboard-summary" *ngIf="!isScrolled" @fade>
-            <h1 class="dashboard-title">{{ 'dashboard.welcomeTitle' | sqxTranslate: { user: user } }}</h1>
-
-            <div class="subtext" [innerHTML]="'dashboard.welcomeText' | sqxTranslate: { app: app.displayName } | sqxMarkdown | sqxSafeHtml"></div>
+            <div class="row g-3">
+                <div class="col-auto">
+                    <div class="squid d-flex align-items-center justify-content-center bordered">
+                        <img src="./images/squid.svg">
+                    </div>
+                </div>
+                <div class="col">
+                    <h1 class="dashboard-title">{{ 'dashboard.welcomeTitle' | sqxTranslate: { user: user } }}</h1>
+        
+                    <div class="subtext" [innerHTML]="'dashboard.welcomeText' | sqxTranslate: { app: app.displayName } | sqxMarkdown | sqxSafeHtml"></div>
+                </div>
+            </div>
         </div>
 
         <gridster [options]="gridOptions" #grid>

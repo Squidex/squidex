@@ -19,12 +19,23 @@ export class UserDto {
     }
 }
 
+export type UpdateProfileDto = Readonly<{
+    // The given answers.
+    answers: { [question: string]: string };
+ }>;
+
 @Injectable()
 export class UsersService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
     ) {
+    }
+
+    public postUser(dto: UpdateProfileDto): Observable<any> {
+        const url = this.apiUrl.buildUrl('api/user');
+
+        return this.http.post<any[]>(url, dto);
     }
 
     public getUsers(query?: string): Observable<ReadonlyArray<UserDto>> {
