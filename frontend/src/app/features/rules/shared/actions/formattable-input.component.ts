@@ -121,12 +121,12 @@ function getValueFromMode(value: string | undefined, mode: TemplateMode) {
     value = value.trim();
 
     switch (mode) {
-        case 'Liquid': {
-            return `Liquid(${value})`;
-        }
-        case 'Script': {
-            `Script(${value})`;
-        }
+        case 'Liquid':
+            value = `Liquid(${value})`;
+            break;
+        case 'Script':
+            value = `Script(${value})`;
+            break;
     }
 
     return value;
