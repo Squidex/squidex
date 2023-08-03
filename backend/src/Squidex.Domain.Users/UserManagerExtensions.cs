@@ -100,7 +100,7 @@ internal static class UserManagerExtensions
         SyncString(SquidexClaimTypes.DisplayName, values.DisplayName);
         SyncString(SquidexClaimTypes.PictureUrl, values.PictureUrl);
 
-        SyncBoolean(SquidexClaimTypes.Hidden, values.Hidden);
+        SyncBoolean(SquidexClaimTypes.Hidden, values.IsHidden);
         SyncBoolean(SquidexClaimTypes.Invited, values.Invited);
         SyncBoolean(SquidexClaimTypes.Consent, values.Consent);
         SyncBoolean(SquidexClaimTypes.ConsentForEmails, values.ConsentForEmails);

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Users;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
@@ -41,12 +42,6 @@ public sealed class UpdateUserDto
 
     public UserValues ToValues()
     {
-        return new UserValues
-        {
-            Email = Email,
-            DisplayName = DisplayName,
-            Password = Password,
-            Permissions = new PermissionSet(Permissions)
-        };
+        return SimpleMapper.Map(this, new UserValues { Permissions = new PermissionSet(Permissions) };
     }
 }

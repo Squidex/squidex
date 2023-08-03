@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Users;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile;
@@ -22,6 +23,6 @@ public class ChangeProfileModel
 
     public UserValues ToValues()
     {
-        return new UserValues { Email = Email, DisplayName = DisplayName, Hidden = IsHidden };
+        return SimpleMapper.Map(this, new UserValues());
     }
 }

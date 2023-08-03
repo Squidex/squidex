@@ -22,7 +22,7 @@ public sealed class UserValues
 
     public string Email { get; set; }
 
-    public bool? Hidden { get; set; }
+    public bool? IsHidden { get; set; }
 
     public bool? Invited { get; set; }
 

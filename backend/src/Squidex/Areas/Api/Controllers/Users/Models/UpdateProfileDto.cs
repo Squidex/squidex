@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Users;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models;
@@ -20,9 +21,6 @@ public sealed class UpdateProfileDto
 
     public UserValues ToValues()
     {
-        return new UserValues
-        {
-            Answers = Answers
-        };
+        return SimpleMapper.Map(this, new UserValues());
     }
 }
