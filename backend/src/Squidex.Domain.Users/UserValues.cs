@@ -36,5 +36,5 @@ public sealed class UserValues
 
     public List<(string Name, string Value)>? Properties { get; set; }
 
-    public Dictionary<string, string>? Answers { get; set; }
+    public Dictionary<string, string?>? Answers { get; set; }
 }

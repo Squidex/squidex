@@ -1135,6 +1135,12 @@
   <data name="users.noEmailAddress" xml:space="preserve">
     <value>We cannot get the email address from authentication provider.</value>
   </data>
+  <data name="users.profile.aboutHint" xml:space="preserve">
+    <value>Please share some information about your. It helps us to get an understanding about our users and to improve the product.</value>
+  </data>
+  <data name="users.profile.aboutTitle" xml:space="preserve">
+    <value>About You</value>
+  </data>
   <data name="users.profile.addLoginDone" xml:space="preserve">
     <value>La login è stata aggiunta con successo.</value>
   </data>
@@ -1149,6 +1155,12 @@
   </data>
   <data name="users.profile.clientTitle" xml:space="preserve">
     <value>Client</value>
+  </data>
+  <data name="users.profile.companyRole" xml:space="preserve">
+    <value>What is your role?</value>
+  </data>
+  <data name="users.profile.companySize" xml:space="preserve">
+    <value>How many people work in a company?</value>
   </data>
   <data name="users.profile.confirmPassword" xml:space="preserve">
     <value>Confermare</value>
@@ -1174,6 +1186,30 @@
   <data name="users.profile.pii" xml:space="preserve">
     <value>Informazioni personali</value>
   </data>
+  <data name="users.profile.project" xml:space="preserve">
+    <value>What kind of project do you realize?</value>
+  </data>
+  <data name="users.profile.projectBackend" xml:space="preserve">
+    <value>Backend Data Management</value>
+  </data>
+  <data name="users.profile.projectCommerce" xml:space="preserve">
+    <value>E-Commerce Solution</value>
+  </data>
+  <data name="users.profile.projectLearning" xml:space="preserve">
+    <value>None, I am just here for learning</value>
+  </data>
+  <data name="users.profile.projectMobileApp" xml:space="preserve">
+    <value>Mobile App</value>
+  </data>
+  <data name="users.profile.projectNewsMagazine" xml:space="preserve">
+    <value>News Magazine</value>
+  </data>
+  <data name="users.profile.projectPersonalBlog" xml:space="preserve">
+    <value>Personal Blog</value>
+  </data>
+  <data name="users.profile.projectSmallBusiness" xml:space="preserve">
+    <value>Website for Small Business</value>
+  </data>
   <data name="users.profile.propertiesHint" xml:space="preserve">
     <value>Utilizza proprietà personalizzate per regole e script.</value>
   </data>
@@ -1186,11 +1222,44 @@
   <data name="users.profile.removeLoginDone" xml:space="preserve">
     <value>Il provider per l'autenticazione è stato rimosso correttamente.</value>
   </data>
+  <data name="users.profile.roleBusinessAnalyst" xml:space="preserve">
+    <value>Business Analyst</value>
+  </data>
+  <data name="users.profile.roleBusinessOwner" xml:space="preserve">
+    <value>Business Owner</value>
+  </data>
+  <data name="users.profile.roleContentCreator" xml:space="preserve">
+    <value>Content Creator</value>
+  </data>
+  <data name="users.profile.roleEmployee" xml:space="preserve">
+    <value>Work at a company</value>
+  </data>
+  <data name="users.profile.roleProductManager" xml:space="preserve">
+    <value>Product Manager</value>
+  </data>
+  <data name="users.profile.roleSoftwareDeveloper" xml:space="preserve">
+    <value>Business Owner</value>
+  </data>
   <data name="users.profile.setPassword" xml:space="preserve">
     <value>Imposta la Password</value>
   </data>
   <data name="users.profile.setPasswordDone" xml:space="preserve">
     <value>Password impostata con successo.</value>
+  </data>
+  <data name="users.profile.sizeLarge" xml:space="preserve">
+    <value>101-1000</value>
+  </data>
+  <data name="users.profile.sizeMedium" xml:space="preserve">
+    <value>51-100</value>
+  </data>
+  <data name="users.profile.sizeSingle" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="users.profile.sizeSmall" xml:space="preserve">
+    <value>2-10</value>
+  </data>
+  <data name="users.profile.sizeVeryLarge" xml:space="preserve">
+    <value>1000+</value>
   </data>
   <data name="users.profile.title" xml:space="preserve">
     <value>Profilo</value>

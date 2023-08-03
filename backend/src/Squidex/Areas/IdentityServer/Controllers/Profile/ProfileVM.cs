@@ -17,11 +17,19 @@ public sealed class ProfileVM
 
     public string DisplayName { get; set; }
 
+    public string? CompanyRole { get; set; }
+
+    public string? CompanySize { get; set; }
+
+    public string? Project { get; set; }
+
     public string? ClientSecret { get; set; }
 
     public string? ErrorMessage { get; set; }
 
     public string? SuccessMessage { get; set; }
+
+    public bool ShowAbout { get; set; }
 
     public bool IsHidden { get; set; }
 

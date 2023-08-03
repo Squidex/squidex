@@ -93,6 +93,14 @@ public sealed class ProfileController : IdentityServerController
     }
 
     [HttpPost]
+    [Route("account/profile/about/")]
+    public Task<IActionResult> UpdateAbout(ChangeAboutModel model)
+    {
+        return MakeChangeAsync((id, ct) => userService.UpdateAsync(id, model.ToValues(), ct: ct),
+            T.Get("users.profile.updateProfileDone"), model);
+    }
+
+    [HttpPost]
     [Route("account/profile/login-remove/")]
     public Task<IActionResult> RemoveLogin(RemoveLoginModel model)
     {
@@ -249,14 +257,18 @@ public sealed class ProfileController : IdentityServerController
         {
             Id = user.Id,
             ClientSecret = user.Claims.ClientSecret()!,
+            CompanyRole = user.Claims.Answer("companyRole"),
+            CompanySize = user.Claims.Answer("companySize"),
+            DisplayName = user.Claims.DisplayName()!,
             Email = user.Email,
             ErrorMessage = errorMessage,
             ExternalLogins = logins,
             ExternalProviders = providers,
-            DisplayName = user.Claims.DisplayName()!,
             HasPassword = hasPassword,
             HasPasswordAuth = identityOptions.AllowPasswordAuth,
             IsHidden = user.Claims.IsHidden(),
+            Project = user.Claims.Answer("project"),
+            ShowAbout = identityOptions.ShowAbout,
             SuccessMessage = successMessage
         };
 

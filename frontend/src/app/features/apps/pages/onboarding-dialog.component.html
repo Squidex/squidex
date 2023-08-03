@@ -32,7 +32,7 @@
                     <div [innerHTML]="'tour.stepDataText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
     
                     <div class="form-group mt-4">
-                        <label for="role">{{ 'tour.stepDataRole' | sqxTranslate }}</label>
+                        <label for="role">{{ 'tour.stepDataCompanyRole' | sqxTranslate }}</label>
     
                         <select class="form-select" id="companyRole" formControlName="companyRole">
                             <option [ngValue]="'RoleEmployee'">{{ 'tour.roleEmployee' | sqxTranslate }}</option>
@@ -60,7 +60,7 @@
     
                         <select class="form-select" id="project" formControlName="project">
                             <option [ngValue]="'ProjectNewsMagazine'">{{ 'tour.projectNewsMagazine' | sqxTranslate }}</option>
-                            <option [ngValue]="'ProjectSmallBusiness'">{{ 'tour.projectPersonalBlog' | sqxTranslate }}</option>
+                            <option [ngValue]="'ProjectPersonalBlog'">{{ 'tour.projectPersonalBlog' | sqxTranslate }}</option>
                             <option [ngValue]="'ProjectSmallBusiness'">{{ 'tour.projectSmallBusiness' | sqxTranslate }}</option>
                             <option [ngValue]="'ProjectCommerce'">{{ 'tour.projectCommerce' | sqxTranslate }}</option>
                             <option [ngValue]="'ProjectMobileApp'">{{ 'tour.projectMobileApp' | sqxTranslate }}</option>

@@ -79,27 +79,28 @@ public sealed class Startup
     public void Configure(IApplicationBuilder app)
     {
         app.UseWebSockets();
-
         app.UseCookiePolicy();
-
         app.UseDefaultPathBase();
         app.UseDefaultForwardRules();
-
         app.UseSquidexHealthCheck();
         app.UseSquidexRobotsTxt();
         app.UseSquidexLogging();
         app.UseSquidexLocalization();
         app.UseSquidexLocalCache();
         app.UseSquidexCors();
+
         app.UseOpenApi(options =>
         {
             options.Path = "/api/swagger/v1/swagger.json";
         });
 
-        app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixIdentityServer, StringComparison.OrdinalIgnoreCase), builder =>
+        if (!app.ApplicationServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
         {
-            builder.UseExceptionHandler("/identity-server/error");
-        });
+            app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixIdentityServer, StringComparison.OrdinalIgnoreCase), builder =>
+            {
+                builder.UseExceptionHandler("/identity-server/error");
+            });
+        }
 
         app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixApi, StringComparison.OrdinalIgnoreCase), builder =>
         {
@@ -110,7 +111,6 @@ public sealed class Startup
         });
 
         app.UseRouting();
-
         app.UseAuthentication();
         app.UseAuthorization();
 

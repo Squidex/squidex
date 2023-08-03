@@ -73,6 +73,8 @@ public sealed class MyIdentityOptions
 
     public bool ShowPII { get; set; }
 
+    public bool ShowAbout { get; set; }
+
     public bool SuppressXFrameOptionsHeader { get; set; }
 
     public bool IsAdminConfigured()

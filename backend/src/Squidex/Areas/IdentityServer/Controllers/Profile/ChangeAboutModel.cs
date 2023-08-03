@@ -6,23 +6,27 @@
 // ==========================================================================
 
 using Squidex.Domain.Users;
-using Squidex.Web;
 
-namespace Squidex.Areas.Api.Controllers.Users.Models;
+namespace Squidex.Areas.IdentityServer.Controllers.Profile;
 
-[OpenApiRequest]
-public sealed class UpdateProfileDto
+public class ChangeAboutModel
 {
-    /// <summary>
-    /// The answers from a questionaire.
-    /// </summary>
-    public Dictionary<string, string?>? Answers { get; set; }
+    public string? CompanyRole { get; set; }
+
+    public string? CompanySize { get; set; }
+
+    public string? Project { get; set; }
 
     public UserValues ToValues()
     {
         return new UserValues
         {
-            Answers = Answers
+            Answers = new Dictionary<string, string?>
+            {
+                ["companyRole"] = CompanyRole,
+                ["companySize"] = CompanySize,
+                ["project"] = Project,
+            }
         };
     }
 }

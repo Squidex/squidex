@@ -53,7 +53,7 @@
     @Html.AntiForgeryToken()
 
     <div class="form-group">
-        <label for="email">@T.Get("common.email")</label>
+        <label asp-for="Email">@T.Get("common.email")</label>
 
         @{ RenderValidation("Email"); }
 
@@ -61,7 +61,7 @@
     </div>
 
     <div class="form-group">
-        <label for="displayName">@T.Get("common.displayName")</label>
+        <label asp-for="DisplayName">@T.Get("common.displayName")</label>
 
         @{ RenderValidation("DisplayName"); }
 
@@ -78,6 +78,66 @@
 
     <button type="submit" class="btn btn-primary">@T.Get("common.save")</button>
 </form>
+
+@if (Model.ShowAbout)
+{
+    <hr />
+
+    <div class="profile-section">
+        <h2 id="about">@T.Get("users.profile.aboutTitle")</h2>
+
+        <small class="form-text text-muted mt-0 mb-3 d-block">@T.Get("users.profile.aboutHint")</small>
+
+        <form class="profile-form" asp-controller="Profile" asp-action="UpdateAbout" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label asp-for="CompanyRole">@T.Get("users.profile.companyRole")</label>
+
+                <select type="password" class="form-select" asp-for="CompanyRole">
+                    <option></option>
+                    <option value="RoleEmployee">@T.Get("users.profile.roleEmployee")</option>
+                    <option value="RoleProductManager">@T.Get("users.profile.roleProductManager")</option>
+                    <option value="RoleContentCreator">@T.Get("users.profile.roleContentCreator")</option>
+                    <option value="RoleSoftwareDeveloper">@T.Get("users.profile.roleSoftwareDeveloper")</option>
+                    <option value="RoleBusinessAnalyst">@T.Get("users.profile.roleBusinessAnalyst")</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CompanySize">@T.Get("users.profile.companySize")</label>
+
+                <select type="password" class="form-select" asp-for="CompanySize">
+                    <option></option>
+                    <option value="SizeSingle">@T.Get("users.profile.sizeSingle")</option>
+                    <option value="SizeSmall">@T.Get("users.profile.sizeSmall")</option>
+                    <option value="SizeMedium">@T.Get("users.profile.sizeMedium")</option>
+                    <option value="SizeLarge">@T.Get("users.profile.sizeLarge")</option>
+                    <option value="SizeVeryLarge">@T.Get("users.profile.sizeVeryLarge")</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Project">@T.Get("users.profile.project")</label>
+
+                <select type="password" class="form-select" asp-for="Project">
+                    <option></option>
+                    <option value="ProjectNewsMagazine">@T.Get("users.profile.projectNewsMagazine")</option>
+                    <option value="ProjectPersonalBlog">@T.Get("users.profile.projectPersonalBlog")</option>
+                    <option value="ProjectSmallBusiness">@T.Get("users.profile.projectSmallBusiness")</option>
+                    <option value="ProjectCommerce">@T.Get("users.profile.projectCommerce")</option>
+                    <option value="ProjectMobileApp">@T.Get("users.profile.projectMobileApp")</option>
+                    <option value="ProjectBackend">@T.Get("users.profile.projectBackend")</option>
+                    <option value="ProjectLearning">@T.Get("users.profile.projectLearning")</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">@T.Get("common.save")</button>
+            </div>
+        </form>
+    </div>
+}
 
 @if (Model!.ExternalProviders.Any())
 {
@@ -210,7 +270,7 @@
 <div class="profile-section">
     <h2>@T.Get("users.profile.clientTitle")</h2>
 
-    <small class="form-text text-muted mt-2 mb-2">@T.Get("users.profile.clientHint")</small>
+    <small class="form-text text-muted mt-0 mb-3 d-block">@T.Get("users.profile.clientHint")</small>
 
     <div class="row g-2 form-group">
         <div class="col-8">
@@ -242,7 +302,7 @@
 <div class="profile-section">
     <h2>@T.Get("users.profile.propertiesTitle")</h2>
 
-    <small class="form-text text-muted mt-2 mb-2">@T.Get("users.profile.propertiesHint")</small>
+    <small class="form-text text-muted mt-0 mb-3 d-block">@T.Get("users.profile.propertiesHint")</small>
 
     <form class="profile-form" asp-controller="Profile" asp-action="UpdateProperties" method="post">
         @Html.AntiForgeryToken()

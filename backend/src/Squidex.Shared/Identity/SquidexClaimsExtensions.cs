@@ -76,6 +76,21 @@ namespace Squidex.Shared.Identity
             return user.GetClaimValue(SquidexClaimTypes.DisplayName);
         }
 
+        public static string? Answer(this IEnumerable<Claim> user, string name)
+        {
+            var prefix = $"{name}=";
+
+            foreach (var claim in user)
+            {
+                if (claim.Type == SquidexClaimTypes.Answer && claim.Value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return claim.Value[prefix.Length..];
+                }
+            }
+
+            return null;
+        }
+
         public static int GetTotalApps(this IEnumerable<Claim> user)
         {
             var value = user.GetClaimValue(SquidexClaimTypes.TotalApps);
