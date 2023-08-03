@@ -59,6 +59,7 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
                     apiUrl: this.notifoApiUrl,
                     userKey: null,
                     userToken: this.notifoApiKey,
+                    linkTarget: '_blank',
                 };
 
                 if (this.notifoApiUrl.includes('localhost:5002')) {

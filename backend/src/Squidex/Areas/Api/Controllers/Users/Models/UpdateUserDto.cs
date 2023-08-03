@@ -42,6 +42,6 @@ public sealed class UpdateUserDto
 
     public UserValues ToValues()
     {
-        return SimpleMapper.Map(this, new UserValues { Permissions = new PermissionSet(Permissions) };
+        return SimpleMapper.Map(this, new UserValues { Permissions = new PermissionSet(Permissions) });
     }
 }
