@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { AppLanguageDto, AppsState, changed$, disabled$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-field[form][formContext][formLevel][formModel][language][languages][schema]',
+    selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html',
 })
@@ -27,25 +27,25 @@ export class ContentFieldComponent {
     @Input()
     public formCompare?: EditContentForm | null;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formModel!: FieldForm;
 
     @Input()
     public formModelCompare?: FieldForm;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     public showAllControls = false;

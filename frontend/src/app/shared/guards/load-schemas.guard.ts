@@ -6,13 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
+
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SchemasState } from './../state/schemas.state';
 
 @Injectable()
-export class LoadSchemasGuard implements CanActivate {
+export class LoadSchemasGuard  {
     constructor(
         private readonly schemasState: SchemasState,
     ) {

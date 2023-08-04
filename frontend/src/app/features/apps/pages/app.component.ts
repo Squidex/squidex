@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { AppDto, ModalModel } from '@app/shared';
 
 @Component({
-    selector: 'sqx-app[app]',
+    selector: 'sqx-app',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-    @Input()
+    @Input({ required: true })
     public app!: AppDto;
 
     @Output()

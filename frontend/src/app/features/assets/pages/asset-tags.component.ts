@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { DialogModel, TagItem, TagsSelected } from '@app/shared';
 
 @Component({
-    selector: 'sqx-asset-tags[tags][tagsSelected]',
+    selector: 'sqx-asset-tags',
     styleUrls: ['./asset-tags.component.scss'],
     templateUrl: './asset-tags.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,10 +23,10 @@ export class AssetTagsComponent {
     @Output()
     public toggle = new EventEmitter<string>();
 
-    @Input()
+    @Input({ required: true })
     public tags!: ReadonlyArray<TagItem>;
 
-    @Input()
+    @Input({ required: true })
     public tagsSelected!: TagsSelected;
 
     @Input()

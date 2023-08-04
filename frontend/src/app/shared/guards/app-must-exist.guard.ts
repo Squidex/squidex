@@ -6,13 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { AppsState } from './../state/apps.state';
 
 @Injectable()
-export class AppMustExistGuard implements CanActivate {
+export class AppMustExistGuard  {
     constructor(
         private readonly appsState: AppsState,
         private readonly router: Router,

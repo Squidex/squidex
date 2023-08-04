@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { AppLanguageDto, FieldForm } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-languages[formModel][language][languages]',
+    selector: 'sqx-field-languages',
     styleUrls: ['./field-languages.component.scss'],
     templateUrl: './field-languages.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,13 +24,13 @@ export class FieldLanguagesComponent {
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public formModel!: FieldForm;
 
     public toggleShowAllControls() {

@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy
 import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State, ToolbarService, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-references[content][language][languages]',
+    selector: 'sqx-content-references',
     styleUrls: ['./content-references.component.scss'],
     templateUrl: './content-references.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,13 +18,13 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, 
     ],
 })
 export class ContentReferencesComponent implements OnInit, OnDestroy {
-    @Input()
+    @Input({ required: true })
     public content!: ContentDto;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()

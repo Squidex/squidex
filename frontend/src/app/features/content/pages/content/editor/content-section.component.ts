@@ -14,7 +14,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-section[form][formContext][formLevel][formSection][language][languages][schema]',
+    selector: 'sqx-content-section',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,28 +26,28 @@ export class ContentSectionComponent extends StatefulComponent<State> {
     @Input()
     public isCompact?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
     @Input()
     public formCompare?: EditContentForm | null;
 
-    @Input()
+    @Input({ required: true })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true })
     public formSection!: FieldSection<RootFieldDto, FieldForm>;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     constructor(changeDetector: ChangeDetectorRef,

@@ -9,15 +9,15 @@ import { Component, Input } from '@angular/core';
 import { AppLanguageDto, FieldForm, ModalModel, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-copy-button[formModel][languages]',
+    selector: 'sqx-field-copy-button',
     styleUrls: ['./field-copy-button.component.scss'],
     templateUrl: './field-copy-button.component.html',
 })
 export class FieldCopyButtonComponent {
-    @Input()
+    @Input({ required: true })
     public formModel!: FieldForm;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     public languageCodes: ReadonlyArray<string> = [];

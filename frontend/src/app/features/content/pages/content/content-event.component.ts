@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { ContentDto, HistoryEventDto, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-event[content][event]',
+    selector: 'sqx-content-event',
     styleUrls: ['./content-event.component.scss'],
     templateUrl: './content-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,10 +21,10 @@ export class ContentEventComponent {
     @Output()
     public dataCompare = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public event!: HistoryEventDto;
 
-    @Input()
+    @Input({ required: true })
     public content!: ContentDto;
 
     public canLoadOrCompare = false;

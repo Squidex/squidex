@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-asset-tag-dialog[tagName]',
+    selector: 'sqx-asset-tag-dialog',
     styleUrls: ['./asset-tag-dialog.component.scss'],
     templateUrl: './asset-tag-dialog.component.html',
 })
@@ -17,7 +17,7 @@ export class AssetTagDialogComponent implements OnInit {
     @Output()
     public complete = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public tagName!: string;
 
     public editForm = new RenameAssetTagForm();

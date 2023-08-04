@@ -7,14 +7,14 @@
 
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { UIOptions } from '@app/framework';
 import { AuthService } from './../services/auth.service';
 
 @Injectable()
-export class MustBeNotAuthenticatedGuard implements CanActivate {
+export class MustBeNotAuthenticatedGuard  {
     constructor(
         private readonly authService: AuthService,
         private readonly location: Location,
