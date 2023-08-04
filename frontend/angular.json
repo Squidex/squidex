@@ -30,6 +30,7 @@
             "inlineStyleLanguage": "scss",
             "allowedCommonJsDependencies": [
               "@tweenjs/tween.js",
+              "copy-to-clipboard",
               "cropperjs",
               "crypto-js",
               "crypto-js/core.js",
@@ -38,9 +39,11 @@
               "crypto-js/sha256.js",
               "mousetrap",
               "mersenne-twister",
+              "nullthrows",
               "pikaday",
               "pikaday/pikaday",
               "progressbar.js",
+              "set-value",
               "slugify"
             ],
             "assets": [

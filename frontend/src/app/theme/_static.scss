@@ -12,7 +12,7 @@ noscript {
     margin-bottom: 20px;
 }
 
-@media (max-width: 550px) {
+@media (width <= 550px) {
     .profile {
         background-color: $color-white;
     }
