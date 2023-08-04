@@ -23,7 +23,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-references-editor[formContext][language][languages][schemaIds]',
+    selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
     providers: [
@@ -32,16 +32,16 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
-    @Input()
+    @Input({ required: true })
     public schemaIds!: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
     @Input()

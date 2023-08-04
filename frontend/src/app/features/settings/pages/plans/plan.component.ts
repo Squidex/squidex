@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { PlanInfo, PlansState } from '@app/shared';
 
 @Component({
-    selector: 'sqx-plan[planInfo]',
+    selector: 'sqx-plan',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlanComponent {
-    @Input()
+    @Input({ required: true })
     public planInfo!: PlanInfo;
 
     constructor(

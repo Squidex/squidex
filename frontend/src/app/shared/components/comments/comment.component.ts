@@ -14,7 +14,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-comment[comment][commentsState]',
+    selector: 'sqx-comment',
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,13 +29,13 @@ export class CommentComponent extends StatefulComponent<State> {
     @Input()
     public canEdit?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public commentsState!: CommentsState;
 
     @Input()
     public confirmDelete?: boolean | null = true;
 
-    @Input()
+    @Input({ required: true })
     public comment!: CommentDto;
 
     @Input()

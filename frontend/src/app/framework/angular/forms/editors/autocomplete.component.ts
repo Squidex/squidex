@@ -36,7 +36,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-autocomplete[itemsSource]',
+    selector: 'sqx-autocomplete',
     styleUrls: ['./autocomplete.component.scss'],
     templateUrl: './autocomplete.component.html',
     providers: [
@@ -48,7 +48,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     private readonly modalStream = new Subject<string>();
     private timer: any;
 
-    @Input()
+    @Input({ required: true })
     public itemsSource!: AutocompleteSource;
 
     @Input()

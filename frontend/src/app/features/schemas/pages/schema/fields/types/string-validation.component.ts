@@ -11,29 +11,29 @@ import { Observable } from 'rxjs';
 import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, Types, value$, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-string-validation[field][fieldForm][languages][properties][schema][settings]',
+    selector: 'sqx-string-validation',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
 })
 export class StringValidationComponent extends ResourceOwner {
     public readonly contentTypes = STRING_CONTENT_TYPES;
 
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: StringFieldPropertiesDto;
 
-    @Input()
+    @Input({ required: true })
     public settings!: AppSettingsDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()

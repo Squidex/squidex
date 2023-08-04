@@ -9,12 +9,12 @@ import { Component, Input } from '@angular/core';
 import { SchemaDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
 
 @Component({
-    selector: 'sqx-schema-export-form[schema]',
+    selector: 'sqx-schema-export-form',
     styleUrls: ['./schema-export-form.component.scss'],
     templateUrl: './schema-export-form.component.html',
 })
 export class SchemaExportFormComponent {
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
     public synchronizeForm = new SynchronizeSchemaForm();

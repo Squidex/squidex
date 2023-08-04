@@ -11,15 +11,15 @@ import { take } from 'rxjs/operators';
 import { AppDto, AppsState, AuthService, DialogModel, DialogService, LocalizerService, ModalModel, TypedSimpleChanges, Types, UIState } from '@app/shared';
 
 @Component({
-    selector: 'sqx-dashboard-config[app][config]',
+    selector: 'sqx-dashboard-config',
     styleUrls: ['./dashboard-config.component.scss'],
     templateUrl: './dashboard-config.component.html',
 })
 export class DashboardConfigComponent {
-    @Input()
+    @Input({ required: true })
     public app!: AppDto;
 
-    @Input()
+    @Input({ required: true })
     public config!: GridsterItem[];
 
     @Input()

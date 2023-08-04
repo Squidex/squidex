@@ -10,13 +10,13 @@ import { ErrorDto } from '@app/framework/internal';
 import { TypedSimpleChanges } from './../helpers';
 
 @Component({
-    selector: 'sqx-form-error[error]',
+    selector: 'sqx-form-error',
     styleUrls: ['./form-error.component.scss'],
     templateUrl: './form-error.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormErrorComponent {
-    @Input()
+    @Input({ required: true })
     public error?: ErrorDto | null;
 
     @Input()

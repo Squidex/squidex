@@ -10,7 +10,7 @@ import { FormControl, ValidatorFn, Validators } from '@angular/forms';
 import { Keys } from '@app/framework/internal';
 
 @Component({
-    selector: 'sqx-editable-title[inputTitle]',
+    selector: 'sqx-editable-title',
     styleUrls: ['./editable-title.component.scss'],
     templateUrl: './editable-title.component.html',
 })
@@ -18,7 +18,7 @@ export class EditableTitleComponent {
     @Output()
     public inputTitleChange = new EventEmitter<string>();
 
-    @Input()
+    @Input({ required: true })
     public inputTitle!: string;
 
     @Input()

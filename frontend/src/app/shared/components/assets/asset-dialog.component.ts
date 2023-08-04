@@ -16,7 +16,7 @@ import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
 @Component({
-    selector: 'sqx-asset-dialog[asset]',
+    selector: 'sqx-asset-dialog',
     styleUrls: ['./asset-dialog.component.scss'],
     templateUrl: './asset-dialog.component.html',
 })
@@ -30,7 +30,7 @@ export class AssetDialogComponent implements OnInit {
     @Output()
     public assetUpdated = new EventEmitter<AssetDto>();
 
-    @Input()
+    @Input({ required: true })
     public asset!: AssetDto;
 
     @ViewChildren(ImageCropperComponent)

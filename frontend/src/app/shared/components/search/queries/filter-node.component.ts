@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { FilterComparison, FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-filter-node[language][languages][model][statuses]',
+    selector: 'sqx-filter-node',
     styleUrls: ['./filter-node.component.scss'],
     templateUrl: './filter-node.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,19 +23,19 @@ export class FilterNodeComponent {
     @Output()
     public remove = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public statuses?: ReadonlyArray<StatusInfo> | null;
 
     @Input()
     public level = 0;
 
-    @Input()
+    @Input({ required: true })
     public model!: QueryModel;
 
     @Input()

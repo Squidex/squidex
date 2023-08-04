@@ -11,7 +11,7 @@ import { ModalModel, RelativePosition } from '@app/framework/internal';
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
 
 @Component({
-    selector: 'sqx-language-selector[language][languages]',
+    selector: 'sqx-language-selector',
     styleUrls: ['./language-selector.component.scss'],
     templateUrl: './language-selector.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,10 +20,10 @@ export class LanguageSelectorComponent implements  OnInit {
     @Output()
     public languageChange = new EventEmitter<any>();
 
-    @Input()
+    @Input({ required: true })
     public language!: Language;
 
-    @Input()
+    @Input({ required: true })
     public languages: ReadonlyArray<Language> = [];
 
     @Input()

@@ -9,12 +9,12 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-api-card[app]',
+    selector: 'sqx-api-card',
     styleUrls: ['./api-card.component.scss'],
     templateUrl: './api-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiCardComponent {
-    @Input()
+    @Input({ required: true })
     public app!: AppDto;
 }

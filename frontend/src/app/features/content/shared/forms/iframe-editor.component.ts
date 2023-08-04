@@ -17,7 +17,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-iframe-editor[context][formField][formIndex][formValue][formControlBinding][language][languages]',
+    selector: 'sqx-iframe-editor',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,25 +42,25 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     @Input()
     public isExpanded = false;
 
-    @Input()
+    @Input({ required: true })
     public context: any = {};
 
-    @Input()
+    @Input({ required: true })
     public formValue!: any;
 
-    @Input()
+    @Input({ required: true })
     public formField = '';
 
-    @Input()
+    @Input({ required: true })
     public formIndex?: number | null;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public formControlBinding!: AbstractControl;
 
     @Input()

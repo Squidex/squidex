@@ -10,21 +10,21 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/shared';
 
 @Component({
-    selector: 'sqx-references-validation[field][fieldForm][languages][properties]',
+    selector: 'sqx-references-validation',
     styleUrls: ['references-validation.component.scss'],
     templateUrl: 'references-validation.component.html',
 })
 export class ReferencesValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: ReferencesFieldPropertiesDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()

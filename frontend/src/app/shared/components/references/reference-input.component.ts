@@ -22,7 +22,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-reference-input[mode][[language][languages]',
+    selector: 'sqx-reference-input',
     styleUrls: ['./reference-input.component.scss'],
     templateUrl: './reference-input.component.html',
     providers: [
@@ -34,13 +34,13 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
     @Input()
     public schemaIds?: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public mode: 'Array' | 'Single' = 'Single';
 
     @Input()

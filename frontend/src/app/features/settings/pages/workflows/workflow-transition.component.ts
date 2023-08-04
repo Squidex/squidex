@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RoleDto, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
 
 @Component({
-    selector: 'sqx-workflow-transition[roles][transition]',
+    selector: 'sqx-workflow-transition',
     styleUrls: ['./workflow-transition.component.scss'],
     templateUrl: './workflow-transition.component.html',
 })
@@ -22,10 +22,10 @@ export class WorkflowTransitionComponent {
     @Output()
     public remove = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public transition!: WorkflowTransitionView;
 
-    @Input()
+    @Input({ required: true })
     public roles!: ReadonlyArray<string>;
 
     @Input()

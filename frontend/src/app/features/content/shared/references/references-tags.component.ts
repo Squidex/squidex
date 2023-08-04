@@ -27,7 +27,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-references-tags[language][languages][schemaId]',
+    selector: 'sqx-references-tags',
     styleUrls: ['./references-tags.component.scss'],
     templateUrl: './references-tags.component.html',
     providers: [
@@ -40,13 +40,13 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     private isOpenedBefore = false;
     private isLoadingFailed = false;
 
-    @Input()
+    @Input({ required: true })
     public schemaId!: string;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()

@@ -10,7 +10,7 @@ import { timer } from 'rxjs';
 import { AppsState, CommentsService, switchSafe } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-watching-users[resource]',
+    selector: 'sqx-watching-users',
     styleUrls: ['./watching-users.component.scss'],
     templateUrl: './watching-users.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,7 +18,7 @@ import { AppsState, CommentsService, switchSafe } from '@app/shared/internal';
 export class WatchingUsersComponent {
     private appName: string;
 
-    @Input()
+    @Input({ required: true })
     public resource!: string;
 
     public users =

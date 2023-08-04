@@ -15,7 +15,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-assets-list[assetsState]',
+    selector: 'sqx-assets-list',
     styleUrls: ['./assets-list.component.scss'],
     templateUrl: './assets-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,7 +27,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
     @Output()
     public select = new EventEmitter<AssetDto>();
 
-    @Input()
+    @Input({ required: true })
     public assetsState!: AssetsState;
 
     @Input()

@@ -10,7 +10,7 @@ import { UntypedFormGroup } from '@angular/forms';
 import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-form[field][fieldForm][languages][schema][settings]',
+    selector: 'sqx-field-form',
     styleUrls: ['./field-form.component.scss'],
     templateUrl: './field-form.component.html',
 })
@@ -21,19 +21,19 @@ export class FieldFormComponent implements AfterViewInit {
     @Input()
     public isEditable?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public settings!: AppSettingsDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()

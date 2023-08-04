@@ -10,18 +10,18 @@ import { Component, Input } from '@angular/core';
 import { AppLanguageDto, EditLanguageForm, LanguageDto, LanguagesState, sorted } from '@app/shared';
 
 @Component({
-    selector: 'sqx-language[language][fallbackLanguages][fallbackLanguagesNew]',
+    selector: 'sqx-language',
     styleUrls: ['./language.component.scss'],
     templateUrl: './language.component.html',
 })
 export class LanguageComponent {
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public fallbackLanguages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public fallbackLanguagesNew!: ReadonlyArray<LanguageDto>;
 
     public otherLanguage!: LanguageDto;

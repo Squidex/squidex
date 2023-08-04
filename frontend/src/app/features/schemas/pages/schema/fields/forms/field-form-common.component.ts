@@ -10,17 +10,17 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, SchemaDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-form-common[field][fieldForm][schema]',
+    selector: 'sqx-field-form-common',
     styleUrls: ['./field-form-common.component.scss'],
     templateUrl: './field-form-common.component.html',
 })
 export class FieldFormCommonComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 }

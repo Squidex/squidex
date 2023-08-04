@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-table-header[text]',
+    selector: 'sqx-table-header',
     styleUrls: ['./table-header.component.scss'],
     templateUrl: './table-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +21,7 @@ export class TableHeaderComponent {
     @Input()
     public query: Query | undefined | null;
 
-    @Input()
+    @Input({ required: true })
     public text = '';
 
     @Input()

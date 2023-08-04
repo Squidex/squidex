@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CurrentStorageDto } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-asset-uploads-size-summary-card[usage]',
+    selector: 'sqx-asset-uploads-size-summary-card',
     styleUrls: ['./asset-uploads-size-summary-card.component.scss'],
     templateUrl: './asset-uploads-size-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetUploadsSizeSummaryCardComponent {
-    @Input()
+    @Input({ required: true })
     public usage?: CurrentStorageDto;
 
     public storageCurrent = 0;

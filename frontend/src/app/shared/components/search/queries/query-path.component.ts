@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { FilterableField, QueryModel } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-query-path[model]',
+    selector: 'sqx-query-path',
     styleUrls: ['./query-path.component.scss'],
     templateUrl: './query-path.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +21,7 @@ export class QueryPathComponent {
     @Input()
     public path = '';
 
-    @Input()
+    @Input({ required: true })
     public model!: QueryModel;
 
     public field?: FilterableField;

@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 import { AbstractContentForm, AppLanguageDto, DialogModel, EditContentForm, FieldDto, hasNoValue$, MathHelper, TypedSimpleChanges, Types } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-editor[form][formContext][formLevel][formModel][isComparing][language][languages]',
+    selector: 'sqx-field-editor',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',
 })
@@ -21,28 +21,28 @@ export class FieldEditorComponent {
     @Output()
     public expandedChange = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formModel!: AbstractContentForm<FieldDto, AbstractControl>;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public index: number | null | undefined;
 
-    @Input()
+    @Input({ required: true })
     public isComparing = false;
 
     @Input()

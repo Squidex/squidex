@@ -11,7 +11,7 @@ import { AddFieldForm, AppSettingsDto, createProperties, EditFieldForm, FieldDto
 const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
 
 @Component({
-    selector: 'sqx-field-wizard[schema][settings]',
+    selector: 'sqx-field-wizard',
     styleUrls: ['./field-wizard.component.scss'],
     templateUrl: './field-wizard.component.html',
 })
@@ -19,10 +19,10 @@ export class FieldWizardComponent implements OnInit {
     @ViewChild('nameInput', { static: false })
     public nameInput!: ElementRef<HTMLElement>;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public settings!: AppSettingsDto;
 
     @Input()

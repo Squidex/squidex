@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { CallsUsageDto, ChartHelpers, ChartOptions, TypedSimpleChanges } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-api-traffic-card[usage]',
+    selector: 'sqx-api-traffic-card',
     styleUrls: ['./api-traffic-card.component.scss'],
     templateUrl: './api-traffic-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiTrafficCardComponent {
-    @Input()
+    @Input({ required: true })
     public usage?: CallsUsageDto;
 
     @Input()

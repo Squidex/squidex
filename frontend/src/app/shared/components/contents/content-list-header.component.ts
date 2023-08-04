@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { LanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-content-list-header[field][language]',
+    selector: 'sqx-content-list-header',
     styleUrls: ['./content-list-header.component.scss'],
     templateUrl: './content-list-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,7 +17,7 @@ import { LanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shar
 export class ContentListHeaderComponent {
     public readonly metaFields = META_FIELDS;
 
-    @Input()
+    @Input({ required: true })
     public field!: TableField;
 
     @Output()
@@ -26,7 +26,7 @@ export class ContentListHeaderComponent {
     @Input()
     public query: Query | undefined;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
     public sortPath?: string;

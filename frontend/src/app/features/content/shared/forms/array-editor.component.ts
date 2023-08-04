@@ -14,25 +14,25 @@ import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentFor
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
-    selector: 'sqx-array-editor[form][formContext][formLevel][formModel][language][languages][isComparing]',
+    selector: 'sqx-array-editor',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArrayEditorComponent {
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formModel!: FieldArrayForm;
 
-    @Input()
+    @Input({ required: true })
     public isComparing = false;
 
     @Input()
@@ -41,10 +41,10 @@ export class ArrayEditorComponent {
     @Input()
     public canUnset?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     @ViewChildren(ArrayItemComponent)

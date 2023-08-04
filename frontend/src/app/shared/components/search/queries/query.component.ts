@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { LanguageDto, Query, QueryModel, StatusInfo } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-query[language][languages][model][statuses]',
+    selector: 'sqx-query',
     styleUrls: ['./query.component.scss'],
     templateUrl: './query.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,16 +18,16 @@ export class QueryComponent {
     @Output()
     public queryChange = new EventEmitter<Query>();
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public statuses?: ReadonlyArray<StatusInfo> | null;
 
-    @Input()
+    @Input({ required: true })
     public model!: QueryModel;
 
     @Input()

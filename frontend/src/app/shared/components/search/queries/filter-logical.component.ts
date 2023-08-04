@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-filter-logical[filter][language][languages][model][statuses]',
+    selector: 'sqx-filter-logical',
     styleUrls: ['./filter-logical.component.scss'],
     templateUrl: './filter-logical.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,13 +23,13 @@ export class FilterLogicalComponent {
     @Output()
     public remove = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public statuses?: ReadonlyArray<StatusInfo> | null;
 
     @Input()
@@ -38,10 +38,10 @@ export class FilterLogicalComponent {
     @Input()
     public isRoot?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public model!: QueryModel;
 
-    @Input()
+    @Input({ required: true })
     public set filter(filter: FilterLogical | undefined | null) {
         this.filterValue = filter || {};
 

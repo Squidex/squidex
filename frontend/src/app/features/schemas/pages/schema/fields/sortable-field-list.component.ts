@@ -10,7 +10,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppSettingsDto, FieldDto, FieldGroup, groupFields, LanguageDto, RootFieldDto, SchemaDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-sortable-field-list[fields][languages][settings]',
+    selector: 'sqx-sortable-field-list',
     styleUrls: ['./sortable-field-list.component.scss'],
     templateUrl: './sortable-field-list.component.html',
 })
@@ -18,13 +18,13 @@ export class SortableFieldListComponent {
     @Output()
     public sorted = new EventEmitter<ReadonlyArray<FieldDto>>();
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public parent?: RootFieldDto;
 
-    @Input()
+    @Input({ required: true })
     public settings!: AppSettingsDto;
 
     @Input()
@@ -36,7 +36,7 @@ export class SortableFieldListComponent {
     @Input()
     public fieldsEmpty = false;
 
-    @Input()
+    @Input({ required: true })
     public set fields(value: ReadonlyArray<FieldDto>) {
         this.fieldGroups = groupFields(value, true);
     }

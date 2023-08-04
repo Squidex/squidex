@@ -10,24 +10,24 @@ import { UntypedFormGroup } from '@angular/forms';
 import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-form-validation[field][fieldForm][languages][schema][settings]',
+    selector: 'sqx-field-form-validation',
     styleUrls: ['./field-form-validation.component.scss'],
     templateUrl: './field-form-validation.component.html',
 })
 export class FieldFormValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public settings!: AppSettingsDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()

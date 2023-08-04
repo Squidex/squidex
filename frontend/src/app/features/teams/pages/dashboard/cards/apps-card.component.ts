@@ -14,13 +14,13 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-apps-card[team]',
+    selector: 'sqx-apps-card',
     styleUrls: ['./apps-card.component.scss'],
     templateUrl: './apps-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppsCardComponent extends StatefulComponent<State> implements OnInit {
-    @Input()
+    @Input({ required: true })
     public team!: TeamDto;
 
     constructor(changeDetector: ChangeDetectorRef,

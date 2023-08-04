@@ -10,16 +10,16 @@ import { LocalizerService, TypedSimpleChanges } from '@app/framework';
 import { ScheduleDto } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-content-status[status][statusColor]',
+    selector: 'sqx-content-status',
     styleUrls: ['./content-status.component.scss'],
     templateUrl: './content-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentStatusComponent {
-    @Input()
+    @Input({ required: true })
     public status!: string;
 
-    @Input()
+    @Input({ required: true })
     public statusColor!: string;
 
     @Input()

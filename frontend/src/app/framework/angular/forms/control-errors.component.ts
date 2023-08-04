@@ -18,7 +18,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-control-errors[for]',
+    selector: 'sqx-control-errors',
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,7 +27,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     private controlDisplayName = '';
     private control: AbstractControl | null = null;
 
-    @Input()
+    @Input({ required: true })
     public for!: string | AbstractControl;
 
     @Input()

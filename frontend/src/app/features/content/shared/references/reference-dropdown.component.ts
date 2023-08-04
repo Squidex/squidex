@@ -31,7 +31,7 @@ type ContentName = { name: string; id?: string };
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-reference-dropdown[mode][language][languages][schemaId]',
+    selector: 'sqx-reference-dropdown',
     styleUrls: ['./reference-dropdown.component.scss'],
     templateUrl: './reference-dropdown.component.html',
     providers: [
@@ -44,16 +44,16 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
     private isOpenedBefore = false;
     private isLoadingFailed = false;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public schemaId!: string;
 
-    @Input()
+    @Input({ required: true })
     public mode: 'Array' | 'Single' = 'Single';
 
     @Input()

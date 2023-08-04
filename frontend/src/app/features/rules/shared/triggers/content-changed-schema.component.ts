@@ -12,15 +12,15 @@ import { SchemaDto, ScriptCompletions, TypedSimpleChanges, value$ } from '@app/s
 import { CompletionsCache } from './completions-cache';
 
 @Component({
-    selector: 'sqx-content-changed-schema[form][schemas]',
+    selector: 'sqx-content-changed-schema',
     styleUrls: ['./content-changed-schema.component.scss'],
     templateUrl: './content-changed-schema.component.html',
 })
 export class ContentChangedSchemaComponent {
-    @Input()
+    @Input({ required: true })
     public schemas?: ReadonlyArray<SchemaDto> | null;
 
-    @Input()
+    @Input({ required: true })
     public form!: FormGroup;
 
     @Output()

@@ -12,7 +12,7 @@ import { META_FIELDS, SchemaDto, TableField } from '@app/shared';
 const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELDS.empty);
 
 @Component({
-    selector: 'sqx-field-list[fieldNames][schema]',
+    selector: 'sqx-field-list',
     styleUrls: ['./field-list.component.scss'],
     templateUrl: './field-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,10 +21,10 @@ export class FieldListComponent {
     @Input()
     public emptyText = '';
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public fieldNames!: ReadonlyArray<string>;
 
     @Input()

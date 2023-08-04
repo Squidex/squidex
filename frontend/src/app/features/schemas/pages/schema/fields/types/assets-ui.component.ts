@@ -10,17 +10,17 @@ import { UntypedFormGroup } from '@angular/forms';
 import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-assets-ui[field][fieldForm][properties]',
+    selector: 'sqx-assets-ui',
     styleUrls: ['assets-ui.component.scss'],
     templateUrl: 'assets-ui.component.html',
 })
 export class AssetsUIComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: AssetsFieldPropertiesDto;
 }

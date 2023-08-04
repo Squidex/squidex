@@ -10,31 +10,31 @@ import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSe
 import { FieldEditorComponent } from './field-editor.component';
 
 @Component({
-    selector: 'sqx-component-section[form][formContext][formLevel][formSection][isComparing][language][languages]',
+    selector: 'sqx-component-section',
     styleUrls: ['./component-section.component.scss'],
     templateUrl: './component-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComponentSectionComponent {
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formSection!: FieldSection<FieldDto, any>;
 
-    @Input()
+    @Input({ required: true })
     public isComparing = false;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()

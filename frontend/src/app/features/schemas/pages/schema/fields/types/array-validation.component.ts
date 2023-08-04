@@ -10,17 +10,17 @@ import { UntypedFormGroup } from '@angular/forms';
 import { ArrayFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-array-validation[field][fieldForm][properties]',
+    selector: 'sqx-array-validation',
     styleUrls: ['array-validation.component.scss'],
     templateUrl: 'array-validation.component.html',
 })
 export class ArrayValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: ArrayFieldPropertiesDto;
 }

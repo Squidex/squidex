@@ -11,7 +11,7 @@ import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, 
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
-    selector: 'sqx-component[form][formContext][formLevel][formModel][isComparing][language][languages]',
+    selector: 'sqx-component',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,25 +20,25 @@ export class ComponentComponent extends ResourceOwner {
     @Input()
     public canUnset?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formModel!: ComponentForm;
 
-    @Input()
+    @Input({ required: true })
     public isComparing = false;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     @ViewChildren(ComponentSectionComponent)

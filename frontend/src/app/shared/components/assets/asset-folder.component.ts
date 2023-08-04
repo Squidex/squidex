@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { AssetFolderDto, AssetPathItem, DialogModel, ModalModel, Types } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-asset-folder[assetPathItem]',
+    selector: 'sqx-asset-folder',
     styleUrls: ['./asset-folder.component.scss'],
     templateUrl: './asset-folder.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,7 +24,7 @@ export class AssetFolderComponent {
     @Input()
     public isDisabled?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public assetPathItem!: AssetPathItem;
 
     public editDropdown = new ModalModel();

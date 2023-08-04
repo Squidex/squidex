@@ -11,7 +11,7 @@ import { PagingInfo } from './../state';
 export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
 
 @Component({
-    selector: 'sqx-pager[paging]',
+    selector: 'sqx-pager',
     styleUrls: ['./pager.component.scss'],
     templateUrl: './pager.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,7 +23,7 @@ export class PagerComponent {
     @Output()
     public pagingChange = new EventEmitter<{ page: number; pageSize: number }>();
 
-    @Input()
+    @Input({ required: true })
     public paging: PagingInfo | undefined | null;
 
     @Input()

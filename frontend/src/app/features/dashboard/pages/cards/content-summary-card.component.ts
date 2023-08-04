@@ -14,13 +14,13 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-summary-card[app]',
+    selector: 'sqx-content-summary-card',
     styleUrls: ['./content-summary-card.component.scss'],
     templateUrl: './content-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentSummaryCardComponent extends StatefulComponent<State> implements OnInit {
-    @Input()
+    @Input({ required: true })
     public app!: AppDto;
 
     @Input()

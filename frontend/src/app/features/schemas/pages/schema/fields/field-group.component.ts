@@ -15,7 +15,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-field-group[fieldGroup][languages][schema][settings]',
+    selector: 'sqx-field-group',
     styleUrls: ['./field-group.component.scss'],
     templateUrl: './field-group.component.html',
 })
@@ -23,25 +23,25 @@ export class FieldGroupComponent extends StatefulComponent<State> {
     @Output()
     public sorted = new EventEmitter<CdkDragDrop<FieldDto[]>>();
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public parent?: RootFieldDto;
 
-    @Input()
+    @Input({ required: true })
     public settings!: AppSettingsDto;
 
     @Input()
     public sortable = false;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
     @Input()
     public fieldsEmpty = false;
 
-    @Input()
+    @Input({ required: true })
     public fieldGroup!: FieldGroup;
 
     public trackByFieldFn: (_index: number, field: FieldDto) => any;

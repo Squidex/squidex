@@ -9,15 +9,15 @@ import { Component, Input } from '@angular/core';
 import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, FieldDto, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field[field][languages][schema][settings]',
+    selector: 'sqx-field',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
 })
 export class FieldComponent {
-    @Input()
+    @Input({ required: true })
     public field!: NestedFieldDto | RootFieldDto;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
     @Input()
@@ -26,10 +26,10 @@ export class FieldComponent {
     @Input()
     public parent?: RootFieldDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public settings!: AppSettingsDto;
 
     public dropdown = new ModalModel();

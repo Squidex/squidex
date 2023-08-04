@@ -9,12 +9,12 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-settings-menu[app]',
+    selector: 'sqx-settings-menu',
     styleUrls: ['./settings-menu.component.scss'],
     templateUrl: './settings-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsMenuComponent {
-    @Input()
+    @Input({ required: true })
     public app!: AppDto;
 }

@@ -15,7 +15,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-list-field[content][field][language][languages][schema]',
+    selector: 'sqx-content-list-field',
     styleUrls: ['./content-list-field.component.scss'],
     templateUrl: './content-list-field.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,13 +23,13 @@ interface State {
 export class ContentListFieldComponent extends StatefulComponent<State> {
     public readonly metaFields = META_FIELDS;
 
-    @Input()
+    @Input({ required: true })
     public field!: TableField;
 
     @Input()
     public fields?: TableSettings;
 
-    @Input()
+    @Input({ required: true })
     public content!: ContentDto;
 
     @Input()
@@ -38,13 +38,13 @@ export class ContentListFieldComponent extends StatefulComponent<State> {
     @Input()
     public patchForm?: UntypedFormGroup | null;
 
-    @Input()
+    @Input({ required: true })
     public schema?: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     public get isInlineEditable() {

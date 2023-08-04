@@ -11,7 +11,7 @@ import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-content-selector[language][languages]',
+    selector: 'sqx-content-selector',
     styleUrls: ['./content-selector.component.scss'],
     templateUrl: './content-selector.component.html',
     providers: [
@@ -36,10 +36,10 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Input()
     public schemaNames?: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()

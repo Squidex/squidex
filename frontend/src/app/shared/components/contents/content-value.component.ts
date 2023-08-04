@@ -14,13 +14,13 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-value[value]',
+    selector: 'sqx-content-value',
     styleUrls: ['./content-value.component.scss'],
     templateUrl: './content-value.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentValueComponent extends StatefulComponent<State> {
-    @Input()
+    @Input({ required: true })
     public value!: any;
 
     @Input()

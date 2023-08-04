@@ -12,7 +12,7 @@ import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatte
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
-    selector: 'sqx-array-item[form][formContext][formLevel][formModel][index][isComparing][language][languages]',
+    selector: 'sqx-array-item',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,22 +30,22 @@ export class ArrayItemComponent {
     @Output()
     public clone = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formModel!: ObjectFormBase;
 
     @Input()
     public canUnset?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public isComparing = false;
 
     @Input()
@@ -60,13 +60,13 @@ export class ArrayItemComponent {
     @Input()
     public isDisabled?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public index!: number;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     @ViewChildren(ComponentSectionComponent)

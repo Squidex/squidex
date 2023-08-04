@@ -22,7 +22,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-references-checkboxes[language][schemaId]',
+    selector: 'sqx-references-checkboxes',
     styleUrls: ['./references-checkboxes.component.scss'],
     templateUrl: './references-checkboxes.component.html',
     providers: [
@@ -34,10 +34,10 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
     private readonly itemCount: number;
     private contentItems: ReadonlyArray<ContentDto> | null = null;
 
-    @Input()
+    @Input({ required: true })
     public schemaId: string | undefined | null;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
     @Input()

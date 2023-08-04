@@ -10,21 +10,21 @@ import { UntypedFormGroup } from '@angular/forms';
 import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-assets-validation[field][fieldForm][languages][properties]',
+    selector: 'sqx-assets-validation',
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html',
 })
 export class AssetsValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: AssetsFieldPropertiesDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()

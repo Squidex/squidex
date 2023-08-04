@@ -10,13 +10,13 @@ import { TeamPlansState } from '@app/features/teams/internal';
 import { PlanInfo } from '@app/shared';
 
 @Component({
-    selector: 'sqx-plan[planInfo]',
+    selector: 'sqx-plan',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlanComponent {
-    @Input()
+    @Input({ required: true })
     public planInfo!: PlanInfo;
 
     constructor(

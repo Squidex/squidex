@@ -13,12 +13,12 @@ import { AppsState, AssetDto, HistoryEventDto, HistoryService } from '@app/share
 interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean }
 
 @Component({
-    selector: 'sqx-asset-history[asset]',
+    selector: 'sqx-asset-history',
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
 })
 export class AssetHistoryComponent {
-    @Input()
+    @Input({ required: true })
     public asset!: AssetDto;
 
     public assetEvents!: Observable<ReadonlyArray<AssetEvent>>;

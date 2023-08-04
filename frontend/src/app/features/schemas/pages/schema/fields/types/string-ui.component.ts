@@ -11,20 +11,20 @@ import { Observable } from 'rxjs';
 import { FieldDto, ResourceOwner, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, valueProjection$, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-string-ui[field][fieldForm][properties]',
+    selector: 'sqx-string-ui',
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',
 })
 export class StringUIComponent extends ResourceOwner {
     public readonly editors = STRING_FIELD_EDITORS;
 
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: StringFieldPropertiesDto;
 
     public hideAllowedValues?: Observable<boolean>;
