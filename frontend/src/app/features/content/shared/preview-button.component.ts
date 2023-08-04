@@ -19,7 +19,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-preview-button[content][schema]',
+    selector: 'sqx-preview-button',
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,10 +28,10 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     @Input()
     public confirm?: () => Observable<boolean>;
 
-    @Input()
+    @Input({ required: true })
     public content!: ContentDto;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
     public dropdown = new ModalModel();

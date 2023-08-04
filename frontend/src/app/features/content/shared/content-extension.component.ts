@@ -11,7 +11,7 @@ import { ApiUrlConfig, ResourceOwner, Types } from '@app/framework/internal';
 import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-extension[content][contentSchema]',
+    selector: 'sqx-content-extension',
     styleUrls: ['./content-extension.component.scss'],
     templateUrl: './content-extension.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,10 +23,10 @@ export class ContentExtensionComponent extends ResourceOwner {
     @ViewChild('iframe', { static: false })
     public iframe!: ElementRef<HTMLIFrameElement>;
 
-    @Input()
+    @Input({ required: true })
     public content?: ContentDto | null;
 
-    @Input()
+    @Input({ required: true })
     public contentSchema!: SchemaDto;
 
     @Input()
