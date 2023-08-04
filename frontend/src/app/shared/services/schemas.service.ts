@@ -237,7 +237,7 @@ export class SchemaDto {
         ];
 
         const cleanup = (source: any, ...exclude: string[]): any => {
-            const clone = {};
+            const clone = {} as Record<string, any>;
 
             for (const [key, value] of Object.entries(source)) {
                 if (!exclude.includes(key) && key.indexOf('can') !== 0 && !Types.isUndefined(value) && !Types.isNull(value)) {

@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RuleElementDto } from '@app/shared';
+import { RuleElementMetadataDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-element',
@@ -19,7 +19,7 @@ export class RuleElementComponent {
     public type!: string;
 
     @Input({ required: true })
-    public element!: RuleElementDto;
+    public element!: RuleElementMetadataDto;
 
     @Input()
     public isSmall?: boolean | null = true;

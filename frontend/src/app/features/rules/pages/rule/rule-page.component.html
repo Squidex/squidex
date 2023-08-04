@@ -96,7 +96,7 @@
                             <div class="row g-0">
                                 <div *ngFor="let triggerType of supportedTriggers | sqxKeys" class="col-12 col-md-6">
                                     <div class="rule-element" (click)="selectTrigger(triggerType)">
-                                        <sqx-rule-element [type]="triggerType" [isSmall]="false" [element]="supportedTriggers[triggerType]"></sqx-rule-element>
+                                        <sqx-rule-element [type]="triggerType" [isSmall]="false" [element]="$any(supportedTriggers)[triggerType]"></sqx-rule-element>
                                     </div>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@
                             </div>
 
                             <div class="col col-icon" *ngIf="currentAction">
-                                <sqx-rule-element [type]="currentAction.actionType" [isSmall]="true" [element]="actionElement" [disabled]="true"></sqx-rule-element>
+                                <sqx-rule-element [type]="currentAction.actionType" [isSmall]="true" [element]="$any(actionElement)" [disabled]="true"></sqx-rule-element>
                             </div>
 
                             <div class="col text-end" *ngIf="currentAction && !rule">
@@ -145,7 +145,7 @@
                             <div class="row g-0">
                                 <div *ngFor="let actionType of supportedActions | sqxKeys" class="col-12 col-md-6">
                                     <div class="rule-element" (click)="selectAction(actionType)">
-                                        <sqx-rule-element [type]="actionType" [isSmall]="false" [element]="supportedActions[actionType]"></sqx-rule-element>
+                                        <sqx-rule-element [type]="actionType" [isSmall]="false" [element]="$any(supportedActions[actionType])"></sqx-rule-element>
                                     </div>
                                 </div>
                             </div>

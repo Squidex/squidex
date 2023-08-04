@@ -74,15 +74,17 @@ export class FieldEditorComponent {
     }
 
     public reset() {
-        if (this.editor) {
+        const editor = this.editor as any;
+
+        if (editor) {
             const nativeElement = this.editor.nativeElement;
 
             if (nativeElement && Types.isFunction(nativeElement['reset'])) {
                 nativeElement['reset']();
             }
 
-            if (this.editor && Types.isFunction(this.editor['reset'])) {
-                this.editor['reset']();
+            if (this.editor && Types.isFunction(editor['reset'])) {
+                editor['reset']();
             }
         }
     }

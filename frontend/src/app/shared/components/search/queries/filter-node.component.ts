@@ -40,7 +40,7 @@ export class FilterNodeComponent {
 
     @Input()
     public set filter(value: FilterNode) {
-        if (value['and'] || value['or']) {
+        if ((value as any)['and'] || (value as any)['or']) {
             this.logical = <FilterLogical>value;
         } else {
             this.comparison = <FilterComparison>value;

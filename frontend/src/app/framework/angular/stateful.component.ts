@@ -19,7 +19,7 @@ export class ResourceOwner implements OnDestroy {
 
     public own<T>(subscription: Subscription | UnsubscribeFunction | Observable<T> | null | undefined) {
         if (subscription) {
-            if (Types.isFunction(subscription['subscribe'])) {
+            if (Types.isFunction((subscription as any)['subscribe'])) {
                 const observable = <Observable<T>>subscription;
 
                 this.subscriptions.push(observable.pipe(catchError(_ => EMPTY)).subscribe());

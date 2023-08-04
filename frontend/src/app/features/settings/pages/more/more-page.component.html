@@ -75,7 +75,7 @@
                                 <span class="btn btn-success upload-button" [class.disabled]="!isEditableImage" (click)="fileInput.click()">
                                     <span>{{ 'apps.uploadImageButton' | sqxTranslate }}</span>
                         
-                                    <input type="file" (change)="uploadImage($event.target!['files'])" #fileInput single accept="image/x-png,image/gif,image/jpeg">
+                                    <input type="file" (change)="uploadImage($any($event.target!)['files'])" #fileInput single accept="image/x-png,image/gif,image/jpeg">
                                 </span>
                             </div>
                         </div>

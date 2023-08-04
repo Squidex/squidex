@@ -163,12 +163,12 @@ export class WorkflowDto {
     }
 
     public serialize(): any {
-        const result = { steps: {}, schemaIds: this.schemaIds, initial: this.initial, name: this.name };
+        const result = { steps: {} as Record<string, any>, schemaIds: this.schemaIds, initial: this.initial, name: this.name };
 
         for (const step of this.steps) {
             const { name, ...values } = step;
 
-            const s = { ...values, transitions: {} };
+            const s = { ...values, transitions: {} as Record<string, any> };
 
             for (const transition of this.getTransitions(step)) {
                 const { to, step: _, from: __, ...t } = transition;

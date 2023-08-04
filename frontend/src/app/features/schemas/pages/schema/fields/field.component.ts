@@ -42,7 +42,7 @@ export class FieldComponent {
     public fieldWizard = new DialogModel();
 
     public get isLocalizable() {
-        return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];
+        return (this.parent && this.parent.isLocalizable) || (this.field as any)['isLocalizable'];
     }
 
     constructor(

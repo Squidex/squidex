@@ -7,7 +7,7 @@
         <span class="btn btn-success" (click)="fileInput.click()">
             <span>{{ 'assets.uploadByDialog' | sqxTranslate }})</span>
 
-            <input class="file-drop-button-input" type="file" (change)="addFiles($event.target!['files'])" #fileInput multiple>
+            <input class="file-drop-button-input" type="file" (change)="addFiles($any($event.target!)['files'])" #fileInput multiple>
         </span>
     </div>
 
@@ -78,7 +78,7 @@
                 [isDisabled]="isDisabled"
                 [isListView]="isListView"
                 [isSelectable]="!!selectedIds"
-                [isSelected]="isSelected(asset)"
+                [isSelected]="!!isSelected(asset)"
                 (loadDone)="replaceAsset($event)"
                 (select)="select.emit(asset)" 
                 (selectFolder)="selectFolder(asset)">

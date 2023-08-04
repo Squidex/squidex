@@ -91,7 +91,7 @@ export interface ListState<TQuery = any> extends LoadingState {
     query?: TQuery;
 }
 
-const devToolsExtension = window['__REDUX_DEVTOOLS_EXTENSION__'];
+const devToolsExtension = (window as any)['__REDUX_DEVTOOLS_EXTENSION__'];
 
 export class State<T extends {}> {
     private readonly state: BehaviorSubject<Readonly<T>>;
@@ -171,7 +171,7 @@ export class State<T extends {}> {
             isChanged = true;
         } else {
             for (const key of newKeys) {
-                if (newState[key] !== this.snapshot[key]) {
+                if ((newState as any)[key] !== (this.snapshot as any)[key]) {
                     isChanged = true;
                     break;
                 }

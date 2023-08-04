@@ -453,7 +453,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     }
 
     public selectTags(tags: ReadonlyArray<string>): Observable<any> {
-        const tagsSelected = {};
+        const tagsSelected = {} as Record<string, boolean>;
 
         for (const tag of tags) {
             tagsSelected[tag] = true;

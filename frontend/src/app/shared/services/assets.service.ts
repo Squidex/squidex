@@ -36,7 +36,7 @@ export class AssetDto {
     }
 
     public get contentUrl() {
-        return getLinkUrl(this, 'content');
+        return getLinkUrl(this, 'content') as string;
     }
 
     public get fileNameWithoutExtension() {
@@ -240,7 +240,7 @@ export class AssetsService {
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/query`);
 
-        return this.http.post<any>(url, body, buildHeaders(q, q?.['ref'])).pipe(
+        return this.http.post<any>(url, body, buildHeaders(q, (q as any)?.ref)).pipe(
             map(body => {
                 return parseAssets(body);
             }),
@@ -405,7 +405,7 @@ export class AssetsService {
 
 function buildHeaders(q: AssetsQuery | undefined, noTotal: boolean) {
     let options = {
-        headers: {},
+        headers: {} as Record<string, string>,
     };
 
     if (q?.noTotal || noTotal) {

@@ -50,10 +50,10 @@ export class RoleComponent {
     @ViewChild('addInput', { static: false })
     public addPermissionInput!: AutocompleteComponent;
 
-    public descriptions = DESCRIPTIONS;
+    public descriptions = DESCRIPTIONS as Record<string, string>;
 
     public propertiesList = Settings.AppProperties;
-    public properties!: {};
+    public properties!: Record<string, any>;
     public propertiesSimple = SIMPLE_PROPERTIES;
 
     public isEditing = false;

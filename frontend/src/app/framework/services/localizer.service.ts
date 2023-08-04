@@ -36,7 +36,7 @@ export class LocalizerService {
             key = key.substring(5);
         }
 
-        let text = this.translations[key];
+        let text = (this.translations as any)[key];
 
         if (!text) {
             if (this.shouldLog && !key.includes(' ')) {
@@ -82,7 +82,7 @@ export class LocalizerService {
         return text;
     }
 
-    private getVar(args: {}, key: string) {
+    private getVar(args: Record<string, string>, key: string) {
         let value = args[key];
 
         if (!value) {

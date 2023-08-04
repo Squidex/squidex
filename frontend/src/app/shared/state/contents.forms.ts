@@ -55,7 +55,7 @@ export class PatchContentForm extends Form<ExtendedFormGroup, any> {
         const result = super.submit();
 
         if (result) {
-            const request = {};
+            const request = {} as Record<string, any>;
 
             for (const field of this.editableFields) {
                 const value = result[field.name];
@@ -237,7 +237,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, UntypedFormGrou
 
     public get(language: string | LanguageDto) {
         if (this.field.isLocalizable) {
-            return this.partitions[language['iso2Code'] || language];
+            return this.partitions[(language as any)['iso2Code'] || language];
         } else {
             return this.partitions[fieldInvariant];
         }
@@ -345,7 +345,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
             new TemplatedFormArray(new ArrayTemplate(() => this), FieldsValidators.create(field, isOptional)),
             isOptional, rules);
 
-        this.form.template['form'] = this;
+        (this.form.template as any)['form'] = this;
     }
 
     public get(index: number) {
@@ -488,7 +488,7 @@ export class ObjectFormBase<TField extends FieldDto = FieldDto> extends Abstract
     }
 
     public get(field: string | { name: string }): FieldItemForm | undefined {
-        return this.fields[field['name'] || field];
+        return this.fields[(field as any)['name'] || field];
     }
 
     protected updateCustomState(context: any, _: any, state: AbstractContentFormState) {

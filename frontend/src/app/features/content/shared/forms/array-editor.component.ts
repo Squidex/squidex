@@ -7,7 +7,7 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
-import { VirtualScrollerComponent } from 'ngx-virtual-scroller';
+import { VirtualScrollerComponent } from '@iharbeck/ngx-virtual-scroller';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, TypedSimpleChanges, Types } from '@app/shared';
@@ -63,7 +63,7 @@ export class ArrayEditorComponent {
     public isCollapsedInitial = false;
 
     public get hasField() {
-        return this.formModel.field['nested']?.length > 0;
+        return (this.formModel.field as any)['nested']?.length > 0;
     }
 
     constructor(
@@ -73,7 +73,7 @@ export class ArrayEditorComponent {
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.formModel) {
-            const maxItems = this.formModel.field.properties['maxItems'] || Number.MAX_VALUE;
+            const maxItems = (this.formModel.field.properties as any)['maxItems'] || Number.MAX_VALUE;
 
             if (Types.is(this.formModel.field.properties, ComponentsFieldPropertiesDto)) {
                 this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).defined().sortedByString(x => x.displayName) || [];

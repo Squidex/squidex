@@ -37,7 +37,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public isListView?: boolean | null;
 
     @Input()
-    public selectedIds?: {};
+    public selectedIds?: Record<string, AssetDto>;
 
     @Input()
     public showFolderIcon?: boolean | null = true;

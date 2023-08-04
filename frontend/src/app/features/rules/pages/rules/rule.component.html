@@ -76,7 +76,7 @@
                 <h3>{{ 'rules.ruleSyntax.then' | sqxTranslate }}</h3>
             </div>
             <div class="col">
-                <sqx-rule-element [disabled]="true" [type]="rule.actionType" [element]="ruleActions[rule.actionType]"></sqx-rule-element>
+                <sqx-rule-element [disabled]="true" [type]="rule.actionType" [element]="$any(ruleActions[rule.actionType])"></sqx-rule-element>
             </div>
             <div class="col col-last text-end">
                 <ng-container *ngIf="isManual; else notManual">

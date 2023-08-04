@@ -16,7 +16,7 @@
                         <span title="i18n:schemas.field.visibleMarker">{{field.displayName}}</span>
                     </ng-template>
 
-                    <span class="field-partitioning ms-2" *ngIf="field['isLocalizable']">{{ 'schemas.field.localizableMarker' | sqxTranslate }}</span>
+                    <span class="field-partitioning ms-2" *ngIf="$any(field)['isLocalizable']">{{ 'schemas.field.localizableMarker' | sqxTranslate }}</span>
                 </span>
             </div>
             <div class="col-4 flex-nowrap" *ngIf="!plain">
@@ -106,7 +106,7 @@
     </div>
 
     <div class="nested-fields" *ngIf="field.properties.fieldType === 'Array'">
-        <ng-container *ngIf="field['nested']; let nested">
+        <ng-container *ngIf="$any(field)['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
             <sqx-sortable-field-list

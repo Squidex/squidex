@@ -179,7 +179,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     public expand(event: MouseEvent) {
-        if (event.target?.['nodeName'] !== 'DIV') {
+        if ((event.target as any)?.['nodeName'] !== 'DIV') {
             return;
         }
 

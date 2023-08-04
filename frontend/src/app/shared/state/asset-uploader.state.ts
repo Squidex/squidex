@@ -75,7 +75,7 @@ export class AssetUploaderState extends State<Snapshot> {
     public uploadAsset(asset: AssetDto, file: Blob): Observable<AssetDto | number> {
         const stream = this.assetsService.putAssetFile(this.appName, asset, file, asset.version);
 
-        return this.upload(stream, asset.id, file['name'] || asset.fileName);
+        return this.upload(stream, asset.id, (file as any)['name'] || asset.fileName);
     }
 
     private upload(source: Observable<number | AssetDto>, id: string, name: string) {

@@ -48,7 +48,7 @@ const escapeReplacements = {
     '>' : '&gt;',
     '"' : '&quot;',
     '\'': '&#39;',
-};
+} as Record<string, string>;
 
 const getEscapeReplacement = (ch: string) => escapeReplacements[ch];
 

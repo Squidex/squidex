@@ -34,6 +34,6 @@ export module DateHelper {
     }
 
     export function getFnsLocale(): Locale {
-        return DateHelper.FNSLOCALES[DateHelper.getLocale()] || enUS;
+        return (DateHelper.FNSLOCALES as any)[DateHelper.getLocale()] || enUS;
     }
 }

@@ -39,7 +39,7 @@ export class FieldWizardComponent implements OnInit {
     public editForm?: EditFieldForm;
 
     public get isLocalizable() {
-        return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];
+        return (this.parent && this.parent.isLocalizable) || (this.field as any)['isLocalizable'];
     }
 
     constructor(

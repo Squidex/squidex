@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RuleElementDto } from '@app/shared';
+import { RuleElementMetadataDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-icon',
@@ -16,7 +16,7 @@ import { RuleElementDto } from '@app/shared';
 })
 export class RuleIconComponent {
     @Input({ required: true })
-    public element!: RuleElementDto;
+    public element!: RuleElementMetadataDto;
 
     @Input()
     public size: 'sm' | 'md' | 'lg' = 'sm';
