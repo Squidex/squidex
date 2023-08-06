@@ -19,16 +19,14 @@ import { AuthInterceptor } from './auth.interceptor';
 
 describe('AuthInterceptor', () => {
     let authService: IMock<AuthService>;
-    let location: IMock<Location>;
+    let location = Mock.ofType<Location>();
     let router: IMock<Router>;
 
     beforeEach(() => {
+        authService = Mock.ofType<AuthService>();
+
         location = Mock.ofType<Location>();
-
-        location.setup(x => x.path())
-            .returns(() => '/my-path');
-
-        authService = Mock.ofType(AuthService);
+        location.setup(x => x.path()).returns(() => '/my-path');
 
         router = Mock.ofType<Router>();
 

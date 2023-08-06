@@ -59,7 +59,7 @@ describe('TableSettings', () => {
                 },
             };
 
-            uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+            uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
                 .returns(() => of(config));
 
             const tableSettings = new TableSettings(uiState.object, schema);
@@ -97,14 +97,14 @@ describe('TableSettings', () => {
 
     INVALID_CONFIGS.forEach(test => {
         it(`should remove ui state if config is ${test.case}`, () => {
-            uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+            uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
                 .returns(() => of(({})));
 
             const tableSettings = new TableSettings(uiState.object, schema);
 
             tableSettings.updateFields(test.fields, true);
 
-            uiState.verify(x => x.removeUser('schemas.my-schema.config'), Times.once());
+            uiState.verify(x => x.removeAppUser('schemas.my-schema.config'), Times.once());
 
             expect().nothing();
         });
@@ -113,7 +113,7 @@ describe('TableSettings', () => {
     it('should eliminate invalid fields from the config', () => {
         let listFields: ReadonlyArray<string>;
 
-        uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+        uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
             .returns(() => of(({ fields: ['invalid', META_FIELDS.version.name] })));
 
         const tableSettings = new TableSettings(uiState.object, schema);
@@ -128,7 +128,7 @@ describe('TableSettings', () => {
     });
 
     it('should update config if fields are saved', () => {
-        uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+        uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
             .returns(() => of(({})));
 
         const tableSettings = new TableSettings(uiState.object, schema);
@@ -137,26 +137,26 @@ describe('TableSettings', () => {
 
         tableSettings.updateFields(config, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, fields: [META_FIELDS.version.name] }, true), Times.once());
+        uiState.verify(x => x.setAppUser('schemas.my-schema.config', { ...EMPTY, fields: [META_FIELDS.version.name] }), Times.once());
 
         expect().nothing();
     });
 
     it('should remove config if fields are saved', () => {
-        uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+        uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
             .returns(() => of(({})));
 
         const tableSettings = new TableSettings(uiState.object, schema);
 
         tableSettings.updateFields([], true);
 
-        uiState.verify(x => x.removeUser('schemas.my-schema.config'), Times.once());
+        uiState.verify(x => x.removeAppUser('schemas.my-schema.config'), Times.once());
 
         expect().nothing();
     });
 
     it('should update config if fields are only updated', () => {
-        uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+        uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
             .returns(() => of(({})));
 
         const tableSettings = new TableSettings(uiState.object, schema);
@@ -165,7 +165,7 @@ describe('TableSettings', () => {
 
         tableSettings.updateFields(config, false);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
+        uiState.verify(x => x.setAppUser('schemas.my-schema.config', It.isAny()), Times.never());
 
         expect().nothing();
     });
@@ -173,7 +173,7 @@ describe('TableSettings', () => {
     it('should update config if sizes are saved', () => {
         let fieldSizes: FieldSizes;
 
-        uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+        uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
             .returns(() => of(({})));
 
         const tableSettings = new TableSettings(uiState.object, schema);
@@ -184,7 +184,7 @@ describe('TableSettings', () => {
 
         tableSettings.updateSize(META_FIELDS.version.name, 100, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, sizes: { [META_FIELDS.version.name]: 100 } }, true), Times.once());
+        uiState.verify(x => x.setAppUser('schemas.my-schema.config', { ...EMPTY, sizes: { [META_FIELDS.version.name]: 100 } }), Times.once());
 
         expect(fieldSizes!).toEqual({ [META_FIELDS.version.name]: 100 });
     });
@@ -192,7 +192,7 @@ describe('TableSettings', () => {
     it('should update config if sizes are only updated', () => {
         let fieldSizes: FieldSizes;
 
-        uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+        uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
             .returns(() => of(({})));
 
         const tableSettings = new TableSettings(uiState.object, schema);
@@ -203,7 +203,7 @@ describe('TableSettings', () => {
 
         tableSettings.updateSize(META_FIELDS.version.name, 100, false);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
+        uiState.verify(x => x.setAppUser('schemas.my-schema.config', It.isAny()), Times.never());
 
         expect(fieldSizes!).toEqual({ [META_FIELDS.version.name]: 100 });
     });
@@ -211,7 +211,7 @@ describe('TableSettings', () => {
     it('should update config if wrapping is toggled', () => {
         let fieldWrappings: FieldWrappings;
 
-        uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+        uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
             .returns(() => of(({})));
 
         const tableSettings = new TableSettings(uiState.object, schema);
@@ -222,7 +222,7 @@ describe('TableSettings', () => {
 
         tableSettings.toggleWrapping(META_FIELDS.version.name, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', { ...EMPTY, wrappings: { [META_FIELDS.version.name]: true } }, true), Times.once());
+        uiState.verify(x => x.setAppUser('schemas.my-schema.config', { ...EMPTY, wrappings: { [META_FIELDS.version.name]: true } }), Times.once());
 
         expect(fieldWrappings!).toEqual({ [META_FIELDS.version.name]: true });
     });
@@ -230,7 +230,7 @@ describe('TableSettings', () => {
     it('should update config if wrapping is toggled and only updated', () => {
         let fieldWrappings: FieldWrappings;
 
-        uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+        uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
             .returns(() => of(({})));
 
         const tableSettings = new TableSettings(uiState.object, schema);
@@ -241,7 +241,7 @@ describe('TableSettings', () => {
 
         tableSettings.toggleWrapping(META_FIELDS.version.name, false);
 
-        uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
+        uiState.verify(x => x.setAppUser('schemas.my-schema.config', It.isAny()), Times.never());
 
         expect(fieldWrappings!).toEqual({ [META_FIELDS.version.name]: true });
     });
@@ -265,7 +265,7 @@ describe('TableSettings', () => {
             },
         };
 
-        uiState.setup(x => x.getUser<any>('schemas.my-schema.config', {}))
+        uiState.setup(x => x.getAppUser<any>('schemas.my-schema.config', {}))
             .returns(() => of(config));
 
         const tableSettings = new TableSettings(uiState.object, schema);

@@ -18,7 +18,7 @@
         
         <div class="dropdown-divider"></div>
 
-        <a class="dropdown-item" routerLink="/app/administration" *ngIf="uiState.canUserAdminResource | async">
+        <a class="dropdown-item" routerLink="/app/administration" *ngIf="uiState.canUseAdminResource | async">
             {{ 'common.administration' | sqxTranslate }}
         </a>
 

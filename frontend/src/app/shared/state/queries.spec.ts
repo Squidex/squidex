@@ -36,10 +36,10 @@ describe('Queries', () => {
         uiState.setup(x => x.get('schemas.my-schema.queries', {}))
             .returns(() => merged$);
 
-        uiState.setup(x => x.getShared('schemas.my-schema.queries', {}))
+        uiState.setup(x => x.getAppShared('schemas.my-schema.queries', {}))
             .returns(() => shared$);
 
-        uiState.setup(x => x.getUser('schemas.my-schema.queries', {}))
+        uiState.setup(x => x.getAppUser('schemas.my-schema.queries', {}))
             .returns(() => user$);
 
         queries = new Queries(uiState.object, prefix);
@@ -101,12 +101,20 @@ describe('Queries', () => {
         expect(key!).toEqual('key3');
     });
 
-    it('should forward add call to state', () => {
-        queries.add('key3', { fullText: 'text3' }, true);
+    it('should forward add user call to state', () => {
+        queries.addUser('key3', { fullText: 'text3' });
 
         expect(true).toBeTruthy();
 
-        uiState.verify(x => x.set('schemas.my-schema.queries.key3', '{"fullText":"text3"}', true), Times.once());
+        uiState.verify(x => x.setAppUser('schemas.my-schema.queries.key3', '{"fullText":"text3"}'), Times.once());
+    });
+
+    it('should forward add shared call to state', () => {
+        queries.addShared('key3', { fullText: 'text3' });
+
+        expect(true).toBeTruthy();
+
+        uiState.verify(x => x.setAppShared('schemas.my-schema.queries.key3', '{"fullText":"text3"}'), Times.once());
     });
 
     it('should forward remove shared call to state', () => {
@@ -114,7 +122,7 @@ describe('Queries', () => {
 
         expect(true).toBeTruthy();
 
-        uiState.verify(x => x.removeShared('schemas.my-schema.queries.key3'), Times.once());
+        uiState.verify(x => x.removeAppShared('schemas.my-schema.queries.key3'), Times.once());
     });
 
     it('should forward remove user call to state', () => {
@@ -122,6 +130,6 @@ describe('Queries', () => {
 
         expect(true).toBeTruthy();
 
-        uiState.verify(x => x.removeUser('schemas.my-schema.queries.key3'), Times.once());
+        uiState.verify(x => x.removeAppUser('schemas.my-schema.queries.key3'), Times.once());
     });
 });

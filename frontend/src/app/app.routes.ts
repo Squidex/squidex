@@ -7,7 +7,7 @@
 
 import { ModuleWithProviders } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AppMustExistGuard, LoadAppsGuard, LoadTeamsGuard, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, TeamMustExistGuard, UnsetAppGuard, UnsetTeamGuard } from './shared';
+import { AppMustExistGuard, LoadAppsGuard, LoadSettingsGuard, LoadTeamsGuard, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, TeamMustExistGuard, UnsetAppGuard, UnsetTeamGuard } from './shared';
 import { AppAreaComponent, ForbiddenPageComponent, HomePageComponent, InternalAreaComponent, LoginPageComponent, LogoutPageComponent, NotFoundPageComponent, TeamsAreaComponent } from './shell';
 
 const routes: Routes = [
@@ -19,7 +19,7 @@ const routes: Routes = [
     {
         path: 'app',
         component: InternalAreaComponent,
-        canActivate: [MustBeAuthenticatedGuard, LoadAppsGuard, LoadTeamsGuard],
+        canActivate: [MustBeAuthenticatedGuard, LoadAppsGuard, LoadTeamsGuard, LoadSettingsGuard],
         children: [
             {
                 path: '',

@@ -42,6 +42,9 @@ export class ModalDialogComponent implements AfterViewInit {
     @Input()
     public fullHeight?: boolean | null;
 
+    @Input()
+    public tourId?: string;
+
     @ViewChild('tabsElement', { static: false })
     public tabsElement!: ElementRef<ParentNode>;
 

@@ -99,7 +99,11 @@ export class SearchFormComponent {
 
         if (value) {
             if (this.queries && this.query) {
-                this.queries.add(value.name, this.query, value.user);
+                if (value.user) {
+                    this.queries.addUser(value.name, this.query);
+                } else {
+                    this.queries.addShared(value.name, this.query);
+                }
             }
 
             this.saveQueryForm.submitCompleted();

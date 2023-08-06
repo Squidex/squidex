@@ -166,6 +166,30 @@ hr {
     @include truncate;
 }
 
+.squid {
+    @include circle(60px);
+    align-items: center;
+    background: $color-white;
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: nowrap;
+    justify-content: center;
+
+    &.bordered {
+        border: 1px solid $color-border;
+    }
+
+    img {
+        max-height: 70%;
+    }
+}
+
+.ngx-ui-tour_backdrop {
+    & {
+        z-index: 1040 !important;
+    }
+}
+
 //
 // Green or red circle if element is published or unpublished
 //

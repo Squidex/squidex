@@ -55,7 +55,7 @@ export class TableSettings extends State<Snapshot> {
 
         this.settingsKey = `schemas.${this.schema.name}.config`;
 
-        this.uiState.getUser<any>(this.settingsKey, {}).pipe(take(1))
+        this.uiState.getAppUser<any>(this.settingsKey, {}).pipe(take(1))
             .subscribe(settings => {
                 if (!Types.isArrayOfString(settings.fields)) {
                     settings.fields = [];
@@ -135,11 +135,11 @@ export class TableSettings extends State<Snapshot> {
         const { sizes, fields, wrappings } = this.snapshot;
 
         if (Object.keys(sizes).length === 0 && Object.keys(wrappings).length === 0 && fields.length === 0) {
-            this.uiState.removeUser(this.settingsKey);
+            this.uiState.removeAppUser(this.settingsKey);
         } else {
             const update = { sizes, wrappings, fields: fields.map(x => x.name) };
 
-            this.uiState.set(this.settingsKey, update, true);
+            this.uiState.setAppUser(this.settingsKey, update);
         }
     }
 }

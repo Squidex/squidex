@@ -34,9 +34,9 @@ export function renderMarkdown(input: string | undefined | null, inline: boolean
     input = escapeHTML(input);
 
     if (inline) {
-        return marked(input, { renderer: RENDERER_INLINE });
+        return marked(input, { renderer: RENDERER_INLINE, mangle: false, headerIds: false });
     } else {
-        return marked(input, { renderer: RENDERER_DEFAULT });
+        return marked(input, { renderer: RENDERER_DEFAULT, mangle: false, headerIds: false });
     }
 }
 

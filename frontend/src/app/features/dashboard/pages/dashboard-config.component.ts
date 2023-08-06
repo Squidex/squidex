@@ -60,7 +60,7 @@ export class DashboardConfigComponent {
         }
 
         if (changes.app) {
-            this.uiState.getUser('dashboard.grid', this.configDefaults).pipe(take(1))
+            this.uiState.getAppUser('dashboard.grid', this.configDefaults).pipe(take(1))
                 .subscribe(dto => {
                     this.setConfig(dto);
                 });
@@ -96,7 +96,7 @@ export class DashboardConfigComponent {
     }
 
     public saveConfig() {
-        this.uiState.set('dashboard.grid', this.config, true);
+        this.uiState.setAppShared('dashboard.grid', this.config);
 
         this.dialogs.notifyInfo('i18n:dashboard.configSaved');
     }

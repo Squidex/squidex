@@ -11,7 +11,7 @@ import { ShortcutDirective } from './shortcut.directive';
 
 describe('ShortcutDirective', () => {
     let shortcutService: ShortcutService;
-    let shortcutElement: object;
+    let shortcutElement: any;
     let shortcutDirective: ShortcutDirective;
 
     beforeEach(() => {

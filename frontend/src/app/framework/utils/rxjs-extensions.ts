@@ -20,11 +20,11 @@ export function mapVersioned<T = any, R = any>(project: (value: T, version: Vers
 
 type Options = { silent?: boolean; throw?: boolean };
 
-export function shareSubscribed<T>(dialogs: DialogService, options?: Options) {
+export function shareSubscribed<T>(dialogs?: DialogService, options?: Options) {
     return shareMapSubscribed<T, T>(dialogs, x => x, options);
 }
 
-export function shareMapSubscribed<T, R = T>(dialogs: DialogService, project: (value: T) => R, options?: Options) {
+export function shareMapSubscribed<T, R = T>(dialogs: DialogService | undefined, project: (value: T) => R, options?: Options) {
     return function mapOperation(source: Observable<T>) {
         const shared = source.pipe(share({
             connector: () => new ReplaySubject(1),
@@ -36,7 +36,7 @@ export function shareMapSubscribed<T, R = T>(dialogs: DialogService, project: (v
         shared.pipe(
             catchError(error => {
                 if (!options || !options.silent) {
-                    dialogs.notifyError(error);
+                    dialogs?.notifyError(error);
                 }
 
                 if (options?.throw) {

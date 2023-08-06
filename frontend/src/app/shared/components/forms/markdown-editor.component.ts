@@ -119,7 +119,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         ]).then(() => {
             const options = {
                 previewRender: (text: string) => {
-                    return marked(text, { pedantic: true });
+                    return marked(text, { pedantic: true, mangle: false, headerIds: false });
                 },
                 autoDownloadFontAwesome: true,
                 spellChecker: false,

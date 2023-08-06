@@ -115,17 +115,16 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         }
 
         this.updatePosition();
-
         this.isViewInit = true;
     }
 
     private updatePosition() {
-        if (!this.targetElement) {
+        if (!this.targetElement || !this.targetElement?.isConnected) {
             return;
         }
 
         const modalRef = this.element.nativeElement;
-        const modalRect = this.element.nativeElement.getBoundingClientRect();
+        const modalRect = modalRef.getBoundingClientRect();
 
         if ((modalRect.width === 0 && !this.adjustWidth) || (modalRect.height === 0 && !this.adjustHeight)) {
             return;

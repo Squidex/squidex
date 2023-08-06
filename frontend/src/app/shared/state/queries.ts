@@ -47,23 +47,27 @@ export class Queries {
         this.queries = this.uiState.get(path, {}).pipe(
             map(parseQueries), shareReplay(1));
 
-        this.queriesShared = this.uiState.getShared(path, {}).pipe(
+        this.queriesShared = this.uiState.getAppShared(path, {}).pipe(
             map(parseQueries), shareReplay(1));
 
-        this.queriesUser = this.uiState.getUser(path, {}).pipe(
+        this.queriesUser = this.uiState.getAppUser(path, {}).pipe(
             map(parseQueries), shareReplay(1));
     }
 
-    public add(key: string, query: Query, user = false) {
-        this.uiState.set(this.getPath(key), JSON.stringify(query), user);
+    public addUser(key: string, query: Query) {
+        this.uiState.setAppUser(this.getPath(key), JSON.stringify(query));
+    }
+
+    public addShared(key: string, query: Query) {
+        this.uiState.setAppShared(this.getPath(key), JSON.stringify(query),);
     }
 
     public removeShared(saved: SavedQuery | string) {
-        this.uiState.removeShared(this.getPath(saved));
+        this.uiState.removeAppShared(this.getPath(saved));
     }
 
     public removeUser(saved: SavedQuery | string) {
-        this.uiState.removeUser(this.getPath(saved));
+        this.uiState.removeAppUser(this.getPath(saved));
     }
 
     public remove(saved: SavedQuery | string) {

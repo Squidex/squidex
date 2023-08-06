@@ -9,7 +9,7 @@ import { UIOptions } from './../configurations';
 import { OnboardingService } from './onboarding.service';
 
 class LocalStoreMock {
-    private store = {};
+    private readonly store: Record<string, any> = {};
 
     public get(key: string) {
         return this.store[key];

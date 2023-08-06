@@ -1,0 +1,49 @@
+<ng-container *sqxModal="currentStep; closeAuto: false">
+    <div class="tour-step" 
+        [class.d-none]="!isVisible"
+        [sqxAnchoredTo]="currentElement!" 
+        [offsetX]="0" 
+        [offsetY]="4"
+        [spaceX]="4"
+        [spaceY]="4"
+        [position]="currentStep.position || 'bottom-left'"
+        @fade>
+        <div class="tour-progress" [style.width]="progress "></div>
+
+        <div class="tour-body">
+            <div class="row g-0">
+                <div class="col-auto">
+                    <div class="squid d-flex align-items-center justify-content-center bordered">
+                        <img src="./images/squid.svg">
+                    </div>
+                </div>
+
+                <div class="col">
+                    <h5>{{currentStep.title | sqxTranslate}}</h5>
+
+                    <div>{{currentStep.content | sqxTranslate}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tour-footer" *ngIf="hasNext || hasPrev || hasFinish">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex pe-4">
+                    <button class="btn btn-outline-secondary btn-sm" *ngIf="hasPrev" (click)="tourService.prev()">
+                        {{ 'common.prev' | sqxTranslate}}
+                    </button>
+                </div>
+
+                <div class="d-flex ps-4">
+                    <button class="btn btn-outline-secondary btn-sm" *ngIf="hasNext" (click)="tourService.next()">
+                        {{ 'common.next' | sqxTranslate}}
+                    </button>
+
+                    <button class="btn btn-outline-secondary btn-sm" *ngIf="hasFinish" (click)="tourService.end()">
+                        {{ 'common.finish' | sqxTranslate}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>

@@ -508,7 +508,7 @@ export function createRule(id: number, suffix = '') {
             param2: 2,
             triggerType: `rule-trigger${key}`,
         },
-        `rule-trigger${key}`,
+        `rule-trigger${key}` as any,
         {
             param3: 3,
             param4: 4,
