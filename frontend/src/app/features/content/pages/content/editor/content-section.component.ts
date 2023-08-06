@@ -55,9 +55,9 @@ export class ContentSectionComponent extends StatefulComponent<State> {
     ) {
         super({ isCollapsed: false });
 
-        this.changes.subscribe(state => {
+        this.project(x => x.isCollapsed).subscribe(isCollapsed => {
             if (this.formSection?.separator && this.schema) {
-                this.localStore.setBoolean(this.isCollapsedKey(), state.isCollapsed);
+                this.localStore.setBoolean(this.isCollapsedKey(), isCollapsed);
             }
         });
     }

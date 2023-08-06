@@ -83,7 +83,7 @@ export class AppsPageComponent implements OnInit {
                 }
 
                     this.tourState.start();
-                    this.tourState.startFirstTask();
+                    //this.tourState.startFirstTask();
 
                 if (!this.uiOptions.get('hideNews')) {
                     const newsVersion = this.localStore.getInt(Settings.Local.NEWS_VERSION);

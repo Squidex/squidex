@@ -111,8 +111,8 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     public ngOnInit() {
-        this.changes.subscribe(state => {
-            if (state.suggestedItems.length > 0) {
+        this.project(x => x.suggestedItems).subscribe(suggestedItems => {
+            if (suggestedItems.length > 0) {
                 this.suggestionsModal.show();
             } else {
                 this.suggestionsModal.hide();

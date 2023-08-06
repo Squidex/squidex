@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
+import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
 import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from './../services/contributors.service';
 import { AppsState } from './apps.state';
 
@@ -75,7 +75,9 @@ export class ContributorsState extends State<Snapshot> {
             pageSize: 10,
             total: 0,
             version: Version.EMPTY,
-        }, 'Contributors');
+        });
+
+        debug(this, 'contributors');
     }
 
     public loadIfNotLoaded(): Observable<any> {

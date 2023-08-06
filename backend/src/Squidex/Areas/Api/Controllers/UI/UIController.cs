@@ -43,7 +43,7 @@ public sealed class UIController : ApiController
     [ApiPermission]
     public async Task<IActionResult> GetCommonSettings()
     {
-        var common = await appUISettings.GetAsync(SharedKey, null, HttpContext.RequestAborted);
+        var common = await appUISettings.GetAsync(SharedKey, UserId, HttpContext.RequestAborted);
 
         var result = new Dictionary<string, JsonValue>
         {
@@ -105,7 +105,7 @@ public sealed class UIController : ApiController
     [ApiPermission]
     public async Task<IActionResult> PutCommonSetting(string key, [FromBody] UpdateSettingDto request)
     {
-        await appUISettings.SetAsync(SharedKey, null, key, request.Value, HttpContext.RequestAborted);
+        await appUISettings.SetAsync(SharedKey, UserId, key, request.Value, HttpContext.RequestAborted);
 
         return NoContent();
     }
@@ -157,7 +157,7 @@ public sealed class UIController : ApiController
     [ApiPermission]
     public async Task<IActionResult> DeleteCommonSetting(string key)
     {
-        await appUISettings.RemoveAsync(SharedKey, null, key, HttpContext.RequestAborted);
+        await appUISettings.RemoveAsync(SharedKey, UserId, key, HttpContext.RequestAborted);
 
         return NoContent();
     }

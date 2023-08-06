@@ -210,7 +210,11 @@ export class Router2StateMap<T extends {}> implements StateSynchronizerMap<T> {
     }
 
     public listen() {
-        this.stateSubscription = this.state.changes.subscribe(s => this.syncToRoute(s));
+        this.stateSubscription =
+            this.state.changes
+                .subscribe(change => {
+                    this.syncToRoute(change.snapshot);
+                });
 
         return this;
     }

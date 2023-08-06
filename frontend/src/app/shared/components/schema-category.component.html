@@ -37,7 +37,7 @@
 
         <div [hidden]="isCollapsed" [style.height]="getContainerHeight()" class="nav-collapsed">
             <ng-container *ngIf="!forContent; else simpleMode">
-                <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate"
+                <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate" sqxTourStep="schema"
                     cdkDrag
                     [cdkDragData]="schema"
                     (cdkDragStarted)="dragStarted($event)">

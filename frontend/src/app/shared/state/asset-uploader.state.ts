@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, shareReplay, Subject, takeUntil } from 'rxjs';
-import { DialogService, MathHelper, State, Types } from '@app/framework';
+import { debug, DialogService, MathHelper, State, Types } from '@app/framework';
 import { AssetDto, AssetsService } from './../services/assets.service';
 import { AppsState } from './apps.state';
 
@@ -53,7 +53,9 @@ export class AssetUploaderState extends State<Snapshot> {
         private readonly assetsService: AssetsService,
         private readonly dialogs: DialogService,
     ) {
-        super({ uploads: [] }, 'AssetUploader');
+        super({ uploads: [] });
+
+        debug(this, 'assetUploader');
     }
 
     public stopUpload(upload: Upload) {

@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
+import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { AppLanguageDto, AppLanguagesPayload, AppLanguagesService, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto, LanguagesService } from './../services/languages.service';
 import { AppsState } from './apps.state';
@@ -85,7 +85,9 @@ export class LanguagesState extends State<Snapshot> {
             allLanguagesNew: [],
             languages: [],
             version: Version.EMPTY,
-        }, 'Languages');
+        });
+
+        debug(this, 'languages');
     }
 
     public load(isReload = false): Observable<any> {

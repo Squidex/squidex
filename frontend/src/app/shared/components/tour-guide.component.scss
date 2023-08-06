@@ -14,6 +14,12 @@ $caret-size: 14px;
     max-width: 300px;
     position: relative;
 
+    &-body {
+        max-height: 300px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
     &::before {
         @include caret-bottom($color-border, $caret-size);
         @include absolute(null, 20px, -$caret-size * 2, null);

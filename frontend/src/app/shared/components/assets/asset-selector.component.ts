@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings, StatefulComponent } from '@app/shared/internal';
 
 interface State {
@@ -42,7 +41,7 @@ export class AssetSelectorComponent extends StatefulComponent<State> implements 
             isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
         });
 
-        this.changes.pipe(map(x => x.isListView), distinctUntilChanged()).subscribe(value => {
+        this.project(x => x.isListView).subscribe(value => {
             localStore.setBoolean(Settings.Local.ASSETS_MODE, value);
         });
     }

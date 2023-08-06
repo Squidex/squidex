@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State, Types } from '@app/framework';
+import { debug, DialogService, shareSubscribed, State, Types } from '@app/framework';
 import { AppDto, AppSettingsDto, AppsService, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
 
 interface Snapshot {
@@ -25,13 +25,13 @@ interface Snapshot {
 @Injectable()
 export class AppsState extends State<Snapshot> {
     public apps =
-        this.project(s => s.apps);
+        this.project(x => x.apps);
 
     public selectedApp =
-        this.project(s => s.selectedApp);
+        this.project(x => x.selectedApp);
 
     public selectedSettings =
-        this.project(s => s.selectedSettings);
+        this.project(x => x.selectedSettings);
 
     public get appId() {
         return this.snapshot.selectedApp?.id || '';
@@ -49,7 +49,9 @@ export class AppsState extends State<Snapshot> {
             apps: [],
             selectedApp: null,
             selectedSettings: null,
-        }, 'Apps');
+        });
+
+        debug(this, 'apps');
     }
 
     public reloadApps() {

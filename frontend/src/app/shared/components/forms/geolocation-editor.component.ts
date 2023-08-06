@@ -7,7 +7,6 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
-import { distinctUntilChanged, map } from 'rxjs/operators';
 import { ExtendedFormGroup, LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
 declare const L: any;
@@ -76,8 +75,8 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     ) {
         super({ isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP) });
 
-        this.changes.pipe(map(x => x.isMapHidden), distinctUntilChanged()).subscribe(value => {
-            localStore.setBoolean(Settings.Local.HIDE_MAP, value);
+        this.project(x => x.isMapHidden).subscribe(isMapHidden => {
+            localStore.setBoolean(Settings.Local.HIDE_MAP, isMapHidden);
         });
 
         this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';

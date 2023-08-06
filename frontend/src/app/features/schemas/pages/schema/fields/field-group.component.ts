@@ -55,9 +55,9 @@ export class FieldGroupComponent extends StatefulComponent<State> {
     ) {
         super({ isCollapsed: false });
 
-        this.changes.subscribe(state => {
+        this.changes.subscribe(change => {
             if (this.fieldGroup?.separator && this.schema) {
-                this.localStore.setBoolean(this.isCollapsedKey(), state.isCollapsed);
+                this.localStore.setBoolean(this.isCollapsedKey(), change.snapshot.isCollapsed);
             }
         });
 

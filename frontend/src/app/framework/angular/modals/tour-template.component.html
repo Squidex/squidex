@@ -1,11 +1,10 @@
-<ng-container *sqxModal="currentStep; closeAuto: false">
+<ng-container *sqxModal="currentElement; closeAuto: false">
     <div class="tour-step" 
         [class.d-none]="!isVisible"
         [sqxAnchoredTo]="currentElement!" 
-        [offsetX]="0" 
-        [offsetY]="4"
-        [spaceX]="4"
-        [spaceY]="4"
+        [offsetAuto]="4" 
+        [spaceX]="0"
+        [spaceY]="0"
         [position]="currentStep.position || 'bottom-left'"
         @fade>
         <div class="tour-progress" [style.width]="progress "></div>
@@ -19,9 +18,9 @@
                 </div>
 
                 <div class="col">
-                    <h5>{{currentStep.title | sqxTranslate}}</h5>
+                    <h5 class="break-all">{{currentStep.title | sqxTranslate}}</h5>
 
-                    <div>{{currentStep.content | sqxTranslate}}</div>
+                    <div class="break-all">{{currentStep.content | sqxTranslate}}</div>
                 </div>
             </div>
         </div>

@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { TourService as BaseTourService, IStepOption } from 'ngx-ui-tour-core';
+import { TourService as BaseTourService, IStepOption, TourState } from 'ngx-ui-tour-core';
 import { filter, Observable, Subscription, take } from 'rxjs';
 import { RelativePosition } from '@app/framework/internal';
 import { TourTemplateComponent } from './tour-template.component';
@@ -49,7 +49,9 @@ export class TourService extends BaseTourService<StepDefinition> {
 
         this.stepHide$
             .subscribe(() => {
-                this.condition?.unsubscribe();
+                if (this.getStatus() !== TourState.PAUSED) {
+                    this.condition?.unsubscribe();
+                }
             });
     }
 
@@ -59,7 +61,7 @@ export class TourService extends BaseTourService<StepDefinition> {
 
     protected showStep(step: StepDefinition): Promise<void> {
         this.condition = step.nextOnCondition?.(this)?.subscribe(() => {
-            this.next();
+            this.goto(this.steps.indexOf(step) + 1);
         });
 
         return super.showStep(step);

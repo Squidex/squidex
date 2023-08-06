@@ -8,7 +8,6 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AssetDto, DialogModel, LocalStoreService, MessageBus, ResolveAssets, Settings, sorted, StatefulControlComponent, Types } from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -73,8 +72,8 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
             isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
         });
 
-        this.changes.pipe(map(x => x.isListView), distinctUntilChanged()).subscribe(value => {
-            localStore.setBoolean(Settings.Local.ASSETS_MODE, value);
+        this.project(x => x.isListView).subscribe(isListView => {
+            localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
         });
     }
 

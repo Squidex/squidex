@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg">
+<sqx-modal-dialog (close)="emitComplete()" size="lg" tourId="fieldForm">
     <ng-container title>
         <ng-container *ngIf="parent; else noParent">
             {{ 'schemas.addNestedField' | sqxTranslate }}

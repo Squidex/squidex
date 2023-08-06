@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
+import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
 import { RuleDto, RulesService, UpsertRuleDto } from './../services/rules.service';
 import { AppsState } from './apps.state';
 
@@ -74,7 +74,9 @@ export class RulesState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rulesService: RulesService,
     ) {
-        super({ rules: [] }, 'Rules');
+        super({ rules: [] });
+
+        debug(this, 'rules');
     }
 
     public select(id: string | null): Observable<RuleDto | null> {

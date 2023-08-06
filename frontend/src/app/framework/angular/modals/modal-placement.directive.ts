@@ -20,12 +20,6 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
     } as any;
 
     private targetField?: Element;
-    private positionField?: RelativePosition;
-    private offsetField = 0;
-    private offsetXField = 0;
-    private offsetYField = 0;
-    private anchorXField: AnchorX = 'right-to-right';
-    private anchorYField: AnchorY = 'top-to-bottom';
     private isViewInit = false;
     private previousPosition?: PositionResult;
 
@@ -35,18 +29,14 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
             return;
         }
 
-        this.unsubscribeAll();
+        if (this.targetField) {
+            this.unsubscribeAll();
+        }
 
         this.targetField = value;
 
-        if (value) {
-            this.listenToElement(value);
-        }
-
-        if (this.isViewInit) {
-            setTimeout(() => {
-                this.updatePosition();
-            })
+        if (this.targetField) {
+            this.listenToElement(this.targetField);
         }
     }
 
@@ -60,62 +50,37 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
     public scrollMargin = 10;
 
     @Input()
-    public set spaceX = 0;
-    @Input()
-    public set spaceY(value: number | undefined) {
-        this.request.spaceY = value;
-    }
+    public offsetAuto = 0;
 
     @Input()
-    public set adjustWidth(value: boolean | undefined) {
-        this.request.computeWidth = value;
-    }
+    public offsetX = 0;
 
     @Input()
-    public set adjustHeight(value: boolean | undefined) {
-        this.request.computeHeight = value;
-    }
+    public offsetY = 2;
 
     @Input()
-    public set update(value: boolean | undefined) {
-        this.request.adjust = value;
-    }
+    public spaceX = 0;
 
     @Input()
-    public set offset(value: number) {
-        this.offsetField = value;
-        this.invalidateRequest();
-    }
+    public spaceY = 0;
 
     @Input()
-    public set anchorX(value: AnchorX) {
-        this.anchorXField = value;
-        this.invalidateRequest();
-    }
+    public anchorX: AnchorX = 'right-to-right';
 
     @Input()
-    public set anchorY(value: AnchorY) {
-        this.anchorYField = value;
-        this.invalidateRequest();
-    }
+    public anchorY: AnchorY = 'top-to-bottom';
 
     @Input()
-    public set offsetX(value: number) {
-        this.offsetXField = value;
-        this.invalidateRequest();
-    }
+    public position?: RelativePosition;
 
     @Input()
-    public set offsetY(value: number) {
-        this.offsetYField = value;
-        this.invalidateRequest();
-    }
+    public adjustWidth = false;
 
     @Input()
-    public set position(value: RelativePosition) {
-        this.positionField = value;
-        this.invalidateRequest();
-    }
+    public adjustHeight = false;
+
+    @Input()
+    public update = true;
 
     constructor(
         private readonly renderer: Renderer2,
@@ -124,7 +89,6 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         super();
 
         renderer.setStyle(element.nativeElement, 'visibility', 'hidden');
-        this.invalidateRequest();
     }
 
     private listenToElement(element: any) {
@@ -141,14 +105,14 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         this.own(timer(100, 100).subscribe(() => this.updatePosition()));
     }
 
-    private invalidateRequest() {
-        this.request.anchorX = this.anchorXField;
-        this.request.anchorY = this.anchorYField;
-        this.request.offsetX = this.offsetXField;
-        this.request.offsetY = this.offsetYField;
+    public ngOnChanges() {
+        this.request.anchorX = this.anchorX;
+        this.request.anchorY = this.anchorY;
+        this.request.offsetX = this.offsetX;
+        this.request.offsetY = this.offsetY;
 
-        if (this.positionField) {
-            const [anchorX, offsetX, anchorY, offsetY] = computeAnchors(this.positionField, this.offsetField);
+        if (this.position) {
+            const [anchorX, offsetX, anchorY, offsetY] = computeAnchors(this.position, this.offsetAuto);
 
             this.request.anchorX = anchorX;
             this.request.anchorY = anchorY;
@@ -163,6 +127,7 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         }
 
         this.previousPosition = undefined;
+        this.updatePosition();
     }
 
     public ngAfterViewInit() {
@@ -179,12 +144,12 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
             this.renderer.setStyle(modalRef, 'z-index', 10000);
         }
 
-        this.updatePosition();
         this.isViewInit = true;
+        this.updatePosition();
     }
 
     private updatePosition() {
-        if (!this.targetField || !this.targetField?.isConnected) {
+        if (!this.isViewInit || !this.targetField?.isConnected) {
             return;
         }
 

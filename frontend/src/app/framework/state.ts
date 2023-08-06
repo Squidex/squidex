@@ -91,23 +91,28 @@ export interface ListState<TQuery = any> extends LoadingState {
     query?: TQuery;
 }
 
-const devToolsExtension = (window as any)['__REDUX_DEVTOOLS_EXTENSION__'];
+interface Change<T> {
+    // The actual value.
+    snapshot: Readonly<T>;
+
+    // The name of the event.
+    event: string;
+}
 
 export class State<T extends {}> {
-    private readonly state: BehaviorSubject<Readonly<T>>;
-    private readonly devTools?: any;
+    private readonly state: BehaviorSubject<Change<T>>;
 
-    public get changes(): Observable<Readonly<T>> {
+    public get changes(): Observable<Change<T>> {
         return this.state;
     }
 
     public get snapshot(): Readonly<T> {
-        return this.state.value;
+        return this.state.value.snapshot;
     }
 
     public project<M>(project: (value: T) => M, compare?: (x: M, y: M) => boolean) {
         return this.changes.pipe(
-            map(project), distinctUntilChanged(compare), shareReplay(1));
+            map(x => project(x.snapshot)), distinctUntilChanged(compare), shareReplay(1));
     }
 
     public projectFrom<M, N>(source: Observable<M>, project: (value: M) => N, compare?: (x: N, y: N) => boolean) {
@@ -122,37 +127,23 @@ export class State<T extends {}> {
 
     constructor(
         private readonly initialState: Readonly<T>,
-        private readonly debugName?: string,
     ) {
-        this.state = new BehaviorSubject(initialState);
-
-        if (debugName && devToolsExtension) {
-            const name = `[Squidex] ${debugName}`;
-
-            this.devTools = devToolsExtension.connect({ name, features: { jump: true } });
-            this.devTools.init(initialState);
-
-            this.devTools.subscribe((message: any) => {
-                if (message.type === 'DISPATCH' && message.payload.type === 'JUMP_TO_ACTION') {
-                    this.state.next(JSON.parse(message.state));
-                }
-            });
-        }
+        this.state = new BehaviorSubject({ snapshot: initialState, event: 'Initial' });
     }
 
-    public resetState(update?: ((v: T) => Readonly<T>) | Partial<T> | string, action = 'Reset') {
+    public resetState(update?: ((v: T) => Readonly<T>) | Partial<T> | string, event = 'Reset') {
         if (Types.isString(update)) {
-            return this.updateState(this.initialState, {}, update);
+            return this.updateState(this.initialState, event, {});
         } else {
-            return this.updateState(this.initialState, update, action);
+            return this.updateState(this.initialState, event, update);
         }
     }
 
-    public next(update: ((v: T) => Readonly<T>) | Partial<T>, action = 'Update') {
-        return this.updateState(this.state.value, update, action);
+    public next(update: ((v: T) => Readonly<T>) | Partial<T>, event = 'Update') {
+        return this.updateState(this.state.value.snapshot, event, update);
     }
 
-    private updateState(state: T, update?: ((v: T) => Readonly<T>) | Partial<T>, action?: string) {
+    private updateState(state: T, event: string, update?: ((v: T) => Readonly<T>) | Partial<T>) {
         let newState = state;
 
         if (update) {
@@ -179,15 +170,44 @@ export class State<T extends {}> {
         }
 
         if (isChanged) {
-            if (action && this.devTools) {
-                const name = `[${this.debugName}] ${action}`;
-
-                this.devTools?.send(name, newState);
-            }
-
-            this.state.next(newState);
+            this.state.next({ snapshot: newState, event });
         }
 
         return isChanged;
     }
+}
+
+const devToolsExtension = (window as any)['__REDUX_DEVTOOLS_EXTENSION__'];
+
+class Connector {
+    public static readonly INSTANCE = new Connector();
+
+    private readonly devTools?: any;
+    private readonly state: Record<string, any> = {};
+
+    private constructor() {
+        if (!devToolsExtension) {
+            return;
+        }
+
+        this.devTools = devToolsExtension.connect({ name: 'Squidex' });
+        this.devTools.init(this.state);
+    }
+
+    public connect<T extends {}>(state: State<T>, slice: string) {
+        if (!this.devTools) {
+            return;
+        }
+
+        state.changes
+            .subscribe(change => {
+                this.state[slice] = change.snapshot;
+
+                this.devTools?.send(`${slice} - ${change.event}`, this.state);
+            });
+    }
+}
+
+export function debug<T extends {}>(state: State<T>, slice: string) {
+    Connector.INSTANCE.connect(state, slice);
 }

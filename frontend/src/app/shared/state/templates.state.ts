@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
+import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
 import { TemplateDto, TemplatesService } from './../services/templates.service';
 
 interface Snapshot extends LoadingState {
@@ -34,7 +34,9 @@ export class TemplatesState extends State<Snapshot> {
         private readonly templatesService: TemplatesService,
         private readonly dialogs: DialogService,
     ) {
-        super({ templates: [] }, 'Templates');
+        super({ templates: [] });
+
+        debug(this, 'templates');
     }
 
     public load(isReload = false, silent = false): Observable<any> {

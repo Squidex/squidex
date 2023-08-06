@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { fadeAnimation, StatefulComponent } from '@app/framework/internal';
 import { StepDefinition } from './tour.service';
 import { TourService } from './tour.service';
@@ -36,7 +36,7 @@ export class TourTemplateComponent extends StatefulComponent implements AfterCon
 
     public progress = '0%';
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         public readonly tourService: TourService,
     ) {
         super({});

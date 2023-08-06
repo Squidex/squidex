@@ -9,6 +9,7 @@ $hide-shadow: rgba(0, 0, 0, 50%);
         background: $color-white;
         border: 0;
         border-radius: 0;
+        width: 400px;
     }
 
     &-progress {
@@ -34,6 +35,10 @@ $hide-shadow: rgba(0, 0, 0, 50%);
             display: none;
         }
     }
+}
+
+.break-all {
+    word-break: break-all;
 }
 
 .squid {

@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { DialogService, shareSubscribed, State } from '@app/framework';
+import { debug, DialogService, shareSubscribed, State } from '@app/framework';
 import { CreateTeamDto, TeamDto, TeamsService, UpdateTeamDto } from '@app/shared/internal';
 
 interface Snapshot {
@@ -16,16 +16,16 @@ interface Snapshot {
     teams: ReadonlyArray<TeamDto>;
 
     // The selected team.
-    selectedTeam: TeamDto | null;
+    selectedTeam?: TeamDto | null;
 }
 
 @Injectable()
 export class TeamsState extends State<Snapshot> {
     public teams =
-        this.project(s => s.teams);
+        this.project(x => x.teams);
 
     public selectedTeam =
-        this.project(s => s.selectedTeam);
+        this.project(x => x.selectedTeam);
 
     public get teamId() {
         return this.snapshot.selectedTeam?.id || '';
@@ -35,10 +35,9 @@ export class TeamsState extends State<Snapshot> {
         private readonly teamsService: TeamsService,
         private readonly dialogs: DialogService,
     ) {
-        super({
-            teams: [],
-            selectedTeam: null,
-        }, 'Teams');
+        super({ teams: [] });
+
+        debug(this, 'teams');
     }
 
     public reloadTeams() {

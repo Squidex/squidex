@@ -5,24 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { debounceTime } from 'rxjs';
-import { State, StepDefinition, TourService, waitForAnchor } from '@app/framework';
+import { debug, State, TourService } from '@app/framework';
+import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
 import { UIState } from './ui.state';
-
-export interface TaskDefinition {
-    // The ID to store it in the backend.
-    id: string;
-
-    // The title.
-    title: string;
-
-    // The description.
-    description: string;
-
-    // The steps to operate.
-    steps: StepDefinition[];
-}
 
 export interface TaskSnapshot extends TaskDefinition {
     // True if active.
@@ -52,35 +39,39 @@ export class TourState extends State<Snapshot> {
         this.project(x => x.status);
 
     public tasks =
-        this.projectFrom(this.completedTasks, createTasks);
+        this.projectFrom(this.completedTasks, x => createTasks(this.definition.tasks, x));
 
     public pendingTasks =
-        this.projectFrom(this.tasks, x => x.filter(t => !t.isCompleted).length);
+        this.projectFrom(this.tasks, x => x.filter(t => !t.onComplete).length);
 
     constructor(
+        @Inject(TASK_CONFIGURATION) private readonly definition: TaskConfiguration,
         private readonly tourService: TourService,
         private readonly uiState: UIState,
     ) {
-        super({}, 'Tour');
+        super({});
 
-        this.tourService.setDefaults(DEFAULTS);
+        debug(this, 'tour');
 
-        tourService.end$
-            .subscribe(() => {
+        this.tourService.setDefaults(this.definition.defaults);
+
+        for (const tasks of definition.tasks) {
+            tasks.onComplete.subscribe(() => {
                 this.next(state => ({
                     ...state,
-                    completedTasks: { ...state.completedTasks || {}, [state.taskId!]: true },
+                    completedTasks: { ...state.completedTasks || {}, [tasks.id]: true },
                 }));
             });
+        }
 
         this.changes.pipe(debounceTime(1000))
-            .subscribe(changes => {
-                this.uiState.setCommon('tour', changes);
+            .subscribe(change => {
+                this.uiState.setCommon('tour', change.snapshot);
             });
 
         this.uiState.getCommon('tour', {} as Snapshot)
-            .subscribe(changes => {
-                this.next({ ...changes, status: changes.status || 'Ready' });
+            .subscribe(change => {
+                this.next({ ...change, status: change.status || 'Ready' });
             });
     }
 
@@ -101,7 +92,7 @@ export class TourState extends State<Snapshot> {
     }
 
     public startFirstTask() {
-        this.runTask(TASKS[0]);
+        this.runTask(this.definition.tasks[0]);
     }
 
     public runTask(task: TaskDefinition | undefined) {
@@ -111,7 +102,7 @@ export class TourState extends State<Snapshot> {
 
         this.next({ taskId: task.id });
 
-        this.tourService.initialize(task.steps, DEFAULTS);
+        this.tourService.initialize(task.steps);
         this.tourService.start();
     }
 
@@ -120,10 +111,10 @@ export class TourState extends State<Snapshot> {
     }
 }
 
-function createTasks(completed?: Record<string, boolean>): TaskSnapshot[] {
+function createTasks(tasks: TaskDefinition[], completed?: Record<string, boolean>): TaskSnapshot[] {
     let wasCompleted = false;
 
-    return TASKS.map(task => {
+    return tasks.map(task => {
         const isCompleted = completed?.[task.id] === true;
         const isActive = wasCompleted && !isCompleted;
 
@@ -136,78 +127,3 @@ function createTasks(completed?: Record<string, boolean>): TaskSnapshot[] {
         };
     });
 }
-
-const TASKS: TaskDefinition[] = [{
-    id: 'createApp',
-    title: 'tour.createApp.title',
-    description: 'tour.createApp.description',
-    steps: [{
-        anchorId: 'addApp',
-        content: 'Use this button to create a new app.',
-        title: 'Add a new app',
-        nextOnAnchorClick: true,
-        scrollContainer: '.panel-container',
-    }, {
-        anchorId: 'appForm',
-        content: 'Other content',
-        title: 'Second',
-        nextOnCondition: waitForAnchor('app'),
-        scrollContainer: '.panel-container',
-    }, {
-        anchorId: 'app',
-        content: 'Click on your app',
-        title: 'Second',
-        nextOnAnchorClick: true,
-        scrollContainer: '.panel-container',
-    }, {
-        anchorId: 'appDashboard',
-        content: 'Other content',
-        title: 'Second',
-        isAsync: true,
-        enableBackdrop: false,
-    }],
-}, {
-    id: 'createSchema',
-    title: 'tour.createSchema.title',
-    description: 'tour.createSchema.description',
-    steps: [{
-        anchorId: 'addSchema',
-        content: 'Use this button to create a new app.',
-        title: 'Add a new app',
-        nextOnAnchorClick: true,
-        scrollContainer: '.panel-container',
-    }, {
-        anchorId: 'appForm',
-        content: 'Other content',
-        title: 'Second',
-        nextOnCondition: waitForAnchor('app'),
-        scrollContainer: '.panel-container',
-    }, {
-        anchorId: 'app',
-        content: 'Other content',
-        title: 'Second',
-        duplicateAnchorHandling: 'registerFirst',
-        scrollContainer: '.panel-container',
-    }],
-}, {
-    id: 'createContent',
-    title: 'tour.createContent.title',
-    description: 'tour.createContent.description',
-    steps: [{
-        anchorId: 'selectSchema',
-        content: 'Use this button to create a new app.',
-        title: 'Add a new app',
-        nextOnAnchorClick: true,
-        scrollContainer: '.panel-container',
-    }, {
-        anchorId: 'appForm',
-        content: 'Other content',
-        title: 'Second',
-    }],
-}];
-
-const DEFAULTS: StepDefinition = {
-    allowUserInitiatedNavigation: true,
-    enableBackdrop: true,
-    duplicateAnchorHandling: 'registerLast',
-};

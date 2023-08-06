@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
-import { defined, hasAnyLink, shareSubscribed, State, Types } from '@app/framework';
+import { debug, defined, hasAnyLink, shareSubscribed, State, Types } from '@app/framework';
 import { UIService } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
 import { AppsState } from './apps.state';
@@ -97,7 +97,9 @@ export class UIState extends State<Snapshot> {
         private readonly uiService: UIService,
         private readonly usersService: UsersService,
     ) {
-        super({}, 'Setting');
+        super({});
+
+        debug(this, 'settings');
 
         appsState.selectedApp.pipe(defined())
             .subscribe(app => {

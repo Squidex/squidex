@@ -40,15 +40,15 @@ describe('position', () => {
         it(`should calculate modal position for ${test.position}`, () => {
             const modalRect = buildRect(0, 0, 30, 30);
 
-            const [anchorX, anchorY] = computeAnchors(test.position);
+            const [anchorX, offsetX, anchorY, offsetY] = computeAnchors(test.position, 10);
 
             const request: PositionRequest = {
                 anchorX,
                 anchorY,
                 clientHeight: 1000,
                 clientWidth: 1000,
-                offsetX: 10,
-                offsetY: 10,
+                offsetX,
+                offsetY,
                 modalRect,
                 targetRect,
             };
@@ -63,7 +63,7 @@ describe('position', () => {
     it('should calculate modal position for vertical top fix', () => {
         const modalRect = buildRect(0, 0, 30, 200);
 
-        const [anchorX, anchorY] = computeAnchors('top-left');
+        const [anchorX, offsetX, anchorY, offsetY] = computeAnchors('top-left', 10);
 
         const request: PositionRequest = {
             adjust: true,
@@ -72,8 +72,8 @@ describe('position', () => {
             clientHeight: 600,
             clientWidth: 600,
             modalRect,
-            offsetX: 10,
-            offsetY: 10,
+            offsetX,
+            offsetY,
             targetRect,
         };
 
@@ -86,7 +86,7 @@ describe('position', () => {
     it('should calculate modal position for vertical bottom fix', () => {
         const modalRect = buildRect(0, 0, 30, 70);
 
-        const [anchorX, anchorY] = computeAnchors('bottom-left');
+        const [anchorX, offsetX, anchorY, offsetY] = computeAnchors('bottom-left', 10);
 
         const request: PositionRequest = {
             adjust: true,
@@ -95,8 +95,8 @@ describe('position', () => {
             clientHeight: 350,
             clientWidth: 350,
             modalRect,
-            offsetX: 10,
-            offsetY: 10,
+            offsetX,
+            offsetY,
             targetRect,
         };
 
@@ -109,7 +109,7 @@ describe('position', () => {
     it('should calculate modal position for horizontal left fix', () => {
         const modalRect = buildRect(0, 0, 200, 30);
 
-        const [anchorX, anchorY] = computeAnchors('left-top');
+        const [anchorX, offsetX, anchorY, offsetY] = computeAnchors('left-top');
 
         const request: PositionRequest = {
             adjust: true,
@@ -118,8 +118,8 @@ describe('position', () => {
             clientHeight: 600,
             clientWidth: 600,
             modalRect,
-            offsetX: 10,
-            offsetY: 10,
+            offsetX,
+            offsetY,
             targetRect,
         };
 
@@ -132,7 +132,7 @@ describe('position', () => {
     it('should calculate modal position for horizontal right fix', () => {
         const modalRect = buildRect(0, 0, 70, 30);
 
-        const [anchorX, anchorY] = computeAnchors('right-top');
+        const [anchorX, offsetX, anchorY, offsetY] = computeAnchors('right-top', 10);
 
         const request: PositionRequest = {
             adjust: true,
@@ -141,8 +141,8 @@ describe('position', () => {
             clientHeight: 350,
             clientWidth: 350,
             modalRect,
-            offsetX: 10,
-            offsetY: 10,
+            offsetX,
+            offsetY,
             targetRect,
         };
 

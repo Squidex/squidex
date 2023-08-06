@@ -37,38 +37,38 @@ export type SimplePosition =
     'top-left' |
     'top-right';
 
-export function computeAnchors(value: RelativePosition): [AnchorX, AnchorY] {
+export function computeAnchors(value: RelativePosition, offset?: number): [AnchorX, number | undefined, AnchorY, number | undefined] {
     if (Types.isArray(value)) {
-        return value;
+        return [value[0], offset, value[1], offset];
     }
 
     switch (value) {
         case 'bottom-center':
-            return ['center', 'top-to-bottom'];
+            return ['center', 0, 'top-to-bottom', offset];
         case 'bottom-left':
-            return ['left-to-left', 'top-to-bottom'];
+            return ['left-to-left', 0, 'top-to-bottom', offset];
         case 'bottom-right':
-            return ['right-to-right', 'top-to-bottom'];
+            return ['right-to-right', 0, 'top-to-bottom', offset];
         case 'left-bottom':
-            return ['right-to-left', 'bottom-to-bottom'];
+            return ['right-to-left', offset, 'bottom-to-bottom', 0];
         case 'left-center':
-            return ['right-to-left', 'center'];
+            return ['right-to-left', offset, 'center', 0];
         case 'left-top':
-            return ['right-to-left', 'top-to-top'];
+            return ['right-to-left', offset, 'top-to-top', 0];
         case 'right-bottom':
-            return ['left-to-right', 'bottom-to-bottom'];
+            return ['left-to-right', offset, 'bottom-to-bottom', 0];
         case 'right-center':
-            return ['left-to-right', 'center'];
+            return ['left-to-right', offset, 'center', 0];
         case 'right-top':
-            return ['left-to-right', 'top-to-top'];
+            return ['left-to-right', offset, 'top-to-top', 0];
         case 'top-center':
-            return ['center', 'bottom-to-top'];
+            return ['center', 0, 'bottom-to-top', offset];
         case 'top-left':
-            return ['left-to-left', 'bottom-to-top'];
+            return ['left-to-left', 0, 'bottom-to-top', offset];
         case 'top-right':
-            return ['right-to-right', 'bottom-to-top'];
+            return ['right-to-right', 0, 'bottom-to-top', offset];
         default:
-            return ['center', 'center'];
+            return ['center', 0, 'center', 0];
     }
 }
 
