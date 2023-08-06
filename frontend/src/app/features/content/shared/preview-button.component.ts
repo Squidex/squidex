@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService, ContentDto, interpolate, LocalStoreService, ModalModel, SchemaDto, Settings, StatefulComponent } from '@app/shared';
@@ -36,13 +36,11 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
 
     public dropdown = new ModalModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly authService: AuthService,
         private readonly localStore: LocalStoreService,
     ) {
-        super(changeDetector, {
-            previewNamesMore: [],
-        });
+        super({ previewNamesMore: [] });
     }
 
     public ngOnInit() {

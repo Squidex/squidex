@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy,  Component, Input } from '@angular/core';
 import { ModalModel, StatefulComponent, TypedSimpleChanges } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
@@ -43,8 +43,8 @@ export class ContentValueComponent extends StatefulComponent<State> {
         return !Types.is(this.value, HtmlValue);
     }
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, { wrapping: false });
+    constructor() {
+        super({ wrapping: false });
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {

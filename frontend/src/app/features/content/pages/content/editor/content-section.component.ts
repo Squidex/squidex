@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
 
 interface State {
@@ -50,12 +50,10 @@ export class ContentSectionComponent extends StatefulComponent<State> {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly localStore: LocalStoreService,
     ) {
-        super(changeDetector, {
-            isCollapsed: false,
-        });
+        super({ isCollapsed: false });
 
         this.changes.subscribe(state => {
             if (this.formSection?.separator && this.schema) {

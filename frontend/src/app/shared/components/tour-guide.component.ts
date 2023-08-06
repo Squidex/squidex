@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { fadeAnimation, StatefulComponent, TaskSnapshot, TourState } from '@app/shared/internal';
 
 interface State {
@@ -23,10 +23,10 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TourGuideComponent extends StatefulComponent<State> {
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         public readonly tourState: TourState,
     ) {
-        super(changeDetector, { isCollapsed: false });
+        super({ isCollapsed: false });
     }
 
     public toggle() {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
@@ -92,8 +92,8 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public queryInput = new UntypedFormControl();
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
+    constructor() {
+        super({
             selectedItem: undefined,
             suggestedIndex: -1,
             suggestedItems: [],

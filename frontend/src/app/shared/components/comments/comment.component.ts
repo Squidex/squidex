@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MentionConfig } from 'angular-mentions';
 import { CommentDto, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
 
@@ -51,12 +51,10 @@ export class CommentComponent extends StatefulComponent<State> {
 
     public editingText = '';
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly dialogs: DialogService,
     ) {
-        super(changeDetector, {
-            isEditing: false,
-        });
+        super({ isEditing: false });
     }
 
     public ngOnChanges() {

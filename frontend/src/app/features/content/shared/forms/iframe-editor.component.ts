@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DialogModel, DialogService, disabled$, StatefulComponent, TypedSimpleChanges, Types, value$ } from '@app/framework';
@@ -82,15 +82,13 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     public contentsSchemas?: string[];
     public contentsDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
         private readonly renderer: Renderer2,
         private readonly router: Router,
     ) {
-        super(changeDetector, {
-            isFullscreen: false,
-        });
+        super({ isFullscreen: false });
     }
 
     public ngOnDestroy() {

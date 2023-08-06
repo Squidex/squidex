@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AssetDto, DialogModel, LocalStoreService, MessageBus, ResolveAssets, Settings, sorted, StatefulControlComponent, Types } from '@app/shared';
@@ -63,11 +63,11 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
 
     public assetsDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef, localStore: LocalStoreService,
+    constructor(localStore: LocalStoreService,
         private readonly assetsResolver: ResolveAssets,
         private readonly messageBus: MessageBus,
     ) {
-        super(changeDetector, {
+        super({
             assets: [],
             assetFiles: [],
             isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),

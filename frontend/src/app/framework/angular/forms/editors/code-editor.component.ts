@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
 import { ResourceLoaderService, ScriptCompletions, StatefulControlComponent, Types } from '@app/framework/internal';
@@ -79,10 +79,10 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
         }
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly resourceLoader: ResourceLoaderService,
     ) {
-        super(changeDetector, {});
+        super({});
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {

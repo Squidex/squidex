@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppLanguageDto, ContentDto, DialogModel, ResolveContents, sorted, StatefulControlComponent, Types } from '@app/shared';
 
@@ -60,10 +60,10 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public contentCreatorDialog = new DialogModel();
     public contentSelectorDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly contentsResolver: ResolveContents,
     ) {
-        super(changeDetector, { contentItems: [] });
+        super({ contentItems: [] });
     }
 
     public writeValue(obj: any) {

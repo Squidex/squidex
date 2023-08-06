@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
 import { StatefulComponent } from '@app/framework/internal';
 
 interface State {
@@ -66,12 +66,10 @@ export class ListViewComponent extends StatefulComponent<State> implements After
         return this.snapshot.isLoading;
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly renderer: Renderer2,
     ) {
-        super(changeDetector, {
-            isLoading: false,
-        });
+        super({ isLoading: false });
     }
 
     public ngAfterViewInit() {

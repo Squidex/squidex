@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { ContentDto, FieldValue, getContentValue, LanguageDto, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
 
@@ -51,10 +51,8 @@ export class ContentListFieldComponent extends StatefulComponent<State> {
         return this.field.rootField?.isInlineEditable === true;
     }
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
-            formatted: '',
-        });
+    constructor() {
+        super({ formatted: '' });
     }
 
     public ngOnChanges() {

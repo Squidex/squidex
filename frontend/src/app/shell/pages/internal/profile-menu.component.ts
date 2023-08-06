@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ApiUrlConfig, AuthService, Cookies, ModalModel, StatefulComponent, UILanguages, UIOptions, UIState } from '@app/shared';
 
 interface State {
@@ -37,12 +37,12 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     public language = this.uiOptions.get('culture');
     public languages = UILanguages.ALL;
 
-    constructor(changeDetector: ChangeDetectorRef, apiUrl: ApiUrlConfig,
+    constructor(apiUrl: ApiUrlConfig,
         public readonly uiState: UIState,
         public readonly uiOptions: UIOptions,
         public readonly authService: AuthService,
     ) {
-        super(changeDetector, {
+        super({
             profileDisplayName: '',
             profileEmail: '',
             profileId: '',

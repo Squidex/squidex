@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { AppDto, ContentsService, StatefulComponent, Types } from '@app/shared';
 
 interface State {
@@ -26,10 +26,10 @@ export class ContentSummaryCardComponent extends StatefulComponent<State> implem
     @Input()
     public options?: any;
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly contentsService: ContentsService,
     ) {
-        super(changeDetector, {
+        super({
             itemCount: 0,
         });
     }

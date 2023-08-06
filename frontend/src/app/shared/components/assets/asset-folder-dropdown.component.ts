@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalModel, StatefulControlComponent, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
@@ -40,11 +40,11 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<any, 
 
     public dropdown = new ModalModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
     ) {
-        super(changeDetector, {});
+        super({});
     }
 
     public writeValue(obj: string) {

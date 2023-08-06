@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { AssetDto, AssetUploaderState, DialogService, StatefulComponent, Types, UploadCanceled } from '@app/shared/internal';
 
 interface State {
@@ -71,13 +71,11 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Input() @HostBinding('class.isListView')
     public isListView?: boolean | null;
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly assetUploader: AssetUploaderState,
         private readonly dialogs: DialogService,
     ) {
-        super(changeDetector, {
-            progress: 0,
-        });
+        super({ progress: 0,});
     }
 
     public ngOnInit() {

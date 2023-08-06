@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ContentsDto } from '@app/shared';
@@ -67,13 +67,11 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
         return !!this.schemaId && !!this.language;
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly contentsResolver: ResolveContents,
         private readonly localizer: LocalizerService,
     ) {
-        super(changeDetector, {
-            contentNames: [],
-        });
+        super({ contentNames: [] });
 
         this.own(
             value$(this.control)

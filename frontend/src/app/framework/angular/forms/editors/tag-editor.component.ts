@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
@@ -126,8 +126,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public addInput = new UntypedFormControl();
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
+    constructor() {
+        super({
             hasFocus: false,
             suggestedIndex: 0,
             suggestedItems: [],

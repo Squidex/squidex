@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/shared/internal';
 
@@ -50,12 +50,12 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
 
     public contentSelectorDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly localizer: LocalizerService,
     ) {
-        super(changeDetector, {});
+        super({});
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {

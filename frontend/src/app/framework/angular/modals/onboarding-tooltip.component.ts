@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { timer } from 'rxjs';
 import { DialogModel, fadeAnimation, OnboardingService, RelativePosition, StatefulComponent, Types } from '@app/framework/internal';
 
@@ -33,11 +33,11 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
 
     public tooltipModal = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly onboardingService: OnboardingService,
         private readonly renderer: Renderer2,
     ) {
-        super(changeDetector, {});
+        super({});
     }
 
     public ngOnDestroy() {

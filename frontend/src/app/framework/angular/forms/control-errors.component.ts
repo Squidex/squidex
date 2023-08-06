@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
 import { merge } from 'rxjs';
 import { LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
@@ -37,13 +37,11 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         return this.control?.touched || Types.is(this.control, UntypedFormArray);
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
         private readonly localizer: LocalizerService,
     ) {
-        super(changeDetector, {
-            errorMessages: [],
-        });
+        super({ errorMessages: [] });
     }
 
     public ngOnChanges() {

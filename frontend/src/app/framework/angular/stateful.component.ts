@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Directive, OnDestroy } from '@angular/core';
+import { Directive, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { catchError, EMPTY, Observable, skip, Subscription } from 'rxjs';
 import { State } from './../state';
@@ -52,11 +52,9 @@ export class ResourceOwner implements OnDestroy {
 export abstract class StatefulComponent<T extends {} = object> extends State<T> implements OnDestroy {
     private readonly subscriptions = new ResourceOwner();
     private readonly subscription: Subscription;
+    private readonly changeDetector = inject(ChangeDetectorRef);
 
-    protected constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-        state: T,
-    ) {
+    protected constructor(state: T) {
         super(state);
 
         this.subscription =
@@ -94,8 +92,8 @@ export abstract class StatefulControlComponent<T extends {}, TValue> extends Sta
     private fnChanged = (_: any) => { /* NOOP */ };
     private fnTouched = () => { /* NOOP */ };
 
-    protected constructor(changeDetector: ChangeDetectorRef, state: T) {
-        super(changeDetector, { ...state, isDisabled: false });
+    protected constructor(state: T) {
+        super({ ...state, isDisabled: false });
     }
 
     public registerOnChange(fn: any) {

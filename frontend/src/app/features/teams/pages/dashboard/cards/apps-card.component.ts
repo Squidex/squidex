@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { AppDto, AppsService, StatefulComponent, TeamDto } from '@app/shared';
 
 interface State {
@@ -23,10 +23,10 @@ export class AppsCardComponent extends StatefulComponent<State> implements OnIni
     @Input({ required: true })
     public team!: TeamDto;
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly appsService: AppsService,
     ) {
-        super(changeDetector, {});
+        super({});
     }
 
     public ngOnInit() {

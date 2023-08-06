@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import * as Pikaday from 'pikaday/pikaday';
 import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
@@ -88,10 +88,8 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
         return !!this.dateTime;
     }
 
-    constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions) {
-        super(changeDetector, {
-            isLocal: true,
-        });
+    constructor(uiOptions: UIOptions) {
+        super({ isLocal: true });
 
         this.hideDateButtonsSettings = !!uiOptions.get('hideDateButtons');
         this.hideDateTimeModeButtonSetting = !!uiOptions.get('hideDateTimeModeButton');

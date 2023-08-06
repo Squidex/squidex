@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { TypedSimpleChanges, Types } from '@app/framework';
@@ -60,13 +60,11 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         return !!this.schemaId && !!this.language;
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly contentsResolver: ResolveContents,
         private readonly localizer: LocalizerService,
     ) {
-        super(changeDetector, {
-            converter: new ReferencesTagsConverter(null!, [], localizer),
-        });
+        super({ converter: new ReferencesTagsConverter(null!, [], localizer) });
 
         this.own(
             this.control.valueChanges

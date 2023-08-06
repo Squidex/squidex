@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
@@ -35,10 +35,8 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
         this.setDisabledState(value === true);
     }
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
-            isChecked: null,
-        });
+    constructor() {
+        super({ isChecked: null });
     }
 
     public writeValue(obj: any) {

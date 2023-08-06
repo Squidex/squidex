@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer } from '@app/framework/internal';
 
@@ -64,8 +64,8 @@ export class RadioGroupComponent extends StatefulControlComponent<State, string>
 
     public valueModel: any;
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {});
+    constructor() {
+        super({});
 
         this.textMeasurer = new TextMeasurer(() => this.containerElement);
     }

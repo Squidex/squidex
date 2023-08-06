@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { Language } from './../../language-selector.component';
@@ -68,10 +68,8 @@ export class LocalizedInputComponent extends StatefulControlComponent<State, { [
         return !this.value.hasOwnProperty(this.snapshot.language.iso2Code);
     }
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
-            language: DEFAULT_LANGUAGE,
-        });
+    constructor() {
+        super({ language: DEFAULT_LANGUAGE });
     }
 
     public setLanguage(language: Language) {

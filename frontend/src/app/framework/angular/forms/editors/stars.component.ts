@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
@@ -62,8 +62,8 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
         return this.maximumStarsValue;
     }
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
+    constructor() {
+        super({
             stars: -1,
             starsArray: [1, 2, 3, 4, 5],
             value: 1,

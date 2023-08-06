@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { marked } from 'marked';
 import { ApiUrlConfig, AssetDto, AssetUploaderState, ContentDto, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
@@ -64,15 +64,13 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
 
     public contentsDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
         private readonly renderer: Renderer2,
         private readonly resourceLoader: ResourceLoaderService,
     ) {
-        super(changeDetector, {
-            isFullscreen: false,
-        });
+        super({ isFullscreen: false });
     }
 
     public writeValue(obj: any) {

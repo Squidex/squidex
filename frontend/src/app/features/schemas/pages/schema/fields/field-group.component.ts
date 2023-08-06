@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppSettingsDto, FieldDto, FieldGroup, LanguageDto, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 
 interface State {
@@ -50,12 +50,10 @@ export class FieldGroupComponent extends StatefulComponent<State> {
         return this.parent ? this.parent.nested.length > 0 : this.schema.fields.length > 0;
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly localStore: LocalStoreService,
     ) {
-        super(changeDetector, {
-            isCollapsed: false,
-        });
+        super({ isCollapsed: false });
 
         this.changes.subscribe(state => {
             if (this.fieldGroup?.separator && this.schema) {

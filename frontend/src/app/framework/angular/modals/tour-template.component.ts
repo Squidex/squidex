@@ -39,7 +39,7 @@ export class TourTemplateComponent extends StatefulComponent implements AfterCon
     constructor(changeDetector: ChangeDetectorRef,
         public readonly tourService: TourService,
     ) {
-        super(changeDetector, {});
+        super({});
     }
 
     public ngAfterContentInit() {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
@@ -99,8 +99,8 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
 
     public queryInput = new UntypedFormControl();
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
+    constructor() {
+        super({
             suggestedItems: [],
             suggestedIndex: -1,
         });
