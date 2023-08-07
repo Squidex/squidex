@@ -67,6 +67,7 @@ export * from './components/search/query-list.component';
 export * from './components/search/search-form.component';
 export * from './components/search/shared-queries.component';
 export * from './components/table-header.component';
+export * from './components/tour-hint.directive';
 export * from './components/tour-guide.component';
 export * from './components/team-form.component';
 export * from './components/watching-users.component';

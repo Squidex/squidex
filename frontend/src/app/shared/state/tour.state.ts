@@ -7,7 +7,7 @@
 
 import { Inject, Injectable } from '@angular/core';
 import { debounceTime } from 'rxjs';
-import { debug, State, TourService } from '@app/framework';
+import { debug, State, TourService, UIOptions } from '@app/framework';
 import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
 import { UIState } from './ui.state';
 
@@ -20,11 +20,11 @@ export interface TaskSnapshot extends TaskDefinition {
 }
 
 interface Snapshot {
-    // The running task.
-    taskId?: string;
-
     // The completed tasks.
     completedTasks?: Record<string, boolean>;
+
+    // The shown hints.
+    shownHints?: { [name: string]: boolean };
 
     // True, if tour is running.
     status?: 'Ready' | 'Started' | 'Completed';
@@ -42,12 +42,13 @@ export class TourState extends State<Snapshot> {
         this.projectFrom(this.completedTasks, x => createTasks(this.definition.tasks, x));
 
     public pendingTasks =
-        this.projectFrom(this.tasks, x => x.filter(t => !t.onComplete).length);
+        this.projectFrom(this.tasks, x => x.filter(t => !t.isCompleted).length);
 
     constructor(
         @Inject(TASK_CONFIGURATION) private readonly definition: TaskConfiguration,
         private readonly tourService: TourService,
         private readonly uiState: UIState,
+        private readonly uiOptions: UIOptions,
     ) {
         super({});
 
@@ -76,22 +77,15 @@ export class TourState extends State<Snapshot> {
     }
 
     public complete() {
-        if (this.isDoneOrNotReady()) {
-            return;
-        }
-
         this.next({ status: 'Completed' });
     }
 
     public start() {
-        if (this.snapshot.status !== 'Ready') {
+        if (this.snapshot.status !== 'Ready' || this.isDisabled) {
             return;
         }
 
         this.next({ status: 'Started' });
-    }
-
-    public startFirstTask() {
         this.runTask(this.definition.tasks[0]);
     }
 
@@ -100,14 +94,27 @@ export class TourState extends State<Snapshot> {
             return;
         }
 
-        this.next({ taskId: task.id });
-
         this.tourService.initialize(task.steps);
         this.tourService.start();
     }
 
-    private isDoneOrNotReady() {
-        return !this.snapshot.status || this.snapshot.status === 'Completed';
+    public disableAllHints() {
+        this.next(s => ({ ...s, shownHints: { ...s.shownHints || {}, all: true } }));
+    }
+
+    public disableHint(key: string) {
+        this.next(s => ({ ...s, shownHints: { ...s.shownHints || {}, [key]: true } }));
+    }
+
+    public shouldShowHint(key: string) {
+        return this.snapshot.status !== 'Started' &&
+            !this.isDisabled &&
+            !this.snapshot.shownHints?.[key] &&
+            !this.snapshot.shownHints?.['all'];
+    }
+
+    private get isDisabled() {
+        return this.uiOptions.get('hideOnboarding');
     }
 }
 

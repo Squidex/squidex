@@ -11,16 +11,17 @@
 
     <ng-container *ngIf="formModel.field.properties.isComplexUI || !showAllControls">
         <div class="button-container ms-1">
-            <sqx-language-selector size="sm" #buttonLanguages
+            <sqx-language-selector
+                size="sm"
                 [exists]="formModel.translationStatus | async"
                 (languageChange)="languageChange.emit($event)"
                 [language]="language"
-                [languages]="languages">
+                [languages]="languages"
+                hintText="contents.validationHint"
+                hintAfter="120000"
+                hintPosition="top-right"
+                sqxTourStep="languages">
             </sqx-language-selector>
         </div>
-
-        <sqx-onboarding-tooltip helpId="languages" [for]="buttonLanguages" position="top-right" [after]="120000">
-            {{ 'contents.validationHint' | sqxTranslate }}
-        </sqx-onboarding-tooltip>
     </ng-container>
 </ng-container>

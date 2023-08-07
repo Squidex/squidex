@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { fadeAnimation, StatefulComponent, TaskSnapshot, TourState } from '@app/shared/internal';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { fadeAnimation, StatefulComponent, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
 
 interface State {
     // The when the section is collapsed.
@@ -22,11 +22,26 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TourGuideComponent extends StatefulComponent<State> {
+export class TourGuideComponent extends StatefulComponent<State> implements OnInit {
     constructor(
         public readonly tourState: TourState,
+        public readonly tourService: TourService,
     ) {
         super({ isCollapsed: false });
+    }
+
+    public ngOnInit() {
+        this.own(
+            this.tourService.stepShow$
+                .subscribe(() => {
+                    this.next({ isCollapsed: true });
+                }));
+
+        this.own(
+            this.tourService.end$
+                .subscribe(() => {
+                    this.next({ isCollapsed: false });
+                }));
     }
 
     public toggle() {

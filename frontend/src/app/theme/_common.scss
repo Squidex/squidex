@@ -39,6 +39,11 @@ hr {
     white-space: nowrap;
 }
 
+.text-break-all {
+    word-break: break-all;
+}
+
+
 .drag-handle {
     color: $color-text-decent;
     cursor: move;
@@ -167,7 +172,7 @@ hr {
 }
 
 .squid {
-    @include circle(60px);
+    @include circle(50px);
     align-items: center;
     background: $color-white;
     display: flex;

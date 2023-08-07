@@ -1,37 +1,38 @@
 <div class="tour" *ngIf="(tourState.status | async) === 'Started'">
     <div class="card" *ngIf="!snapshot.isCollapsed" @fade>
-        <div class="card-header bg-primary text-white">
+        <div class="card-header">
             <div class="row align-items-center">
                 <div class="col">
                     {{ 'tour.guide-title' | sqxTranslate }}
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-simple btn-sm text-white" (click)="toggle()">
+                    <button class="btn btn-simple btn-sm" (click)="toggle()">
                         <i class="icon-angle-down"></i>
                     </button>
                 </div>
             </div>
         </div>
-        <div class="card-body">
-            <h2 class="mb-3">{{ 'tour.guide-header' | sqxTranslate }}</h2>
-    
+        <div class="card-body" #body>    
             <div *ngIf="tourState.tasks | async; let tasks">
-                <div class="row g-3 mb-3 step align-items-center" *ngFor="let task of tasks" (click)="start(task)" [class.active]="task.isActive">
+                <div class="row g-3 mb-3 step align-items-center" *ngFor="let task of tasks" (click)="start(task)" [class.active]="task.isActive"
+                    [sqxScrollActive]="task.isActive"
+                    [sqxScrollContainer]="body">
                     <div class="col-auto">
                         <div class="checkmark" [class.pending]="!task.isCompleted" [class.completed]="task.isCompleted">
                             <i class="icon-checkmark" [class.hidden]="!task.isCompleted"></i>
                         </div>
                     </div>
                     <div class="col" [class.strikethrough]="task.isCompleted" [class.text-completed]="task.isCompleted || !task.isActive">
-                        <h4 class="mb-0">{{task.title}}</h4>
+                        <h5 class="mb-0">{{task.title | sqxTranslate}}</h5>
     
-                        <div>{{task.description}}</div>
+                        <div>{{task.description | sqxTranslate}}</div>
                     </div>
-    
                 </div>
             </div>
 
-            <button class="btn btn-outline-secondary btn-block mt-2" (click)="complete()">
+            <button class="btn btn-outline-secondary btn-block mt-2" (click)="complete()"
+                [sqxScrollActive]="(tourState.pendingTasks | async) === 0"
+                [sqxScrollContainer]="body">
                 {{ 'tour.complete' | sqxTranslate}}
             </button>
         </div>
@@ -67,7 +68,7 @@
     </div>
 
     <div class="d-flex justify-content-end">
-        <div class="summary expanded" [class.expanded]="!snapshot.isCollapsed" (click)="toggle()">
+        <div class="summary" [class.expanded]="snapshot.isCollapsed" (click)="toggle()">
             <div class="counter">{{tourState.pendingTasks | async}}</div>
     
             <span>{{ 'tour.guide-title' | sqxTranslate }}</span>

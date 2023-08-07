@@ -87,7 +87,7 @@
                             <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
 
                             <ng-container *ngIf="content?.canUpdate">
-                                <button type="submit" class="btn btn-primary ms-2" shortcut="CTRL + SHIFT + S">
+                                <button type="submit" class="btn btn-primary ms-2" shortcut="CTRL + SHIFT + S" sqxTourStep="saveContent">
                                     {{ 'common.save' | sqxTranslate }}
                                 </button>
                             </ng-container>
@@ -108,13 +108,15 @@
                         [percents]="contentForm.translationStatus | async">
                     </sqx-language-selector>
 
-                    <button type="button" class="btn btn-primary ms-2" (click)="save()" *ngIf="contentsState.canCreate | async">
-                        {{ 'common.save' | sqxTranslate }}
-                    </button>
-
-                    <button type="submit" class="btn btn-success ms-2" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
-                        {{ 'contents.saveAndPublish' | sqxTranslate }}
-                    </button>
+                    <div sqxTourStep="saveContent">
+                        <button type="button" class="btn btn-primary ms-2" (click)="save()" *ngIf="contentsState.canCreate | async">
+                            {{ 'common.save' | sqxTranslate }}
+                        </button>
+    
+                        <button type="submit" class="btn btn-success ms-2" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
+                            {{ 'contents.saveAndPublish' | sqxTranslate }}
+                        </button>
+                    </div>
                 </ng-template>
             </div>
         </ng-container>
@@ -174,21 +176,40 @@
 
         <ng-container sidebarMenu>
             <div class="panel-nav">
-                <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.workflow" titlePosition="left-center" #linkHistory>
+                <a class="panel-link"
+                    routerLink="history"
+                    routerLinkActive="active"
+                    queryParamsHandling="preserve"
+                    title="i18n:common.workflow"
+                    titlePosition="left-center"
+
+                    sqxTourStep="history"
+                    #linkHistory>
                     <i class="icon-time"></i>
                 </a>
 
-                <a class="panel-link" routerLink="comments" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.comments" titlePosition="left-center">
+                <a class="panel-link"
+                    routerLink="comments"
+                    routerLinkActive="active"
+                    queryParamsHandling="preserve"
+                    title="i18n:common.comments"
+                    titlePosition="left-center"
+                    hintText="common.sidebarTour"
+                    hintAfter="120000"
+                    sqxTourStep="comments">
                     <i class="icon-comments"></i>
                 </a>
                 
-                <a class="panel-link" routerLink="sidebar" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.sidebar" titlePosition="left-center" *ngIf="schema.properties.contentSidebarUrl">
+                <a class="panel-link"
+                    routerLink="sidebar"
+                    routerLinkActive="active"
+                    queryParamsHandling="preserve"
+                    title="i18n:common.sidebar"
+                    titlePosition="left-center"
+                    sqxTourStep="plugin"
+                    *ngIf="schema.properties.contentSidebarUrl">
                     <i class="icon-plugin"></i>
                 </a>
-
-                <sqx-onboarding-tooltip helpId="history" [for]="linkHistory" position="left-top" [after]="120000">
-                    {{ 'common.sidebarTour' | sqxTranslate }}
-                </sqx-onboarding-tooltip>
             </div>
         </ng-container>
     </sqx-layout>

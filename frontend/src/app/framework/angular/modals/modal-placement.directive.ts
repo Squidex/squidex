@@ -127,7 +127,10 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         }
 
         this.previousPosition = undefined;
-        this.updatePosition();
+
+        setTimeout(() => {
+            this.updatePosition();
+        });
     }
 
     public ngAfterViewInit() {

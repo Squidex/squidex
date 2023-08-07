@@ -60,7 +60,6 @@ export * from './angular/modals/dialog-renderer.component';
 export * from './angular/modals/modal-dialog.component';
 export * from './angular/modals/modal-placement.directive';
 export * from './angular/modals/modal.directive';
-export * from './angular/modals/onboarding-tooltip.component';
 export * from './angular/modals/root-view.component';
 export * from './angular/modals/tour-step.directive';
 export * from './angular/modals/tour-template.component';

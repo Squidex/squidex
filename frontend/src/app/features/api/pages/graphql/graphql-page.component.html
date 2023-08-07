@@ -1,7 +1,7 @@
 <sqx-title message="i18n:api.graphqlPageTitle"></sqx-title>
 
 <sqx-layout layout="main" [hideHeader]="true" [hideSidebar]="true">
-    <div inner #graphiQLContainer></div>
+    <div inner #graphiQLContainer sqxTourStep="graphQLExplorer"></div>
         
     <button class="btn btn-simple btn-options" *ngIf="clientsReadable" (click)="clientsDialog.show()">
         <i class="icon-clients"></i>

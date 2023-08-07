@@ -15,6 +15,12 @@ export interface StepDefinition extends IStepOption {
     // The position.
     position?: RelativePosition;
 
+    // Additional callback.
+    hideAll?: () => void;
+
+    // Additional callback.
+    hideThis?: () => void;
+
     // Goes to the next element automatically.
     nextOnCondition?: ((service: TourService) => Observable<any>) | null;
 }

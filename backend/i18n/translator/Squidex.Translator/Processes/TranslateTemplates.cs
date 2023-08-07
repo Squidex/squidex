@@ -11,7 +11,7 @@ using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes;
 
-public class TranslateTemplates
+public partial class TranslateTemplates
 {
     private static readonly HashSet<string> TagsToIgnore = new HashSet<string>
     {
@@ -198,8 +198,11 @@ public class TranslateTemplates
         // Fix the attributes, because html agility packs converts attributes without value to attributes with empty string.
         // For example
         // <ng-container content> becomes <ng-container content="">
-        text = Regex.Replace(text, " (?<Name>[^\\s]*)=\"\"", x => " " + x.Groups["Name"].Value);
+        text = TextRegex().Replace(text, x => " " + x.Groups["Name"].Value);
 
         File.WriteAllText(file.FullName, text);
     }
+
+    [GeneratedRegex(" (?<Name>[^\\s]*)=\"\"")]
+    private static partial Regex TextRegex();
 }

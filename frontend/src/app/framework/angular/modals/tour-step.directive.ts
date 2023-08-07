@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { TourAnchorDirective } from 'ngx-ui-tour-core';
 import { StepDefinition, TourService } from './tour.service';
 
@@ -13,10 +13,12 @@ import { StepDefinition, TourService } from './tour.service';
     selector: '[sqxTourStep]',
 })
 export class TourStepDirective implements OnInit, OnDestroy, TourAnchorDirective {
+    private isNextOnClick = false;
     private isActive = false;
+    private wasClicked = false;
 
     @Input({ alias: 'sqxTourStep', required: true })
-    public tourAnchor?: string | null;
+    public anchorId?: string | null;
 
     constructor(public readonly element: ElementRef,
         private readonly tourService: TourService,
@@ -24,33 +26,40 @@ export class TourStepDirective implements OnInit, OnDestroy, TourAnchorDirective
     }
 
     public ngOnInit(): void {
-        if (!this.tourAnchor) {
+        if (!this.anchorId) {
             return;
         }
 
-        this.tourService.register(this.tourAnchor, this);
+        this.tourService.register(this.anchorId, this);
     }
 
     public ngOnDestroy(): void {
-        if (!this.tourAnchor) {
+        if (!this.anchorId) {
             return;
         }
 
-        if (this.isActive) {
+        if (this.isActive && (!this.isNextOnClick || !this.wasClicked)) {
             this.tourService.render(null, null);
             this.tourService.pause();
         }
 
-        this.tourService.unregister(this.tourAnchor);
+        this.tourService.unregister(this.anchorId);
+    }
+
+    @HostListener('click')
+    public onClick() {
+        this.wasClicked = true;
     }
 
     public showTourStep(step: StepDefinition) {
         this.tourService.render(step, this.element.nativeElement);
         this.isActive = true;
+        this.isNextOnClick = !!step.nextOnAnchorClick;
     }
 
     public hideTourStep() {
         this.tourService.render(null, null);
         this.isActive = false;
+        this.isNextOnClick = false;
     }
 }

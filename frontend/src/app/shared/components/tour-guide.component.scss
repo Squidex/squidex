@@ -4,30 +4,34 @@
 $caret-size: 14px;
 
 .tour {
-    @include fixed(null, 2rem, 2rem, null);
+    @include fixed(null, 1rem, 1rem, null);
 }
 
 .card {
     @include box-shadow-outer(0, 2px, 5px, .2);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     margin-top: 0;
     max-width: 300px;
     position: relative;
 
     &-body {
-        max-height: 300px;
+        max-height: 350px;
         overflow-x: hidden;
         overflow-y: auto;
     }
 
+    &-footer {
+        font-size: $font-small;
+    }
+
     &::before {
         @include caret-bottom($color-border, $caret-size);
-        @include absolute(null, 20px, -$caret-size * 2, null);
+        @include absolute(null, 15px, -$caret-size * 2, null);
     }
 
     &::after {
         @include caret-bottom($color-white, $caret-size);
-        @include absolute(null, 20px, -$caret-size * 2 + 3, null);
+        @include absolute(null, 15px, -$caret-size * 2 + 3, null);
     }
 }
 
@@ -78,7 +82,7 @@ $caret-size: 14px;
     flex-wrap: nowrap;
 
     .counter {
-        @include circle(40px);
+        @include circle(30px);
         align-items: center;
         background-color: rgba(0, 0, 0, 30%);
         display: none;
@@ -127,4 +131,8 @@ a {
     &:hover {
         color: $color-theme-brand;
     }
+}
+
+h5 {
+    font-size: 1rem;
 }

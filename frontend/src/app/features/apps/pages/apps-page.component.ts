@@ -76,14 +76,13 @@ export class AppsPageComponent implements OnInit {
     public ngOnInit() {
         this.appsState.apps.pipe(take(1))
             .subscribe(apps => {
-                if (apps.length === 0) {
-                    // this.tourState.start();
-                    // this.tourState.startFirstTask();
-                    // return;
+                if (apps.length === 0 && this.tourState.snapshot.status !== 'Completed') {
+                    this.onboardingDialog.show();
+                    return;
                 }
 
-                    this.tourState.start();
-                    //this.tourState.startFirstTask();
+                return;
+                this.tourState.complete();
 
                 if (!this.uiOptions.get('hideNews')) {
                     const newsVersion = this.localStore.getInt(Settings.Local.NEWS_VERSION);

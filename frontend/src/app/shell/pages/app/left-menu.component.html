@@ -24,7 +24,7 @@
             <i class="nav-icon icon-rules"></i> <div class="nav-text">{{ 'common.rules' | sqxTranslate }}</div>
         </a>
     </li>
-    <li class="nav-item" *ngIf="!isApiHidden(app)" sqxTourStep="settings">
+    <li class="nav-item" *ngIf="!isApiHidden(app)" sqxTourStep="api">
         <a class="nav-link" routerLink="api" routerLinkActive="active">
             <i class="nav-icon icon-api"></i> <div class="nav-text">{{ 'common.api' | sqxTranslate }}</div>
         </a>
@@ -32,12 +32,12 @@
 </ul>
 
 <ul class="nav flex-column bottom">
-    <li class="nav-item">
+    <li class="nav-item" sqxTourStep="support">
         <a class="nav-link" href="https://squidex.io/help" target="_blank">
             <i class="nav-icon icon-help2"></i>
         </a>
     </li>
-    <li class="nav-item" *ngIf="!isSettingsHidden(app)">
+    <li class="nav-item" *ngIf="!isSettingsHidden(app)" sqxTourStep="settings">
         <a class="nav-link" routerLink="settings" routerLinkActive="active">
             <i class="nav-icon icon-settings"></i>
         </a>

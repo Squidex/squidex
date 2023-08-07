@@ -934,8 +934,6 @@
   "start.loginHint": "De login-knop opent een nieuwe pop-up. Zodra je succesvol bent ingelogd, zullen we je doorverwijzen naar het Squidex beheerportaal.",
   "start.madeBy": "Met trots gemaakt door",
   "start.madeByCopyright": "Sebastian Stehle en medewerkers, 2016-2020",
-  "tour.joinForum": "Word lid van ons forum",
-  "tour.joinGithub": "Bezoek ons ​​op Github",
   "tour.skip": "Tour overslaan",
   "tour.stepAppNext": "Doorgaan",
   "tour.stepAppText": "Een app is de opslagplaats voor uw project, bijvoorbeeld (blog, webshop of mobiele app). Je kunt bijdragers aan uw app toewijzen om samen te werken. \n \n Je kunt een onbeperkt aantal apps maken in Squidex om meerdere projecten tegelijkertijd te beheren. ",

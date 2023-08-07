@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, DialogService } from '@app/shared';
+import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, DialogService, MessageBus } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-connect-form',
@@ -35,6 +35,7 @@ export class ClientConnectFormComponent implements OnInit {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly clientsService: ClientsService,
         private readonly dialogs: DialogService,
+        private readonly messageBus: MessageBus,
     ) {
     }
 
@@ -52,6 +53,8 @@ export class ClientConnectFormComponent implements OnInit {
                     this.dialogs.notifyError(error);
                 },
             });
+
+        this.messageBus.emit(new ClientTourStated());
     }
 
     public go(step: string) {

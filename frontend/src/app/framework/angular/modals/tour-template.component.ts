@@ -65,7 +65,7 @@ export class TourTemplateComponent extends StatefulComponent implements AfterCon
 
             this.hasPrev = false;
             this.hasNext = this.tourService.hasNext(step) && !step.nextOnAnchorClick && !step.nextOnCondition;
-            this.hasFinish = !this.tourService.hasNext(step);
+            this.hasFinish = !this.tourService.hasNext(step) && !step.hideAll;
 
             this.currentStep = step;
             this.currentElement = element;

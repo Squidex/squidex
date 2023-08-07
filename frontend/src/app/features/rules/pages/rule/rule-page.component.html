@@ -158,22 +158,39 @@
         <ng-container sidebarMenu>
             <div class="panel-nav">
                 <ng-container  *ngIf="rule && (rulesState.canReadEvents | async)">
-                    <a class="panel-link panel-link-gray" routerLink="events" [queryParams]="{ ruleId: rule.id }" routerLinkActive="active" title="i18n:common.history" titlePosition="left-center">
+                    <a class="panel-link panel-link-gray"
+                        routerLink="events"
+                        routerLinkActive="active"
+                        [queryParams]="{ ruleId: rule.id }"
+                        title="i18n:common.history"
+                        titlePosition="left-center"
+                        sqxTourStep="history">
                         <i class="icon-time"></i>
                     </a>
     
-                    <a class="panel-link panel-link-gray" routerLink="simulator" [queryParams]="{ ruleId: rule.id }" routerLinkActive="active" title="i18n:rules.simulator" titlePosition="left-center">
+                    <a class="panel-link panel-link-gray"
+                        routerLink="simulator"
+                        routerLinkActive="active"
+                        [queryParams]="{ ruleId: rule.id }"
+                        title="i18n:rules.simulator"
+                        titlePosition="left-center"
+                        sqxTourStep="simulator">
                         <i class="icon-play-line"></i>
                     </a>
                 </ng-container>
     
-                <a class="panel-link" routerLink="help" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.help" titlePosition="left-center" #helpLink>
+                <a class="panel-link"
+                    routerLink="help"
+                    routerLinkActive="active"
+                    queryParamsHandling="preserve"
+                    hintText="common.helpTour"
+                    hintAfter="180000"
+                    title="i18n:common.help"
+                    titlePosition="left-center"
+                    sqxTourStep="help"
+                    #helpLink>
                     <i class="icon-help2"></i>
                 </a>
-    
-                <sqx-onboarding-tooltip helpId="help" [for]="helpLink" position="left-top" [after]="180000">
-                    <span [innerHTML]="'common.helpTour' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span>
-                </sqx-onboarding-tooltip>
             </div>
         </ng-container>
     </sqx-layout>

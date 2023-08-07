@@ -9,6 +9,10 @@
             (ngModelChange)="changeQueryFullText($event)" 
             [ngModelOptions]="{ standalone: true }" 
             [placeholder]="placeholder"
+            hintText="search.fullTextTour"
+            hintAfter="120000"
+            hintPosition="bottom-right"
+            sqxTourStep="search"
             shortcut="CTRL + I"
             shortcutAction="none">
 
@@ -27,20 +31,16 @@
         </ng-container>
 
         <ng-container *ngIf="queryModel">
-            <sqx-onboarding-tooltip helpId="contentArchive" [for]="expand" position="bottom-right" [after]="60000">
-                {{ 'search.advancedTour' | sqxTranslate }}
-            </sqx-onboarding-tooltip>
-
-            <button type="button" class="btn btn-outline-secondary" (click)="searchDialog.toggle()" #expand>
+            <button type="button" class="btn btn-outline-secondary" (click)="searchDialog.toggle()"
+                hintText="search.advancedTour"
+                hintAfter="60000"
+                hintPosition="bottom-right"
+                sqxTourStep="search">
                 <i [class.icon-filter]="!hasFilter" [class.icon-filter-filled]="hasFilter"></i>
             </button>
         </ng-container>
     </div>
 </form>
-
-<sqx-onboarding-tooltip helpId="contentFind" [for]="inputFind" position="bottom-right" [after]="120000">
-    {{ 'search.fullTextTour' | sqxTranslate }}
-</sqx-onboarding-tooltip>
 
 <ng-container *sqxModal="searchDialog">
     <sqx-modal-dialog (close)="searchDialog.hide()" size="lg">

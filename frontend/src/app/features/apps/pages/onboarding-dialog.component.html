@@ -17,7 +17,9 @@
                 <div [innerHTML]="'tour.stepIntroText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
 
                 <div class="mt-4">
-                    <button (click)="next()" class="btn btn-success">{{ 'tour.stepIntroNext' | sqxTranslate }}</button>
+                    <button (click)="next()" class="btn btn-success">
+                        {{ 'tour.stepIntroNext' | sqxTranslate }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -36,6 +38,7 @@
     
                         <select class="form-select" id="companyRole" formControlName="companyRole">
                             <option [ngValue]="'RoleEmployee'">{{ 'tour.roleEmployee' | sqxTranslate }}</option>
+                            <option [ngValue]="'RoleBusinessOwner'">{{ 'tour.roleBusinessOwner' | sqxTranslate }}</option>
                             <option [ngValue]="'RoleProductManager'">{{ 'tour.roleProductManager' | sqxTranslate }}</option>
                             <option [ngValue]="'RoleContentCreator'">{{ 'tour.roleContentCreator' | sqxTranslate }}</option>
                             <option [ngValue]="'RoleSoftwareDeveloper'">{{ 'tour.roleSoftwareDeveloper' | sqxTranslate }}</option>
@@ -75,86 +78,21 @@
         </div>
 
         <div class="onboarding-step" *ngIf="step === 2">
-            <div class="row g-0" @slide>
-                <div class="col">
-                    <h2>{{ 'common.apps' | sqxTranslate }}</h2>
-
-                    <div [innerHTML]="'tour.stepAppText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-
-                    <div class="footer">
-                        <button (click)="next()" class="btn btn-success">{{ 'tour.stepAppNext' | sqxTranslate }}</button>
-                    </div>
-                </div>
-                <div class="col col-image">
-                    <img src="./images/tour-apps.png">
-                </div>
-            </div>
-        </div>
-
-        <div class="onboarding-step" *ngIf="step === 3">
-            <div class="row g-0" @slide>
-                <div class="col">
-                    <h2>{{ 'common.schemas' | sqxTranslate }}</h2>
-
-                    <div [innerHTML]="'tour.stepSchemasText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-
-                    <div class="footer">
-                        <button (click)="next()" class="btn btn-success">{{ 'tour.stepSchemasNext' | sqxTranslate }}</button>
-                    </div>
-                </div>
-                <div class="col col-image">
-                    <img src="./images/tour-schema.png">
-                </div>
-            </div>
-        </div>
-        <div class="onboarding-step" *ngIf="step === 4">
-            <div class="row g-0" @slide>
-                <div class="col">
-                    <h2>{{ 'common.contents' | sqxTranslate }}</h2>
-
-                    <div [innerHTML]="'tour.stepContentText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-
-                    <div class="footer">
-                        <button (click)="next()" class="btn btn-success">{{ 'tour.stepContentNext' | sqxTranslate }}</button>
-                    </div>
-                </div>
-                <div class="col col-image">
-                    <img src="./images/tour-content.png">
-                </div>t
-            </div>
-        </div>
-        <div class="onboarding-step" *ngIf="step === 5">
-            <div class="row g-0" @slide>
-                <div class="col">
-                    <h2>{{ 'common.assets' | sqxTranslate }}</h2>
-
-                    <div [innerHTML]="'tour.stepAssetsText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-
-                    <div class="footer">
-                        <button (click)="next()" class="btn btn-success">{{ 'tour.stepAssetsNext' | sqxTranslate }}</button>
-                    </div>
-                </div>
-                <div class="col col-image">
-                    <img src="./images/tour-assets.png">
-                </div>
-            </div>
-        </div>
-        <div class="onboarding-step" *ngIf="step === 6">
             <img @fade class="header-left" src="./images/logo-white-small.png">
 
             <div @slide class="onboarding-enter-leave text-center">
-                <h2>{{ 'tour.stepOutroTitle' | sqxTranslate }}</h2>
-                
-                <div [innerHTML]="'tour.stepOutroText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                <h2>{{ 'tour.stepTourTitle' | sqxTranslate }}</h2>
+
+                <div [innerHTML]="'tour.stepTourText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
 
                 <div class="mt-4">
-                    <a class="btn btn-success me-2" href="https://support.squidex.io" sqxExternalLink>
-                        {{ 'tour.joinForum' | sqxTranslate }}
-                    </a> 
+                    <button (click)="start()" class="btn btn-success">
+                        {{ 'tour.startYes' | sqxTranslate }}
+                    </button>
 
-                    <a class="btn btn-success" href="https://github.com/squidex/squidex" sqxExternalLink>
-                        {{ 'tour.joinGithub' | sqxTranslate }}
-                    </a>
+                    <button (click)="cancel()" class="btn btn-outline-secondary ms-2">
+                        {{ 'tour.startNo' | sqxTranslate }}
+                    </button>
                 </div>
             </div>
         </div>
