@@ -44,7 +44,7 @@
 
                     <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" sqxStopDrag
                         title="{{schema.displayName}}"
-                        titlePosition="top-left">
+                        titlePosition="top-start">
                         <i cdkDragHandle class="icon-drag2 drag-handle"></i>
 
                         <span class="item-published me-1" [class.unpublished]="!schema.isPublished" id="schema_{{schema.name}}"></span> {{schema.displayName}} <span class="singleton" *ngIf="schema.type === 'Singleton'">Singleton</span>
@@ -56,7 +56,7 @@
                 <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate" sqxTourStep="schema">
                     <a class="nav-link truncate drag-none" [routerLink]="schemaRoute(schema)" routerLinkActive="active" sqxStopDrag
                         title="{{schema.displayName}}"
-                        titlePosition="top-left">
+                        titlePosition="top-start">
                         {{schema.displayName}}
                     </a>
                 </li>

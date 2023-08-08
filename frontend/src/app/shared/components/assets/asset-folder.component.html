@@ -13,34 +13,29 @@
                         <i class="icon-dots"></i>
                     </button>
     
-                    <ng-container *sqxModal="editDropdown;closeAlways:true">
-                        <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">  
-                            <ng-container *ngIf="canUpdate">
-                                <a class="dropdown-item" (click)="editDialog.show()">
-                                    {{ 'common.rename' | sqxTranslate }}
-                                </a>
-                        
-                                <div class="dropdown-divider"></div>
-                            </ng-container>
-    
-                            <a class="dropdown-item dropdown-item-delete" [class.disabled]="!canDelete"
-                                (sqxConfirmClick)="emitDelete()"
-                                confirmTitle="i18n:assets.deleteFolderConfirmTitle"
-                                confirmText="i18n:assets.deleteFolderConfirmText"
-                                confirmRememberKey="deleteAssetFolder">
-                                {{ 'common.delete' | sqxTranslate }}
+                    <sqx-dropdown-menu *sqxModal="editDropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true">  
+                        <ng-container *ngIf="canUpdate">
+                            <a class="dropdown-item" (click)="editDialog.show()">
+                                {{ 'common.rename' | sqxTranslate }}
                             </a>
-                        </sqx-dropdown-menu>
-                    </ng-container>
+                    
+                            <div class="dropdown-divider"></div>
+                        </ng-container>
+
+                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!canDelete"
+                            (sqxConfirmClick)="emitDelete()"
+                            confirmTitle="i18n:assets.deleteFolderConfirmTitle"
+                            confirmText="i18n:assets.deleteFolderConfirmText"
+                            confirmRememberKey="deleteAssetFolder">
+                            {{ 'common.delete' | sqxTranslate }}
+                        </a>
+                    </sqx-dropdown-menu>
                 </ng-container>
             </div>
         </div>            
     </div>
 </div>
 
-
-<ng-container *sqxModal="editDialog">
-    <sqx-asset-folder-dialog [assetFolder]="assetFolder"
-        (complete)="editDialog.hide()">
-    </sqx-asset-folder-dialog>
-</ng-container>
+<sqx-asset-folder-dialog *sqxModal="editDialog"
+    (close)="editDialog.hide()" [assetFolder]="assetFolder">
+</sqx-asset-folder-dialog>

@@ -36,25 +36,21 @@
     </ng-container>
 </div>
 
-<ng-container *sqxModal="contentCreatorDialog">
-    <sqx-content-creator
-        (select)="select($event)"
-        [formContext]="formContext"
-        [initialData]="clonedContent?.data"
-        [language]="language"
-        [languages]="languages"
-        [schemaName]="clonedContent?.schemaName"
-        [schemaIds]="schemaIds">
-    </sqx-content-creator>
-</ng-container>
+<sqx-content-creator *sqxModal="contentCreatorDialog"
+    (select)="select($event)"
+    [formContext]="formContext"
+    [initialData]="clonedContent?.data"
+    [language]="language"
+    [languages]="languages"
+    [schemaName]="clonedContent?.schemaName"
+    [schemaIds]="schemaIds">
+</sqx-content-creator>
 
-<ng-container *sqxModal="contentSelectorDialog">
-    <sqx-content-selector
-        (select)="select($event)"
-        [allowDuplicates]="allowDuplicates"
-        [alreadySelected]="snapshot.contentItems"
-        [language]="language"
-        [languages]="languages"
-        [schemaIds]="schemaIds">
-    </sqx-content-selector>
-</ng-container>
+<sqx-content-selector *sqxModal="contentSelectorDialog"
+    (select)="select($event)"
+    [allowDuplicates]="allowDuplicates"
+    [alreadySelected]="snapshot.contentItems"
+    [language]="language"
+    [languages]="languages"
+    [schemaIds]="schemaIds">
+</sqx-content-selector>

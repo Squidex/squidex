@@ -41,7 +41,6 @@ export * from './angular/forms/templated-form-array';
 export * from './angular/forms/transform-input.directive';
 export * from './angular/forms/validators';
 export * from './angular/global-error-handler';
-export * from './angular/helpers';
 export * from './angular/hover-background.directive';
 export * from './angular/http/caching.interceptor';
 export * from './angular/http/http-extensions';

@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, ContentChild, ElementRef, forwardRe
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
-import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
+import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
@@ -76,7 +76,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public debounceTime = 300;
 
     @Input()
-    public dropdownPosition: RelativePosition = 'bottom-left';
+    public dropdownPosition: FloatingPlacement = 'bottom-start';
 
     @Input()
     public dropdownFullWidth = true;

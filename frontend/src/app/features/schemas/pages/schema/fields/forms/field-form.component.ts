@@ -40,7 +40,7 @@ export class FieldFormComponent implements AfterViewInit {
     public isLocalizable?: boolean | null;
 
     @Output()
-    public cancel = new EventEmitter();
+    public close = new EventEmitter();
 
     public selectedTab = 0;
 

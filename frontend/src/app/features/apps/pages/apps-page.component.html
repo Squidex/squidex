@@ -66,14 +66,14 @@
     </div>
 </div>
 
-<ng-container *sqxModal="addAppDialog">
-    <sqx-app-form [template]="addAppTemplate" (complete)="addAppDialog.hide()"></sqx-app-form>
-</ng-container>
+<sqx-app-form *sqxModal="addAppDialog"
+    (close)="addAppDialog.hide()" [template]="addAppTemplate">
+</sqx-app-form>
 
-<ng-container *sqxModal="onboardingDialog">
-    <sqx-onboarding-dialog (close)="onboardingDialog.hide()"></sqx-onboarding-dialog>
-</ng-container>
+<sqx-onboarding-dialog *sqxModal="onboardingDialog"
+    (close)="onboardingDialog.hide()">
+</sqx-onboarding-dialog>
 
-<ng-container *sqxModal="newsDialog">
-    <sqx-news-dialog [features]="newsFeatures!" (close)="newsDialog.hide()"></sqx-news-dialog>
-</ng-container>
+<sqx-news-dialog *sqxModal="newsDialog" [features]="newsFeatures!"
+    (close)="newsDialog.hide()">
+</sqx-news-dialog>

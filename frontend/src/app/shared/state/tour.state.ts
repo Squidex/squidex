@@ -6,7 +6,7 @@
  */
 
 import { Inject, Injectable } from '@angular/core';
-import { debounceTime } from 'rxjs';
+import { filter } from 'rxjs';
 import { debug, State, TourService, UIOptions } from '@app/framework';
 import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
 import { UIState } from './ui.state';
@@ -65,19 +65,19 @@ export class TourState extends State<Snapshot> {
             });
         }
 
-        this.changes.pipe(debounceTime(1000))
+        this.changes.pipe(filter(c => c.event !== LoadedEvent))
             .subscribe(change => {
                 this.uiState.setCommon('tour', change.snapshot);
             });
 
         this.uiState.getCommon('tour', {} as Snapshot)
             .subscribe(change => {
-                this.next({ ...change, status: change.status || 'Ready' });
+                this.next({ ...change, status: change.status || 'Ready' }, LoadedEvent);
             });
     }
 
     public complete() {
-        this.next({ status: 'Completed' });
+        this.next({ status: 'Completed' }, 'Complete');
     }
 
     public start() {
@@ -85,25 +85,23 @@ export class TourState extends State<Snapshot> {
             return;
         }
 
-        this.next({ status: 'Started' });
-        this.runTask(this.definition.tasks[0]);
+        this.next({ status: 'Started' }, 'Start');
     }
 
-    public runTask(task: TaskDefinition | undefined) {
-        if (!task || this.snapshot.status !== 'Started') {
+    public runTask(task: TaskDefinition) {
+        if (this.snapshot.status !== 'Started') {
             return;
         }
 
-        this.tourService.initialize(task.steps);
-        this.tourService.start();
+        this.tourService.run(task.steps);
     }
 
     public disableAllHints() {
-        this.next(s => ({ ...s, shownHints: { ...s.shownHints || {}, all: true } }));
+        this.next(s => ({ ...s, shownHints: { ...s.shownHints || {}, all: true } }), 'Disable Hints');
     }
 
     public disableHint(key: string) {
-        this.next(s => ({ ...s, shownHints: { ...s.shownHints || {}, [key]: true } }));
+        this.next(s => ({ ...s, shownHints: { ...s.shownHints || {}, [key]: true } }), 'Disable Hint');
     }
 
     public shouldShowHint(key: string) {
@@ -117,6 +115,8 @@ export class TourState extends State<Snapshot> {
         return this.uiOptions.get('hideOnboarding');
     }
 }
+
+const LoadedEvent = 'Loaded';
 
 function createTasks(tasks: TaskDefinition[], completed?: Record<string, boolean>): TaskSnapshot[] {
     let wasCompleted = false;

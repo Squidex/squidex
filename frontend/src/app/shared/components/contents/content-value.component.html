@@ -1,5 +1,5 @@
 <ng-container *ngIf="isPlain; else html">
-    <div class="value-container" [title]="title" titlePosition="top-left">
+    <div class="value-container" [title]="title" titlePosition="top-start">
         <div #valueElement [class.truncate]="!snapshot.wrapping">{{value}}</div>
     </div>
 
@@ -17,9 +17,7 @@
         class="html-value">
     </div>
 
-    <ng-container *sqxModal="previewModal;closeAuto:false">
-        <div class="preview" [sqxAnchoredTo]="htmlValue" anchorX="left-to-left">
-            <img [src]="value.preview" />
-        </div>
-    </ng-container>
+    <div *sqxModal="previewModal;closeAuto:false" [sqxAnchoredTo]="htmlValue" class="preview" position="bottom-start">
+        <img [src]="value.preview" />
+    </div>
 </ng-template>

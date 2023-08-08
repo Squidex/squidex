@@ -62,7 +62,7 @@ export class AssetSelectorComponent extends StatefulComponent<State> implements 
         this.assetsState.search(query);
     }
 
-    public emitComplete() {
+    public emitClose() {
         this.select.emit([]);
     }
 

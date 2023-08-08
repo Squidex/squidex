@@ -1,5 +1,5 @@
-<ng-container *sqxModal="dialogView">
-    <sqx-modal-dialog [showClose]="false" (close)="cancel()" *ngIf="snapshot.dialogRequest; let request">
+<ng-container *sqxModal="snapshot.dialogRequest; let request">
+    <sqx-modal-dialog [showClose]="false" (close)="cancel()">
         <ng-container title>
             {{request.title | sqxTranslate}}
         </ng-container>
@@ -26,9 +26,8 @@
             </button>
         </ng-container>
     </sqx-modal-dialog>
-</ng-container>
 
-<div class="notification-container notification-container-bottom-right">
+<div class="notification-container notification-container-bottom-end">
     <div class="alert alert-dismissible alert-{{notification.messageType}} shadowed" *ngFor="let notification of snapshot.notifications" (click)="close(notification)" @fade>
         <button type="button" class="btn-close" data-dismiss="alert" (close)="close(notification)"></button>
 
@@ -38,11 +37,7 @@
 </div>
 
 <ng-container *ngFor="let tooltip of snapshot.tooltips">
-    <div class="tooltip2 tooltip2-{{tooltip.textPosition}}" 
-        [sqxAnchoredTo]="tooltip.target" 
-        [position]="tooltip.textPosition"
-        [offsetY]="tooltip.offsetY"
-        [offsetX]="tooltip.offsetX">
+    <div class="tooltip2 tooltip2-{{tooltip.textPosition}}" [sqxAnchoredTo]="tooltip.target" [position]="tooltip.textPosition" [offset]="6">
         {{tooltip.text | sqxTranslate}}
 
         <ng-container *ngIf="tooltip.shortcut">

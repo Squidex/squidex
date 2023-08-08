@@ -7,7 +7,7 @@
 
 import { Directive, Input, OnDestroy, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
-import { RelativePosition, ResourceOwner, StepDefinition, TourService, TourState, Types } from '@app/shared/internal';
+import { FloatingPlacement, ResourceOwner, StepDefinition, TourService, TourState, Types } from '@app/shared/internal';
 
 @Directive({
     selector: '[hintText]',
@@ -23,10 +23,10 @@ export class TourHintDirective extends ResourceOwner implements OnDestroy, OnIni
     public hintAfter: number | string = 1000;
 
     @Input()
-    public hintPosition?: RelativePosition;
+    public hintPosition?: FloatingPlacement;
 
     @Input()
-    public titlePosition?: RelativePosition;
+    public titlePosition?: FloatingPlacement;
 
     constructor(
         private readonly tourService: TourService,

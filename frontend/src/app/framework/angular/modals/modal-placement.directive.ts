@@ -6,39 +6,18 @@
  */
 
 import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, Renderer2 } from '@angular/core';
-import { timer } from 'rxjs';
-import { AnchorX, AnchorY, computeAnchors, positionModal, PositionRequest, PositionResult, RelativePosition, ResourceOwner, Types } from '@app/framework/internal';
+import { autoUpdate, computePosition, flip, Middleware, offset, shift, size } from '@floating-ui/dom';
+import { FloatingPlacement, TypedSimpleChanges, Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxAnchoredTo]',
 })
-export class ModalPlacementDirective extends ResourceOwner implements AfterViewInit, OnDestroy {
-    private readonly request: PositionRequest = {
-        adjust: true,
-        anchorX: 'right-to-right',
-        anchorY: 'top-to-bottom',
-    } as any;
-
-    private targetField?: Element;
+export class ModalPlacementDirective implements AfterViewInit, OnDestroy {
+    private currentListener?: any;
     private isViewInit = false;
-    private previousPosition?: PositionResult;
 
     @Input('sqxAnchoredTo')
-    public set target(value: Element) {
-        if (value === this.targetField) {
-            return;
-        }
-
-        if (this.targetField) {
-            this.unsubscribeAll();
-        }
-
-        this.targetField = value;
-
-        if (this.targetField) {
-            this.listenToElement(this.targetField);
-        }
-    }
+    public target?: Element;
 
     @Input()
     public scrollX = false;
@@ -50,13 +29,7 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
     public scrollMargin = 10;
 
     @Input()
-    public offsetAuto = 0;
-
-    @Input()
-    public offsetX = 0;
-
-    @Input()
-    public offsetY = 2;
+    public offset = 2;
 
     @Input()
     public spaceX = 0;
@@ -65,13 +38,7 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
     public spaceY = 0;
 
     @Input()
-    public anchorX: AnchorX = 'right-to-right';
-
-    @Input()
-    public anchorY: AnchorY = 'top-to-bottom';
-
-    @Input()
-    public position?: RelativePosition;
+    public position: FloatingPlacement = 'bottom-end';
 
     @Input()
     public adjustWidth = false;
@@ -79,54 +46,25 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
     @Input()
     public adjustHeight = false;
 
-    @Input()
-    public update = true;
-
     constructor(
         private readonly renderer: Renderer2,
         private readonly element: ElementRef<HTMLElement>,
     ) {
-        super();
-
         renderer.setStyle(element.nativeElement, 'visibility', 'hidden');
     }
 
-    private listenToElement(element: any) {
-        this.own(
-            this.renderer.listen(element, 'resize', () => {
-                this.updatePosition();
-            }));
-
-        this.own(
-            this.renderer.listen(this.element.nativeElement, 'resize', () => {
-                this.updatePosition();
-            }));
-
-        this.own(timer(100, 100).subscribe(() => this.updatePosition()));
+    public ngOnDestroy() {
+        this.unsubscribe();
     }
 
-    public ngOnChanges() {
-        this.request.anchorX = this.anchorX;
-        this.request.anchorY = this.anchorY;
-        this.request.offsetX = this.offsetX;
-        this.request.offsetY = this.offsetY;
-
-        if (this.position) {
-            const [anchorX, offsetX, anchorY, offsetY] = computeAnchors(this.position, this.offsetAuto);
-
-            this.request.anchorX = anchorX;
-            this.request.anchorY = anchorY;
-
-            if (Types.isNumber(offsetX)) {
-                this.request.offsetX = offsetX;
-            }
-
-            if (Types.isNumber(offsetY)) {
-                this.request.offsetY = offsetY;
-            }
+    public ngOnChanges(changes: TypedSimpleChanges<ModalPlacementDirective>) {
+        if (changes.target?.previousValue) {
+            this.unsubscribe();
         }
 
-        this.previousPosition = undefined;
+        if (changes.target?.currentValue) {
+            this.subscribe(changes.target?.currentValue);
+        }
 
         setTimeout(() => {
             this.updatePosition();
@@ -136,10 +74,9 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
     public ngAfterViewInit() {
         const modalRef = this.element.nativeElement;
 
-        this.renderer.setStyle(modalRef, 'margin', '0');
+        this.renderer.setStyle(modalRef, 'margin-top', '0');
+        this.renderer.setStyle(modalRef, 'margin-left', '0');
         this.renderer.setStyle(modalRef, 'position', 'fixed');
-        this.renderer.setStyle(modalRef, 'bottom', 'auto');
-        this.renderer.setStyle(modalRef, 'right', 'auto');
 
         const zIndex = window.document.defaultView!.getComputedStyle(modalRef).getPropertyValue('z-index');
 
@@ -151,8 +88,17 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         this.updatePosition();
     }
 
+    private unsubscribe() {
+        this.currentListener?.();
+    }
+
+    private subscribe(element: Element) {
+        this.currentListener = autoUpdate(element, this.element.nativeElement, () => this.updatePosition());
+    }
+
+    /*
     private updatePosition() {
-        if (!this.isViewInit || !this.targetField?.isConnected) {
+        if (!this.isViewInit || !this.target?.isConnected) {
             return;
         }
 
@@ -163,7 +109,7 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
             return;
         }
 
-        this.request.targetRect = this.targetField.getBoundingClientRect();
+        this.request.targetRect = this.target.getBoundingClientRect();
 
         if (this.scrollX) {
             modalRect.width = modalRef.scrollWidth;
@@ -201,22 +147,90 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
             this.renderer.setStyle(modalRef, 'max-height', maxHeight);
         }
 
-        if (position.width) {
+        if (Types.isNumber(position.width)) {
             this.renderer.setStyle(modalRef, 'width', `${position.width}px`);
         }
 
-        if (position.height) {
+        if (Types.isNumber(position.height)) {
             this.renderer.setStyle(modalRef, 'height', `${position.height}px`);
         }
 
-        if (position.x) {
+        if (Types.isNumber(position.x)) {
             this.renderer.setStyle(modalRef, 'left', `${position.x}px`);
         }
 
-        if (position.y) {
+        if (Types.isNumber(position.y)) {
+            this.renderer.setStyle(modalRef, 'left', `${position.x}px`);
             this.renderer.setStyle(modalRef, 'top', `${position.y}px`);
         }
 
+        this.renderer.setStyle(modalRef, 'visibility', 'visible');
+    }*/
+
+    private async updatePosition() {
+        if (!this.isViewInit || !this.target?.isConnected) {
+            return;
+        }
+
+        const isInside = Types.isArray(this.position) && this.position[1] === 'inside';
+
+        const placement = Types.isArray(this.position) ? this.position[0] : this.position;
+
+        const modalRef = this.element.nativeElement;
+        const middleware: Middleware[] = [];
+
+        if (isInside) {
+            middleware.push(offset(({ rects }) => {
+                if (placement.startsWith('top') || placement.startsWith('bottom')) {
+                    return -rects.floating.height;
+                } else {
+                    return -rects.floating.width;
+                }
+            }));
+        } else if (this.offset !== 0) {
+            middleware.push(offset(this.offset));
+        }
+
+        middleware.push(flip());
+        middleware.push(shift());
+
+        middleware.push(size({
+            apply: ({ availableWidth, availableHeight, rects }) => {
+                if (this.scrollX) {
+                    const maxWidth = availableWidth > 0 ? `${availableWidth - this.scrollMargin}px` : 'none';
+
+                    this.renderer.setStyle(modalRef, 'overflow-x', 'auto');
+                    this.renderer.setStyle(modalRef, 'overflow-y', 'none');
+                    this.renderer.setStyle(modalRef, 'max-width', maxWidth);
+                }
+
+                if (this.scrollY) {
+                    const maxHeight = availableHeight > 0 ? `${availableHeight - this.scrollMargin}px` : 'none';
+
+                    this.renderer.setStyle(modalRef, 'overflow-x', 'none');
+                    this.renderer.setStyle(modalRef, 'overflow-y', 'auto');
+                    this.renderer.setStyle(modalRef, 'max-height', maxHeight);
+                }
+
+                if (this.adjustWidth) {
+                    const width = rects.reference.width + 2 * this.spaceX;
+
+                    this.renderer.setStyle(modalRef, 'width', `${width}px`);
+                }
+
+                if (this.adjustHeight) {
+                    const height = rects.reference.height + 2 * this.spaceY;
+
+                    this.renderer.setStyle(modalRef, 'width', `${height}px`);
+                }
+            },
+        }));
+
+
+        const computedSize = await computePosition(this.target, modalRef, { middleware, placement, strategy: 'fixed' });
+
+        this.renderer.setStyle(modalRef, 'left', `${computedSize.x}px`);
+        this.renderer.setStyle(modalRef, 'top', `${computedSize.y}px`);
         this.renderer.setStyle(modalRef, 'visibility', 'visible');
     }
 }

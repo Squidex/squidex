@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ModalModel, RelativePosition } from '@app/framework/internal';
+import { FloatingPlacement, ModalModel } from '@app/framework/internal';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
 
@@ -33,7 +33,7 @@ export class LanguageSelectorComponent implements  OnInit {
     public percents?: { [language: string]: number } | null;
 
     @Input()
-    public dropdownPosition: RelativePosition = 'bottom-right';
+    public dropdownPosition: FloatingPlacement = 'bottom-end';
 
     @Input()
     public size: 'sm' | 'md' | 'lg' = 'md';

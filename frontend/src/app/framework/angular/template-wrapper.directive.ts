@@ -6,7 +6,7 @@
  */
 
 import { Directive, EmbeddedViewRef, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
-import { TypedSimpleChanges } from './helpers';
+import { TypedSimpleChanges } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxTemplateWrapper]',

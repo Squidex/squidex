@@ -28,6 +28,7 @@
     "@angular/router": "16.1.8",
     "@babel/runtime": "^7.22.6",
     "@egjs/hammerjs": "2.0.17",
+    "@floating-ui/dom": "^1.5.1",
     "@graphiql/toolkit": "^0.9.1",
     "@iharbeck/ngx-virtual-scroller": "^16.0.0",
     "@lithiumjs/angular": "^7.3.0",

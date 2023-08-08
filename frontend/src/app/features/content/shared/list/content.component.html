@@ -26,32 +26,30 @@
             <i class="icon-dots"></i>
         </button>
 
-        <ng-container *sqxModal="dropdown;closeAlways:true">
-            <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true" position="bottom-left">
-                <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
-                    {{ 'common.statusChangeTo' | sqxTranslate }} 
+        <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" position="bottom-start">
+            <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
+                {{ 'common.statusChangeTo' | sqxTranslate }} 
 
-                    <sqx-content-status [small]="true"
-                        layout="text"
-                        [status]="info.status"
-                        [statusColor]="info.color">
-                    </sqx-content-status>
-                </a>
-                <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="cloneable">
-                    {{ 'common.clone' | sqxTranslate }}
-                </a>
-                
-                <div class="dropdown-divider"></div>
-    
-                <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
-                    (sqxConfirmClick)="delete.emit()"
-                    confirmTitle="i18n:contents.deleteConfirmTitle"
-                    confirmText="i18n:contents.deleteConfirmText"
-                    confirmRememberKey="deleteContent">
-                    {{ 'common.delete' | sqxTranslate }}
-                </a>
-            </sqx-dropdown-menu>
-        </ng-container>
+                <sqx-content-status [small]="true"
+                    layout="text"
+                    [status]="info.status"
+                    [statusColor]="info.color">
+                </sqx-content-status>
+            </a>
+            <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="cloneable">
+                {{ 'common.clone' | sqxTranslate }}
+            </a>
+            
+            <div class="dropdown-divider"></div>
+
+            <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
+                (sqxConfirmClick)="delete.emit()"
+                confirmTitle="i18n:contents.deleteConfirmTitle"
+                confirmText="i18n:contents.deleteConfirmText"
+                confirmRememberKey="deleteContent">
+                {{ 'common.delete' | sqxTranslate }}
+            </a>
+        </sqx-dropdown-menu>
     </td>
 
     <td *ngFor="let field of tableFields" 

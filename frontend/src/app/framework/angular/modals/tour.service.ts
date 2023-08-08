@@ -8,12 +8,12 @@
 import { Injectable } from '@angular/core';
 import { TourService as BaseTourService, IStepOption, TourState } from 'ngx-ui-tour-core';
 import { filter, Observable, Subscription, take } from 'rxjs';
-import { RelativePosition } from '@app/framework/internal';
+import { FloatingPlacement } from '@app/framework/internal';
 import { TourTemplateComponent } from './tour-template.component';
 
 export interface StepDefinition extends IStepOption {
     // The position.
-    position?: RelativePosition;
+    position?: FloatingPlacement;
 
     // Additional callback.
     hideAll?: () => void;
@@ -63,6 +63,11 @@ export class TourService extends BaseTourService<StepDefinition> {
 
     public render(step: StepDefinition | null, target: any | null) {
         this.component?.render(step, target);
+    }
+
+    public run(steps: StepDefinition[]) {
+        this.initialize(steps);
+        this.start();
     }
 
     protected showStep(step: StepDefinition): Promise<void> {

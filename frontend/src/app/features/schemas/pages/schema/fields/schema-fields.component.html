@@ -23,11 +23,9 @@
         </button>
     </ng-container>
 
-    <ng-container *sqxModal="fieldWizard">
-        <sqx-field-wizard 
-            [settings]="settings"
-            [schema]="schema"
-            (complete)="fieldWizard.hide()">
-        </sqx-field-wizard>
-    </ng-container>
+    <sqx-field-wizard *sqxModal="fieldWizard"
+        [settings]="settings"
+        [schema]="schema"
+        (close)="fieldWizard.hide()">
+    </sqx-field-wizard>
 </ng-container>

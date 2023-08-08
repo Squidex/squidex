@@ -50,13 +50,13 @@ export function buildTasks() {
             content: 'i18n:tour.createApp.buttonContent',
             nextOnAnchorClick: true,
             scrollContainer: '.panel-container',
-            position: 'top-left',
+            position: 'top-start',
         }, {
             anchorId: 'appForm',
             content: 'i18n:tour.createApp.formContent',
             nextOnCondition: waitForAnchor('app'),
             scrollContainer: '.panel-container',
-            position: 'left-top',
+            position: 'left-start',
         }, {
             anchorId: 'app',
             content: 'i18n:tour.general.selectAppContent',
@@ -66,7 +66,7 @@ export function buildTasks() {
             anchorId: 'appDashboard',
             content: 'i18n:tour.createApp.dashboardContent',
             isAsync: true,
-            position: 'right-top',
+            position: 'right-start',
         }],
         onComplete: (() => {
             const appsState = inject(AppsState);
@@ -89,7 +89,7 @@ export function buildTasks() {
             anchorId: 'schemas',
             content: 'i18n:tour.createSchema.navigateContent',
             nextOnAnchorClick: true,
-            position: 'right-center',
+            position: 'right-start',
         }, {
             anchorId: 'addSchema',
             content: 'i18n:tour.createSchema.addContent',
@@ -109,7 +109,7 @@ export function buildTasks() {
             anchorId: 'fieldForm',
             content: 'i18n:tour.createSchema.fieldFormContent',
             nextOnCondition: waitForAnchor('schemaField'),
-            position: ['right-to-right', 'top-to-top'],
+            position: ['top-end', 'inside'],
         }, {
             anchorId: 'schemaField',
             content: 'i18n:tour.createSchema.schemaFieldContent',
@@ -122,12 +122,12 @@ export function buildTasks() {
             anchorId: 'help',
             content: 'i18n:tour.createSchema.helpContent',
             scrollContainer: '.panel-container',
-            position: 'left-center',
+            position: 'left-start',
         }, {
             anchorId: 'history',
             content: 'i18n:tour.createSchema.historyContent',
             scrollContainer: '.panel-container',
-            position: 'left-center',
+            position: 'left-start',
         }],
         onComplete: (() => {
             const schemasState = inject(SchemasState);
@@ -151,7 +151,7 @@ export function buildTasks() {
             anchorId: 'content',
             content: 'i18n:tour.createContent.navigateContent',
             nextOnAnchorClick: true,
-            position: 'right-center',
+            position: 'right-start',
         }, {
             anchorId: 'schema',
             content: 'i18n:tour.createContent.selectSchemaContent',
@@ -161,19 +161,19 @@ export function buildTasks() {
             content: 'i18n:tour.createContent.addContent',
             nextOnAnchorClick: true,
             isAsync: true,
-            position: 'bottom-right',
+            position: 'bottom-end',
         }, {
             anchorId: 'saveContent',
             content: 'i18n:tour.createContent.saveContent',
             nextOnAnchorClick: true,
             isAsync: true,
-            position: 'left-top',
+            position: 'left-start',
             enableBackdrop: false,
         }, {
             anchorId: 'status',
             content: 'i18n:tour.createContent.statusContent',
             isAsync: true,
-            position: 'left-center',
+            position: 'left-start',
         }],
         onComplete: (() => {
             const contentsState = inject(ContentsState);
@@ -198,7 +198,7 @@ export function buildTasks() {
             anchorId: 'assets',
             content: 'i18n:tour.createAsset.navigateContent',
             nextOnAnchorClick: true,
-            position: 'right-center',
+            position: 'right-start',
         }, {
             anchorId: 'upload',
             content: 'i18n:tour.createAsset.uploadContent',
@@ -206,7 +206,7 @@ export function buildTasks() {
         }, {
             anchorId: 'filter',
             content: 'i18n:tour.createAsset.filterContent',
-            position: 'left-center',
+            position: 'left-start',
         }],
         onComplete: (() => {
             const assetsState = inject(AssetsState);
@@ -229,7 +229,7 @@ export function buildTasks() {
             anchorId: 'settings',
             content: 'i18n:tour.checkClient.navigateContent',
             nextOnAnchorClick: true,
-            position: 'right-bottom',
+            position: 'right-end',
         }, {
             anchorId: 'clients',
             content: 'i18n:tour.checkClient.navigateClientsContent',
@@ -264,7 +264,7 @@ export function buildTasks() {
             anchorId: 'api',
             content: 'i18n:tour.testGraphQL.navigateContent',
             nextOnAnchorClick: true,
-            position: 'right-center',
+            position: 'right-start',
         }, {
             anchorId: 'graphql',
             content: 'i18n:tour.testGraphQL.navigateGraphQLContent',

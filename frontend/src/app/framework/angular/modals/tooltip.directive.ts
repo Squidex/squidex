@@ -6,7 +6,7 @@
  */
 
 import { Directive, ElementRef, HostListener, Input, OnDestroy, Renderer2 } from '@angular/core';
-import { DialogService, RelativePosition, Tooltip } from '@app/framework/internal';
+import { DialogService, FloatingPlacement, Tooltip } from '@app/framework/internal';
 
 @Directive({
     selector: '[title]:not(sqx-layout),[shortcut]',
@@ -17,7 +17,7 @@ export class TooltipDirective implements OnDestroy {
     private shortcutTimer: any;
 
     @Input()
-    public shortcutPosition: RelativePosition = 'bottom-left';
+    public shortcutPosition: FloatingPlacement = 'bottom-start';
 
     @Input()
     public shortcut?: string | undefined;
@@ -26,7 +26,7 @@ export class TooltipDirective implements OnDestroy {
     public shortcutDelay = 2000;
 
     @Input()
-    public titlePosition: RelativePosition = 'top-right';
+    public titlePosition: FloatingPlacement = 'top-end';
 
     @Input()
     public titleDelay = 1000;

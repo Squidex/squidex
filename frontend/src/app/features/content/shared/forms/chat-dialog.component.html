@@ -39,7 +39,7 @@
                         <textarea class="form-control" readonly [ngModel]="answer"></textarea>
                     </div>
                     <div class="col-auto">
-                        <button type="submit" class="btn btn-primary" (click)="complete.emit(answer)">
+                        <button type="submit" class="btn btn-primary" (click)="select.emit(answer)">
                             {{ 'chat.use' | sqxTranslate }}
                         </button>
                     </div>

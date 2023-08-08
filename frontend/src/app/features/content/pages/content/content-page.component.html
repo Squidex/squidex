@@ -67,17 +67,15 @@
                             <i class="icon-dots"></i>
                         </button>
 
-                        <ng-container *sqxModal="dropdown;closeAlways:true">
-                            <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
-                                <a class="dropdown-item dropdown-item-delete"
-                                    (sqxConfirmClick)="delete()"
-                                    confirmTitle="i18n:contents.deleteConfirmTitle"
-                                    confirmText="i18n:contents.deleteConfirmText"
-                                    confirmRememberKey="deleteContent">
-                                    {{ 'common.delete' | sqxTranslate }}
-                                </a>
-                            </sqx-dropdown-menu>
-                        </ng-container>
+                        <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
+                            <a class="dropdown-item dropdown-item-delete"
+                                (sqxConfirmClick)="delete()"
+                                confirmTitle="i18n:contents.deleteConfirmTitle"
+                                confirmText="i18n:contents.deleteConfirmText"
+                                confirmRememberKey="deleteContent">
+                                {{ 'common.delete' | sqxTranslate }}
+                            </a>
+                        </sqx-dropdown-menu>
                     </ng-container>
 
                     <ng-container *ngIf="contentTab | async; let tab">
@@ -181,7 +179,7 @@
                     routerLinkActive="active"
                     queryParamsHandling="preserve"
                     title="i18n:common.workflow"
-                    titlePosition="left-center"
+                    titlePosition="left"
 
                     sqxTourStep="history"
                     #linkHistory>
@@ -193,7 +191,7 @@
                     routerLinkActive="active"
                     queryParamsHandling="preserve"
                     title="i18n:common.comments"
-                    titlePosition="left-center"
+                    titlePosition="left"
                     hintText="common.sidebarTour"
                     hintAfter="120000"
                     sqxTourStep="comments">
@@ -205,7 +203,7 @@
                     routerLinkActive="active"
                     queryParamsHandling="preserve"
                     title="i18n:common.sidebar"
-                    titlePosition="left-center"
+                    titlePosition="left"
                     sqxTourStep="plugin"
                     *ngIf="schema.properties.contentSidebarUrl">
                     <i class="icon-plugin"></i>

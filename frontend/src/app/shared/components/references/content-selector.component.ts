@@ -127,7 +127,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         return !this.allowDuplicates && this.alreadySelected && !!this.alreadySelected.find(x => x.id === content.id);
     }
 
-    public emitComplete() {
+    public emitClose() {
         this.select.emit([]);
     }
 

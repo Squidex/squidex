@@ -8,8 +8,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
-import { ResourceLoaderService, ScriptCompletions, StatefulControlComponent, Types } from '@app/framework/internal';
-import { TypedSimpleChanges } from './../../helpers';
+import { ResourceLoaderService, ScriptCompletions, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
 import { FocusComponent } from './../forms-helper';
 
 declare const ace: any;

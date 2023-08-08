@@ -6,8 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { picasso } from '@app/framework/internal';
-import { TypedSimpleChanges } from './helpers';
+import { picasso, TypedSimpleChanges } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-avatar',

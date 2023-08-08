@@ -107,8 +107,6 @@
     </div>
 </div>
 
-<ng-container *sqxModal="connectDialog">
-    <sqx-client-connect-form [client]="client" 
-        (complete)="connectDialog.hide()">
-    </sqx-client-connect-form>   
-</ng-container>
+<sqx-client-connect-form *sqxModal="connectDialog"
+    (close)="connectDialog.hide()" [client]="client">
+</sqx-client-connect-form>   

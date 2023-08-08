@@ -122,7 +122,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
         }
     }
 
-    public emitComplete() {
+    public emitClose() {
         this.select.emit([]);
     }
 

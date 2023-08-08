@@ -45,29 +45,27 @@
             <i class="icon-dots"></i>
         </button>
 
-        <ng-container *sqxModal="editOptionsDropdown;closeAlways:true">
-            <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">                    
-                <ng-container *ngIf="schemasState.canCreate">
-                    <div class="dropdown-divider"></div>
-    
-                    <a class="dropdown-item" (click)="cloneSchema()">
-                        {{ 'common.clone' | sqxTranslate }}
-                    </a>
-                </ng-container>
-                
-                <ng-container>
-                    <div class="dropdown-divider"></div>
-    
-                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!schema.canDelete"
-                        (sqxConfirmClick)="deleteSchema()"
-                        confirmTitle="i18n:schemas.deleteConfirmTitle"
-                        confirmText="i18n:schemas.deleteConfirmText"
-                        confirmRememberKey="deleteSchema">
-                        {{ 'common.delete' | sqxTranslate }}
-                    </a>
-                </ng-container>
-            </sqx-dropdown-menu>
-        </ng-container>
+        <sqx-dropdown-menu *sqxModal="editOptionsDropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true">                    
+            <ng-container *ngIf="schemasState.canCreate">
+                <div class="dropdown-divider"></div>
+
+                <a class="dropdown-item" (click)="cloneSchema()">
+                    {{ 'common.clone' | sqxTranslate }}
+                </a>
+            </ng-container>
+            
+            <ng-container>
+                <div class="dropdown-divider"></div>
+
+                <a class="dropdown-item dropdown-item-delete" [class.disabled]="!schema.canDelete"
+                    (sqxConfirmClick)="deleteSchema()"
+                    confirmTitle="i18n:schemas.deleteConfirmTitle"
+                    confirmText="i18n:schemas.deleteConfirmText"
+                    confirmRememberKey="deleteSchema">
+                    {{ 'common.delete' | sqxTranslate }}
+                </a>
+            </ng-container>
+        </sqx-dropdown-menu>
     </ng-container>
 
     <ng-container content>
@@ -115,7 +113,7 @@
                 routerLinkActive="active"
                 queryParamsHandling="preserve"
                 title="i18n:common.history"
-                titlePosition="left-center"
+                titlePosition="left"
                 sqxTourStep="history">
                 <i class="icon-time"></i>
             </a>
@@ -125,7 +123,7 @@
                 routerLinkActive="active"
                 queryParamsHandling="preserve"
                 title="i18n:common.help"
-                titlePosition="left-center"
+                titlePosition="left"
                 sqxTourStep="help">
                 <i class="icon-help2"></i>
             </a>

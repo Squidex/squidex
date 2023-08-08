@@ -1,5 +1,5 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createApp()">
-    <sqx-modal-dialog (close)="emitComplete()" tourId="appForm">
+    <sqx-modal-dialog (close)="emitClose()" tourId="appForm">
         <ng-container title>
             <ng-container *ngIf="template; else noTemplate">
                 {{ 'apps.createWithTemplate' | sqxTranslate: { template: template.title } }}
@@ -33,7 +33,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-secondary" (click)="emitComplete()">
+            <button type="button" class="btn btn-secondary" (click)="emitClose()">
                 {{ 'common.cancel' | sqxTranslate }}
             </button>
 

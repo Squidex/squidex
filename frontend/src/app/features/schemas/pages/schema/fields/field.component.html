@@ -44,48 +44,46 @@
                         <i class="icon-dots"></i>
                     </button>
 
-                    <ng-container *sqxModal="dropdown;closeAlways:true">
-                        <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
-                            <ng-container *ngIf="field.properties.isContentField">
-                                <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
-                                    {{ 'schemas.field.enable' | sqxTranslate }}
-                                </a>
-                                <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
-                                    {{ 'schemas.field.disable' | sqxTranslate }}
-                                </a>
-                                <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
-                                    {{ 'schemas.field.hide' | sqxTranslate }}
-                                </a>
-                                <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
-                                    {{ 'schemas.field.show' | sqxTranslate }}
-                                </a>
-                            </ng-container>                
-                            
-                            <ng-container *ngIf="field.canLock">
-                                <div class="dropdown-divider"></div>
+                    <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
+                        <ng-container *ngIf="field.properties.isContentField">
+                            <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
+                                {{ 'schemas.field.enable' | sqxTranslate }}
+                            </a>
+                            <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
+                                {{ 'schemas.field.disable' | sqxTranslate }}
+                            </a>
+                            <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
+                                {{ 'schemas.field.hide' | sqxTranslate }}
+                            </a>
+                            <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
+                                {{ 'schemas.field.show' | sqxTranslate }}
+                            </a>
+                        </ng-container>                
                         
-                                <a class="dropdown-item"
-                                    (sqxConfirmClick)="lockField()"
-                                    confirmTitle="i18n:schemas.field.lockConfirmTitle"
-                                    confirmText="i18n:schemas.field.lockConfirmText"
-                                    confirmRememberKey="lockField">
-                                    {{ 'schemas.field.lock' | sqxTranslate }}
-                                </a>
-                            </ng-container>
+                        <ng-container *ngIf="field.canLock">
+                            <div class="dropdown-divider"></div>
+                    
+                            <a class="dropdown-item"
+                                (sqxConfirmClick)="lockField()"
+                                confirmTitle="i18n:schemas.field.lockConfirmTitle"
+                                confirmText="i18n:schemas.field.lockConfirmText"
+                                confirmRememberKey="lockField">
+                                {{ 'schemas.field.lock' | sqxTranslate }}
+                            </a>
+                        </ng-container>
 
-                            <ng-container>
-                                <div class="dropdown-divider"></div>
+                        <ng-container>
+                            <div class="dropdown-divider"></div>
 
-                                <a class="dropdown-item dropdown-item-delete" [class.disabled]="!field.canDelete"
-                                    (sqxConfirmClick)="deleteField()"
-                                    confirmTitle="i18n:schemas.field.deleteConfirmTitle"
-                                    confirmText="i18n:schemas.field.deleteConfirmText"
-                                    confirmRememberKey="deleteField">
-                                    {{ 'common.delete' | sqxTranslate }}
-                                </a>
-                            </ng-container>
-                        </sqx-dropdown-menu>
-                    </ng-container>
+                            <a class="dropdown-item dropdown-item-delete" [class.disabled]="!field.canDelete"
+                                (sqxConfirmClick)="deleteField()"
+                                confirmTitle="i18n:schemas.field.deleteConfirmTitle"
+                                confirmText="i18n:schemas.field.deleteConfirmText"
+                                confirmRememberKey="deleteField">
+                                {{ 'common.delete' | sqxTranslate }}
+                            </a>
+                        </ng-container>
+                    </sqx-dropdown-menu>
                 </div>
             </div>
         </div>
@@ -128,14 +126,12 @@
                 </button>
             </div>
                 
-            <ng-container *sqxModal="fieldWizard">
-                <sqx-field-wizard 
-                    [parent]="$any(field)"
-                    [schema]="schema"
-                    [settings]="settings"
-                    (complete)="fieldWizard.hide()">
-                </sqx-field-wizard>
-            </ng-container>
+            <sqx-field-wizard *sqxModal="fieldWizard"
+                [parent]="$any(field)"
+                [schema]="schema"
+                [settings]="settings"
+                (close)="fieldWizard.hide()">
+            </sqx-field-wizard>
         </ng-container>
     </div>
 </div>

@@ -249,7 +249,6 @@
     </sqx-form-hint>
 </div>
 
-
-<ng-container *sqxModal="chatDialog">
-    <sqx-chat-dialog (close)="chatDialog.hide()" (complete)="setValue($event)"></sqx-chat-dialog>
-</ng-container>
+<sqx-chat-dialog *sqxModal="chatDialog"
+    (close)="chatDialog.hide()" (select)="setValue($event)">
+</sqx-chat-dialog>

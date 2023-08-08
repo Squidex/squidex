@@ -29,7 +29,7 @@ export class ChatDialogComponent extends StatefulComponent<State> {
     public close = new EventEmitter();
 
     @Output()
-    public complete = new EventEmitter<string>();
+    public select = new EventEmitter<string>();
 
     constructor(
         private readonly appsState: AppsState,

@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
 import * as ProgressBar from 'progressbar.js';
-import { TypedSimpleChanges } from './../helpers';
+import { TypedSimpleChanges } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-progress-bar',

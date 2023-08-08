@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [flexBody]="true" [hasTabs]="false">
+<sqx-modal-dialog (close)="emitClose()" size="lg" [fullHeight]="true" [flexBody]="true" [hasTabs]="false">
     <ng-container title>
         <div class="row">
             <div class="col-selector">
@@ -92,7 +92,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn btn-text-secondary" (click)="emitComplete()">
+        <button type="button" class="btn btn-text-secondary" (click)="emitClose()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 

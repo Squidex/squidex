@@ -1,5 +1,5 @@
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
-    <sqx-modal-dialog (close)="emitComplete()" size="xl" [fullHeight]="true" [showFooter]="false" [hasTabs]="true">
+    <sqx-modal-dialog (close)="close.emit()" size="xl" [fullHeight]="true" [showFooter]="false" [hasTabs]="true">
         <ng-container title>
             {{ 'assets.edit' | sqxTranslate }}
         </ng-container>

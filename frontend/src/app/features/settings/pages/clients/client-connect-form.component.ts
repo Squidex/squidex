@@ -15,7 +15,7 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
 })
 export class ClientConnectFormComponent implements OnInit {
     @Output()
-    public complete = new EventEmitter();
+    public close = new EventEmitter();
 
     @Input({ required: true })
     public client!: ClientDto;

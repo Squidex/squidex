@@ -2,17 +2,13 @@
     <div class="editor" #editor></div>
 </div>
 
-<ng-container *sqxModal="assetsDialog">
-    <sqx-asset-selector
-        (select)="insertAssets($event)">
-    </sqx-asset-selector>
-</ng-container>
+<sqx-asset-selector *sqxModal="assetsDialog"
+    (select)="insertAssets($event)">
+</sqx-asset-selector>
 
-<ng-container *sqxModal="contentsDialog">
-    <sqx-content-selector
-        [language]="language"
-        [languages]="languages"
-        [schemaIds]="schemaIds"
-        (select)="insertContents($event)">
-    </sqx-content-selector>
-</ng-container>
+<sqx-content-selector *sqxModal="contentsDialog"
+    [language]="language"
+    [languages]="languages"
+    [schemaIds]="schemaIds"
+    (select)="insertContents($event)">
+</sqx-content-selector>

@@ -14,12 +14,13 @@ declare type Model = DialogModel | ModalModel | any;
 @Directive({
     selector: '[sqxModal]',
 })
-export class ModalDirective implements OnDestroy {
+export class ModalDirective<T = unknown> implements OnDestroy {
     private readonly eventsView = new ResourceOwner();
     private readonly eventsModel = new ResourceOwner();
     private static backdrop: any;
     private currentModel: DialogModel | ModalModel | null = null;
-    private renderedView: EmbeddedViewRef<any> | null = null;
+    private currentContext: ModalContext<T> = new ModalContext<T>();
+    private renderedView: EmbeddedViewRef<ModalContext<T>> | null = null;
     private renderRoots: ReadonlyArray<HTMLElement> | null = null;
     private isOpen = false;
 
@@ -50,7 +51,7 @@ export class ModalDirective implements OnDestroy {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,
         private readonly rootView: RootViewComponent,
-        private readonly templateRef: TemplateRef<any>,
+        private readonly templateRef: TemplateRef<ModalContext<T>>,
         private readonly viewContainer: ViewContainerRef,
     ) {
     }
@@ -73,7 +74,7 @@ export class ModalDirective implements OnDestroy {
             if (!this.renderedView) {
                 const container = this.getContainer();
 
-                this.renderedView = container.createEmbeddedView(this.templateRef);
+                this.renderedView = container.createEmbeddedView(this.templateRef, this.currentContext);
                 this.renderRoots = this.renderedView.rootNodes.filter(x => !!x.style);
 
                 this.setupStyles();
@@ -113,6 +114,8 @@ export class ModalDirective implements OnDestroy {
 
             this.eventsModel.own(value.isOpenChanges.subscribe(isOpen => this.update(isOpen)));
         } else {
+            this.currentContext.$implicit = value;
+
             this.update(!!value);
         }
     }
@@ -188,6 +191,10 @@ export class ModalDirective implements OnDestroy {
         }
     }
 }
+export class ModalContext<T = unknown> {
+    public $implicit: T = null!;
+  }
+
 
 function insertBefore(renderer: Renderer2, refElement: any, element: any) {
     if (element && refElement) {

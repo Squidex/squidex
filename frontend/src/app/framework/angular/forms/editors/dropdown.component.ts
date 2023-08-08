@@ -8,8 +8,7 @@
 import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { map } from 'rxjs/operators';
-import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
-import { TypedSimpleChanges } from './../../helpers';
+import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
 
 export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
@@ -69,7 +68,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     public canSearch?: boolean | null = true;
 
     @Input()
-    public dropdownPosition: RelativePosition = 'bottom-left';
+    public dropdownPosition: FloatingPlacement = 'bottom-start';
 
     @Input()
     public dropdownFullWidth = false;

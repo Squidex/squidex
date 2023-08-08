@@ -4,17 +4,13 @@
     </div>
 </div>
 
-<ng-container *sqxModal="assetsDialog">
-    <sqx-asset-selector
-        (select)="pickAssets($event)">
-    </sqx-asset-selector>
-</ng-container>
+<sqx-asset-selector *sqxModal="assetsDialog"
+    (select)="pickAssets($event)">
+</sqx-asset-selector>
 
-<ng-container *sqxModal="contentsDialog">
-    <sqx-content-selector 
-        (select)="pickContents($event)"
-        [language]="language"
-        [languages]="languages"
-        [schemaNames]="contentsSchemas">
-    </sqx-content-selector>
-</ng-container>
+<sqx-content-selector *sqxModal="contentsDialog"
+    (select)="pickContents($event)"
+    [language]="language"
+    [languages]="languages"
+    [schemaNames]="contentsSchemas">
+</sqx-content-selector>

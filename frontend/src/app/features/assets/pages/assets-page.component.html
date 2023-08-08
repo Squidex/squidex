@@ -78,7 +78,7 @@
                 routerLinkActive="active"
                 queryParamsHandling="preserve"
                 title="i18n:common.filters"
-                titlePosition="left-center"
+                titlePosition="left"
                 sqxTourStep="filter">
                 <i class="icon-filter"></i>
             </a>    
@@ -88,13 +88,13 @@
 
 <router-outlet></router-outlet>
 
-<ng-container *sqxModal="addAssetFolderDialog">
-    <sqx-asset-folder-dialog (complete)="addAssetFolderDialog.hide()"></sqx-asset-folder-dialog>
-</ng-container>
+<sqx-asset-folder-dialog *sqxModal="addAssetFolderDialog"
+    (close)="addAssetFolderDialog.hide()">
+</sqx-asset-folder-dialog>
 
 <sqx-asset-dialog *sqxModal="editAsset;isDialog:true"
     [asset]="editAsset!" 
     (assetUpdated)="replaceAsset($event)"
     (assetReplaced)="replaceAsset($event)"
-    (complete)="editDone()">
+    (close)="editDone()">
 </sqx-asset-dialog>

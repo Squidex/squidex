@@ -5,7 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Placement } from '@floating-ui/dom';
 import { BehaviorSubject, Observable } from 'rxjs';
+
+export type FloatingPlacement = Placement | [Placement, 'inside' | 'outside'];
 
 export interface Openable {
     isOpenChanges: Observable<boolean>;

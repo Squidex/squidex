@@ -1,56 +1,53 @@
-<ng-container *sqxModal="currentElement; closeAuto: false">
-    <div class="tour-step" 
-        [class.d-none]="!isVisible"
-        [sqxAnchoredTo]="currentElement!" 
-        [offsetAuto]="4" 
-        [spaceX]="0"
-        [spaceY]="0"
-        [position]="currentStep.position || 'bottom-left'"
-        @fade>
-        <div class="tour-progress" [style.width]="progress "></div>
+<div *sqxModal="currentElement; closeAuto: false" [sqxAnchoredTo]="currentElement!" class="tour-step" 
+    [class.d-none]="!isVisible"
+    [offset]="4" 
+    [spaceX]="0"
+    [spaceY]="0"
+    [position]="currentStep.position || 'bottom-start'"
+    @fade>
+    <div class="tour-progress" [style.width]="progress "></div>
 
-        <div class="tour-body">
-            <div class="row g-0">
-                <div class="col-auto">
-                    <div class="squid d-flex align-items-center justify-content-center bordered">
-                        <img src="./images/squid.svg">
-                    </div>
-                </div>
-
-                <div class="col">
-                    <h5 [innerHTML]="currentStep.title | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></h5>
-
-                    <div [innerHTML]="currentStep.content | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+    <div class="tour-body">
+        <div class="row g-0">
+            <div class="col-auto">
+                <div class="squid d-flex align-items-center justify-content-center bordered">
+                    <img src="./images/squid.svg">
                 </div>
             </div>
-        </div>
 
-        <div class="tour-footer" *ngIf="hasNext || hasPrev || hasFinish || currentStep.hideAll || currentStep.hideThis">
-            <div class="d-flex justify-content-between">
-                <div class="d-flex pe-4">
-                    <button class="btn btn-outline-secondary btn-sm me-2" *ngIf="hasPrev" (click)="tourService.prev()">
-                        {{ 'common.prev' | sqxTranslate}}
-                    </button>
+            <div class="col">
+                <h5 [innerHTML]="currentStep.title | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></h5>
 
-                    <button class="btn btn-outline-danger btn-sm" *ngIf="currentStep.hideAll" (click)="currentStep.hideAll()">
-                        {{ 'tour.tooltipStop' | sqxTranslate }}
-                    </button>
-                </div>
-
-                <div class="d-flex ps-4">
-                    <button class="btn btn-outline-secondary btn-sm" *ngIf="hasNext" (click)="tourService.next()">
-                        {{ 'common.next' | sqxTranslate}}
-                    </button>
-
-                    <button class="btn btn-outline-success btn-sm" *ngIf="hasFinish" (click)="tourService.end()">
-                        {{ 'common.finish' | sqxTranslate}}
-                    </button>
-
-                    <button class="btn btn-outline-success btn-sm" *ngIf="currentStep.hideThis" (click)="currentStep.hideThis()" >
-                        {{ 'tour.tooltipConfirm' | sqxTranslate }}
-                    </button>
-                </div>
+                <div [innerHTML]="currentStep.content | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
             </div>
         </div>
     </div>
-</ng-container>
+
+    <div class="tour-footer" *ngIf="hasNext || hasPrev || hasFinish || currentStep.hideAll || currentStep.hideThis">
+        <div class="d-flex justify-content-between">
+            <div class="d-flex pe-4">
+                <button class="btn btn-outline-secondary btn-sm me-2" *ngIf="hasPrev" (click)="tourService.prev()">
+                    {{ 'common.prev' | sqxTranslate}}
+                </button>
+
+                <button class="btn btn-outline-danger btn-sm" *ngIf="currentStep.hideAll" (click)="currentStep.hideAll()">
+                    {{ 'tour.tooltipStop' | sqxTranslate }}
+                </button>
+            </div>
+
+            <div class="d-flex ps-4">
+                <button class="btn btn-outline-secondary btn-sm" *ngIf="hasNext" (click)="tourService.next()">
+                    {{ 'common.next' | sqxTranslate}}
+                </button>
+
+                <button class="btn btn-outline-success btn-sm" *ngIf="hasFinish" (click)="tourService.end()">
+                    {{ 'common.finish' | sqxTranslate}}
+                </button>
+
+                <button class="btn btn-outline-success btn-sm" *ngIf="currentStep.hideThis" (click)="currentStep.hideThis()" >
+                    {{ 'tour.tooltipConfirm' | sqxTranslate }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

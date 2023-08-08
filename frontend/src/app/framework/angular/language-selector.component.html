@@ -4,25 +4,23 @@
             {{language.iso2Code}}
         </button>
     
-        <ng-container *sqxModal="dropdown;closeAlways:true">
-            <sqx-dropdown-menu [sqxAnchoredTo]="button" [scrollY]="true" [position]="dropdownPosition">
-                <table>
-                    <tbody>
-                        <tr class="dropdown-item" *ngFor="let supported of languages; trackBy: trackByLanguage" 
-                            [class.active]="supported === language"
-                            [class.missing]="exists && !exists[supported.iso2Code]"
-                            (click)="selectLanguage(supported)">
-                            <td class="text-language">{{supported.iso2Code}}</td>
-                            <td>({{supported.englishName}})</td>
-    
-                            <td *ngIf="percents" class="text-right">
-                                {{percents[supported.iso2Code] || 0}} %
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </sqx-dropdown-menu>
-        </ng-container>
+        <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="button" [scrollY]="true" [position]="dropdownPosition">
+            <table>
+                <tbody>
+                    <tr class="dropdown-item" *ngFor="let supported of languages; trackBy: trackByLanguage" 
+                        [class.active]="supported === language"
+                        [class.missing]="exists && !exists[supported.iso2Code]"
+                        (click)="selectLanguage(supported)">
+                        <td class="text-language">{{supported.iso2Code}}</td>
+                        <td>({{supported.englishName}})</td>
+
+                        <td *ngIf="percents" class="text-right">
+                            {{percents[supported.iso2Code] || 0}} %
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </sqx-dropdown-menu>
     </ng-container>
 
     <ng-template #smallMode>

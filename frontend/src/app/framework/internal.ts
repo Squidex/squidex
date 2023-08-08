@@ -22,6 +22,7 @@ export * from './services/shortcut.service';
 export * from './services/temp.service';
 export * from './services/title.service';
 export * from './services/toolbar.service';
+export * from './utils/angular';
 export * from './utils/array-helper';
 export * from './utils/cookies';
 export * from './utils/completion';

@@ -22,6 +22,9 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
     @Input()
     public topic = '';
 
+    @Input()
+    public position?: 'bottom-left' | 'bottom-right' = 'bottom-left';
+
     @ViewChild('element', { static: false })
     public element!: ElementRef<Element>;
 
@@ -75,9 +78,9 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
             const element = this.element?.nativeElement;
 
             if (!this.topic) {
-                notifo.push(['show-notifications', element, { position: 'bottom-right', style: 'notifo' }]);
+                notifo.push(['show-notifications', element, { position: this.position, style: 'notifo' }]);
             } else {
-                notifo.push(['show-topic', element, this.topic, { position: 'bottom-right', style: 'bell' }]);
+                notifo.push(['show-topic', element, this.topic, { position: this.position, style: 'bell' }]);
             }
 
             if (element) {

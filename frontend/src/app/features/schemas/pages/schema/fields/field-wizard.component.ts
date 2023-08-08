@@ -29,7 +29,7 @@ export class FieldWizardComponent implements OnInit {
     public parent: RootFieldDto | null | undefined;
 
     @Output()
-    public complete = new EventEmitter();
+    public close = new EventEmitter();
 
     public fieldTypes = fieldTypes;
     public field!: FieldDto;
@@ -54,8 +54,8 @@ export class FieldWizardComponent implements OnInit {
         }
     }
 
-    public emitComplete() {
-        this.complete.emit();
+    public emitClose() {
+        this.close.emit();
     }
 
     public addField(addNew: boolean, edit = false) {
@@ -77,7 +77,7 @@ export class FieldWizardComponent implements OnInit {
                             this.editForm = new EditFieldForm(this.field.properties);
                             this.editForm.load(this.field.properties);
                         } else {
-                            this.emitComplete();
+                            this.emitClose();
                         }
                     },
                     error: error => {
@@ -105,7 +105,7 @@ export class FieldWizardComponent implements OnInit {
                         if (addNew) {
                             this.editForm = undefined;
                         } else {
-                            this.emitComplete();
+                            this.emitClose();
                         }
                     },
                     error: error => {

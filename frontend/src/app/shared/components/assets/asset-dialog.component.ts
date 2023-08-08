@@ -22,7 +22,7 @@ import { ImageFocusPointComponent } from './image-focus-point.component';
 })
 export class AssetDialogComponent implements OnInit {
     @Output()
-    public complete = new EventEmitter();
+    public close = new EventEmitter();
 
     @Output()
     public assetReplaced = new EventEmitter<AssetDto>();
@@ -126,10 +126,6 @@ export class AssetDialogComponent implements OnInit {
 
     public startMoving() {
         this.isMoving = true;
-    }
-
-    public emitComplete() {
-        this.complete.emit();
     }
 
     public cropImage() {

@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" tourId="fieldForm">
+<sqx-modal-dialog (close)="emitClose()" size="lg" tourId="fieldForm">
     <ng-container title>
         <ng-container *ngIf="parent; else noParent">
             {{ 'schemas.addNestedField' | sqxTranslate }}
@@ -77,7 +77,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="reset" class="float-start btn btn-text-secondary" (click)="emitComplete()">
+        <button type="reset" class="float-start btn btn-text-secondary" (click)="emitClose()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 

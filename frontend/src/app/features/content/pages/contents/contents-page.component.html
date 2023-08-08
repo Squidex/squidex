@@ -4,7 +4,7 @@
     <ng-container menu>
         <div class="row flex-nowrap flex-grow-1 gx-2">
             <div class="col-auto ms-8">
-                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema.id}}/contents"></sqx-notifo>
+                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema.id}}/contents" position="bottom-left"></sqx-notifo>
 
                 <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:contents.refreshTooltip" shortcut="CTRL + B">
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -68,16 +68,14 @@
                                 <i class="icon-settings"></i>
                             </button>
 
-                            <ng-container *sqxModal="tableViewModal">
-                                <sqx-dropdown-menu [sqxAnchoredTo]="buttonSettings" [scrollY]="true" position="bottom-right">
-                                    <sqx-custom-view-editor
-                                        [allFields]="tableSettings.schemaFields" 
-                                        (listFieldsChange)="tableSettings.updateFields($event)"
-                                        [listFields]="$any(tableFields)"
-                                        (reset)="tableSettings.reset()">
-                                    </sqx-custom-view-editor>
-                                </sqx-dropdown-menu>
-                            </ng-container>
+                            <sqx-dropdown-menu *sqxModal="tableViewModal" [sqxAnchoredTo]="buttonSettings" [scrollY]="true" position="bottom-end">
+                                <sqx-custom-view-editor
+                                    [allFields]="tableSettings.schemaFields" 
+                                    (listFieldsChange)="tableSettings.updateFields($event)"
+                                    [listFields]="$any(tableFields)"
+                                    (reset)="tableSettings.reset()">
+                                </sqx-custom-view-editor>
+                            </sqx-dropdown-menu>
                         </div>
                     </ng-container>
 
@@ -152,7 +150,7 @@
                 routerLinkActive="active"
                 queryParamsHandling="preserve"
                 title="i18n:common.filters"
-                titlePosition="left-center"
+                titlePosition="left"
                 sqxTourStep="filters">
                 <i class="icon-filter"></i>
             </a>
@@ -162,7 +160,7 @@
                 routerLinkActive="active"
                 queryParamsHandling="preserve"
                 title="i18n:common.sidebar"
-                titlePosition="left-center"
+                titlePosition="left"
                 sqxTourStep="plugin"
                 *ngIf="schema.properties.contentsSidebarUrl">
                 <i class="icon-plugin"></i>

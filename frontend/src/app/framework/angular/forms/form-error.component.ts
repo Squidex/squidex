@@ -6,8 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ErrorDto } from '@app/framework/internal';
-import { TypedSimpleChanges } from './../helpers';
+import { ErrorDto, TypedSimpleChanges } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-form-error',
