@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, NgZone, numberAttribute, OnDestroy, Output } from '@angular/core';
 import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/internal';
 
 @Directive({
@@ -15,10 +15,10 @@ export class ResizedDirective extends ResourceOwner implements OnDestroy, Resize
     private condition: ((rect: DOMRect) => boolean) | undefined;
     private conditionValue = false;
 
-    @Input('sqxResizeMinWidth')
+    @Input({ alias: 'sqxResizeMinWidth', transform: numberAttribute })
     public minWidth?: number;
 
-    @Input('sqxResizeMaxWidth')
+    @Input({ alias: 'sqxResizeMaxWidth', transform: numberAttribute })
     public maxWidth?: number;
 
     @Output('sqxResizeCondition')

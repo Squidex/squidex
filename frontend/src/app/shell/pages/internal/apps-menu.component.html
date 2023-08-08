@@ -16,7 +16,7 @@
             </ng-template>
         </span>
 
-        <sqx-dropdown-menu *sqxModal="appsMenu;closeAlways:true;onRoot:false" [sqxAnchoredTo]="button" [scrollY]="true" position="bottom-start">
+        <sqx-dropdown-menu *sqxModal="appsMenu;closeAlways:true;onRoot:false" [sqxAnchoredTo]="button" scrollY="true" position="bottom-start">
             <ng-container *ngIf="appsState.apps | async; let apps">
                 <ng-container *ngIf="apps.length > 0">
                     <a class="dropdown-item dropdown-header" routerLink="/app">

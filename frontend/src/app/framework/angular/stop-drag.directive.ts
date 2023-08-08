@@ -5,14 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, HostListener, Input } from '@angular/core';
+import { booleanAttribute, Directive, HostListener, Input } from '@angular/core';
 
 @Directive({
     selector: '[sqxStopDrag]',
 })
 export class StopDragDirective {
-    @Input('sqxStopDrag')
-    public shouldStop: any = true;
+    @Input({ alias: 'sqxStopDrag', transform: booleanAttribute })
+    public shouldStop = true;
 
     @HostListener('dragstart', ['$event'])
     public onDragStart(event: Event) {

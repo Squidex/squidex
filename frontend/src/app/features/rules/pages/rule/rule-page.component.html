@@ -2,7 +2,7 @@
 <sqx-title message="i18n:rules.itemPageTitle"></sqx-title>
 
 <form (ngSubmit)="save()">#
-    <sqx-layout layout="main" [innerWidth]="54">
+    <sqx-layout layout="main" innerWidth="54">
         <ng-container title>
             <div class="d-flex align-items-center">
                 <a class="btn btn-text-secondary" (click)="back()">
@@ -49,7 +49,7 @@
                             </div>
         
                             <div class="col col-icon" *ngIf="currentTrigger">
-                                <sqx-rule-element [type]="currentTrigger.triggerType" [isSmall]="true" [element]="triggerElement" [disabled]="true"></sqx-rule-element>
+                                <sqx-rule-element [type]="currentTrigger.triggerType" isSmall="true" [element]="triggerElement" disabled="true"></sqx-rule-element>
                             </div>
 
                             <div class="col text-end" *ngIf="currentTrigger && !rule">
@@ -96,7 +96,7 @@
                             <div class="row g-0">
                                 <div *ngFor="let triggerType of supportedTriggers | sqxKeys" class="col-12 col-md-6">
                                     <div class="rule-element" (click)="selectTrigger(triggerType)">
-                                        <sqx-rule-element [type]="triggerType" [isSmall]="false" [element]="$any(supportedTriggers)[triggerType]"></sqx-rule-element>
+                                        <sqx-rule-element [type]="triggerType" isSmall="false" [element]="$any(supportedTriggers)[triggerType]"></sqx-rule-element>
                                     </div>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@
                             </div>
 
                             <div class="col col-icon" *ngIf="currentAction">
-                                <sqx-rule-element [type]="currentAction.actionType" [isSmall]="true" [element]="$any(actionElement)" [disabled]="true"></sqx-rule-element>
+                                <sqx-rule-element [type]="currentAction.actionType" isSmall="true" [element]="$any(actionElement)" disabled="true"></sqx-rule-element>
                             </div>
 
                             <div class="col text-end" *ngIf="currentAction && !rule">
@@ -145,7 +145,7 @@
                             <div class="row g-0">
                                 <div *ngFor="let actionType of supportedActions | sqxKeys" class="col-12 col-md-6">
                                     <div class="rule-element" (click)="selectAction(actionType)">
-                                        <sqx-rule-element [type]="actionType" [isSmall]="false" [element]="$any(supportedActions[actionType])"></sqx-rule-element>
+                                        <sqx-rule-element [type]="actionType" isSmall="false" [element]="$any(supportedActions[actionType])"></sqx-rule-element>
                                     </div>
                                 </div>
                             </div>

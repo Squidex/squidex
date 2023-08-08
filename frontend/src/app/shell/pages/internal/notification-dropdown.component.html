@@ -6,7 +6,7 @@
     </span>
 </li>
 
-<sqx-dropdown-menu *sqxModal="modalMenu;onRoot:false" [sqxAnchoredTo]="button" [scrollTop]="scrollMe.nativeElement.scrollHeight" [offset]="10" #scrollMe>
+<sqx-dropdown-menu *sqxModal="modalMenu;onRoot:false" [sqxAnchoredTo]="button" [scrollTop]="scrollMe.nativeElement.scrollHeight" offset="10" #scrollMe>
     <ng-container *ngIf="commentsState.comments | async; let comments">
         <small class="text-muted" *ngIf="comments.length === 0">
             {{ 'notifications.empty' | sqxTranslate}}
@@ -15,9 +15,9 @@
         <sqx-comment *ngFor="let comment of comments; trackBy: trackByComment"
             [comment]="comment"
             [commentsState]="commentsState"
-            [confirmDelete]="false"
-            [canDelete]="true"
-            [canFollow]="true"
+            confirmDelete="false"
+            canDelete="true"
+            canFollow="true"
             [userToken]="userToken">
         </sqx-comment>
     </ng-container>

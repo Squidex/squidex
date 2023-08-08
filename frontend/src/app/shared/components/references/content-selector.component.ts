@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
@@ -24,7 +24,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Output()
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public maxItems = Number.MAX_VALUE;
 
     @Input()

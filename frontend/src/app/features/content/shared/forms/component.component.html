@@ -24,7 +24,7 @@
                 {{ 'contents.addComponent' | sqxTranslate}}
             </button>
             
-            <sqx-dropdown-menu *sqxModal="schemasDropdown;closeAlways:true" [sqxAnchoredTo]="buttonSelect" [scrollY]="true">
+            <sqx-dropdown-menu *sqxModal="schemasDropdown;closeAlways:true" [sqxAnchoredTo]="buttonSelect" scrollY="true">
                 <a class="dropdown-item" *ngFor="let schema of schemasList" (click)="setSchema(schema)">
                     {{schema.displayName}}
                 </a>

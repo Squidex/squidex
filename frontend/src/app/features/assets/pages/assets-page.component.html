@@ -15,13 +15,13 @@
                             [itemsSource]="assetsState.tagsNames | async"
                             [ngModel]="assetsState.selectedTagNames | async"
                             (ngModelChange)="selectTags($event)"
-                            [styleScrollable]="true"
-                            [undefinedWhenEmpty]="false">
+                            styleScrollable="true"
+                            undefinedWhenEmpty="false">
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize"
-                            [enableShortcut]="true"
+                            enableShortcut="true"
                             [queries]="listQueries"
                             [queriesTypes]="'common.assets' | sqxTranslate"
                             [query]="assetsState.query | async"

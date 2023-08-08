@@ -3,7 +3,7 @@
         <i class="icon-settings"></i>
     </button>
     
-    <sqx-dropdown-menu *sqxModal="dropdownModal" [sqxAnchoredTo]="buttonSettings" [scrollY]="true" position="bottom-end">
+    <sqx-dropdown-menu *sqxModal="dropdownModal" [sqxAnchoredTo]="buttonSettings" scrollY="true" position="bottom-end">
         <div class="dropdown-item" *ngFor="let item of configOptions">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="field_{{item.type}}" [ngModel]="isSelected(item)" (ngModelChange)="addOrRemove(item)">
@@ -35,14 +35,14 @@
         </a>
     </sqx-dropdown-menu>    
     
-    <sqx-modal-dialog *sqxModal="expertDialog" (close)="expertDialog.hide()" [fullHeight]="true" size="lg">
+    <sqx-modal-dialog *sqxModal="expertDialog" (close)="expertDialog.hide()" fullHeight="true" size="lg">
         <ng-container title>
             {{ 'dashboard.editConfig' | sqxTranslate }}
         </ng-container>
     
         <ng-container content>
             <div class="json-editor">
-                <sqx-code-editor [borderless]="true" [(ngModel)]="expertConfig" valueMode="Json"></sqx-code-editor>
+                <sqx-code-editor borderless="true" [(ngModel)]="expertConfig" valueMode="Json"></sqx-code-editor>
             </div>
         </ng-container>
 

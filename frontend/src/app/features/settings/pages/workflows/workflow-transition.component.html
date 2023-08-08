@@ -23,14 +23,14 @@
     </div>
     <div class="col col-roles">
         <sqx-tag-editor placeholder="{{ 'common.role' | sqxTranslate }}"
-            [allowDuplicates]="false" 
+            allowDuplicates="false" 
             [disabled]="!!disabled" 
             [itemsSource]="roles"
             [ngModelOptions]="onBlur"
             [ngModel]="transition.roles" 
             (ngModelChange)="changeRole($event)" 
-            [styleDashed]="true"
-            [styleScrollable]="true">
+            styleDashed="true"
+            styleScrollable="true">
         </sqx-tag-editor>
     </div>
 

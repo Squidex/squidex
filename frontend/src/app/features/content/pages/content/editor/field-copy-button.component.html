@@ -3,7 +3,7 @@
         <i class="icon-copy"></i>
     </button>
 
-    <sqx-dropdown-menu *sqxModal="dropdown" [sqxAnchoredTo]="button" [scrollY]="true">
+    <sqx-dropdown-menu *sqxModal="dropdown" [sqxAnchoredTo]="button" scrollY="true">
         <div class="section d-flex justify-content-end">
             <button type="button" class="btn btn-primary" (click)="copy()" tabindex="-1">
                 {{ 'common.copy' | sqxTranslate }}

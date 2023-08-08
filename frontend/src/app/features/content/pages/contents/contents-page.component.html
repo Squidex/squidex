@@ -12,7 +12,7 @@
             </div>
             <div class="col">
                 <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
-                    [enableShortcut]="true"
+                    enableShortcut="true"
                     [language]="(languagesState.isoMasterLanguage | async)!"
                     [languages]="languages"
                     [queries]="queries | async"
@@ -42,7 +42,7 @@
     <ng-container>
         <ng-container *ngIf="tableSettings | async; let tableSettings">
             <ng-container *ngIf="tableSettings.listFields | async; let tableFields">
-                <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [tableNoPadding]="true">
+                <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" tableNoPadding="true">
                     <ng-container topHeader>
                         <div class="selection" *ngIf="selectionCount > 0">
                             {{ 'contents.selectionCount' | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
@@ -68,7 +68,7 @@
                                 <i class="icon-settings"></i>
                             </button>
 
-                            <sqx-dropdown-menu *sqxModal="tableViewModal" [sqxAnchoredTo]="buttonSettings" [scrollY]="true" position="bottom-end">
+                            <sqx-dropdown-menu *sqxModal="tableViewModal" [sqxAnchoredTo]="buttonSettings" scrollY="true" position="bottom-end">
                                 <sqx-custom-view-editor
                                     [allFields]="tableSettings.schemaFields" 
                                     (listFieldsChange)="tableSettings.updateFields($event)"

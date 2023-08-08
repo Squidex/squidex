@@ -1,8 +1,8 @@
 <div *sqxModal="currentElement; closeAuto: false" [sqxAnchoredTo]="currentElement!" class="tour-step" 
     [class.d-none]="!isVisible"
-    [offset]="4" 
-    [spaceX]="0"
-    [spaceY]="0"
+    offset="4" 
+    spaceX="0"
+    spaceY="0"
     [position]="currentStep.position || 'bottom-start'"
     @fade>
     <div class="tour-progress" [style.width]="progress "></div>

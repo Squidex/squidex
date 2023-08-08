@@ -15,10 +15,10 @@
                 <div class="col overflow-hidden pe-1">
                     <sqx-editable-title 
                         size="sm"
-                        [closeButton]="false"
+                        closeButton="false"
                         (inputTitleChange)="changeName($event)"
                         [inputTitle]="schemaCategory.displayName | sqxTranslate"
-                        [inputTitleLength]="30"
+                        inputTitleLength="30"
                         [disabled]="!schemaCategory.name">
                     </sqx-editable-title>
                 </div>

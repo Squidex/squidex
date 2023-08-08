@@ -1,6 +1,6 @@
 <sqx-title [message]="schemasState.schemaName"></sqx-title>
 
-<sqx-layout layout="main"[innerWidth]="50" *ngIf="schemaTab | async; let tab">
+<sqx-layout layout="main"innerWidth="50" *ngIf="schemaTab | async; let tab">
     <ng-container title>
         <ul class="nav nav-tabs2">
             <li class="nav-item">
@@ -45,7 +45,7 @@
             <i class="icon-dots"></i>
         </button>
 
-        <sqx-dropdown-menu *sqxModal="editOptionsDropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true">                    
+        <sqx-dropdown-menu *sqxModal="editOptionsDropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">                    
             <ng-container *ngIf="schemasState.canCreate">
                 <div class="dropdown-divider"></div>
 
@@ -97,7 +97,7 @@
                 </sqx-list-view>
             </ng-container>
             <ng-container *ngSwitchDefault>
-                <sqx-list-view innerWidth="50rem" [table]="true">
+                <sqx-list-view innerWidth="50rem" table="true">
                     <div>
                         <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
                     </div>

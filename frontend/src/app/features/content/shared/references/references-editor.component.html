@@ -1,7 +1,7 @@
 <div class="references-container" [class.expanded]="isExpanded"
     (sqxResizeCondition)="setCompact($event)"
-    [sqxResizeMinWidth]="600"
-    [sqxResizeMaxWidth]="0">
+    sqxResizeMinWidth="600"
+    sqxResizeMaxWidth="0">
     <ng-container>
         <div class="drop-area-container" [class.disabled]="snapshot.isDisabled">
             <div class="drop-area">

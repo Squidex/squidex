@@ -7,8 +7,8 @@
                     [displayFallback]="'rules.unnamed' | sqxTranslate" 
                     (inputTitleChange)="rename($event)"
                     [inputTitle]="rule.name"
-                    [inputTitleLength]="60"
-                    [inputTitleRequired]="false" >
+                    inputTitleLength="60"
+                    inputTitleRequired="false" >
                 </sqx-editable-title>
             </div>
             <div class="col-auto" [class.invisible]="!rule.canDelete && !rule.canRun">
@@ -16,7 +16,7 @@
                     <i class="icon-dots"></i>
                 </button>
         
-                <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" position="bottom-end">
+                <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true" position="bottom-end">
                     <a class="dropdown-item" *ngIf="rule.canUpdate" [routerLink]="rule.id">
                         {{ 'common.edit' | sqxTranslate }}
                     </a>
@@ -68,13 +68,13 @@
                 <h3>{{ 'rules.ruleSyntax.if' | sqxTranslate }}</h3>
             </div>
             <div class="col">
-                <sqx-rule-element [disabled]="true" [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]"></sqx-rule-element>
+                <sqx-rule-element disabled="true" [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]"></sqx-rule-element>
             </div>
             <div class="col-auto">
                 <h3>{{ 'rules.ruleSyntax.then' | sqxTranslate }}</h3>
             </div>
             <div class="col">
-                <sqx-rule-element [disabled]="true" [type]="rule.actionType" [element]="$any(ruleActions[rule.actionType])"></sqx-rule-element>
+                <sqx-rule-element disabled="true" [type]="rule.actionType" [element]="$any(ruleActions[rule.actionType])"></sqx-rule-element>
             </div>
             <div class="col col-last text-end">
                 <ng-container *ngIf="isManual; else notManual">

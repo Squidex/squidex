@@ -21,7 +21,7 @@
                 [disabled]="step.isLocked || disabled"
                 (inputTitleChange)="changeName($event)"
                 [inputTitle]="step.name" 
-                [inputTitleLength]="100">
+                inputTitleLength="100">
             </sqx-editable-title>
         </div>
         <div class="col">
@@ -49,7 +49,7 @@
                 <i class="icon-corner-down-right text-decent"></i>
             </div>
             <div class="col col-step">
-                <sqx-dropdown [items]="openSteps" [(ngModel)]="openStep" [canSearch]="false">
+                <sqx-dropdown [items]="openSteps" [(ngModel)]="openStep" canSearch="false">
                     <ng-template let-target="$implicit">
                         <i class="icon-circle" [style.color]="target.color"></i> {{target.name}}
                     </ng-template>
@@ -93,14 +93,14 @@
                 </div>
                 <div class="col col-roles">
                     <sqx-tag-editor 
-                        [allowDuplicates]="false"
+                        allowDuplicates="false"
                         [disabled]="!!disabled" 
                         [itemsSource]="roles" placeholder="{{ 'common.role' | sqxTranslate }}"
                         [ngModelOptions]="onBlur" 
                         [ngModel]="step.noUpdateRoles"
                         (ngModelChange)="changeNoUpdateRoles($event)"
-                        [styleDashed]="true"
-                        [styleScrollable]="true">
+                        styleDashed="true"
+                        styleScrollable="true">
                     </sqx-tag-editor>
                 </div>
                 <div class="col col-button"></div>

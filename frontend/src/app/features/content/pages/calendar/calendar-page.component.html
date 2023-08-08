@@ -1,6 +1,6 @@
 <sqx-title message="i18n:contents.calendar"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:contents.calendar" [hideSidebar]="true">
+<sqx-layout layout="main" titleText="i18n:contents.calendar" hideSidebar="true">
     <ng-container menu>
         {{title}}
 
@@ -72,7 +72,7 @@
                         layout="text"
                         [status]="content.status"
                         [statusColor]="content.statusColor"
-                        [small]="true">
+                        small="true">
                     </sqx-content-status>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                         layout="text"
                         [status]="content.scheduleJob.status"
                         [statusColor]="content.scheduleJob.color"
-                        [small]="true">
+                        small="true">
                     </sqx-content-status>
                 </div>
             </div>

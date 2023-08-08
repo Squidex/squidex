@@ -9,7 +9,7 @@
         <div class="btn-group" *ngIf="snapshot.previewNamesMore.length > 0">
             <button type="button" class="btn btn-secondary dropdown-toggle" (click)="dropdown.toggle()"></button>
             
-            <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonGroup" [scrollY]="true">
+            <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonGroup" scrollY="true">
                 <a *ngFor="let name of snapshot.previewNamesMore" class="dropdown-item" (click)="follow(name)">{{name}}</a>
             </sqx-dropdown-menu>
         </div>

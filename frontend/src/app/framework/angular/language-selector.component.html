@@ -4,7 +4,7 @@
             {{language.iso2Code}}
         </button>
     
-        <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="button" [scrollY]="true" [position]="dropdownPosition">
+        <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="button" scrollY="true" [position]="dropdownPosition">
             <table>
                 <tbody>
                     <tr class="dropdown-item" *ngFor="let supported of languages; trackBy: trackByLanguage" 

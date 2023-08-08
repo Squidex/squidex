@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
+import { booleanAttribute, ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
 import { DialogModel, ModalModel, ResourceOwner, Types } from '@app/framework/internal';
 import { RootViewComponent } from './root-view.component';
 
@@ -35,16 +35,16 @@ export class ModalDirective<T = unknown> implements OnDestroy {
         }
     }
 
-    @Input('sqxModalOnRoot')
+    @Input({ alias: 'sqxModalOnRoot', transform: booleanAttribute })
     public placeOnRoot = true;
 
-    @Input('sqxModalCloseAuto')
+    @Input({ alias: 'sqxModalCloseAuto', transform: booleanAttribute })
     public closeAuto = true;
 
-    @Input('sqxModalCloseAlways')
+    @Input({ alias: 'sqxModalCloseAlways', transform: booleanAttribute })
     public closeAlways = false;
 
-    @Input('sqxModalIsDialog')
+    @Input({ alias: 'sqxModalIsDialog', transform: booleanAttribute })
     public isDialog = false;
 
     constructor(

@@ -1,4 +1,4 @@
-<sqx-layout layout="right" titleText="i18n:common.workflow" [width]="20" [white]="true" [overflow]="true" [padding]="true">
+<sqx-layout layout="right" titleText="i18n:common.workflow" width="20" white="true" overflow="true" padding="true">
     <ng-container>
         <div class="section mb-4">
             <label for="id">{{ 'common.id' | sqxTranslate }}</label>
@@ -31,7 +31,7 @@
                     </sqx-content-status>
                 </button>
 
-                <sqx-dropdown-menu *sqxModal="dropdownNew;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
+                <sqx-dropdown-menu *sqxModal="dropdownNew;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
                     <ng-container *ngIf="content.statusUpdates.length > 0">
                         <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
                             {{ 'common.statusChangeTo' | sqxTranslate }} <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
@@ -66,23 +66,25 @@
 
             <div *ngIf="!content.newStatus; else newStatusOld">
                 <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdown.toggle()" #buttonOptions sqxTourStep="status">
-                    <sqx-content-status [small]="true"
+                    <sqx-content-status
                         layout="multiline"
                         [status]="content.status"
                         [statusColor]="content.statusColor"
-                        [scheduled]="content.scheduleJob">
+                        [scheduled]="content.scheduleJob"
+                        small="true">
                     </sqx-content-status>
                 </button>
 
-                <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
+                <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
                     <ng-container *ngIf="content.statusUpdates.length > 0">
                         <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
                             {{ 'common.statusChangeTo' | sqxTranslate }} 
                             
-                            <sqx-content-status [small]="true"
+                            <sqx-content-status
                                 layout="text"
                                 [status]="info.status"
-                                [statusColor]="info.color">
+                                [statusColor]="info.color"
+                                small="true">
                             </sqx-content-status>
                         </a>
 

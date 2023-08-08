@@ -1,4 +1,4 @@
-<sqx-form-error [bubble]="true" [closeable]="true" [error]="contentError"></sqx-form-error>
+<sqx-form-error bubble="true" closeable="true" [error]="contentError"></sqx-form-error>
 
 <div class="inner-menu">
     <ul class="nav nav-tabs2" *ngIf="mode | async; let currentMode">
@@ -22,7 +22,7 @@
 
 <div class="inner-main">
     <sqx-code-editor
-        [borderless]="true" 
+        borderless="true" 
         [ngModel]="actualData | async"
         (ngModelChange)="setData($event)"
         valueMode="Json">

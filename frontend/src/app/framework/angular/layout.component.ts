@@ -38,10 +38,10 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input()
     public layout: 'left' | 'main' | 'right' = 'main';
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public width = -1;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public innerWidth = -1;
 
     @Input({ transform: numberAttribute })

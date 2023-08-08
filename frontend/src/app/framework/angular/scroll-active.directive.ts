@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
+import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxScrollActive]',
 })
 export class ScrollActiveDirective implements AfterViewInit {
-    @Input('sqxScrollActive')
+    @Input({ alias: 'sqxScrollActive', transform: booleanAttribute })
     public isActive = false;
 
     @Input('sqxScrollContainer')

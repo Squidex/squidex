@@ -44,7 +44,7 @@
                         <i class="icon-dots"></i>
                     </button>
 
-                    <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
+                    <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
                         <ng-container *ngIf="field.properties.isContentField">
                             <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
                                 {{ 'schemas.field.enable' | sqxTranslate }}
@@ -91,7 +91,7 @@
 
     <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
-            <sqx-field-form [showButtons]="true" (cancel)="toggleEditing()"
+            <sqx-field-form showButtons="true" (cancel)="toggleEditing()"
                 [languages]="languages"
                 [fieldForm]="editForm.form"
                 [field]="field"

@@ -27,9 +27,9 @@
 
     <sqx-dropdown-menu *sqxModal="suggestionsModal" [sqxAnchoredTo]="input" class="control-dropdown" #container
         [adjustWidth]="dropdownFullWidth"
-        [adjustHeight]="false"
-        [scrollX]="false"
-        [scrollY]="true" 
+        adjustHeight="false"
+        scrollX="false"
+        scrollY="true" 
         [style]="dropdownStyles"
         [position]="dropdownPosition">
         <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"

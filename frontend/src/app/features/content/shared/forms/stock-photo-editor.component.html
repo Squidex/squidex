@@ -17,7 +17,7 @@
     <sqx-loader color="white" *ngIf="snapshot.thumbnailStatus !== 'Loaded'"></sqx-loader>
 </div>
 
-<sqx-modal-dialog *sqxModal="searchDialog" size="lg" [fullHeight]="true" (close)="searchDialog.hide()">
+<sqx-modal-dialog *sqxModal="searchDialog" size="lg" fullHeight="true" (close)="searchDialog.hide()">
     <ng-container title>
         <input class="form-control search" [formControl]="stockPhotoSearch" sqxFocusOnInit placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}">
         

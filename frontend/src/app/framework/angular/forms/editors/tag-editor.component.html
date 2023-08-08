@@ -28,10 +28,10 @@
     </div>
 
     <sqx-dropdown-menu *sqxModal="snapshot.suggestedItems.length > 0" [sqxAnchoredTo]="form" class="control-dropdown" 
-        [adjustWidth]="true"
-        [adjustHeight]="false"
-        [scrollX]="false"
-        [scrollY]="true" 
+        adjustWidth="true"
+        adjustHeight="false"
+        scrollX="false"
+        scrollY="true" 
         [style.minWidth]="dropdownWidth"
         position="bottom-end" #container>
         <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
@@ -46,10 +46,10 @@
     </sqx-dropdown-menu>
 
     <sqx-dropdown-menu *sqxModal="itemsModal" [sqxAnchoredTo]="form" class="control-dropdown suggestions-dropdown"
-        [adjustWidth]="false"
-        [adjustHeight]="false"
-        [scrollX]="false"
-        [scrollY]="true"
+        adjustWidth="false"
+        adjustHeight="false"
+        scrollX="false"
+        scrollY="true"
         position="bottom-end">
         <div class="row">
             <div class=" col-6" *ngFor="let item of itemsSorted; let i = index">
