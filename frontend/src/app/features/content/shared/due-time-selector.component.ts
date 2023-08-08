@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { booleanAttribute, Component, Input } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { DialogModel } from '@app/shared';
 
@@ -19,7 +19,7 @@ const OPTION_IMMEDIATELY = 'Immediately';
 export class DueTimeSelectorComponent {
     private dueTimeResult?: Subject<string | null>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public disabled?: boolean | null;
 
     public dueTimeDialog = new DialogModel();

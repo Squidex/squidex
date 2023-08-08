@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
 import { FloatingPlacement, ModalModel } from '@app/framework/internal';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
@@ -26,10 +26,10 @@ export class LanguageSelectorComponent implements  OnInit {
     @Input({ required: true })
     public languages: ReadonlyArray<Language> = [];
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public exists?: { [language: string]: boolean } | null;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public percents?: { [language: string]: number } | null;
 
     @Input()

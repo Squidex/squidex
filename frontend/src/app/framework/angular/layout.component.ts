@@ -7,7 +7,7 @@
 
 /* eslint-disable import/no-cycle */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, Optional, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, numberAttribute, OnDestroy, OnInit, Optional, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
 import { concat, defer, filter, map, of } from 'rxjs';
 import { LayoutContainerDirective } from './layout-container.directive';
@@ -44,25 +44,25 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input()
     public innerWidth = -1;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public innerWidthPadding = 3;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public white = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public overflow = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public hideHeader = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public hideSidebar = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public padding = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public customHeader = false;
 
     @ViewChild('panel', { static: false })

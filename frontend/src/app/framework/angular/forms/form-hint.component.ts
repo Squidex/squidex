@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
 
 @Component({
     selector: 'sqx-form-hint',
@@ -17,9 +17,9 @@ export class FormHintComponent {
     @Input()
     public class = '';
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public marginTop: number | string = 0;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public marginBottom: number | string = 0;
 }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostListener, Input, OnDestroy, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, numberAttribute, OnDestroy, Renderer2 } from '@angular/core';
 import { DialogService, FloatingPlacement, Tooltip } from '@app/framework/internal';
 
 @Directive({
@@ -22,13 +22,13 @@ export class TooltipDirective implements OnDestroy {
     @Input()
     public shortcut?: string | undefined;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public shortcutDelay = 2000;
 
     @Input()
     public titlePosition: FloatingPlacement = 'top-end';
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public titleDelay = 1000;
 
     @Input()

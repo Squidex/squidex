@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, TypedSimpleChanges, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
@@ -40,7 +40,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
     @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }

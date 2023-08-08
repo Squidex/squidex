@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, Renderer2 } from '@angular/core';
+import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input, numberAttribute, OnDestroy, Renderer2 } from '@angular/core';
 import { autoUpdate, computePosition, flip, Middleware, offset, shift, size } from '@floating-ui/dom';
 import { FloatingPlacement, TypedSimpleChanges, Types } from '@app/framework/internal';
 
@@ -19,31 +19,31 @@ export class ModalPlacementDirective implements AfterViewInit, OnDestroy {
     @Input('sqxAnchoredTo')
     public target?: Element;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public scrollX = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public scrollY = false;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public scrollMargin = 10;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public offset = 2;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public spaceX = 0;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public spaceY = 0;
 
     @Input()
     public position: FloatingPlacement = 'bottom-end';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public adjustWidth = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public adjustHeight = false;
 
     constructor(

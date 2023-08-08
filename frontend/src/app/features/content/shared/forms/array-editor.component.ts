@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { VirtualScrollerComponent } from '@iharbeck/ngx-virtual-scroller';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -26,19 +26,19 @@ export class ArrayEditorComponent {
     @Input({ required: true })
     public formContext!: any;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
     @Input({ required: true })
     public formModel!: FieldArrayForm;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isExpanded = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
     @Input({ required: true })

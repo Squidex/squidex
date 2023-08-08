@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, EditContentForm, FieldDto, FieldSection, ModalModel, ResourceOwner, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
@@ -17,7 +17,7 @@ import { ComponentSectionComponent } from './component-section.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComponentComponent extends ResourceOwner {
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
     @Input({ required: true })
@@ -26,13 +26,13 @@ export class ComponentComponent extends ResourceOwner {
     @Input({ required: true })
     public formContext!: any;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
     @Input({ required: true })
     public formModel!: ComponentForm;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 
     @Input({ required: true })

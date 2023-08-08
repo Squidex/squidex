@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AbstractContentForm, AppLanguageDto, DialogModel, EditContentForm, FieldDto, hasNoValue$, MathHelper, TypedSimpleChanges, Types } from '@app/shared';
@@ -27,7 +27,7 @@ export class FieldEditorComponent {
     @Input({ required: true })
     public formContext!: any;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
     @Input({ required: true })
@@ -39,13 +39,13 @@ export class FieldEditorComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public index: number | null | undefined;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
     @Input()

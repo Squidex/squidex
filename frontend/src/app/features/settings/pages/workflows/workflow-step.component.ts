@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TypedSimpleChanges, WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
 
 @Component({
@@ -46,7 +46,7 @@ export class WorkflowStepComponent {
     @Input({ required: true })
     public roles!: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public disabled?: boolean | null;
 
     public openSteps!: ReadonlyArray<WorkflowStep>;

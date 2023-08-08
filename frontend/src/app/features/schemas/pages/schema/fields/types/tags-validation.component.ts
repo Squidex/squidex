@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { booleanAttribute, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, TagsFieldPropertiesDto } from '@app/shared';
 
@@ -27,6 +27,6 @@ export class TagsValidationComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;
 }

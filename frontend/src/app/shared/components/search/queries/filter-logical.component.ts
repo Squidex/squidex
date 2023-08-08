@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
 
 @Component({
@@ -32,10 +32,10 @@ export class FilterLogicalComponent {
     @Input({ required: true })
     public statuses?: ReadonlyArray<StatusInfo> | null;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public level = 0;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isRoot?: boolean | null;
 
     @Input({ required: true })

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
 import { fadeAnimation } from '@app/framework/internal';
 
 @Component({
@@ -21,25 +21,25 @@ export class ModalDialogComponent implements AfterViewInit {
     @Output()
     public close = new EventEmitter();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public showClose?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public showHeader?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public showFooter?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public hasTabs?: boolean | null = false;
 
     @Input()
     public size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public flexBody?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public fullHeight?: boolean | null;
 
     @Input()

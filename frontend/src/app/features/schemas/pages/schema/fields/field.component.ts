@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { booleanAttribute, Component, Input } from '@angular/core';
 import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, FieldDto, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, TypedSimpleChanges } from '@app/shared';
 
 @Component({
@@ -20,7 +20,7 @@ export class FieldComponent {
     @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public plain = false;
 
     @Input()

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
@@ -30,7 +30,7 @@ export class TableHeaderComponent {
     @Input()
     public sortPath?: string | undefined | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public sortable?: boolean | null;
 
     @Input()

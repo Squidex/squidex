@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppLanguageDto, ContentDto, DialogModel, ResolveContents, sorted, StatefulControlComponent, Types } from '@app/shared';
 
@@ -44,13 +44,13 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isExpanded = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public allowDuplicates?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }

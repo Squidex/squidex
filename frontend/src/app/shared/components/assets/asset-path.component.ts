@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AssetPathItem } from '@app/shared/internal';
 
 @Component({
@@ -21,6 +21,6 @@ export class AssetPathComponent {
     @Input()
     public path?: ReadonlyArray<AssetPathItem> | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public all?: boolean | null;
 }

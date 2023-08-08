@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MathHelper, ModalModel, StatefulControlComponent } from '@app/framework/internal';
 import { FocusComponent } from './../forms-helper';
@@ -40,7 +40,7 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
     @Input()
     public mode: 'Input' | 'Circle' = 'Input';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }

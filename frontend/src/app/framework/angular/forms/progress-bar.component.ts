@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, numberAttribute, OnInit, Renderer2 } from '@angular/core';
 import * as ProgressBar from 'progressbar.js';
 import { TypedSimpleChanges } from '@app/framework/internal';
 
@@ -31,19 +31,19 @@ export class ProgressBarComponent implements  OnInit {
     @Input()
     public trailColor = '#f4f4f4';
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public trailWidth = 4;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public strokeWidth = 4;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public showText?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public animated?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public value = 0;
 
     constructor(changeDetector: ChangeDetectorRef,

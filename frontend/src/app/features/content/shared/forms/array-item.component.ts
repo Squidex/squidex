@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output, QueryList, ViewChildren } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
@@ -36,31 +36,31 @@ export class ArrayItemComponent {
     @Input({ required: true })
     public formContext!: any;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
     @Input({ required: true })
     public formModel!: ObjectFormBase;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isCollapsedInitial = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isFirst?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isLast?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isDisabled?: boolean | null;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: numberAttribute })
     public index!: number;
 
     @Input({ required: true })

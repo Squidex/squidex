@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { DialogModel, TagItem, TagsSelected } from '@app/shared';
 
 @Component({
@@ -29,7 +29,7 @@ export class AssetTagsComponent {
     @Input({ required: true })
     public tagsSelected!: TagsSelected;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canRename = false;
 
     public tagRenaming?: TagItem;

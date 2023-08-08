@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ErrorDto, TypedSimpleChanges } from '@app/framework/internal';
 
 @Component({
@@ -18,10 +18,10 @@ export class FormErrorComponent {
     @Input({ required: true })
     public error?: ErrorDto | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public bubble?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public closeable?: boolean | null;
 
     public show = false;

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, numberAttribute, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DialogModel, DialogService, disabled$, StatefulComponent, TypedSimpleChanges, Types, value$ } from '@app/framework';
@@ -39,7 +39,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     @Output()
     public isExpandedChange = new EventEmitter();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isExpanded = false;
 
     @Input({ required: true })
@@ -51,7 +51,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     @Input({ required: true })
     public formField = '';
 
-    @Input({ required: true })
+    @Input({ required: true, transform: numberAttribute })
     public formIndex?: number | null;
 
     @Input({ required: true })
@@ -63,7 +63,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     @Input({ required: true })
     public formControlBinding!: AbstractControl;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.updatedisabled(value === true);
     }

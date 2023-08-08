@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { FormControl, ValidatorFn, Validators } from '@angular/forms';
 import { Keys } from '@app/framework/internal';
 
@@ -21,16 +21,16 @@ export class EditableTitleComponent {
     @Input({ required: true })
     public inputTitle!: string;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public inputTitleLength = 20;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public inputTitleRequired = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public disabled?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public closeButton = true;
 
     @Input()

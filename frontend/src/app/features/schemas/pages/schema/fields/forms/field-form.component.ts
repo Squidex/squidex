@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto } from '@app/shared';
 
@@ -15,10 +15,10 @@ import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto } from '@app/shared';
     templateUrl: './field-form.component.html',
 })
 export class FieldFormComponent implements AfterViewInit {
-    @Input()
+    @Input({ transform: booleanAttribute })
     public showButtons?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isEditable?: boolean | null;
 
     @Input({ required: true })
@@ -36,7 +36,7 @@ export class FieldFormComponent implements AfterViewInit {
     @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;
 
     @Output()

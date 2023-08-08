@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RuleElementMetadataDto } from '@app/shared';
 
 @Component({
@@ -21,9 +21,9 @@ export class RuleElementComponent {
     @Input({ required: true })
     public element!: RuleElementMetadataDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isSmall?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public disabled = false;
 }

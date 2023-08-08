@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
+import { booleanAttribute, Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
 import { ResourceOwner } from '@app/framework/internal';
 
@@ -15,7 +15,7 @@ import { ResourceOwner } from '@app/framework/internal';
 export class ParentLinkDirective extends ResourceOwner implements OnInit {
     private url?: string;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isLazyLoaded?: boolean | null;
 
     @Input()

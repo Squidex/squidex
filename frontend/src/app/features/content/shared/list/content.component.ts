@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, SchemaDto, TableField, TableSettings, TypedSimpleChanges } from '@app/shared';
 
 /* tslint:disable: component-selector */
@@ -29,7 +29,7 @@ export class ContentComponent {
     @Output()
     public selectedChange = new EventEmitter<boolean>();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public selected = false;
 
     @Input()
@@ -47,7 +47,7 @@ export class ContentComponent {
     @Input()
     public tableSettings!: TableSettings;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public cloneable?: boolean | null;
 
     @Input()

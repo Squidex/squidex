@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
 
 @Component({
     selector: 'sqx-form-alert',
@@ -17,15 +17,15 @@ export class FormAlertComponent {
     @Input()
     public class = '';
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public marginTop: number | string | undefined | null = 2;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public marginBottom: number | string | undefined | null = 4;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public light?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public large?: boolean | null;
 }

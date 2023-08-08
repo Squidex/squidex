@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { ContentDto, FieldValue, getContentValue, LanguageDto, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
 
@@ -32,7 +32,7 @@ export class ContentListFieldComponent extends StatefulComponent<State> {
     @Input({ required: true })
     public content!: ContentDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public patchAllowed?: boolean | null;
 
     @Input()

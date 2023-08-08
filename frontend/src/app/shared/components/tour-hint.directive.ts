@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, Input, OnDestroy, OnInit } from '@angular/core';
+import { Directive, Input, numberAttribute, OnDestroy, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 import { FloatingPlacement, ResourceOwner, StepDefinition, TourService, TourState, Types } from '@app/shared/internal';
 
@@ -19,7 +19,7 @@ export class TourHintDirective extends ResourceOwner implements OnDestroy, OnIni
     @Input()
     public hintText!: string;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public hintAfter: number | string = 1000;
 
     @Input()

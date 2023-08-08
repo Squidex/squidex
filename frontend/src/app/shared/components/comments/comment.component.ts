@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MentionConfig } from 'angular-mentions';
 import { CommentDto, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
 
@@ -20,19 +20,19 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentComponent extends StatefulComponent<State> {
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canFollow?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canDelete?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canEdit?: boolean | null;
 
     @Input({ required: true })
     public commentsState!: CommentsState;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public confirmDelete?: boolean | null = true;
 
     @Input({ required: true })

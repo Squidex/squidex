@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSection } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
 
@@ -22,13 +22,13 @@ export class ComponentSectionComponent {
     @Input({ required: true })
     public formContext!: any;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
     @Input({ required: true })
     public formSection!: FieldSection<FieldDto, any>;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 
     @Input({ required: true })
@@ -37,10 +37,10 @@ export class ComponentSectionComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public index: number | null | undefined;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
     @ViewChildren(FieldEditorComponent)

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
@@ -42,7 +42,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public allowDuplicates?: boolean | null;
 
     @Input()

@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AssetDto, AssetFolderDto, AssetsState, getFiles, StatefulComponent, Types } from '@app/shared/internal';
 
 interface State {
@@ -30,20 +30,20 @@ export class AssetsListComponent extends StatefulComponent<State> {
     @Input({ required: true })
     public assetsState!: AssetsState;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isDisabled?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isListView?: boolean | null;
 
     @Input()
     public selectedIds?: Record<string, AssetDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public showFolderIcon?: boolean | null = true;
 
     constructor() {
-        super({ newFiles: [], });
+        super({ newFiles: [] });
     }
 
     public add(file: File, asset: AssetDto) {

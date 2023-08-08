@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { booleanAttribute, Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { Subscriber, take } from 'rxjs';
 import { DialogService, Types } from '@app/framework/internal';
 
@@ -22,7 +22,7 @@ export class ConfirmClickDirective {
     @Input()
     public confirmRememberKey = '';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public confirmRequired?: boolean | null = true;
 
     @Output()

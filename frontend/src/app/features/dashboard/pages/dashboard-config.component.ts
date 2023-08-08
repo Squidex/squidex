@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { GridsterItem } from 'angular-gridster2';
 import { take } from 'rxjs/operators';
 import { AppDto, AppsState, AuthService, DialogModel, DialogService, LocalizerService, ModalModel, TypedSimpleChanges, Types, UIState } from '@app/shared';
@@ -28,7 +28,7 @@ export class DashboardConfigComponent {
     @Input()
     public configAvailable!: GridsterItem[];
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public needsAttention?: boolean | null;
 
     @Output()

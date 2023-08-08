@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, numberAttribute } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
@@ -36,12 +36,12 @@ interface State {
 export class StarsComponent extends StatefulControlComponent<State, number | null> {
     private maximumStarsValue = 5;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public set maximumStars(value: number) {
         const maxStars: number = Types.isNumber(value) ? value : 5;
 

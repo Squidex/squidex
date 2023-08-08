@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { META_FIELDS, SchemaDto, TableField } from '@app/shared';
 
 const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELDS.empty);
@@ -27,7 +27,7 @@ export class FieldListComponent {
     @Input({ required: true })
     public fieldNames!: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public withMetaFields = false;
 
     @Output()

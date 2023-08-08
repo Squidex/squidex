@@ -5,14 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
+import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input } from '@angular/core';
 import { Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxFocusOnInit]',
 })
 export class FocusOnInitDirective implements AfterViewInit {
-    @Input()
+    @Input({ transform: booleanAttribute })
     public select = false;
 
     @Input('sqxFocusOnInit')

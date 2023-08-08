@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, NgZone, numberAttribute, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { MathHelper, ResourceOwner, StringHelper } from '@app/framework/internal';
 
 const LAYOUT_CACHE: { [key: string]: { width: number; height: number } } = {};
@@ -22,7 +22,7 @@ export class ImageSourceDirective extends ResourceOwner implements  OnDestroy, O
     @Input('sqxImageSource')
     public imageSource!: string;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public retryCount = 0;
 
     @Input()

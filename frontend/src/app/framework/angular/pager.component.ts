@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { PagingInfo } from './../state';
 
 export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
@@ -26,7 +26,7 @@ export class PagerComponent {
     @Input({ required: true })
     public paging: PagingInfo | undefined | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public autoHide?: boolean | null;
 
     public totalPages = 0;

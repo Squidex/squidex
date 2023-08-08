@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppSettingsDto, FieldDto, FieldGroup, groupFields, LanguageDto, RootFieldDto, SchemaDto } from '@app/shared';
 
 @Component({
@@ -30,10 +30,10 @@ export class SortableFieldListComponent {
     @Input()
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public sortable = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public fieldsEmpty = false;
 
     @Input({ required: true })

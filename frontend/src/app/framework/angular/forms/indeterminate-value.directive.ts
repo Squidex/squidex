@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, forwardRef, HostListener, Input, Renderer2 } from '@angular/core';
+import { booleanAttribute, Directive, ElementRef, forwardRef, HostListener, Input, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Types } from '@app/framework/internal';
 
@@ -24,7 +24,7 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
     private callTouched = () => { /* NOOP */ };
     private isChecked?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public threeStates = true;
 
     constructor(

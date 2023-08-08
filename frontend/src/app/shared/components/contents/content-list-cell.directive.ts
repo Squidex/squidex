@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, Input, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, Input, numberAttribute, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
 import { ResourceOwner } from '@app/framework';
 import { ContentDto, FieldSizes, META_FIELDS, TableField, TableSettings } from '@app/shared/internal';
 
@@ -187,7 +187,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     @Input('fields')
     public tableFields?: TableSettings;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public minimumWidth = 50;
 
     constructor(

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
     selector: 'sqx-logo',
@@ -14,6 +14,6 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LogoComponent {
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isLoading?: boolean | null;
 }

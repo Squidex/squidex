@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { RuleEventDto } from '@app/shared';
 
 @Component({
@@ -18,7 +18,7 @@ export class RuleEventComponent {
     @Input('sqxRuleEvent')
     public event!: RuleEventDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public expanded = false;
 
     @Output()

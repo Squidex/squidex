@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
@@ -27,10 +27,10 @@ interface State {
     ],
 })
 export class ToggleComponent extends StatefulControlComponent<State, boolean | null> {
-    @Input()
+    @Input({ transform: booleanAttribute })
     public threeStates?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }

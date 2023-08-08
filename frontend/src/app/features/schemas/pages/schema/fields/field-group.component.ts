@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppSettingsDto, FieldDto, FieldGroup, LanguageDto, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 
 interface State {
@@ -32,13 +32,13 @@ export class FieldGroupComponent extends StatefulComponent<State> {
     @Input({ required: true })
     public settings!: AppSettingsDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public sortable = false;
 
     @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public fieldsEmpty = false;
 
     @Input({ required: true })

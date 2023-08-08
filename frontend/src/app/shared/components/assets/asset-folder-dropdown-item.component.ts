@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { AssetsService } from '@app/shared/internal';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
 
@@ -21,7 +21,7 @@ export class AssetFolderDropdownItemComponent {
     @Input({ required: true })
     public nodeModel!: AssetFolderDropdowNode;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public nodeLevel = 0;
 
     @Output()
