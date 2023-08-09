@@ -38,6 +38,9 @@ export interface TaskDefinition {
 
     // Indicates that the task has been completed.
     onComplete: Observable<any>;
+
+    // The task, this depends on.
+    dependsOn: string | null;
 }
 
 export function buildTasks() {
@@ -45,6 +48,7 @@ export function buildTasks() {
         id: 'createApp',
         title: 'i18n:tour.createApp.title',
         description: 'i18n:tour.createApp.description',
+        dependsOn: null,
         steps: [{
             anchorId: 'addApp',
             content: 'i18n:tour.createApp.buttonContent',
@@ -80,6 +84,7 @@ export function buildTasks() {
         id: 'createSchema',
         title: 'i18n:tour.createSchema.title',
         description: 'i18n:tour.createSchema.description',
+        dependsOn: 'createApp',
         steps: [{
             anchorId: 'app',
             content: 'i18n:tour.general.selectAppContent',
@@ -88,6 +93,8 @@ export function buildTasks() {
         }, {
             anchorId: 'schemas',
             content: 'i18n:tour.createSchema.navigateContent',
+            disableScrollToAnchor: true,
+            isAsync: true,
             nextOnAnchorClick: true,
             position: 'right-start',
         }, {
@@ -141,6 +148,7 @@ export function buildTasks() {
         id: 'createContent',
         title: 'i18n:tour.createContent.title',
         description: 'i18n:tour.createContent.description',
+        dependsOn: 'createSchema',
         steps: [{
             anchorId: 'app',
             content: 'i18n:tour.general.selectAppContent',
@@ -150,11 +158,14 @@ export function buildTasks() {
         }, {
             anchorId: 'content',
             content: 'i18n:tour.createContent.navigateContent',
+            disableScrollToAnchor: true,
+            isAsync: true,
             nextOnAnchorClick: true,
             position: 'right-start',
         }, {
-            anchorId: 'schema',
+            anchorId: 'contentSchema',
             content: 'i18n:tour.createContent.selectSchemaContent',
+            isAsync: true,
             nextOnAnchorClick: true,
         }, {
             anchorId: 'addContent',
@@ -188,6 +199,7 @@ export function buildTasks() {
         id: 'createAsset',
         title: 'i18n:tour.createAsset.title',
         description: 'i18n:tour.createContent.description',
+        dependsOn: 'createApp',
         steps: [{
             anchorId: 'app',
             content: 'i18n:tour.general.selectAppContent',
@@ -197,6 +209,8 @@ export function buildTasks() {
         }, {
             anchorId: 'assets',
             content: 'i18n:tour.createAsset.navigateContent',
+            disableScrollToAnchor: true,
+            isAsync: true,
             nextOnAnchorClick: true,
             position: 'right-start',
         }, {
@@ -220,6 +234,7 @@ export function buildTasks() {
         id: 'checkClient',
         title: 'i18n:tour.checkClient.title',
         description: 'i18n:tour.checkClient.description',
+        dependsOn: 'createApp',
         steps: [{
             anchorId: 'app',
             content: 'i18n:tour.general.selectAppContent',
@@ -228,6 +243,8 @@ export function buildTasks() {
         }, {
             anchorId: 'settings',
             content: 'i18n:tour.checkClient.navigateContent',
+            disableScrollToAnchor: true,
+            isAsync: true,
             nextOnAnchorClick: true,
             position: 'right-end',
         }, {
@@ -254,6 +271,7 @@ export function buildTasks() {
         id: 'testGraphQL',
         title: 'i18n:tour.testGraphQL.title',
         description: 'i18n:tour.testGraphQL.description',
+        dependsOn: 'createContent',
         steps: [{
             anchorId: 'app',
             content: 'i18n:tour.general.selectAppContent',
@@ -263,6 +281,8 @@ export function buildTasks() {
         }, {
             anchorId: 'api',
             content: 'i18n:tour.testGraphQL.navigateContent',
+            disableScrollToAnchor: true,
+            isAsync: true,
             nextOnAnchorClick: true,
             position: 'right-start',
         }, {
@@ -285,8 +305,8 @@ export function buildTasks() {
     const defaults: StepDefinition = {
         allowUserInitiatedNavigation: true,
         enableBackdrop: true,
-        disablePageScrolling: true,
-        disableScrollToAnchor: false,
+        disableScrollToAnchor: true,
+        disablePageScrolling: false,
         duplicateAnchorHandling: 'registerLast',
     };
 

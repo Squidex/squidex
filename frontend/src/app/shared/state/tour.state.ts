@@ -123,18 +123,15 @@ export class TourState extends State<Snapshot> {
 const LoadedEvent = 'Loaded';
 
 function createTasks(tasks: TaskDefinition[], completed?: Record<string, boolean>): TaskSnapshot[] {
-    let wasCompleted = true;
+    const snapshots = tasks.map(task => ({
+        ...task,
+        isCompleted: completed?.[task.id] === true,
+        isActive: false,
+    }));
 
-    return tasks.map(task => {
-        const isCompleted = completed?.[task.id] === true;
-        const isActive = wasCompleted && !isCompleted;
+    for (const snapshot of snapshots) {
+        snapshot.isActive = !snapshot.isCompleted && snapshots.find(x => x.id === snapshot.dependsOn)?.isCompleted !== false;
+    }
 
-        wasCompleted = isCompleted;
-
-        return {
-            ...task,
-            isCompleted,
-            isActive,
-        };
-    });
+    return snapshots;
 }

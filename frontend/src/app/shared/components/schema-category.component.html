@@ -53,7 +53,7 @@
             </ng-container>
         
             <ng-template #simpleMode>
-                <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate" sqxTourStep="schema">
+                <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate" sqxTourStep="contentSchema">
                     <a class="nav-link truncate drag-none" [routerLink]="schemaRoute(schema)" routerLinkActive="active" sqxStopDrag
                         title="{{schema.displayName}}"
                         titlePosition="top-start">

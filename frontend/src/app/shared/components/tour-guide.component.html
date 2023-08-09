@@ -14,9 +14,7 @@
         </div>
         <div class="card-body" #body>    
             <div *ngIf="tourState.tasks | async; let tasks">
-                <div class="row g-3 mb-3 step align-items-center" *ngFor="let task of tasks" (click)="start(task)" [class.active]="task.isActive"
-                    [sqxScrollActive]="task.isActive"
-                    [sqxScrollContainer]="body">
+                <div class="row g-3 mb-3 step align-items-center" *ngFor="let task of tasks" (click)="start(task)" [class.active]="task.isActive">
                     <div class="col-auto">
                         <div class="checkmark" [class.pending]="!task.isCompleted" [class.completed]="task.isCompleted">
                             <i class="icon-checkmark" [class.hidden]="!task.isCompleted"></i>
@@ -37,7 +35,7 @@
             </button>
         </div>
         <div class="card-footer">
-            <a href="https://docs.squidex.io" target="_blank">
+            <a href="https://squidex.io/help" target="_blank">
                 <div class="row g-0 align-items-center">
                     <div class="col-auto">
                         <i class="icon-help"></i>

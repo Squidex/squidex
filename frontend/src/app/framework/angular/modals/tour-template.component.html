@@ -8,7 +8,7 @@
     <div class="tour-progress" [style.width]="progress "></div>
 
     <div class="tour-body">
-        <div class="row g-0">
+        <div class="row g-2">
             <div class="col-auto">
                 <div class="squid d-flex align-items-center justify-content-center bordered">
                     <img src="./images/squid.svg">
@@ -19,6 +19,10 @@
                 <h5 [innerHTML]="currentStep.title | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></h5>
 
                 <div [innerHTML]="currentStep.content | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+            </div>
+
+            <div class="col-auto">
+                <button type="button" class="btn btn-sm btn-close" (click)="tourService.end()"></button>
             </div>
         </div>
     </div>
