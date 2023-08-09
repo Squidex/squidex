@@ -42,6 +42,10 @@ p {
             position: relative;
         }
 
+        &-body {
+            overflow: hidden;
+        }
+
         &-footer {
             border: 0;
         }

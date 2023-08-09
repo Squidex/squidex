@@ -71,7 +71,7 @@ describe('TeamsState', () => {
         const teamSelected = await firstValueFrom(teamsState.loadTeam(team1.name));
 
         expect(teamSelected).toEqual(newTeam);
-        expect(teamsState.snapshot.selectedTeam).toBeNull();
+        expect(teamsState.snapshot.selectedTeam).not.toBeDefined();
     });
 
     it('should add team to snapshot if created', () => {

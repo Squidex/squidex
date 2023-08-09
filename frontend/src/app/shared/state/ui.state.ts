@@ -6,8 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
-import { distinctUntilChanged, filter, map } from 'rxjs/operators';
-import { defined, hasAnyLink, State, Types } from '@app/framework';
+import { combineLatest } from 'rxjs';
+import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
+import { debug, defined, hasAnyLink, shareSubscribed, State, Types } from '@app/framework';
 import { UIService } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
 import { AppsState } from './apps.state';
@@ -16,16 +17,13 @@ type Settings = { canCreateApps?: boolean; canCreateTeams?: boolean; [key: strin
 
 interface Snapshot {
     // All common settings.
-    settingsCommon: Settings;
+    settingsCommon?: Settings | null;
 
     // All shared app settings.
-    settingsShared?: Settings | null;
+    settingsAppShared?: Settings | null;
 
     // All user app settings.
-    settingsUser?: Settings | null;
-
-    // The merged settings of app and common settings.
-    settings: Settings;
+    settingsAppUser?: Settings | null;
 
     // Indicates if the user can read events.
     canReadEvents?: boolean;
@@ -37,19 +35,22 @@ interface Snapshot {
     canRestore?: boolean;
 
     // Indicates if the user can use at least one admin resource.
-    canUserAdminResource?: boolean;
+    canUseAdminResource?: boolean;
 }
 
 @Injectable()
 export class UIState extends State<Snapshot> {
     public settings =
-        this.project(x => x.settings);
+        this.project(mergeSettings);
+
+    public settingsCommon =
+        this.project(x => x.settingsCommon);
 
     public settingsShared =
-        this.project(x => x.settingsShared).pipe(filter(x => !!x));
+        this.project(x => x.settingsAppShared).pipe(filter(x => !!x));
 
     public settingsUser =
-        this.project(x => x.settingsUser).pipe(filter(x => !!x));
+        this.project(x => x.settingsAppUser).pipe(filter(x => !!x));
 
     public canReadEvents =
         this.project(x => x.canReadEvents === true);
@@ -60,7 +61,7 @@ export class UIState extends State<Snapshot> {
     public canRestore =
         this.project(x => x.canRestore === true);
 
-    public canUserAdminResource =
+    public canUseAdminResource =
         this.project(x => x.canRestore === true || x.canReadUsers === true || x.canReadEvents === true);
 
     public get<T>(path: string, defaultValue: T) {
@@ -68,13 +69,18 @@ export class UIState extends State<Snapshot> {
             distinctUntilChanged());
     }
 
-    public getShared<T>(path: string, defaultValue: T) {
-        return this.settingsShared.pipe(map(x => getValue(x, path, defaultValue)),
+    public getCommon<T>(path: string, defaultValue: T) {
+        return this.settingsCommon.pipe(filter(x => x !== undefined), map(x => getValue(x, path, defaultValue)),
             distinctUntilChanged());
     }
 
-    public getUser<T>(path: string, defaultValue: T) {
-        return this.settingsUser.pipe(map(x => getValue(x, path, defaultValue)),
+    public getAppShared<T>(path: string, defaultValue: T) {
+        return this.settingsShared.pipe(filter(x => x !== undefined), map(x => getValue(x, path, defaultValue)),
+            distinctUntilChanged());
+    }
+
+    public getAppUser<T>(path: string, defaultValue: T) {
+        return this.settingsUser.pipe(filter(x => x !== undefined), map(x => getValue(x, path, defaultValue)),
             distinctUntilChanged());
     }
 
@@ -91,119 +97,137 @@ export class UIState extends State<Snapshot> {
         private readonly uiService: UIService,
         private readonly usersService: UsersService,
     ) {
-        super({
-            settings: {},
-            settingsCommon: {},
-        }, 'Setting');
+        super({});
 
-        this.loadResources();
-        this.loadCommon();
+        debug(this, 'settings');
 
         appsState.selectedApp.pipe(defined())
             .subscribe(app => {
-                this.load(app.name);
+                this.loadForApp(app.name);
             });
     }
 
-    private load(app: string) {
+    public load() {
+        return combineLatest([this.loadCommon(), this.loadResources()]);
+    }
+
+    private loadForApp(app: string) {
         this.next(s => ({
             ...s,
-            settings: s.settingsCommon,
-            settingsShared: undefined,
-            settingsUser: undefined,
-        }), 'Loading Done');
+            settingsAppShared: null,
+            settingsAppUser: null,
+        }), 'Loading Started');
 
-        this.uiService.getSharedSettings(app)
+        this.uiService.getAppSharedSettings(app)
             .subscribe(payload => {
-                this.next(s => updateSettings(s, { settingsShared: payload }), 'Loading Shared Success');
+                this.next({ settingsAppShared: payload }, 'Loading App Shared Done');
             });
 
-        this.uiService.getUserSettings(app)
+        this.uiService.getAppUserSettings(app)
             .subscribe(payload => {
-                this.next(s => updateSettings(s, { settingsUser: payload }), 'Loading User Success');
+                this.next({ settingsAppUser: payload }, 'Loading App User Done');
             });
     }
 
     private loadCommon() {
-        this.uiService.getCommonSettings()
-            .subscribe(payload => {
-                this.next(s => updateSettings(s, { settingsCommon: payload }), 'Loading Common Done');
-            });
+        return this.uiService.getCommonSettings().pipe(
+            tap(payload => {
+                this.next({ settingsCommon: payload }, 'Loading Common Done');
+            }),
+            shareSubscribed(undefined, { throw: true }));
     }
 
     private loadResources() {
-        this.usersService.getResources()
-            .subscribe(payload => {
+        return this.usersService.getResources().pipe(
+            tap(payload => {
                 this.next({
                     canReadEvents: hasAnyLink(payload, 'admin/events'),
                     canReadUsers: hasAnyLink(payload, 'admin/users'),
                     canRestore: hasAnyLink(payload, 'admin/restore'),
                 }, 'Loading Resources Done');
-            });
+            }),
+            shareSubscribed(undefined, { throw: true }));
     }
 
-    public set(path: string, value: any, user = false) {
-        if (user) {
-            this.setUser(path, value);
-        } else {
-            this.setShared(path, value);
-        }
-    }
-
-    private setUser(path: string, value: any) {
-        const { key, current, root } = getContainer(this.snapshot.settingsUser, path);
+    public setCommon(path: string, value: any) {
+        const { key, current, root } = getContainer(this.snapshot.settingsCommon, path);
 
         if (current && key) {
-            this.uiService.putUserSetting(this.appName, path, value).subscribe();
+            this.uiService.putCommonSetting(path, value).subscribe();
 
             current[key] = value;
 
-            this.next(s => updateSettings(s, { settingsUser: root }), 'Set User');
+            this.next({ settingsCommon: root }, 'Set Common');
         }
     }
 
-    private setShared(path: string, value: any) {
-        const { key, current, root } = getContainer(this.snapshot.settingsShared, path);
+    public setAppUser(path: string, value: any) {
+        const { key, current, root } = getContainer(this.snapshot.settingsAppUser, path);
 
         if (current && key) {
-            this.uiService.putSharedSetting(this.appName, path, value).subscribe();
+            this.uiService.putAppUserSetting(this.appName, path, value).subscribe();
 
             current[key] = value;
 
-            this.next(s => updateSettings(s, { settingsShared: root }), 'Set Shared');
+            this.next({ settingsAppUser: root }, 'Set App user');
+        }
+    }
+
+    public setAppShared(path: string, value: any) {
+        const { key, current, root } = getContainer(this.snapshot.settingsAppShared, path);
+
+        if (current && key) {
+            this.uiService.putAppSharedSetting(this.appName, path, value).subscribe();
+
+            current[key] = value;
+
+            this.next({ settingsAppShared: root }, 'Set App Shared');
         }
     }
 
     public remove(path: string) {
-        return this.removeUser(path) || this.removeShared(path);
+        return this.removeCommon(path) || this.removeAppUser(path) || this.removeAppShared(path);
     }
 
-    public removeUser(path: string) {
-        const { key, current, root } = getContainer(this.snapshot.settingsUser, path);
+    public removeCommon(path: string) {
+        const { key, current, root } = getContainer(this.snapshot.settingsCommon, path);
 
         if (current && key && current[key]) {
-            this.uiService.deleteUserSetting(this.appName, path).subscribe();
+            this.uiService.deleteCommonSetting(path).subscribe();
 
             delete current[key];
 
-            this.next(s => updateSettings(s, { settingsUser: root }), 'Removed User');
-
+            this.next({ settingsCommon: root }, 'Remove Common');
             return true;
         }
 
         return false;
     }
 
-    public removeShared(path: string) {
-        const { key, current, root } = getContainer(this.snapshot.settingsShared, path);
+    public removeAppUser(path: string) {
+        const { key, current, root } = getContainer(this.snapshot.settingsAppUser, path);
 
         if (current && key && current[key]) {
-            this.uiService.deleteSharedSetting(this.appName, path).subscribe();
+            this.uiService.deleteAppUserSetting(this.appName, path).subscribe();
 
             delete current[key];
 
-            this.next(s => updateSettings(s, { settingsShared: root }), 'Removed Shared');
+            this.next({ settingsAppUser: root }, 'Remove App User');
+            return true;
+        }
 
+        return false;
+    }
+
+    public removeAppShared(path: string) {
+        const { key, current, root } = getContainer(this.snapshot.settingsAppShared, path);
+
+        if (current && key && current[key]) {
+            this.uiService.deleteAppSharedSetting(this.appName, path).subscribe();
+
+            delete current[key];
+
+            this.next({ settingsAppShared: root }, 'Remove App Shared');
             return true;
         }
 
@@ -267,12 +291,12 @@ function getContainer(settings: Settings | undefined | null, path: string) {
     return { key: segments[segments.length - 1], current, root };
 }
 
-function updateSettings(state: Snapshot, update: Partial<Snapshot>) {
-    const settings = {};
+function mergeSettings(state: Snapshot): Settings {
+    const result = {};
 
-    Types.mergeInto(settings, update.settingsCommon || state.settingsCommon);
-    Types.mergeInto(settings, update.settingsShared || state.settingsShared);
-    Types.mergeInto(settings, update.settingsUser || state.settingsUser);
+    Types.mergeInto(result, state.settingsCommon);
+    Types.mergeInto(result, state.settingsAppShared);
+    Types.mergeInto(result, state.settingsAppUser);
 
-    return { ...state, settings, ...update };
+    return result;
 }

@@ -7,8 +7,7 @@
 
 import { Component } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { moduleMetadata } from '@storybook/angular';
-import { Meta, Story } from '@storybook/angular/types-6-0';
+import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { DropdownComponent, LocalizerService, SqxFrameworkModule } from '@app/framework';
 
 const TRANSLATIONS = {
@@ -55,6 +54,21 @@ export default {
             control: 'boolean',
         },
     },
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-root-view>
+                <sqx-dropdown 
+                    [disabled]="disabled"
+                    [dropdownPosition]="'bottom-left'"
+                    [dropdownFullWidth]="dropdownFullWidth"
+                    [items]="items"
+                    [itemsLoading]="itemsLoading"
+                    [ngModel]="model">
+                </sqx-dropdown>
+            </sqx-root-view>
+        `,
+    }),
     decorators: [
         moduleMetadata({
             declarations: [
@@ -72,111 +86,96 @@ export default {
     ],
 } as Meta;
 
-const Template: Story<DropdownComponent & { model: any }> = (args: DropdownComponent) => ({
-    props: args,
-    template: `
-        <sqx-root-view>
-            <sqx-dropdown 
-                [disabled]="disabled"
-                [dropdownPosition]="'bottom-left'"
-                [dropdownFullWidth]="dropdownFullWidth"
-                [items]="items"
-                [itemsLoading]="itemsLoading"
-                [ngModel]="model">
-            </sqx-dropdown>
-        </sqx-root-view>
-    `,
-});
+type Story = StoryObj<DropdownComponent & { model: any }>;
 
-const Template2: Story<DropdownComponent & { model: any }> = (args: DropdownComponent) => ({
-    props: args,
-    template: `
-        <sqx-root-view>
-            <sqx-dropdown
-                [disabled]="disabled"
-                [dropdownPosition]="'bottom-left'"
-                [dropdownFullWidth]="dropdownFullWidth"
-                [items]="items"
-                [itemsLoading]="itemsLoading"
-                [searchProperty]="searchProperty"
-                [ngModel]="model"
-                [valueProperty]="valueProperty">
-                <ng-template let-target="$implicit">
-                    {{target.label}}
-                </ng-template>
-            </sqx-dropdown>
-        </sqx-root-view>
-    `,
-});
-
-const Template3: Story<DropdownComponent & { model: any }> = (args: DropdownComponent) => ({
-    props: args,
-    template: `
-        <sqx-dropdown-test></sqx-dropdown-test>
-    `,
-});
-
-export const Default = Template.bind({});
-
-Default.args = {
-    items: ['A', 'B', 'C'],
-    model: 'B',
+export const Default: Story = {
+    args: {
+        items: ['A', 'B', 'C'],
+        model: 'B',
+    },
 };
 
-export const WrongModel = Template.bind({});
-
-WrongModel.args = {
-    items: ['A', 'B', 'C'],
-    model: 'D',
+export const WrongModel: Story = {
+    args: {
+        items: ['A', 'B', 'C'],
+        model: 'D',
+    },
 };
 
-export const Empty = Template.bind({});
-
-Empty.args = {
-    items: [],
-    model: 'B',
+export const Empty: Story = {
+    args: {
+        items: [],
+        model: 'B',
+    },
 };
 
-export const EmptyLoading = Template.bind({});
-
-EmptyLoading.args = {
-    items: [],
-    itemsLoading: true,
+export const EmptyLoading: Story = {
+    args: {
+        items: [],
+        itemsLoading: true,
+    },
 };
 
-export const NoSearch = Template.bind({});
-
-NoSearch.args = {
-    items: ['A', 'B', 'C'],
-    canSearch: false,
+export const NoSearch: Story = {
+    args: {
+        items: ['A', 'B', 'C'],
+        canSearch: false,
+    },
 };
 
-export const FullWidth = Template.bind({});
-
-FullWidth.args = {
-    items: ['A', 'B', 'C'],
-    dropdownFullWidth: true,
+export const FullWidth: Story = {
+    args: {
+        items: ['A', 'B', 'C'],
+        dropdownFullWidth: true,
+    },
 };
 
-export const ComplexValues = Template2.bind({});
-
-ComplexValues.args = {
-    searchProperty: 'label',
-    items: [{
-        id: 1,
-        label: 'Lorem',
-    }, {
-        id: 2,
-        label: 'ipsum',
-    }, {
-        id: 3,
-        label: 'dolor',
-    }, {
-        id: 4,
-        label: 'sit',
-    }],
-    model: 2,
-    valueProperty: 'id',
+export const Lazy: Story = {
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-dropdown-test></sqx-dropdown-test>
+        `,
+    }),
 };
 
-export const Lazy = Template3.bind({});
+export const ComplexValues: Story = {
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-root-view>
+                <sqx-dropdown
+                    [disabled]="disabled"
+                    [dropdownPosition]="'bottom-left'"
+                    [dropdownFullWidth]="dropdownFullWidth"
+                    [items]="items"
+                    [itemsLoading]="itemsLoading"
+                    [searchProperty]="searchProperty"
+                    [ngModel]="model"
+                    [valueProperty]="valueProperty">
+                    <ng-template let-target="$implicit">
+                        {{target.label}}
+                    </ng-template>
+                </sqx-dropdown>
+            </sqx-root-view>
+        `,
+    }),
+    args: {
+        searchProperty: 'label',
+        items: [{
+            id: 1,
+            label: 'Lorem',
+        }, {
+            id: 2,
+            label: 'ipsum',
+        }, {
+            id: 3,
+            label: 'dolor',
+        }, {
+            id: 4,
+            label: 'sit',
+        }],
+        model: 2,
+        valueProperty: 'id',
+    },
+};

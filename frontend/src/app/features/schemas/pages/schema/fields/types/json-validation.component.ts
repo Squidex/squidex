@@ -10,17 +10,17 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-json-validation[field][fieldForm][properties]',
+    selector: 'sqx-json-validation',
     styleUrls: ['json-validation.component.scss'],
     templateUrl: 'json-validation.component.html',
 })
 export class JsonValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: JsonFieldPropertiesDto;
 }

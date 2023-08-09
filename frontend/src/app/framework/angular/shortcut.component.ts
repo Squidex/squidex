@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ShortcutService } from '@app/framework/internal';
 
 @Component({
@@ -21,7 +21,7 @@ export class ShortcutComponent implements OnDestroy, OnInit {
     @Input()
     public keys = '';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public disabled?: boolean | null;
 
     constructor(changeDetector: ChangeDetectorRef,

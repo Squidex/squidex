@@ -210,7 +210,11 @@ export class Router2StateMap<T extends {}> implements StateSynchronizerMap<T> {
     }
 
     public listen() {
-        this.stateSubscription = this.state.changes.subscribe(s => this.syncToRoute(s));
+        this.stateSubscription =
+            this.state.changes
+                .subscribe(change => {
+                    this.syncToRoute(change.snapshot);
+                });
 
         return this;
     }
@@ -244,19 +248,19 @@ export class Router2StateMap<T extends {}> implements StateSynchronizerMap<T> {
     }
 
     public getInitial() {
-        const update: Partial<T> = {};
+        const update = {} as Record<string, undefined>;
 
         const query = this.route.snapshot.queryParams;
 
         for (const sync of this.syncs) {
-            const values = sync.parseFromRoute(query);
+            const values = sync.parseFromRoute(query) as Record<string, any> | undefined;
 
             for (const key of sync.keys) {
                 update[key] = values?.[key];
             }
         }
 
-        return update;
+        return update as Partial<T>;
     }
 
     public withString(key: keyof T & string) {

@@ -10,7 +10,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject, Subject, throwError } from 'rxjs';
 import { ErrorDto } from './../utils/error';
-import { RelativePosition } from './../utils/modal-positioner';
+import { FloatingPlacement } from './../utils/modal-view';
 import { Types } from './../utils/types';
 import { LocalStoreService } from './local-store.service';
 
@@ -60,30 +60,13 @@ export class DialogRequest {
 }
 
 export class Tooltip {
-    private readonly isHorizontal;
-
-    public get offsetX() {
-        return this.isHorizontal ? 6 : 0;
-    }
-
-    public get offsetY() {
-        return this.isHorizontal ? 0 : 6;
-    }
-
     constructor(
         public readonly target: any,
         public readonly text: string | null | undefined,
-        public readonly textPosition: RelativePosition,
+        public readonly textPosition: FloatingPlacement,
         public readonly multiple?: boolean,
         public readonly shortcut?: string,
     ) {
-        this.isHorizontal =
-            textPosition === 'left-bottom' ||
-            textPosition === 'left-center' ||
-            textPosition === 'left-top' ||
-            textPosition === 'right-bottom' ||
-            textPosition === 'right-center' ||
-            textPosition === 'right-top';
     }
 }
 

@@ -22,14 +22,14 @@
         </ng-container>
         <ng-container *ngSwitchCase="'Date'">
             <sqx-date-time-editor mode="Date"
-                [hideDateButtons]="true"
+                hideDateButtons="true"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)">
             </sqx-date-time-editor>
         </ng-container>
         <ng-container *ngSwitchCase="'DateTime'">
             <sqx-date-time-editor mode="DateTime"
-                [hideDateButtons]="true"
+                hideDateButtons="true"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)">
             </sqx-date-time-editor>
@@ -62,7 +62,7 @@
                 [items]="statuses"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)"
-                [canSearch]="false">
+                canSearch="false">
                 <ng-template let-status="$implicit">
                     <i class="icon-circle" [style.color]="status.color"></i> {{status.status}}
                 </ng-template>

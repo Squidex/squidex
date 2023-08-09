@@ -6,13 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { TeamsState } from './../state/teams.state';
 
 @Injectable()
-export class TeamMustExistGuard implements CanActivate {
+export class TeamMustExistGuard  {
     constructor(
         private readonly teamsState: TeamsState,
         private readonly router: Router,

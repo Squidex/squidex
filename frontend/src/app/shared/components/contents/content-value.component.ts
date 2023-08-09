@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy,  Component, Input } from '@angular/core';
 import { ModalModel, StatefulComponent, TypedSimpleChanges } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
@@ -14,13 +14,13 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-value[value]',
+    selector: 'sqx-content-value',
     styleUrls: ['./content-value.component.scss'],
     templateUrl: './content-value.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentValueComponent extends StatefulComponent<State> {
-    @Input()
+    @Input({ required: true })
     public value!: any;
 
     @Input()
@@ -43,8 +43,8 @@ export class ContentValueComponent extends StatefulComponent<State> {
         return !Types.is(this.value, HtmlValue);
     }
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, { wrapping: false });
+    constructor() {
+        super({ wrapping: false });
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {

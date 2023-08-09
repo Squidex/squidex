@@ -1,0 +1,138 @@
+@import 'mixins';
+@import 'vars';
+
+$caret-size: 14px;
+
+.tour {
+    @include fixed(null, 1rem, 1rem, null);
+}
+
+.card {
+    @include box-shadow-outer(0, 2px, 5px, .2);
+    margin-bottom: 1rem;
+    margin-top: 0;
+    max-width: 300px;
+    position: relative;
+
+    &-body {
+        max-height: 350px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    &-footer {
+        font-size: $font-small;
+    }
+
+    &::before {
+        @include caret-bottom($color-border, $caret-size);
+        @include absolute(null, 15px, -$caret-size * 2, null);
+    }
+
+    &::after {
+        @include caret-bottom($color-white, $caret-size);
+        @include absolute(null, 15px, -$caret-size * 2 + 3, null);
+    }
+}
+
+.strikethrough {
+    text-decoration: line-through;
+}
+
+.step {
+    font-size: $font-small;
+
+    &.active {
+        &:hover {
+            color: darken($color-text, 50%) !important;
+            cursor: pointer
+        }
+    }
+}
+
+.checkmark {
+    @include circle(34px);
+    align-items: center;
+    color: $color-white;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    font-size: 1.2rem;
+    font-weight: light;
+    justify-content: center;
+    
+    &.pending {
+        border: 2px solid $color-border;
+    }
+
+    &.completed {
+        background-color: $color-theme-success;
+    }
+}
+
+.text-completed {
+    opacity: .5;
+}
+
+.summary {
+    align-items: center;
+    color: $color-white;
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    .counter {
+        @include circle(30px);
+        align-items: center;
+        background-color: rgba(0, 0, 0, 30%);
+        display: none;
+        flex-grow: 1;
+        flex-wrap: nowrap;
+        justify-content: center;
+        margin-left: .5rem;
+    }
+
+    .squid {
+        @include box-shadow-outer(0, 2px, 4px, .1);
+        border: 1px solid $color-border;
+    }
+
+    span {
+        display: none;
+        font-size: 1.2rem;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    &.expanded {
+        background-color: $color-theme-brand;
+        padding: .25rem;
+        border: 0;
+        border-radius: 100px;
+        transition: all .3s ease-in-out;
+
+        .counter {
+            display: flex;
+        }
+
+        span {
+            display: inline-block;
+        }
+    }
+}
+
+a {
+    display: block;
+    color: $color-text;
+    padding-bottom: .375rem;
+    padding-top: .375rem;
+    text-decoration: none;
+
+    &:hover {
+        color: $color-theme-brand;
+    }
+}
+
+h5 {
+    font-size: 1rem;
+}

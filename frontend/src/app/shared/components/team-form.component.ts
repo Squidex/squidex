@@ -16,7 +16,7 @@ import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
 })
 export class TeamFormComponent {
     @Output()
-    public complete = new EventEmitter();
+    public close = new EventEmitter();
 
     public createForm = new CreateTeamForm();
 
@@ -26,8 +26,8 @@ export class TeamFormComponent {
     ) {
     }
 
-    public emitComplete() {
-        this.complete.emit();
+    public emitClose() {
+        this.close.emit();
     }
 
     public createTeam() {
@@ -37,7 +37,7 @@ export class TeamFormComponent {
             this.teamsStore.create(value)
                 .subscribe({
                     next: () => {
-                        this.emitComplete();
+                        this.emitClose();
                     },
                     error: error => {
                         this.createForm.submitFailed(error);

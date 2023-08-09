@@ -22,7 +22,7 @@ import { routing } from './app.routes';
 import { ApiUrlConfig, DateHelper, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
 
-const options = window['options'] || {};
+const options = (window as any)['options'] || {};
 
 DateHelper.setlocale(options.more?.culture);
 

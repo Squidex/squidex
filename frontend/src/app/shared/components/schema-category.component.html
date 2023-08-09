@@ -15,10 +15,10 @@
                 <div class="col overflow-hidden pe-1">
                     <sqx-editable-title 
                         size="sm"
-                        [closeButton]="false"
+                        closeButton="false"
                         (inputTitleChange)="changeName($event)"
                         [inputTitle]="schemaCategory.displayName | sqxTranslate"
-                        [inputTitleLength]="30"
+                        inputTitleLength="30"
                         [disabled]="!schemaCategory.name">
                     </sqx-editable-title>
                 </div>
@@ -37,14 +37,14 @@
 
         <div [hidden]="isCollapsed" [style.height]="getContainerHeight()" class="nav-collapsed">
             <ng-container *ngIf="!forContent; else simpleMode">
-                <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate"
+                <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate" sqxTourStep="schema"
                     cdkDrag
                     [cdkDragData]="schema"
                     (cdkDragStarted)="dragStarted($event)">
 
                     <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" sqxStopDrag
                         title="{{schema.displayName}}"
-                        titlePosition="top-left">
+                        titlePosition="top-start">
                         <i cdkDragHandle class="icon-drag2 drag-handle"></i>
 
                         <span class="item-published me-1" [class.unpublished]="!schema.isPublished" id="schema_{{schema.name}}"></span> {{schema.displayName}} <span class="singleton" *ngIf="schema.type === 'Singleton'">Singleton</span>
@@ -53,10 +53,10 @@
             </ng-container>
         
             <ng-template #simpleMode>
-                <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate">
+                <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate" sqxTourStep="contentSchema">
                     <a class="nav-link truncate drag-none" [routerLink]="schemaRoute(schema)" routerLinkActive="active" sqxStopDrag
                         title="{{schema.displayName}}"
-                        titlePosition="top-left">
+                        titlePosition="top-start">
                         {{schema.displayName}}
                     </a>
                 </li>

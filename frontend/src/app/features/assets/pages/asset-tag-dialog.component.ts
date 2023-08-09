@@ -9,15 +9,15 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-asset-tag-dialog[tagName]',
+    selector: 'sqx-asset-tag-dialog',
     styleUrls: ['./asset-tag-dialog.component.scss'],
     templateUrl: './asset-tag-dialog.component.html',
 })
 export class AssetTagDialogComponent implements OnInit {
     @Output()
-    public complete = new EventEmitter();
+    public close = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public tagName!: string;
 
     public editForm = new RenameAssetTagForm();
@@ -31,8 +31,8 @@ export class AssetTagDialogComponent implements OnInit {
         this.editForm.load({ tagName: this.tagName });
     }
 
-    public emitComplete() {
-        this.complete.emit();
+    public emitClose() {
+        this.close.emit();
     }
 
     public renameAssetTag() {
@@ -43,13 +43,13 @@ export class AssetTagDialogComponent implements OnInit {
         }
 
         if (value.tagName === this.tagName) {
-            this.emitComplete();
+            this.emitClose();
         }
 
         this.assetsState.renameTag(this.tagName, value?.tagName)
             .subscribe({
                 next: () => {
-                    this.emitComplete();
+                    this.emitClose();
                 },
                 error: error => {
                     this.editForm.submitFailed(error);

@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
-import { compareStrings, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, Types } from '@app/framework';
+import { compareStrings, debug, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
 import { Query } from './../services/query';
 import { AppsState } from './apps.state';
@@ -137,7 +137,9 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             tagsAvailable: {},
             tagsSelected: {},
             total: 0,
-        }, name);
+        });
+
+        debug(this, name);
     }
 
     public load(isReload = false, noSlowTotal = true, update: Partial<Snapshot> = {}): Observable<any> {
@@ -453,7 +455,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     }
 
     public selectTags(tags: ReadonlyArray<string>): Observable<any> {
-        const tagsSelected = {};
+        const tagsSelected = {} as Record<string, boolean>;
 
         for (const tag of tags) {
             tagsSelected[tag] = true;
@@ -585,7 +587,7 @@ export class AssetsState extends AssetsStateBase {
     constructor(
         appsState: AppsState, assetsService: AssetsService, dialogs: DialogService,
     ) {
-        super('Assets', appsState, assetsService, dialogs);
+        super('assets', appsState, assetsService, dialogs);
     }
 }
 
@@ -594,6 +596,6 @@ export class ComponentAssetsState extends AssetsStateBase {
     constructor(
         appsState: AppsState, assetsService: AssetsService, dialogs: DialogService,
     ) {
-        super('Component Assets', appsState, assetsService, dialogs);
+        super('componentAssets', appsState, assetsService, dialogs);
     }
 }

@@ -27,16 +27,16 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
     private readonly errorValidator = new ErrorValidator();
 
     public submitCount =
-        this.state.project(s => s.submitCount);
+        this.state.project(x => x.submitCount);
 
     public submitted =
-        this.state.project(s => s.submitCount > 0);
+        this.state.project(x => x.submitCount > 0);
 
     public submitting =
-        this.state.project(s => s.submitting);
+        this.state.project(x => x.submitting);
 
     public error =
-        this.state.project(s => s.error);
+        this.state.project(x => x.error);
 
     public get remoteValidator(): ValidatorFn {
         return this.errorValidator.validator;

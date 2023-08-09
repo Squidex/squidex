@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
-import { distinctUntilChanged, map } from 'rxjs/operators';
 import { ExtendedFormGroup, LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
 declare const L: any;
@@ -43,7 +42,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     private map: any;
     private value: Geolocation | null = null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -70,16 +69,14 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     @ViewChild('searchBox', { static: false })
     public searchBoxInput!: ElementRef<HTMLInputElement>;
 
-    constructor(changeDetector: ChangeDetectorRef, localStore: LocalStoreService,
+    constructor(localStore: LocalStoreService,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly uiOptions: UIOptions,
     ) {
-        super(changeDetector, {
-            isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP),
-        });
+        super({ isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP) });
 
-        this.changes.pipe(map(x => x.isMapHidden), distinctUntilChanged()).subscribe(value => {
-            localStore.setBoolean(Settings.Local.HIDE_MAP, value);
+        this.project(x => x.isMapHidden).subscribe(isMapHidden => {
+            localStore.setBoolean(Settings.Local.HIDE_MAP, isMapHidden);
         });
 
         this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';

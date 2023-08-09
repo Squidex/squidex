@@ -7,7 +7,7 @@
 
 /* tslint:disable: component-selector */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ContentDto, LanguageDto, META_FIELDS, SchemaDto } from '@app/shared/internal';
 
 @Component({
@@ -22,10 +22,10 @@ export class ContentSelectorItemComponent {
     @Output()
     public selectedChange = new EventEmitter<boolean>();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public selected?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public selectable?: boolean | null = true;
 
     @Input()

@@ -10,17 +10,17 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-geolocation-validation[field][fieldForm][properties]',
+    selector: 'sqx-geolocation-validation',
     styleUrls: ['geolocation-validation.component.scss'],
     templateUrl: 'geolocation-validation.component.html',
 })
 export class GeolocationValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: GeolocationFieldPropertiesDto;
 }

@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <div class="body" (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="600" [sqxResizeMaxWidth]="0">
+    <div class="body" (sqxResizeCondition)="setCompact($event)" sqxResizeMinWidth="600" sqxResizeMaxWidth="0">
         <ng-container *ngIf="!snapshot.isListView; else listTemplate">
             <div class="row g-0">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles"
@@ -40,7 +40,7 @@
                     (edit)="editStart($event)"
                     [isDisabled]="snapshot.isDisabled"
                     [isCompact]="snapshot.isCompact"
-                    [removeMode]="true"
+                    removeMode="true"
                     (remove)="removeLoadedAsset(asset)"
                     (update)="notifyOthers(asset)">
                 </sqx-asset>
@@ -54,7 +54,7 @@
                     [folderId]="folderId"
                     [isCompact]="snapshot.isCompact"
                     [isDisabled]="snapshot.isDisabled"
-                    [isListView]="true"
+                    isListView="true"
                     (loadDone)="addAsset(file, $event)"
                     (loadError)="removeLoadingAsset(file)">
                 </sqx-asset>
@@ -67,11 +67,11 @@
                         <sqx-asset
                             [asset]="asset"
                             (edit)="editStart($event)"
-                            [isListView]="true"
+                            isListView="true"
                             [isDisabled]="snapshot.isDisabled"
                             [isCompact]="snapshot.isCompact"
                             (update)="notifyOthers(asset)"
-                            [removeMode]="true"
+                            removeMode="true"
                             (remove)="removeLoadedAsset(asset)">
                         </sqx-asset>
                     </div>
@@ -81,13 +81,13 @@
     </div>
 </div>
 
-<ng-container *sqxModal="assetsDialog">
-    <sqx-asset-selector (select)="selectAssets($event)"></sqx-asset-selector>
-</ng-container>
+<sqx-asset-selector *sqxModal="assetsDialog"
+    (select)="selectAssets($event)">
+</sqx-asset-selector>
 
 <sqx-asset-dialog *sqxModal="snapshot.editAsset;isDialog:true"
     [asset]="snapshot.editAsset!" 
     (assetReplaced)="notifyOthers($event)"
     (assetUpdated)="notifyOthers($event)"
-    (complete)="editDone()">
+    (close)="editDone()">
 </sqx-asset-dialog>

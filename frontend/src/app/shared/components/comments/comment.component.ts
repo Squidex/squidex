@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MentionConfig } from 'angular-mentions';
 import { CommentDto, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
 
@@ -14,28 +14,28 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-comment[comment][commentsState]',
+    selector: 'sqx-comment',
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentComponent extends StatefulComponent<State> {
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canFollow?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canDelete?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canEdit?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public commentsState!: CommentsState;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public confirmDelete?: boolean | null = true;
 
-    @Input()
+    @Input({ required: true })
     public comment!: CommentDto;
 
     @Input()
@@ -51,12 +51,10 @@ export class CommentComponent extends StatefulComponent<State> {
 
     public editingText = '';
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly dialogs: DialogService,
     ) {
-        super(changeDetector, {
-            isEditing: false,
-        });
+        super({ isEditing: false });
     }
 
     public ngOnChanges() {

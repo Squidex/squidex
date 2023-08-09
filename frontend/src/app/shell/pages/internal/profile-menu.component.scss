@@ -31,7 +31,7 @@
     }
 }
 
-@media (max-width: 1000px) {
+@media (width <= 1000px) {
     .nav-item-help {
         display: none;
     }

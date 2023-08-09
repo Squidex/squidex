@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
 
 interface State {
@@ -14,7 +14,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-section[form][formContext][formLevel][formSection][language][languages][schema]',
+    selector: 'sqx-content-section',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,43 +23,41 @@ export class ContentSectionComponent extends StatefulComponent<State> {
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isCompact?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
     @Input()
     public formCompare?: EditContentForm | null;
 
-    @Input()
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true })
     public formSection!: FieldSection<RootFieldDto, FieldForm>;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly localStore: LocalStoreService,
     ) {
-        super(changeDetector, {
-            isCollapsed: false,
-        });
+        super({ isCollapsed: false });
 
-        this.changes.subscribe(state => {
+        this.project(x => x.isCollapsed).subscribe(isCollapsed => {
             if (this.formSection?.separator && this.schema) {
-                this.localStore.setBoolean(this.isCollapsedKey(), state.isCollapsed);
+                this.localStore.setBoolean(this.isCollapsedKey(), isCollapsed);
             }
         });
     }

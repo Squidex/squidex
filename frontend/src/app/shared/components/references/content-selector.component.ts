@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-content-selector[language][languages]',
+    selector: 'sqx-content-selector',
     styleUrls: ['./content-selector.component.scss'],
     templateUrl: './content-selector.component.html',
     providers: [
@@ -24,7 +24,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Output()
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public maxItems = Number.MAX_VALUE;
 
     @Input()
@@ -36,13 +36,13 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Input()
     public schemaNames?: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public allowDuplicates?: boolean | null;
 
     @Input()
@@ -127,7 +127,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         return !this.allowDuplicates && this.alreadySelected && !!this.alreadySelected.find(x => x.id === content.id);
     }
 
-    public emitComplete() {
+    public emitClose() {
         this.select.emit([]);
     }
 

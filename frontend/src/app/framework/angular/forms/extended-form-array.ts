@@ -12,12 +12,12 @@ export class ExtendedFormArray extends UntypedFormArray {
     constructor(controls: AbstractControl[], validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
         super(controls, validatorOrOpts, asyncValidator);
 
-        this['_reduceValue'] = () => {
+        (this as any)['_reduceValue'] = () => {
             return this.controls.map(x => x.value);
         };
 
-        this['_updateValue'] = () => {
-            (this as { value: any }).value = this['_reduceValue']();
+        (this as any)['_updateValue'] = () => {
+            (this as { value: any }).value = (this as any)['_reduceValue']();
         };
     }
 }
@@ -28,9 +28,9 @@ export class UndefinableFormArray extends ExtendedFormArray {
     constructor(controls: AbstractControl[], validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
         super(controls, validatorOrOpts, asyncValidator);
 
-        const reduce = this['_reduceValue'];
+        const reduce = (this as any)['_reduceValue'];
 
-        this['_reduceValue'] = () => {
+        (this as any)['_reduceValue'] = () => {
             if (this.isUndefined) {
                 return undefined;
             } else {

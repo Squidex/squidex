@@ -150,7 +150,7 @@ export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, Configure
     }
 
     public transformSubmit(value: any) {
-        const result = {};
+        const result = {} as Record<string, any>;
 
         for (const item of value) {
             result[item.name] = item.url;

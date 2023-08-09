@@ -4,7 +4,7 @@
         [class.border-primary]="isSelected"
         (sqxDropFile)="updateFile($event)"
         [sqxDropDisabled]="!asset || !asset.canUpload"
-        [sqxDropNoPaste]="true">
+        sqxDropNoPaste="true">
         <div class="card-body">
             <div class="file-preview" *ngIf="asset && snapshot.progress === 0">
                 <span class="file-type" *ngIf="asset.fileType">

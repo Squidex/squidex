@@ -1,5 +1,5 @@
 <form [formGroup]="editForm.form" (ngSubmit)="renameAssetTag()">
-    <sqx-modal-dialog (close)="emitComplete()">
+    <sqx-modal-dialog (close)="emitClose()">
         <ng-container title>
             {{ 'common.renameTag' | sqxTranslate }}
         </ng-container>
@@ -17,7 +17,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-text-secondary" (click)="emitComplete()">
+            <button type="button" class="btn btn-text-secondary" (click)="emitClose()">
                 {{ 'common.cancel' | sqxTranslate }}
             </button>
             

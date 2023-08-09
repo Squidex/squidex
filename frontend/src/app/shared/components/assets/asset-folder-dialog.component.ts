@@ -15,7 +15,7 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
 })
 export class AssetFolderDialogComponent implements OnInit {
     @Output()
-    public complete = new EventEmitter();
+    public close = new EventEmitter();
 
     @Input()
     public assetFolder?: AssetFolderDto;
@@ -33,8 +33,8 @@ export class AssetFolderDialogComponent implements OnInit {
         }
     }
 
-    public emitComplete() {
-        this.complete.emit();
+    public emitClose() {
+        this.close.emit();
     }
 
     public createAssetFolder() {
@@ -45,7 +45,7 @@ export class AssetFolderDialogComponent implements OnInit {
                 this.assetsState.updateAssetFolder(this.assetFolder, value)
                     .subscribe({
                         next: () => {
-                            this.emitComplete();
+                            this.emitClose();
                         },
                         error: error => {
                             this.editForm.submitFailed(error);
@@ -55,7 +55,7 @@ export class AssetFolderDialogComponent implements OnInit {
                 this.assetsState.createAssetFolder(value.folderName)
                     .subscribe({
                         next: () => {
-                            this.emitComplete();
+                            this.emitClose();
                         },
                         error: error => {
                             this.editForm.submitFailed(error);

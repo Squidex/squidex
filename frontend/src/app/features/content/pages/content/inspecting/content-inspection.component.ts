@@ -13,23 +13,23 @@ import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto, T
 type Mode = 'Content' | 'Data' | 'FlatData';
 
 @Component({
-    selector: 'sqx-content-inspection[appName][content][language][languages]',
+    selector: 'sqx-content-inspection',
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',
 })
 export class ContentInspectionComponent implements OnDestroy {
     private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);
 
-    @Input()
+    @Input({ required: true })
     public appName!: string;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public content!: ContentDto;
 
     public mode = new BehaviorSubject<Mode>('Content');

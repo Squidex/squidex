@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { TypedSimpleChanges, Types } from '@app/framework';
@@ -27,7 +27,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-references-tags[language][languages][schemaId]',
+    selector: 'sqx-references-tags',
     styleUrls: ['./references-tags.component.scss'],
     templateUrl: './references-tags.component.html',
     providers: [
@@ -40,16 +40,16 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     private isOpenedBefore = false;
     private isLoadingFailed = false;
 
-    @Input()
+    @Input({ required: true })
     public schemaId!: string;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -60,13 +60,11 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         return !!this.schemaId && !!this.language;
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly contentsResolver: ResolveContents,
         private readonly localizer: LocalizerService,
     ) {
-        super(changeDetector, {
-            converter: new ReferencesTagsConverter(null!, [], localizer),
-        });
+        super({ converter: new ReferencesTagsConverter(null!, [], localizer) });
 
         this.own(
             this.control.valueChanges

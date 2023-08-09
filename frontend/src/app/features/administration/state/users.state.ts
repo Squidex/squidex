@@ -11,7 +11,7 @@ import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { DialogService, getPagingInfo, ListState, shareSubscribed, State } from '@app/shared';
+import { debug, DialogService, getPagingInfo, ListState, shareSubscribed, State } from '@app/shared';
 import { UpsertUserDto, UserDto, UsersService } from './../services/users.service';
 
 interface Snapshot extends ListState<string> {
@@ -57,7 +57,9 @@ export class UsersState extends State<Snapshot> {
             page: 0,
             pageSize: 10,
             total: 0,
-        }, 'Users');
+        });
+
+        debug(this, 'users');
     }
 
     public select(id: string | null): Observable<UserDto | null> {

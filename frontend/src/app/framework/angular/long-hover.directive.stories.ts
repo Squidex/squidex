@@ -7,8 +7,7 @@
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { action } from '@storybook/addon-actions';
-import { moduleMetadata } from '@storybook/angular';
-import { Meta, Story } from '@storybook/angular/types-6-0';
+import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { CodeEditorComponent, LongHoverDirective, SqxFrameworkModule } from '@app/framework';
 
 export default {
@@ -25,6 +24,16 @@ export default {
             action: 'cancelled',
         },
     },
+    render: args => ({
+        props: args,
+        template: `
+            <div (sqxLongHover)="hover()" (longHoverCancelled)="cancelled()" [longHoverSelector]="selector">
+                <div style="border: 1px solid #eee; padding: 100px">
+                    <button class="btn btn-primary">Button</button>
+                </div>
+            </div>
+        `,
+    }),
     decorators: [
         moduleMetadata({
             imports: [
@@ -36,29 +45,20 @@ export default {
     ],
 } as Meta;
 
-const Template: Story<LongHoverDirective> = (args: LongHoverDirective & any) => ({
-    props: args,
-    template: `
-        <div (sqxLongHover)="hover()" (longHoverCancelled)="cancelled()" [longHoverSelector]="selector">
-            <div style="border: 1px solid #eee; padding: 100px">
-                <button class="btn btn-primary">Button</button>
-            </div>
-        </div>
-    `,
-});
+type Story = StoryObj<LongHoverDirective>;
 
-export const Default = Template.bind({});
-
-Default.args = {
-    hover: action('Hover') as any,
-    selector: '',
-    cancelled: action('Cancelled') as any,
+export const Default: Story = {
+    args: {
+        hover: action('Hover') as any,
+        selector: '',
+        cancelled: action('Cancelled') as any,
+    },
 };
 
-export const Selector = Default.bind({});
-
-Selector.args = {
-    hover: action('Hover') as any,
-    selector: 'button',
-    cancelled: action('Cancelled') as any,
+export const Selector: Story = {
+    args: {
+        hover: action('Hover') as any,
+        selector: 'button',
+        cancelled: action('Cancelled') as any,
+    },
 };

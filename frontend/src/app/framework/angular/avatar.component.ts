@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { picasso } from '@app/framework/internal';
-import { TypedSimpleChanges } from './helpers';
+import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
+import { picasso, TypedSimpleChanges } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-avatar',
@@ -22,7 +21,7 @@ export class AvatarComponent {
     @Input()
     public image: string | undefined | null;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public size = 50;
 
     public imageSource?: string | null;

@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, RootFieldDto, SchemaDto, Version } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-editor[contentId][contentForm][formContext][language][languages][schema]',
+    selector: 'sqx-content-editor',
     styleUrls: ['./content-editor.component.scss'],
     templateUrl: './content-editor.component.html',
 })
@@ -23,19 +23,19 @@ export class ContentEditorComponent {
     @Output()
     public contentIdChange = new EventEmitter<string>();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isNew = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isDeleted?: boolean;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public showIdInput = false;
 
-    @Input()
+    @Input({ required: true })
     public contentId!: string;
 
-    @Input()
+    @Input({ required: true })
     public contentForm!: EditContentForm;
 
     @Input()
@@ -44,16 +44,16 @@ export class ContentEditorComponent {
     @Input()
     public contentFormCompare?: EditContentForm | null;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {

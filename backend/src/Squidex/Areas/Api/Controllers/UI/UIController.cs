@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
@@ -18,6 +20,7 @@ namespace Squidex.Areas.Api.Controllers.UI;
 
 public sealed class UIController : ApiController
 {
+    private static readonly DomainId SharedKey = DomainId.Create("__shared");
     private static readonly Permission CreateAppPermission = new Permission(PermissionIds.AdminAppCreate);
     private static readonly Permission CreateTeamPermission = new Permission(PermissionIds.AdminTeamCreate);
     private readonly MyUIOptions uiOptions;
@@ -36,15 +39,22 @@ public sealed class UIController : ApiController
     /// <response code="200">UI settings returned.</response>.
     [HttpGet]
     [Route("ui/settings/")]
-    [ProducesResponseType(typeof(UISettingsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Dictionary<string, JsonValue>), StatusCodes.Status200OK)]
     [ApiPermission]
-    public IActionResult GetSettings()
+    public async Task<IActionResult> GetCommonSettings()
     {
-        var result = new UISettingsDto
+        var common = await appUISettings.GetAsync(SharedKey, UserId, HttpContext.RequestAborted);
+
+        var result = new Dictionary<string, JsonValue>
         {
-            CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateAppPermission),
-            CanCreateTeams = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateTeamPermission),
+            ["canCreateApps"] = !uiOptions.OnlyAdminsCanCreateApps || Context.UserPermissions.Includes(CreateAppPermission),
+            ["canCreateTeams"] = !uiOptions.OnlyAdminsCanCreateTeams || Context.UserPermissions.Includes(CreateTeamPermission),
         };
+
+        foreach (var (key, value) in common)
+        {
+            result[key] = value;
+        }
 
         return Ok(result);
     }
@@ -57,7 +67,7 @@ public sealed class UIController : ApiController
     /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/ui/settings/")]
-    [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Dictionary<string, JsonValue>), StatusCodes.Status200OK)]
     [ApiPermission]
     public async Task<IActionResult> GetSettings(string app)
     {
@@ -74,13 +84,30 @@ public sealed class UIController : ApiController
     /// <response code="404">App not found.</response>.
     [HttpGet]
     [Route("apps/{app}/ui/settings/me")]
-    [ProducesResponseType(typeof(Dictionary<string, string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Dictionary<string, JsonValue>), StatusCodes.Status200OK)]
     [ApiPermission]
     public async Task<IActionResult> GetUserSettings(string app)
     {
         var result = await appUISettings.GetAsync(AppId, UserId, HttpContext.RequestAborted);
 
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Set ui settings.
+    /// </summary>
+    /// <param name="key">The name of the setting.</param>
+    /// <param name="request">The request with the value to update.</param>
+    /// <response code="200">UI setting set.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpPut]
+    [Route("ui/settings/{key}")]
+    [ApiPermission]
+    public async Task<IActionResult> PutCommonSetting(string key, [FromBody] UpdateSettingDto request)
+    {
+        await appUISettings.SetAsync(SharedKey, UserId, key, request.Value, HttpContext.RequestAborted);
+
+        return NoContent();
     }
 
     /// <summary>
@@ -115,6 +142,22 @@ public sealed class UIController : ApiController
     public async Task<IActionResult> PutUserSetting(string app, string key, [FromBody] UpdateSettingDto request)
     {
         await appUISettings.SetAsync(AppId, UserId, key, request.Value, HttpContext.RequestAborted);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Remove ui settings.
+    /// </summary>
+    /// <param name="key">The name of the setting.</param>
+    /// <response code="200">UI setting removed.</response>.
+    /// <response code="404">App not found.</response>.
+    [HttpDelete]
+    [Route("ui/settings/{key}")]
+    [ApiPermission]
+    public async Task<IActionResult> DeleteCommonSetting(string key)
+    {
+        await appUISettings.RemoveAsync(SharedKey, UserId, key, HttpContext.RequestAborted);
 
         return NoContent();
     }

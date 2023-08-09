@@ -10,18 +10,18 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/shared';
 
 @Component({
-    selector: 'sqx-component-validation[field][fieldForm][properties]',
+    selector: 'sqx-component-validation',
     styleUrls: ['component-validation.component.scss'],
     templateUrl: 'component-validation.component.html',
 })
 export class ComponentValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: ReferencesFieldPropertiesDto;
 
     constructor(

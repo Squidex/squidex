@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
-import { TypedSimpleChanges } from './../../helpers';
+import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, TextMeasurer, TypedSimpleChanges, Types } from '@app/framework/internal';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
@@ -61,28 +60,28 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     @Input()
     public itemConverter = StringConverter.INSTANCE;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public undefinedWhenEmpty?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public acceptEnter?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public allowOpen?: boolean | null = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public allowDuplicates?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public readonly?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public styleDashed?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public styleBlank?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public styleScrollable?: boolean | null;
 
     @Input()
@@ -91,16 +90,16 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     @Input()
     public dropdownWidth = '18rem';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public itemSeparator?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public itemsSourceLoading?: boolean | null;
 
     @Input()
     public itemsSourceEmptyText = 'i18n:common.empty';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -126,8 +125,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public addInput = new UntypedFormControl();
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
+    constructor() {
+        super({
             hasFocus: false,
             suggestedIndex: 0,
             suggestedItems: [],

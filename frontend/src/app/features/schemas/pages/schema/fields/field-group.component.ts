@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppSettingsDto, FieldDto, FieldGroup, LanguageDto, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 
 interface State {
@@ -15,7 +15,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-field-group[fieldGroup][languages][schema][settings]',
+    selector: 'sqx-field-group',
     styleUrls: ['./field-group.component.scss'],
     templateUrl: './field-group.component.html',
 })
@@ -23,25 +23,25 @@ export class FieldGroupComponent extends StatefulComponent<State> {
     @Output()
     public sorted = new EventEmitter<CdkDragDrop<FieldDto[]>>();
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public parent?: RootFieldDto;
 
-    @Input()
+    @Input({ required: true })
     public settings!: AppSettingsDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public sortable = false;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public fieldsEmpty = false;
 
-    @Input()
+    @Input({ required: true })
     public fieldGroup!: FieldGroup;
 
     public trackByFieldFn: (_index: number, field: FieldDto) => any;
@@ -50,16 +50,14 @@ export class FieldGroupComponent extends StatefulComponent<State> {
         return this.parent ? this.parent.nested.length > 0 : this.schema.fields.length > 0;
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly localStore: LocalStoreService,
     ) {
-        super(changeDetector, {
-            isCollapsed: false,
-        });
+        super({ isCollapsed: false });
 
-        this.changes.subscribe(state => {
+        this.changes.subscribe(change => {
             if (this.fieldGroup?.separator && this.schema) {
-                this.localStore.setBoolean(this.isCollapsedKey(), state.isCollapsed);
+                this.localStore.setBoolean(this.isCollapsedKey(), change.snapshot.isCollapsed);
             }
         });
 

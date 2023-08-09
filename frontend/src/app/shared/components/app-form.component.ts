@@ -16,7 +16,7 @@ import { ApiUrlConfig, AppsState, CreateAppForm, TemplateDto } from '@app/shared
 })
 export class AppFormComponent {
     @Output()
-    public complete = new EventEmitter();
+    public close = new EventEmitter();
 
     @Input()
     public template?: TemplateDto;
@@ -29,8 +29,8 @@ export class AppFormComponent {
     ) {
     }
 
-    public emitComplete() {
-        this.complete.emit();
+    public emitClose() {
+        this.close.emit();
     }
 
     public createApp() {
@@ -42,7 +42,7 @@ export class AppFormComponent {
             this.appsStore.create(request)
                 .subscribe({
                     next: () => {
-                        this.emitComplete();
+                        this.emitClose();
                     },
                     error: error => {
                         this.createForm.submitFailed(error);

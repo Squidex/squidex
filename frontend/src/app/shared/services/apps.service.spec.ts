@@ -474,7 +474,7 @@ export function createAssetScripts(id: number, suffix = ''): AssetScriptsPayload
 }
 
 function createProperties(id: number) {
-    const result = {};
+    const result = {} as Record<string, any>;
 
     result[`property${id}`] = true;
 

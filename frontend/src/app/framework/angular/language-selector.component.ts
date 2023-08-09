@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ModalModel, RelativePosition } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
+import { FloatingPlacement, ModalModel } from '@app/framework/internal';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
 
 @Component({
-    selector: 'sqx-language-selector[language][languages]',
+    selector: 'sqx-language-selector',
     styleUrls: ['./language-selector.component.scss'],
     templateUrl: './language-selector.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,20 +20,20 @@ export class LanguageSelectorComponent implements  OnInit {
     @Output()
     public languageChange = new EventEmitter<any>();
 
-    @Input()
+    @Input({ required: true })
     public language!: Language;
 
-    @Input()
+    @Input({ required: true })
     public languages: ReadonlyArray<Language> = [];
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public exists?: { [language: string]: boolean } | null;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public percents?: { [language: string]: number } | null;
 
     @Input()
-    public dropdownPosition: RelativePosition = 'bottom-right';
+    public dropdownPosition: FloatingPlacement = 'bottom-end';
 
     @Input()
     public size: 'sm' | 'md' | 'lg' = 'md';

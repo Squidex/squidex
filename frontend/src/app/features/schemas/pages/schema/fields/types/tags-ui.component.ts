@@ -10,19 +10,19 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, TAGS_FIELD_EDITORS, TagsFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-tags-ui[field][fieldForm][properties]',
+    selector: 'sqx-tags-ui',
     styleUrls: ['tags-ui.component.scss'],
     templateUrl: 'tags-ui.component.html',
 })
 export class TagsUIComponent {
     public readonly editors = TAGS_FIELD_EDITORS;
 
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: TagsFieldPropertiesDto;
 }

@@ -15,13 +15,13 @@
                             [itemsSource]="assetsState.tagsNames | async"
                             [ngModel]="assetsState.selectedTagNames | async"
                             (ngModelChange)="selectTags($event)"
-                            [styleScrollable]="true"
-                            [undefinedWhenEmpty]="false">
+                            styleScrollable="true"
+                            undefinedWhenEmpty="false">
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize"
-                            [enableShortcut]="true"
+                            enableShortcut="true"
                             [queries]="listQueries"
                             [queriesTypes]="'common.assets' | sqxTranslate"
                             [query]="assetsState.query | async"
@@ -73,7 +73,13 @@
 
     <ng-container sidebarMenu>   
         <div class="panel-nav">
-            <a class="panel-link" routerLink="filters" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.filters" titlePosition="left-center">
+            <a class="panel-link"
+                routerLink="filters"
+                routerLinkActive="active"
+                queryParamsHandling="preserve"
+                title="i18n:common.filters"
+                titlePosition="left"
+                sqxTourStep="filter">
                 <i class="icon-filter"></i>
             </a>    
         </div> 
@@ -82,13 +88,13 @@
 
 <router-outlet></router-outlet>
 
-<ng-container *sqxModal="addAssetFolderDialog">
-    <sqx-asset-folder-dialog (complete)="addAssetFolderDialog.hide()"></sqx-asset-folder-dialog>
-</ng-container>
+<sqx-asset-folder-dialog *sqxModal="addAssetFolderDialog"
+    (close)="addAssetFolderDialog.hide()">
+</sqx-asset-folder-dialog>
 
 <sqx-asset-dialog *sqxModal="editAsset;isDialog:true"
     [asset]="editAsset!" 
     (assetUpdated)="replaceAsset($event)"
     (assetReplaced)="replaceAsset($event)"
-    (complete)="editDone()">
+    (close)="editDone()">
 </sqx-asset-dialog>

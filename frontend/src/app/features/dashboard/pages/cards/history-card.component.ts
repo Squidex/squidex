@@ -10,13 +10,13 @@ import { Observable } from 'rxjs';
 import { AppDto, HistoryEventDto, HistoryService } from '@app/shared';
 
 @Component({
-    selector: 'sqx-history-card[app]',
+    selector: 'sqx-history-card',
     styleUrls: ['./history-card.component.scss'],
     templateUrl: './history-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistoryCardComponent {
-    @Input()
+    @Input({ required: true })
     public app!: AppDto;
 
     public history?: Observable<ReadonlyArray<HistoryEventDto>>;

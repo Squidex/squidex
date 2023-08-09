@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Meta, Story } from '@storybook/angular/types-6-0';
+import { Meta, StoryObj } from '@storybook/angular';
 import { StatusIconComponent } from '@app/framework';
 
 export default {
@@ -35,48 +35,46 @@ export default {
     },
 } as Meta;
 
-const Template: Story<StatusIconComponent> = (args: StatusIconComponent) => ({
-    props: args,
-});
+type Story = StoryObj<StatusIconComponent>;
 
-export const Success = Template.bind({});
-
-Success.args = {
-    status: 'Success',
+export const Success: Story = {
+    args: {
+        status: 'Success',
+    },
 };
 
-export const Completed = Template.bind({});
-
-Completed.args = {
-    status: 'Completed',
+export const Completed: Story = {
+    args: {
+        status: 'Completed',
+    },
 };
 
-export const Failed = Template.bind({});
-
-Failed.args = {
-    status: 'Failed',
+export const Failed: Story = {
+    args: {
+        status: 'Failed',
+    },
 };
 
-export const Pending = Template.bind({});
-
-Pending.args = {
-    status: 'Pending',
+export const Pending: Story = {
+    args: {
+        status: 'Pending',
+    },
 };
 
-export const Started = Template.bind({});
-
-Started.args = {
-    status: 'Started',
+export const Started: Story = {
+    args: {
+        status: 'Started',
+    },
 };
 
-export const SizeSm = Template.bind({});
-
-SizeSm.args = {
-    size: 'sm',
+export const SizeSm: Story = {
+    args: {
+        size: 'sm',
+    },
 };
 
-export const SizeLg = Template.bind({});
-
-SizeLg.args = {
-    size: 'lg',
+export const SizeLg: Story = {
+    args: {
+        size: 'lg',
+    },
 };

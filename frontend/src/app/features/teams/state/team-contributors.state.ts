@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { TeamContributorsService } from '@app/features/teams/internal';
-import { AssignContributorDto, ContributorDto, ContributorsPayload, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, TeamsState, Types, Version } from '@app/shared';
+import { AssignContributorDto, ContributorDto, ContributorsPayload, debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, TeamsState, Types, Version } from '@app/shared';
 
 interface Snapshot extends ListState<string> {
     // The current contributors.
@@ -70,7 +70,9 @@ export class TeamContributorsState extends State<Snapshot> {
             pageSize: 10,
             total: 0,
             version: Version.EMPTY,
-        }, 'Team Contributors');
+        });
+
+        debug(this, 'teamContributors');
     }
 
     public loadIfNotLoaded(): Observable<any> {

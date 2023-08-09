@@ -10,7 +10,7 @@ using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes;
 
-public class TranslateTypescript
+public partial class TranslateTypescript
 {
     private readonly TranslationService service;
     private readonly DirectoryInfo folder;
@@ -30,7 +30,7 @@ public class TranslateTypescript
 
             var isReplaced = false;
 
-            content = Regex.Replace(content, "'[^']*'", match =>
+            content = TextRegex().Replace(content, match =>
             {
                 var value = match.Value[1..^1];
 
@@ -41,7 +41,6 @@ public class TranslateTypescript
                     service.Translate(relativeName, value, "Code", key =>
                     {
                         result = $"\'i18n:{key}\'";
-
                         isReplaced = true;
                     });
                 }
@@ -58,4 +57,7 @@ public class TranslateTypescript
             }
         }
     }
+
+    [GeneratedRegex("'[^']*'")]
+    private static partial Regex TextRegex();
 }

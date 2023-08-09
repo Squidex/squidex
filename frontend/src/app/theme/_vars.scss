@@ -69,6 +69,10 @@ $input-shadow:              inset 0 1px 2px rgb(0 0 0 / 8%);
 $size-navbar-height:        3.75rem;
 $size-sidebar-width:        5rem;
 
+$card-bg:                   $color-white;
+
+$table-bg:                  $color-white;
+
 $color-dark-onboarding:   #273039;
 
 $panel-padding:             1.5rem;
@@ -83,6 +87,8 @@ $headings-line-height:      1.3;
 $btn-disabled-color:        inherit;
 $btn-disabled-bg:           inherit;
 $btn-disabled-border-color: inherit;
+
+$modal-content-bg:          $color-white;
 
 $history-dot-size:          10px;
 $history-dot-offset-x:      -($history-dot-size * .5 + 1px);

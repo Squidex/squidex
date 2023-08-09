@@ -14,7 +14,7 @@ import { ApiUrlConfig } from '@app/framework';
 export type UISettingsDto = Readonly<{
     // True, if the user has the permissions to create a new app.
     canCreateApps?: boolean;
-}>;
+}> & Record<string, any>;
 
 @Injectable()
 export class UIService {
@@ -33,7 +33,7 @@ export class UIService {
             }));
     }
 
-    public getSharedSettings(appName: string): Observable<{}> {
+    public getAppSharedSettings(appName: string): Observable<{}> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings`);
 
         return this.http.get<{}>(url).pipe(
@@ -42,7 +42,7 @@ export class UIService {
             }));
     }
 
-    public getUserSettings(appName: string): Observable<{}> {
+    public getAppUserSettings(appName: string): Observable<{}> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings/me`);
 
         return this.http.get<{}>(url).pipe(
@@ -51,25 +51,37 @@ export class UIService {
             }));
     }
 
-    public putSharedSetting(appName: string, key: string, value: any): Observable<any> {
+    public putCommonSetting(key: string, value: any): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/ui/settings/${key}`);
+
+        return this.http.put(url, { value });
+    }
+
+    public putAppSharedSetting(appName: string, key: string, value: any): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings/${key}`);
 
         return this.http.put(url, { value });
     }
 
-    public putUserSetting(appName: string, key: string, value: any): Observable<any> {
+    public putAppUserSetting(appName: string, key: string, value: any): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings/me/${key}`);
 
         return this.http.put(url, { value });
     }
 
-    public deleteSharedSetting(appName: string, key: string): Observable<any> {
+    public deleteCommonSetting(key: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/ui/settings/${key}`);
+
+        return this.http.delete(url);
+    }
+
+    public deleteAppSharedSetting(appName: string, key: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings/${key}`);
 
         return this.http.delete(url);
     }
 
-    public deleteUserSetting(appName: string, key: string): Observable<any> {
+    public deleteAppUserSetting(appName: string, key: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings/me/${key}`);
 
         return this.http.delete(url);

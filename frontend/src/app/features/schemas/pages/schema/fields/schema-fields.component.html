@@ -1,7 +1,7 @@
 <div class="table-items-row  table-items-row-summary table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
     {{ 'schemas.field.empty' | sqxTranslate }}
     
-    <button type="button" class="btn btn-success btn-sm ms-2" (click)="fieldWizard.show()" *ngIf="schema.canAddField">
+    <button type="button" class="btn btn-success btn-sm ms-2" (click)="fieldWizard.show()" *ngIf="schema.canAddField" sqxTourStep="addField">
         <i class="icon icon-plus"></i> {{ 'schemas.addField' | sqxTranslate }}
     </button>
 </div>
@@ -23,11 +23,9 @@
         </button>
     </ng-container>
 
-    <ng-container *sqxModal="fieldWizard">
-        <sqx-field-wizard 
-            [settings]="settings"
-            [schema]="schema"
-            (complete)="fieldWizard.hide()">
-        </sqx-field-wizard>
-    </ng-container>
+    <sqx-field-wizard *sqxModal="fieldWizard"
+        [settings]="settings"
+        [schema]="schema"
+        (close)="fieldWizard.hide()">
+    </sqx-field-wizard>
 </ng-container>

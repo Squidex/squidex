@@ -5,32 +5,32 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { booleanAttribute, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, SchemaDto, Types } from '@app/shared';
 
 @Component({
-    selector: 'sqx-number-validation[field][fieldForm][languages][properties][schema]',
+    selector: 'sqx-number-validation',
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
 })
 export class NumberValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: NumberFieldPropertiesDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;
 
     public get showUnique() {

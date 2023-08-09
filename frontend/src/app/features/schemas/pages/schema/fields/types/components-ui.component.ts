@@ -10,17 +10,17 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-components-ui[field][fieldForm][properties]',
+    selector: 'sqx-components-ui',
     styleUrls: ['components-ui.component.scss'],
     templateUrl: 'components-ui.component.html',
 })
 export class ComponentsUIComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: ReferencesFieldPropertiesDto;
 }

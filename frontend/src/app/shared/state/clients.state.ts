@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
+import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
 import { ClientDto, ClientsPayload, ClientsService, CreateClientDto, UpdateClientDto } from './../services/clients.service';
 import { AppsState } from './apps.state';
 
@@ -51,6 +51,8 @@ export class ClientsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
     ) {
         super({ clients: [], version: Version.EMPTY });
+
+        debug(this, 'clients');
     }
 
     public load(isReload = false): Observable<any> {

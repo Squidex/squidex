@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, EmbeddedViewRef, Input, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
-import { TypedSimpleChanges } from './helpers';
+import { Directive, EmbeddedViewRef, Input, numberAttribute, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { TypedSimpleChanges } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxTemplateWrapper]',
@@ -15,7 +15,7 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit {
     @Input()
     public item: any;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public index = 0;
 
     @Input()

@@ -7,7 +7,7 @@
 
 /* tslint:disable: component-selector */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { ContentDto, getContentValue, LanguageDto, META_FIELDS } from '@app/shared';
 
 @Component({
@@ -31,22 +31,22 @@ export class ReferenceItemComponent {
     @Input()
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canRemove?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isCompact?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isDisabled?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public validations?: { [id: string]: boolean };
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public validityVisible?: boolean | null;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public columns = 0;
 
     @Input('sqxReferenceItem')

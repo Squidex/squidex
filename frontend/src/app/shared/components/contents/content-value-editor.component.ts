@@ -10,16 +10,16 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, MathHelper } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-content-value-editor[field][form]',
+    selector: 'sqx-content-value-editor',
     styleUrls: ['./content-value-editor.component.scss'],
     templateUrl: './content-value-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentValueEditorComponent {
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public form!: UntypedFormGroup;
 
     public readonly uniqueId = MathHelper.guid();

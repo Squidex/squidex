@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
+import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
 import { CreateRoleDto, RoleDto, RolesPayload, RolesService, UpdateRoleDto } from './../services/roles.service';
 import { AppsState } from './apps.state';
 
@@ -56,7 +56,9 @@ export class RolesState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rolesService: RolesService,
     ) {
-        super({ roles: [], version: Version.EMPTY }, 'Roles');
+        super({ roles: [], version: Version.EMPTY });
+
+        debug(this, 'roles');
     }
 
     public load(isReload = false): Observable<any> {

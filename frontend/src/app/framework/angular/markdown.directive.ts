@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, Input, Renderer2 } from '@angular/core';
+import { booleanAttribute, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
 import { renderMarkdown } from '@app/framework/internal';
 
 @Directive({
@@ -15,10 +15,10 @@ export class MarkdownDirective {
     @Input('sqxMarkdown')
     public markdown!: string;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public inline = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public optional = false;
 
     constructor(

@@ -12,7 +12,7 @@ import { LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app
 const ITEM_HEIGHT = 2.5;
 
 @Component({
-    selector: 'sqx-schema-category[schemaCategory]',
+    selector: 'sqx-schema-category',
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +21,7 @@ export class SchemaCategoryComponent {
     @Output()
     public remove = new EventEmitter<string>();
 
-    @Input()
+    @Input({ required: true })
     public schemaCategory!: SchemaCategory;
 
     @Input()

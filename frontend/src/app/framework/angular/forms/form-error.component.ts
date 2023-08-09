@@ -5,24 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ErrorDto } from '@app/framework/internal';
-import { TypedSimpleChanges } from './../helpers';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ErrorDto, TypedSimpleChanges } from '@app/framework/internal';
 
 @Component({
-    selector: 'sqx-form-error[error]',
+    selector: 'sqx-form-error',
     styleUrls: ['./form-error.component.scss'],
     templateUrl: './form-error.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormErrorComponent {
-    @Input()
+    @Input({ required: true })
     public error?: ErrorDto | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public bubble?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public closeable?: boolean | null;
 
     public show = false;

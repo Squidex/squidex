@@ -4,8 +4,8 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-form-alert [marginBottom]="4">
-            <span [sqxMarkdown]="'chat.description' | sqxTranslate" [inline]="true"></span>
+        <sqx-form-alert marginBottom="4">
+            <span [sqxMarkdown]="'chat.description' | sqxTranslate" inline="true"></span>
         </sqx-form-alert>
 
         <form (ngSubmit)="ask()">
@@ -39,7 +39,7 @@
                         <textarea class="form-control" readonly [ngModel]="answer"></textarea>
                     </div>
                     <div class="col-auto">
-                        <button type="submit" class="btn btn-primary" (click)="complete.emit(answer)">
+                        <button type="submit" class="btn btn-primary" (click)="select.emit(answer)">
                             {{ 'chat.use' | sqxTranslate }}
                         </button>
                     </div>

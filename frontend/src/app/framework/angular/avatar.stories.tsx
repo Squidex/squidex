@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { moduleMetadata } from '@storybook/angular';
-import { Meta, Story } from '@storybook/angular/types-6-0';
+import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { AvatarComponent, SqxFrameworkModule } from '@app/framework';
 
 export default {
@@ -33,43 +32,34 @@ export default {
     ],
 } as Meta;
 
-const Template: Story<AvatarComponent> = (args: AvatarComponent) => ({
-    props: args,
-});
+type Story = StoryObj<AvatarComponent>;
 
-export const Empty = Template.bind({});
-
-Empty.args = {
+export const Empty: Story = {
+    args: {},
 };
 
-export const Image = Template.bind({});
-
-Image.args = {
-    image: 'https://via.placeholder.com/50',
+export const Image = {
+    args: {
+        image: 'https://via.placeholder.com/50',
+    },
 };
 
-export const InvalidImage = Template.bind({});
-
-InvalidImage.args = {
-    image: 'https://invalid-url',
+export const InvalidImage = {
+    args: {
+        image: 'https://invalid-url',
+    },
 };
 
-export const Identifier = Template.bind({});
-
-Identifier.args = {
-    identifier: 'image',
+export const Large = {
+    args: {
+        identifier: 'image',
+        size: 200,
+    },
 };
 
-export const Large = Template.bind({});
-
-Large.args = {
-    identifier: 'image',
-    size: 200,
-};
-
-export const InvalidImageWithFallback = Template.bind({});
-
-InvalidImageWithFallback.args = {
-    image: 'https://invalid-url',
-    identifier: 'image',
+export const InvalidImageWithFallback = {
+    args: {
+        image: 'https://invalid-url',
+        identifier: 'image',
+    },
 };

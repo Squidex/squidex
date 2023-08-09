@@ -40,7 +40,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
             let value: string | undefined;
 
             if (Types.isObject(fieldValue)) {
-                value = fieldValue[language.iso2Code];
+                value = (fieldValue as any)[language.iso2Code];
             } else {
                 value = fieldValue;
             }
@@ -54,7 +54,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
             if (isAssets && Types.isArray(value)) {
                 if (value.length === 2) {
                     const buildImage = (src: string) => {
-                        let format = field.properties['previewFormat'] || '';
+                        let format = (field.properties as any)['previewFormat'] || '';
 
                         if (format.indexOf('width') < 0 || format.indexOf('height') < 0) {
                             format = `width=50&height=50&mode=Pad&${format}`;
@@ -63,7 +63,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                         return `<img src="${src}?${format}" />`;
                     };
 
-                    switch (field.properties['previewMode'] as AssetPreviewMode) {
+                    switch ((field.properties as any)['previewMode'] as AssetPreviewMode) {
                         case 'ImageAndFileName':
                             formatted = new HtmlValue(`<div class="image">${buildImage(value[0])} <span>${value[1]}</span></div>`, value[0]);
                             break;
@@ -465,7 +465,7 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         return null;
     }
 
-    private getValue(value: any, values?: {}) {
+    private getValue(value: any, values?: any) {
         if (values && values.hasOwnProperty(this.partitionKey)) {
             return values[this.partitionKey];
         }

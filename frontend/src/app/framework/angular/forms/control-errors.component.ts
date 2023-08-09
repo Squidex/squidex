@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
 import { merge } from 'rxjs';
 import { LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
@@ -18,7 +18,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-control-errors[for]',
+    selector: 'sqx-control-errors',
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,7 +27,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     private controlDisplayName = '';
     private control: AbstractControl | null = null;
 
-    @Input()
+    @Input({ required: true })
     public for!: string | AbstractControl;
 
     @Input()
@@ -37,13 +37,11 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         return this.control?.touched || Types.is(this.control, UntypedFormArray);
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
         private readonly localizer: LocalizerService,
     ) {
-        super(changeDetector, {
-            errorMessages: [],
-        });
+        super({ errorMessages: [] });
     }
 
     public ngOnChanges() {

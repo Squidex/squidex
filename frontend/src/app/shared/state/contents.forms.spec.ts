@@ -1066,16 +1066,16 @@ describe('ContentForm', () => {
             expect(array.items.length).toBe(length);
         }
 
-        function expectForm(parent: AbstractControl, path: string, test: { invalid?: boolean; disabled?: boolean; value?: any }) {
-            const form = parent.get(path);
+        function expectForm(parent: AbstractControl, path: string, test: { invalid?: boolean; disabled?: boolean; value?: any } & Record<string, any>) {
+            const form = parent.get(path) as Record<string, any>;
 
             if (form) {
                 for (const key in test) {
                     if (test.hasOwnProperty(key)) {
-                        const a = form[key];
-                        const e = test[key];
+                        const valueActual = form[key];
+                        const valueExpected = test[key];
 
-                        expect(a).withContext(`Expected ${key} of ${path} to be <${e}>, but found <${a}>.`).toEqual(e);
+                        expect(valueActual).withContext(`Expected ${key} of ${path} to be <${valueExpected}>, but found <${valueActual}>.`).toEqual(valueExpected);
                     }
                 }
             } else {

@@ -9,20 +9,20 @@ import { Component, Input } from '@angular/core';
 import { ErrorDto, MathHelper, SchemaTagSource, WorkflowDto, WorkflowsState, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues } from '@app/shared';
 
 @Component({
-    selector: 'sqx-workflow[roles][schemasSource][workflow]',
+    selector: 'sqx-workflow',
     styleUrls: ['./workflow.component.scss'],
     templateUrl: './workflow.component.html',
 })
 export class WorkflowComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
-    @Input()
+    @Input({ required: true })
     public workflow!: WorkflowDto;
 
-    @Input()
+    @Input({ required: true })
     public roles!: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ required: true })
     public schemasSource!: SchemaTagSource;
 
     public error?: ErrorDto | null;

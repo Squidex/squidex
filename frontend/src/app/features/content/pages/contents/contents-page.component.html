@@ -4,7 +4,7 @@
     <ng-container menu>
         <div class="row flex-nowrap flex-grow-1 gx-2">
             <div class="col-auto ms-8">
-                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema.id}}/contents"></sqx-notifo>
+                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema.id}}/contents" position="bottom-left"></sqx-notifo>
 
                 <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:contents.refreshTooltip" shortcut="CTRL + B">
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -12,7 +12,7 @@
             </div>
             <div class="col">
                 <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
-                    [enableShortcut]="true"
+                    enableShortcut="true"
                     [language]="(languagesState.isoMasterLanguage | async)!"
                     [languages]="languages"
                     [queries]="queries | async"
@@ -32,7 +32,7 @@
                 </sqx-language-selector>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-success" routerLink="new" title="i18n:contents.createContentTooltip" shortcut="CTRL + U" [disabled]="(contentsState.canCreateAny | async) === false">
+                <button type="button" class="btn btn-success" routerLink="new" title="i18n:contents.createContentTooltip" shortcut="CTRL + U" [disabled]="(contentsState.canCreateAny | async) === false" sqxTourStep="addContent">
                     <i class="icon-plus"></i> {{ 'contents.create' | sqxTranslate }}
                 </button>
             </div>
@@ -42,7 +42,7 @@
     <ng-container>
         <ng-container *ngIf="tableSettings | async; let tableSettings">
             <ng-container *ngIf="tableSettings.listFields | async; let tableFields">
-                <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [tableNoPadding]="true">
+                <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" tableNoPadding="true">
                     <ng-container topHeader>
                         <div class="selection" *ngIf="selectionCount > 0">
                             {{ 'contents.selectionCount' | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
@@ -68,16 +68,14 @@
                                 <i class="icon-settings"></i>
                             </button>
 
-                            <ng-container *sqxModal="tableViewModal">
-                                <sqx-dropdown-menu [sqxAnchoredTo]="buttonSettings" [scrollY]="true" position="bottom-right">
-                                    <sqx-custom-view-editor
-                                        [allFields]="tableSettings.schemaFields" 
-                                        (listFieldsChange)="tableSettings.updateFields($event)"
-                                        [listFields]="$any(tableFields)"
-                                        (reset)="tableSettings.reset()">
-                                    </sqx-custom-view-editor>
-                                </sqx-dropdown-menu>
-                            </ng-container>
+                            <sqx-dropdown-menu *sqxModal="tableViewModal" [sqxAnchoredTo]="buttonSettings" scrollY="true" position="bottom-end">
+                                <sqx-custom-view-editor
+                                    [allFields]="tableSettings.schemaFields" 
+                                    (listFieldsChange)="tableSettings.updateFields($event)"
+                                    [listFields]="$any(tableFields)"
+                                    (reset)="tableSettings.reset()">
+                                </sqx-custom-view-editor>
+                            </sqx-dropdown-menu>
                         </div>
                     </ng-container>
 
@@ -147,11 +145,24 @@
 
     <ng-container sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link" routerLink="filters" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.filters" titlePosition="left-center">
+            <a class="panel-link"
+                routerLink="filters"
+                routerLinkActive="active"
+                queryParamsHandling="preserve"
+                title="i18n:common.filters"
+                titlePosition="left"
+                sqxTourStep="filters">
                 <i class="icon-filter"></i>
             </a>
 
-            <a class="panel-link" routerLink="sidebar" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.sidebar" titlePosition="left-center" *ngIf="schema.properties.contentsSidebarUrl">
+            <a class="panel-link"
+                routerLink="sidebar"
+                routerLinkActive="active"
+                queryParamsHandling="preserve"
+                title="i18n:common.sidebar"
+                titlePosition="left"
+                sqxTourStep="plugin"
+                *ngIf="schema.properties.contentsSidebarUrl">
                 <i class="icon-plugin"></i>
             </a>
         </div>

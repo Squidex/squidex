@@ -105,7 +105,7 @@ export type ContentsDto = Readonly<{
 
 export type ContentReferencesValue = Readonly<{
     // The references by partition.
-    [partition: string]: string;
+    [partition: string]: any;
 }> | string;
 
 export type ContentReferences = Readonly<{
@@ -370,7 +370,7 @@ export class ContentsService {
 
 function buildHeaders(q: ContentsQuery | undefined) {
     let options = {
-        headers: {},
+        headers: {} as Record<string, string>,
     };
 
     if (q?.fieldNames) {

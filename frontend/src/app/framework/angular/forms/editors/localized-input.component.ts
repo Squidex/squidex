@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { Language } from './../../language-selector.component';
@@ -22,7 +22,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-localized-input[languages]',
+    selector: 'sqx-localized-input',
     styleUrls: ['./localized-input.component.scss'],
     templateUrl: './localized-input.component.html',
     providers: [
@@ -33,7 +33,7 @@ interface State {
 export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {
     private value: { [key: string]: any } | undefined;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<Language>;
 
     @Input()
@@ -45,7 +45,7 @@ export class LocalizedInputComponent extends StatefulControlComponent<State, { [
     @Input()
     public id = '';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -68,10 +68,8 @@ export class LocalizedInputComponent extends StatefulControlComponent<State, { [
         return !this.value.hasOwnProperty(this.snapshot.language.iso2Code);
     }
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
-            language: DEFAULT_LANGUAGE,
-        });
+    constructor() {
+        super({ language: DEFAULT_LANGUAGE });
     }
 
     public setLanguage(language: Language) {

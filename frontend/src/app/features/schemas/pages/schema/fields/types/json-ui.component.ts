@@ -10,17 +10,17 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-json-ui[field][fieldForm][properties]',
+    selector: 'sqx-json-ui',
     styleUrls: ['json-ui.component.scss'],
     templateUrl: 'json-ui.component.html',
 })
 export class JsonUIComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: JsonFieldPropertiesDto;
 }

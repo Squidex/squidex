@@ -6,18 +6,18 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, DialogService } from '@app/shared';
+import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, DialogService, MessageBus } from '@app/shared';
 
 @Component({
-    selector: 'sqx-client-connect-form[client]',
+    selector: 'sqx-client-connect-form',
     styleUrls: ['./client-connect-form.component.scss'],
     templateUrl: './client-connect-form.component.html',
 })
 export class ClientConnectFormComponent implements OnInit {
     @Output()
-    public complete = new EventEmitter();
+    public close = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public client!: ClientDto;
 
     public appName!: string;
@@ -35,6 +35,7 @@ export class ClientConnectFormComponent implements OnInit {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly clientsService: ClientsService,
         private readonly dialogs: DialogService,
+        private readonly messageBus: MessageBus,
     ) {
     }
 
@@ -52,6 +53,8 @@ export class ClientConnectFormComponent implements OnInit {
                     this.dialogs.notifyError(error);
                 },
             });
+
+        this.messageBus.emit(new ClientTourStated());
     }
 
     public go(step: string) {

@@ -10,14 +10,12 @@
 </div> 
 
 <div class="items-container">
-    <ng-container *sqxModal="dropdown">
-        <div class="control-dropdown" [sqxAnchoredTo]="input" [scrollY]="true" position="bottom-left">
-            <sqx-asset-folder-dropdown-item 
-                [appName]="appName"
-                [nodeModel]="root"
-                [nodeLevel]="0"
-                (selectNode)="select($event)">
-            </sqx-asset-folder-dropdown-item>
-        </div>
-    </ng-container>
+    <div class="control-dropdown" *sqxModal="dropdown" [sqxAnchoredTo]="input" scrollY="true" position="bottom-start">
+        <sqx-asset-folder-dropdown-item 
+            [appName]="appName"
+            [nodeModel]="root"
+            [nodeLevel]="0"
+            (selectNode)="select($event)">
+        </sqx-asset-folder-dropdown-item>
+    </div>
 </div>

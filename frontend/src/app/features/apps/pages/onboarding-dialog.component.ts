@@ -8,7 +8,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { fadeAnimation, slideAnimation } from '@app/framework';
-import { UsersService } from '@app/shared';
+import { TourState, UsersService } from '@app/shared';
 
 @Component({
     selector: 'sqx-onboarding-dialog',
@@ -34,6 +34,7 @@ export class OnboardingDialogComponent {
 
     constructor(
         private readonly formBuilder: FormBuilder,
+        private readonly tourState: TourState,
         private readonly usersService: UsersService,
     ) {
     }
@@ -41,6 +42,16 @@ export class OnboardingDialogComponent {
     public submitAnswers() {
         this.usersService.postUser({ answers: this.answersForm.value as any }).subscribe();
         this.next();
+    }
+
+    public start() {
+        this.tourState.start();
+        this.close.emit();
+    }
+
+    public cancel() {
+        this.tourState.complete();
+        this.close.emit();
     }
 
     public next() {

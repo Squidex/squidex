@@ -6,14 +6,14 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { allParams } from '@app/framework';
 import { SchemasState } from './../state/schemas.state';
 
 @Injectable()
-export class SchemaMustExistPublishedGuard implements CanActivate {
+export class SchemaMustExistPublishedGuard  {
     constructor(
         private readonly schemasState: SchemasState,
         private readonly router: Router,

@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-asset-uploads-count-card[usage]',
+    selector: 'sqx-asset-uploads-count-card',
     styleUrls: ['./asset-uploads-count-card.component.scss'],
     templateUrl: './asset-uploads-count-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetUploadsCountCardComponent {
-    @Input()
+    @Input({ required: true })
     public usage?: ReadonlyArray<StorageUsagePerDateDto>;
 
     public chartData: any;

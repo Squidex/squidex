@@ -42,7 +42,7 @@ public class Commands
         {
             var (folder, service) = Setup(arguments, "frontend");
 
-            new CheckFrontend(folder, service).Run();
+            new CheckFrontend(folder, service).Run(arguments.Fix);
         }
 
         [Command(Name = "backend", Description = "Translate backend files.")]
@@ -172,6 +172,9 @@ public class Commands
 
         [Option(LongName = "report", ShortName = "r")]
         public bool Report { get; set; }
+
+        [Option(LongName = "fix")]
+        public bool Fix { get; set; }
 
         [Option(LongName = "locale", ShortName = "l")]
         public IEnumerable<string> Locales { get; set; }

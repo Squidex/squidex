@@ -9,19 +9,19 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionsDto, ModalModel, RuleDto, RulesState, TriggersDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-rule[rule][ruleActions][ruleTriggers]',
+    selector: 'sqx-rule',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RuleComponent {
-    @Input()
+    @Input({ required: true })
     public ruleTriggers!: TriggersDto;
 
-    @Input()
+    @Input({ required: true })
     public ruleActions!: ActionsDto;
 
-    @Input()
+    @Input({ required: true })
     public rule!: RuleDto;
 
     public dropdown = new ModalModel();

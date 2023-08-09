@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, Subscription } from 'rxjs';
-import { ActionForm, ALL_TRIGGERS, MessageBus, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm, value$ } from '@app/shared';
+import { ActionForm, ALL_TRIGGERS, MessageBus, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm, TriggerType, value$ } from '@app/shared';
 import { RuleConfigured } from './../messages';
 
 @Component({
@@ -41,7 +41,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
     }
 
     public get triggerElement() {
-        return this.supportedTriggers[this.currentTrigger?.triggerType || ''];
+        return this.supportedTriggers[(this.currentTrigger?.triggerType || '') as TriggerType];
     }
 
     constructor(
@@ -105,7 +105,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
         }
     }
 
-    public selectTrigger(type: string, values?: any) {
+    public selectTrigger(type: TriggerType, values?: any) {
         if (this.currentTrigger?.triggerType !== type) {
             this.currentTrigger = new TriggerForm(type);
             this.currentTrigger.setEnabled(this.isEditable);

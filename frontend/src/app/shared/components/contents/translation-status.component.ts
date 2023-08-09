@@ -9,22 +9,22 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { contentTranslationStatus, LanguageDto, SchemaDto } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-translation-status[data][languages][schema]',
+    selector: 'sqx-translation-status',
     styleUrls: ['./translation-status.component.scss'],
     templateUrl: './translation-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TranslationStatusComponent {
-    @Input()
+    @Input({ required: true })
     public data!: any;
 
     @Input()
     public language?: LanguageDto | null;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public schema?: SchemaDto;
 
     public text = 'N/A';

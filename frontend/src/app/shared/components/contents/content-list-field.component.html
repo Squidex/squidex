@@ -40,28 +40,30 @@
         <ng-container *ngIf="content.newStatus; else singleStatus">
             <div class="row g-0 status-grid">
                 <div class="col">
-                    <sqx-content-status [truncate]="true"
+                    <sqx-content-status
                         layout="text"
                         [status]="content.status"
-                        [statusColor]="content.statusColor">
+                        [statusColor]="content.statusColor"
+                        truncate="true">
                     </sqx-content-status>
                 </div>
                 <div class="col-auto">
                     <i class="icon-caret-right"></i>
                 </div>
                 <div class="col">
-                    <sqx-content-status [truncate]="true" 
+                    <sqx-content-status
                         layout="text"
                         [status]="content.newStatus"
                         [statusColor]="content.newStatusColor!"
-                        [scheduled]="content.scheduleJob">
+                        [scheduled]="content.scheduleJob"
+                        truncate="true">
                     </sqx-content-status>
                 </div>
             </div>
         </ng-container>
 
         <ng-template #singleStatus>
-            <sqx-content-status [truncate]="true" 
+            <sqx-content-status truncate="true" 
                 layout="text"
                 [status]="content.status"
                 [statusColor]="content.statusColor"

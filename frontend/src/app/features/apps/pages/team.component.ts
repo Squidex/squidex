@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { ModalModel, TeamDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-team[team]',
+    selector: 'sqx-team',
     styleUrls: ['./team.component.scss'],
     templateUrl: './team.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamComponent {
-    @Input()
+    @Input({ required: true })
     public team!: TeamDto;
 
     @Output()

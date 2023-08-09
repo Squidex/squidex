@@ -1,40 +1,38 @@
 <sqx-title message="i18n:api.graphqlPageTitle"></sqx-title>
 
-<sqx-layout layout="main" [hideHeader]="true" [hideSidebar]="true">
-    <div inner #graphiQLContainer></div>
+<sqx-layout layout="main" hideHeader="true" hideSidebar="true">
+    <div inner #graphiQLContainer sqxTourStep="graphQLExplorer"></div>
         
     <button class="btn btn-simple btn-options" *ngIf="clientsReadable" (click)="clientsDialog.show()">
         <i class="icon-clients"></i>
     </button>
 </sqx-layout>
 
-<ng-container *sqxModal="clientsDialog">
-    <sqx-modal-dialog (close)="clientsDialog.hide()">
-        <ng-container title>
-            {{ 'api.selectClient' | sqxTranslate }}
-        </ng-container>
+<sqx-modal-dialog *sqxModal="clientsDialog" (close)="clientsDialog.hide()">
+    <ng-container title>
+        {{ 'api.selectClient' | sqxTranslate }}
+    </ng-container>
 
-        <ng-container content>
-            <sqx-form-hint>
-                {{ 'api.selectClientDescription' | sqxTranslate }}
-            </sqx-form-hint>
+    <ng-container content>
+        <sqx-form-hint>
+            {{ 'api.selectClientDescription' | sqxTranslate }}
+        </sqx-form-hint>
 
-            <div class="form-group">
-                <label for="client">{{ 'common.client' | sqxTranslate }}</label>
-                
-                <select class="form-control" id="client"
-                    [ngModel]="clientSelected"
-                    (ngModelChange)="selectClient($event)">
-                    <option [ngValue]="null">{{ 'api.noClient' | sqxTranslate }}</option>
-                    <option *ngFor="let client of clientsState.clients | async" [ngValue]="client">{{client.id}}</option>
-                </select>
-            </div>
-        </ng-container>
+        <div class="form-group">
+            <label for="client">{{ 'common.client' | sqxTranslate }}</label>
+            
+            <select class="form-control" id="client"
+                [ngModel]="clientSelected"
+                (ngModelChange)="selectClient($event)">
+                <option [ngValue]="null">{{ 'api.noClient' | sqxTranslate }}</option>
+                <option *ngFor="let client of clientsState.clients | async" [ngValue]="client">{{client.id}}</option>
+            </select>
+        </div>
+    </ng-container>
 
-        <ng-container footer>
-            <button type="button" class="btn btn-text-secondary" (click)="clientsDialog.hide()">
-                {{ 'common.close' | sqxTranslate }}
-            </button>
-        </ng-container>
-    </sqx-modal-dialog>
-</ng-container>
+    <ng-container footer>
+        <button type="button" class="btn btn-text-secondary" (click)="clientsDialog.hide()">
+            {{ 'common.close' | sqxTranslate }}
+        </button>
+    </ng-container>
+</sqx-modal-dialog>

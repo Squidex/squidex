@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AbstractContentForm, AppLanguageDto, DialogModel, EditContentForm, FieldDto, hasNoValue$, MathHelper, TypedSimpleChanges, Types } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-editor[form][formContext][formLevel][formModel][isComparing][language][languages]',
+    selector: 'sqx-field-editor',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',
 })
@@ -21,31 +21,31 @@ export class FieldEditorComponent {
     @Output()
     public expandedChange = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formModel!: AbstractContentForm<FieldDto, AbstractControl>;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public index: number | null | undefined;
 
-    @Input()
+    @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
     @Input()
@@ -74,15 +74,17 @@ export class FieldEditorComponent {
     }
 
     public reset() {
-        if (this.editor) {
+        const editor = this.editor as any;
+
+        if (editor) {
             const nativeElement = this.editor.nativeElement;
 
             if (nativeElement && Types.isFunction(nativeElement['reset'])) {
                 nativeElement['reset']();
             }
 
-            if (this.editor && Types.isFunction(this.editor['reset'])) {
-                this.editor['reset']();
+            if (this.editor && Types.isFunction(editor['reset'])) {
+                editor['reset']();
             }
         }
     }

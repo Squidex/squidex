@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, numberAttribute, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DialogModel, DialogService, disabled$, StatefulComponent, TypedSimpleChanges, Types, value$ } from '@app/framework';
@@ -17,7 +17,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-iframe-editor[context][formField][formIndex][formValue][formControlBinding][language][languages]',
+    selector: 'sqx-iframe-editor',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,31 +39,31 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     @Output()
     public isExpandedChange = new EventEmitter();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isExpanded = false;
 
-    @Input()
+    @Input({ required: true })
     public context: any = {};
 
-    @Input()
+    @Input({ required: true })
     public formValue!: any;
 
-    @Input()
+    @Input({ required: true })
     public formField = '';
 
-    @Input()
+    @Input({ required: true, transform: numberAttribute })
     public formIndex?: number | null;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public formControlBinding!: AbstractControl;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.updatedisabled(value === true);
     }
@@ -82,15 +82,13 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     public contentsSchemas?: string[];
     public contentsDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
         private readonly renderer: Renderer2,
         private readonly router: Router,
     ) {
-        super(changeDetector, {
-            isFullscreen: false,
-        });
+        super({ isFullscreen: false });
     }
 
     public ngOnDestroy() {

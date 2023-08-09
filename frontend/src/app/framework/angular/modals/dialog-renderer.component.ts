@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 import { DialogModel, DialogRequest, DialogService, fadeAnimation, Notification, StatefulComponent, Tooltip } from '@app/framework/internal';
 
@@ -32,10 +32,10 @@ interface State {
 export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
     public dialogView = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly dialogs: DialogService,
     ) {
-        super(changeDetector, { notifications: [], tooltips: [] });
+        super({ notifications: [], tooltips: [] });
     }
 
     public ngOnInit() {

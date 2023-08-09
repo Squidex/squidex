@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.subscription"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" [innerWidth]="60">
+<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" innerWidth="60">
     <ng-container menu>
         <sqx-notifo topic="apps/{{plansState.teamId}}/settings/plan"></sqx-notifo>
 
@@ -47,11 +47,23 @@
 
     <ng-container sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.history" titlePosition="left-center">
+            <a class="panel-link"
+                routerLink="history"
+                routerLinkActive="active"
+                queryParamsHandling="preserve"
+                title="i18n:common.history"
+                titlePosition="left"
+                sqxTourStep="history">
                 <i class="icon-time"></i>
             </a>
 
-            <a class="panel-link" routerLink="help" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.help" titlePosition="left-center">
+            <a class="panel-link"
+                routerLink="help"
+                routerLinkActive="active"
+                queryParamsHandling="preserve"
+                title="i18n:common.help"
+                titlePosition="left"
+                sqxTourStep="help">
                 <i class="icon-help2"></i>
             </a>
         </div>

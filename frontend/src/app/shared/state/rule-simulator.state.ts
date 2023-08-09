@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, ListState, shareSubscribed, State } from '@app/framework';
+import { debug, DialogService, ListState, shareSubscribed, State } from '@app/framework';
 import { RulesService, SimulatedRuleEventDto } from './../services/rules.service';
 import { AppsState } from './apps.state';
 
@@ -58,7 +58,9 @@ export class RuleSimulatorState extends State<Snapshot> {
             page: 0,
             pageSize: 0,
             total: 0,
-        }, 'Simulated Rule Events');
+        });
+
+        debug(this, 'ruleSimulator');
     }
 
     public load(isReload = false): Observable<any> {

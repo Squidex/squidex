@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TypedSimpleChanges, WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
 
 @Component({
-    selector: 'sqx-workflow-step[roles][step][workflow]',
+    selector: 'sqx-workflow-step',
     styleUrls: ['./workflow-step.component.scss'],
     templateUrl: './workflow-step.component.html',
 })
@@ -37,16 +37,16 @@ export class WorkflowStepComponent {
     @Output()
     public remove = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public workflow!: WorkflowDto;
 
-    @Input()
+    @Input({ required: true })
     public step!: WorkflowStep;
 
-    @Input()
+    @Input({ required: true })
     public roles!: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public disabled?: boolean | null;
 
     public openSteps!: ReadonlyArray<WorkflowStep>;

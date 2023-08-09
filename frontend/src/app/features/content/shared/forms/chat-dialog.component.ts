@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { AppsState, StatefulComponent, TranslationsService } from '@app/shared';
 
 interface State {
@@ -29,13 +29,13 @@ export class ChatDialogComponent extends StatefulComponent<State> {
     public close = new EventEmitter();
 
     @Output()
-    public complete = new EventEmitter<string>();
+    public select = new EventEmitter<string>();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly appsState: AppsState,
         private readonly translator: TranslationsService,
     ) {
-        super(changeDetector, {
+        super({
             isRunning: false,
             chatQuestion: '',
             chatAnswers: undefined,

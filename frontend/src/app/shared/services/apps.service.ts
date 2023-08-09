@@ -52,7 +52,7 @@ export class AppDto {
         public readonly canAccessApi: boolean,
         public readonly canAccessContent: boolean,
         public readonly roleName: string | undefined,
-        public readonly roleProperties: {},
+        public readonly roleProperties: { [key: string]: any },
         public readonly teamId: string | null,
     ) {
         this._links = links;
@@ -78,7 +78,7 @@ export class AppDto {
         this.canUpdateGeneral = hasAnyLink(links, 'update');
         this.canUpdateImage = hasAnyLink(links, 'image/upload');
         this.canUploadAssets = hasAnyLink(links, 'assets/create');
-        this.image = getLinkUrl(links, 'image');
+        this.image = getLinkUrl(links, 'image') as string;
     }
 }
 

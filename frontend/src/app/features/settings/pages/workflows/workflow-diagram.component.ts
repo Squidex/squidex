@@ -11,7 +11,7 @@ import { ResourceLoaderService, WorkflowDto } from '@app/shared';
 declare const vis: any;
 
 @Component({
-    selector: 'sqx-workflow-diagram[workflow]',
+    selector: 'sqx-workflow-diagram',
     styleUrls: ['./workflow-diagram.component.scss'],
     templateUrl: './workflow-diagram.component.html',
 })
@@ -21,7 +21,7 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
     @ViewChild('chartContainer', { static: false })
     public chartContainer!: ElementRef;
 
-    @Input()
+    @Input({ required: true })
     public workflow!: WorkflowDto;
 
     public isLoaded = false;

@@ -8,13 +8,13 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
-    selector: 'sqx-status-icon[status]',
+    selector: 'sqx-status-icon',
     styleUrls: ['./status-icon.component.scss'],
     templateUrl: './status-icon.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatusIconComponent {
-    @Input()
+    @Input({ required: true })
     public status?: 'Started' | 'Failed' | 'Success' | 'Completed' | 'Pending' | string;
 
     @Input()

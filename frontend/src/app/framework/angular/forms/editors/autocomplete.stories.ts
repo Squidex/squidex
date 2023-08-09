@@ -6,8 +6,7 @@
  */
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { moduleMetadata } from '@storybook/angular';
-import { Meta, Story } from '@storybook/angular/types-6-0';
+import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { map, Observable, timer } from 'rxjs';
 import { AutocompleteComponent, LocalizerService, SqxFrameworkModule } from '@app/framework';
 import { AutocompleteSource } from './autocomplete.component';
@@ -28,6 +27,19 @@ export default {
             control: 'boolean',
         },
     },
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-root-view>
+                <sqx-autocomplete 
+                    [disabled]="disabled"
+                    [icon]="icon"
+                    [inputStyle]="inputStyle"
+                    [itemsSource]="itemsSource">
+                </sqx-autocomplete>
+            </sqx-root-view>
+        `,
+    }),
     decorators: [
         moduleMetadata({
             imports: [
@@ -42,20 +54,6 @@ export default {
     ],
 } as Meta;
 
-const Template: Story<AutocompleteComponent & { model: any }> = (args: AutocompleteComponent) => ({
-    props: args,
-    template: `
-        <sqx-root-view>
-            <sqx-autocomplete 
-                [disabled]="disabled"
-                [icon]="icon"
-                [inputStyle]="inputStyle"
-                [itemsSource]="itemsSource">
-            </sqx-autocomplete>
-        </sqx-root-view>
-    `,
-});
-
 class Source implements AutocompleteSource {
     constructor(
         private readonly values: string[],
@@ -68,39 +66,42 @@ class Source implements AutocompleteSource {
     }
 }
 
-export const Default = Template.bind({});
+type Story = StoryObj<AutocompleteComponent>;
 
-Default.args = {
-    itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing']),
+export const Default: Story = {
+    args: {
+        itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing']),
+    },
 };
 
-export const Disabled = Template.bind({});
-
-Disabled.args = {
-    disabled: true,
+export const Disabled: Story = {
+    args: {
+        disabled: true,
+    },
 };
 
-export const Icon = Template.bind({});
-
-Icon.args = {
-    icon: 'user',
+export const Icon: Story = {
+    args: {
+        icon: 'user',
+    },
 };
 
-export const StyleEmpty = Template.bind({});
+export const StyleEmpty: Story = {
+    args: {
+        inputStyle: 'empty',
 
-StyleEmpty.args = {
-    inputStyle: 'empty',
+    },
 };
 
-export const StyleUnderlined = Template.bind({});
-
-StyleUnderlined.args = {
-    inputStyle: 'underlined',
+export const StyleUnderlined: Story = {
+    args: {
+        inputStyle: 'underlined',
+    },
 };
 
-export const IconLoading = Template.bind({});
-
-IconLoading.args = {
-    itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing'], 4000),
-    icon: 'user',
+export const IconLoading: Story = {
+    args: {
+        itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing'], 4000),
+        icon: 'user',
+    },
 };

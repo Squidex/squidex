@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AssetFolderDto, AssetPathItem, DialogModel, ModalModel, Types } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-asset-folder[assetPathItem]',
+    selector: 'sqx-asset-folder',
     styleUrls: ['./asset-folder.component.scss'],
     templateUrl: './asset-folder.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,10 +21,10 @@ export class AssetFolderComponent {
     @Output()
     public delete = new EventEmitter<AssetFolderDto>();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isDisabled?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public assetPathItem!: AssetPathItem;
 
     public editDropdown = new ModalModel();

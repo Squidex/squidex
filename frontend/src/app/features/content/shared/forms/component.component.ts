@@ -5,40 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, EditContentForm, FieldDto, FieldSection, ModalModel, ResourceOwner, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
-    selector: 'sqx-component[form][formContext][formLevel][formModel][isComparing][language][languages]',
+    selector: 'sqx-component',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComponentComponent extends ResourceOwner {
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formModel!: ComponentForm;
 
-    @Input()
+    @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
     @ViewChildren(ComponentSectionComponent)

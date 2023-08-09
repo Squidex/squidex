@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { TeamPlansService } from '@app/features/teams/internal';
-import { DialogService, LoadingState, PlanDto, PlanLockedReason, ReferralDto, shareSubscribed, State, TeamsState, Version } from '@app/shared';
+import { debug, DialogService, LoadingState, PlanDto, PlanLockedReason, ReferralDto, shareSubscribed, State, TeamsState, Version } from '@app/shared';
 
 export interface PlanInfo {
     // The plan.
@@ -76,7 +76,9 @@ export class TeamPlansState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly plansService: TeamPlansService,
     ) {
-        super({ plans: [], version: Version.EMPTY }, 'Teams Plans');
+        super({ plans: [], version: Version.EMPTY });
+
+        debug(this, 'teamPlans');
     }
 
     public load(isReload = false, overridePlanId?: string): Observable<any> {

@@ -10,7 +10,7 @@ import { SchemaDto, TemplatedFormArray, TriggerForm } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
 
 @Component({
-    selector: 'sqx-content-changed-trigger[trigger][triggerForm]',
+    selector: 'sqx-content-changed-trigger',
     styleUrls: ['./content-changed-trigger.component.scss'],
     templateUrl: './content-changed-trigger.component.html',
     providers: [
@@ -21,10 +21,10 @@ export class ContentChangedTriggerComponent {
     @Input()
     public schemas?: ReadonlyArray<SchemaDto> | null;
 
-    @Input()
+    @Input({ required: true })
     public trigger!: any;
 
-    @Input()
+    @Input({ required: true })
     public triggerForm!: TriggerForm;
 
     public get schemasForm() {

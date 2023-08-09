@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppLanguageDto, ContentDto, DialogModel, ResolveContents, sorted, StatefulControlComponent, Types } from '@app/shared';
 
@@ -23,7 +23,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-references-editor[formContext][language][languages][schemaIds]',
+    selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
     providers: [
@@ -32,25 +32,25 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
-    @Input()
+    @Input({ required: true })
     public schemaIds!: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isExpanded = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public allowDuplicates?: boolean | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -60,10 +60,10 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public contentCreatorDialog = new DialogModel();
     public contentSelectorDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly contentsResolver: ResolveContents,
     ) {
-        super(changeDetector, { contentItems: [] });
+        super({ contentItems: [] });
     }
 
     public writeValue(obj: any) {

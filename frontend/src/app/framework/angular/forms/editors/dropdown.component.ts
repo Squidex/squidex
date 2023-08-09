@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
+import { AfterContentInit, booleanAttribute, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { map } from 'rxjs/operators';
-import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
-import { TypedSimpleChanges } from './../../helpers';
+import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
 
 export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
@@ -47,7 +46,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     @Output()
     public close = new EventEmitter();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public itemsLoading?: boolean | null;
 
     @Input()
@@ -56,7 +55,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     @Input()
     public items: ReadonlyArray<any> | undefined | null = [];
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public itemSeparator?: boolean | null;
 
     @Input()
@@ -65,19 +64,19 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     @Input()
     public valueProperty?: string;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canSearch?: boolean | null = true;
 
     @Input()
-    public dropdownPosition: RelativePosition = 'bottom-left';
+    public dropdownPosition: FloatingPlacement = 'bottom-start';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public dropdownFullWidth = false;
 
     @Input()
     public dropdownStyles: any = {};
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -92,8 +91,8 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public queryInput = new UntypedFormControl();
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
+    constructor() {
+        super({
             selectedItem: undefined,
             suggestedIndex: -1,
             suggestedItems: [],

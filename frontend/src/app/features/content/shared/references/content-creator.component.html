@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" [showFooter]="false">
+<sqx-modal-dialog (close)="emitClose()" size="lg" showFooter="false">
     <ng-container title>
         <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
             <option *ngFor="let schema of schemas" [ngValue]="schema">
@@ -12,7 +12,7 @@
             <div class="col-auto">          
                 <div *ngIf="schema && languages.length > 1">
                     <sqx-language-selector class="languages-buttons"
-                        dropdownPosition="bottom-left"
+                        dropdownPosition="bottom-end"
                         (languageChange)="language = $event"
                         [language]="language" 
                         [languages]="languages" 
@@ -30,7 +30,7 @@
                     {{ 'contents.referencesCreatePublish' | sqxTranslate }}
                 </button>
 
-                <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm.error | async"></sqx-form-error>
+                <sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async"></sqx-form-error>
             </div>
         </div>
     </ng-container>

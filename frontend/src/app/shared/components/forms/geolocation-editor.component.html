@@ -1,7 +1,7 @@
 <div class="editor-container" [class.compact]="snapshot.isCompact" 
     (sqxResizeCondition)="setCompact($event)" 
-    [sqxResizeMinWidth]="600" 
-    [sqxResizeMaxWidth]="0">
+    sqxResizeMinWidth="600" 
+    sqxResizeMaxWidth="0">
     <form [class.hidden]="snapshot.isMapHidden">
         <div class="editor" #editor></div>
 

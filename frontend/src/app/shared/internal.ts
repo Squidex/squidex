@@ -74,6 +74,8 @@ export * from './state/schemas.forms';
 export * from './state/schemas.state';
 export * from './state/settings';
 export * from './state/table-settings';
+export * from './state/tour.state';
+export * from './state/tour.tasks';
 export * from './state/teams.forms';
 export * from './state/teams.state';
 export * from './state/templates.state';

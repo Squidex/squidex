@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
@@ -41,7 +41,7 @@ type Request = { search?: string; page: number };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -54,12 +54,10 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
 
     public searchDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly stockPhotoService: StockPhotoService,
     ) {
-        super(changeDetector, {
-            stockPhotos: [],
-        });
+        super({ stockPhotos: [] });
     }
 
     public ngOnInit() {

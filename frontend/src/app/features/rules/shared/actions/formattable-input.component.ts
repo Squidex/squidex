@@ -18,7 +18,7 @@ export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-    selector: 'sqx-formattable-input[type]',
+    selector: 'sqx-formattable-input',
     styleUrls: ['./formattable-input.component.scss'],
     templateUrl: './formattable-input.component.html',
     providers: [
@@ -31,7 +31,7 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
     private fnTouched = () => { /* NOOP */ };
     private value?: string;
 
-    @Input()
+    @Input({ required: true })
     public type: 'Text' | 'Code' = 'Text';
 
     @Input()

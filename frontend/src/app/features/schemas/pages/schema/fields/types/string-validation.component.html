@@ -35,16 +35,14 @@
             <input class="form-control" id="{{field.fieldId}}_fieldPattern" formControlName="pattern" placeholder="{{ 'schemas.fieldTypes.string.pattern' | sqxTranslate }}" #inputPattern autocomplete="off" autocorrect="off" autocapitalize="off" (focus)="patternsModal.show()">
 
             <ng-container *ngIf="settings.patterns.length > 0 && (showPatternSuggestions | async)">
-                <ng-container *sqxModal="patternsModal">
-                    <sqx-dropdown-menu class="control-dropdown" [sqxAnchoredTo]="inputPattern" [scrollY]="true" position="bottom-left">
-                        <h4>{{ 'schemas.fieldTypes.string.suggestions' | sqxTranslate }}</h4>
-        
-                        <div *ngFor="let pattern of settings.patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
-                            <div class="truncate">{{pattern.name}}</div>
-                            <div class="truncate text-muted">{{pattern.regex}}</div>
-                        </div>
-                    </sqx-dropdown-menu>
-                </ng-container>
+                <sqx-dropdown-menu *sqxModal="patternsModal" [sqxAnchoredTo]="inputPattern" scrollY="true" position="bottom-start" class="control-dropdown">
+                    <h4>{{ 'schemas.fieldTypes.string.suggestions' | sqxTranslate }}</h4>
+    
+                    <div *ngFor="let pattern of settings.patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
+                        <div class="truncate">{{pattern.name}}</div>
+                        <div class="truncate text-muted">{{pattern.regex}}</div>
+                    </div>
+                </sqx-dropdown-menu>
             </ng-container>
 
             <sqx-form-hint>

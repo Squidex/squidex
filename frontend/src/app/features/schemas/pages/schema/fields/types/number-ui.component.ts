@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 import { FieldDto, FloatConverter, NUMBER_FIELD_EDITORS, NumberFieldPropertiesDto, ResourceOwner, valueProjection$, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-number-ui[field][fieldForm][properties]',
+    selector: 'sqx-number-ui',
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html',
 })
@@ -19,13 +19,13 @@ export class NumberUIComponent extends ResourceOwner {
     public readonly converter = FloatConverter.INSTANCE;
     public readonly editors = NUMBER_FIELD_EDITORS;
 
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: NumberFieldPropertiesDto;
 
     public hideAllowedValues?: Observable<boolean>;

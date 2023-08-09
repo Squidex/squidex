@@ -10,7 +10,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { TableField } from '@app/shared';
 
 @Component({
-    selector: 'sqx-custom-view-editor[allFields][listFields]',
+    selector: 'sqx-custom-view-editor',
     styleUrls: ['./custom-view-editor.component.scss'],
     templateUrl: './custom-view-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,10 +22,10 @@ export class CustomViewEditorComponent {
     @Output()
     public listFieldsChange = new EventEmitter<ReadonlyArray<TableField>>();
 
-    @Input()
+    @Input({ required: true })
     public listFields!: TableField[];
 
-    @Input()
+    @Input({ required: true })
     public allFields!: ReadonlyArray<TableField>;
 
     public fieldsNotAdded!: ReadonlyArray<TableField>;

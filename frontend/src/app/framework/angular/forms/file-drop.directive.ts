@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
+import { booleanAttribute, Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 import { Types } from '@app/framework/internal';
 
 @Directive({
@@ -17,13 +17,13 @@ export class FileDropDirective {
     @Input()
     public allowedFiles?: ReadonlyArray<string>;
 
-    @Input('sqxDropOnlyImages')
+    @Input({ alias: 'sqxDropOnlyImages', transform: booleanAttribute })
     public onlyImages!: boolean;
 
-    @Input('sqxDropNoPaste')
+    @Input({ alias: 'sqxDropNoPaste', transform: booleanAttribute })
     public noPaste!: boolean;
 
-    @Input('sqxDropDisabled')
+    @Input({ alias: 'sqxDropDisabled', transform: booleanAttribute })
     public disabled = false;
 
     @Output('sqxDropFile')

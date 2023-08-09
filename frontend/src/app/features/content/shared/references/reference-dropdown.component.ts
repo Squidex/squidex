@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ContentsDto } from '@app/shared';
@@ -31,7 +31,7 @@ type ContentName = { name: string; id?: string };
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-reference-dropdown[mode][language][languages][schemaId]',
+    selector: 'sqx-reference-dropdown',
     styleUrls: ['./reference-dropdown.component.scss'],
     templateUrl: './reference-dropdown.component.html',
     providers: [
@@ -44,19 +44,19 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
     private isOpenedBefore = false;
     private isLoadingFailed = false;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public schemaId!: string;
 
-    @Input()
+    @Input({ required: true })
     public mode: 'Array' | 'Single' = 'Single';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -67,13 +67,11 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
         return !!this.schemaId && !!this.language;
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly contentsResolver: ResolveContents,
         private readonly localizer: LocalizerService,
     ) {
-        super(changeDetector, {
-            contentNames: [],
-        });
+        super({ contentNames: [] });
 
         this.own(
             value$(this.control)

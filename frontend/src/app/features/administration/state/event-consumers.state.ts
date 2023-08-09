@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, shareSubscribed, State } from '@app/shared';
+import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/shared';
 import { EventConsumerDto, EventConsumersService } from './../services/event-consumers.service';
 
 interface Snapshot extends LoadingState {
@@ -31,7 +31,9 @@ export class EventConsumersState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly eventConsumersService: EventConsumersService,
     ) {
-        super({ eventConsumers: [] }, 'EventConsumers');
+        super({ eventConsumers: [] });
+
+        debug(this, 'eventConsumers');
     }
 
     public load(isReload = false, silent = false): Observable<any> {

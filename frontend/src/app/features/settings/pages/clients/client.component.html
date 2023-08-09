@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card" sqxTourStep="client">
     <div class="card-header">
         <div class="row g-1">
             <div class="col col-name">
@@ -6,11 +6,11 @@
                     [disabled]="!client.canUpdate"
                     (inputTitleChange)="rename($event)"
                     [inputTitle]="client.name"
-                    [inputTitleLength]="100">
+                    inputTitleLength="100">
                 </sqx-editable-title>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-primary" (click)="connectDialog.show()">
+                <button type="button" class="btn btn-primary" (click)="connectDialog.show()" sqxTourStep="connect">
                     {{ 'clients.connect' | sqxTranslate }}
                 </button>
             </div>
@@ -107,8 +107,6 @@
     </div>
 </div>
 
-<ng-container *sqxModal="connectDialog">
-    <sqx-client-connect-form [client]="client" 
-        (complete)="connectDialog.hide()">
-    </sqx-client-connect-form>   
-</ng-container>
+<sqx-client-connect-form *sqxModal="connectDialog"
+    (close)="connectDialog.hide()" [client]="client">
+</sqx-client-connect-form>   
