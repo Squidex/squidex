@@ -39,8 +39,12 @@ export class TourStepDirective implements OnInit, OnDestroy, TourAnchorDirective
         }
 
         if (this.isActive && (!this.isNextOnClick || !this.wasClicked)) {
-            this.tourService.render(null, null);
-            this.tourService.pause();
+            setTimeout(() => {
+                if (this.tourService.currentStep.anchorId === this.anchorId) {
+                    this.tourService.render(null, null);
+                    this.tourService.pause();
+                }
+            }, 200);
         }
 
         this.tourService.unregister(this.anchorId);

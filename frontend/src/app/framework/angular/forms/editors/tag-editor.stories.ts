@@ -8,8 +8,7 @@
 
 import { Component } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { moduleMetadata } from '@storybook/angular';
-import { Meta, Story } from '@storybook/angular/types-6-0';
+import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { LocalizerService, SqxFrameworkModule, TagEditorComponent } from '@app/framework';
 
 const TRANSLATIONS = {
@@ -56,6 +55,23 @@ export default {
             control: 'boolean',
         },
     },
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-root-view>
+                <sqx-tag-editor
+                    [allowOpen]="allowOpen"
+                    [disabled]="disabled"
+                    [itemsSource]="itemsSource"
+                    [itemsSourceLoading]="itemsSourceLoading"
+                    [ngModel]="model"
+                    [styleScrollable]="styleScrollable"
+                    [styleBlank]="styleBlank"
+                    [styleDashed]="styleDashed">
+                </sqx-tag-editor>
+            </sqx-root-view>
+        `,
+    }),
     decorators: [
         moduleMetadata({
             declarations: [
@@ -73,101 +89,87 @@ export default {
     ],
 } as Meta;
 
-const Template: Story<TagEditorComponent & { ngModel: any }> = (args: TagEditorComponent) => ({
-    props: args,
-    template: `
-        <sqx-root-view>
-            <sqx-tag-editor
-                [allowOpen]="allowOpen"
-                [disabled]="disabled"
-                [itemsSource]="itemsSource"
-                [itemsSourceLoading]="itemsSourceLoading"
-                [ngModel]="ngModel"
-                [styleScrollable]="styleScrollable"
-                [styleBlank]="styleBlank"
-                [styleDashed]="styleDashed">
-            </sqx-tag-editor>
-        </sqx-root-view>
-    `,
-});
+type Story = StoryObj<TagEditorComponent & { model: any }>;
 
-const Template2: Story<TagEditorComponent & { ngModel: any }> = (args: TagEditorComponent) => ({
-    props: args,
-    template: `
-        <sqx-tag-editor-test></sqx-tag-editor-test>
-    `,
-});
-
-export const Default = Template.bind({});
-
-export const Suggestions = Template.bind({});
-
-Suggestions.args = {
-    itemsSource: ['A', 'B', 'C'],
-    allowOpen: true,
+export const Default: Story = {
+    args: {},
 };
 
-export const SuggestionsEmpty = Template.bind({});
-
-SuggestionsEmpty.args = {
-    itemsSource: [],
-    allowOpen: true,
+export const Suggestions: Story = {
+    args: {
+        itemsSource: ['A', 'B', 'C'],
+        allowOpen: true,
+    },
 };
 
-export const SuggestionsLoading = Template.bind({});
-
-SuggestionsLoading.args = {
-    itemsSourceLoading: true,
-    allowOpen: true,
+export const SuggestionsEmpty: Story = {
+    args: {
+        itemsSource: [],
+        allowOpen: true,
+    },
 };
 
-export const Values = Template.bind({});
-
-Values.args = {
-    itemsSource: [],
-    ngModel: ['A', 'A', 'B'],
+export const SuggestionsLoading: Story = {
+    args: {
+        itemsSourceLoading: true,
+        allowOpen: true,
+    },
 };
 
-export const StyleDashed = Template.bind({});
-
-StyleDashed.args = {
-    styleDashed: true,
-    ngModel: [],
+export const Values: Story = {
+    args: {
+        itemsSource: [],
+        model: ['A', 'A', 'B'],
+    },
 };
 
-export const StyleDashedValues = Template.bind({});
-
-StyleDashedValues.args = {
-    styleDashed: true,
-    ngModel: ['A', 'B', 'C'],
+export const StyleDashed: Story = {
+    args: {
+        styleDashed: true,
+        model: [],
+    },
 };
 
-export const StyleBlank = Template.bind({});
-
-StyleBlank.args = {
-    styleBlank: true,
-    ngModel: [],
+export const StyleDashedValues: Story = {
+    args: {
+        styleDashed: true,
+        model: ['A', 'B', 'C'],
+    },
 };
 
-export const StyleBlankValues = Template.bind({});
-
-StyleBlankValues.args = {
-    styleBlank: true,
-    ngModel: ['A', 'B', 'C'],
+export const StyleBlank: Story = {
+    args: {
+        styleBlank: true,
+        model: [],
+    },
 };
 
-export const Multiline = Template.bind({});
-
-Multiline.args = {
-    styleScrollable: false,
-    ngModel: ['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'],
+export const StyleBlankValues: Story = {
+    args: {
+        styleBlank: true,
+        model: ['A', 'B', 'C'],
+    },
 };
 
-export const SingleLine = Template.bind({});
-
-SingleLine.args = {
-    styleScrollable: true,
-    ngModel: ['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'],
+export const Multiline: Story = {
+    args: {
+        styleScrollable: false,
+        model: ['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'],
+    },
 };
 
-export const Lazy = Template2.bind({});
+export const SingleLine: Story = {
+    args: {
+        styleScrollable: true,
+        model: ['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'],
+    },
+};
+
+export const Lazy: Story = {
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-tag-editor-test></sqx-tag-editor-test>
+        `,
+    }),
+};

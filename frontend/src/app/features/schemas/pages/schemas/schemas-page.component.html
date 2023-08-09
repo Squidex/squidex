@@ -33,7 +33,7 @@
 </sqx-layout>
 
 <sqx-schema-form *sqxModal="addSchemaDialog"
-    (cancel)="addSchemaDialog.hide()" (create)="redirectSchema($event)" [import]="import">
+    (close)="addSchemaDialog.hide()" (create)="redirectSchema($event)" [import]="import">
 </sqx-schema-form>
 
 <router-outlet></router-outlet>

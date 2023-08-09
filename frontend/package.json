@@ -10,8 +10,8 @@
     "test": "ng test",
     "test:coverage": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessNoSandbox",
     "watch": "ng build --watch --configuration development",
-    "storybook": "start-storybook -p 6006",
-    "storybook-build": "build-storybook"
+    "storybook": "ng run squidex:storybook",
+    "storybook-build": "ng run squidex:build-storybook"
   },
   "private": true,
   "dependencies": {
@@ -90,8 +90,6 @@
     "@storybook/addon-interactions": "^7.2.1",
     "@storybook/addon-links": "^7.2.1",
     "@storybook/angular": "^7.2.1",
-    "@storybook/builder-webpack5": "^7.2.1",
-    "@storybook/manager-webpack5": "^6.5.16",
     "@storybook/testing-library": "^0.2.0",
     "@types/codemirror": "5.60.8",
     "@types/core-js": "2.5.5",
@@ -116,6 +114,7 @@
     "eslint-plugin-deprecation": "^1.5.0",
     "eslint-plugin-import": "2.28.0",
     "eslint-plugin-jsx-a11y": "6.7.1",
+    "eslint-plugin-storybook": "^0.6.13",
     "eslint-webpack-plugin": "4.0.1",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.2",
@@ -124,6 +123,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "raw-loader": "^4.0.2",
+    "storybook": "^7.2.1",
     "stylelint": "15.10.2",
     "stylelint-config-standard": "34.0.0",
     "stylelint-config-standard-scss": "^10.0.0",

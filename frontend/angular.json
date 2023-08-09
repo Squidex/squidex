@@ -53,7 +53,9 @@
               "src/styles.scss"
             ],
             "stylePreprocessorOptions": {
-              "includePaths": ["./src/app/theme"]
+              "includePaths": [
+                "./src/app/theme"
+              ]
             },
             "customWebpackConfig": {
               "path": "./src/config/webpack.config.js"
@@ -128,9 +130,29 @@
               "src/styles.scss"
             ],
             "stylePreprocessorOptions": {
-              "includePaths": ["./src/app/theme"]
+              "includePaths": [
+                "./src/app/theme"
+              ]
             },
             "scripts": []
+          }
+        },
+        "storybook": {
+          "builder": "@storybook/angular:start-storybook",
+          "options": {
+            "configDir": ".storybook",
+            "browserTarget": "squidex:build",
+            "compodoc": false,
+            "port": 6006
+          }
+        },
+        "build-storybook": {
+          "builder": "@storybook/angular:build-storybook",
+          "options": {
+            "configDir": ".storybook",
+            "browserTarget": "squidex:build",
+            "compodoc": false,
+            "outputDir": "storybook-static"
           }
         }
       }

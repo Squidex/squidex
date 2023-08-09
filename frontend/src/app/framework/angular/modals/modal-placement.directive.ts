@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input, numberAttribute, OnDestroy, Renderer2 } from '@angular/core';
-import { autoUpdate, computePosition, flip, Middleware, offset, shift, size } from '@floating-ui/dom';
+import { autoUpdate, computePosition, flip, Middleware, offset, Placement, shift, size } from '@floating-ui/dom';
 import { FloatingPlacement, TypedSimpleChanges, Types } from '@app/framework/internal';
 
 @Directive({
@@ -96,90 +96,25 @@ export class ModalPlacementDirective implements AfterViewInit, OnDestroy {
         this.currentListener = autoUpdate(element, this.element.nativeElement, () => this.updatePosition());
     }
 
-    /*
-    private updatePosition() {
-        if (!this.isViewInit || !this.target?.isConnected) {
-            return;
-        }
-
-        const modalRef = this.element.nativeElement;
-        const modalRect = modalRef.getBoundingClientRect();
-
-        if ((modalRect.width === 0 && !this.adjustWidth) || (modalRect.height === 0 && !this.adjustHeight)) {
-            return;
-        }
-
-        this.request.targetRect = this.target.getBoundingClientRect();
-
-        if (this.scrollX) {
-            modalRect.width = modalRef.scrollWidth;
-        }
-
-        if (this.scrollY) {
-            modalRect.height = modalRef.scrollHeight;
-        }
-
-        this.request.clientWidth = document.documentElement!.clientWidth;
-        this.request.clientHeight = document.documentElement!.clientHeight;
-        this.request.modalRect = modalRect;
-
-        const position = positionModal(this.request);
-
-        if (Types.equals(position, this.previousPosition)) {
-            return;
-        }
-
-        this.previousPosition = position;
-
-        if (this.scrollX) {
-            const maxWidth = position.maxWidth > 0 ? `${position.maxWidth - this.scrollMargin}px` : 'none';
-
-            this.renderer.setStyle(modalRef, 'overflow-x', 'auto');
-            this.renderer.setStyle(modalRef, 'overflow-y', 'none');
-            this.renderer.setStyle(modalRef, 'max-width', maxWidth);
-        }
-
-        if (this.scrollY) {
-            const maxHeight = position.maxHeight > 0 ? `${position.maxHeight - this.scrollMargin}px` : 'none';
-
-            this.renderer.setStyle(modalRef, 'overflow-x', 'none');
-            this.renderer.setStyle(modalRef, 'overflow-y', 'auto');
-            this.renderer.setStyle(modalRef, 'max-height', maxHeight);
-        }
-
-        if (Types.isNumber(position.width)) {
-            this.renderer.setStyle(modalRef, 'width', `${position.width}px`);
-        }
-
-        if (Types.isNumber(position.height)) {
-            this.renderer.setStyle(modalRef, 'height', `${position.height}px`);
-        }
-
-        if (Types.isNumber(position.x)) {
-            this.renderer.setStyle(modalRef, 'left', `${position.x}px`);
-        }
-
-        if (Types.isNumber(position.y)) {
-            this.renderer.setStyle(modalRef, 'left', `${position.x}px`);
-            this.renderer.setStyle(modalRef, 'top', `${position.y}px`);
-        }
-
-        this.renderer.setStyle(modalRef, 'visibility', 'visible');
-    }*/
-
     private async updatePosition() {
         if (!this.isViewInit || !this.target?.isConnected) {
             return;
         }
 
-        const isInside = Types.isArray(this.position) && this.position[1] === 'inside';
+        let placement: Placement;
+        let placedInside = false;
 
-        const placement = Types.isArray(this.position) ? this.position[0] : this.position;
+        if (Types.isArray(this.position)) {
+            placement = this.position[0];
+            placedInside = this.position[1] === 'inside';
+        } else {
+            placement = this.position;
+        }
 
         const modalRef = this.element.nativeElement;
         const middleware: Middleware[] = [];
 
-        if (isInside) {
+        if (placedInside) {
             middleware.push(offset(({ rects }) => {
                 if (placement.startsWith('top') || placement.startsWith('bottom')) {
                     return -rects.floating.height;
@@ -187,12 +122,11 @@ export class ModalPlacementDirective implements AfterViewInit, OnDestroy {
                     return -rects.floating.width;
                 }
             }));
-        } else if (this.offset !== 0) {
+        } else {
             middleware.push(offset(this.offset));
+            middleware.push(flip());
+            middleware.push(shift());
         }
-
-        middleware.push(flip());
-        middleware.push(shift());
 
         middleware.push(size({
             apply: ({ availableWidth, availableHeight, rects }) => {

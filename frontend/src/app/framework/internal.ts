@@ -35,7 +35,6 @@ export * from './utils/interpolator';
 export * from './utils/keys';
 export * from './utils/math-helper';
 export * from './utils/markdown';
-export * from './utils/modal-positioner';
 export * from './utils/modal-view';
 export * from './utils/picasso';
 export * from './utils/rxjs-extensions';
