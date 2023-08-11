@@ -201,9 +201,13 @@ class Connector {
 
         state.changes
             .subscribe(change => {
-                this.state[slice] = change.snapshot;
+                const eventName = `${slice} - ${change.event}`;
 
-                this.devTools?.send(`${slice} - ${change.event}`, this.state);
+                if (this.devTools) {
+                    this.state[slice] = change.snapshot;
+
+                    this.devTools?.send(eventName, this.state);
+                }
             });
     }
 }
