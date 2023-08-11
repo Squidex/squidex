@@ -29,8 +29,6 @@
     </div>
 </div>
 
-<ng-container *sqxModal="importDialog">
-    <sqx-import-contributors-dialog
-        (close)="importDialog.hide()">
-    </sqx-import-contributors-dialog>
-</ng-container>
+<sqx-import-contributors-dialog *sqxModal="importDialog"
+    (close)="importDialog.hide()">
+</sqx-import-contributors-dialog>

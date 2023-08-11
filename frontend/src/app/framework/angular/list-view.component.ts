@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
 import { StatefulComponent } from '@app/framework/internal';
 
 interface State {
@@ -31,25 +31,25 @@ export class ListViewComponent extends StatefulComponent<State> implements After
     @ViewChild('contentElement', { static: false })
     public contentElement!: ElementRef<ParentNode>;
 
-    @Input() @HostBinding('class.overflow')
+    @Input({ transform: booleanAttribute }) @HostBinding('class.overflow')
     public overflow?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public syncedHeader?: boolean | null;
 
     @Input()
     public innerWidth = '100%';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public table?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public tableNoPadding?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isLoaded: boolean | undefined | null = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set isLoading(value: boolean | undefined | null) {
         clearTimeout(this.timer);
 
@@ -66,12 +66,10 @@ export class ListViewComponent extends StatefulComponent<State> implements After
         return this.snapshot.isLoading;
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly renderer: Renderer2,
     ) {
-        super(changeDetector, {
-            isLoading: false,
-        });
+        super({ isLoading: false });
     }
 
     public ngAfterViewInit() {

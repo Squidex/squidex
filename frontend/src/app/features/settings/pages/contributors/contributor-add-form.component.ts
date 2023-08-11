@@ -38,7 +38,7 @@ export class UsersDataSource implements AutocompleteSource {
 }
 
 @Component({
-    selector: 'sqx-contributor-add-form[roles]',
+    selector: 'sqx-contributor-add-form',
     styleUrls: ['./contributor-add-form.component.scss'],
     templateUrl: './contributor-add-form.component.html',
     providers: [
@@ -48,7 +48,7 @@ export class UsersDataSource implements AutocompleteSource {
 export class ContributorAddFormComponent {
     private defaultValue: any;
 
-    @Input()
+    @Input({ required: true })
     public roles!: ReadonlyArray<RoleDto>;
 
     public assignContributorForm = new AssignContributorForm();

@@ -27,57 +27,53 @@
         <i class="icon-caret-down"></i>
     </div>
 
-    <ng-container *sqxModal="snapshot.suggestedItems.length > 0">
-        <sqx-dropdown-menu class="control-dropdown" 
-            [sqxAnchoredTo]="form"
-            [adjustWidth]="true"
-            [adjustHeight]="false"
-            [scrollY]="true" 
-            [style.minWidth]="dropdownWidth"
-            position="bottom-left" #container>
-            <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
-                [class.active]="i === snapshot.suggestedIndex"
-                [class.separated]="itemSeparator"
-                (mousedown)="selectValue(item)" 
-                (mouseover)="selectIndex(i)"
-                [sqxScrollActive]="i === snapshot.suggestedIndex"
-                [sqxScrollContainer]="container.nativeElement">
-                <ng-container>{{item}}</ng-container>
-            </div>
-        </sqx-dropdown-menu>
-    </ng-container>
+    <sqx-dropdown-menu *sqxModal="snapshot.suggestedItems.length > 0" [sqxAnchoredTo]="form" class="control-dropdown" 
+        adjustWidth="true"
+        adjustHeight="false"
+        scrollX="false"
+        scrollY="true" 
+        [style.minWidth]="dropdownWidth"
+        position="bottom-end" #container>
+        <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
+            [class.active]="i === snapshot.suggestedIndex"
+            [class.separated]="itemSeparator"
+            (mousedown)="selectValue(item)" 
+            (mouseover)="selectIndex(i)"
+            [sqxScrollActive]="i === snapshot.suggestedIndex"
+            [sqxScrollContainer]="container.nativeElement">
+            <ng-container>{{item}}</ng-container>
+        </div>
+    </sqx-dropdown-menu>
 
-    <ng-container *sqxModal="itemsModal">
-        <sqx-dropdown-menu class="control-dropdown suggestions-dropdown"
-            [sqxAnchoredTo]="form"
-            [adjustWidth]="false"
-            [adjustHeight]="false"
-            [scrollY]="true"
-            position="bottom-left">
-            <div class="row">
-                <div class=" col-6" *ngFor="let item of itemsSorted; let i = index">
-                    <div class="form-check form-check">
-                        <input class="form-check-input" type="checkbox" id="tag_{{i}}"
-                            [ngModel]="isSelected(item)"
-                            (ngModelChange)="toggleValue($event, item)"
-                        />
+    <sqx-dropdown-menu *sqxModal="itemsModal" [sqxAnchoredTo]="form" class="control-dropdown suggestions-dropdown"
+        adjustWidth="false"
+        adjustHeight="false"
+        scrollX="false"
+        scrollY="true"
+        position="bottom-end">
+        <div class="row">
+            <div class=" col-6" *ngFor="let item of itemsSorted; let i = index">
+                <div class="form-check form-check">
+                    <input class="form-check-input" type="checkbox" id="tag_{{i}}"
+                        [ngModel]="isSelected(item)"
+                        (ngModelChange)="toggleValue($event, item)"
+                    />
 
-                        <label class="form-check-label" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-left">
-                            <span class="truncate">{{item.name}}</span>
-                        </label>
-                    </div>
+                    <label class="form-check-label" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-start">
+                        <span class="truncate">{{item.name}}</span>
+                    </label>
                 </div>
             </div>
+        </div>
 
-            <div class="text-decent" *ngIf="itemsSorted.length === 0">
-                <ng-container *ngIf="itemsSourceLoading; else notLoading">
-                    <sqx-loader color="input"></sqx-loader>
-                </ng-container>
+        <div class="text-decent" *ngIf="itemsSorted.length === 0">
+            <ng-container *ngIf="itemsSourceLoading; else notLoading">
+                <sqx-loader color="input"></sqx-loader>
+            </ng-container>
 
-                <ng-template #notLoading>
-                    <small>{{itemsSourceEmptyText | sqxTranslate}}</small>
-                </ng-template>
-            </div>
-        </sqx-dropdown-menu>
-    </ng-container>
+            <ng-template #notLoading>
+                <small>{{itemsSourceEmptyText | sqxTranslate}}</small>
+            </ng-template>
+        </div>
+    </sqx-dropdown-menu>
 </div>

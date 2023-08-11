@@ -12,8 +12,8 @@ export class ExtendedFormGroup extends UntypedFormGroup {
     constructor(controls: { [key: string]: AbstractControl }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
         super(controls, validatorOrOpts, asyncValidator);
 
-        this['_reduceValue'] = () => {
-            const result = {};
+        (this as any)['_reduceValue'] = () => {
+            const result = {} as Record<string, any>;
 
             for (const [key, control] of Object.entries(this.controls)) {
                 result[key] = control.value;
@@ -22,8 +22,8 @@ export class ExtendedFormGroup extends UntypedFormGroup {
             return result;
         };
 
-        this['_updateValue'] = () => {
-            (this as { value: any }).value = this['_reduceValue']();
+        (this as any)['_updateValue'] = () => {
+            (this as { value: any }).value = (this as any)['_reduceValue']();
         };
     }
 }
@@ -34,9 +34,9 @@ export class UndefinableFormGroup extends ExtendedFormGroup {
     constructor(controls: { [key: string]: AbstractControl }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
         super(controls, validatorOrOpts, asyncValidator);
 
-        const reduce = this['_reduceValue'];
+        const reduce = (this as any)['_reduceValue'];
 
-        this['_reduceValue'] = () => {
+        (this as any)['_reduceValue'] = () => {
             if (this.isUndefined) {
                 return undefined;
             } else {

@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, numberAttribute, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
-import { ResourceLoaderService, ScriptCompletions, StatefulControlComponent, Types } from '@app/framework/internal';
-import { TypedSimpleChanges } from './../../helpers';
+import { ResourceLoaderService, ScriptCompletions, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
 import { FocusComponent } from './../forms-helper';
 
 declare const ace: any;
@@ -38,7 +37,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
     @ViewChild('editor', { static: false })
     public editor!: ElementRef;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public borderless?: boolean | null;
 
     @Input()
@@ -50,22 +49,22 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
     @Input()
     public valueMode: 'String' | 'Json' | 'JsonString' = 'String';
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public maxLines: number | undefined;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public singleLine = false;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public snippets = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public wordWrap = false;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public height: number | 'auto' | 'full' = 'full';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -79,10 +78,10 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
         }
     }
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly resourceLoader: ResourceLoaderService,
     ) {
-        super(changeDetector, {});
+        super({});
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
+import { booleanAttribute, Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
 import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/internal';
 
 @Directive({
@@ -14,8 +14,8 @@ import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/int
 export class CompensateScrollbarDirective extends ResourceOwner implements ResizeListener {
     private previousScrollbarWidth = -1;
 
-    @Input('sqxCompensateScrollbar')
-    public enabled?: string | boolean | null = true;
+    @Input({ alias: 'sqxCompensateScrollbar', transform: booleanAttribute })
+    public enabled = true;
 
     constructor(
         private readonly renderer: Renderer2,
@@ -41,7 +41,7 @@ export class CompensateScrollbarDirective extends ResourceOwner implements Resiz
     }
 
     private resize() {
-        if (this.enabled === false) {
+        if (!this.enabled) {
             return;
         }
 

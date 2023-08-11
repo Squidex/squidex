@@ -9,12 +9,12 @@ import { Component, Input } from '@angular/core';
 import { EditSchemaForm, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
-    selector: 'sqx-schema-edit-form[schema]',
+    selector: 'sqx-schema-edit-form',
     styleUrls: ['./schema-edit-form.component.scss'],
     templateUrl: './schema-edit-form.component.html',
 })
 export class SchemaEditFormComponent {
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
     public fieldForm = new EditSchemaForm();

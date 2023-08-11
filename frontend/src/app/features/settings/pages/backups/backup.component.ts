@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ApiUrlConfig, BackupDto, BackupsState, Duration, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-backup[backup]',
+    selector: 'sqx-backup',
     styleUrls: ['./backup.component.scss'],
     templateUrl: './backup.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BackupComponent {
-    @Input()
+    @Input({ required: true })
     public backup!: BackupDto;
 
     public duration = '';

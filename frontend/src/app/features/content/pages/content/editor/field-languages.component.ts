@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppLanguageDto, FieldForm } from '@app/shared';
 
 @Component({
@@ -18,7 +18,7 @@ export class FieldLanguagesComponent {
     @Output()
     public showAllControlsChange = new EventEmitter<boolean>();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public showAllControls?: boolean | null;
 
     @Output()

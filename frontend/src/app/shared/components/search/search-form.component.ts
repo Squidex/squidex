@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, StatusInfo, TypedSimpleChanges, Types } from '@app/shared/internal';
 
@@ -45,7 +45,7 @@ export class SearchFormComponent {
     @Input()
     public queriesTypes = '';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public enableShortcut?: boolean | null;
 
     @Input()
@@ -99,7 +99,11 @@ export class SearchFormComponent {
 
         if (value) {
             if (this.queries && this.query) {
-                this.queries.add(value.name, this.query, value.user);
+                if (value.user) {
+                    this.queries.addUser(value.name, this.query);
+                } else {
+                    this.queries.addShared(value.name, this.query);
+                }
             }
 
             this.saveQueryForm.submitCompleted();

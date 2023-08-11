@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
 
 @Component({
@@ -27,7 +27,7 @@ export class QueryListComponent {
     @Input()
     public queries?: ReadonlyArray<SavedQuery> | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canRemove?: boolean | null;
 
     @Input()

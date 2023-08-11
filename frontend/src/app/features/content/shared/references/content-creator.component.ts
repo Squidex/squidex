@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResolveAssets, ResolveContents, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-creator[formContext][language][languages]',
+    selector: 'sqx-content-creator',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
     providers: [
@@ -31,13 +31,13 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     @Input()
     public schemaIds?: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
     public schema!: SchemaDto;
@@ -122,7 +122,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
         }
     }
 
-    public emitComplete() {
+    public emitClose() {
         this.select.emit([]);
     }
 

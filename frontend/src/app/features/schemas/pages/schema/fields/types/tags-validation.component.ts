@@ -5,28 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { booleanAttribute, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, TagsFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-tags-validation[field][fieldForm][languages][properties]',
+    selector: 'sqx-tags-validation',
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html',
 })
 export class TagsValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: TagsFieldPropertiesDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;
 }

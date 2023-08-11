@@ -10,13 +10,13 @@ import { map, Observable, shareReplay } from 'rxjs';
 import { AppsState, ClientsState, TemplateDetailsDto, TemplateDto, TemplatesService } from '@app/shared';
 
 @Component({
-    selector: 'sqx-template[template]',
+    selector: 'sqx-template',
     styleUrls: ['./template.component.scss'],
     templateUrl: './template.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TemplateComponent {
-    @Input()
+    @Input({ required: true })
     public template!: TemplateDto;
 
     public isExpanded = false;

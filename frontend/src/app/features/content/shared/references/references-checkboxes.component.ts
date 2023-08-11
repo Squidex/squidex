@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, TypedSimpleChanges, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
@@ -22,7 +22,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-references-checkboxes[language][schemaId]',
+    selector: 'sqx-references-checkboxes',
     styleUrls: ['./references-checkboxes.component.scss'],
     templateUrl: './references-checkboxes.component.html',
     providers: [
@@ -34,13 +34,13 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
     private readonly itemCount: number;
     private contentItems: ReadonlyArray<ContentDto> | null = null;
 
-    @Input()
+    @Input({ required: true })
     public schemaId: string | undefined | null;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -51,14 +51,12 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         return !!this.schemaId && !!this.language;
     }
 
-    constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
+    constructor(uiOptions: UIOptions,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly localizer: LocalizerService,
     ) {
-        super(changeDetector, {
-            converter: new ReferencesTagsConverter(null!, [], localizer),
-        });
+        super({ converter: new ReferencesTagsConverter(null!, [], localizer) });
 
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
 

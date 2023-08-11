@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { PagingInfo } from './../state';
 
 export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
 
 @Component({
-    selector: 'sqx-pager[paging]',
+    selector: 'sqx-pager',
     styleUrls: ['./pager.component.scss'],
     templateUrl: './pager.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,10 +23,10 @@ export class PagerComponent {
     @Output()
     public pagingChange = new EventEmitter<{ page: number; pageSize: number }>();
 
-    @Input()
+    @Input({ required: true })
     public paging: PagingInfo | undefined | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public autoHide?: boolean | null;
 
     public totalPages = 0;

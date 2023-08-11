@@ -10,22 +10,22 @@ import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { ActionForm, RulesService, ScriptCompletions, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-generic-action[actionForm][appName][trigger][triggerType]',
+    selector: 'sqx-generic-action',
     styleUrls: ['./generic-action.component.scss'],
     templateUrl: './generic-action.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenericActionComponent {
-    @Input()
+    @Input({ required: true })
     public actionForm!: ActionForm;
 
-    @Input()
+    @Input({ required: true })
     public appName!: string;
 
-    @Input()
+    @Input({ required: true })
     public trigger!: any;
 
-    @Input()
+    @Input({ required: true })
     public triggerType: string | undefined | null;
 
     public ruleCompletions: Observable<ScriptCompletions> = EMPTY;

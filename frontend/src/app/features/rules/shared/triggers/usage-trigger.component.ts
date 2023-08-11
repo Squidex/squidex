@@ -9,11 +9,11 @@ import { Component, Input } from '@angular/core';
 import { TriggerForm } from '@app/shared';
 
 @Component({
-    selector: 'sqx-usage-trigger[triggerForm]',
+    selector: 'sqx-usage-trigger',
     styleUrls: ['./usage-trigger.component.scss'],
     templateUrl: './usage-trigger.component.html',
 })
 export class UsageTriggerComponent {
-    @Input()
+    @Input({ required: true })
     public triggerForm!: TriggerForm;
 }

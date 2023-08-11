@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
-import { DialogService, ErrorDto, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
+import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
 import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService } from './../services/contents.service';
 import { Query } from './../services/query';
 import { AppsState } from './apps.state';
@@ -106,7 +106,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             pageSize: 10,
             total: 0,
             validationResults: {},
-        }, name);
+        });
+
+        debug(this, name);
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -452,7 +454,7 @@ export class ContentsState extends ContentsStateBase {
     constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
         private readonly schemasState: SchemasState,
     ) {
-        super('Contents', appsState, contentsService, dialogs);
+        super('contents', appsState, contentsService, dialogs);
     }
 
     public get schemaName() {
@@ -467,7 +469,7 @@ export class ComponentContentsState extends ContentsStateBase {
     constructor(
         appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
     ) {
-        super('Components Contents', appsState, contentsService, dialogs);
+        super('componentContents', appsState, contentsService, dialogs);
     }
 
     public get schemaName() {

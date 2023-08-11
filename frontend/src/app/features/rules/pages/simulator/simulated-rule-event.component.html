@@ -31,7 +31,7 @@
                         <div class="history-state">
                             <label>{{ 'common.event' | sqxTranslate }}</label>
 
-                            <sqx-code-editor [ngModel]="event.event" valueMode="Json" [disabled]="true" [wordWrap]="false" height="auto" [maxLines]="20"></sqx-code-editor>
+                            <sqx-code-editor [ngModel]="event.event" valueMode="Json" disabled="true" wordWrap="false" height="auto" maxLines="20"></sqx-code-editor>
                         </div>
 
                         <sqx-rule-transition [event]="event" text="i18n:rules.simulation.eventTriggerChecked" [errors]="errorsAfterEvent"></sqx-rule-transition>
@@ -42,7 +42,7 @@
                             <div class="history-state" *ngIf="event.enrichedEvent">
                                 <label>{{ 'rules.enrichedEvent' | sqxTranslate }}</label>
 
-                                <sqx-code-editor [ngModel]="event.enrichedEvent" valueMode="Json" [disabled]="true" [wordWrap]="false" height="auto" [maxLines]="20"></sqx-code-editor>
+                                <sqx-code-editor [ngModel]="event.enrichedEvent" valueMode="Json" disabled="true" wordWrap="false" height="auto" maxLines="20"></sqx-code-editor>
                             </div>
 
                             <sqx-rule-transition [event]="event" text="i18n:rules.simulation.eventConditionEvaluated" [errors]="errorsAfterEnrichedEvent"></sqx-rule-transition>
@@ -53,7 +53,7 @@
                                 <div class="history-state">
                                     <label>{{ 'rules.actionData' | sqxTranslate }}</label>
 
-                                    <sqx-code-editor [ngModel]="event.actionData" valueMode="JsonString" [disabled]="true" [wordWrap]="true" height="auto" [maxLines]="20"></sqx-code-editor>
+                                    <sqx-code-editor [ngModel]="event.actionData" valueMode="JsonString" disabled="true" wordWrap="true" height="auto" maxLines="20"></sqx-code-editor>
                                 </div>
 
                                 <sqx-rule-transition text="i18n:rules.simulation.actionExecuted"></sqx-rule-transition>
@@ -66,7 +66,7 @@
                     <div class="history-state" *ngIf="event.error">
                         <label>{{ 'common.error' | sqxTranslate }}</label>
                         
-                        <sqx-code-editor [ngModel]="event.error" [disabled]="true" [wordWrap]="true" height="auto" [maxLines]="20"></sqx-code-editor>
+                        <sqx-code-editor [ngModel]="event.error" disabled="true" wordWrap="true" height="auto" maxLines="20"></sqx-code-editor>
                     </div>
                 </div>
 

@@ -21,7 +21,7 @@ export function getLinkUrl(value: Resource | ResourceLinks, ...rels: ReadonlyArr
         return false;
     }
 
-    const links = value._links || value;
+    const links = (value._links || value) as ResourceLinks;
 
     for (const rel of rels) {
         const link = links[rel];

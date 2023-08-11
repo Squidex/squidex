@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings, StatefulComponent } from '@app/shared/internal';
 
 interface State {
@@ -33,16 +32,16 @@ export class AssetSelectorComponent extends StatefulComponent<State> implements 
     @Output()
     public select = new EventEmitter<ReadonlyArray<AssetDto>>();
 
-    constructor(changeDector: ChangeDetectorRef, localStore: LocalStoreService,
+    constructor(localStore: LocalStoreService,
         public readonly assetsState: ComponentAssetsState,
     ) {
-        super(changeDector, {
+        super({
             selectedAssets: {},
             selectionCount: 0,
             isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
         });
 
-        this.changes.pipe(map(x => x.isListView), distinctUntilChanged()).subscribe(value => {
+        this.project(x => x.isListView).subscribe(value => {
             localStore.setBoolean(Settings.Local.ASSETS_MODE, value);
         });
     }
@@ -63,7 +62,7 @@ export class AssetSelectorComponent extends StatefulComponent<State> implements 
         this.assetsState.search(query);
     }
 
-    public emitComplete() {
+    public emitClose() {
         this.select.emit([]);
     }
 

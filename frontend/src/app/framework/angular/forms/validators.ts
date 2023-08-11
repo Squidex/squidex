@@ -200,7 +200,7 @@ export module ValidatorsEx {
 
             const items: any[] = control.value;
 
-            const duplicateKeys: object = {};
+            const duplicateKeys = {} as Record<string, boolean>;
 
             for (const field of fields) {
                 const values: any[] = [];

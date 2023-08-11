@@ -25,24 +25,22 @@
         <i class="icon-caret-down"></i>
     </div>
 
-    <ng-container *sqxModal="suggestionsModal">
-        <sqx-dropdown-menu class="control-dropdown" #container
-            [sqxAnchoredTo]="input"
-            [adjustWidth]="dropdownFullWidth"
-            [adjustHeight]="false"
-            [scrollY]="true" 
-            [style]="dropdownStyles"
-            [position]="dropdownPosition">
-            <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
-                [class.active]="i === snapshot.suggestedIndex"
-                (mousedown)="selectItem(item)"
-                (mouseover)="selectIndex(i)"
-                [sqxScrollActive]="i === snapshot.suggestedIndex"
-                [sqxScrollContainer]="$any(container.nativeElement)">
-                <ng-container *ngIf="!itemTemplate">{{item}}</ng-container>
+    <sqx-dropdown-menu *sqxModal="suggestionsModal" [sqxAnchoredTo]="input" class="control-dropdown" #container
+        [adjustWidth]="dropdownFullWidth"
+        adjustHeight="false"
+        scrollX="false"
+        scrollY="true" 
+        [style]="dropdownStyles"
+        [position]="dropdownPosition">
+        <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
+            [class.active]="i === snapshot.suggestedIndex"
+            (mousedown)="selectItem(item)"
+            (mouseover)="selectIndex(i)"
+            [sqxScrollActive]="i === snapshot.suggestedIndex"
+            [sqxScrollContainer]="$any(container.nativeElement)">
+            <ng-container *ngIf="!itemTemplate">{{item}}</ng-container>
 
-                <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
-            </div>
-        </sqx-dropdown-menu>
-    </ng-container>
+            <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
+        </div>
+    </sqx-dropdown-menu>
 </div>

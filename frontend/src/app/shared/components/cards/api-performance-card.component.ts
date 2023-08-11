@@ -5,20 +5,20 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-api-performance-card[usage]',
+    selector: 'sqx-api-performance-card',
     styleUrls: ['./api-performance-card.component.scss'],
     templateUrl: './api-performance-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiPerformanceCardComponent {
-    @Input()
+    @Input({ required: true })
     public usage?: CallsUsageDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isStacked?: boolean | null;
 
     @Output()

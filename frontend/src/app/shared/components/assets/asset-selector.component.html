@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [flexBody]="true" [hasTabs]="false">
+<sqx-modal-dialog (close)="emitClose()" size="lg" fullHeight="true" flexBody="true" hasTabs="false">
     <ng-container title>
         {{ 'assets.selectMany' | sqxTranslate }}
     </ng-container>
@@ -15,14 +15,14 @@
                     <div class="col-6">
                         <sqx-tag-editor class="tags" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
                             [itemsSource]="assetsState.tagsNames | async"
-                            (ngModelChange)="selectTags($event)" [undefinedWhenEmpty]="false"
+                            (ngModelChange)="selectTags($event)" undefinedWhenEmpty="false"
                             [ngModel]="assetsState.selectedTagNames | async"
-                            [styleScrollable]="true">
+                            styleScrollable="true">
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" 
-                            [enableShortcut]="true"
+                            enableShortcut="true"
                             [queriesTypes]="'common.assets' | sqxTranslate"
                             (queryChange)="search($event)"
                             [query]="assetsState.query | async">
@@ -44,7 +44,7 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-list-view [isLoading]="assetsState.isLoading | async" [overflow]="true">
+        <sqx-list-view [isLoading]="assetsState.isLoading | async" overflow="true">
             <ng-container content>
                 <sqx-assets-list 
                     [assetsState]="assetsState"
@@ -62,7 +62,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn btn-text-secondary" (click)="emitComplete()">
+        <button type="button" class="btn btn-text-secondary" (click)="emitClose()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 

@@ -9,12 +9,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
-    selector: 'sqx-schema-fields[schema]',
+    selector: 'sqx-schema-fields',
     styleUrls: ['./schema-fields.component.scss'],
     templateUrl: './schema-fields.component.html',
 })
 export class SchemaFieldsComponent implements OnInit {
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
     public fieldTypes = fieldTypes;

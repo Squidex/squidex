@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/shared/internal';
 
@@ -22,7 +22,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-reference-input[mode][[language][languages]',
+    selector: 'sqx-reference-input',
     styleUrls: ['./reference-input.component.scss'],
     templateUrl: './reference-input.component.html',
     providers: [
@@ -34,28 +34,28 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
     @Input()
     public schemaIds?: ReadonlyArray<string>;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public mode: 'Array' | 'Single' = 'Single';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 
     public contentSelectorDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly localizer: LocalizerService,
     ) {
-        super(changeDetector, {});
+        super({});
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {

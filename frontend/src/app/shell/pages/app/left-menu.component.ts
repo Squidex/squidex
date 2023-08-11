@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppDto, Settings } from '@app/shared';
 
 @Component({
-    selector: 'sqx-left-menu[app]',
+    selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LeftMenuComponent {
-    @Input()
+    @Input({ required: true })
     public app!: AppDto;
 
     public isAssetsHidden(app: AppDto) {

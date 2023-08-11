@@ -23,6 +23,6 @@
     </div>
 </div>
 
-<ng-container *sqxModal="tagRenameDialog">
-    <sqx-asset-tag-dialog [tagName]="tagRenaming!.name" (complete)="tagRenameDialog.hide()"></sqx-asset-tag-dialog>
-</ng-container>
+<sqx-asset-tag-dialog *sqxModal="tagRenameDialog"
+    (close)="tagRenameDialog.hide()" [tagName]="tagRenaming!.name">
+</sqx-asset-tag-dialog>

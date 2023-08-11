@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [flexBody]="true" [hasTabs]="false">
+<sqx-modal-dialog (close)="emitClose()" size="lg" fullHeight="true" flexBody="true" hasTabs="false">
     <ng-container title>
         <div class="row">
             <div class="col-selector">
@@ -39,7 +39,7 @@
 
     <ng-container content>
         <ng-container *ngIf="schema">
-            <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [table]="true">
+            <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
                 <ng-container header>
                     <table class="table table-items table-fixed" [sqxContentListWidth]="schema.defaultReferenceFields" #header>
                         <thead>
@@ -92,7 +92,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn btn-text-secondary" (click)="emitComplete()">
+        <button type="button" class="btn btn-text-secondary" (click)="emitClose()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 

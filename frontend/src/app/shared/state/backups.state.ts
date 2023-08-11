@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
+import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
 import { BackupDto, BackupsService } from './../services/backups.service';
 import { AppsState } from './apps.state';
 
@@ -50,7 +50,9 @@ export class BackupsState extends State<Snapshot> {
         private readonly backupsService: BackupsService,
         private readonly dialogs: DialogService,
     ) {
-        super({ backups: [] }, 'Backups');
+        super({ backups: [] });
+
+        debug(this, 'backups');
     }
 
     public load(isReload = false, silent = false): Observable<any> {

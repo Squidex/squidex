@@ -5,23 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { AssetsService } from '@app/shared/internal';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
 
 @Component({
-    selector: 'sqx-asset-folder-dropdown-item[appName][nodeModel]',
+    selector: 'sqx-asset-folder-dropdown-item',
     styleUrls: ['./asset-folder-dropdown-item.component.scss'],
     templateUrl: './asset-folder-dropdown-item.component.html',
 })
 export class AssetFolderDropdownItemComponent {
-    @Input()
+    @Input({ required: true })
     public appName!: string;
 
-    @Input()
+    @Input({ required: true })
     public nodeModel!: AssetFolderDropdowNode;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public nodeLevel = 0;
 
     @Output()

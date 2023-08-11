@@ -1,5 +1,5 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createSchema()">     
-    <sqx-modal-dialog (close)="cancel.emit()">
+    <sqx-modal-dialog (close)="emitClose()" tourId="schemaForm">
         <ng-container title>
             <ng-container *ngIf="import; else noImport">
                 {{ 'schemas.clone' | sqxTranslate }}
@@ -105,12 +105,12 @@
                     {{ 'common.hide' | sqxTranslate }}
                 </button>
         
-                <sqx-code-editor [height]="250" *ngIf="showImport" formControlName="importing" valueMode="Json"></sqx-code-editor>
+                <sqx-code-editor height="250" *ngIf="showImport" formControlName="importing" valueMode="Json"></sqx-code-editor>
             </div>
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-text-secondary" (click)="cancel.emit()">
+            <button type="button" class="btn btn-text-secondary" (click)="close.emit()">
                 {{ 'common.cancel' | sqxTranslate }}
             </button>
 

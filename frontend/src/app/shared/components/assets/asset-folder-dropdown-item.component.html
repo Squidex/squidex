@@ -1,7 +1,7 @@
 <div class="control-dropdown-item d-flex align-items-center" [class.active]="nodeModel.isSelected" [style.paddingLeft]="paddingLeft" (click)="selectNode.emit(nodeModel)">
     <ng-container *ngIf="nodeModel.isLoading; else notLoading" class="loader">
         <button type="button" class="btn btn-sm btn-decent btn-text-secondary">
-            <sqx-loader [size]="14"></sqx-loader>
+            <sqx-loader size="14"></sqx-loader>
         </button>
     </ng-container>
 

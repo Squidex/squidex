@@ -9,11 +9,11 @@ import { Component, Input } from '@angular/core';
 import { TriggerForm } from '@app/shared';
 
 @Component({
-    selector: 'sqx-comment-trigger[triggerForm]',
+    selector: 'sqx-comment-trigger',
     styleUrls: ['./comment-trigger.component.scss'],
     templateUrl: './comment-trigger.component.html',
 })
 export class CommentTriggerComponent {
-    @Input()
+    @Input({ required: true })
     public triggerForm!: TriggerForm;
 }

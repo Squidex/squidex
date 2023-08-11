@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CallsUsageDto } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-api-traffic-summary-card[usage]',
+    selector: 'sqx-api-traffic-summary-card',
     styleUrls: ['./api-traffic-summary-card.component.scss'],
     templateUrl: './api-traffic-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiTrafficSummaryCardComponent {
-    @Input()
+    @Input({ required: true })
     public usage?: CallsUsageDto;
 
     public bytesMonth = 0;

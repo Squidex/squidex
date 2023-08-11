@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AssetDto, AssetFolderDto, AssetsState, getFiles, StatefulComponent, Types } from '@app/shared/internal';
 
 interface State {
@@ -15,7 +15,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-assets-list[assetsState]',
+    selector: 'sqx-assets-list',
     styleUrls: ['./assets-list.component.scss'],
     templateUrl: './assets-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,25 +27,23 @@ export class AssetsListComponent extends StatefulComponent<State> {
     @Output()
     public select = new EventEmitter<AssetDto>();
 
-    @Input()
+    @Input({ required: true })
     public assetsState!: AssetsState;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isDisabled?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isListView?: boolean | null;
 
     @Input()
-    public selectedIds?: {};
+    public selectedIds?: Record<string, AssetDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public showFolderIcon?: boolean | null = true;
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
-            newFiles: [],
-        });
+    constructor() {
+        super({ newFiles: [] });
     }
 
     public add(file: File, asset: AssetDto) {

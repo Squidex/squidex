@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, HostListener, Input } from '@angular/core';
+import { booleanAttribute, Directive, HostListener, Input } from '@angular/core';
 
 @Directive({
     selector: '[sqxStopClick]',
 })
 export class StopClickDirective {
-    @Input('sqxStopClick')
+    @Input({ alias: 'sqxStopClick', transform: booleanAttribute })
     public shouldStop: any = true;
 
     @HostListener('click', ['$event'])

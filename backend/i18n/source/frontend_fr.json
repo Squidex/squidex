@@ -1039,8 +1039,6 @@
   "templates.loadFailed": "Échec du chargement des modèles. Veuillez recharger.",
   "templates.refreshTooltip": "Actualiser les modèles",
   "templates.reloaded": "Modèles rechargés.",
-  "tour.joinForum": "Rejoignez notre forum",
-  "tour.joinGithub": "Rejoignez-nous sur Github",
   "tour.skip": "Passer le tour",
   "tour.stepAppNext": "Continuer",
   "tour.stepAppText": "Une application est le référentiel de votre projet, par exemple (blog, boutique en ligne ou application mobile). Vous pouvez affecter des contributeurs à votre application pour travailler ensemble. Vous pouvez créer un nombre illimité d'applications dans Squidex pour gérer plusieurs projets en même temps.",

@@ -6,17 +6,17 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RuleElementDto } from '@app/shared';
+import { RuleElementMetadataDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-rule-icon[element]',
+    selector: 'sqx-rule-icon',
     styleUrls: ['./rule-icon.component.scss'],
     templateUrl: './rule-icon.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RuleIconComponent {
-    @Input()
-    public element!: RuleElementDto;
+    @Input({ required: true })
+    public element!: RuleElementMetadataDto;
 
     @Input()
     public size: 'sm' | 'md' | 'lg' = 'sm';

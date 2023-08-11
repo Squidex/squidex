@@ -9,12 +9,12 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-schema-card[app]',
+    selector: 'sqx-schema-card',
     styleUrls: ['./schema-card.component.scss'],
     templateUrl: './schema-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SchemaCardComponent {
-    @Input()
+    @Input({ required: true })
     public app!: AppDto;
 }

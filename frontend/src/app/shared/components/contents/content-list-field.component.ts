@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { ContentDto, FieldValue, getContentValue, LanguageDto, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
 
@@ -15,7 +15,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-list-field[content][field][language][languages][schema]',
+    selector: 'sqx-content-list-field',
     styleUrls: ['./content-list-field.component.scss'],
     templateUrl: './content-list-field.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,38 +23,36 @@ interface State {
 export class ContentListFieldComponent extends StatefulComponent<State> {
     public readonly metaFields = META_FIELDS;
 
-    @Input()
+    @Input({ required: true })
     public field!: TableField;
 
     @Input()
     public fields?: TableSettings;
 
-    @Input()
+    @Input({ required: true })
     public content!: ContentDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public patchAllowed?: boolean | null;
 
     @Input()
     public patchForm?: UntypedFormGroup | null;
 
-    @Input()
+    @Input({ required: true })
     public schema?: SchemaDto;
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
     public get isInlineEditable() {
         return this.field.rootField?.isInlineEditable === true;
     }
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
-            formatted: '',
-        });
+    constructor() {
+        super({ formatted: '' });
     }
 
     public ngOnChanges() {

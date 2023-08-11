@@ -1,5 +1,5 @@
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
-    <sqx-modal-dialog (close)="emitComplete()" size="xl" [fullHeight]="true" [showFooter]="false" [hasTabs]="true">
+    <sqx-modal-dialog (close)="close.emit()" size="xl" fullHeight="true" showFooter="false" hasTabs="true">
         <ng-container title>
             {{ 'assets.edit' | sqxTranslate }}
         </ng-container>
@@ -96,7 +96,7 @@
                                 <ng-template #pathTemplate>
                                     <div class="row align-items-center g-2">
                                         <div class="col">
-                                            <sqx-asset-path [path]="pathItems | async" [all]="true" (navigate)="navigate($event.id)"></sqx-asset-path>
+                                            <sqx-asset-path [path]="pathItems | async" all="true" (navigate)="navigate($event.id)"></sqx-asset-path>
                                         </div>
 
                                         <div class="col-auto" *ngIf="isMoveable">
@@ -158,7 +158,7 @@
                             
                             <sqx-control-errors for="tags"></sqx-control-errors>
             
-                            <sqx-tag-editor [itemsSource]="tags" [allowDuplicates]="false" [undefinedWhenEmpty]="false" formControlName="tags"></sqx-tag-editor>
+                            <sqx-tag-editor [itemsSource]="tags" allowDuplicates="false" undefinedWhenEmpty="false" formControlName="tags"></sqx-tag-editor>
                         </div>
             
                         <div class="form-group">
@@ -219,9 +219,9 @@
                         <div class="editor-progress" *ngIf="progress > 0">
                             <sqx-progress-bar
                                 [value]="progress"
-                                [strokeWidth]="2" 
-                                [trailColor]="'transparent'"
-                                [trailWidth]="0">
+                                strokeWidth="2" 
+                                trailColor="transparent"
+                                trailWidth="0">
                             </sqx-progress-bar>
                         </div>
                     </div>
@@ -233,9 +233,9 @@
                         <div class="editor-progress" *ngIf="progress > 0">
                             <sqx-progress-bar
                                 [value]="progress"
-                                [strokeWidth]="2" 
-                                [trailColor]="'transparent'"
-                                [trailWidth]="0">
+                                strokeWidth="2" 
+                                trailColor="transparent"
+                                trailWidth="0">
                             </sqx-progress-bar>
                         </div>
                     </div>
@@ -247,9 +247,9 @@
                         <div class="editor-progress" *ngIf="progress > 0">
                             <sqx-progress-bar
                                 [value]="progress"
-                                [strokeWidth]="2" 
-                                [trailColor]="'transparent'"
-                                [trailWidth]="0">
+                                strokeWidth="2" 
+                                trailColor="transparent"
+                                trailWidth="0">
                             </sqx-progress-bar>
                         </div>
                     </div>

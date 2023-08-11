@@ -10,8 +10,8 @@
     "test": "ng test",
     "test:coverage": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessNoSandbox",
     "watch": "ng build --watch --configuration development",
-    "storybook": "start-storybook -p 6006",
-    "storybook-build": "build-storybook"
+    "storybook": "ng run squidex:storybook",
+    "storybook-build": "ng run squidex:build-storybook"
   },
   "private": true,
   "dependencies": {
@@ -28,13 +28,17 @@
     "@angular/router": "16.1.8",
     "@babel/runtime": "^7.22.6",
     "@egjs/hammerjs": "2.0.17",
+    "@floating-ui/dom": "^1.5.1",
     "@graphiql/toolkit": "^0.9.1",
+    "@iharbeck/ngx-virtual-scroller": "^16.0.0",
+    "@lithiumjs/angular": "^7.3.0",
+    "@lithiumjs/ngx-virtual-scroll": "^0.3.0",
     "@marker.io/browser": "^0.19.0",
     "ace-builds": "1.23.4",
     "angular-gridster2": "16.0.0",
     "angular-mentions": "1.5.0",
     "babel-polyfill": "6.26.0",
-    "bootstrap": "5.3.1",
+    "bootstrap": "5.2.3",
     "core-js": "3.32.0",
     "cropperjs": "2.0.0-alpha.1",
     "date-fns": "2.30.0",
@@ -50,10 +54,10 @@
     "mersenne-twister": "1.1.0",
     "moment": "^2.29.4",
     "mousetrap": "1.6.5",
-    "ng2-charts": "^5.0.1",
+    "ng2-charts": "^4.1.1",
     "ngx-color-picker": "14.0.0",
     "ngx-doc-viewer": "15.0.1",
-    "ngx-virtual-scroller": "^4.0.3",
+    "ngx-ui-tour-core": "^11.0.3",
     "oidc-client-ts": "^2.2.4",
     "pikaday": "1.8.2",
     "progressbar.js": "1.1.0",
@@ -62,7 +66,7 @@
     "rxjs": "7.8.1",
     "simplemde": "1.11.2",
     "slugify": "1.6.6",
-    "tinymce": "6.6.1",
+    "tinymce": "5.10.2",
     "tslib": "2.6.1",
     "tui-calendar": "^1.15.3",
     "typemoq": "^2.1.0",
@@ -86,8 +90,6 @@
     "@storybook/addon-interactions": "^7.2.1",
     "@storybook/addon-links": "^7.2.1",
     "@storybook/angular": "^7.2.1",
-    "@storybook/builder-webpack5": "^7.2.1",
-    "@storybook/manager-webpack5": "^6.5.16",
     "@storybook/testing-library": "^0.2.0",
     "@types/codemirror": "5.60.8",
     "@types/core-js": "2.5.5",
@@ -112,6 +114,7 @@
     "eslint-plugin-deprecation": "^1.5.0",
     "eslint-plugin-import": "2.28.0",
     "eslint-plugin-jsx-a11y": "6.7.1",
+    "eslint-plugin-storybook": "^0.6.13",
     "eslint-webpack-plugin": "4.0.1",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.2",
@@ -120,11 +123,17 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "raw-loader": "^4.0.2",
+    "storybook": "^7.2.1",
     "stylelint": "15.10.2",
     "stylelint-config-standard": "34.0.0",
     "stylelint-config-standard-scss": "^10.0.0",
     "stylelint-scss": "5.0.1",
     "stylelint-webpack-plugin": "4.1.1",
     "typescript": "5.1.6"
+  },
+  "overrides": {
+    "ng2-charts": {
+      "ng2-charts-schematics": "0.1.7"
+    }
   }
 }

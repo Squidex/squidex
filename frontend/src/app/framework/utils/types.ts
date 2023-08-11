@@ -123,7 +123,7 @@ export module Types {
 
             return result as any;
         } else if (Types.isObject(lhs)) {
-            const result = {};
+            const result = {} as Record<string, any>;
 
             for (const [key, value] of Object.entries(lhs)) {
                 result[key] = clone(value);
@@ -186,20 +186,20 @@ export module Types {
         return false;
     }
 
-    export function mergeInto(target: {}, source: {} | undefined | null) {
+    export function mergeInto(target: Record<string, any>, source: Record<string, any> | undefined | null) {
         if (!Types.isObject(target) || !Types.isObject(source)) {
             return source;
         }
 
         Object.entries(source).forEach(([key, sourceValue]) => {
-            const targetValue = target[key];
+            const targetValue = (target as any)[key];
 
             if (Types.isArray(targetValue) && Types.isArray(sourceValue)) {
-                target[key] = targetValue.concat(sourceValue);
+                (target as any)[key] = targetValue.concat(sourceValue);
             } else if (Types.isObject(targetValue) && Types.isObject(sourceValue)) {
-                target[key] = mergeInto({ ...targetValue }, sourceValue);
+                (target as any)[key] = mergeInto({ ...targetValue }, sourceValue);
             } else {
-                target[key] = sourceValue;
+                (target as any)[key] = sourceValue;
             }
         });
 

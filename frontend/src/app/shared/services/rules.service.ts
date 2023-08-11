@@ -15,8 +15,10 @@ export type RuleElementMetadataDto = Readonly<{
     description: string;
     display: string;
     iconColor: string;
-    iconCode: string;
+    iconCode?: string | null;
+    iconImage?: string;
     title?: string;
+    readMore?: string;
 }>;
 
 export type TriggerType =
@@ -122,7 +124,7 @@ export class RuleDto {
         public readonly version: Version,
         public readonly isEnabled: boolean,
         public readonly trigger: any,
-        public readonly triggerType: string,
+        public readonly triggerType: TriggerType,
         public readonly action: any,
         public readonly actionType: string,
         public readonly name: string,

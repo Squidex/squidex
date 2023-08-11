@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
+import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 
@@ -79,7 +79,9 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService,
     ) {
-        super({ schemas: [], addedCategories: new Set() }, 'Schemas');
+        super({ schemas: [], addedCategories: new Set() });
+
+        debug(this, 'schemas');
     }
 
     public select(idOrName: string | null): Observable<SchemaDto | null> {

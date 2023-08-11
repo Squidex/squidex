@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
+import { Directive, EventEmitter, HostListener, Input, numberAttribute, Output, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxLongHover]',
@@ -24,7 +24,7 @@ export class LongHoverDirective {
     @Input('longHoverSelector')
     public selector?: string;
 
-    @Input('longHoverDuration')
+    @Input({ alias: 'longHoverDuration', transform: numberAttribute })
     public duration = 2000;
 
     constructor(

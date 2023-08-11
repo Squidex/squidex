@@ -1,4 +1,4 @@
-<sqx-layout layout="right" titleText="i18n:common.workflow" [width]="20" [white]="true" [overflow]="true" [padding]="true">
+<sqx-layout layout="right" titleText="i18n:common.workflow" width="20" white="true" overflow="true" padding="true">
     <ng-container>
         <div class="section mb-4">
             <label for="id">{{ 'common.id' | sqxTranslate }}</label>
@@ -22,7 +22,7 @@
             <ng-template #newVersion>
                 <label>{{ 'contents.draftStatus' | sqxTranslate }}</label>
 
-                <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdownNew.toggle()" #buttonOptions>
+                <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdownNew.toggle()" #buttonOptions sqxTourStep="status">
                     <sqx-content-status
                         layout="multiline"
                         [status]="content.newStatus!"
@@ -31,35 +31,33 @@
                     </sqx-content-status>
                 </button>
 
-                <ng-container *sqxModal="dropdownNew;closeAlways:true">
-                    <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
-                        <ng-container *ngIf="content.statusUpdates.length > 0">
-                            <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
-                                {{ 'common.statusChangeTo' | sqxTranslate }} <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
-                            </a>
-    
-                            <div class="dropdown-divider"></div>
-                        </ng-container>
-
-                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDraftDelete"
-                            (sqxConfirmClick)="deleteDraft()" 
-                            confirmTitle="i18n:contents.deleteConfirmTitle"
-                            confirmText="i18n:contents.deleteVersionConfirmText"
-                            confirmRememberKey="deleteDraft">
-                            {{ 'contents.versionDelete' | sqxTranslate }}
+                <sqx-dropdown-menu *sqxModal="dropdownNew;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                    <ng-container *ngIf="content.statusUpdates.length > 0">
+                        <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
+                            {{ 'common.statusChangeTo' | sqxTranslate }} <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
                         </a>
 
                         <div class="dropdown-divider"></div>
+                    </ng-container>
 
-                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
-                            (sqxConfirmClick)="delete()"
-                            confirmTitle="i18n:contents.deleteConfirmTitle"
-                            confirmText="i18n:contents.deleteConfirmText"
-                            confirmRememberKey="deleteContent">
-                            {{ 'common.delete' | sqxTranslate }}
-                        </a>
-                    </sqx-dropdown-menu>
-                </ng-container>
+                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDraftDelete"
+                        (sqxConfirmClick)="deleteDraft()" 
+                        confirmTitle="i18n:contents.deleteConfirmTitle"
+                        confirmText="i18n:contents.deleteVersionConfirmText"
+                        confirmRememberKey="deleteDraft">
+                        {{ 'contents.versionDelete' | sqxTranslate }}
+                    </a>
+
+                    <div class="dropdown-divider"></div>
+
+                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
+                        (sqxConfirmClick)="delete()"
+                        confirmTitle="i18n:contents.deleteConfirmTitle"
+                        confirmText="i18n:contents.deleteConfirmText"
+                        confirmRememberKey="deleteContent">
+                        {{ 'common.delete' | sqxTranslate }}
+                    </a>
+                </sqx-dropdown-menu>
             </ng-template>
         </div>
 
@@ -67,50 +65,50 @@
             <label>{{ 'contents.currentStatusLabel' | sqxTranslate }}</label>
 
             <div *ngIf="!content.newStatus; else newStatusOld">
-                <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdown.toggle()" #buttonOptions>
-                    <sqx-content-status [small]="true"
+                <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdown.toggle()" #buttonOptions sqxTourStep="status">
+                    <sqx-content-status
                         layout="multiline"
                         [status]="content.status"
                         [statusColor]="content.statusColor"
-                        [scheduled]="content.scheduleJob">
+                        [scheduled]="content.scheduleJob"
+                        small="true">
                     </sqx-content-status>
                 </button>
 
-                <ng-container *sqxModal="dropdown;closeAlways:true">
-                    <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
-                        <ng-container *ngIf="content.statusUpdates.length > 0">
-                            <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
-                                {{ 'common.statusChangeTo' | sqxTranslate }} 
-                                
-                                <sqx-content-status [small]="true"
-                                    layout="text"
-                                    [status]="info.status"
-                                    [statusColor]="info.color">
-                                </sqx-content-status>
-                            </a>
-    
-                            <div class="dropdown-divider"></div>
-                        </ng-container>
-
-                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canCancelStatus"
-                            (sqxConfirmClick)="cancelStatus()"
-                            confirmTitle="i18n:contents.cancelStatusConfirmTitle"
-                            confirmText="i18n:contents.cancelStatusConfirmText"
-                            confirmRememberKey="cancelStatus">
-                            {{ 'contents.cancelStatus' | sqxTranslate }}
+                <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                    <ng-container *ngIf="content.statusUpdates.length > 0">
+                        <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
+                            {{ 'common.statusChangeTo' | sqxTranslate }} 
+                            
+                            <sqx-content-status
+                                layout="text"
+                                [status]="info.status"
+                                [statusColor]="info.color"
+                                small="true">
+                            </sqx-content-status>
                         </a>
-                        
+
                         <div class="dropdown-divider"></div>
+                    </ng-container>
 
-                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
-                            (sqxConfirmClick)="delete()"
-                            confirmTitle="i18n:contents.deleteConfirmTitle"
-                            confirmText="i18n:contents.deleteConfirmText"
-                            confirmRememberKey="deleteContent">
-                            {{ 'common.delete' | sqxTranslate }}
-                        </a>
-                    </sqx-dropdown-menu>
-                </ng-container>
+                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canCancelStatus"
+                        (sqxConfirmClick)="cancelStatus()"
+                        confirmTitle="i18n:contents.cancelStatusConfirmTitle"
+                        confirmText="i18n:contents.cancelStatusConfirmText"
+                        confirmRememberKey="cancelStatus">
+                        {{ 'contents.cancelStatus' | sqxTranslate }}
+                    </a>
+                    
+                    <div class="dropdown-divider"></div>
+
+                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
+                        (sqxConfirmClick)="delete()"
+                        confirmTitle="i18n:contents.deleteConfirmTitle"
+                        confirmText="i18n:contents.deleteConfirmText"
+                        confirmRememberKey="deleteContent">
+                        {{ 'common.delete' | sqxTranslate }}
+                    </a>
+                </sqx-dropdown-menu>
             </div>
 
             <ng-template #newStatusOld>

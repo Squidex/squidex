@@ -7,7 +7,7 @@
 
 /* eslint-disable import/no-cycle */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
 
 @Component({
     selector: 'sqx-loader',
@@ -16,7 +16,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoaderComponent {
-    @Input()
+    @Input({ transform: numberAttribute })
     public size = 18;
 
     @Input()

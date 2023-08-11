@@ -67,17 +67,15 @@
                             <i class="icon-dots"></i>
                         </button>
 
-                        <ng-container *sqxModal="dropdown;closeAlways:true">
-                            <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
-                                <a class="dropdown-item dropdown-item-delete"
-                                    (sqxConfirmClick)="delete()"
-                                    confirmTitle="i18n:contents.deleteConfirmTitle"
-                                    confirmText="i18n:contents.deleteConfirmText"
-                                    confirmRememberKey="deleteContent">
-                                    {{ 'common.delete' | sqxTranslate }}
-                                </a>
-                            </sqx-dropdown-menu>
-                        </ng-container>
+                        <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                            <a class="dropdown-item dropdown-item-delete"
+                                (sqxConfirmClick)="delete()"
+                                confirmTitle="i18n:contents.deleteConfirmTitle"
+                                confirmText="i18n:contents.deleteConfirmText"
+                                confirmRememberKey="deleteContent">
+                                {{ 'common.delete' | sqxTranslate }}
+                            </a>
+                        </sqx-dropdown-menu>
                     </ng-container>
 
                     <ng-container *ngIf="contentTab | async; let tab">
@@ -87,7 +85,7 @@
                             <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
 
                             <ng-container *ngIf="content?.canUpdate">
-                                <button type="submit" class="btn btn-primary ms-2" shortcut="CTRL + SHIFT + S">
+                                <button type="submit" class="btn btn-primary ms-2" shortcut="CTRL + SHIFT + S" sqxTourStep="saveContent">
                                     {{ 'common.save' | sqxTranslate }}
                                 </button>
                             </ng-container>
@@ -108,13 +106,15 @@
                         [percents]="contentForm.translationStatus | async">
                     </sqx-language-selector>
 
-                    <button type="button" class="btn btn-primary ms-2" (click)="save()" *ngIf="contentsState.canCreate | async">
-                        {{ 'common.save' | sqxTranslate }}
-                    </button>
-
-                    <button type="submit" class="btn btn-success ms-2" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
-                        {{ 'contents.saveAndPublish' | sqxTranslate }}
-                    </button>
+                    <div sqxTourStep="saveContent">
+                        <button type="button" class="btn btn-primary ms-2" (click)="save()" *ngIf="contentsState.canCreate | async">
+                            {{ 'common.save' | sqxTranslate }}
+                        </button>
+    
+                        <button type="submit" class="btn btn-success ms-2" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
+                            {{ 'contents.saveAndPublish' | sqxTranslate }}
+                        </button>
+                    </div>
                 </ng-template>
             </div>
         </ng-container>
@@ -174,21 +174,40 @@
 
         <ng-container sidebarMenu>
             <div class="panel-nav">
-                <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.workflow" titlePosition="left-center" #linkHistory>
+                <a class="panel-link"
+                    routerLink="history"
+                    routerLinkActive="active"
+                    queryParamsHandling="preserve"
+                    title="i18n:common.workflow"
+                    titlePosition="left"
+
+                    sqxTourStep="history"
+                    #linkHistory>
                     <i class="icon-time"></i>
                 </a>
 
-                <a class="panel-link" routerLink="comments" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.comments" titlePosition="left-center">
+                <a class="panel-link"
+                    routerLink="comments"
+                    routerLinkActive="active"
+                    queryParamsHandling="preserve"
+                    title="i18n:common.comments"
+                    titlePosition="left"
+                    hintText="common.sidebarTour"
+                    hintAfter="120000"
+                    sqxTourStep="comments">
                     <i class="icon-comments"></i>
                 </a>
                 
-                <a class="panel-link" routerLink="sidebar" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.sidebar" titlePosition="left-center" *ngIf="schema.properties.contentSidebarUrl">
+                <a class="panel-link"
+                    routerLink="sidebar"
+                    routerLinkActive="active"
+                    queryParamsHandling="preserve"
+                    title="i18n:common.sidebar"
+                    titlePosition="left"
+                    sqxTourStep="plugin"
+                    *ngIf="schema.properties.contentSidebarUrl">
                     <i class="icon-plugin"></i>
                 </a>
-
-                <sqx-onboarding-tooltip helpId="history" [for]="linkHistory" position="left-top" [after]="120000">
-                    {{ 'common.sidebarTour' | sqxTranslate }}
-                </sqx-onboarding-tooltip>
             </div>
         </ng-container>
     </sqx-layout>

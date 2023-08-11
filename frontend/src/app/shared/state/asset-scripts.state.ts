@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, Resource, shareSubscribed, State, Version } from '@app/framework';
+import { debug, DialogService, LoadingState, Resource, shareSubscribed, State, Version } from '@app/framework';
 import { AppsService, AssetScripts, AssetScriptsPayload } from './../services/apps.service';
 import { AppsState } from './apps.state';
 
@@ -54,6 +54,8 @@ export class AssetScriptsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
     ) {
         super({ scripts: {}, resource: { _links: {} }, version: Version.EMPTY });
+
+        debug(this, 'assetScripts');
     }
 
     public load(isReload = false): Observable<any> {

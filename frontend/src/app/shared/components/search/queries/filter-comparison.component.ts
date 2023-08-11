@@ -10,7 +10,7 @@ import { FilterableField, FilterComparison, FilterFieldUI, getFilterUI, Language
 import { ContributorsState } from '@app/shared/state/contributors.state';
 
 @Component({
-    selector: 'sqx-filter-comparison[filter][language][languages][model][statuses]',
+    selector: 'sqx-filter-comparison',
     styleUrls: ['./filter-comparison.component.scss'],
     templateUrl: './filter-comparison.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,19 +22,19 @@ export class FilterComparisonComponent {
     @Output()
     public remove = new EventEmitter();
 
-    @Input()
+    @Input({ required: true })
     public language!: LanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public statuses?: ReadonlyArray<StatusInfo> | null;
 
-    @Input()
+    @Input({ required: true })
     public model!: QueryModel;
 
-    @Input()
+    @Input({ required: true })
     public filter!: FilterComparison;
 
     public field?: FilterableField;

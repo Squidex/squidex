@@ -1,5 +1,5 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createTeam()">
-    <sqx-modal-dialog (close)="emitComplete()">
+    <sqx-modal-dialog (close)="emitClose()">
         <ng-container title>
             {{ 'teams.create' | sqxTranslate }}
         </ng-container>
@@ -27,7 +27,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-secondary" (click)="emitComplete()">
+            <button type="button" class="btn btn-secondary" (click)="emitClose()">
                 {{ 'common.cancel' | sqxTranslate }}
             </button>
 

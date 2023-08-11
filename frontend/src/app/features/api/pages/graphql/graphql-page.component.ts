@@ -10,7 +10,7 @@ import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import GraphiQL from 'graphiql';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel } from '@app/shared';
+import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, MessageBus, QueryExecuted, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-graphql-page',
@@ -30,6 +30,7 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit {
         private readonly apiUrl: ApiUrlConfig,
         private readonly authService: AuthService,
         private readonly clientsService: ClientsService,
+        private readonly messageBus: MessageBus,
         public readonly clientsState: ClientsState,
     ) {
     }
@@ -74,6 +75,15 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit {
             url: graphQLEndpoint,
             headers: {
                 Authorization: `Bearer ${accessToken}`,
+            },
+            fetch: (input: RequestInfo | URL, init?: RequestInit) => {
+                const isIntrospection = Types.isString(init?.body) && init!.body.indexOf('IntrospectionQuery') >= 0;
+
+                if (!isIntrospection) {
+                    this.messageBus.emit(new QueryExecuted());
+                }
+
+                return fetch(input, init);
             },
             subscriptionUrl,
         });

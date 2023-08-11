@@ -6,8 +6,7 @@
  */
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { moduleMetadata } from '@storybook/angular';
-import { Meta, Story } from '@storybook/angular/types-6-0';
+import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { DateTimeEditorComponent, LocalizerService, SqxFrameworkModule, UIOptions } from '@app/framework';
 
 const translations = {
@@ -58,32 +57,24 @@ export default {
     ],
 } as Meta;
 
-const Template: Story<DateTimeEditorComponent> = (args: DateTimeEditorComponent) => ({
-    props: args,
-});
+type Story = StoryObj<DateTimeEditorComponent>;
 
-export const Date = Template.bind({});
-
-Date.args = {
-    mode: 'Date',
+export const Date: Story = {
+    args: {
+        mode: 'Date',
+    },
 };
 
-export const DateDisabled = Template.bind({});
-
-DateDisabled.args = {
-    mode: 'Date',
-    disabled: true,
+export const DateTime: Story = {
+    args: {
+        mode: 'DateTime',
+        disabled: true,
+    },
 };
 
-export const DateTime = Template.bind({});
-
-DateTime.args = {
-    mode: 'DateTime',
-};
-
-export const DateTimeDisabled = Template.bind({});
-
-DateTimeDisabled.args = {
-    mode: 'DateTime',
-    disabled: true,
+export const DateTimeDisabled: Story = {
+    args: {
+        mode: 'DateTime',
+        disabled: true,
+    },
 };

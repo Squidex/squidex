@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, OnboardingService, TeamDto, TeamsState, TemplateDto, TemplatesState, UIOptions, UIState } from '@app/shared';
+import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, TeamDto, TeamsState, TemplateDto, TemplatesState, TourState, UIOptions, UIState } from '@app/shared';
 import { Settings } from '@app/shared/state/settings';
 
 type GroupedApps = { team?: TeamDto; apps: AppDto[] };
@@ -63,9 +63,9 @@ export class AppsPageComponent implements OnInit {
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
         private readonly newsService: NewsService,
-        private readonly onboardingService: OnboardingService,
         private readonly teamsState: TeamsState,
         private readonly templatesState: TemplatesState,
+        private readonly tourState: TourState,
         private readonly uiOptions: UIOptions,
     ) {
         if (uiOptions.get('showInfo')) {
@@ -74,14 +74,20 @@ export class AppsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        const shouldShowOnboarding = this.onboardingService.shouldShow('dialog');
-
         this.appsState.apps.pipe(take(1))
             .subscribe(apps => {
-                if (shouldShowOnboarding && apps.length === 0) {
-                    this.onboardingService.disable('dialog');
+                if (apps.length === 0 &&
+                    this.tourState.snapshot.status !== 'Completed' &&
+                    this.tourState.snapshot.status !== 'Started') {
                     this.onboardingDialog.show();
-                } else if (!this.uiOptions.get('hideNews')) {
+                    return;
+                }
+
+                if (this.tourState.snapshot.status !== 'Started') {
+                    this.tourState.complete();
+                }
+
+                if (!this.uiOptions.get('hideNews')) {
                     const newsVersion = this.localStore.getInt(Settings.Local.NEWS_VERSION);
 
                     this.newsService.getFeatures(newsVersion)
@@ -95,7 +101,7 @@ export class AppsPageComponent implements OnInit {
                                 this.localStore.setInt(Settings.Local.NEWS_VERSION, result.version);
                             }
                         });
-                }
+                    }
             });
 
         this.templatesState.load(false, true);

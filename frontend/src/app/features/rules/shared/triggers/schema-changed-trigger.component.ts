@@ -9,11 +9,11 @@ import { Component, Input } from '@angular/core';
 import { TriggerForm } from '@app/shared';
 
 @Component({
-    selector: 'sqx-schema-changed-trigger[triggerForm]',
+    selector: 'sqx-schema-changed-trigger',
     styleUrls: ['./schema-changed-trigger.component.scss'],
     templateUrl: './schema-changed-trigger.component.html',
 })
 export class SchemaChangedTriggerComponent {
-    @Input()
+    @Input({ required: true })
     public triggerForm!: TriggerForm;
 }

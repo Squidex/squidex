@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 
@@ -45,10 +45,10 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     @Input()
     public layout: 'Auto' | 'Singleline' | 'Multiline' = 'Auto';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public unsorted = true;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -68,8 +68,8 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     public tagValuesSorted: ReadonlyArray<TagValue> = [];
     public tagValuesUnsorted: ReadonlyArray<TagValue> = [];
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, { checkedValues: [] });
+    constructor() {
+        super({ checkedValues: [] });
 
         this.textMeasurer = new TextMeasurer(() => this.containerElement);
     }

@@ -9,16 +9,16 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-client[client][clientRoles]',
+    selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClientComponent {
-    @Input()
+    @Input({ required: true })
     public client!: ClientDto;
 
-    @Input()
+    @Input({ required: true })
     public clientRoles!: ReadonlyArray<RoleDto>;
 
     public apiCallsLimit = 0;

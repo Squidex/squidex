@@ -22,6 +22,9 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
     @Input()
     public topic = '';
 
+    @Input()
+    public position?: 'bottom-left' | 'bottom-right' = 'bottom-left';
+
     @ViewChild('element', { static: false })
     public element!: ElementRef<Element>;
 
@@ -50,7 +53,7 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
 
     public ngAfterViewInit() {
         if (this.isConfigured) {
-            let notifo = window['notifo'];
+            let notifo = (window as any)['notifo'];
 
             if (!notifo) {
                 notifo = [];
@@ -69,15 +72,15 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
                 notifo.push(['init', options]);
                 notifo.push(['subscribe']);
 
-                window['notifo'] = notifo;
+                (window as any)['notifo'] = notifo;
             }
 
             const element = this.element?.nativeElement;
 
             if (!this.topic) {
-                notifo.push(['show-notifications', element, { position: 'bottom-right', style: 'notifo' }]);
+                notifo.push(['show-notifications', element, { position: this.position, style: 'notifo' }]);
             } else {
-                notifo.push(['show-topic', element, this.topic, { position: 'bottom-right', style: 'bell' }]);
+                notifo.push(['show-topic', element, this.topic, { position: this.position, style: 'bell' }]);
             }
 
             if (element) {
@@ -87,7 +90,7 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        const notifo = window['notifo'];
+        const notifo = (window as any)['notifo'];
 
         const element = this.element?.nativeElement;
 
@@ -98,7 +101,7 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
     }
 
     public ngOnDestroy() {
-        const notifo = window['notifo'];
+        const notifo = (window as any)['notifo'];
 
         const element = this.element?.nativeElement;
 

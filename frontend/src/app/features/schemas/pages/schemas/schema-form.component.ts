@@ -15,10 +15,10 @@ import { ApiUrlConfig, AppsState, CreateSchemaForm, SchemaDto, SchemasState } fr
 })
 export class SchemaFormComponent implements OnInit {
     @Output()
-    public complete = new EventEmitter<SchemaDto>();
+    public create = new EventEmitter<SchemaDto>();
 
     @Output()
-    public cancel = new EventEmitter();
+    public close = new EventEmitter();
 
     @Input()
     public import: any;
@@ -46,8 +46,12 @@ export class SchemaFormComponent implements OnInit {
         return false;
     }
 
-    public emitComplete(value: SchemaDto) {
-        this.complete.emit(value);
+    public emitCreate(value: SchemaDto) {
+        this.create.emit(value);
+    }
+
+    public emitClose() {
+        this.close.emit();
     }
 
     public createSchema() {
@@ -57,7 +61,7 @@ export class SchemaFormComponent implements OnInit {
             this.schemasState.create(value)
                 .subscribe({
                     next: dto => {
-                        this.emitComplete(dto);
+                        this.emitCreate(dto);
                     },
                     error: error => {
                         this.createForm.submitFailed(error);

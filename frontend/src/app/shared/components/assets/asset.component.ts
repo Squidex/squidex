@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { AssetDto, AssetUploaderState, DialogService, StatefulComponent, Types, UploadCanceled } from '@app/shared/internal';
 
 interface State {
@@ -50,34 +50,32 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Input()
     public folderId?: string;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public folderIcon?: boolean | null | undefined;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public removeMode?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isDisabled?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isSelected?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isCompact: boolean | undefined | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isSelectable?: boolean | null;
 
-    @Input() @HostBinding('class.isListView')
+    @Input({ transform: booleanAttribute }) @HostBinding('class.isListView')
     public isListView?: boolean | null;
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly assetUploader: AssetUploaderState,
         private readonly dialogs: DialogService,
     ) {
-        super(changeDetector, {
-            progress: 0,
-        });
+        super({ progress: 0 });
     }
 
     public ngOnInit() {

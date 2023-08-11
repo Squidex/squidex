@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-table-header[text]',
+    selector: 'sqx-table-header',
     styleUrls: ['./table-header.component.scss'],
     templateUrl: './table-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +21,7 @@ export class TableHeaderComponent {
     @Input()
     public query: Query | undefined | null;
 
-    @Input()
+    @Input({ required: true })
     public text = '';
 
     @Input()
@@ -30,7 +30,7 @@ export class TableHeaderComponent {
     @Input()
     public sortPath?: string | undefined | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public sortable?: boolean | null;
 
     @Input()

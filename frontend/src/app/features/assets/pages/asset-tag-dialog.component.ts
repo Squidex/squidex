@@ -15,7 +15,7 @@ import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
 })
 export class AssetTagDialogComponent implements OnInit {
     @Output()
-    public complete = new EventEmitter();
+    public close = new EventEmitter();
 
     @Input({ required: true })
     public tagName!: string;
@@ -31,8 +31,8 @@ export class AssetTagDialogComponent implements OnInit {
         this.editForm.load({ tagName: this.tagName });
     }
 
-    public emitComplete() {
-        this.complete.emit();
+    public emitClose() {
+        this.close.emit();
     }
 
     public renameAssetTag() {
@@ -43,13 +43,13 @@ export class AssetTagDialogComponent implements OnInit {
         }
 
         if (value.tagName === this.tagName) {
-            this.emitComplete();
+            this.emitClose();
         }
 
         this.assetsState.renameTag(this.tagName, value?.tagName)
             .subscribe({
                 next: () => {
-                    this.emitComplete();
+                    this.emitClose();
                 },
                 error: error => {
                     this.editForm.submitFailed(error);

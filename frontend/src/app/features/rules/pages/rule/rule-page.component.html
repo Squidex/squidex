@@ -2,7 +2,7 @@
 <sqx-title message="i18n:rules.itemPageTitle"></sqx-title>
 
 <form (ngSubmit)="save()">#
-    <sqx-layout layout="main" [innerWidth]="54">
+    <sqx-layout layout="main" innerWidth="54">
         <ng-container title>
             <div class="d-flex align-items-center">
                 <a class="btn btn-text-secondary" (click)="back()">
@@ -49,7 +49,7 @@
                             </div>
         
                             <div class="col col-icon" *ngIf="currentTrigger">
-                                <sqx-rule-element [type]="currentTrigger.triggerType" [isSmall]="true" [element]="triggerElement" [disabled]="true"></sqx-rule-element>
+                                <sqx-rule-element [type]="currentTrigger.triggerType" isSmall="true" [element]="triggerElement" disabled="true"></sqx-rule-element>
                             </div>
 
                             <div class="col text-end" *ngIf="currentTrigger && !rule">
@@ -96,7 +96,7 @@
                             <div class="row g-0">
                                 <div *ngFor="let triggerType of supportedTriggers | sqxKeys" class="col-12 col-md-6">
                                     <div class="rule-element" (click)="selectTrigger(triggerType)">
-                                        <sqx-rule-element [type]="triggerType" [isSmall]="false" [element]="supportedTriggers[triggerType]"></sqx-rule-element>
+                                        <sqx-rule-element [type]="triggerType" isSmall="false" [element]="$any(supportedTriggers)[triggerType]"></sqx-rule-element>
                                     </div>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@
                             </div>
 
                             <div class="col col-icon" *ngIf="currentAction">
-                                <sqx-rule-element [type]="currentAction.actionType" [isSmall]="true" [element]="actionElement" [disabled]="true"></sqx-rule-element>
+                                <sqx-rule-element [type]="currentAction.actionType" isSmall="true" [element]="$any(actionElement)" disabled="true"></sqx-rule-element>
                             </div>
 
                             <div class="col text-end" *ngIf="currentAction && !rule">
@@ -145,7 +145,7 @@
                             <div class="row g-0">
                                 <div *ngFor="let actionType of supportedActions | sqxKeys" class="col-12 col-md-6">
                                     <div class="rule-element" (click)="selectAction(actionType)">
-                                        <sqx-rule-element [type]="actionType" [isSmall]="false" [element]="supportedActions[actionType]"></sqx-rule-element>
+                                        <sqx-rule-element [type]="actionType" isSmall="false" [element]="$any(supportedActions[actionType])"></sqx-rule-element>
                                     </div>
                                 </div>
                             </div>
@@ -158,22 +158,39 @@
         <ng-container sidebarMenu>
             <div class="panel-nav">
                 <ng-container  *ngIf="rule && (rulesState.canReadEvents | async)">
-                    <a class="panel-link panel-link-gray" routerLink="events" [queryParams]="{ ruleId: rule.id }" routerLinkActive="active" title="i18n:common.history" titlePosition="left-center">
+                    <a class="panel-link panel-link-gray"
+                        routerLink="events"
+                        routerLinkActive="active"
+                        [queryParams]="{ ruleId: rule.id }"
+                        title="i18n:common.history"
+                        titlePosition="left"
+                        sqxTourStep="history">
                         <i class="icon-time"></i>
                     </a>
     
-                    <a class="panel-link panel-link-gray" routerLink="simulator" [queryParams]="{ ruleId: rule.id }" routerLinkActive="active" title="i18n:rules.simulator" titlePosition="left-center">
+                    <a class="panel-link panel-link-gray"
+                        routerLink="simulator"
+                        routerLinkActive="active"
+                        [queryParams]="{ ruleId: rule.id }"
+                        title="i18n:rules.simulator"
+                        titlePosition="left"
+                        sqxTourStep="simulator">
                         <i class="icon-play-line"></i>
                     </a>
                 </ng-container>
     
-                <a class="panel-link" routerLink="help" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.help" titlePosition="left-center" #helpLink>
+                <a class="panel-link"
+                    routerLink="help"
+                    routerLinkActive="active"
+                    queryParamsHandling="preserve"
+                    hintText="common.helpTour"
+                    hintAfter="180000"
+                    title="i18n:common.help"
+                    titlePosition="left"
+                    sqxTourStep="help"
+                    #helpLink>
                     <i class="icon-help2"></i>
                 </a>
-    
-                <sqx-onboarding-tooltip helpId="help" [for]="helpLink" position="left-top" [after]="180000">
-                    <span [innerHTML]="'common.helpTour' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span>
-                </sqx-onboarding-tooltip>
             </div>
         </ng-container>
     </sqx-layout>

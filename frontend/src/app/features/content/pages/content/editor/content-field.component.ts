@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, HostBinding, Input, numberAttribute, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, AppsState, changed$, disabled$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService, TypedSimpleChanges } from '@app/shared';
 
@@ -18,7 +18,7 @@ export class ContentFieldComponent {
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isCompact?: boolean | null;
 
     @Input()
@@ -30,7 +30,7 @@ export class ContentFieldComponent {
     @Input({ required: true })
     public formContext!: any;
 
-    @Input({ required: true })
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
     @Input({ required: true })

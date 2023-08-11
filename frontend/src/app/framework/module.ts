@@ -7,11 +7,12 @@
 
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ErrorHandler, ModuleWithProviders, NgModule } from '@angular/core';
+import { ErrorHandler, Injector, ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ColorPickerModule } from 'ngx-color-picker';
-import { AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactivateGuard, CheckboxGroupComponent, ClipboardService, CodeComponent, CodeEditorComponent, ColorPickerComponent, CompensateScrollbarDirective, ConfirmClickDirective, ControlErrorsComponent, ControlErrorsMessagesComponent, CopyDirective, DarkenPipe, DatePipe, DateTimeEditorComponent, DayOfWeekPipe, DayPipe, DialogRendererComponent, DialogService, DisplayNamePipe, DropdownComponent, DropdownMenuComponent, DurationPipe, EditableTitleComponent, ExternalLinkDirective, FileDropDirective, FileSizePipe, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FromNowPipe, FullDateTimePipe, GlobalErrorHandler, HighlightPipe, HoverBackgroundDirective, IfOnceDirective, ImageSourceDirective, ImageUrlDirective, IndeterminateValueDirective, ISODatePipe, JoinPipe, KeysPipe, KNumberPipe, LanguageSelectorComponent, LayoutComponent, LayoutContainerDirective, LightenPipe, ListViewComponent, LoaderComponent, LoadingInterceptor, LoadingService, LocalizedInputComponent, LocalStoreService, LongHoverDirective, MarkdownDirective, MarkdownInlinePipe, MarkdownPipe, MessageBus, ModalDialogComponent, ModalDirective, ModalPlacementDirective, MonthPipe, OnboardingService, OnboardingTooltipComponent, PagerComponent, ParentLinkDirective, ProgressBarComponent, RadioGroupComponent, ResizedDirective, ResizeService, ResourceLoaderService, RootViewComponent, SafeHtmlPipe, SafeResourceUrlPipe, SafeUrlPipe, ScrollActiveDirective, ShortcutComponent, ShortcutDirective, ShortcutService, ShortDatePipe, ShortTimePipe, StarsComponent, StatusIconComponent, StopClickDirective, StopDragDirective, SyncScollingDirective, SyncWidthDirective, TabRouterlinkDirective, TagEditorComponent, TemplateWrapperDirective, TempService, TitleComponent, TitleService, ToggleComponent, ToolbarComponent, TooltipDirective, TransformInputDirective, TranslatePipe, VideoPlayerComponent } from './declarations';
+import { TourService as BaseTourService } from 'ngx-ui-tour-core';
+import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactivateGuard, CheckboxGroupComponent, ClipboardService, CodeComponent, CodeEditorComponent, ColorPickerComponent, CompensateScrollbarDirective, ConfirmClickDirective, ControlErrorsComponent, ControlErrorsMessagesComponent, CopyDirective, DarkenPipe, DatePipe, DateTimeEditorComponent, DayOfWeekPipe, DayPipe, DialogRendererComponent, DialogService, DisplayNamePipe, DropdownComponent, DropdownMenuComponent, DurationPipe, EditableTitleComponent, ExternalLinkDirective, FileDropDirective, FileSizePipe, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FromNowPipe, FullDateTimePipe, GlobalErrorHandler, HighlightPipe, HoverBackgroundDirective, IfOnceDirective, ImageSourceDirective, ImageUrlDirective, IndeterminateValueDirective, ISODatePipe, JoinPipe, KeysPipe, KNumberPipe, LanguageSelectorComponent, LayoutComponent, LayoutContainerDirective, LightenPipe, ListViewComponent, LoaderComponent, LoadingInterceptor, LoadingService, LocalizedInputComponent, LocalStoreService, LongHoverDirective, MarkdownDirective, MarkdownInlinePipe, MarkdownPipe, MessageBus, ModalDialogComponent, ModalDirective, ModalPlacementDirective, MonthPipe, PagerComponent, ParentLinkDirective, ProgressBarComponent, RadioGroupComponent, ResizedDirective, ResizeService, ResourceLoaderService, RootViewComponent, SafeHtmlPipe, SafeResourceUrlPipe, SafeUrlPipe, ScrollActiveDirective, ShortcutComponent, ShortcutDirective, ShortcutService, ShortDatePipe, ShortTimePipe, StarsComponent, StatusIconComponent, StopClickDirective, StopDragDirective, SyncScollingDirective, SyncWidthDirective, TabRouterlinkDirective, TagEditorComponent, TemplateWrapperDirective, TempService, TitleComponent, TitleService, ToggleComponent, ToolbarComponent, TooltipDirective, TourService, TourStepDirective, TourTemplateComponent, TransformInputDirective, TranslatePipe, VideoPlayerComponent } from './declarations';
 
 @NgModule({
     imports: [
@@ -78,7 +79,6 @@ import { AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactiva
         ModalDirective,
         ModalPlacementDirective,
         MonthPipe,
-        OnboardingTooltipComponent,
         PagerComponent,
         ParentLinkDirective,
         ProgressBarComponent,
@@ -106,6 +106,8 @@ import { AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactiva
         ToolbarComponent,
         ToggleComponent,
         TooltipDirective,
+        TourStepDirective,
+        TourTemplateComponent,
         TransformInputDirective,
         TranslatePipe,
         VideoPlayerComponent,
@@ -168,7 +170,6 @@ import { AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactiva
         ModalDirective,
         ModalPlacementDirective,
         MonthPipe,
-        OnboardingTooltipComponent,
         PagerComponent,
         ParentLinkDirective,
         ProgressBarComponent,
@@ -194,31 +195,42 @@ import { AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactiva
         TagEditorComponent,
         TemplateWrapperDirective,
         TitleComponent,
-        ToolbarComponent,
         ToggleComponent,
+        ToolbarComponent,
         TooltipDirective,
+        TourStepDirective,
+        TourTemplateComponent,
         TransformInputDirective,
         TranslatePipe,
         VideoPlayerComponent,
     ],
 })
 export class SqxFrameworkModule {
+    constructor(injector: Injector) {
+        injector.get(AnalyticsService);
+    }
+
     public static forRoot(): ModuleWithProviders<SqxFrameworkModule> {
         return {
             ngModule: SqxFrameworkModule,
             providers: [
+                AnalyticsService,
                 CanDeactivateGuard,
                 ClipboardService,
                 DialogService,
                 LoadingService,
                 LocalStoreService,
                 MessageBus,
-                OnboardingService,
                 ResizeService,
                 ResourceLoaderService,
                 ShortcutService,
                 TempService,
+                TourService,
                 TitleService,
+                {
+                    provide: BaseTourService,
+                    useClass: TourService,
+                },
                 {
                     provide: ErrorHandler,
                     useClass: GlobalErrorHandler,

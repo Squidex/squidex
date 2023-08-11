@@ -32,28 +32,28 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
 }];
 
 @Component({
-    selector: 'sqx-role[allPermissions][role][schemas]',
+    selector: 'sqx-role',
     styleUrls: ['./role.component.scss'],
     templateUrl: './role.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoleComponent {
-    @Input()
+    @Input({ required: true })
     public role!: RoleDto;
 
-    @Input()
+    @Input({ required: true })
     public allPermissions!: AutocompleteSource;
 
-    @Input()
+    @Input({ required: true })
     public schemas!: ReadonlyArray<SchemaDto>;
 
     @ViewChild('addInput', { static: false })
     public addPermissionInput!: AutocompleteComponent;
 
-    public descriptions = DESCRIPTIONS;
+    public descriptions = DESCRIPTIONS as Record<string, string>;
 
     public propertiesList = Settings.AppProperties;
-    public properties!: {};
+    public properties!: Record<string, any>;
     public propertiesSimple = SIMPLE_PROPERTIES;
 
     public isEditing = false;

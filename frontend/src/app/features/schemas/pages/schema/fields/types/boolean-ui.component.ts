@@ -10,19 +10,19 @@ import { UntypedFormGroup } from '@angular/forms';
 import { BOOLEAN_FIELD_EDITORS, BooleanFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-boolean-ui[field][fieldForm][properties]',
+    selector: 'sqx-boolean-ui',
     styleUrls: ['boolean-ui.component.scss'],
     templateUrl: 'boolean-ui.component.html',
 })
 export class BooleanUIComponent {
     public readonly editors = BOOLEAN_FIELD_EDITORS;
 
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: BooleanFieldPropertiesDto;
 }

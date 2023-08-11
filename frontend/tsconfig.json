@@ -21,7 +21,6 @@
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "target": "ES2022",
     "lib": [
       "es2020",

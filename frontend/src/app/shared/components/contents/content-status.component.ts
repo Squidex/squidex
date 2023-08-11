@@ -5,21 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { LocalizerService, TypedSimpleChanges } from '@app/framework';
 import { ScheduleDto } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-content-status[status][statusColor]',
+    selector: 'sqx-content-status',
     styleUrls: ['./content-status.component.scss'],
     templateUrl: './content-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentStatusComponent {
-    @Input()
+    @Input({ required: true })
     public status!: string;
 
-    @Input()
+    @Input({ required: true })
     public statusColor!: string;
 
     @Input()
@@ -28,10 +28,10 @@ export class ContentStatusComponent {
     @Input()
     public layout: 'icon' | 'text' | 'multiline' = 'icon';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public truncate?: boolean | null;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public small?: boolean | null;
 
     public tooltipText = '';

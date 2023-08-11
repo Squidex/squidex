@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, ElementRef, forwardRef, Input, numberAttribute, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
-import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
+import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
@@ -36,7 +36,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-autocomplete[itemsSource]',
+    selector: 'sqx-autocomplete',
     styleUrls: ['./autocomplete.component.scss'],
     templateUrl: './autocomplete.component.html',
     providers: [
@@ -48,13 +48,13 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     private readonly modalStream = new Subject<string>();
     private timer: any;
 
-    @Input()
+    @Input({ required: true })
     public itemsSource!: AutocompleteSource;
 
     @Input()
     public inputStyle?: 'underlined' | 'empty';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public allowOpen?: boolean | null = false;
 
     @Input()
@@ -69,22 +69,22 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     @Input()
     public icon = '';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public autoFocus?: boolean | null;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public debounceTime = 300;
 
     @Input()
-    public dropdownPosition: RelativePosition = 'bottom-left';
+    public dropdownPosition: FloatingPlacement = 'bottom-start';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public dropdownFullWidth = true;
 
     @Input()
     public dropdownStyles: any = {};
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -99,8 +99,8 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
 
     public queryInput = new UntypedFormControl();
 
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {
+    constructor() {
+        super({
             suggestedItems: [],
             suggestedIndex: -1,
         });
@@ -111,8 +111,8 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     public ngOnInit() {
-        this.changes.subscribe(state => {
-            if (state.suggestedItems.length > 0) {
+        this.project(x => x.suggestedItems).subscribe(suggestedItems => {
+            if (suggestedItems.length > 0) {
                 this.suggestionsModal.show();
             } else {
                 this.suggestionsModal.hide();

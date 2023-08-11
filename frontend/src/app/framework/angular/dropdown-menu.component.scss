@@ -1,2 +1,6 @@
 @import 'mixins';
 @import 'vars';
+
+:host {
+    background-color: $color-white;
+}

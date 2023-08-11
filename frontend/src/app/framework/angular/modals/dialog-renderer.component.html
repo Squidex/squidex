@@ -40,11 +40,7 @@
 </div>
 
 <ng-container *ngFor="let tooltip of snapshot.tooltips">
-    <div class="tooltip2 tooltip2-{{tooltip.textPosition}}" 
-        [sqxAnchoredTo]="tooltip.target" 
-        [position]="tooltip.textPosition"
-        [offsetY]="tooltip.offsetY"
-        [offsetX]="tooltip.offsetX">
+    <div class="tooltip2 tooltip2-{{tooltip.textPosition}}" [sqxAnchoredTo]="tooltip.target" [position]="tooltip.textPosition"[offset]="6">
         {{tooltip.text | sqxTranslate}}
 
         <ng-container *ngIf="tooltip.shortcut">

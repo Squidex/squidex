@@ -7,7 +7,7 @@
 
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { DateTime, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
+import { DateTime, debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
 import { CommentDto, CommentsService } from './../services/comments.service';
 
 interface Snapshot extends LoadingState {
@@ -38,7 +38,9 @@ export class CommentsState extends State<Snapshot> {
         private readonly orderDescending = false,
         initialVersion = -1,
     ) {
-        super({ comments: [], version: new Version(initialVersion.toString()) }, 'Comments');
+        super({ comments: [], version: new Version(initialVersion.toString()) });
+
+        debug(this, 'comments');
     }
 
     public load(silent = false): Observable<any> {

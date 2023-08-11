@@ -19,23 +19,25 @@ describe('UIState', () => {
     const common = {
         key: 'xx',
         map: {
-            type: 'GSM',
-            sizeX: 800,
-            sizeY: 600,
+            overridenByShared: 'common1',
+            overridenByUser: 'common2',
+            onlyCommon: 'common3',
         },
         canCreateApps: true,
     };
 
     const shared = {
         map: {
-            type: 'GM', key: 'xyz',
+            overridenByShared: 'shared1',
+            onlyShared: 'shared2',
         },
         canCreateApps: true,
     };
 
     const user = {
         map: {
-            sizeX: 1000,
+            overridenByUser: 'user1',
+            onlyUser: 'user2',
         },
         canCustomize: true,
     };
@@ -56,10 +58,10 @@ describe('UIState', () => {
         uiService.setup(x => x.getCommonSettings())
             .returns(() => of(common));
 
-        uiService.setup(x => x.getSharedSettings(app))
+        uiService.setup(x => x.getAppSharedSettings(app))
             .returns(() => of(shared));
 
-        uiService.setup(x => x.getUserSettings(app))
+        uiService.setup(x => x.getAppUserSettings(app))
             .returns(() => of(user));
 
         usersService = Mock.ofType<UsersService>();
@@ -71,13 +73,22 @@ describe('UIState', () => {
     });
 
     it('should load settings', () => {
-        expect(uiState.snapshot.settings).toEqual({
+        let settings: any;
+
+        uiState.settings.subscribe(value => {
+            settings = value;
+        });
+
+        uiState.load().subscribe();
+
+        expect(settings).toEqual({
             key: 'xx',
             map: {
-                type: 'GM',
-                sizeX: 1000,
-                sizeY: 600,
-                key: 'xyz',
+                overridenByShared: 'shared1',
+                overridenByUser: 'user1',
+                onlyCommon: 'common3',
+                onlyShared: 'shared2',
+                onlyUser: 'user2',
             },
             canCreateApps: true,
             canCustomize: true,
@@ -88,19 +99,27 @@ describe('UIState', () => {
         expect(uiState.snapshot.canRestore).toBeTruthy();
     });
 
-    it('should add value to snapshot if set as shared', () => {
-        uiService.setup(x => x.putSharedSetting(app, 'root.nested', 123))
+    it('should add value to snapshot if set as common', () => {
+        let settings: any;
+
+        uiState.settings.subscribe(value => {
+            settings = value;
+        });
+
+        uiService.setup(x => x.putCommonSetting('root.nested', 123))
             .returns(() => of({})).verifiable();
 
-        uiState.set('root.nested', 123);
+        uiState.load();
+        uiState.setCommon('root.nested', 123);
 
-        expect(uiState.snapshot.settings).toEqual({
+        expect(settings).toEqual({
             key: 'xx',
             map: {
-                type: 'GM',
-                sizeX: 1000,
-                sizeY: 600,
-                key: 'xyz',
+                overridenByShared: 'shared1',
+                overridenByUser: 'user1',
+                onlyCommon: 'common3',
+                onlyShared: 'shared2',
+                onlyUser: 'user2',
             },
             canCreateApps: true,
             canCustomize: true,
@@ -124,19 +143,27 @@ describe('UIState', () => {
         uiService.verifyAll();
     });
 
-    it('should add value to snapshot if set as user', () => {
-        uiService.setup(x => x.putUserSetting(app, 'root.nested', 123))
+    it('should add value to snapshot if set as app shared', () => {
+        let settings: any;
+
+        uiState.settings.subscribe(value => {
+            settings = value;
+        });
+
+        uiService.setup(x => x.putAppSharedSetting(app, 'root.nested', 123))
             .returns(() => of({})).verifiable();
 
-        uiState.set('root.nested', 123, true);
+        uiState.load();
+        uiState.setAppShared('root.nested', 123);
 
-        expect(uiState.snapshot.settings).toEqual({
+        expect(settings).toEqual({
             key: 'xx',
             map: {
-                type: 'GM',
-                sizeX: 1000,
-                sizeY: 600,
-                key: 'xyz',
+                overridenByShared: 'shared1',
+                overridenByUser: 'user1',
+                onlyCommon: 'common3',
+                onlyShared: 'shared2',
+                onlyUser: 'user2',
             },
             canCreateApps: true,
             canCustomize: true,
@@ -160,18 +187,70 @@ describe('UIState', () => {
         uiService.verifyAll();
     });
 
-    it('should remove value from snapshot and shared settings if removed', () => {
-        uiService.setup(x => x.deleteSharedSetting(app, 'map.key'))
+    it('should add value to snapshot if set as app user', () => {
+        let settings: any;
+
+        uiState.settings.subscribe(value => {
+            settings = value;
+        });
+
+        uiService.setup(x => x.putAppUserSetting(app, 'root.nested', 123))
             .returns(() => of({})).verifiable();
 
-        uiState.remove('map.key');
+        uiState.load();
+        uiState.setAppUser('root.nested', 123);
 
-        expect(uiState.snapshot.settings).toEqual({
+        expect(settings).toEqual({
             key: 'xx',
             map: {
-                type: 'GM',
-                sizeX: 1000,
-                sizeY: 600,
+                overridenByShared: 'shared1',
+                overridenByUser: 'user1',
+                onlyCommon: 'common3',
+                onlyShared: 'shared2',
+                onlyUser: 'user2',
+            },
+            canCreateApps: true,
+            canCustomize: true,
+            root: {
+                nested: 123,
+            },
+        });
+
+        uiState.get('root', {}).subscribe(x => {
+            expect(x).toEqual({ nested: 123 });
+        });
+
+        uiState.get('root.nested', 0).subscribe(x => {
+            expect(x).toEqual(123);
+        });
+
+        uiState.get('root.notfound', 1337).subscribe(x => {
+            expect(x).toEqual(1337);
+        });
+
+        uiService.verifyAll();
+    });
+
+    it('should remove value from snapshot and common settings if removed', () => {
+        let settings: any;
+
+        uiState.settings.subscribe(value => {
+            settings = value;
+        });
+
+        uiService.setup(x => x.deleteCommonSetting('map.onlyCommon'))
+            .returns(() => of({})).verifiable();
+
+        uiState.load();
+        uiState.remove('map.onlyCommon');
+
+        expect(settings).toEqual({
+            key: 'xx',
+            map: {
+                overridenByShared: 'shared1',
+                overridenByUser: 'user1',
+                onlyShared: 'shared2',
+                onlyUser: 'user2',
             },
             canCreateApps: true,
             canCustomize: true,
@@ -180,19 +259,54 @@ describe('UIState', () => {
         uiService.verifyAll();
     });
 
-    it('should remove value from snapshot and user settings if removed', () => {
-        uiService.setup(x => x.deleteUserSetting(app, 'map.sizeX'))
+    it('should remove value from snapshot and app shared settings if removed', () => {
+        let settings: any;
+
+        uiState.settings.subscribe(value => {
+            settings = value;
+        });
+
+        uiService.setup(x => x.deleteAppSharedSetting(app, 'map.onlyShared'))
             .returns(() => of({})).verifiable();
 
-        uiState.remove('map.sizeX');
+        uiState.load();
+        uiState.remove('map.onlyShared');
 
-        expect(uiState.snapshot.settings).toEqual({
+        expect(settings).toEqual({
             key: 'xx',
             map: {
-                type: 'GM',
-                sizeX: 800,
-                sizeY: 600,
-                key: 'xyz',
+                overridenByShared: 'shared1',
+                overridenByUser: 'user1',
+                onlyCommon: 'common3',
+                onlyUser: 'user2',
+            },
+            canCreateApps: true,
+            canCustomize: true,
+        });
+
+        uiService.verifyAll();
+    });
+
+    it('should remove value from snapshot and app user settings if removed', () => {
+        let settings: any;
+
+        uiState.settings.subscribe(value => {
+            settings = value;
+        });
+
+        uiService.setup(x => x.deleteAppUserSetting(app, 'map.onlyUser'))
+            .returns(() => of({})).verifiable();
+
+        uiState.load();
+        uiState.remove('map.onlyUser');
+
+        expect(settings).toEqual({
+            key: 'xx',
+            map: {
+                overridenByShared: 'shared1',
+                overridenByUser: 'user1',
+                onlyCommon: 'common3',
+                onlyShared: 'shared2',
             },
             canCreateApps: true,
             canCustomize: true,

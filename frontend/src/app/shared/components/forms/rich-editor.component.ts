@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ContentDto } from '@app/shared';
 import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
@@ -44,7 +44,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     @Input()
     public folderId = '';
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -56,12 +56,12 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
 
     public contentsDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
         private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
         private readonly resourceLoader: ResourceLoaderService,
     ) {
-        super(changeDetector, {});
+        super({});
     }
 
     public ngOnDestroy() {

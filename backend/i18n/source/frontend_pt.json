@@ -1010,8 +1010,6 @@
   "templates.loadFailed": "Falhou em carregar modelos. Por favor, recarregue.",
   "templates.refreshTooltip": "Modelos de atualização",
   "templates.reloaded": "Modelos recarregados.",
-  "tour.joinForum": "Junte-se ao nosso Fórum",
-  "tour.joinGithub": "Junte-se a nós em Github",
   "tour.skip": "Tour de salto",
   "tour.stepAppNext": "Continuar",
   "tour.stepAppText": "Uma App é o repositório do seu projeto, por exemplo (blog, web shop ou aplicativo móvel). Pode atribuir colaboradores à sua aplicação para trabalharem em conjunto.\n\nPode criar um número ilimitado de Apps em Squidex para gerir vários projetos ao mesmo tempo.",

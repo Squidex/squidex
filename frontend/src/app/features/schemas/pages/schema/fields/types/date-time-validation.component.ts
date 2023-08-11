@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { booleanAttribute, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto, TypedSimpleChanges } from '@app/shared';
@@ -13,24 +13,24 @@ import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto, TypedSi
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
 @Component({
-    selector: 'sqx-date-time-validation[field][fieldForm][languages][properties]',
+    selector: 'sqx-date-time-validation',
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html',
 })
 export class DateTimeValidationComponent {
-    @Input()
+    @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
-    @Input()
+    @Input({ required: true })
     public field!: FieldDto;
 
-    @Input()
+    @Input({ required: true })
     public properties!: DateTimeFieldPropertiesDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;
 
     public showDefaultValues?: Observable<boolean>;

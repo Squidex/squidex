@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-api-calls-card[usage]',
+    selector: 'sqx-api-calls-card',
     styleUrls: ['./api-calls-card.component.scss'],
     templateUrl: './api-calls-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,7 +18,7 @@ export class ApiCallsCardComponent {
     @Input()
     public app: AppDto | undefined | null;
 
-    @Input()
+    @Input({ required: true })
     public usage?: CallsUsageDto;
 
     public chartOptions = ChartOptions.Stacked;

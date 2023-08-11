@@ -1,0 +1,42 @@
+@import 'mixins';
+@import 'vars';
+
+$hide-shadow: rgba(0, 0, 0, 50%);
+
+.tour {
+    &-step {
+        @include box-shadow-outer(0, 0, 4px, .2);
+        background: $color-white;
+        border: 0;
+        border-radius: 0;
+    }
+
+    &-progress {
+        background: $color-theme-brand;
+        border: 0;
+        border-radius: 0;
+        height: 4px;
+        transition: width .4s ease-in-out;
+    }
+
+    &-body {
+        padding: .5rem 1rem;
+        font-size: $font-small;
+        font-weight: normal;
+        max-width: 300px;
+    }
+
+    &-footer {
+        border-top: 1px solid $color-border;
+        border-bottom: 0;;
+        padding: .5rem;
+
+        &:empty {
+            display: none;
+        }
+    }
+}
+
+p:last-child {
+    margin: 0;
+}

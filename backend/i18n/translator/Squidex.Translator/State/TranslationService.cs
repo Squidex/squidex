@@ -10,6 +10,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Squidex.Translator.State.Old;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Squidex.Translator.State;
 
@@ -159,6 +160,14 @@ public sealed class TranslationService
         Save();
     }
 
+    public void Remove(string key)
+    {
+        foreach (var (_, texts) in translations)
+        {
+            texts.Remove(key);
+        }
+    }
+
     public void Save()
     {
         foreach (var (locale, texts) in translations)
@@ -295,6 +304,11 @@ public sealed class TranslationService
     private bool IsIgnored(string name, string text)
     {
         return translationToIgnore.TryGetValue(name, out var ignores) && (ignores.Contains(text) || ignores.Contains("*"));
+    }
+
+    public void Add(string key)
+    {
+        MainTranslations[key] = string.Empty;
     }
 
     private void AddText(string key, string text)

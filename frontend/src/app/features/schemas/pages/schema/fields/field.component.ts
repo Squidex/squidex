@@ -5,31 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { booleanAttribute, Component, Input } from '@angular/core';
 import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, FieldDto, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field[field][languages][schema][settings]',
+    selector: 'sqx-field',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
 })
 export class FieldComponent {
-    @Input()
+    @Input({ required: true })
     public field!: NestedFieldDto | RootFieldDto;
 
-    @Input()
+    @Input({ required: true })
     public schema!: SchemaDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public plain = false;
 
     @Input()
     public parent?: RootFieldDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input()
+    @Input({ required: true })
     public settings!: AppSettingsDto;
 
     public dropdown = new ModalModel();
@@ -42,7 +42,7 @@ export class FieldComponent {
     public fieldWizard = new DialogModel();
 
     public get isLocalizable() {
-        return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];
+        return (this.parent && this.parent.isLocalizable) || (this.field as any)['isLocalizable'];
     }
 
     constructor(

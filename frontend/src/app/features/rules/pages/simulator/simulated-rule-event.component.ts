@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { SimulatedRuleEventDto } from '@app/shared';
 
 const ERRORS_AFTER_EVENT = [
@@ -37,7 +37,7 @@ export class SimulatedRuleEventComponent {
     @Input('sqxSimulatedRuleEvent')
     public event!: SimulatedRuleEventDto;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public expanded = false;
 
     @Output()

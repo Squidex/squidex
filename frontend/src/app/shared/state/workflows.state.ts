@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
+import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
 import { WorkflowDto, WorkflowsPayload, WorkflowsService } from './../services/workflows.service';
 import { AppsState } from './apps.state';
 
@@ -56,7 +56,9 @@ export class WorkflowsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly workflowsService: WorkflowsService,
     ) {
-        super({ errors: [], workflows: [], version: Version.EMPTY }, 'Workflows');
+        super({ errors: [], workflows: [], version: Version.EMPTY });
+
+        debug(this, 'workflows');
     }
 
     public load(isReload = false): Observable<any> {

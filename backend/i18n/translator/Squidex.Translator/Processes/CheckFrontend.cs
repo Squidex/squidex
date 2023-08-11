@@ -22,7 +22,7 @@ public class CheckFrontend
         this.service = service;
     }
 
-    public void Run()
+    public void Run(bool fix)
     {
         var all = new HashSet<string>();
 
@@ -35,7 +35,15 @@ public class CheckFrontend
                 all.Add(translation);
             }
 
-            Helper.CheckForFile(service, relativeName, translations);
+            var notTranslated = Helper.CheckForFile(service, relativeName, translations);
+
+            if (fix)
+            {
+                foreach (var key in notTranslated)
+                {
+                    service.Add(key);
+                }
+            }
         }
 
         foreach (var (file, relativeName) in Frontend.GetTypescriptFiles(folder))
@@ -47,10 +55,27 @@ public class CheckFrontend
                 all.Add(translation);
             }
 
-            Helper.CheckForFile(service, relativeName, translations);
+            var notTranslated = Helper.CheckForFile(service, relativeName, translations);
+
+            if (fix)
+            {
+                foreach (var key in notTranslated)
+                {
+                    service.Add(key);
+                }
+            }
         }
 
-        Helper.CheckUnused(service, all);
+        var notUsed = Helper.CheckUnused(service, all);
+
+        if (fix)
+        {
+            foreach (var key in notUsed)
+            {
+                service.Remove(key);
+            }
+        }
+
         Helper.CheckOtherLocales(service);
 
         service.Save();
@@ -73,7 +98,8 @@ public class CheckFrontend
         }
 
         AddTranslations("\"i18n\\:(?<Key>[^\"]+)\"");
-        AddTranslations("'i18n\\:(?<Key>[^\']+)'");
+        AddTranslations("\'i18n\\:(?<Key>[^\']+)\'");
+
         AddTranslations("'(?<Key>[^\']+)' \\| sqxTranslate");
 
         return translations;
@@ -96,6 +122,7 @@ public class CheckFrontend
         }
 
         AddTranslations("'i18n\\:(?<Key>[^\']+)'");
+
         AddTranslations("localizer.get\\('(?<Key>[^\']+)'\\)");
         AddTranslations("localizer.getOrKey\\('(?<Key>[^\']+)'\\)");
 

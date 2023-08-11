@@ -6,3 +6,7 @@
  */
 
 export class HistoryChannelUpdated {}
+
+export class QueryExecuted {}
+
+export class ClientTourStated {}

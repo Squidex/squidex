@@ -5,42 +5,42 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSection } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
 
 @Component({
-    selector: 'sqx-component-section[form][formContext][formLevel][formSection][isComparing][language][languages]',
+    selector: 'sqx-component-section',
     styleUrls: ['./component-section.component.scss'],
     templateUrl: './component-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComponentSectionComponent {
-    @Input()
+    @Input({ required: true })
     public form!: EditContentForm;
 
-    @Input()
+    @Input({ required: true })
     public formContext!: any;
 
-    @Input()
+    @Input({ required: true, transform: numberAttribute })
     public formLevel!: number;
 
-    @Input()
+    @Input({ required: true })
     public formSection!: FieldSection<FieldDto, any>;
 
-    @Input()
+    @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 
-    @Input()
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
-    @Input()
+    @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input()
+    @Input({ transform: numberAttribute })
     public index: number | null | undefined;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
     @ViewChildren(FieldEditorComponent)

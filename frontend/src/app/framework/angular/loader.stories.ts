@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { moduleMetadata } from '@storybook/angular';
-import { Meta, Story } from '@storybook/angular/types-6-0';
+import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { LoaderComponent, SqxFrameworkModule } from '@app/framework';
 
 export default {
@@ -35,48 +34,46 @@ export default {
     ],
 } as Meta;
 
-const Template: Story<LoaderComponent> = (args: LoaderComponent) => ({
-    props: args,
-});
+type Story = StoryObj<LoaderComponent>;
 
-export const ColorWhite = Template.bind({});
-
-ColorWhite.args = {
-    color: 'white',
+export const ColorWhite: Story = {
+    args: {
+        color: 'white',
+    },
 };
 
-export const ColorTheme = Template.bind({});
-
-ColorTheme.args = {
-    color: 'theme',
+export const ColorTheme: Story = {
+    args: {
+        color: 'theme',
+    },
 };
 
-export const ColorText = Template.bind({});
-
-ColorText.args = {
-    color: 'text',
+export const ColorText: Story = {
+    args: {
+        color: 'text',
+    },
 };
 
-export const ColorInput = Template.bind({});
-
-ColorInput.args = {
-    color: 'input',
+export const ColorInput: Story = {
+    args: {
+        color: 'input',
+    },
 };
 
-export const SizeSmall = Template.bind({});
-
-SizeSmall.args = {
-    size: 16,
+export const SizeSmall: Story = {
+    args: {
+        size: 16,
+    },
 };
 
-export const SizeMedium = Template.bind({});
-
-SizeMedium.args = {
-    size: 32,
+export const SizeMedium: Story = {
+    args: {
+        size: 32,
+    },
 };
 
-export const SizeLarge = Template.bind({});
-
-SizeLarge.args = {
-    size: 64,
+export const SizeLarge: Story = {
+    args: {
+        size: 64,
+    },
 };

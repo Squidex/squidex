@@ -100,13 +100,13 @@
                     </sqx-array-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'DateTime'">
-                    <sqx-date-time-editor [formControl]="$any(fieldForm)" [mode]="field.rawProperties.editor" [enforceTime]="true"></sqx-date-time-editor>
+                    <sqx-date-time-editor [formControl]="$any(fieldForm)" [mode]="field.rawProperties.editor" enforceTime="true"></sqx-date-time-editor>
                 </ng-container>
 				<ng-container *ngSwitchCase="'Geolocation'">
 					<sqx-geolocation-editor [formControl]="$any(fieldForm)"></sqx-geolocation-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Json'">
-					<sqx-code-editor [formControl]="$any(fieldForm)" valueMode="Json" [height]="350"></sqx-code-editor>
+					<sqx-code-editor [formControl]="$any(fieldForm)" valueMode="Json" height="350"></sqx-code-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Number'">
 					<ng-container [ngSwitch]="field.rawProperties.editor">
@@ -117,7 +117,7 @@
 							<sqx-stars [formControl]="$any(fieldForm)" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Radio'">
-                            <sqx-radio-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues" [unsorted]="true"></sqx-radio-group>
+                            <sqx-radio-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues" unsorted="true"></sqx-radio-group>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Dropdown'">
 							<select class="form-select" [formControl]="$any(fieldForm)">
@@ -195,7 +195,7 @@
                             </sqx-rich-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Html'">
-							<sqx-code-editor [formControl]="$any(fieldForm)" #editor mode="ace/mode/html" [height]="350"  ></sqx-code-editor>
+							<sqx-code-editor [formControl]="$any(fieldForm)" #editor mode="ace/mode/html" height="350"  ></sqx-code-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Markdown'">
 							<sqx-markdown-editor [formControl]="$any(fieldForm)" #editor 
@@ -215,7 +215,7 @@
 							</select>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Radio'">
-                            <sqx-radio-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues" [unsorted]="true"></sqx-radio-group>
+                            <sqx-radio-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues" unsorted="true"></sqx-radio-group>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Color'">
                             <sqx-color-picker [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder"></sqx-color-picker>
@@ -245,11 +245,10 @@
     </div>
 
     <sqx-form-hint *ngIf="field.properties.hints && field.properties.hints.length > 0">
-        <span [sqxMarkdown]="field.properties.hints" [optional]="true" [inline]="true"></span>
+        <span [sqxMarkdown]="field.properties.hints" optional="true" inline="true"></span>
     </sqx-form-hint>
 </div>
 
-
-<ng-container *sqxModal="chatDialog">
-    <sqx-chat-dialog (close)="chatDialog.hide()" (complete)="setValue($event)"></sqx-chat-dialog>
-</ng-container>
+<sqx-chat-dialog *sqxModal="chatDialog"
+    (close)="chatDialog.hide()" (select)="setValue($event)">
+</sqx-chat-dialog>

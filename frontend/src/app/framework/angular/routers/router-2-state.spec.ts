@@ -213,7 +213,7 @@ describe('Router2State', () => {
         it('should unsubscribe from state', () => {
             router2State.ngOnDestroy();
 
-            expect(state.changes['observers'].length).toEqual(0);
+            expect((state.changes as any)['observers'].length).toEqual(0);
         });
 
         it('Should get values from route', () => {

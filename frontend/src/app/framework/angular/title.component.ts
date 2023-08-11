@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TitleService, Types } from '@app/framework/internal';
 
 @Component({
-    selector: 'sqx-title[message]',
+    selector: 'sqx-title',
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -22,7 +22,7 @@ export class TitleComponent implements OnDestroy {
     @Input()
     public url: any[] = ['./'];
 
-    @Input()
+    @Input({ required: true })
     public message!: string;
 
     constructor(

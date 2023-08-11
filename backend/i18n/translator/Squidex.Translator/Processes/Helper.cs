@@ -88,7 +88,7 @@ public static class Helper
         }
     }
 
-    public static void CheckUnused(TranslationService service, HashSet<string> translations)
+    public static ISet<string> CheckUnused(TranslationService service, HashSet<string> translations)
     {
         var notUsing = new SortedSet<string>();
 
@@ -114,9 +114,11 @@ public static class Helper
                 Console.WriteLine(key);
             }
         }
+
+        return notUsing;
     }
 
-    public static void CheckForFile(TranslationService service, string relativeName, HashSet<string> translations)
+    public static ISet<string> CheckForFile(TranslationService service, string relativeName, HashSet<string> translations)
     {
         if (translations.Count > 0)
         {
@@ -158,6 +160,8 @@ public static class Helper
                 Console.WriteLine();
             }
         }
+
+        return translations;
     }
 
     private static bool HasInvalidPrefixes(HashSet<string> prefixes)
