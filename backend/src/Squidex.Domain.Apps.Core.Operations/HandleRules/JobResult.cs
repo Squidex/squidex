@@ -55,7 +55,7 @@ public sealed record JobResult
 
     public DomainId RuleId { get; set; }
 
-    public Rule Rule { get; init; }
+    public Rule? Rule { get; init; }
 
     public RuleJob? Job { get; init; }
 

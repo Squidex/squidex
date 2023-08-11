@@ -43,10 +43,13 @@ internal sealed class RuleQueueWriter : IAsyncDisposable
             writes.Add(new RuleEventWrite(result.Job, result.Job.Created));
         }
 
-        log?.LogInformation("Adding rule job {jobId} for Rule(action={ruleAction}, trigger={ruleTrigger})",
-            result.Job.Id,
-            result.Rule.Action.GetType().Name,
-            result.Rule.Trigger.GetType().Name);
+        if (result.Rule != null)
+        {
+            log?.LogInformation("Adding rule job {jobId} for Rule(action={ruleAction}, trigger={ruleTrigger})",
+                result.Job.Id,
+                result.Rule.Action.GetType().Name,
+                result.Rule.Trigger.GetType().Name);
+        }
 
         var totalFailure = result.SkipReason == SkipReason.Failed ? 1 : 0;
         var totalCreated = 1;
