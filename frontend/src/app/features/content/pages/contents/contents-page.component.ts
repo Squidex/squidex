@@ -108,7 +108,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.own(
             combineLatest([schema$, tableName$])
                 .subscribe(([schema, fieldNames]) => {
-                    if (!this.schema) {
+                    if (this.schema?.id !== schema.id) {
                         this.resetSelection();
 
                         this.schema = schema;
