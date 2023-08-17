@@ -91,8 +91,18 @@ export const META_FIELDS = {
     },
 };
 
-export function isDataField(name: string) {
-    return name.indexOf('meta.') < 0;
+export function getTableFields(fields: ReadonlyArray<TableField>) {
+    const result: string[] = [];
+
+    for (const field of fields) {
+        if (field.name && field.name.indexOf('meta') < 0) {
+            result.push(field.name);
+        }
+    }
+
+    result.sort();
+    
+    return result;
 }
 
 export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [

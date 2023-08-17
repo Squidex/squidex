@@ -13,7 +13,6 @@ import { TestValues } from './_test-helpers';
 describe('UIState', () => {
     const {
         app,
-        appsState,
     } = TestValues;
 
     const common = {
@@ -69,7 +68,9 @@ describe('UIState', () => {
         usersService.setup(x => x.getResources())
             .returns(() => of({ _links: resources }));
 
-        uiState = new UIState(appsState.object, uiService.object, usersService.object);
+        uiState = new UIState(uiService.object, usersService.object);
+        uiState.load();
+        uiState.loadApp(app);
     });
 
     it('should load settings', () => {
@@ -78,8 +79,6 @@ describe('UIState', () => {
         uiState.settings.subscribe(value => {
             settings = value;
         });
-
-        uiState.load().subscribe();
 
         expect(settings).toEqual({
             key: 'xx',
@@ -109,7 +108,6 @@ describe('UIState', () => {
         uiService.setup(x => x.putCommonSetting('root.nested', 123))
             .returns(() => of({})).verifiable();
 
-        uiState.load();
         uiState.setCommon('root.nested', 123);
 
         expect(settings).toEqual({
@@ -153,7 +151,6 @@ describe('UIState', () => {
         uiService.setup(x => x.putAppSharedSetting(app, 'root.nested', 123))
             .returns(() => of({})).verifiable();
 
-        uiState.load();
         uiState.setAppShared('root.nested', 123);
 
         expect(settings).toEqual({
@@ -197,7 +194,6 @@ describe('UIState', () => {
         uiService.setup(x => x.putAppUserSetting(app, 'root.nested', 123))
             .returns(() => of({})).verifiable();
 
-        uiState.load();
         uiState.setAppUser('root.nested', 123);
 
         expect(settings).toEqual({
@@ -241,7 +237,6 @@ describe('UIState', () => {
         uiService.setup(x => x.deleteCommonSetting('map.onlyCommon'))
             .returns(() => of({})).verifiable();
 
-        uiState.load();
         uiState.remove('map.onlyCommon');
 
         expect(settings).toEqual({
@@ -269,7 +264,6 @@ describe('UIState', () => {
         uiService.setup(x => x.deleteAppSharedSetting(app, 'map.onlyShared'))
             .returns(() => of({})).verifiable();
 
-        uiState.load();
         uiState.remove('map.onlyShared');
 
         expect(settings).toEqual({
@@ -297,7 +291,6 @@ describe('UIState', () => {
         uiService.setup(x => x.deleteAppUserSetting(app, 'map.onlyUser'))
             .returns(() => of({})).verifiable();
 
-        uiState.load();
         uiState.remove('map.onlyUser');
 
         expect(settings).toEqual({

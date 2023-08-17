@@ -8,10 +8,9 @@
 import { Injectable } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
-import { debug, defined, hasAnyLink, shareSubscribed, State, Types } from '@app/framework';
+import { debug, hasAnyLink, shareSubscribed, State, Types } from '@app/framework';
 import { UIService } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
-import { AppsState } from './apps.state';
 
 type Settings = { canCreateApps?: boolean; canCreateTeams?: boolean; [key: string]: any };
 
@@ -36,6 +35,9 @@ interface Snapshot {
 
     // Indicates if the user can use at least one admin resource.
     canUseAdminResource?: boolean;
+
+    // The app name.
+    appName?: string;
 }
 
 @Injectable()
@@ -84,49 +86,37 @@ export class UIState extends State<Snapshot> {
             distinctUntilChanged());
     }
 
-    public get appId() {
-        return this.appsState.appId;
-    }
-
-    public get appName() {
-        return this.appsState.appName;
-    }
-
     constructor(
-        private readonly appsState: AppsState,
         private readonly uiService: UIService,
         private readonly usersService: UsersService,
     ) {
         super({});
 
         debug(this, 'settings');
-
-        appsState.selectedApp.pipe(defined())
-            .subscribe(app => {
-                this.loadForApp(app.name);
-            });
     }
 
     public load() {
         return combineLatest([this.loadCommon(), this.loadResources()]);
     }
 
-    private loadForApp(app: string) {
-        this.next(s => ({
-            ...s,
-            settingsAppShared: null,
-            settingsAppUser: null,
-        }), 'Loading Started');
+    public loadApp(appName: string) {
+        return combineLatest([this.loadAppShared(appName), this.loadAppUser(appName)]);
+    }
 
-        this.uiService.getAppSharedSettings(app)
-            .subscribe(payload => {
-                this.next({ settingsAppShared: payload }, 'Loading App Shared Done');
-            });
+    private loadAppUser(appName: string) {
+        return this.uiService.getAppUserSettings(appName).pipe(
+            tap(settingsAppUser => {
+                this.next({ settingsAppUser, appName }, 'Loading App User Done');
+            }),
+            shareSubscribed(undefined, { throw: true }));
+    }
 
-        this.uiService.getAppUserSettings(app)
-            .subscribe(payload => {
-                this.next({ settingsAppUser: payload }, 'Loading App User Done');
-            });
+    private loadAppShared(appName: string) {
+        return this.uiService.getAppSharedSettings(appName).pipe(
+            tap(settingsAppShared => {
+                this.next({ settingsAppShared, appName }, 'Loading App Shared Done');
+            }),
+            shareSubscribed(undefined, { throw: true }));
     }
 
     private loadCommon() {
@@ -232,6 +222,10 @@ export class UIState extends State<Snapshot> {
         }
 
         return false;
+    }
+
+    private get appName() {
+        return this.snapshot.appName!;
     }
 }
 

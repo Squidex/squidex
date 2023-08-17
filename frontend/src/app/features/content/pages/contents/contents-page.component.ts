@@ -9,9 +9,9 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest, Observable } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, isDataField, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, Types, UIState } from '@app/shared';
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, map, shareReplay, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, getTableFields, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, Types, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -97,17 +97,14 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         const tableSetting$ =
             schema$.pipe(map(s => new TableSettings(this.uiState, s)), shareReplay(1));
 
-        const tableField$ =
-            tableSetting$.pipe(switchMap(s => s.listFields));
-
         const tableName$ =
-            tableField$.pipe(map(t => t.map(x => x.name).filter(isDataField).sorted()), distinctUntilChanged(Types.equals));
+            tableSetting$.pipe(switchMap(s => s.listFields), map(s => getTableFields(s)), distinctUntilChanged(Types.equals));
 
         this.tableSettings = tableSetting$;
 
         this.own(
-            combineLatest([schema$, tableName$])
-                .subscribe(([schema, fieldNames]) => {
+            tableName$.pipe(withLatestFrom(schema$))
+                .subscribe(([fieldNames, schema]) => {
                     if (this.schema?.id !== schema.id) {
                         this.resetSelection();
 
