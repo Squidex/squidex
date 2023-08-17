@@ -8,7 +8,7 @@
 import { Router } from '@angular/router';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-import { AppsState } from '@app/shared/internal';
+import { AppsState, UIState } from '@app/shared/internal';
 import { AppMustExistGuard } from './app-must-exist.guard';
 
 describe('AppMustExistGuard', () => {
@@ -21,11 +21,12 @@ describe('AppMustExistGuard', () => {
     let router: IMock<Router>;
     let appsState: IMock<AppsState>;
     let appGuard: AppMustExistGuard;
+    let uiState: IMock<UIState>;
 
     beforeEach(() => {
         router = Mock.ofType<Router>();
         appsState = Mock.ofType<AppsState>();
-        appGuard = new AppMustExistGuard(appsState.object, router.object);
+        appGuard = new AppMustExistGuard(appsState.object, router.object, uiState.object);
     });
 
     it('should navigate to 404 page if app is not found', async () => {
@@ -40,6 +41,9 @@ describe('AppMustExistGuard', () => {
     });
 
     it('should return true if app is found', async () => {
+        uiState.setup(x => x.loadForApp('my-app'))
+            .returns(() => of(<any>{}));
+
         appsState.setup(x => x.select('my-app'))
             .returns(() => of(<any>{}));
 

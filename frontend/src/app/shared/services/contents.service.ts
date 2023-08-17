@@ -12,7 +12,7 @@ import { map } from 'rxjs/operators';
 import { ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
 import { StatusInfo } from './../state/contents.state';
 import { Query, sanitize } from './query';
-import { isDataField, parseField, RootFieldDto } from './schemas.service';
+import { parseField, RootFieldDto } from './schemas.service';
 
 export class ScheduleDto {
     constructor(
@@ -374,7 +374,7 @@ function buildHeaders(q: ContentsQuery | undefined) {
     };
 
     if (q?.fieldNames) {
-        options.headers['X-Fields'] = q.fieldNames.filter(isDataField).join(',');
+        options.headers['X-Fields'] = q.fieldNames.join(',');
     }
 
     if (q?.noTotal) {
