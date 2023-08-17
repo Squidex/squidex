@@ -99,7 +99,7 @@ export class UIState extends State<Snapshot> {
         return combineLatest([this.loadCommon(), this.loadResources()]);
     }
 
-    public loadForApp(appName: string) {
+    public loadApp(appName: string) {
         return combineLatest([this.loadAppShared(appName), this.loadAppUser(appName)]);
     }
 

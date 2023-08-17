@@ -33,7 +33,7 @@ export class AppMustExistGuard  {
                 }),
                 switchMap(app => {
                     if (app) {
-                        return this.uiState.loadForApp(app.name).pipe(map(() => app));
+                        return this.uiState.loadApp(appName).pipe(map(() => app));
                     } else {
                         return of(app);
                     }

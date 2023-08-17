@@ -24,6 +24,7 @@ describe('AppMustExistGuard', () => {
     let uiState: IMock<UIState>;
 
     beforeEach(() => {
+        uiState = Mock.ofType<UIState>();
         router = Mock.ofType<Router>();
         appsState = Mock.ofType<AppsState>();
         appGuard = new AppMustExistGuard(appsState.object, router.object, uiState.object);
@@ -41,7 +42,7 @@ describe('AppMustExistGuard', () => {
     });
 
     it('should return true if app is found', async () => {
-        uiState.setup(x => x.loadForApp('my-app'))
+        uiState.setup(x => x.loadApp('my-app'))
             .returns(() => of(<any>{}));
 
         appsState.setup(x => x.select('my-app'))
