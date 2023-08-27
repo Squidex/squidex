@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v3.6.0
 
       - name: Prepare - Inject short Variables
         uses: rlespinasse/github-slug-action@v4.4.1
@@ -146,7 +146,7 @@ jobs:
           path: ./CHANGELOG.md
 
       - name: Release - Publish Binaries
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1.13.0
         with:
           allowUpdates: true
           artifactErrorsFailBuild: true
