@@ -243,6 +243,40 @@ public class BackgroundUsageTrackerTests
             .MustHaveHappened();
     }
 
+    [Fact]
+    public async Task Should_write_with_shared_counters()
+    {
+        var key1 = Guid.NewGuid().ToString();
+        var key2 = Guid.NewGuid().ToString();
+
+        var counters1 = Counters(a: 1, b: 2);
+
+        await sut.TrackAsync(date, key1, "my-category", counters1, ct);
+        await sut.TrackAsync(date, key2, "my-category", counters1, ct);
+
+        await sut.TrackAsync(date, key2, "my-category", Counters(a: 0.3, b: 2000), ct);
+
+        UsageUpdate[]? updates = null;
+
+        A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._, A<CancellationToken>._))
+            .Invokes(args =>
+            {
+                updates = args.GetArgument<UsageUpdate[]>(0)!;
+            });
+
+        // Wait for the timer to trigger.
+        await WaitForCompletion();
+
+        updates.Should().BeEquivalentTo(new[]
+        {
+            new UsageUpdate(date, key1, "my-category", Counters(a: 1.0, b: 2)),
+            new UsageUpdate(date, key2, "my-category", Counters(a: 1.3, b: 2002)),
+        }, o => o.ComparingByMembers<UsageUpdate>());
+
+        A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._, A<CancellationToken>._))
+            .MustHaveHappened();
+    }
+
     private async Task WaitForCompletion()
     {
         sut.Next();

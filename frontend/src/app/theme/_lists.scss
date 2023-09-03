@@ -38,6 +38,7 @@
     thead {
         // Small font size for the table header, content is more important!
         th {
+            background: none;
             border: 0;
             color: $color-text-decent;
             font-size: .8rem;

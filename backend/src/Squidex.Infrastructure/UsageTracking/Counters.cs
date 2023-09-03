@@ -42,15 +42,22 @@ public sealed class Counters : Dictionary<string, double>
         return (long)value;
     }
 
-    public Counters SumUp(Counters counters)
+    public Counters SumpUpCloned(Counters counters)
     {
-        foreach (var (key, value) in counters)
+        var result = new Counters(this);
+
+        return result.SumpUp(counters);
+    }
+
+    public Counters SumpUp(Counters source)
+    {
+        foreach (var (key, value) in source)
         {
             var newValue = value;
 
-            if (TryGetValue(key, out var temp))
+            if (TryGetValue(key, out var existing))
             {
-                newValue += temp;
+                newValue += existing;
             }
 
             this[key] = newValue;

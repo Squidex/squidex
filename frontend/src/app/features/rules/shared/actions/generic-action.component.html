@@ -25,7 +25,7 @@
                     </ng-template>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Javascript'">
-                    <sqx-code-editor [completion]="ruleCompletions | async" [formControlName]="property.name" height="350"></sqx-code-editor>
+                    <sqx-code-editor [completion]="ruleCompletions | async" [formControlName]="property.name" [height]="350"></sqx-code-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Checkbox'">
                     <div class="form-check">

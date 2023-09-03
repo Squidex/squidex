@@ -117,7 +117,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
         category = GetCategory(category);
 
 #pragma warning disable MA0105 // Use the lambda parameters instead of using a closure
-        jobs.AddOrUpdate((key, category, date), counters, (k, p) => p.SumUp(counters));
+        jobs.AddOrUpdate((key, category, date), counters, (k, p) => p.SumpUpCloned(counters));
 #pragma warning restore MA0105 // Use the lambda parameters instead of using a closure
 
         return Task.CompletedTask;
@@ -191,7 +191,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
 
         foreach (var usage in queried)
         {
-            result.SumUp(usage.Counters);
+            result.SumpUp(usage.Counters);
         }
 
         return result;

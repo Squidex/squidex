@@ -61,7 +61,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
     @Input({ transform: booleanAttribute })
     public wordWrap = false;
 
-    @Input({ transform: numberAttribute })
+    @Input()
     public height: number | 'auto' | 'full' = 'full';
 
     @Input({ transform: booleanAttribute })

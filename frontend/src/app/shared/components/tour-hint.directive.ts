@@ -20,7 +20,7 @@ export class TourHintDirective extends ResourceOwner implements OnDestroy, OnIni
     public hintText!: string;
 
     @Input({ transform: numberAttribute })
-    public hintAfter: number | string = 1000;
+    public hintAfter: number = 1000;
 
     @Input()
     public hintPosition?: FloatingPlacement;

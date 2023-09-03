@@ -2,7 +2,7 @@
     <div class="form-group">
         <label>{{ 'schemas.field.graphQLSchema' | sqxTranslate }}</label>
 
-        <sqx-code-editor formControlName="graphQLSchema" mode="ace/mode/graphqlschema" height="350"></sqx-code-editor>
+        <sqx-code-editor formControlName="graphQLSchema" mode="ace/mode/graphqlschema" [height]="350"></sqx-code-editor>
 
         <sqx-form-hint>
             {{ 'schemas.field.graphQLSchemaHint' | sqxTranslate }}

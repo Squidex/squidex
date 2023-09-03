@@ -18,10 +18,10 @@ export class FormAlertComponent {
     public class = '';
 
     @Input({ transform: numberAttribute })
-    public marginTop: number | string | undefined | null = 2;
+    public marginTop: number | undefined | null = 2;
 
     @Input({ transform: numberAttribute })
-    public marginBottom: number | string | undefined | null = 4;
+    public marginBottom: number | undefined | null = 4;
 
     @Input({ transform: booleanAttribute })
     public light?: boolean | null;
