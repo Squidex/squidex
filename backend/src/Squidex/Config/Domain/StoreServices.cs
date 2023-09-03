@@ -80,6 +80,9 @@ public static class StoreServices
                 services.AddTransientAs<ConvertOldSnapshotStores>()
                     .As<IMigration>();
 
+                services.AddTransientAs<CopyRuleStatistics>()
+                    .As<IMigration>();
+
                 services.AddTransientAs(c => new DeleteContentCollections(GetDatabase(c, mongoContentDatabaseName)))
                     .As<IMigration>();
 
