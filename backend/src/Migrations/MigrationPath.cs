@@ -15,7 +15,7 @@ namespace Migrations;
 
 public sealed class MigrationPath : IMigrationPath
 {
-    private const int CurrentVersion = 25;
+    private const int CurrentVersion = 26;
     private readonly IServiceProvider serviceProvider;
 
     public MigrationPath(IServiceProvider serviceProvider)
@@ -114,10 +114,16 @@ public sealed class MigrationPath : IMigrationPath
             }
         }
 
-        // Version 13: Json refactoring
+        // Version 13: Json refactoring.
         if (version < 13)
         {
             yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
+        }
+
+        // Version 27: New rule statistics using normal usage collection.
+        if (version < 26)
+        {
+            yield return serviceProvider.GetRequiredService<CopyRuleStatistics>();
         }
     }
 }

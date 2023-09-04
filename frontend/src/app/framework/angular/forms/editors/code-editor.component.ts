@@ -294,6 +294,8 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
             printMargin: !this.singleLine,
             showGutter: !this.singleLine,
         });
+
+        this.aceEditor.commands.bindKey('Enter|Shift-Enter', this.singleLine ? 'null' : undefined);
     }
 
     private setValue(value: string) {
