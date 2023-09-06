@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Output } from '@angular/core';
-import { AppsState, StatefulComponent, TranslationsService } from '@app/shared';
+import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { AppsState, AuthService, StatefulComponent, TranslationsService } from '@app/shared';
 
 interface State {
     // True, when running
@@ -16,7 +16,7 @@ interface State {
     chatQuestion: string;
 
     // The answers.
-    chatAnswers?: ReadonlyArray<string>;
+    chatTalk: ReadonlyArray<{ prompt: string; isUser?: boolean }>;
 }
 
 @Component({
@@ -31,14 +31,20 @@ export class ChatDialogComponent extends StatefulComponent<State> {
     @Output()
     public select = new EventEmitter<string>();
 
+    @ViewChild('input', { static: false })
+    public input!: ElementRef<HTMLInputElement>;
+
+    public user = this.authService.user!;
+
     constructor(
         private readonly appsState: AppsState,
+        private readonly authService: AuthService,
         private readonly translator: TranslationsService,
     ) {
         super({
             isRunning: false,
             chatQuestion: '',
-            chatAnswers: undefined,
+            chatTalk: [],
         });
     }
 
@@ -47,15 +53,40 @@ export class ChatDialogComponent extends StatefulComponent<State> {
     }
 
     public ask() {
-        this.next({ isRunning: true });
+        const prompt = this.snapshot.chatQuestion;
 
-        this.translator.ask(this.appsState.appName, { prompt: this.snapshot.chatQuestion })
+        if (!prompt || prompt.length === 0) {
+            return;
+        }
+
+        this.next(s => ({
+            ...s,
+            chatQuestion: '',
+            chatTalk: [
+                ...s.chatTalk,
+                { prompt, isUser: true },
+            ],
+            isRunning: true,
+        }));
+
+        this.translator.ask(this.appsState.appName, { prompt })
             .subscribe({
                 next: chatAnswers => {
-                    this.next({ chatAnswers, isRunning: false });
+                    this.next(s => ({
+                        ...s,
+                        chatTalk: [
+                            ...s.chatTalk,
+                            ...chatAnswers.map(answer => ({ prompt: answer })),
+                        ],
+                        isRunning: false,
+                    }));
+
+                    setTimeout(() => {
+                        this.input.nativeElement.focus();
+                    }, 100);
                 },
                 error: () => {
-                    this.next({ chatAnswers: [], isRunning: false });
+                    this.next({ isRunning: false });
                 },
                 complete: () => {
                     this.next({ isRunning: false });

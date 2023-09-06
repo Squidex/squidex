@@ -155,6 +155,40 @@ hr {
 }
 
 //
+// Code
+//
+.code {
+    background: $color-code-background;
+    margin: .25rem 0;
+    padding-left: .5rem;
+    padding-right: 3rem;
+}
+.code,
+.code-copy {
+    @include text-code;
+    min-height: 27px;
+    padding-bottom: .25rem;
+    padding-top: .25rem;
+}
+
+.code-container {
+    position: relative;
+}
+
+.code-copy {
+    @include absolute(0, 0, auto, auto);
+    background: darken($color-border-dark, 30%);
+    border: 0;
+    color: $color-white;
+    padding-left: .375rem;
+    padding-right: .375rem;
+
+    &:focus {
+        background: darken($color-border-dark, 40%);
+    }
+}
+
+//
 // Profile picture in circle
 //
 .user-picture {
@@ -186,6 +220,10 @@ hr {
 
     img {
         max-height: 70%;
+    }
+
+    &-sm {
+        @include circle(32px);
     }
 }
 

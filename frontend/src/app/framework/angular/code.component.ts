@@ -6,6 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { MathHelper } from '../internal';
 
 @Component({
     selector: 'sqx-code',
@@ -13,4 +14,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     templateUrl: './code.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodeComponent {}
+export class CodeComponent {
+    public readonly id = MathHelper.guid();
+}

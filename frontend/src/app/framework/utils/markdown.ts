@@ -6,6 +6,7 @@
  */
 
 import { marked } from 'marked';
+import { MathHelper } from './math-helper';
 
 function renderLink(href: string, _: string, text: string) {
     if (href && href.startsWith('mailto')) {
@@ -13,6 +14,20 @@ function renderLink(href: string, _: string, text: string) {
     } else {
         return `<a href="${href}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
     }
+}
+
+function renderCode(code: string) {
+    const id = MathHelper.guid();
+
+    return `
+        <div class="code-container">
+            <button type="button" class="code-copy" copy="${id}">
+                <i class="icon-copy"></i>
+            </button>
+
+            <pre class="code" id="${id}">${code}</pre>
+        </div>
+    `;
 }
 
 function renderInlineParagraph(text: string) {
@@ -24,14 +39,18 @@ const RENDERER_INLINE = new marked.Renderer();
 
 RENDERER_INLINE.paragraph = renderInlineParagraph;
 RENDERER_INLINE.link = renderLink;
+RENDERER_INLINE.code = renderCode;
 RENDERER_DEFAULT.link = renderLink;
+RENDERER_DEFAULT.code = renderCode;
 
-export function renderMarkdown(input: string | undefined | null, inline: boolean) {
+export function renderMarkdown(input: string | undefined | null, inline: boolean, trusted = false) {
     if (!input) {
         return '';
     }
 
-    input = escapeHTML(input);
+    if (!trusted) {
+        input = escapeHTML(input);
+    }
 
     if (inline) {
         return marked(input, { renderer: RENDERER_INLINE, mangle: false, headerIds: false });

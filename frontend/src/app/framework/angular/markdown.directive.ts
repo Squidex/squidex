@@ -16,6 +16,9 @@ export class MarkdownDirective {
     public markdown!: string;
 
     @Input({ transform: booleanAttribute })
+    public trusted = true;
+
+    @Input({ transform: booleanAttribute })
     public inline = true;
 
     @Input({ transform: booleanAttribute })
@@ -43,7 +46,7 @@ export class MarkdownDirective {
         } else if (this.optional && !hasExclamation) {
             html = markdown;
         } else if (this.markdown) {
-            html = renderMarkdown(markdown, this.inline);
+            html = renderMarkdown(markdown, this.inline, this.trusted);
         }
 
         const hasHtml = html.indexOf('<') >= 0 || html.indexOf('&') >= 0;
