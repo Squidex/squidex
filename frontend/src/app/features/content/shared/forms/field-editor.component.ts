@@ -57,7 +57,7 @@ export class FieldEditorComponent {
     public isEmpty?: Observable<boolean>;
     public isExpanded = false;
 
-    public chatDialog = new DialogModel(true);
+    public chatDialog = new DialogModel();
 
     public get field() {
         return this.formModel.field;
