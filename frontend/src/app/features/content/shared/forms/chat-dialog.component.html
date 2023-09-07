@@ -1,17 +1,84 @@
-<sqx-modal-dialog size="lg" (close)="close.emit()">
+<sqx-modal-dialog size="lg" (close)="close.emit()" fullHeight="true">
     <ng-container title>
         {{ 'chat.title' | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
-        <sqx-form-alert marginBottom="4">
-            <span [sqxMarkdown]="'chat.description' | sqxTranslate" inline="true"></span>
-        </sqx-form-alert>
+        <div class="item">
+            <div class="row">
+                <div class="col-auto">
+                    <div class="squid squid-sm d-flex align-items-center justify-content-center">
+                        <img src="./images/squid.svg">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="bubble bubble-right">
+                        <span [sqxMarkdown]="'chat.description' | sqxTranslate" inline="false"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="item" *ngFor="let item of snapshot.chatTalk">
+            <div class="row mt-3" *ngIf="item.isUser">
+                <div class="col">
+                    <div class="bubble bubble-left">
+                        {{item.prompt}}
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <img class="user-picture" title="{{user.displayName}}" [src]="user.id | sqxUserIdPicture" />
+                </div>
+            </div>
+
+            <div class="row mt-3" *ngIf="!item.isUser">
+                <div class="col-auto">
+                    <div class="squid squid-sm d-flex align-items-center justify-content-center">
+                        <img src="./images/squid.svg">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="bubble bubble-right">
+                        <div class="mb-2">
+                            {{ 'chat.answer' | sqxTranslate}}
+                        </div>
+
+                        <textarea class="form-control" readonly [ngModel]="item.prompt"></textarea>
+
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-primary" (click)="select.emit(item.prompt)">
+                                {{ 'chat.use' | sqxTranslate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3" *ngIf="snapshot.isRunning">
+            <div class="col-auto">
+                <div class="squid squid-sm d-flex align-items-center justify-content-center">
+                    <img src="./images/squid.svg">
+                </div>
+            </div>
+            <div class="col">
+                <div class="bubble bubble-right">
+                    <svg height="40" width="40" class="loader">
+                    <circle class="dot" cx="10" cy="20" r="3" />
+                    <circle class="dot" cx="20" cy="20" r="3" />
+                    <circle class="dot" cx="30" cy="20" r="3" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container footer>
         <form (ngSubmit)="ask()">
             <div class="row row-cols-0 g-2">
                 <div class="col">
-                    <input class="form-control" placeholder="{{ 'chat.prompt' | sqxTranslate }}"
+                    <input class="form-control" #input
+                        placeholder="{{ 'chat.prompt' | sqxTranslate }}"
                         sqxFocusOnInit
                         (ngModelChange)="setQuestion($event)"
                         [ngModel]="snapshot.chatQuestion"
@@ -25,32 +92,5 @@
                 </div>
             </div>
         </form>
-        
-        <ng-container *ngIf="!snapshot.isRunning; else loading">
-            <ng-container *ngIf="snapshot.chatAnswers">
-                <h4 class="mt-4">{{ 'chat.answers' | sqxTranslate }}</h4>
-    
-                <div *ngIf="snapshot.chatAnswers?.length === 0">
-                    <small class="text-muted">{{ 'chat.answersEmpty' | sqxTranslate }}</small>
-                </div>
-
-                <div class="row g-2 answer" *ngFor="let answer of (snapshot.chatAnswers || [])">
-                    <div class="col">
-                        <textarea class="form-control" readonly [ngModel]="answer"></textarea>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary" (click)="select.emit(answer)">
-                            {{ 'chat.use' | sqxTranslate }}
-                        </button>
-                    </div>
-                </div>
-            </ng-container>
-        </ng-container>
-
-        <ng-template #loading>
-            <div class="mt-4">
-                <sqx-loader></sqx-loader>
-            </div>
-        </ng-template>
     </ng-container>
 </sqx-modal-dialog>

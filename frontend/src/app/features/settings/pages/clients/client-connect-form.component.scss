@@ -1,6 +1,26 @@
 @import 'mixins';
 @import 'vars';
 
+sqx-code {
+    pre {
+        white-space: pre;
+    }
+}
+
+:host ::ng-deep {
+    svg {
+        max-height: 100%;
+    }
+
+    h3 {
+        margin-top: 1.75rem;
+    }
+
+    .code-container {
+        margin: .5rem 0;
+    }
+}
+
 .badge {
     @include circle(1.3rem);
     font-size: $font-smallest;
@@ -23,6 +43,30 @@
     }
 }
 
+.sdk-header {
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    display: inline-block;
+    cursor: pointer;
+    padding: 1rem;
+    margin-bottom: .5rem;
+    margin-right: .5rem;
+    width: 160px;
+    text-align: center;
+
+    &.active {
+        border-color: $color-theme-brand;
+    }
+
+    &:hover {
+        border-color: $color-theme-brand-dark;
+    }
+
+    .logo {
+        height: 100px;
+    }
+}
+
 .option {
     background: none;
     border: 1px solid $color-border;
@@ -42,11 +86,5 @@
         color: $color-border;
         font-size: $font-smallest;
         font-weight: normal;
-    }
-}
-
-sqx-code {
-    pre {
-        white-space: pre;
     }
 }
