@@ -16,7 +16,7 @@ export class MarkdownDirective {
     public markdown!: string;
 
     @Input({ transform: booleanAttribute })
-    public trusted = true;
+    public trusted = false;
 
     @Input({ transform: booleanAttribute })
     public inline = true;
