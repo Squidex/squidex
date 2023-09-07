@@ -20,10 +20,10 @@
         </div>
 
         <div class="item" *ngFor="let item of snapshot.chatTalk">
-            <div class="row mt-3" *ngIf="item.isUser">
+            <div class="row mt-3" *ngIf="item.type === 'user'">
                 <div class="col">
                     <div class="bubble bubble-left">
-                        {{item.prompt}}
+                        {{item.text}}
                     </div>
                 </div>
                 <div class="col-auto">
@@ -31,7 +31,20 @@
                 </div>
             </div>
 
-            <div class="row mt-3" *ngIf="!item.isUser">
+            <div class="row mt-3" *ngIf="item.type === 'system'">
+                <div class="col-auto">
+                    <div class="squid squid-sm d-flex align-items-center justify-content-center">
+                        <img src="./images/squid.svg">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="bubble bubble-right">
+                        {{ item.text | sqxTranslate}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3" *ngIf="item.type === 'bot'">
                 <div class="col-auto">
                     <div class="squid squid-sm d-flex align-items-center justify-content-center">
                         <img src="./images/squid.svg">
@@ -43,10 +56,10 @@
                             {{ 'chat.answer' | sqxTranslate}}
                         </div>
 
-                        <textarea class="form-control" readonly [ngModel]="item.prompt"></textarea>
+                        <textarea class="form-control" readonly [ngModel]="item.text"></textarea>
 
                         <div class="mt-2">
-                            <button type="button" class="btn btn-primary" (click)="select.emit(item.prompt)">
+                            <button type="button" class="btn btn-primary" (click)="select.emit(item.text)">
                                 {{ 'chat.use' | sqxTranslate }}
                             </button>
                         </div>

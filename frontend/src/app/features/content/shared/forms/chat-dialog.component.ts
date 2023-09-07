@@ -6,6 +6,7 @@
  */
 
 import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { delay } from 'rxjs/operators';
 import { AppsState, AuthService, StatefulComponent, TranslationsService } from '@app/shared';
 
 interface State {
@@ -16,7 +17,7 @@ interface State {
     chatQuestion: string;
 
     // The answers.
-    chatTalk: ReadonlyArray<{ prompt: string; isUser?: boolean }>;
+    chatTalk: ReadonlyArray<{ text: string; type: 'user' | 'bot' | 'system' }>;
 }
 
 @Component({
@@ -64,22 +65,34 @@ export class ChatDialogComponent extends StatefulComponent<State> {
             chatQuestion: '',
             chatTalk: [
                 ...s.chatTalk,
-                { prompt, isUser: true },
+                { text: prompt, type: 'user' },
             ],
             isRunning: true,
         }));
 
-        this.translator.ask(this.appsState.appName, { prompt })
+        this.translator.ask(this.appsState.appName, { prompt }).pipe(delay(500))
             .subscribe({
                 next: chatAnswers => {
-                    this.next(s => ({
-                        ...s,
-                        chatTalk: [
-                            ...s.chatTalk,
-                            ...chatAnswers.map(answer => ({ prompt: answer })),
-                        ],
-                        isRunning: false,
-                    }));
+                    if (chatAnswers.length === 0) {
+                        this.next(s => ({
+                            ...s,
+                            chatQuestion: '',
+                            chatTalk: [
+                                ...s.chatTalk,
+                                { text: 'i18n:chat.answersEmpty', type: 'system' },
+                            ],
+                            isRunning: true,
+                        }));
+                    } else {
+                        this.next(s => ({
+                            ...s,
+                            chatTalk: [
+                                ...s.chatTalk,
+                                ...chatAnswers.map(text => ({ text, type: 'bot' } as any)),
+                            ],
+                            isRunning: false,
+                        }));
+                    }
 
                     setTimeout(() => {
                         this.input.nativeElement.focus();
