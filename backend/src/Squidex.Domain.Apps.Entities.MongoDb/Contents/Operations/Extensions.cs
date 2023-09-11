@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
@@ -18,6 +19,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 
 public static class Extensions
 {
+    private static readonly BsonDocument LookupLet =
+        new BsonDocument()
+            .Add("id", "$_id");
+
+    private static readonly BsonDocument LookupMatch =
+        new BsonDocument()
+            .Add("$expr", new BsonDocument()
+                .Add("$eq", new BsonArray { "$_id", "$$id" }));
+
     private static Dictionary<string, string> propertyMap;
 
     public static IReadOnlyDictionary<string, string> PropertyMap
@@ -113,8 +123,15 @@ public static class Extensions
                     .QuerySort(query)
                     .QuerySkip(query)
                     .QueryLimit(query)
-                    .Lookup<IdOnly, MongoContentEntity, IdOnly>(collection, x => x.Id, x => x.DocumentId, x => x.Joined)
-                    .SelectFields(q.Fields)
+                    .Lookup<IdOnly, MongoContentEntity, MongoContentEntity, MongoContentEntity[], IdOnly>(collection,
+                        LookupLet,
+                        PipelineDefinitionBuilder.For<MongoContentEntity>()
+                            .Match(LookupMatch)
+                            .Project(
+                                BuildProjection2<MongoContentEntity>(q.Fields)),
+                        x => x.Joined)
+                    .Project<IdOnly>(
+                        Builders<IdOnly>.Projection.Include(x => x.Joined))
                     .ToListAsync(ct);
 
             return joined.Select(x => x.Joined[0]).ToList();
@@ -147,15 +164,15 @@ public static class Extensions
 
     public static IFindFluent<T, T> SelectFields<T>(this IFindFluent<T, T> find, IEnumerable<string>? fields)
     {
-        return find.Project<T>(BuildProjection<T>(fields));
+        return find.Project<T>(BuildProjection2<T>(fields));
     }
 
     public static IAggregateFluent<T> SelectFields<T>(this IAggregateFluent<T> find, IEnumerable<string>? fields)
     {
-        return find.Project<T>(BuildProjection<T>(fields));
+        return find.Project<T>(BuildProjection2<T>(fields));
     }
 
-    private static ProjectionDefinition<T> BuildProjection<T>(IEnumerable<string>? fields)
+    private static ProjectionDefinition<T, T> BuildProjection2<T>(IEnumerable<string>? fields)
     {
         var projector = Builders<T>.Projection;
         var projections = new List<ProjectionDefinition<T>>();
