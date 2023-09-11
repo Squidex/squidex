@@ -26,30 +26,37 @@ public sealed class CommentActionHandler : RuleActionHandler<CommentAction, Crea
 
     protected override async Task<(string Description, CreateComment Data)> CreateJobAsync(EnrichedEvent @event, CommentAction action)
     {
-        if (@event is EnrichedContentEvent contentEvent)
+        if (@event is not EnrichedContentEvent contentEvent)
         {
-            var ruleJob = new CreateComment
-            {
-                AppId = contentEvent.AppId
-            };
-
-            ruleJob.Text = (await FormatAsync(action.Text, @event))!;
-
-            if (!string.IsNullOrEmpty(action.Client))
-            {
-                ruleJob.Actor = RefToken.Client(action.Client);
-            }
-            else
-            {
-                ruleJob.Actor = contentEvent.Actor;
-            }
-
-            ruleJob.CommentsId = contentEvent.Id;
-
-            return (Description, ruleJob);
+            return ("Ignore", new CreateComment());
         }
 
-        return ("Ignore", new CreateComment());
+        var ruleJob = new CreateComment
+        {
+            AppId = contentEvent.AppId
+        };
+
+        var text = await FormatAsync(action.Text, @event);
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return ("NoText", new CreateComment());
+        }
+
+        ruleJob.Text = text;
+
+        if (!string.IsNullOrEmpty(action.Client))
+        {
+            ruleJob.Actor = RefToken.Client(action.Client);
+        }
+        else
+        {
+            ruleJob.Actor = contentEvent.Actor;
+        }
+
+        ruleJob.CommentsId = contentEvent.Id;
+
+        return (Description, ruleJob);
     }
 
     protected override async Task<Result> ExecuteJobAsync(CreateComment job,

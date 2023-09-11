@@ -22,6 +22,8 @@ public interface IUrlGenerator
 
     string AssetContent(NamedId<DomainId> appId, string idOrSlug);
 
+    string AssetContent(NamedId<DomainId> appId, string idOrSlug, long version);
+
     string AssetContentBase();
 
     string AssetContentBase(string appName);

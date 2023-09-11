@@ -67,6 +67,11 @@ public sealed class UrlGenerator : IUrlGenerator
         return urlGenerator.BuildUrl($"api/assets/{appId.Name}/{idOrSlug}");
     }
 
+    public string AssetContent(NamedId<DomainId> appId, string idOrSlug, long version)
+    {
+        return urlGenerator.BuildUrl($"api/assets/{appId.Name}/{idOrSlug}?version={version}");
+    }
+
     public string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion)
     {
         return assetFileStore.GeneratePublicUrl(appId.Id, assetId, fileVersion, null);

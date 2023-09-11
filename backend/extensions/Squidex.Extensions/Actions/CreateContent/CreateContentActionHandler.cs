@@ -47,6 +47,7 @@ public sealed class CreateContentActionHandler : RuleActionHandler<CreateContent
         }
 
         ruleJob.SchemaId = schema.NamedId();
+        ruleJob.FromRule = true;
 
         var json = await FormatAsync(action.Data, @event);
 
@@ -73,8 +74,6 @@ public sealed class CreateContentActionHandler : RuleActionHandler<CreateContent
         CancellationToken ct = default)
     {
         var command = job;
-
-        command.FromRule = true;
 
         await commandBus.PublishAsync(command, ct);
 
