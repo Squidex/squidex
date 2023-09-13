@@ -249,6 +249,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 
     public visitArray() {
+        this.config['calculatedDefaultValue'] = new UntypedFormControl('EmptyArray');
         this.config['maxItems'] = new UntypedFormControl(undefined);
         this.config['minItems'] = new UntypedFormControl(undefined);
         this.config['uniqueFields'] = new UntypedFormControl(undefined);
@@ -288,6 +289,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 
     public visitComponents() {
+        this.config['calculatedDefaultValue'] = new UntypedFormControl('EmptyArray');
         this.config['schemaIds'] = new UntypedFormControl(undefined);
         this.config['maxItems'] = new UntypedFormControl(undefined);
         this.config['minItems'] = new UntypedFormControl(undefined);

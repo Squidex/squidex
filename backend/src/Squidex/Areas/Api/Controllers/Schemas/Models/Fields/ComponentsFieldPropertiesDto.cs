@@ -27,6 +27,11 @@ public sealed class ComponentsFieldPropertiesDto : FieldPropertiesDto
     public int? MaxItems { get; set; }
 
     /// <summary>
+    /// The calculated default value for the field value.
+    /// </summary>
+    public ArrayCalculatedDefaultValue CalculatedDefaultValue { get; set; }
+
+    /// <summary>
     /// The ID of the embedded schemas.
     /// </summary>
     public ReadonlyList<DomainId>? SchemaIds { get; set; }

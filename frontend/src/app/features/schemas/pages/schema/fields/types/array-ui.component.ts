@@ -7,16 +7,16 @@
 
 import { Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
+import { ArrayFieldPropertiesDto, FieldDto } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
 @Component({
-    selector: 'sqx-components-ui',
-    styleUrls: ['components-ui.component.scss'],
-    templateUrl: 'components-ui.component.html',
+    selector: 'sqx-array-ui',
+    styleUrls: ['array-ui.component.scss'],
+    templateUrl: 'array-ui.component.html',
 })
-export class ComponentsUIComponent {
+export class ArrayUIComponent {
     @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
@@ -24,7 +24,7 @@ export class ComponentsUIComponent {
     public field!: FieldDto;
 
     @Input({ required: true })
-    public properties!: ReferencesFieldPropertiesDto;
+    public properties!: ArrayFieldPropertiesDto;
 
     public calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

@@ -41,6 +41,18 @@ describe('UndefinableFormArray', () => {
         valueActual: [1],
     }];
 
+    it('should initialize with undefined', () => {
+        const control = new UndefinableFormArray();
+
+        expect(control.value).toBeUndefined();
+    });
+
+    it('should initialize with empty array', () => {
+        const control = new UndefinableFormArray([]);
+
+        expect(control.value).toEqual([]);
+    });
+
     it('should provide value even if controls are disabled', () => {
         const control = new UndefinableFormArray([
             new UntypedFormControl('1'),

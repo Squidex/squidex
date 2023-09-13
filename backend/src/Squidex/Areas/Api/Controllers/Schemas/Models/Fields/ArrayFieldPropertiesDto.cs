@@ -26,6 +26,11 @@ public sealed class ArrayFieldPropertiesDto : FieldPropertiesDto
     public int? MaxItems { get; set; }
 
     /// <summary>
+    /// The calculated default value for the field value.
+    /// </summary>
+    public ArrayCalculatedDefaultValue CalculatedDefaultValue { get; set; }
+
+    /// <summary>
     /// The fields that must be unique.
     /// </summary>
     public ReadonlyList<string>? UniqueFields { get; set; }

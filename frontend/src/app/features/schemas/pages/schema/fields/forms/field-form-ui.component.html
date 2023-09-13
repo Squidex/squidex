@@ -13,6 +13,9 @@
 </div>
 
 <ng-container [ngSwitch]="field.rawProperties.fieldType">
+    <ng-container *ngSwitchCase="'Array'">
+        <sqx-array-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-array-ui>
+    </ng-container>
     <ng-container *ngSwitchCase="'Assets'">
         <sqx-assets-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-assets-ui>
     </ng-container>

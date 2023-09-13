@@ -130,6 +130,7 @@
                 "isDisabled": false,
                 "properties": {
                     "$type": "ComponentsField",
+                    "calculatedDefaultValue": "EmptyArray",
                     "schemaId": "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c",
                     "schemaIds": [
                         "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c"
@@ -267,6 +268,7 @@
                 "isDisabled": false,
                 "properties": {
                     "$type": "ArrayField",
+                    "calculatedDefaultValue": "EmptyArray",
                     "isRequired": false,
                     "isRequiredOnPublish": false,
                     "isHalfWidth": false
