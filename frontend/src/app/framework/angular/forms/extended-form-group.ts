@@ -29,10 +29,10 @@ export class ExtendedFormGroup extends UntypedFormGroup {
 }
 
 export class UndefinableFormGroup extends ExtendedFormGroup {
-    private isUndefined = true;
+    private isUndefined = false;
 
-    constructor(controls: { [key: string]: AbstractControl }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
-        super(controls, validatorOrOpts, asyncValidator);
+    constructor(controls?: { [key: string]: AbstractControl }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
+        super(controls || {}, validatorOrOpts, asyncValidator);
 
         const reduce = (this as any)['_reduceValue'];
 
@@ -43,6 +43,12 @@ export class UndefinableFormGroup extends ExtendedFormGroup {
                 return reduce.apply(this);
             }
         };
+
+        if (Types.isUndefined(controls)) {
+            this.isUndefined = true;
+
+            super.reset({}, { emitEvent: false });
+        }
     }
 
     public getRawValue() {

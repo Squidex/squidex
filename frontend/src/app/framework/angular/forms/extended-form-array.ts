@@ -23,10 +23,10 @@ export class ExtendedFormArray extends UntypedFormArray {
 }
 
 export class UndefinableFormArray extends ExtendedFormArray {
-    private isUndefined = true;
+    private isUndefined = false;
 
-    constructor(controls: AbstractControl[], validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
-        super(controls, validatorOrOpts, asyncValidator);
+    constructor(controls?: AbstractControl[], validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
+        super(controls || [], validatorOrOpts, asyncValidator);
 
         const reduce = (this as any)['_reduceValue'];
 
@@ -37,6 +37,12 @@ export class UndefinableFormArray extends ExtendedFormArray {
                 return reduce.apply(this);
             }
         };
+
+        if (Types.isUndefined(controls)) {
+            this.isUndefined = true;
+
+            super.reset([], { emitEvent: false });
+        }
     }
 
     public getRawValue() {
