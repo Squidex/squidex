@@ -23,7 +23,7 @@ export class ExtendedFormArray extends UntypedFormArray {
 }
 
 export class UndefinableFormArray extends ExtendedFormArray {
-    private isUndefined = false;
+    private isUndefined = true;
 
     constructor(controls: AbstractControl[], validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
         super(controls, validatorOrOpts, asyncValidator);

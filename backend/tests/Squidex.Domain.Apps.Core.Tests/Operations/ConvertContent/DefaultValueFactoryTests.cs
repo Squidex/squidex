@@ -20,6 +20,26 @@ public class DefaultValueFactoryTests
     private readonly Language language = Language.DE;
 
     [Fact]
+    public void Should_get_default_value_from_array_field()
+    {
+        var field =
+            Fields.Array(1, "1", Partitioning.Invariant,
+                new ArrayFieldProperties());
+
+        Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+    }
+
+    [Fact]
+    public void Should_get_default_value_from_array_field_if_set_to_null()
+    {
+        var field =
+            Fields.Array(1, "1", Partitioning.Invariant,
+                new ArrayFieldProperties { CalculatedDefaultValue = ArrayCalculatedDefaultValue.Null });
+
+        Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+    }
+
+    [Fact]
     public void Should_get_default_value_from_assets_field()
     {
         var field =
@@ -79,6 +99,26 @@ public class DefaultValueFactoryTests
                     }),
                     DefaultValue = true
                 });
+
+        Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+    }
+
+    [Fact]
+    public void Should_get_default_value_from_components_field()
+    {
+        var field =
+            Fields.Components(1, "1", Partitioning.Invariant,
+                new ComponentsFieldProperties());
+
+        Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+    }
+
+    [Fact]
+    public void Should_get_default_value_from_components_field_if_set_to_null()
+    {
+        var field =
+            Fields.Components(1, "1", Partitioning.Invariant,
+                new ComponentsFieldProperties { CalculatedDefaultValue = ArrayCalculatedDefaultValue.Null });
 
         Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
     }

@@ -33,6 +33,21 @@ public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, Def
 
     public JsonValue Visit(ArrayFieldProperties properties, Args args)
     {
+        if (properties.CalculatedDefaultValue == ArrayCalculatedDefaultValue.Null)
+        {
+            return JsonValue.Null;
+        }
+
+        return new JsonArray();
+    }
+
+    public JsonValue Visit(ComponentsFieldProperties properties, Args args)
+    {
+        if (properties.CalculatedDefaultValue == ArrayCalculatedDefaultValue.Null)
+        {
+            return JsonValue.Null;
+        }
+
         return new JsonArray();
     }
 
@@ -53,11 +68,6 @@ public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, Def
     public JsonValue Visit(ComponentFieldProperties properties, Args args)
     {
         return JsonValue.Null;
-    }
-
-    public JsonValue Visit(ComponentsFieldProperties properties, Args args)
-    {
-        return new JsonArray();
     }
 
     public JsonValue Visit(GeolocationFieldProperties properties, Args args)

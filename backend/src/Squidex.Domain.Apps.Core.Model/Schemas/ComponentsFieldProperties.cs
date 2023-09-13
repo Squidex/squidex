@@ -18,6 +18,8 @@ public sealed record ComponentsFieldProperties : FieldProperties
 
     public ReadonlyList<string>? UniqueFields { get; init; }
 
+    public ArrayCalculatedDefaultValue CalculatedDefaultValue { get; init; }
+
     public DomainId SchemaId
     {
         init

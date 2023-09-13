@@ -417,8 +417,20 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         }
     }
 
-    public visitArray(_: ArrayFieldPropertiesDto): any {
-        return null;
+    public visitArray(properties: ArrayFieldPropertiesDto): any {
+        if (properties.calculatedDefaultValue === 'Null') {
+            return null;
+        }
+
+        return [];
+    }
+
+    public visitComponents(properties: ComponentsFieldPropertiesDto): any {
+        if (properties.calculatedDefaultValue === 'Null') {
+            return null;
+        }
+
+        return [];
     }
 
     public visitAssets(properties: AssetsFieldPropertiesDto): any {
@@ -430,10 +442,6 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     }
 
     public visitComponent(_: ComponentFieldPropertiesDto): any {
-        return null;
-    }
-
-    public visitComponents(_: ComponentsFieldPropertiesDto): any {
         return null;
     }
 

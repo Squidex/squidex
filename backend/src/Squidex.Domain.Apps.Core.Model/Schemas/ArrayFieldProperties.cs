@@ -15,6 +15,8 @@ public sealed record ArrayFieldProperties : FieldProperties
 
     public int? MaxItems { get; init; }
 
+    public ArrayCalculatedDefaultValue CalculatedDefaultValue { get; init; }
+
     public ReadonlyList<string>? UniqueFields { get; init; }
 
     public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)

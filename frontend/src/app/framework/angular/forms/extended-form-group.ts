@@ -29,7 +29,7 @@ export class ExtendedFormGroup extends UntypedFormGroup {
 }
 
 export class UndefinableFormGroup extends ExtendedFormGroup {
-    private isUndefined = false;
+    private isUndefined = true;
 
     constructor(controls: { [key: string]: AbstractControl }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
         super(controls, validatorOrOpts, asyncValidator);
