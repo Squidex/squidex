@@ -78,6 +78,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     public assetsCorrelationId: any;
     public assetsDialog = new DialogModel();
 
+    public contentsQuery?: string = undefined;
     public contentsCorrelationId: any;
     public contentsSchemas?: string[];
     public contentsDialog = new DialogModel();
@@ -207,9 +208,10 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
                     this.assetsDialog.show();
                 }
             } else if (type === 'pickContents') {
-                const { correlationId, schemas } = event.data;
+                const { correlationId, schemas, query } = event.data;
 
                 if (correlationId) {
+                    this.contentsQuery = query;
                     this.contentsCorrelationId = correlationId;
                     this.contentsSchemas = schemas;
                     this.contentsDialog.show();

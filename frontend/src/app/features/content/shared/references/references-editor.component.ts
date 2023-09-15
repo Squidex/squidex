@@ -36,6 +36,9 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public schemaIds!: ReadonlyArray<string>;
 
     @Input({ required: true })
+    public query?: string;
+
+    @Input({ required: true })
     public language!: AppLanguageDto;
 
     @Input({ required: true })

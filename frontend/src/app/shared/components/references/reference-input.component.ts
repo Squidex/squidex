@@ -35,6 +35,9 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
     public schemaIds?: ReadonlyArray<string>;
 
     @Input({ required: true })
+    public query?: string;
+
+    @Input({ required: true })
     public language!: LanguageDto;
 
     @Input({ required: true })

@@ -345,6 +345,8 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
             new TemplatedFormArray(new ArrayTemplate(() => this), FieldsValidators.create(field, isOptional)),
             isOptional, rules);
 
+        this.form.setValue(FieldDefaultValue.get(field, this.partition), { emitEvent: false });
+
         (this.form.template as any)['form'] = this;
     }
 

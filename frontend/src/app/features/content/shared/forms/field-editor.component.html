@@ -137,6 +137,7 @@
                                 [isExpanded]="isExpanded"
                                 [language]="language"
                                 [languages]="languages"
+                                [query]="field.rawProperties.query"
                                 [schemaIds]="field.rawProperties.schemaIds">
                             </sqx-references-editor>
                         </ng-container>
@@ -152,9 +153,10 @@
                         <ng-container *ngSwitchCase="'Input'">
                             <sqx-reference-input
                                 mode="Array"
-                                [formControl]="$any(fieldForm)" 
+                                [formControl]="$any(fieldForm)"
                                 [language]="language"
                                 [languages]="languages"
+                                [query]="field.rawProperties.query"
                                 [schemaIds]="field.rawProperties.schemaIds">
                             </sqx-reference-input>
                         </ng-container>

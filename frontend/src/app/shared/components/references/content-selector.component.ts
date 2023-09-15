@@ -19,6 +19,8 @@ import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDt
     ],
 })
 export class ContentSelectorComponent extends ResourceOwner implements OnInit {
+    private initialQuery?: string = undefined;
+
     public readonly metaFields = META_FIELDS;
 
     @Output()
@@ -35,6 +37,9 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
 
     @Input()
     public schemaNames?: ReadonlyArray<string>;
+
+    @Input()
+    public query?: string;
 
     @Input({ required: true })
     public language!: LanguageDto;
@@ -77,6 +82,8 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
+        this.initialQuery = this.query;
+
         this.own(
             this.contentsState.statuses
                 .subscribe(() => {
@@ -101,7 +108,8 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
 
         if (schema) {
             this.contentsState.schema = schema;
-            this.contentsState.load();
+            this.contentsState.search({ fullText: this.initialQuery || undefined });
+            this.initialQuery = undefined;
 
             this.updateModel();
         }

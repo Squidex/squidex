@@ -21,7 +21,7 @@ export class TemplatedFormArray extends UndefinableFormArray {
     constructor(public readonly template: FormArrayTemplate,
         validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null,
     ) {
-        super(undefined, validatorOrOpts, asyncValidator);
+        super([], validatorOrOpts, asyncValidator);
     }
 
     public setValue(value?: any[], options?: { onlySelf?: boolean; emitEvent?: boolean }) {

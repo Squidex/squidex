@@ -52,6 +52,11 @@ public sealed class ReferencesFieldPropertiesDto : FieldPropertiesDto
     public bool MustBePublished { get; set; }
 
     /// <summary>
+    /// The initial query that is applied in the UI.
+    /// </summary>
+    public string? Query { get; init; }
+
+    /// <summary>
     /// The editor that is used to manage this field.
     /// </summary>
     public ReferencesFieldEditor Editor { get; set; }

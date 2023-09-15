@@ -2,12 +2,16 @@
     <ng-container title>
         <div class="row">
             <div class="col-selector">
-                <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
+                <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)" *ngIf="schemas.length > 1">
                     <option *ngFor="let schema of schemas" [ngValue]="schema">
                         {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
                     </option>
                 </select>
             </div>
+        </div>
+
+        <div *ngIf="schemas.length === 1">
+            {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schemas[0].displayName } }}
         </div>
     </ng-container>
 

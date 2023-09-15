@@ -48,6 +48,7 @@ describe('TemplatedFormGroup', () => {
 
             expect(formArray.value).toEqual(value1);
         });
+
         it(`Should call template to clear items with for ${name}`, () => {
             const value1 = {
                 value: 1,

@@ -27,4 +27,16 @@
             </sqx-form-hint>
         </div>
     </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_query">{{ 'schemas.field.references.query' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <input type="text" class="form-control" id="{{field.fieldId}}_query" formControlName="query">
+
+            <sqx-form-hint>
+                {{ 'schemas.field.references.queryHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
 </div>

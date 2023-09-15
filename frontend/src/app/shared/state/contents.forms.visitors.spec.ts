@@ -42,10 +42,10 @@ describe('ArrayField', () => {
         expect(FieldDefaultValue.get(field, 'iv')).toEqual([]);
     });
 
-    it('should return default value as null when configured', () => {
+    it('should return default value as undefined when configured', () => {
         const field2 = createField({ properties: createProperties('Array', { calculatedDefaultValue: 'Null' }) });
 
-        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeUndefined();
     });
 });
 
@@ -140,10 +140,10 @@ describe('ComponentsField', () => {
         expect(FieldDefaultValue.get(field, 'iv')).toEqual([]);
     });
 
-    it('should return default value as null when configured', () => {
+    it('should return default value as undefined when configured', () => {
         const field2 = createField({ properties: createProperties('Components', { calculatedDefaultValue: 'Null' }) });
 
-        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeUndefined();
     });
 });
 

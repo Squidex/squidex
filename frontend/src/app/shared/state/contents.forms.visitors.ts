@@ -419,7 +419,7 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 
     public visitArray(properties: ArrayFieldPropertiesDto): any {
         if (properties.calculatedDefaultValue === 'Null') {
-            return null;
+            return undefined;
         }
 
         return [];
@@ -427,7 +427,7 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 
     public visitComponents(properties: ComponentsFieldPropertiesDto): any {
         if (properties.calculatedDefaultValue === 'Null') {
-            return null;
+            return undefined;
         }
 
         return [];
