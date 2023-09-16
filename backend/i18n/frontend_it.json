@@ -913,6 +913,8 @@
   "schemas.fieldTypes.references.countMin": "Numero Min Elementi",
   "schemas.fieldTypes.references.description": "Link ad altri elementi del contenuto.",
   "schemas.fieldTypes.references.mustBePublished": "I contenuti collegati devono essere pubblicati",
+  "schemas.fieldTypes.references.query": "Initial Query",
+  "schemas.fieldTypes.references.queryHint": "The initial query that is used in the UI to narrow down the results for the user. In Odata notation.",
   "schemas.fieldTypes.references.resolve": "Resolve references",
   "schemas.fieldTypes.references.resolveHint": "Mostra il nome dell'elemento collegato (riferimento) nella lista dei contenuti quando il numero massimo di elementi è impostato a 1.",
   "schemas.fieldTypes.string.characters": "Caratteri",

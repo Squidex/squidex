@@ -390,6 +390,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly maxItems?: number;
     public readonly minItems?: number;
     public readonly mustBePublished?: boolean;
+    public readonly query?: string;
     public readonly resolveReference?: boolean;
     public readonly schemaIds?: ReadonlyArray<string>;
 

@@ -1,10 +1,14 @@
-<sqx-modal-dialog (close)="emitClose()" size="lg" showFooter="false">
+-<sqx-modal-dialog (close)="emitClose()" size="lg" showFooter="false">
     <ng-container title>
-        <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
+        <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)" *ngIf="schemas.length > 1">
             <option *ngFor="let schema of schemas" [ngValue]="schema">
                 {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
             </option>
         </select>
+
+        <div *ngIf="schemas.length === 1">
+            {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schemas[0].displayName } }}
+        </div>
     </ng-container>
 
     <ng-container tabs>

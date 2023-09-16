@@ -19,7 +19,7 @@ export class TemplatedFormGroup extends UndefinableFormGroup {
     constructor(public readonly template: FormGroupTemplate,
         validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null,
     ) {
-        super(undefined, validatorOrOpts, asyncValidator);
+        super({}, validatorOrOpts, asyncValidator);
     }
 
     public setValue(value?: {}, options?: { onlySelf?: boolean; emitEvent?: boolean }) {

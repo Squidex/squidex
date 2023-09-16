@@ -410,11 +410,11 @@ describe('ContentForm', () => {
         createField({
             id: 4,
             properties: createProperties('Array'),
-            partitioning: 'invariant',
             nested: [
                 createNestedField({ id: 41, properties: createProperties('String') }),
                 createNestedField({ id: 42, properties: createProperties('String', { defaultValue: 'Default' }), isDisabled: true }),
             ],
+            partitioning: 'invariant',
         }),
     ] });
 
@@ -452,6 +452,18 @@ describe('ContentForm', () => {
     });
 
     describe('with complex form', () => {
+        const arraySetup = [
+            {
+                value: [],
+                defaultValue: 'EmptyArray',
+
+            },
+            {
+                value: undefined,
+                defaultValue: 'Null',
+            },
+        ];
+
         it('should not enabled disabled fields', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('String') }),
@@ -469,6 +481,32 @@ describe('ContentForm', () => {
 
             expectForm(contentForm.form, 'field3.en', { invalid: true });
             expectForm(contentForm.form, 'field3.de', { invalid: false });
+        });
+
+        arraySetup.forEach(test => {
+            it(`should create array with ${test.defaultValue} default value`, () => {
+                const contentForm = createForm([
+                    createField({
+                        id: 4,
+                        properties: createProperties('Array', { calculatedDefaultValue: test.defaultValue }),
+                    }),
+                ]);
+
+                expect(contentForm.value.field4.en).toEqual(test.value);
+            });
+        });
+
+        arraySetup.forEach(test => {
+            it(`should create components with ${test.defaultValue} default value`, () => {
+                const contentForm = createForm([
+                    createField({
+                        id: 4,
+                        properties: createProperties('Components', { calculatedDefaultValue: test.defaultValue }),
+                    }),
+                ]);
+
+                expect(contentForm.value.field4.en).toEqual(test.value);
+            });
         });
 
         it('should require field based on context condition', () => {
@@ -587,11 +625,11 @@ describe('ContentForm', () => {
                 createField({
                     id: 4,
                     properties: createProperties('Array'),
-                    partitioning: 'invariant',
                     nested: [
                         createNestedField({ id: 41, properties: createProperties('Number') }),
                         createNestedField({ id: 42, properties: createProperties('Number') }),
                     ],
+                    partitioning: 'invariant',
                 }),
             ], [{
                 field: 'field4.nested42', action: 'Disable', condition: 'itemData.nested41 > 100',
@@ -620,11 +658,11 @@ describe('ContentForm', () => {
                 createField({
                     id: 4,
                     properties: createProperties('Array'),
-                    partitioning: 'invariant',
                     nested: [
                         createNestedField({ id: 41, properties: createProperties('Number') }),
                         createNestedField({ id: 42, properties: createProperties('Number') }),
                     ],
+                    partitioning: 'invariant',
                 }),
             ], [{
                 field: 'field4.nested42', action: 'Hide', condition: 'itemData.nested41 > 100',
@@ -653,11 +691,11 @@ describe('ContentForm', () => {
                 createField({
                     id: 4,
                     properties: createProperties('Array'),
-                    partitioning: 'language',
                     nested: [
                         createNestedField({ id: 41, properties: createProperties('Number') }),
                         createNestedField({ id: 42, properties: createProperties('Number') }),
                     ],
+                    partitioning: 'language',
                 }),
             ], [{
                 field: 'field4.nested42', action: 'Hide', condition: 'itemData.nested41 > 100',
@@ -686,11 +724,7 @@ describe('ContentForm', () => {
             const component = createSchema({
                 id: 2,
                 fields: [
-                    createField({
-                        id: 1,
-                        properties: createProperties('String'),
-                        partitioning: 'invariant',
-                    }),
+                    createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
                 ],
                 fieldRules: [{
                     field: 'field1', action: 'Hide', condition: 'data.field1 > 100',
@@ -804,11 +838,7 @@ describe('ContentForm', () => {
             });
 
             const contentForm = createForm([
-                createField({
-                    id: 4,
-                    properties: createProperties('Components'),
-                    partitioning: 'invariant',
-                }),
+                createField({ id: 4, properties: createProperties('Components'), partitioning: 'invariant' }),
             ], [], {
                 [componentId]: component,
             });
@@ -841,11 +871,7 @@ describe('ContentForm', () => {
             const component1 = createSchema({
                 id: 1,
                 fields: [
-                    createField({
-                        id: 11,
-                        properties: createProperties('String'),
-                        partitioning: 'invariant',
-                    }),
+                    createField({ id: 11, properties: createProperties('String'), partitioning: 'invariant' }),
                 ],
             });
 
@@ -853,20 +879,12 @@ describe('ContentForm', () => {
             const component2 = createSchema({
                 id: 2,
                 fields: [
-                    createField({
-                        id: 21,
-                        properties: createProperties('String'),
-                        partitioning: 'invariant',
-                    }),
+                    createField({ id: 21, properties: createProperties('String'), partitioning: 'invariant' }),
                 ],
             });
 
             const contentForm = createForm([
-                createField({
-                    id: 4,
-                    properties: createProperties('Component'),
-                    partitioning: 'invariant',
-                }),
+                createField({ id: 4, properties: createProperties('Component'), partitioning: 'invariant' }),
             ], [], {
                 [component1Id]: component1,
                 [component2Id]: component2,
@@ -923,20 +941,11 @@ describe('ContentForm', () => {
             const component = createSchema({
                 id: 1,
                 fields: [
-                    createField({
-                        id: 11,
-                        properties: createProperties('String'),
-                        partitioning: 'invariant',
-                    }),
-                ],
+                    createField({ id: 11, properties: createProperties('String'), partitioning: 'invariant' })],
             });
 
             const contentForm = createForm([
-                createField({
-                    id: 4,
-                    properties: createProperties('Component'),
-                    partitioning: 'invariant',
-                }),
+                createField({ id: 4, properties: createProperties('Component'), partitioning: 'invariant' }),
             ], [], {
                 [componentId]: component,
             });

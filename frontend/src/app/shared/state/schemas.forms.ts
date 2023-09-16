@@ -326,6 +326,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['maxItems'] = new UntypedFormControl(undefined);
         this.config['minItems'] = new UntypedFormControl(undefined);
         this.config['mustBePublished'] = new UntypedFormControl(false);
+        this.config['query'] = new UntypedFormControl(undefined);
         this.config['resolveReference'] = new UntypedFormControl(false);
         this.config['schemaIds'] = new UntypedFormControl(undefined);
     }

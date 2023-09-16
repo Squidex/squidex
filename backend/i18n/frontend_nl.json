@@ -913,6 +913,8 @@
   "schemas.fieldTypes.references.countMin": "Min. items",
   "schemas.fieldTypes.references.description": "Links naar andere inhoudsitems.",
   "schemas.fieldTypes.references.mustBePublished": "Referenties moeten worden gepubliceerd",
+  "schemas.fieldTypes.references.query": "Initial Query",
+  "schemas.fieldTypes.references.queryHint": "The initial query that is used in the UI to narrow down the results for the user. In Odata notation.",
   "schemas.fieldTypes.references.resolve": "Referenties tonen",
   "schemas.fieldTypes.references.resolveHint": "Toon de naam van het item waarnaar wordt verwezen in de inhoudslijst wanneer MaxItems is ingesteld op 1.",
   "schemas.fieldTypes.string.characters": "Karakters",

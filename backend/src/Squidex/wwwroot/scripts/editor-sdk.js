@@ -114,7 +114,7 @@ function SquidexPlugin() {
         /**
          * Register an function that is called when the sidebar is initialized.
          *
-         * @param {Function} callback: The callback to invoke.
+         * @param {function} callback: The callback to invoke.
          */
         onInit: function (callback) {
             if (!isFunction(callback)) {
@@ -129,7 +129,7 @@ function SquidexPlugin() {
         /**
          * Register an function that is called whenever the value of the content has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Content value (any).
+         * @param {function} callback: The callback to invoke. Argument 1: Content value (any).
          */
         onContentChanged: function (callback) {
             if (!isFunction(callback)) {
@@ -491,8 +491,9 @@ function SquidexFormField() {
          * 
          * @param {string} schemas: The list of schema names.
          * @param {function} callback The callback to invoke when the dialog is completed or closed.
+         * @param {string} query: The initial filter that is used in the UI.
          */
-        pickContents: function (schemas, callback) {
+        pickContents: function (schemas, callback, query) {
             if (!isFunction(callback) || !isArrayOfStrings(schemas)) {
                 return;
             }
@@ -501,18 +502,18 @@ function SquidexFormField() {
 
             currentPickContents = {
                 correlationId: correlationId,
-                callback: callback
+                callback: callback,
             };
 
             if (window.parent) {
-                window.parent.postMessage({ type: 'pickContents', correlationId: correlationId, schemas: schemas }, '*');
+                window.parent.postMessage({ type: 'pickContents', correlationId: correlationId, schemas: schemas, query: query }, '*');
             }
         },
 
         /**
          * Register an function that is called when the field is initialized.
          * 
-         * @param {Function} callback: The callback to invoke.
+         * @param {function} callback: The callback to invoke.
          */
         onInit: function (callback) {
             if (!isFunction(callback)) {
@@ -527,7 +528,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called when the field is moved.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: New position (number).
+         * @param {function} callback: The callback to invoke. Argument 1: New position (number).
          */
         onMoved: function (callback) {
             if (!isFunction(callback)) {
@@ -542,7 +543,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the field is disabled or enabled.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: New disabled state (boolean, disabled = true, enabled = false).
+         * @param {function} callback: The callback to invoke. Argument 1: New disabled state (boolean, disabled = true, enabled = false).
          */
         onDisabled: function (callback) {
             if (!isFunction(callback)) {
@@ -557,7 +558,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the field language is changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Language code (string).
+         * @param {function} callback: The callback to invoke. Argument 1: Language code (string).
          */
         onLanguageChanged: function (callback) {
             if (!isFunction(callback)) {
@@ -572,7 +573,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the value of the field has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Field value (any).
+         * @param {function} callback: The callback to invoke. Argument 1: Field value (any).
          */
         onValueChanged: function (callback) {
             if (!isFunction(callback)) {
@@ -587,7 +588,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the value of the content has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Content value (any).
+         * @param {function} callback: The callback to invoke. Argument 1: Content value (any).
          */
         onFormValueChanged: function (callback) {
             if (!isFunction(callback)) {
@@ -602,7 +603,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the fullscreen mode has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Fullscreen state (boolean, fullscreen on = true, fullscreen off = false).
+         * @param {function} callback: The callback to invoke. Argument 1: Fullscreen state (boolean, fullscreen on = true, fullscreen off = false).
          */
         onFullscreen: function (callback) {
             if (!isFunction(callback)) {
@@ -617,7 +618,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the expanded mode has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Expanded state (boolean, expanded on = true, expanded off = false).
+         * @param {function} callback: The callback to invoke. Argument 1: Expanded state (boolean, expanded on = true, expanded off = false).
          */
         onExpanded: function (callback) {
             if (!isFunction(callback)) {

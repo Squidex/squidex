@@ -913,6 +913,8 @@
   "schemas.fieldTypes.references.countMin": "Articles minimum",
   "schemas.fieldTypes.references.description": "Liens vers d'autres éléments de contenu.",
   "schemas.fieldTypes.references.mustBePublished": "Ne tenez compte que des références publiées lors de la validation.",
+  "schemas.fieldTypes.references.query": "Initial Query",
+  "schemas.fieldTypes.references.queryHint": "The initial query that is used in the UI to narrow down the results for the user. In Odata notation.",
   "schemas.fieldTypes.references.resolve": "Résoudre les références",
   "schemas.fieldTypes.references.resolveHint": "Afficher le nom de l'élément référencé dans la liste de contenu lorsque MaxItems est défini sur 1.",
   "schemas.fieldTypes.string.characters": "Personnages",

@@ -45,7 +45,8 @@
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)"
                 [language]="language"
-                [languages]="languages">
+                [languages]="languages"
+                [query]="undefined">
             </sqx-reference-input>
         </ng-container>
         <ng-container *ngSwitchCase="'Select'">
