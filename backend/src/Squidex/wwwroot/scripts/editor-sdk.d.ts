@@ -1,4 +1,4 @@
-declare class EditorPlugin {
+declare class SquidexSidebar {
     /**
      * Get the current context.
      */
@@ -28,6 +28,25 @@ declare class EditorPlugin {
      */
     clean(): void; 
 }
+
+declare class SquidexWidget {
+    /**
+     * Get the current context.
+     */
+    getContext(): any;
+
+    /**
+     * Register an function that is called when the sidebar is initialized.
+     *
+     * @param {function} callback: The callback to invoke.
+     */
+    onInit(callback: () => void): void;
+    /**
+     * Clean the editor SDK.
+     */
+    clean(): void; 
+}
+
 
 declare class SquidexFormField {
     /**

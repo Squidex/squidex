@@ -9,24 +9,21 @@
 
     <style>
         textarea {
+            border-radius: 0;
+            border: 0;
+            bottom: 0;
             box-sizing: border-box; 
+            left: 0;
+            position: fixed;
             resize: none;
-            overflow-x: hidden;
-            overflow-y: hidden;
-            width: 100%;
+            right: 0;
+            top: 0;
         }
     </style>
 </head>
 
 <body>
-    <script>
-        function grow(element) {
-            element.style.height = "5px";
-            element.style.height = (element.scrollHeight)+"px";
-        }
-    </script>
-
-    <textarea oninput="grow(this)" name="content" id="editor"></textarea>
+    <textarea name="content" id="editor"></textarea>
 
     <script>
         var element = document.getElementById('editor');

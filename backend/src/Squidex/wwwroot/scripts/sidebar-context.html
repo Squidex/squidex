@@ -13,7 +13,8 @@
             border: 0;
             border-radius: 0;
             resize: none;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: hidden;
             width: 100%;
         }
     </style>
@@ -27,7 +28,7 @@
         }
     </script>
 
-    <textarea  oninput="grow(this)" name="content" id="editor"></textarea>
+    <textarea oninput="grow(this)" name="content" id="editor"></textarea>
 
     <script>
         var element = document.getElementById('editor');

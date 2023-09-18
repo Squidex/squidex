@@ -60,7 +60,7 @@ export class DashboardConfigComponent {
         }
 
         if (changes.app) {
-            this.uiState.getAppUser('dashboard.grid', this.configDefaults).pipe(take(1))
+            this.uiState.getAppShared('dashboard.grid', this.configDefaults).pipe(take(1))
                 .subscribe(dto => {
                     this.setConfig(dto);
                 });
@@ -91,7 +91,6 @@ export class DashboardConfigComponent {
 
     public resetConfig() {
         this.setConfig(Types.clone(this.configDefaults));
-
         this.saveConfig();
     }
 

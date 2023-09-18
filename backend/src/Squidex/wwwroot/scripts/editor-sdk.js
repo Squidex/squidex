@@ -53,7 +53,7 @@ function isArrayOfStrings(value) {
     return true;
 }
 
-function SquidexPlugin() {
+function SquidexSidebar() {
     var initHandler;
     var initCalled = false;
     var contentHandler;
@@ -94,7 +94,7 @@ function SquidexPlugin() {
 
     timer = measureAndNotifyParent();
 
-    var editor = {
+    var plugin = {
         /**
          * Get the current context.
          */
@@ -153,7 +153,70 @@ function SquidexPlugin() {
         }
     };
 
-    return editor;
+    return plugin;
+}
+
+function SquidexWidget() {
+    var initHandler;
+    var initCalled = false;
+    var context;
+
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+
+    function raiseInit() {
+        if (initHandler && !initCalled && context) {
+            initHandler(context);
+            initCalled = true;
+        }
+    }
+
+    function eventListener(event) {
+        if (event.source !== window) {
+            var type = event.data.type;
+            
+            if (type === 'init') {
+                context = event.data.context;
+
+                raiseInit();
+            }
+        }
+    }
+
+    window.addEventListener('message', eventListener, false);
+
+    var plugin = {
+        /**
+         * Get the current context.
+         */
+        getContext: function () {
+            return context;
+        },
+
+        /**
+         * Register an function that is called when the sidebar is initialized.
+         *
+         * @param {function} callback: The callback to invoke.
+         */
+        onInit: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
+            initHandler = callback;
+
+            raiseInit();
+        },
+
+        /**
+         * Clean the editor SDK.
+         */
+        clean: function () {
+            window.removeEventListener('message', eventListener);
+        }
+    };
+
+    return plugin;
 }
 
 function SquidexFormField() {
@@ -310,7 +373,7 @@ function SquidexFormField() {
 
     timer = measureAndNotifyParent();
 
-    var editor = {
+    var plugin = {
         /**
          * Get the current value.
          */
@@ -634,13 +697,13 @@ function SquidexFormField() {
          * Clean the editor SDK.
          */
         clean: function () {
-            if (timer) {
-                window.removeEventListener('message', eventListener);
+            window.removeEventListener('message', eventListener);
 
+            if (timer) {
                 timer();
             }
         }
     };
 
-    return editor;
+    return plugin;
 };
