@@ -11,7 +11,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, getTableFields, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, Types, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, getTableFields, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -98,7 +98,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             schema$.pipe(map(s => new TableSettings(this.uiState, s)), shareReplay(1));
 
         const tableName$ =
-            tableSetting$.pipe(switchMap(s => s.listFields), map(s => getTableFields(s)), distinctUntilChanged(Types.equals));
+            tableSetting$.pipe(switchMap(s => s.listFields), map(s => getTableFields(s)));
 
         this.tableSettings = tableSetting$;
 
