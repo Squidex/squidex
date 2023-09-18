@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { take } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { State, Types } from '@app/framework';
 import { META_FIELDS, SchemaDto, TableField } from './../services/schemas.service';
 import { UIState } from './ui.state';
@@ -45,8 +45,8 @@ export class TableSettings extends State<Snapshot> {
         this.projectFrom(this.fields, x => x.length > 0 ? x : this.schemaDefaults);
 
     constructor(
-        private readonly uiState: UIState,
-        private readonly schema: SchemaDto,
+        public readonly uiState: UIState,
+        public readonly schema: SchemaDto,
     ) {
         super({ fields: [], sizes: {}, wrappings: {} });
 
@@ -142,4 +142,23 @@ export class TableSettings extends State<Snapshot> {
             this.uiState.setAppUser(this.settingsKey, update);
         }
     }
+}
+
+export function getTableConfig(source: TableSettings) {
+    function sortedTableFields(fields: ReadonlyArray<TableField>) {
+        const result: string[] = [];
+
+        for (const field of fields) {
+            if (field.name && field.name.indexOf('meta') < 0) {
+                result.push(field.name);
+            }
+        }
+
+        result.sort();
+        return result;
+    }
+
+    return source.listFields.pipe(
+        map(fields => sortedTableFields(fields)),
+        map(fields => ({ fieldNames: fields, schema: source.schema })));
 }

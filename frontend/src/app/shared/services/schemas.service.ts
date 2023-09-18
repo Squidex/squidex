@@ -101,7 +101,7 @@ export function getTableFields(fields: ReadonlyArray<TableField>) {
     }
 
     result.sort();
-    
+
     return result;
 }
 
