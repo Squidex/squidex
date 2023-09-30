@@ -21,6 +21,7 @@ using Squidex.Web.Pipeline;
 namespace Squidex.Areas.Api.Controllers.Contents;
 
 [SchemaMustBePublished]
+[ApiExplorerSettings(GroupName = nameof(Contents))]
 public sealed class ContentsSharedController : ApiController
 {
     private readonly IContentQueryService contentQuery;
@@ -39,18 +40,97 @@ public sealed class ContentsSharedController : ApiController
     /// GraphQL endpoint.
     /// </summary>
     /// <param name="app">The name of the app.</param>
+    /// <param name="request">The request parameters.</param>
     /// <response code="200">Contents returned or mutated.</response>.
     /// <response code="404">App not found.</response>.
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
     [Route("content/{app}/graphql/")]
-    [Route("content/{app}/graphql/batch")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(2)]
     [AcceptHeader.Unpublished]
     [IgnoreCacheFilter]
-    public IActionResult GetGraphQL(string app)
+    public IActionResult GetGraphQL(string app, GraphQLQueryDto request)
+    {
+        var options = new GraphQLHttpMiddlewareOptions
+        {
+            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
+        };
+
+        return new GraphQLExecutionActionResult<DummySchema>(options);
+    }
+
+    /// <summary>
+    /// GraphQL endpoint.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">The request object.</param>
+    /// <response code="200">Contents returned or mutated.</response>.
+    /// <response code="404">App not found.</response>.
+    /// <remarks>
+    /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+    /// </remarks>
+    [HttpPost("content/{app}/graphql/")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous]
+    [ApiCosts(2)]
+    [AcceptHeader.Unpublished]
+    [IgnoreCacheFilter]
+    public IActionResult PostGraphQL(string app, [FromBody] object request)
+    {
+        var options = new GraphQLHttpMiddlewareOptions
+        {
+            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
+        };
+
+        return new GraphQLExecutionActionResult<DummySchema>(options);
+    }
+
+    /// <summary>
+    /// GraphQL batch endpoint.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">The request object.</param>
+    /// <response code="200">Contents returned or mutated.</response>.
+    /// <response code="404">App not found.</response>.
+    /// <remarks>
+    /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+    /// </remarks>
+    [HttpGet("content/{app}/graphql/batch")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous]
+    [ApiCosts(2)]
+    [AcceptHeader.Unpublished]
+    [IgnoreCacheFilter]
+    public IActionResult GetGraphQLBatch(string app, GraphQLQueryDto request)
+    {
+        var options = new GraphQLHttpMiddlewareOptions
+        {
+            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
+        };
+
+        return new GraphQLExecutionActionResult<DummySchema>(options);
+    }
+
+    /// <summary>
+    /// GraphQL batch endpoint.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">The request object.</param>
+    /// <response code="200">Contents returned or mutated.</response>.
+    /// <response code="404">App not found.</response>.
+    /// <remarks>
+    /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+    /// </remarks>
+    [HttpPost("content/{app}/graphql/batch")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous]
+    [ApiCosts(2)]
+    [AcceptHeader.Unpublished]
+    [IgnoreCacheFilter]
+    public IActionResult PostGraphQLBatch(string app, [FromBody] object request)
     {
         var options = new GraphQLHttpMiddlewareOptions
         {
@@ -143,7 +223,7 @@ public sealed class ContentsSharedController : ApiController
     [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppContentsReadOwn)]
     [ApiCosts(5)]
-    public async Task<IActionResult> BulkUpdateContents(string app, string schema, [FromBody] BulkUpdateContentsDto request)
+    public async Task<IActionResult> BulkUpdateAllContents(string app, string schema, [FromBody] BulkUpdateContentsDto request)
     {
         var command = request.ToCommand(true);
 

@@ -24,7 +24,6 @@ public sealed class NotificationActionHandler : RuleActionHandler<NotificationAc
         : base(formatter)
     {
         this.commandBus = commandBus;
-
         this.userResolver = userResolver;
     }
 
