@@ -78,9 +78,8 @@ export class CommentsComponent extends ResourceOwner {
     public comment() {
         const value = this.commentForm.submit();
 
-        if (value && value.text && value.text.length > 0) {
+        if (value?.text && value.text.length > 0) {
             this.commentsState.create(value.text, this.router.url);
-
             this.changeDetector.detectChanges();
         }
 

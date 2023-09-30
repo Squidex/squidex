@@ -1,7 +1,7 @@
-<ng-container *ngIf="users | async; let currentUsers">
-    <ng-container *ngIf="currentUsers.length > 1">
-        <div class="user-item" *ngFor="let userId of currentUsers | slice:0:5; let i = index" [style]="{ zIndex: i }">
-            <img class="user-picture" title="{{userId | sqxUserName}}" [src]="userId | sqxUserPicture">
+<ng-container *ngIf="collaboration.otherUsers | async; let currentUsers">
+    <ng-container *ngIf="currentUsers.length > 0">
+        <div class="user-item" *ngFor="let user of currentUsers | slice:0:5; let i = index" [style]="{ zIndex: i }">
+            <img class="user-picture" title="{{user.displayName}}" [src]="user.id | sqxUserPicture">
         </div>
     
         <div class="user-item" *ngIf="currentUsers.length > 5" [style]="{ zIndex: 6 }">

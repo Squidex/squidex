@@ -15,6 +15,7 @@ export * from './services/auth.service';
 export * from './services/autosave.service';
 export * from './services/backups.service';
 export * from './services/clients.service';
+export * from './services/collaboration.service';
 export * from './services/comments.service';
 export * from './services/contents.service';
 export * from './services/contributors.service';

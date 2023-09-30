@@ -9,13 +9,14 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, LanguagesState, LocalStoreService, ModalModel, ResolveAssets, ResolveContents, ResourceOwner, SchemaDto, SchemasState, Settings, TempService, ToolbarService, Types, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, ContentDto, ContentsState, defined, DialogService, EditContentForm, LanguagesState, LocalStoreService, ModalModel, ResolveAssets, ResolveContents, ResourceOwner, SchemaDto, SchemasState, Settings, TempService, ToolbarService, Types, Version } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
     templateUrl: './content-page.component.html',
     providers: [
+        CollaborationService,
         ResolveAssets,
         ResolveContents,
         ToolbarService,
@@ -49,6 +50,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     constructor(apiUrl: ApiUrlConfig, authService: AuthService, appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly autoSaveService: AutoSaveService,
+        private readonly collaboration: CollaborationService,
         private readonly dialogs: DialogService,
         private readonly languagesState: LanguagesState,
         private readonly localStore: LocalStoreService,
@@ -109,9 +111,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     this.formContext['languages'] = this.languages;
                     this.formContext['schema'] = this.schema;
                     this.formContext['initialContent'] = content;
+                    this.contentForm.setContext(this.formContext);
 
                     this.content = content;
-                    this.contentForm.setContext(this.formContext);
 
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
@@ -135,6 +137,12 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                                     this.autoSaveService.remove(this.autoSaveKey);
                                 }
                             });
+                    }
+
+                    if (content) {
+                        this.collaboration.connect(`${this.schema.id}/${content.id}`);
+                    } else {
+                        this.collaboration.connect(null);
                     }
                 }));
 

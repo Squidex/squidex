@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { timer } from 'rxjs';
-import { AppsState, CommentsService, switchSafe } from '@app/shared/internal';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CollaborationService } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-watching-users',
@@ -16,18 +15,8 @@ import { AppsState, CommentsService, switchSafe } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WatchingUsersComponent {
-    private appName: string;
-
-    @Input({ required: true })
-    public resource!: string;
-
-    public users =
-        timer(0, 5000).pipe(
-            switchSafe((() => this.commentsService.getWatchingUsers(this.appName, this.resource))));
-
-    constructor(appsState: AppsState,
-        private readonly commentsService: CommentsService,
+    constructor(
+        public readonly collaboration: CollaborationService,
     ) {
-        this.appName = appsState.appName;
     }
 }
