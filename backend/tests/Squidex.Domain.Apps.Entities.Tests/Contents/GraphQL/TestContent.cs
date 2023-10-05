@@ -346,7 +346,7 @@ public static class TestContent
         return content;
     }
 
-    public static IEnrichedContentEntity CreateRef(NamedId<DomainId> schemaId, DomainId id, string field, string value)
+    public static IEnrichedContentEntity CreateSimple(NamedId<DomainId> schemaId, DomainId id, string field, string value)
     {
         var now = SystemClock.Instance.GetCurrentInstant();
 
