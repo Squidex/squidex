@@ -22,7 +22,7 @@ public static class RebuilderExtensions
     public static Task RebuildAppsAsync(this Rebuilder rebuilder, int batchSize,
         CancellationToken ct = default)
     {
-        var streamFilter = StreamFilter.Prefix("app\\-");
+        var streamFilter = StreamFilter.Prefix("app-");
 
         return rebuilder.RebuildAsync<AppDomainObject, AppDomainObject.State>(streamFilter, batchSize, AllowedErrorRate, ct);
     }
@@ -30,7 +30,7 @@ public static class RebuilderExtensions
     public static Task RebuildSchemasAsync(this Rebuilder rebuilder, int batchSize,
         CancellationToken ct = default)
     {
-        var streamFilter = StreamFilter.Prefix("schema\\-");
+        var streamFilter = StreamFilter.Prefix("schema-");
 
         return rebuilder.RebuildAsync<SchemaDomainObject, SchemaDomainObject.State>(streamFilter, batchSize, AllowedErrorRate, ct);
     }
@@ -38,7 +38,7 @@ public static class RebuilderExtensions
     public static Task RebuildRulesAsync(this Rebuilder rebuilder, int batchSize,
         CancellationToken ct = default)
     {
-        var streamFilter = StreamFilter.Prefix("rule\\-");
+        var streamFilter = StreamFilter.Prefix("rule-");
 
         return rebuilder.RebuildAsync<RuleDomainObject, RuleDomainObject.State>(streamFilter, batchSize, AllowedErrorRate, ct);
     }
@@ -46,7 +46,7 @@ public static class RebuilderExtensions
     public static Task RebuildAssetsAsync(this Rebuilder rebuilder, int batchSize,
         CancellationToken ct = default)
     {
-        var streamFilter = StreamFilter.Prefix("asset\\-");
+        var streamFilter = StreamFilter.Prefix("asset-");
 
         return rebuilder.RebuildAsync<AssetDomainObject, AssetDomainObject.State>(streamFilter, batchSize, AllowedErrorRate, ct);
     }
@@ -54,7 +54,7 @@ public static class RebuilderExtensions
     public static Task RebuildAssetFoldersAsync(this Rebuilder rebuilder, int batchSize,
         CancellationToken ct = default)
     {
-        var streamFilter = StreamFilter.Prefix("assetFolder\\-");
+        var streamFilter = StreamFilter.Prefix("assetFolder-");
 
         return rebuilder.RebuildAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(streamFilter, batchSize, AllowedErrorRate, ct);
     }
@@ -62,7 +62,7 @@ public static class RebuilderExtensions
     public static Task RebuildContentAsync(this Rebuilder rebuilder, int batchSize,
         CancellationToken ct = default)
     {
-        var streamFilter = StreamFilter.Prefix("content\\-");
+        var streamFilter = StreamFilter.Prefix("content-");
 
         return rebuilder.RebuildAsync<ContentDomainObject, ContentDomainObject.State>(streamFilter, batchSize, AllowedErrorRate, ct);
     }
