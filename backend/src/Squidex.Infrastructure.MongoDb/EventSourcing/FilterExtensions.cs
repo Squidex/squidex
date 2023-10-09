@@ -44,11 +44,6 @@ internal static class FilterExtensions
 
         if (filter.Kind == StreamFilterKind.MatchStart)
         {
-            if (filter.Prefixes.Count == 1)
-            {
-                return builder.Regex(x => x.EventStream, $"^{Regex.Escape(filter.Prefixes[0])}");
-            }
-
             return builder.Or(filter.Prefixes.Select(p => builder.Regex(x => x.EventStream, $"^{Regex.Escape(p)}")));
         }
 
@@ -66,12 +61,7 @@ internal static class FilterExtensions
 
         if (filter.Kind == StreamFilterKind.MatchStart)
         {
-            if (filter.Prefixes.Count == 1)
-            {
-                return builder.Regex(x => x.FullDocument.EventStream, $"^{filter.Prefixes[0]}");
-            }
-
-            return builder.Or(filter.Prefixes.Select(p => builder.Regex(x => x.FullDocument.EventStream, $"^{p}")));
+            return builder.Or(filter.Prefixes.Select(p => builder.Regex(x => x.FullDocument.EventStream, $"^{Regex.Escape(p)}")));
         }
 
         return builder.In(x => x.FullDocument.EventStream, filter.Prefixes);

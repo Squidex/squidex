@@ -85,7 +85,7 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
         }
     }
 
-    public async IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string streamName, Instant timestamp = default, int take = int.MaxValue,
+    public async IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(StreamFilter filter, Instant timestamp = default, int take = int.MaxValue,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         if (take <= 0)
@@ -95,10 +95,8 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
 
         StreamPosition lastPosition = timestamp;
 
-        var filterDefinition = CreateFilter(StreamFilter.Name(streamName), lastPosition);
-
         var find =
-            Collection.Find(filterDefinition, Batching.Options)
+            Collection.Find(CreateFilter(filter, lastPosition), Batching.Options)
                 .Limit(take).Sort(Sort.Descending(x => x.Timestamp).Ascending(x => x.EventStream));
 
         var taken = 0;

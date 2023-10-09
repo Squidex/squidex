@@ -27,7 +27,7 @@ public class AssetPermanentDeleterTests : GivenContext
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        Assert.Equal(StreamFilter.Prefix("content-", "asset-"), sut.EventsFilter);
+        Assert.Equal(StreamFilter.Prefix("asset-"), sut.EventsFilter);
     }
 
     [Fact]

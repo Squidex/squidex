@@ -185,12 +185,10 @@ public class PersistenceBatchTests
 
     private void SetupEventStore(Dictionary<DomainId, List<MyEvent>> streams)
     {
-        var storedStreams = new Dictionary<string, IReadOnlyList<StoredEvent>>();
+        var events = new List<StoredEvent>();
 
         foreach (var (id, stream) in streams)
         {
-            var storedStream = new List<StoredEvent>();
-
             var i = 0;
 
             foreach (var @event in stream)
@@ -198,23 +196,20 @@ public class PersistenceBatchTests
                 var eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
                 var eventStored = new StoredEvent(id.ToString(), i.ToString(CultureInfo.InvariantCulture), i, eventData);
 
-                storedStream.Add(eventStored);
-
                 A.CallTo(() => eventFormatter.Parse(eventStored))
                     .Returns(new Envelope<IEvent>(@event));
 
                 A.CallTo(() => eventFormatter.ParseIfKnown(eventStored))
                     .Returns(new Envelope<IEvent>(@event));
 
+                events.Add(eventStored);
                 i++;
             }
-
-            storedStreams[id.ToString()] = storedStream;
         }
 
         var filter = StreamFilter.Name(streams.Keys.Select(x => x.ToString()).ToArray());
 
-        A.CallTo(() => eventStore.QueryManyAsync(filter, A<CancellationToken>._))
-            .Returns(storedStreams);
+        A.CallTo(() => eventStore.QueryAllAsync(filter, null, int.MaxValue, A<CancellationToken>._))
+            .Returns(events.ToAsyncEnumerable());
     }
 }
