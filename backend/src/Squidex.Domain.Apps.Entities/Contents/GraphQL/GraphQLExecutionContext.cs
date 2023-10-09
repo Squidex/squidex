@@ -41,6 +41,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         this.dataLoaders = dataLoaders;
 
         Context = context.Clone(b => b
+            .WithResolveSchemaNames()
             .WithNoCleanup()
             .WithNoEnrichment()
             .WithNoAssetEnrichment());

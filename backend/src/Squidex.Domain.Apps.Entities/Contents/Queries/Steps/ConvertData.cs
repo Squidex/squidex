@@ -149,7 +149,10 @@ public sealed class ConvertData : IContentEnricherStep
             {
                 converter.Add(new ResolveAssetUrls(context.App.NamedId(), urlGenerator, assetUrls));
             }
+        }
 
+        if (!context.IsFrontendClient || context.ResolveSchemaNames())
+        {
             converter.Add(new AddSchemaNames(components));
         }
 

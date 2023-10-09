@@ -763,6 +763,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The graphql request..
+        /// </summary>
+        public static string GraphqlRequest {
+            get {
+                return ResourceManager.GetString("GraphqlRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The current item, if the field is part of an array..
         /// </summary>
         public static string ItemData {

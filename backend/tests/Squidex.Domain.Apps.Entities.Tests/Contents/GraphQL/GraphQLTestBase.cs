@@ -76,7 +76,12 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
     protected Task<ExecutionResult> ExecuteAsync(TestQuery query)
     {
         // Use a shared instance to test caching.
-        sut ??= CreateSut(TestSchemas.Default, TestSchemas.Reference1, TestSchemas.Reference2, TestSchemas.Component);
+        sut ??= CreateSut(
+            TestSchemas.Default,
+            TestSchemas.Reference1,
+            TestSchemas.Reference2,
+            TestSchemas.Singleton,
+            TestSchemas.Component);
 
         var options = query.ToOptions(sut.Services);
 

@@ -23,6 +23,7 @@ public static class ContentHeaders
     public const string KeyNoResolveLanguages = "X-NoResolveLanguages";
     public const string KeyResolveFlow = "X-ResolveFlow";
     public const string KeyResolveUrls = "X-ResolveUrls";
+    public const string KeyResolveSchemaNames = "X-ResolveSchemaName";
     public const string KeyUnpublished = "X-Unpublished";
 
     public static void AddCacheHeaders(this Context context, IRequestCache cache)
@@ -96,6 +97,16 @@ public static class ContentHeaders
     public static ICloneBuilder WithResolveFlow(this ICloneBuilder builder, bool value = true)
     {
         return builder.WithBoolean(KeyResolveFlow, value);
+    }
+
+    public static bool ResolveSchemaNames(this Context context)
+    {
+        return context.AsBoolean(KeyResolveSchemaNames);
+    }
+
+    public static ICloneBuilder WithResolveSchemaNames(this ICloneBuilder builder, bool value = true)
+    {
+        return builder.WithBoolean(KeyResolveSchemaNames, value);
     }
 
     public static bool NoResolveLanguages(this Context context)
