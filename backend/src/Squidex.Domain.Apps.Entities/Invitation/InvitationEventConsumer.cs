@@ -24,15 +24,9 @@ public sealed class InvitationEventConsumer : IEventConsumer
     private readonly IAppProvider appProvider;
     private readonly ILogger<InvitationEventConsumer> log;
 
-    public string Name
-    {
-        get => "NotificationEmailSender";
-    }
+    public string Name => "NotificationEmailSender";
 
-    public string EventsFilter
-    {
-        get { return "^app-|^app-"; }
-    }
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("app-");
 
     public InvitationEventConsumer(
         IAppProvider appProvider,

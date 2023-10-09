@@ -82,7 +82,7 @@ internal sealed class Persistence<T> : IPersistence<T>
         {
             using (Telemetry.Activities.StartActivity("Persistence/ReadEvents"))
             {
-                await eventStore.DeleteStreamAsync(streamName.Value, ct);
+                await eventStore.DeleteAsync(StreamFilter.Name(streamName.Value), ct);
             }
 
             versionEvents = EtagVersion.Empty;
@@ -144,7 +144,7 @@ internal sealed class Persistence<T> : IPersistence<T>
     private async Task ReadEventsAsync(
         CancellationToken ct)
     {
-        var events = await eventStore.QueryAsync(streamName.Value, versionEvents, ct);
+        var events = await eventStore.QueryStreamAsync(streamName.Value, versionEvents, ct);
 
         var isStopped = false;
 

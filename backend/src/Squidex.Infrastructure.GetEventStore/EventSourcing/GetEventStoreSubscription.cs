@@ -23,14 +23,14 @@ internal sealed class GetEventStoreSubscription : IEventSubscription
         IJsonSerializer serializer,
         string? position,
         string? prefix,
-        string? streamFilter)
+        StreamFilter filter)
     {
 #pragma warning disable MA0134 // Observe result of async calls
         Task.Run(async () =>
         {
             var ct = cts.Token;
 
-            var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
+            var streamName = await projectionClient.CreateProjectionAsync(filter);
 
             async Task OnEvent(StreamSubscription subscription, ResolvedEvent @event,
                 CancellationToken ct)

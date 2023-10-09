@@ -19,25 +19,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 
 public sealed class MongoSchemasHash : MongoRepositoryBase<MongoSchemasHashEntity>, ISchemasHash, IEventConsumer, IDeleter
 {
-    public int BatchSize
-    {
-        get => 1000;
-    }
+    public int BatchSize => 1000;
 
-    public int BatchDelay
-    {
-        get => 500;
-    }
+    public int BatchDelay => 500;
 
-    public string Name
-    {
-        get => GetType().Name;
-    }
-
-    public string EventsFilter
-    {
-        get => "^schema-";
-    }
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("schema-");
 
     public MongoSchemasHash(IMongoDatabase database)
         : base(database)

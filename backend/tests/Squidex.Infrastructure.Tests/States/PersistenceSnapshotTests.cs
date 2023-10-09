@@ -162,7 +162,7 @@ public class PersistenceSnapshotTests
 
         await persistence.DeleteAsync();
 
-        A.CallTo(() => eventStore.DeleteStreamAsync(A<string>._, A<CancellationToken>._))
+        A.CallTo(() => eventStore.DeleteAsync(A<StreamFilter>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
         A.CallTo(() => snapshotStore.RemoveAsync(key, A<CancellationToken>._))

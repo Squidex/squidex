@@ -46,14 +46,14 @@ public sealed class GetEventStore : IEventStore, IInitializable
         }
     }
 
-    public IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber, string? streamFilter = null, string? position = null)
+    public IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber, StreamFilter filter, string? position = null)
     {
-        Guard.NotNull(streamFilter);
+        Guard.NotNull(filter);
 
-        return new GetEventStoreSubscription(subscriber, client, projectionClient, serializer, position, StreamPrefix, streamFilter);
+        return new GetEventStoreSubscription(subscriber, client, projectionClient, serializer, position, StreamPrefix, filter);
     }
 
-    public async IAsyncEnumerable<StoredEvent> QueryAllAsync(string? streamFilter = null, string? position = null, int take = int.MaxValue,
+    public async IAsyncEnumerable<StoredEvent> QueryAllAsync(StreamFilter filter, string? position = null, int take = int.MaxValue,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         if (take <= 0)
@@ -61,7 +61,7 @@ public sealed class GetEventStore : IEventStore, IInitializable
             yield break;
         }
 
-        var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
+        var streamName = await projectionClient.CreateProjectionAsync(filter);
 
         var stream = QueryAsync(streamName, position.ToPosition(false), take, ct);
 
@@ -71,7 +71,7 @@ public sealed class GetEventStore : IEventStore, IInitializable
         }
     }
 
-    public async IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, Instant timestamp = default, int take = int.MaxValue,
+    public async IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(StreamFilter filter, Instant timestamp = default, int take = int.MaxValue,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         if (take <= 0)
@@ -79,7 +79,7 @@ public sealed class GetEventStore : IEventStore, IInitializable
             yield break;
         }
 
-        var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
+        var streamName = await projectionClient.CreateProjectionAsync(filter);
 
         var stream = QueryReverseAsync(streamName, StreamPosition.End, take, ct);
 
@@ -89,11 +89,9 @@ public sealed class GetEventStore : IEventStore, IInitializable
         }
     }
 
-    public async Task<IReadOnlyList<StoredEvent>> QueryReverseAsync(string streamName, int count = int.MaxValue,
+    public async Task<IReadOnlyList<StoredEvent>> QueryStreamReverseAsync(string streamName, int count = int.MaxValue,
         CancellationToken ct = default)
     {
-        Guard.NotNullOrEmpty(streamName);
-
         if (count <= 0)
         {
             return EmptyEvents;
@@ -103,7 +101,7 @@ public sealed class GetEventStore : IEventStore, IInitializable
         {
             var result = new List<StoredEvent>();
 
-            var stream = QueryReverseAsync(GetStreamName(streamName), StreamPosition.End, count, ct);
+            var stream = QueryReverseAsync(streamName, StreamPosition.End, count, ct);
 
             await foreach (var storedEvent in stream.IgnoreNotFound(ct))
             {
@@ -114,16 +112,14 @@ public sealed class GetEventStore : IEventStore, IInitializable
         }
     }
 
-    public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
+    public async Task<IReadOnlyList<StoredEvent>> QueryStreamAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
         CancellationToken ct = default)
     {
-        Guard.NotNullOrEmpty(streamName);
-
         using (Telemetry.Activities.StartActivity("GetEventStore/QueryAsync"))
         {
             var result = new List<StoredEvent>();
 
-            var stream = QueryAsync(GetStreamName(streamName), afterStreamPosition.ToPositionBefore(), int.MaxValue, ct);
+            var stream = QueryAsync(streamName, afterStreamPosition.ToPositionBefore(), int.MaxValue, ct);
 
             await foreach (var storedEvent in stream.IgnoreNotFound(ct))
             {
@@ -156,7 +152,7 @@ public sealed class GetEventStore : IEventStore, IInitializable
             streamName,
             start,
             count,
-            resolveLinkTos: true,
+            true,
             cancellationToken: ct);
 
         return result.Select(x => Formatter.Read(x, StreamPrefix, serializer));
@@ -210,10 +206,10 @@ public sealed class GetEventStore : IEventStore, IInitializable
         }
     }
 
-    public async Task DeleteAsync(string streamFilter,
+    public async Task DeleteAsync(StreamFilter filter,
         CancellationToken ct = default)
     {
-        var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
+        var streamName = await projectionClient.CreateProjectionAsync(filter);
 
         var events = client.ReadStreamAsync(Direction.Forwards, streamName, StreamPosition.Start, resolveLinkTos: true, cancellationToken: ct);
 

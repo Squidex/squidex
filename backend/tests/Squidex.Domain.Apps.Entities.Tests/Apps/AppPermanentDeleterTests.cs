@@ -29,7 +29,7 @@ public class AppPermanentDeleterTests : GivenContext
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        Assert.Equal("^app-", sut.EventsFilter);
+        Assert.Equal(StreamFilter.Prefix("app-"), sut.EventsFilter);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class AppPermanentDeleterTests : GivenContext
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        Assert.Equal(nameof(AppPermanentDeleter), sut.Name);
+        Assert.Equal(nameof(AppPermanentDeleter), ((IEventConsumer)sut).Name);
     }
 
     [Fact]

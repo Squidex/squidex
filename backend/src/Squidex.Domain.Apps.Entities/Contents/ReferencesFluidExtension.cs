@@ -39,19 +39,21 @@ public sealed class ReferencesFluidExtension : IFluidExtension
 
     private async ValueTask<Completion> ResolveReference(ValueTuple<Expression, Expression> arguments, TextWriter writer, TextEncoder encoder, TemplateContext context)
     {
-        if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
+        if (context.GetValue("event")?.ToObjectValue() is not EnrichedEvent enrichedEvent)
         {
-            var (nameArg, idArg) = arguments;
+            return Completion.Normal;
+        }
 
-            var contentId = await idArg.EvaluateAsync(context);
-            var content = await ResolveContentAsync(serviceProvider, enrichedEvent.AppId.Id, contentId);
+        var (nameArg, idArg) = arguments;
 
-            if (content != null)
-            {
-                var name = (await nameArg.EvaluateAsync(context)).ToStringValue();
+        var contentId = await idArg.EvaluateAsync(context);
+        var content = await ResolveContentAsync(serviceProvider, enrichedEvent.AppId.Id, contentId);
 
-                context.SetValue(name, content);
-            }
+        if (content != null)
+        {
+            var name = (await nameArg.EvaluateAsync(context)).ToStringValue();
+
+            context.SetValue(name, content);
         }
 
         return Completion.Normal;

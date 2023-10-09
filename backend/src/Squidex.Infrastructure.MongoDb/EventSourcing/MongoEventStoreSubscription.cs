@@ -18,7 +18,7 @@ public sealed class MongoEventStoreSubscription : IEventSubscription
     private readonly IEventSubscriber<StoredEvent> eventSubscriber;
     private readonly CancellationTokenSource stopToken = new CancellationTokenSource();
 
-    public MongoEventStoreSubscription(MongoEventStore eventStore, IEventSubscriber<StoredEvent> eventSubscriber, string? streamFilter, string? position)
+    public MongoEventStoreSubscription(MongoEventStore eventStore, IEventSubscriber<StoredEvent> eventSubscriber, StreamFilter streamFilter, string? position)
     {
         this.eventStore = eventStore;
         this.eventSubscriber = eventSubscriber;
@@ -26,7 +26,7 @@ public sealed class MongoEventStoreSubscription : IEventSubscription
         QueryAsync(streamFilter, position).Forget();
     }
 
-    private async Task QueryAsync(string? streamFilter, string? position)
+    private async Task QueryAsync(StreamFilter streamFilter, string? position)
     {
         try
         {
@@ -51,7 +51,7 @@ public sealed class MongoEventStoreSubscription : IEventSubscription
         }
     }
 
-    private async Task QueryCurrentAsync(string? streamFilter, StreamPosition lastPosition)
+    private async Task QueryCurrentAsync(StreamFilter streamFilter, StreamPosition lastPosition)
     {
         BsonDocument? resumeToken = null;
 
@@ -103,7 +103,7 @@ public sealed class MongoEventStoreSubscription : IEventSubscription
         }
     }
 
-    private async Task<string?> QueryOldAsync(string? streamFilter, string? position)
+    private async Task<string?> QueryOldAsync(StreamFilter streamFilter, string? position)
     {
         string? lastRawPosition = null;
 
@@ -134,7 +134,7 @@ public sealed class MongoEventStoreSubscription : IEventSubscription
         return lastRawPosition;
     }
 
-    private static PipelineDefinition<ChangeStreamDocument<MongoEventCommit>, ChangeStreamDocument<MongoEventCommit>>? Match(string? streamFilter)
+    private static PipelineDefinition<ChangeStreamDocument<MongoEventCommit>, ChangeStreamDocument<MongoEventCommit>>? Match(StreamFilter streamFilter)
     {
         var result = new EmptyPipelineDefinition<ChangeStreamDocument<MongoEventCommit>>();
 
