@@ -88,20 +88,10 @@ public static class Utils
 
         if (filter.Kind == StreamFilterKind.MatchStart)
         {
-            if (filter.Prefixes.Count == 1)
-            {
-                return $"^{Regex.Escape(filter.Prefixes[0])}";
-            }
-
-            return $"^{string.Join('|', filter.Prefixes.Select(p => $"({Regex.Escape(p)})"))}";
+            return $"^{string.Join('|', filter.Prefixes.Select(p => $"({p})"))}";
         }
         else
         {
-            if (filter.Prefixes.Count == 1)
-            {
-                return $"^{filter.Prefixes[0]}$";
-            }
-
             return $"^{string.Join('|', filter.Prefixes.Select(p => $"({p})"))}$";
         }
     }

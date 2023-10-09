@@ -147,7 +147,9 @@ public sealed partial class BackupProcessor
                     var backupUsers = new UserMapping(run.Actor);
                     var backupContext = new BackupContext(appId, backupUsers, writer);
 
-                    await foreach (var storedEvent in eventStore.QueryAllAsync(GetFilter(), ct: ct))
+                    var streamFilter = StreamFilter.Prefix($"[^\\-]*-{appId}");
+
+                    await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, ct: ct))
                     {
                         var @event = eventFormatter.Parse(storedEvent);
 
@@ -198,11 +200,6 @@ public sealed partial class BackupProcessor
 
             log.LogError(ex, "Failed to make backup with backup id '{backupId}'.", run.Job.Id);
         }
-    }
-
-    private StreamFilter GetFilter()
-    {
-        return StreamFilter.Prefix($"[^\\-]*-{Regex.Escape(appId.ToString())}");
     }
 
     public Task DeleteAsync(DomainId id)
