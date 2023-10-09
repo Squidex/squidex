@@ -351,6 +351,9 @@
   <data name="EventType" xml:space="preserve">
     <value>The type of the event.</value>
   </data>
+  <data name="GraphqlRequest" xml:space="preserve">
+    <value>The graphql request.</value>
+  </data>
   <data name="ItemData" xml:space="preserve">
     <value>The current item, if the field is part of an array.</value>
   </data>

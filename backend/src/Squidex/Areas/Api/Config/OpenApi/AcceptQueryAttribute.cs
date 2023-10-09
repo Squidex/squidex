@@ -18,18 +18,13 @@ public sealed class AcceptQueryAttribute : OpenApiOperationProcessorAttribute
     {
     }
 
-    public sealed class Processor : IOperationProcessor
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+    public sealed record Processor(bool SupportsSearch) : IOperationProcessor
+#pragma warning restore SA1313 // Parameter names should begin with lower-case letter
     {
-        private readonly bool supportsSearch;
-
-        public Processor(bool supportsSearch)
-        {
-            this.supportsSearch = supportsSearch;
-        }
-
         public bool Process(OperationProcessorContext context)
         {
-            context.OperationDescription.Operation.AddQuery(supportsSearch);
+            context.OperationDescription.Operation.AddQuery(SupportsSearch);
             return true;
         }
     }
