@@ -26,7 +26,7 @@ public sealed record ReferencesFieldProperties : FieldProperties
 
     public bool MustBePublished { get; init; }
 
-    public string? Query { get; init;}
+    public string? Query { get; init; }
 
     public ReferencesFieldEditor Editor { get; init; }
 

@@ -200,9 +200,9 @@ public sealed partial class BackupProcessor
         }
     }
 
-    private string GetFilter()
+    private StreamFilter GetFilter()
     {
-        return $"^[^\\-]*-{Regex.Escape(appId.ToString())}";
+        return StreamFilter.Prefix($"[^\\-]*-{Regex.Escape(appId.ToString())}");
     }
 
     public Task DeleteAsync(DomainId id)

@@ -7,6 +7,7 @@
 
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using EventStore.Client;
 
 namespace Squidex.Infrastructure.EventSourcing;
@@ -75,6 +76,33 @@ public static class Utils
             ct.ThrowIfCancellationRequested();
 
             yield return enumerator.Current;
+        }
+    }
+
+    public static string ToRegex(this StreamFilter filter)
+    {
+        if (filter.Prefixes == null)
+        {
+            return ".*";
+        }
+
+        if (filter.Kind == StreamFilterKind.MatchStart)
+        {
+            if (filter.Prefixes.Count == 1)
+            {
+                return $"^{Regex.Escape(filter.Prefixes[0])}";
+            }
+
+            return $"^{string.Join('|', filter.Prefixes.Select(p => $"({Regex.Escape(p)})"))}";
+        }
+        else
+        {
+            if (filter.Prefixes.Count == 1)
+            {
+                return $"^{filter.Prefixes[0]}$";
+            }
+
+            return $"^{string.Join('|', filter.Prefixes.Select(p => $"({p})"))}$";
         }
     }
 }

@@ -23,15 +23,7 @@ public sealed class RecursiveDeleter : IEventConsumer
     private readonly ILogger<RecursiveDeleter> log;
     private readonly HashSet<string> consumingTypes;
 
-    public string Name
-    {
-        get => GetType().Name;
-    }
-
-    public string EventsFilter
-    {
-        get => "^assetFolder-";
-    }
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("assetFolder-");
 
     public RecursiveDeleter(
         ICommandBus commandBus,

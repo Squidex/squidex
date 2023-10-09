@@ -212,9 +212,9 @@ public class PersistenceBatchTests
             storedStreams[id.ToString()] = storedStream;
         }
 
-        var streamNames = streams.Keys.Select(x => x.ToString()).ToArray();
+        var filter = StreamFilter.Name(streams.Keys.Select(x => x.ToString()).ToArray());
 
-        A.CallTo(() => eventStore.QueryManyAsync(A<IEnumerable<string>>.That.IsSameSequenceAs(streamNames), A<CancellationToken>._))
+        A.CallTo(() => eventStore.QueryManyAsync(filter, A<CancellationToken>._))
             .Returns(storedStreams);
     }
 }

@@ -27,7 +27,7 @@ public class AssetPermanentDeleterTests : GivenContext
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        Assert.Equal("^asset-", sut.EventsFilter);
+        Assert.Equal(StreamFilter.Prefix("content-", "asset-"), sut.EventsFilter);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class AssetPermanentDeleterTests : GivenContext
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        Assert.Equal(nameof(AssetPermanentDeleter), sut.Name);
+        Assert.Equal(nameof(AssetPermanentDeleter), ((IEventConsumer)sut).Name);
     }
 
     [Fact]

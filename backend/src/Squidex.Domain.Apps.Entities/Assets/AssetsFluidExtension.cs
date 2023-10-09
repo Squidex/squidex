@@ -39,19 +39,21 @@ public sealed class AssetsFluidExtension : IFluidExtension
 
     private async ValueTask<Completion> ResolveAsset(ValueTuple<Expression, Expression> arguments, TextWriter writer, TextEncoder encoder, TemplateContext context)
     {
-        if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
+        if (context.GetValue("event")?.ToObjectValue() is not EnrichedEvent enrichedEvent)
         {
-            var (nameArg, idArg) = arguments;
+            return Completion.Normal;
+        }
 
-            var assetId = await idArg.EvaluateAsync(context);
-            var asset = await ResolveAssetAsync(serviceProvider, enrichedEvent.AppId.Id, assetId);
+        var (nameArg, idArg) = arguments;
 
-            if (asset != null)
-            {
-                var name = (await nameArg.EvaluateAsync(context)).ToStringValue();
+        var assetId = await idArg.EvaluateAsync(context);
+        var asset = await ResolveAssetAsync(serviceProvider, enrichedEvent.AppId.Id, assetId);
 
-                context.SetValue(name, asset);
-            }
+        if (asset != null)
+        {
+            var name = (await nameArg.EvaluateAsync(context)).ToStringValue();
+
+            context.SetValue(name, asset);
         }
 
         return Completion.Normal;

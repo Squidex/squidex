@@ -49,14 +49,14 @@ public class Rebuilder
         return domainObject;
     }
 
-    public virtual Task RebuildAsync<T, TState>(string filter, int batchSize,
+    public virtual Task RebuildAsync<T, TState>(StreamFilter filter, int batchSize,
         CancellationToken ct = default)
         where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
     {
         return RebuildAsync<T, TState>(filter, batchSize, 0, ct);
     }
 
-    public virtual async Task RebuildAsync<T, TState>(string filter, int batchSize, double errorThreshold,
+    public virtual async Task RebuildAsync<T, TState>(StreamFilter filter, int batchSize, double errorThreshold,
         CancellationToken ct = default)
         where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
     {

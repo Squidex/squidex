@@ -52,7 +52,7 @@ public class RuleEnqueuerTests : GivenContext
     [Fact]
     public void Should_return_wildcard_filter_for_events_filter()
     {
-        Assert.Equal(".*", ((IEventConsumer)sut).EventsFilter);
+        Assert.Equal(default, ((IEventConsumer)sut).EventsFilter);
     }
 
     [Fact]

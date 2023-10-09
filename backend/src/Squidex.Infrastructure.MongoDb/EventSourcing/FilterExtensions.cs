@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.RegularExpressions;
 using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.EventSourcing;
@@ -13,53 +14,67 @@ internal static class FilterExtensions
 {
     public static FilterDefinition<MongoEventCommit> ByOffset(long streamPosition)
     {
-        return Builders<MongoEventCommit>.Filter.Gte(x => x.EventStreamOffset, streamPosition);
+        var builder = Builders<MongoEventCommit>.Filter;
+
+        return builder.Gte(x => x.EventStreamOffset, streamPosition);
     }
 
     public static FilterDefinition<MongoEventCommit> ByPosition(StreamPosition streamPosition)
     {
+        var builder = Builders<MongoEventCommit>.Filter;
+
         if (streamPosition.IsEndOfCommit)
         {
-            return Builders<MongoEventCommit>.Filter.Gt(x => x.Timestamp, streamPosition.Timestamp);
+            return builder.Gt(x => x.Timestamp, streamPosition.Timestamp);
         }
         else
         {
-            return Builders<MongoEventCommit>.Filter.Gte(x => x.Timestamp, streamPosition.Timestamp);
+            return builder.Gte(x => x.Timestamp, streamPosition.Timestamp);
         }
     }
 
-    public static FilterDefinition<MongoEventCommit>? ByStream(string? streamFilter)
+    public static FilterDefinition<MongoEventCommit> ByStream(StreamFilter filter)
     {
-        if (StreamFilter.IsAll(streamFilter))
+        var builder = Builders<MongoEventCommit>.Filter;
+
+        if (filter.Prefixes == null)
         {
-            return Builders<MongoEventCommit>.Filter.Exists(x => x.EventStream, true);
+            return builder.Exists(x => x.EventStream, true);
         }
 
-        if (streamFilter.Contains('^', StringComparison.Ordinal))
+        if (filter.Kind == StreamFilterKind.MatchStart)
         {
-            return Builders<MongoEventCommit>.Filter.Regex(x => x.EventStream, streamFilter);
+            if (filter.Prefixes.Count == 1)
+            {
+                return builder.Regex(x => x.EventStream, $"^{Regex.Escape(filter.Prefixes[0])}");
+            }
+
+            return builder.Or(filter.Prefixes.Select(p => builder.Regex(x => x.EventStream, $"^{Regex.Escape(p)}")));
         }
-        else
-        {
-            return Builders<MongoEventCommit>.Filter.Eq(x => x.EventStream, streamFilter);
-        }
+
+        return builder.In(x => x.EventStream, filter.Prefixes);
     }
 
-    public static FilterDefinition<ChangeStreamDocument<MongoEventCommit>>? ByChangeInStream(string? streamFilter)
+    public static FilterDefinition<ChangeStreamDocument<MongoEventCommit>>? ByChangeInStream(StreamFilter filter)
     {
-        if (StreamFilter.IsAll(streamFilter))
+        var builder = Builders<ChangeStreamDocument<MongoEventCommit>>.Filter;
+
+        if (filter.Prefixes == null)
         {
             return null;
         }
 
-        if (streamFilter.Contains('^', StringComparison.Ordinal))
+        if (filter.Kind == StreamFilterKind.MatchStart)
         {
-            return Builders<ChangeStreamDocument<MongoEventCommit>>.Filter.Regex(x => x.FullDocument.EventStream, streamFilter);
+            if (filter.Prefixes.Count == 1)
+            {
+                return builder.Regex(x => x.FullDocument.EventStream, $"^{filter.Prefixes[0]}");
+            }
+
+            return builder.Or(filter.Prefixes.Select(p => builder.Regex(x => x.FullDocument.EventStream, $"^{p}")));
         }
-        else
-        {
-            return Builders<ChangeStreamDocument<MongoEventCommit>>.Filter.Eq(x => x.FullDocument.EventStream, streamFilter);
-        }
+
+        return builder.In(x => x.FullDocument.EventStream, filter.Prefixes);
     }
 
     public static IEnumerable<StoredEvent> Filtered(this MongoEventCommit commit, StreamPosition position)

@@ -33,7 +33,7 @@ public class RecursiveDeleterTests : GivenContext
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        Assert.Equal("^assetFolder-", sut.EventsFilter);
+        Assert.Equal(StreamFilter.Prefix("assetFolder-"), sut.EventsFilter);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class RecursiveDeleterTests : GivenContext
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        Assert.Equal(nameof(RecursiveDeleter), sut.Name);
+        Assert.Equal(nameof(RecursiveDeleter), ((IEventConsumer)sut).Name);
     }
 
     [Fact]

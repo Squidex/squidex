@@ -23,6 +23,8 @@ public sealed class AppEventDeleter : IDeleter
     public Task DeleteAppAsync(IAppEntity app,
         CancellationToken ct)
     {
-        return eventStore.DeleteAsync($"^([a-zA-Z0-9]+)\\-{app.Id}", ct);
+        var streamFilter = StreamFilter.Prefix($"([a-zA-Z0-9]+)\\-{app.Id}");
+
+        return eventStore.DeleteAsync(streamFilter, ct);
     }
 }

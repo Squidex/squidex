@@ -254,9 +254,9 @@ public sealed class RuleRunnerProcessor
         await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
 
         // Use a prefix query so that the storage can use an index for the query.
-        var filter = $"^([a-z]+)\\-{appId}";
+        var streamFilter = StreamFilter.Prefix($"([a-z]+)\\-{appId}");
 
-        await foreach (var storedEvent in eventStore.QueryAllAsync(filter, run.Job.Position, ct: ct))
+        await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, run.Job.Position, ct: ct))
         {
             var @event = eventFormatter.ParseIfKnown(storedEvent);
 

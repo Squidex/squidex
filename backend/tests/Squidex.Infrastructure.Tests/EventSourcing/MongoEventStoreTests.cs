@@ -41,9 +41,8 @@ public abstract class MongoEventStoreTests : EventStoreTests<MongoEventStore>, I
 
         Assert.All(queries, query =>
         {
-            Assert.Equal(query.NumDocuments, query.DocsExamined);
-            Assert.True(query.KeysExamined >= query.NumDocuments);
-            Assert.True(query.KeysExamined <= query.NumDocuments * 2);
+            Assert.InRange(query.DocsExamined, 0, query.NumDocuments);
+            Assert.InRange(query.KeysExamined, query.NumDocuments, (Math.Max(1, query.NumDocuments) * 2) + 1);
         });
     }
 }

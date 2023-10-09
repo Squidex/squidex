@@ -65,9 +65,10 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
 
         var simulatedEvents = new List<SimulatedRuleEvent>(MaxSimulatedEvents);
 
-        var fromNow = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7));
+        var streamStart = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7));
+        var streamFilter = StreamFilter.Prefix($"([a-zA-Z0-9]+)\\-{appId.Id}");
 
-        await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-zA-Z0-9]+)\\-{appId.Id}", fromNow, MaxSimulatedEvents, ct))
+        await foreach (var storedEvent in eventStore.QueryAllReverseAsync(streamFilter, streamStart, MaxSimulatedEvents, ct))
         {
             var @event = eventFormatter.ParseIfKnown(storedEvent);
 
