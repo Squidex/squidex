@@ -24,7 +24,8 @@
                 [isFirst]="isFirst"
                 [isLast]="isLast"
                 (itemRemove)="removeItem(i)"
-                (itemMove)="move(itemForm, $event)" 
+                (itemMove)="move(itemForm, $event)"
+                [hasChatBot]="hasChatBot"
                 [language]="language"
                 [languages]="languages">
                 <i cdkDragHandle class="icon-drag2" [class.hidden]="isDisabled | async"></i>
@@ -53,6 +54,7 @@
                     (itemExpanded)="scroll.invalidateCachedMeasurementAtIndex(scroll.viewPortInfo.startIndexWithBuffer + i)"
                     (itemRemove)="removeItem(scroll.viewPortInfo.startIndexWithBuffer + i)"
                     (itemMove)="move(itemForm, $event)"
+                    [hasChatBot]="hasChatBot"
                     [language]="language"
                     [languages]="languages">
                 </sqx-array-item>

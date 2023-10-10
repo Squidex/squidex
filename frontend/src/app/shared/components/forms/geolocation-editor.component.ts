@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, inject, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { ExtendedFormGroup, LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
@@ -38,20 +38,23 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GeolocationEditorComponent extends StatefulControlComponent<State, Geolocation> implements AfterViewInit {
+    private readonly googleMapsKey = inject(UIOptions).value.map.googleMaps.key;
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
+
+    @ViewChild('editor', { static: false })
+    public editor!: ElementRef<HTMLElement>;
+
+    @ViewChild('searchBox', { static: false })
+    public searchBoxInput!: ElementRef<HTMLInputElement>;
 
     @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 
-    public readonly isGoogleMaps: boolean;
-
-    public get hasValue() {
-        return !!this.value;
-    }
+    public readonly isGoogleMaps = inject(UIOptions).value.map.type !== 'OSM';
 
     public geolocationForm =
         new ExtendedFormGroup({
@@ -63,23 +66,18 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
             ),
         });
 
-    @ViewChild('editor', { static: false })
-    public editor!: ElementRef<HTMLElement>;
-
-    @ViewChild('searchBox', { static: false })
-    public searchBoxInput!: ElementRef<HTMLInputElement>;
+    public get hasValue() {
+        return !!this.value;
+    }
 
     constructor(localStore: LocalStoreService,
         private readonly resourceLoader: ResourceLoaderService,
-        private readonly uiOptions: UIOptions,
     ) {
         super({ isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP) });
 
         this.project(x => x.isMapHidden).subscribe(isMapHidden => {
             localStore.setBoolean(Settings.Local.HIDE_MAP, isMapHidden);
         });
-
-        this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';
     }
 
     public hideMap(isMapHidden: boolean) {
@@ -161,7 +159,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         if (!this.isGoogleMaps) {
             this.ngAfterViewInitOSM();
         } else {
-            this.ngAfterViewInitGoogle(this.uiOptions.get('map.googleMaps.key'));
+            this.ngAfterViewInitGoogle(this.googleMapsKey);
         }
     }
 

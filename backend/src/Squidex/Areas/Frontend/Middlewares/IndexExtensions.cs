@@ -10,8 +10,6 @@ using System.Globalization;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI;
-using Squidex.Domain.Apps.Entities.History;
-using Squidex.Web;
 
 namespace Squidex.Areas.Frontend.Middlewares;
 
@@ -39,27 +37,11 @@ public static class IndexExtensions
         {
             var clonedOptions = uiOptions with
             {
-                More = new Dictionary<string, object>
+                More = new Dictionary<string, object>(uiOptions.More)
                 {
                     ["culture"] = CultureInfo.CurrentUICulture.Name
                 }
             };
-
-            var jsonOptions = httpContext.RequestServices.GetRequiredService<JsonSerializerOptions>();
-
-            using var jsonDocument = JsonSerializer.SerializeToDocument(uiOptions, jsonOptions);
-
-            if (httpContext.RequestServices.GetService<ExposedValues>() is ExposedValues values)
-            {
-                clonedOptions.More["info"] = values.ToString();
-            }
-
-            var notifo = httpContext.RequestServices!.GetService<IOptions<NotifoOptions>>()?.Value;
-
-            if (notifo?.IsConfigured() == true)
-            {
-                clonedOptions.More["notifoApi"] = notifo.ApiUrl;
-            }
 
             var options = httpContext.Features.Get<OptionsFeature>();
 

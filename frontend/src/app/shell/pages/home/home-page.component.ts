@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, UIOptions } from '@app/shared';
 
@@ -16,6 +16,8 @@ import { AuthService, UIOptions } from '@app/shared';
     templateUrl: './home-page.component.html',
 })
 export class HomePageComponent {
+    private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;
+
     public showLoginError = false;
 
     constructor(
@@ -23,7 +25,6 @@ export class HomePageComponent {
         private readonly location: Location,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly uiOptions: UIOptions,
     ) {
     }
 
@@ -32,7 +33,7 @@ export class HomePageComponent {
             this.route.snapshot.queryParams.redirectPath ||
             this.location.path();
 
-        if (this.isInternetExplorer() || this.uiOptions.get('redirectToLogin')) {
+        if (this.isInternetExplorer() || this.redirectToLogin) {
             this.authService.loginRedirect(redirectPath);
             return;
         }

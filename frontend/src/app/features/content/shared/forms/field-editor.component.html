@@ -1,7 +1,7 @@
 <div class="field" [class.expanded]="isExpanded" *ngIf="formModel">
     <div class="buttons-container" *ngIf="canUnset">
         <div class="buttons">
-            <button type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" tabindex="-1">
+            <button *ngIf="hasChatBot" type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" tabindex="-1">
                 AI
             </button>
 
@@ -54,6 +54,7 @@
                         [formContext]="formContext"
                         [isComparing]="isComparing"
                         [isExpanded]="isExpanded"
+                        [hasChatBot]="hasChatBot"
                         [language]="language"
                         [languages]="languages">
                     </sqx-array-editor>
@@ -82,6 +83,7 @@
                         [formLevel]="formLevel"
                         [formModel]="$any(formModel)"
                         [isComparing]="isComparing"
+                        [hasChatBot]="hasChatBot"
                         [language]="language"
                         [languages]="languages">
                     </sqx-component>
@@ -95,6 +97,7 @@
                         [formContext]="formContext"
                         [isComparing]="isComparing"
                         [isExpanded]="isExpanded"
+                        [hasChatBot]="hasChatBot"
                         [language]="language"
                         [languages]="languages">
                     </sqx-array-editor>

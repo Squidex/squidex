@@ -15,7 +15,7 @@
     
                         <sqx-field-copy-button [formModel]="formModel" [languages]="languages"></sqx-field-copy-button>
 
-                        <button *ngIf="!formModel.field.isDisabled && isTranslatable" type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1" title="i18n:contents.autotranslate" (click)="translate()" tabindex="-1">
+                        <button *ngIf="isTranslatable" type="button" [disabled]="formModel.field.isDisabled" class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1" title="i18n:contents.autotranslate" (click)="translate()" tabindex="-1">
                             <i class="icon-translate"></i>
                         </button>
                     </div>
@@ -32,6 +32,7 @@
                         [formLevel]="formLevel"
                         [formModel]="formModel.get(language)"
                         [isComparing]="!!formModelCompare"
+                        [hasChatBot]="hasChatBot"
                         [language]="language"
                         [languages]="languages">
                     </sqx-field-editor>
@@ -46,6 +47,7 @@
                     [formLevel]="formLevel"
                     [formModel]="getControl()"
                     [isComparing]="!!formModelCompare"
+                    [hasChatBot]="hasChatBot"
                     [language]="language"
                     [languages]="languages">
                 </sqx-field-editor>
@@ -85,6 +87,7 @@
                         [formLevel]="formLevel"
                         [formModel]="formModelCompare.get(language)"
                         [isComparing]="!!formModelCompare"
+                        [hasChatBot]="hasChatBot"
                         [language]="language"
                         [languages]="languages">
                     </sqx-field-editor>
@@ -99,7 +102,8 @@
                     [formModel]="getControlCompare()!"
                     [language]="language"
                     [languages]="languages"
-                    [isComparing]="!!formModelCompare">
+                    [isComparing]="!!formModelCompare"
+                    [hasChatBot]="hasChatBot">
                 </sqx-field-editor>
             </ng-template>
         </div>

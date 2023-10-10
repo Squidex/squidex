@@ -21,6 +21,9 @@ import { ArrayItemComponent } from './array-item.component';
 })
 export class ArrayEditorComponent {
     @Input({ required: true })
+    public hasChatBot!: boolean;
+
+    @Input({ required: true })
     public form!: EditContentForm;
 
     @Input({ required: true })

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { ApiUrlConfig, AuthService, Cookies, ModalModel, StatefulComponent, UILanguages, UIOptions, UIState } from '@app/shared';
 
 interface State {
@@ -32,10 +32,10 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
-    public modalMenu = new ModalModel();
+    public readonly modalMenu = new ModalModel();
 
-    public language = this.uiOptions.get('culture');
-    public languages = UILanguages.ALL;
+    public readonly language = inject(UIOptions).value.culture;
+    public readonly languages = UILanguages.ALL;
 
     constructor(apiUrl: ApiUrlConfig,
         public readonly uiState: UIState,

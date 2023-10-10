@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, EventEmitter, HostBinding, Input, numberAttribute, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Output } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, disabled$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, AppsState, changed$, disabled$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-field',
@@ -54,6 +54,9 @@ export class ContentFieldComponent {
     public isInvalid?: Observable<boolean>;
     public isDisabled?: Observable<boolean>;
 
+    public readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
+    public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
+
     @HostBinding('class')
     public get class() {
         return this.isHalfWidth ? 'col-6 half-field' : 'col-12';
@@ -64,7 +67,7 @@ export class ContentFieldComponent {
     }
 
     public get isTranslatable() {
-        return this.formModel.field.properties.fieldType === 'String' && this.formModel.field.isLocalizable && this.languages.length > 1;
+        return this.formModel.field.properties.fieldType === 'String' && this.hasTranslator && this.formModel.field.isLocalizable && this.languages.length > 1;
     }
 
     constructor(

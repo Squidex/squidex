@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DialogService, LoadingService, Notification, ResourceOwner, UIOptions } from '@app/shared';
 
@@ -15,16 +15,14 @@ import { DialogService, LoadingService, Notification, ResourceOwner, UIOptions }
     templateUrl: './internal-area.component.html',
 })
 export class InternalAreaComponent extends ResourceOwner implements OnInit {
-    public isEmbedded = false;
+    public readonly isEmbedded = inject(UIOptions).value.embedded;
 
-    constructor(uiOptions: UIOptions,
+    constructor(
         public readonly loadingService: LoadingService,
         private readonly dialogs: DialogService,
         private readonly route: ActivatedRoute,
     ) {
         super();
-
-        this.isEmbedded = !!uiOptions.get('embedded');
     }
 
     public ngOnInit() {
