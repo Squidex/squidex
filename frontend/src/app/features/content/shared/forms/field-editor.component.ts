@@ -22,6 +22,9 @@ export class FieldEditorComponent {
     public expandedChange = new EventEmitter();
 
     @Input({ required: true })
+    public hasChatBot!: boolean;
+
+    @Input({ required: true })
     public form!: EditContentForm;
 
     @Input({ required: true })

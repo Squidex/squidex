@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import * as Pikaday from 'pikaday/pikaday';
 import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
@@ -34,8 +34,8 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements OnInit, AfterViewInit, FocusComponent {
-    private readonly hideDateButtonsSettings: boolean;
-    private readonly hideDateTimeModeButtonSetting: boolean;
+    private readonly hideDateButtonsSettings: boolean = !!inject(UIOptions).value.hideDateButtons;
+    private readonly hideDateTimeModeButtonSetting: boolean = !!inject(UIOptions).value.hideDateTimeModeButton;
     private picker: any;
     private dateTime?: DateTime | null;
     private suppressEvents = false;
@@ -88,11 +88,8 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
         return !!this.dateTime;
     }
 
-    constructor(uiOptions: UIOptions) {
+    constructor() {
         super({ isLocal: true });
-
-        this.hideDateButtonsSettings = !!uiOptions.get('hideDateButtons');
-        this.hideDateTimeModeButtonSetting = !!uiOptions.get('hideDateTimeModeButton');
     }
 
     public ngOnInit() {

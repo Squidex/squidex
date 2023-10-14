@@ -53,7 +53,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.QueryAsOdata == "?$skip=0&$search=\"Hello\"" && x.NoTotal),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(0, content));
@@ -345,7 +345,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(0, content));
@@ -384,7 +384,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(0, content));
@@ -423,7 +423,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && !x.NoTotal),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(10, content));
@@ -503,7 +503,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_return_null_if_single_content_from_another_schema()
     {
         var contentId = DomainId.NewGuid();
-        var content = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentId, "reference1-field", "reference1");
+        var content = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentId, "reference1-field", "reference1");
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),
@@ -537,7 +537,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_return_single_content_if_finding_content()
+    public async Task Should_find_single_content()
     {
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
@@ -574,12 +574,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_return_single_content_if_finding_content_with_version()
+    public async Task Should_find_single_content_with_version()
     {
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
-        A.CallTo(() => contentQuery.FindAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(), contentId, 3,
+        A.CallTo(() => contentQuery.FindAsync(MatchsContentContext(), content.SchemaId.Id.ToString(), contentId, 3,
                 A<CancellationToken>._))
             .Returns(content);
 
@@ -610,10 +610,101 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
+    public async Task Should_find_singleton_content()
+    {
+        var contentId = TestSchemas.Singleton.Id;
+        var content = TestContent.CreateSimple(TestSchemas.Singleton.NamedId(), contentId, "singleton-field", "Hello");
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySingletonSingleton {
+                    id,
+                    flatData {
+                      singletonField
+                    }
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
+
+        var expected = new
+        {
+            data = new
+            {
+                findMySingletonSingleton = new
+                {
+                    id = contentId,
+                    flatData = new
+                    {
+                        singletonField = "Hello"
+                    }
+                }
+            }
+        };
+
+        AssertResult(expected, actual);
+    }
+
+    [Fact]
+    public async Task Should_find_singleton_content_with_version()
+    {
+        var contentId = TestSchemas.Singleton.Id;
+        var content = TestContent.CreateSimple(TestSchemas.Singleton.NamedId(), contentId, "singleton-field", "Hello");
+
+        A.CallTo(() => contentQuery.FindAsync(MatchsContentContext(), content.SchemaId.Id.ToString(), contentId, 3,
+                A<CancellationToken>._))
+            .Returns(content);
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySingletonSingleton(version: 3) {
+                    id,
+                    flatData {
+                      singletonField
+                    }
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
+
+        var expected = new
+        {
+            data = new
+            {
+                findMySingletonSingleton = new
+                {
+                    id = contentId,
+                    flatData = new
+                    {
+                        singletonField = "Hello"
+                    }
+                }
+            }
+        };
+
+        AssertResult(expected, actual);
+    }
+
+    [Fact]
     public async Task Should_also_fetch_embedded_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -703,7 +794,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_referenced_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -782,7 +873,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_referenced_contents_from_flat_data_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -844,7 +935,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_cache_referenced_contents_from_flat_data_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -915,7 +1006,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_referencing_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -984,7 +1075,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_referencing_contents_with_total_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -1060,7 +1151,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_references_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -1117,7 +1208,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_references_contents_with_total_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);
@@ -1181,7 +1272,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_also_fetch_union_contents_if_field_is_included_in_query()
     {
         var contentRefId = DomainId.NewGuid();
-        var contentRef = TestContent.CreateRef(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId, contentRefId);

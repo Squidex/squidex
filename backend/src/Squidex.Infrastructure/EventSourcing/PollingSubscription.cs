@@ -17,7 +17,7 @@ public sealed class PollingSubscription : IEventSubscription
     public PollingSubscription(
         IEventStore eventStore,
         IEventSubscriber<StoredEvent> eventSubscriber,
-        string? streamFilter,
+        StreamFilter streamFilter,
         string? position)
     {
         timer = new CompletionTimer(5000, async ct =>

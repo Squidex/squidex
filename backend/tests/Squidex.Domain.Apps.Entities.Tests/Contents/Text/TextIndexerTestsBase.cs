@@ -50,6 +50,12 @@ public abstract class TextIndexerTestsBase : GivenContext
     public abstract ITextIndex CreateIndex();
 
     [Fact]
+    public void Should_return_content_filter_for_events_filter()
+    {
+        Assert.Equal(StreamFilter.Prefix("content-"), Sut.EventsFilter);
+    }
+
+    [Fact]
     public async Task Should_search_with_fuzzy()
     {
         if (!SupportsQuerySyntax)

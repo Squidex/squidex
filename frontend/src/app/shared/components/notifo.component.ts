@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, inject, Input, OnDestroy, Renderer2, ViewChild } from '@angular/core';
 import { ResourceLoaderService, TypedSimpleChanges, UIOptions } from '@app/framework';
 import { AuthService } from '@app/shared/internal';
 
@@ -16,7 +16,7 @@ import { AuthService } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotifoComponent implements AfterViewInit, OnDestroy {
-    private readonly notifoApiUrl: string;
+    private readonly notifoApiUrl: string = inject(UIOptions).value.notifoApi;
     private readonly notifoApiKey: string | undefined;
 
     @Input()
@@ -36,11 +36,10 @@ export class NotifoComponent implements AfterViewInit, OnDestroy {
         return !!this.notifoApiUrl && !!this.topic;
     }
 
-    constructor(resourceLoader: ResourceLoaderService, uiOptions: UIOptions, authService: AuthService,
+    constructor(resourceLoader: ResourceLoaderService, authService: AuthService,
         private readonly renderer: Renderer2,
     ) {
         this.notifoApiKey = authService.user?.notifoToken;
-        this.notifoApiUrl = uiOptions.get('notifoApi');
 
         if (this.isConfigured) {
             if (this.notifoApiUrl.indexOf('localhost:5002') >= 0) {

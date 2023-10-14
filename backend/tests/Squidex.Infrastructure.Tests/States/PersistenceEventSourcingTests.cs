@@ -65,7 +65,7 @@ public class PersistenceEventSourcingTests
     {
         var storedEvent = new StoredEvent("1", "1", 0, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
-        A.CallTo(() => eventStore.QueryAsync(key.ToString(), -1, A<CancellationToken>._))
+        A.CallTo(() => eventStore.QueryStreamAsync(key.ToString(), -1, A<CancellationToken>._))
             .Returns(new List<StoredEvent> { storedEvent });
 
         A.CallTo(() => eventFormatter.ParseIfKnown(storedEvent))
@@ -96,7 +96,7 @@ public class PersistenceEventSourcingTests
 
         Assert.False(persistence.IsSnapshotStale);
 
-        A.CallTo(() => eventStore.QueryAsync(key.ToString(), 2, A<CancellationToken>._))
+        A.CallTo(() => eventStore.QueryStreamAsync(key.ToString(), 2, A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -116,7 +116,7 @@ public class PersistenceEventSourcingTests
 
         Assert.True(persistence.IsSnapshotStale);
 
-        A.CallTo(() => eventStore.QueryAsync(key.ToString(), 1, A<CancellationToken>._))
+        A.CallTo(() => eventStore.QueryStreamAsync(key.ToString(), 1, A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -327,7 +327,7 @@ public class PersistenceEventSourcingTests
 
         await persistence.DeleteAsync();
 
-        A.CallTo(() => eventStore.DeleteStreamAsync(key.ToString(), A<CancellationToken>._))
+        A.CallTo(() => eventStore.DeleteAsync(StreamFilter.Name(key.ToString()), A<CancellationToken>._))
             .MustHaveHappened();
 
         A.CallTo(() => snapshotStore.RemoveAsync(key, A<CancellationToken>._))
@@ -341,7 +341,7 @@ public class PersistenceEventSourcingTests
 
         await persistence.DeleteAsync();
 
-        A.CallTo(() => eventStore.DeleteStreamAsync(key.ToString(), A<CancellationToken>._))
+        A.CallTo(() => eventStore.DeleteAsync(StreamFilter.Name(key.ToString()), A<CancellationToken>._))
             .MustHaveHappened();
 
         A.CallTo(() => snapshotStore.RemoveAsync(key, A<CancellationToken>._))
@@ -382,7 +382,7 @@ public class PersistenceEventSourcingTests
             i++;
         }
 
-        A.CallTo(() => eventStore.QueryAsync(key.ToString(), readPosition, A<CancellationToken>._))
+        A.CallTo(() => eventStore.QueryStreamAsync(key.ToString(), readPosition, A<CancellationToken>._))
             .Returns(eventsStored);
     }
 }

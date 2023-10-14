@@ -62,7 +62,7 @@ public class EventConsumerProcessorTests
             }
         };
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
             .Returns(eventSubscription);
 
         A.CallTo(() => eventConsumer.Name)
@@ -101,15 +101,17 @@ public class EventConsumerProcessorTests
     {
         state.Snapshot = new EventConsumerState();
 
+        var filter = StreamFilter.Name("my-filter");
+
         A.CallTo(() => eventConsumer.StartLatest)
             .Returns(true);
 
         A.CallTo(() => eventConsumer.EventsFilter)
-            .Returns("my-filter");
+            .Returns(filter);
 
         var latestPosition = "LATEST";
 
-        A.CallTo(() => eventStore.QueryAllReverseAsync("my-filter", default, 1, A<CancellationToken>._))
+        A.CallTo(() => eventStore.QueryAllReverseAsync(filter, default, 1, A<CancellationToken>._))
             .Returns(Enumerable.Repeat(new StoredEvent("Stream", latestPosition, 1, eventData), 1).ToAsyncEnumerable());
 
         await sut.InitializeAsync(default);
@@ -129,7 +131,7 @@ public class EventConsumerProcessorTests
 
         AssertGrainState(isStopped: true, position: initialPosition);
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
             .MustNotHaveHappened();
     }
 
@@ -143,7 +145,7 @@ public class EventConsumerProcessorTests
 
         AssertGrainState(isStopped: false, position: initialPosition);
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -159,7 +161,7 @@ public class EventConsumerProcessorTests
 
         AssertGrainState(isStopped: false, position: initialPosition);
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -173,7 +175,7 @@ public class EventConsumerProcessorTests
 
         AssertGrainState(isStopped: false, position: initialPosition);
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -219,10 +221,10 @@ public class EventConsumerProcessorTests
         A.CallTo(() => eventSubscription.Dispose())
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, state.Snapshot.Position))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, state.Snapshot.Position))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, null))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, null))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -530,7 +532,7 @@ public class EventConsumerProcessorTests
         A.CallTo(() => eventSubscription.Dispose())
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
             .MustHaveHappened(2, Times.Exactly);
     }
 

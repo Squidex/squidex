@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import markerSDK, { MarkerSdk } from '@marker.io/browser';
 import { UIOptions } from '@app/shared';
 
@@ -18,12 +18,7 @@ import { UIOptions } from '@app/shared';
 export class FeedbackMenuComponent implements OnInit, OnDestroy {
     private widget?: MarkerSdk;
 
-    public markerProject = '';
-
-    constructor(uiOptions: UIOptions,
-    ) {
-        this.markerProject = uiOptions.get('markerProject');
-    }
+    public readonly markerProject = inject(UIOptions).value.markerProject;
 
     public ngOnDestroy() {
         this.widget?.unload();

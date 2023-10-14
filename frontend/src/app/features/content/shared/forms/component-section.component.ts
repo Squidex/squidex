@@ -17,6 +17,9 @@ import { FieldEditorComponent } from './field-editor.component';
 })
 export class ComponentSectionComponent {
     @Input({ required: true })
+    public hasChatBot!: boolean;
+
+    @Input({ required: true })
     public form!: EditContentForm;
 
     @Input({ required: true })

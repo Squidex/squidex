@@ -66,7 +66,6 @@ public sealed class ContentsSharedController : ApiController
     /// GraphQL endpoint.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <param name="request">The request object.</param>
     /// <response code="200">Contents returned or mutated.</response>.
     /// <response code="404">App not found.</response>.
     /// <remarks>
@@ -76,9 +75,10 @@ public sealed class ContentsSharedController : ApiController
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(2)]
+    [AcceptAnyBody]
     [AcceptHeader.Unpublished]
     [IgnoreCacheFilter]
-    public IActionResult PostGraphQL(string app, [FromBody] object request)
+    public IActionResult PostGraphQL(string app)
     {
         var options = new GraphQLHttpMiddlewareOptions
         {
@@ -118,7 +118,6 @@ public sealed class ContentsSharedController : ApiController
     /// GraphQL batch endpoint.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <param name="request">The request object.</param>
     /// <response code="200">Contents returned or mutated.</response>.
     /// <response code="404">App not found.</response>.
     /// <remarks>
@@ -128,9 +127,10 @@ public sealed class ContentsSharedController : ApiController
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous]
     [ApiCosts(2)]
+    [AcceptAnyBody]
     [AcceptHeader.Unpublished]
     [IgnoreCacheFilter]
-    public IActionResult PostGraphQLBatch(string app, [FromBody] object request)
+    public IActionResult PostGraphQLBatch(string app)
     {
         var options = new GraphQLHttpMiddlewareOptions
         {

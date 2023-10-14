@@ -122,7 +122,9 @@ public class RepairFilesTests : GivenContext
                 .Returns(null);
         }
 
-        A.CallTo(() => eventStore.QueryAllAsync("^asset\\-", null, int.MaxValue, CancellationToken))
+        var streamFilter = StreamFilter.Prefix("asset-");
+
+        A.CallTo(() => eventStore.QueryAllAsync(streamFilter, null, int.MaxValue, CancellationToken))
             .Returns(storedEvents.ToAsyncEnumerable());
     }
 }

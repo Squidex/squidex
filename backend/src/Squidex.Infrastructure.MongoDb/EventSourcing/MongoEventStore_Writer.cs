@@ -17,20 +17,12 @@ public partial class MongoEventStore
     private const int MaxWriteAttempts = 20;
     private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
 
-    public Task DeleteStreamAsync(string streamName,
+    public Task DeleteAsync(StreamFilter filter,
         CancellationToken ct = default)
     {
-        Guard.NotNullOrEmpty(streamName);
+        Guard.NotDefault(filter);
 
-        return Collection.DeleteManyAsync(x => x.EventStream == streamName, ct);
-    }
-
-    public Task DeleteAsync(string streamFilter,
-        CancellationToken ct = default)
-    {
-        Guard.NotNullOrEmpty(streamFilter);
-
-        return Collection.DeleteManyAsync(FilterExtensions.ByStream(streamFilter), ct);
+        return Collection.DeleteManyAsync(FilterExtensions.ByStream(filter), ct);
     }
 
     public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,

@@ -42,7 +42,7 @@ public class CommentsStream : IAggregate
     public virtual async Task LoadAsync(
         CancellationToken ct)
     {
-        var storedEvents = await eventStore.QueryReverseAsync(streamName, 100, ct);
+        var storedEvents = await eventStore.QueryStreamReverseAsync(streamName, 100, ct);
 
         foreach (var @event in storedEvents)
         {

@@ -68,8 +68,8 @@ export class AppsPageComponent implements OnInit {
         private readonly tourState: TourState,
         private readonly uiOptions: UIOptions,
     ) {
-        if (uiOptions.get('showInfo')) {
-            this.info = uiOptions.get('info');
+        if (uiOptions.value.showInfo) {
+            this.info = uiOptions.value.info;
         }
     }
 
@@ -87,7 +87,7 @@ export class AppsPageComponent implements OnInit {
                     this.tourState.complete();
                 }
 
-                if (!this.uiOptions.get('hideNews')) {
+                if (!this.uiOptions.value.hideNews) {
                     const newsVersion = this.localStore.getInt(Settings.Local.NEWS_VERSION);
 
                     this.newsService.getFeatures(newsVersion)

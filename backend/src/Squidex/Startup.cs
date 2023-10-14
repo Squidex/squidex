@@ -50,6 +50,7 @@ public sealed class Startup
         services.AddSquidexContents(config);
         services.AddSquidexControllerServices(config);
         services.AddSquidexEventSourcing(config);
+        services.AddSquidexFrontend();
         services.AddSquidexGraphQL();
         services.AddSquidexHealthChecks(config);
         services.AddSquidexHistory(config);

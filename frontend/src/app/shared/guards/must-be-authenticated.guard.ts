@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
@@ -15,17 +15,16 @@ import { AuthService } from './../services/auth.service';
 
 @Injectable()
 export class MustBeAuthenticatedGuard  {
+    private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;
+
     constructor(
         private readonly authService: AuthService,
         private readonly location: Location,
         private readonly router: Router,
-        private readonly uiOptions: UIOptions,
     ) {
     }
 
     public canActivate(): Observable<boolean> {
-        const redirect = this.uiOptions.get('redirectToLogin');
-
         return this.authService.userChanges.pipe(
             take(1),
             tap(user => {
@@ -35,7 +34,7 @@ export class MustBeAuthenticatedGuard  {
 
                 const redirectPath = this.location.path(true);
 
-                if (redirect) {
+                if (this.redirectToLogin) {
                     this.authService.loginRedirect(redirectPath);
                 } else {
                     this.router.navigate([''], { queryParams: { redirectPath } });

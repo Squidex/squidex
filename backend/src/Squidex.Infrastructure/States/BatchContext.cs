@@ -50,22 +50,27 @@ public sealed class BatchContext<T> : IBatchContext<T>
 
     public async Task LoadAsync(IEnumerable<DomainId> ids)
     {
-        var streamNames = ids.ToDictionary(x => x, x => eventStreamNames.GetStreamName(owner, x.ToString()));
+        var streamNames = ids.ToDictionary(
+            x => x,
+            x => eventStreamNames.GetStreamName(owner, x.ToString()));
 
         if (streamNames.Count == 0)
         {
             return;
         }
 
-        var streams = await eventStore.QueryManyAsync(streamNames.Values);
+        var eventsResults = await eventStore.QueryAllAsync(StreamFilter.Name(streamNames.Values.ToArray())).ToListAsync();
+        var eventsByStream = eventsResults.ToLookup(x => x.StreamName);
 
         foreach (var (id, streamName) in streamNames)
         {
-            if (streams.TryGetValue(streamName, out var data))
-            {
-                var stream = data.Select(eventFormatter.ParseIfKnown).NotNull().ToList();
+            var byStream = eventsByStream[streamName].ToList();
 
-                events[id] = (data.Count - 1, stream);
+            if (byStream.Count > 0)
+            {
+                var parsed = byStream.Select(eventFormatter.ParseIfKnown).NotNull().ToList();
+
+                events[id] = (byStream.Count - 1, parsed);
             }
             else
             {

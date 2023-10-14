@@ -17,10 +17,10 @@ public class RetrySubscriptionTests
 
     public RetrySubscriptionTests()
     {
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
             .Returns(eventSubscription);
 
-        sut = new RetrySubscription<StoredEvent>(eventSubscriber, s => eventStore.CreateSubscription(s)) { ReconnectWaitMs = 50 };
+        sut = new RetrySubscription<StoredEvent>(eventSubscriber, s => eventStore.CreateSubscription(s, default)) { ReconnectWaitMs = 50 };
         sutSubscriber = sut;
     }
 
@@ -29,7 +29,7 @@ public class RetrySubscriptionTests
     {
         sut.Dispose();
 
-        A.CallTo(() => eventStore.CreateSubscription(sut, A<string>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(sut, A<StreamFilter>._, A<string>._))
             .MustHaveHappened();
     }
 
@@ -47,7 +47,7 @@ public class RetrySubscriptionTests
         A.CallTo(() => eventSubscription.Dispose())
             .MustHaveHappened(2, Times.Exactly);
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<string>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
             .MustHaveHappened(2, Times.Exactly);
 
         A.CallTo(() => eventSubscriber.OnErrorAsync(eventSubscription, A<Exception>._))

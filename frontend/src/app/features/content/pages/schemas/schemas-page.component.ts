@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -19,7 +19,7 @@ import { AppsState, getCategoryTree, SchemaCategory, SchemasState, Settings, UIO
 export class SchemasPageComponent {
     public schemasFilter = new UntypedFormControl();
 
-    public isEmbedded = false;
+    public readonly isEmbedded = inject(UIOptions).value.embedded;
 
     public schemas =
         this.schemasState.schemas.pipe(
@@ -43,11 +43,10 @@ export class SchemasPageComponent {
             return getCategoryTree(schemas, categories, filter);
         });
 
-    constructor(uiOptions: UIOptions,
+    constructor(
         public readonly schemasState: SchemasState,
         private readonly appsState: AppsState,
     ) {
-        this.isEmbedded = uiOptions.get('embedded');
     }
 
     public trackByCategory(_index: number, category: SchemaCategory) {

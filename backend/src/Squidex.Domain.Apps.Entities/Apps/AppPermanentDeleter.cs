@@ -20,15 +20,7 @@ public sealed class AppPermanentDeleter : IEventConsumer
     private readonly IDomainObjectFactory factory;
     private readonly HashSet<string> consumingTypes;
 
-    public string Name
-    {
-        get => GetType().Name;
-    }
-
-    public string EventsFilter
-    {
-        get => "^app-";
-    }
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("app-");
 
     public AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainObjectFactory factory, TypeRegistry typeRegistry)
     {

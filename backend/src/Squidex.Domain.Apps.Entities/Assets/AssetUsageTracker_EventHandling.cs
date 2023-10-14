@@ -21,25 +21,11 @@ public partial class AssetUsageTracker : IEventConsumer
 {
     private IMemoryCache memoryCache;
 
-    public int BatchSize
-    {
-        get => 1000;
-    }
+    public int BatchSize => 1000;
 
-    public int BatchDelay
-    {
-        get => 1000;
-    }
+    public int BatchDelay => 1000;
 
-    public string Name
-    {
-        get => GetType().Name;
-    }
-
-    public string EventsFilter
-    {
-        get => "^asset-";
-    }
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("asset-");
 
     private void ClearCache()
     {

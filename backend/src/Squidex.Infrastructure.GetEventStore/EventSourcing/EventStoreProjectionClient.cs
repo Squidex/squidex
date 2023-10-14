@@ -29,22 +29,22 @@ public sealed class EventStoreProjectionClient
         return $"by-{projectionPrefix.Slugify()}-{filter.Slugify()}";
     }
 
-    public async Task<string> CreateProjectionAsync(string? streamFilter = null)
+    public async Task<string> CreateProjectionAsync(StreamFilter filter)
     {
-        if (!string.IsNullOrWhiteSpace(streamFilter) && streamFilter[0] != '^')
+        if (filter.Kind == StreamFilterKind.MatchFull && filter.Prefixes?.Count == 1)
         {
-            return $"{projectionPrefix}-{streamFilter}";
+            return $"{projectionPrefix}-{filter.Prefixes[0]}";
         }
 
-        streamFilter ??= ".*";
+        var regex = filter.ToRegex();
 
-        var name = CreateFilterProjectionName(streamFilter);
+        var name = CreateFilterProjectionName(regex);
 
         var query =
             $@"fromAll()
                     .when({{
                         $any: function (s, e) {{
-                            if (e.streamId.indexOf('{projectionPrefix}') === 0 && /{streamFilter}/.test(e.streamId.substring({projectionPrefix.Length + 1}))) {{
+                            if (e.streamId.indexOf('{projectionPrefix}') === 0 && /{regex}/.test(e.streamId.substring({projectionPrefix.Length + 1}))) {{
                                 linkTo('{name}', e);
                             }}
                         }}

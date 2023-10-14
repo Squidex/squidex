@@ -17,6 +17,9 @@ import { ComponentSectionComponent } from './component-section.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComponentComponent extends ResourceOwner {
+    @Input({ required: true })
+    public hasChatBot!: boolean;
+
     @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
