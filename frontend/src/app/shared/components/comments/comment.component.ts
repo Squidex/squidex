@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { MentionConfig } from 'angular-mentions';
-import { CommentDto, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
+import { Comment, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
 
 interface State {
     isEditing: boolean;
@@ -20,6 +20,12 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentComponent extends StatefulComponent<State> {
+    @Output()
+    public delete = new EventEmitter();
+
+    @Output()
+    public edit = new EventEmitter<string>();
+
     @Input({ transform: booleanAttribute })
     public canFollow?: boolean | null;
 
@@ -29,14 +35,14 @@ export class CommentComponent extends StatefulComponent<State> {
     @Input({ transform: booleanAttribute })
     public canEdit?: boolean | null;
 
-    @Input({ required: true })
-    public commentsState!: CommentsState;
-
     @Input({ transform: booleanAttribute })
     public confirmDelete?: boolean | null = true;
 
     @Input({ required: true })
-    public comment!: CommentDto;
+    public comment!: Comment;
+
+    @Input({ required: true })
+    public commentId!: any;
 
     @Input()
     public userToken = '';
@@ -74,12 +80,12 @@ export class CommentComponent extends StatefulComponent<State> {
         this.next({ isEditing: false });
     }
 
-    public delete() {
+    public doDelete() {
         if (!this.isDeletable && !this.canDelete) {
             return;
         }
 
-        this.commentsState.delete(this.comment);
+        this.delete.emit();
     }
 
     public updateWhenEnter(event: KeyboardEvent) {
@@ -103,11 +109,11 @@ export class CommentComponent extends StatefulComponent<State> {
             this.dialogs.confirm('i18n:comments.deleteConfirmTitle', 'i18n:comments.deleteConfirmText')
                 .subscribe(confirmed => {
                     if (confirmed) {
-                        this.delete();
+                        this.doDelete();
                     }
                 });
         } else {
-            this.commentsState.update(this.comment, text);
+            this.edit.emit(text);
 
             this.cancelEdit();
         }

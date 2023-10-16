@@ -31,7 +31,7 @@ public sealed class NewsController : ApiController
     /// Get features since version.
     /// </summary>
     /// <param name="version">The latest received version.</param>
-    /// <response code="200">Latest features returned.</response>.
+    /// <response code="200">Latest features returned.</response>
     [HttpGet]
     [Route("news/features/")]
     [ProducesResponseType(typeof(FeaturesDto), StatusCodes.Status200OK)]

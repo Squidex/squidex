@@ -16,6 +16,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Web;
+using YDotNet.Server.WebSockets;
 
 namespace Squidex.Areas.Api.Controllers.Comments.Notifications;
 
@@ -37,11 +38,28 @@ public sealed class UserNotificationsController : ApiController
     /// Get all notifications.
     /// </summary>
     /// <param name="userId">The user id.</param>
+    /// <remarks>
+    /// When passing in a version you can retrieve all updates since then.
+    /// </remarks>
+    /// <response code="200">All comments returned.</response>
+    [HttpGet]
+    [Route("users/{userId}/notifications2")]
+    [ProducesResponseType(typeof(CommentsDto), StatusCodes.Status200OK)]
+    [ApiPermission]
+    public IActionResult GetNotifications(DomainId userId)
+    {
+        return new YDotNetActionResult($"stream/{userId}");
+    }
+
+    /// <summary>
+    /// Get all notifications.
+    /// </summary>
+    /// <param name="userId">The user id.</param>
     /// <param name="version">The current version.</param>
     /// <remarks>
     /// When passing in a version you can retrieve all updates since then.
     /// </remarks>
-    /// <response code="200">All comments returned.</response>.
+    /// <response code="200">All comments returned.</response>
     [HttpGet]
     [Route("users/{userId}/notifications")]
     [ProducesResponseType(typeof(CommentsDto), StatusCodes.Status200OK)]
@@ -67,8 +85,8 @@ public sealed class UserNotificationsController : ApiController
     /// </summary>
     /// <param name="userId">The user id.</param>
     /// <param name="commentId">The ID of the comment.</param>
-    /// <response code="204">Comment deleted.</response>.
-    /// <response code="404">Comment not found.</response>.
+    /// <response code="204">Comment deleted.</response>
+    /// <response code="404">Comment not found.</response>
     [HttpDelete]
     [Route("users/{userId}/notifications/{commentId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

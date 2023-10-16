@@ -30,7 +30,7 @@ public sealed class LanguagesController : ApiController
     /// <remarks>
     /// Provide a list of supported language codes, following the ISO2Code standard.
     /// </remarks>
-    /// <response code="200">Supported language codes returned.</response>.
+    /// <response code="200">Supported language codes returned.</response>
     [HttpGet]
     [Route("languages/")]
     [ProducesResponseType(typeof(LanguageDto[]), StatusCodes.Status200OK)]

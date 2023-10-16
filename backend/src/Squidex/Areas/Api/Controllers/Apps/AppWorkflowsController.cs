@@ -36,8 +36,8 @@ public sealed class AppWorkflowsController : ApiController
     /// Get app workflow.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Workflows returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Workflows returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/workflows/")]
     [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
@@ -60,9 +60,9 @@ public sealed class AppWorkflowsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The new workflow.</param>
-    /// <response code="200">Workflow created.</response>.
-    /// <response code="400">Workflow request not valid.</response>.
-    /// <response code="404">Workflow or app not found.</response>.
+    /// <response code="200">Workflow created.</response>
+    /// <response code="400">Workflow request not valid.</response>
+    /// <response code="404">Workflow or app not found.</response>
     [HttpPost]
     [Route("apps/{app}/workflows/")]
     [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
@@ -83,9 +83,9 @@ public sealed class AppWorkflowsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the workflow to update.</param>
     /// <param name="request">The new workflow.</param>
-    /// <response code="200">Workflow updated.</response>.
-    /// <response code="400">Workflow request not valid.</response>.
-    /// <response code="404">Workflow or app not found.</response>.
+    /// <response code="200">Workflow updated.</response>
+    /// <response code="400">Workflow request not valid.</response>
+    /// <response code="404">Workflow or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/workflows/{id}")]
     [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]
@@ -105,8 +105,8 @@ public sealed class AppWorkflowsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the workflow to update.</param>
-    /// <response code="200">Workflow deleted.</response>.
-    /// <response code="404">Workflow or app not found.</response>.
+    /// <response code="200">Workflow deleted.</response>
+    /// <response code="404">Workflow or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/workflows/{id}")]
     [ProducesResponseType(typeof(WorkflowsDto), StatusCodes.Status200OK)]

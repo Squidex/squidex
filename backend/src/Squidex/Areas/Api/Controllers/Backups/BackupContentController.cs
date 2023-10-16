@@ -37,8 +37,8 @@ public class BackupContentController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the backup.</param>
-    /// <response code="200">Backup found and content returned.</response>.
-    /// <response code="404">Backup or app not found.</response>.
+    /// <response code="200">Backup found and content returned.</response>
+    /// <response code="404">Backup or app not found.</response>
     [HttpGet]
     [Route("apps/{app}/backups/{id}")]
     [ResponseCache(Duration = 3600 * 24 * 30)]
@@ -56,8 +56,8 @@ public class BackupContentController : ApiController
     /// <param name="id">The ID of the backup.</param>
     /// <param name="appId">The ID of the app.</param>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Backup found and content returned.</response>.
-    /// <response code="404">Backup or app not found.</response>.
+    /// <response code="200">Backup found and content returned.</response>
+    /// <response code="404">Backup or app not found.</response>
     [HttpGet]
     [Route("apps/backups/{id}")]
     [ResponseCache(Duration = 3600 * 24 * 30)]

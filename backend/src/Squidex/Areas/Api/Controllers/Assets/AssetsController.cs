@@ -58,8 +58,8 @@ public sealed class AssetsController : ApiController
     /// Get assets tags.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Assets tags returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Assets tags returned.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// Get all tags for assets.
     /// </remarks>
@@ -83,8 +83,8 @@ public sealed class AssetsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="name">The tag to return.</param>
     /// <param name="request">The required request object.</param>
-    /// <response code="200">Asset tag renamed and new tags returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Asset tag renamed and new tags returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpPut]
     [Route("apps/{app}/assets/tags/{name}")]
     [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
@@ -104,8 +104,8 @@ public sealed class AssetsController : ApiController
     /// <param name="parentId">The optional parent folder id.</param>
     /// <param name="ids">The optional asset ids.</param>
     /// <param name="q">The optional json query.</param>
-    /// <response code="200">Assets returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Assets returned.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// Get all assets for the app.
     /// </remarks>
@@ -134,8 +134,8 @@ public sealed class AssetsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="query">The required query object.</param>
-    /// <response code="200">Assets returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Assets returned.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// Get all assets for the app.
     /// </remarks>
@@ -163,8 +163,8 @@ public sealed class AssetsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the asset to retrieve.</param>
-    /// <response code="200">Asset found.</response>.
-    /// <response code="404">Asset or app not found.</response>.
+    /// <response code="200">Asset found.</response>
+    /// <response code="404">Asset or app not found.</response>
     [HttpGet]
     [Route("apps/{app}/assets/{id}/")]
     [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
@@ -192,10 +192,10 @@ public sealed class AssetsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The request parameters.</param>
-    /// <response code="201">Asset created.</response>.
-    /// <response code="400">Asset request not valid.</response>.
-    /// <response code="413">Asset exceeds the maximum upload size.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="201">Asset created.</response>
+    /// <response code="400">Asset request not valid.</response>
+    /// <response code="413">Asset exceeds the maximum upload size.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and is required correctly.
     /// </remarks>
@@ -218,10 +218,10 @@ public sealed class AssetsController : ApiController
     /// Upload a new asset using tus.io.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="201">Asset created.</response>.
-    /// <response code="400">Asset request not valid.</response>.
-    /// <response code="413">Asset exceeds the maximum upload size.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="201">Asset created.</response>
+    /// <response code="400">Asset request not valid.</response>
+    /// <response code="413">Asset exceeds the maximum upload size.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// Use the tus protocol to upload an asset.
     /// </remarks>
@@ -254,9 +254,9 @@ public sealed class AssetsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The bulk update request.</param>
-    /// <response code="200">Assets created, update or delete.</response>.
-    /// <response code="400">Assets request not valid.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Assets created, update or delete.</response>
+    /// <response code="400">Assets request not valid.</response>
+    /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/assets/bulk")]
     [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
@@ -280,10 +280,10 @@ public sealed class AssetsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The optional custom asset id.</param>
     /// <param name="request">The request parameters.</param>
-    /// <response code="200">Asset created or updated.</response>.
-    /// <response code="400">Asset request not valid.</response>.
-    /// <response code="413">Asset exceeds the maximum upload size.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Asset created or updated.</response>
+    /// <response code="400">Asset request not valid.</response>
+    /// <response code="413">Asset exceeds the maximum upload size.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and is required correctly.
     /// </remarks>
@@ -308,10 +308,10 @@ public sealed class AssetsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the asset.</param>
     /// <param name="file">The file to upload.</param>
-    /// <response code="200">Asset updated.</response>.
-    /// <response code="400">Asset request not valid.</response>.
-    /// <response code="413">Asset exceeds the maximum upload size.</response>.
-    /// <response code="404">Asset or app not found.</response>.
+    /// <response code="200">Asset updated.</response>
+    /// <response code="400">Asset request not valid.</response>
+    /// <response code="413">Asset exceeds the maximum upload size.</response>
+    /// <response code="404">Asset or app not found.</response>
     /// <remarks>
     /// Use multipart request to upload an asset.
     /// </remarks>
@@ -336,9 +336,9 @@ public sealed class AssetsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the asset.</param>
     /// <param name="request">The asset object that needs to updated.</param>
-    /// <response code="200">Asset updated.</response>.
-    /// <response code="400">Asset request not valid.</response>.
-    /// <response code="404">Asset or app not found.</response>.
+    /// <response code="200">Asset updated.</response>
+    /// <response code="400">Asset request not valid.</response>
+    /// <response code="404">Asset or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/assets/{id}/")]
     [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
@@ -360,9 +360,9 @@ public sealed class AssetsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the asset.</param>
     /// <param name="request">The asset object that needs to updated.</param>
-    /// <response code="200">Asset moved.</response>.
-    /// <response code="400">Asset request not valid.</response>.
-    /// <response code="404">Asset or app not found.</response>.
+    /// <response code="200">Asset moved.</response>
+    /// <response code="400">Asset request not valid.</response>
+    /// <response code="404">Asset or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/assets/{id}/parent")]
     [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
@@ -384,8 +384,8 @@ public sealed class AssetsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the asset to delete.</param>
     /// <param name="request">The request parameters.</param>
-    /// <response code="204">Asset deleted.</response>.
-    /// <response code="404">Asset or app not found.</response>.
+    /// <response code="204">Asset deleted.</response>
+    /// <response code="404">Asset or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/assets/{id}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

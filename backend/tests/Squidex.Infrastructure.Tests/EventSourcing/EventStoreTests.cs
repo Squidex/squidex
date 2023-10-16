@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using System.Text.RegularExpressions;
-using EventStore.Client;
 
 namespace Squidex.Infrastructure.EventSourcing;
 

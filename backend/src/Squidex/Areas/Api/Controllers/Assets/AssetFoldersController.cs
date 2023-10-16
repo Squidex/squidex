@@ -39,8 +39,8 @@ public sealed class AssetFoldersController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="parentId">The optional parent folder id.</param>
     /// <param name="scope">The scope of the query.</param>
-    /// <response code="200">Asset folders returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Asset folders returned.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// Get all asset folders for the app.
     /// </remarks>
@@ -90,9 +90,9 @@ public sealed class AssetFoldersController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The asset folder object that needs to be added to the App.</param>
-    /// <response code="201">Asset folder created.</response>.
-    /// <response code="400">Asset folder request not valid.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="201">Asset folder created.</response>
+    /// <response code="400">Asset folder request not valid.</response>
+    /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/assets/folders", Order = -1)]
     [ProducesResponseType(typeof(AssetFolderDto), StatusCodes.Status201Created)]
@@ -114,9 +114,9 @@ public sealed class AssetFoldersController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the asset folder.</param>
     /// <param name="request">The asset folder object that needs to updated.</param>
-    /// <response code="200">Asset folder updated.</response>.
-    /// <response code="400">Asset folder request not valid.</response>.
-    /// <response code="404">Asset folder or app not found.</response>.
+    /// <response code="200">Asset folder updated.</response>
+    /// <response code="400">Asset folder request not valid.</response>
+    /// <response code="404">Asset folder or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
     [ProducesResponseType(typeof(AssetFolderDto), StatusCodes.Status200OK)]
@@ -138,9 +138,9 @@ public sealed class AssetFoldersController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the asset folder.</param>
     /// <param name="request">The asset folder object that needs to updated.</param>
-    /// <response code="200">Asset folder moved.</response>.
-    /// <response code="400">Asset folder request not valid.</response>.
-    /// <response code="404">Asset folder or app not found.</response>.
+    /// <response code="200">Asset folder moved.</response>
+    /// <response code="400">Asset folder request not valid.</response>
+    /// <response code="404">Asset folder or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/assets/folders/{id}/parent", Order = -1)]
     [ProducesResponseType(typeof(AssetFolderDto), StatusCodes.Status200OK)]
@@ -161,8 +161,8 @@ public sealed class AssetFoldersController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the asset folder to delete.</param>
-    /// <response code="204">Asset folder deleted.</response>.
-    /// <response code="404">Asset folder or app not found.</response>.
+    /// <response code="204">Asset folder deleted.</response>
+    /// <response code="404">Asset folder or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/assets/folders/{id}/", Order = -1)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

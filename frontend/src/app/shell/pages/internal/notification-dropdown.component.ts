@@ -5,84 +5,80 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { onErrorResumeNextWith, timer } from 'rxjs';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { switchMap, tap } from 'rxjs/operators';
-import { AuthService, CommentDto, CommentsService, CommentsState, DialogService, LocalStoreService, ModalModel, ResourceOwner, Settings } from '@app/shared';
+import { AuthService, CollaborationService, Comment, ModalModel, ResourceOwner, SharedArray } from '@app/shared';
 
 @Component({
     selector: 'sqx-notification-dropdown',
     styleUrls: ['./notification-dropdown.component.scss'],
     templateUrl: './notification-dropdown.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        CollaborationService,
+    ],
 })
 export class NotificationDropdownComponent extends ResourceOwner implements OnInit {
+    private readonly userId: string;
+
     public modalMenu = new ModalModel();
 
-    public commentsState: CommentsState;
+    public commentsArray?: SharedArray<Comment>;
+    public commentsUnread = 0;
 
-    public versionRead = -1;
-    public versionReceived = -1;
-    public unread = 0;
+    public userToken: string;
 
-    public userToken = '';
-
-    constructor(authService: AuthService, commentsService: CommentsService, dialogs: DialogService,
-        private readonly changeDetector: ChangeDetectorRef,
-        private readonly localStore: LocalStoreService,
+    constructor(authService: AuthService,
+        private readonly collaborations: CollaborationService,
     ) {
         super();
 
+        this.userId = `users/${authService.user!.id}/notifications`;
         this.userToken = authService.user!.token;
-
-        this.versionRead = localStore.getInt(Settings.Local.NOTIFICATION_VERSION, -1);
-        this.versionReceived = this.versionRead;
-
-        this.updateVersion();
-
-        const commentsUrl = `users/${authService.user!.id}/notifications`;
-
-        this.commentsState =
-            new CommentsState(
-                commentsUrl,
-                commentsService,
-                dialogs,
-                true,
-                this.versionRead);
     }
 
     public ngOnInit() {
+        this.collaborations.connect(`users/${this.userId}/notifications`);
+
+        const comments$ = this.collaborations.getArray<Comment>('stream');
+
+        this.own(
+            comments$
+                .subscribe(array => {
+                    this.commentsArray = array;
+                }));
+
+        this.own(
+            comments$.pipe(switchMap(x => x.itemsChanges))
+                .subscribe(array => {
+                    this.commentsUnread = array.filter(x => !x.isRead).length;
+                }));
+
         this.own(
             this.modalMenu.isOpenChanges.pipe(
                 tap(_ => {
-                    this.updateVersion();
+                    this.markRead();
                 }),
             ));
-
-        this.own(
-            this.commentsState.versionNumber.pipe(
-                tap(version => {
-                    this.versionReceived = version;
-
-                    this.updateVersion();
-
-                    this.changeDetector.detectChanges();
-                })));
-
-        this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load(true).pipe(onErrorResumeNextWith()))));
     }
 
-    public trackByComment(_index: number, comment: CommentDto) {
-        return comment.id;
-    }
-
-    private updateVersion() {
-        this.unread = Math.max(0, this.versionReceived - this.versionRead);
-
-        if (this.modalMenu.isOpen) {
-            this.versionRead = this.versionReceived;
-
-            this.localStore.setInt(Settings.Local.NOTIFICATION_VERSION, this.versionRead);
+    public markRead() {
+        if (!this.commentsArray) {
+            return;
         }
+
+        this.commentsArray?.items.forEach((item, i) => {
+            if (!item.isRead) {
+                this.commentsArray?.set(i, { ...item, isRead: true });
+            }
+        });
+    }
+
+    public delete(index: number) {
+        this.commentsArray?.remove(index);
+    }
+
+    public trackByComment(index: number) {
+        return index;
     }
 }

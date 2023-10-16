@@ -31,7 +31,7 @@ public sealed class EventConsumersController : ApiController
     /// <summary>
     /// Get event consumers.
     /// </summary>
-    /// <response code="200">Event consumers returned.</response>.
+    /// <response code="200">Event consumers returned.</response>
     [HttpGet]
     [Route("event-consumers/")]
     [ProducesResponseType(typeof(EventConsumersDto), StatusCodes.Status200OK)]
@@ -49,8 +49,8 @@ public sealed class EventConsumersController : ApiController
     /// Start an event consumer.
     /// </summary>
     /// <param name="consumerName">The name of the event consumer.</param>
-    /// <response code="200">Event consumer started asynchronously.</response>.
-    /// <response code="404">Event consumer not found.</response>.
+    /// <response code="200">Event consumer started asynchronously.</response>
+    /// <response code="404">Event consumer not found.</response>
     [HttpPut]
     [Route("event-consumers/{consumerName}/start/")]
     [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
@@ -68,8 +68,8 @@ public sealed class EventConsumersController : ApiController
     /// Stop an event consumer.
     /// </summary>
     /// <param name="consumerName">The name of the event consumer.</param>
-    /// <response code="200">Event consumer stopped asynchronously.</response>.
-    /// <response code="404">Event consumer not found.</response>.
+    /// <response code="200">Event consumer stopped asynchronously.</response>
+    /// <response code="404">Event consumer not found.</response>
     [HttpPut]
     [Route("event-consumers/{consumerName}/stop/")]
     [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]
@@ -87,8 +87,8 @@ public sealed class EventConsumersController : ApiController
     /// Reset an event consumer.
     /// </summary>
     /// <param name="consumerName">The name of the event consumer.</param>
-    /// <response code="200">Event consumer resetted asynchronously.</response>.
-    /// <response code="404">Event consumer not found.</response>.
+    /// <response code="200">Event consumer resetted asynchronously.</response>
+    /// <response code="404">Event consumer not found.</response>
     [HttpPut]
     [Route("event-consumers/{consumerName}/reset/")]
     [ProducesResponseType(typeof(EventConsumerDto), StatusCodes.Status200OK)]

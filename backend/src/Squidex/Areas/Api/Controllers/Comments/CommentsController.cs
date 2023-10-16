@@ -15,6 +15,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
+using YDotNet.Server.WebSockets;
 
 namespace Squidex.Areas.Api.Controllers.Comments;
 
@@ -40,8 +41,8 @@ public sealed class CommentsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="resource">The path to the resource.</param>
-    /// <response code="200">Watching users returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Watching users returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/watching/{*resource}")]
     [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
@@ -63,8 +64,8 @@ public sealed class CommentsController : ApiController
     /// <remarks>
     /// When passing in a version you can retrieve all updates since then.
     /// </remarks>
-    /// <response code="200">Comments returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Comments returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/comments/{commentsId}")]
     [ProducesResponseType(typeof(CommentsDto), StatusCodes.Status200OK)]
@@ -85,14 +86,32 @@ public sealed class CommentsController : ApiController
     }
 
     /// <summary>
+    /// Get all comments.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="commentsId">The ID of the comments.</param>
+    /// <remarks>
+    /// When passing in a version you can retrieve all updates since then.
+    /// </remarks>
+    /// <response code="200">Comments returned.</response>
+    /// <response code="404">App not found.</response>
+    [Route("apps/{app}/comments2/{commentsId}")]
+    [ApiPermissionOrAnonymous(PermissionIds.AppCommentsRead)]
+    [ApiCosts(0)]
+    public IActionResult CommentsStream(string app, DomainId commentsId)
+    {
+        return new YDotNetActionResult($"chat/{AppId}/{commentsId}");
+    }
+
+    /// <summary>
     /// Create a new comment.
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="commentsId">The ID of the comments.</param>
     /// <param name="request">The comment object that needs to created.</param>
-    /// <response code="201">Comment created.</response>.
-    /// <response code="400">Comment request not valid.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="201">Comment created.</response>
+    /// <response code="400">Comment request not valid.</response>
+    /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/comments/{commentsId}")]
     [ProducesResponseType(typeof(CommentDto), 201)]
@@ -116,9 +135,9 @@ public sealed class CommentsController : ApiController
     /// <param name="commentsId">The ID of the comments.</param>
     /// <param name="commentId">The ID of the comment.</param>
     /// <param name="request">The comment object that needs to updated.</param>
-    /// <response code="204">Comment updated.</response>.
-    /// <response code="400">Comment request not valid.</response>.
-    /// <response code="404">Comment or app not found.</response>.
+    /// <response code="204">Comment updated.</response>
+    /// <response code="400">Comment request not valid.</response>
+    /// <response code="404">Comment or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/comments/{commentsId}/{commentId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -139,8 +158,8 @@ public sealed class CommentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="commentsId">The ID of the comments.</param>
     /// <param name="commentId">The ID of the comment.</param>
-    /// <response code="204">Comment deleted.</response>.
-    /// <response code="404">Comment or app not found.</response>.
+    /// <response code="204">Comment deleted.</response>
+    /// <response code="404">Comment or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/comments/{commentsId}/{commentId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

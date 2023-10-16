@@ -56,8 +56,8 @@ public sealed class UsagesController : ApiController
     /// Get api calls as log file.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Usage tracking results returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Usage tracking results returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/usages/log/")]
     [ProducesResponseType(typeof(LogDownloadDto), StatusCodes.Status200OK)]
@@ -103,8 +103,8 @@ public sealed class UsagesController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
-    /// <response code="200">API call returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">API call returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
@@ -128,8 +128,8 @@ public sealed class UsagesController : ApiController
     /// <param name="team">The name of the team.</param>
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
-    /// <response code="200">API call returned.</response>.
-    /// <response code="404">Team not found.</response>.
+    /// <response code="200">API call returned.</response>
+    /// <response code="404">Team not found.</response>
     [HttpGet]
     [Route("teams/{team}/usages/calls/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
@@ -151,8 +151,8 @@ public sealed class UsagesController : ApiController
     /// Get total asset size.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Storage usage returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Storage usage returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/usages/storage/today/")]
     [ProducesResponseType(typeof(CurrentStorageDto), StatusCodes.Status200OK)]
@@ -174,8 +174,8 @@ public sealed class UsagesController : ApiController
     /// Get total asset size by team.
     /// </summary>
     /// <param name="team">The ID of the team.</param>
-    /// <response code="200">Storage usage returned.</response>.
-    /// <response code="404">Team not found.</response>.
+    /// <response code="200">Storage usage returned.</response>
+    /// <response code="404">Team not found.</response>
     [HttpGet]
     [Route("teams/{team}/usages/storage/today/")]
     [ProducesResponseType(typeof(CurrentStorageDto), StatusCodes.Status200OK)]
@@ -199,8 +199,8 @@ public sealed class UsagesController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
-    /// <response code="200">Storage usage returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Storage usage returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/usages/storage/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(StorageUsagePerDateDto[]), StatusCodes.Status200OK)]
@@ -221,8 +221,8 @@ public sealed class UsagesController : ApiController
     /// <param name="team">The ID of the team.</param>
     /// <param name="fromDate">The from date.</param>
     /// <param name="toDate">The to date.</param>
-    /// <response code="200">Storage usage returned.</response>.
-    /// <response code="404">Team not found.</response>.
+    /// <response code="200">Storage usage returned.</response>
+    /// <response code="404">Team not found.</response>
     [HttpGet]
     [Route("teams/{team}/usages/storage/{fromDate}/{toDate}/")]
     [ProducesResponseType(typeof(StorageUsagePerDateDto[]), StatusCodes.Status200OK)]

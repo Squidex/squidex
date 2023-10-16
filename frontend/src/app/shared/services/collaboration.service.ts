@@ -6,18 +6,20 @@
  */
 
 import { Injectable } from '@angular/core';
-import { HocuspocusProvider } from '@hocuspocus/provider';
 import { BehaviorSubject, map, Observable, of, switchMap } from 'rxjs';
+import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
+import { ApiUrlConfig } from '../internal';
 import { AuthService, Profile } from './auth.service';
 
 @Injectable()
 export class CollaborationService {
-    private readonly provider = new BehaviorSubject<HocuspocusProvider | null>(null);
+    private readonly provider = new BehaviorSubject<{ doc: Y.Doc; provider: WebsocketProvider } | null>(null);
+    private readonly basePath: string;
     private previousName?: string | null;
 
     public awareness =
-        this.provider.pipe(map(x => x?.awareness));
+        this.provider.pipe(map(x => x?.provider.awareness));
 
     public users =
         this.awareness.pipe(
@@ -53,9 +55,13 @@ export class CollaborationService {
     public otherUsers =
         this.users.pipe(map(x => x.filter(u => u.id !== this.authService.user?.id)));
 
-    constructor(
+    constructor(apiUrl: ApiUrlConfig,
         private readonly authService: AuthService,
     ) {
+        this.basePath =
+            apiUrl.buildUrl('/api/')
+                .replace('http://', 'ws://')
+                .replace('https://', 'wss://');
     }
 
     public connect(name: string | null) {
@@ -70,47 +76,52 @@ export class CollaborationService {
             return;
         }
 
-        const provider = new HocuspocusProvider({
-            url: 'ws://localhost:8080/collaboration',
-            name,
-            token: 'Adasd',
-        });
+        const yDocument = new Y.Doc();
+        const yProvider = new WebsocketProvider(this.basePath, `${name}?access_token=${this.authService.user?.accessToken}`, yDocument);
 
         const user = this.authService.user!;
 
         if (user) {
             const { id, email, displayName } = user;
 
-            provider.awareness?.setLocalState({ id, email, displayName });
+            yProvider.awareness?.setLocalState({ id, email, displayName });
         }
 
-        this.provider.next(provider);
+        this.provider.next({ provider: yProvider, doc: yDocument });
     }
 
     private cleanup() {
-        this.provider.value?.destroy();
+        this.provider.value?.provider.destroy();
         this.provider.next(null);
     }
 
     public getArray<T>(name: string) {
-        return this.provider.pipe(map(p => new Array<T>(p?.document.getArray(name))));
+        return this.provider.pipe(map(p => new SharedArray<T>(p?.doc.getArray(name))));
     }
 
     public getMap<T>(name: string) {
-        return this.provider.pipe(map(p => new Map<T>(p?.document.getMap(name))));
+        return this.provider.pipe(map(p => new SharedMap<T>(p?.doc.getMap(name))));
     }
 }
 
-class Map<T> {
-    public readonly values: BehaviorSubject<Record<string, T>>;
+export class SharedMap<T> {
+    private readonly value$: BehaviorSubject<Readonly<Record<string, T>>>;
+
+    public get valueChanges(): Observable<Readonly<Record<string, T>>> {
+        return this.value$;
+    }
+
+    public get state() {
+        return this.value$.value;
+    }
 
     constructor(
         private readonly source: Y.Map<T> | undefined,
     ) {
-        this.values = new BehaviorSubject(source?.toJSON() || {});
+        this.value$ = new BehaviorSubject(source?.toJSON() || {});
 
         source?.observeDeep(() => {
-            this.values.next(source?.toJSON());
+            this.value$.next(source.toJSON());
         });
     }
 
@@ -123,16 +134,24 @@ class Map<T> {
     }
 }
 
-class Array<T> {
-    public readonly values: BehaviorSubject<T[]>;
+export class SharedArray<T> {
+    private readonly items$: BehaviorSubject<ReadonlyArray<T>>;
+
+    public get itemsChanges(): Observable<ReadonlyArray<T>> {
+        return this.items$;
+    }
+
+    public get items() {
+        return this.items$.value;
+    }
 
     constructor(
         private readonly source: Y.Array<T> | undefined,
     ) {
-        this.values = new BehaviorSubject(source?.toJSON() || []);
+        this.items$ = new BehaviorSubject<ReadonlyArray<T>>(source?.toJSON() || []);
 
         source?.observeDeep(() => {
-            this.values.next(source.toJSON());
+            this.items$.next(source.toJSON() || []);
         });
     }
 
@@ -140,8 +159,8 @@ class Array<T> {
         this.source?.insert(this.source.length, [value]);
     }
 
-    public remove(index: number) {
-        this.source?.delete(index, 1);
+    public remove(index: number, count = 1) {
+        this.source?.delete(index, count);
     }
 
     public set(index: number, value: T) {

@@ -32,8 +32,8 @@ public sealed class AppLanguagesController : ApiController
     /// Get app languages.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Languages returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Languages returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/languages/")]
     [ProducesResponseType(typeof(AppLanguagesDto), StatusCodes.Status200OK)]
@@ -56,9 +56,9 @@ public sealed class AppLanguagesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The language to add to the app.</param>
-    /// <response code="201">Language created.</response>.
-    /// <response code="400">Language request not valid.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="201">Language created.</response>
+    /// <response code="400">Language request not valid.</response>
+    /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/languages/")]
     [ProducesResponseType(typeof(AppLanguagesDto), 201)]
@@ -79,9 +79,9 @@ public sealed class AppLanguagesController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="language">The language to update.</param>
     /// <param name="request">The language object.</param>
-    /// <response code="200">Language updated.</response>.
-    /// <response code="400">Language request not valid.</response>.
-    /// <response code="404">Language or app not found.</response>.
+    /// <response code="200">Language updated.</response>
+    /// <response code="400">Language request not valid.</response>
+    /// <response code="404">Language or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/languages/{language}/")]
     [ProducesResponseType(typeof(AppLanguagesDto), StatusCodes.Status200OK)]
@@ -101,9 +101,9 @@ public sealed class AppLanguagesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="language">The language to delete from the app.</param>
-    /// <response code="200">Language deleted.</response>.
-    /// <response code="400">Language is master language.</response>.
-    /// <response code="404">Language or app not found.</response>.
+    /// <response code="200">Language deleted.</response>
+    /// <response code="400">Language is master language.</response>
+    /// <response code="404">Language or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/languages/{language}/")]
     [ProducesResponseType(typeof(AppLanguagesDto), StatusCodes.Status200OK)]
