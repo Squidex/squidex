@@ -102,4 +102,10 @@ public readonly struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
     {
         return new DomainId($"{id1}{IdSeparator}{id2}");
     }
+
+    public static bool TryParse(ReadOnlySpan<char> input, out DomainId result)
+    {
+        result = new DomainId(input.ToString());
+        return true;
+    }
 }

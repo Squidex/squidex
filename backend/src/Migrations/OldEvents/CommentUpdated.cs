@@ -5,8 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Comments.Commands;
+using Squidex.Infrastructure.EventSourcing;
 
-public sealed class UpdateComment : CommentTextCommand
+namespace Migrations.OldEvents;
+
+[EventType(nameof(CommentUpdated))]
+public sealed class CommentUpdated : IEvent
 {
+    public string Text { get; set; }
 }

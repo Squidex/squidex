@@ -140,7 +140,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     }
 
                     if (content) {
-                        this.collaboration.connect(`${this.schema.id}/${content.id}`);
+                        this.collaboration.connect(`apps/${this.schemasState.appName}/collaboration/${content.id}`);
                     } else {
                         this.collaboration.connect(null);
                     }

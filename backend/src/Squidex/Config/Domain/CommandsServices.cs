@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
-using Squidex.Domain.Apps.Entities.Comments.DomainObject;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Invitation;
@@ -104,9 +103,6 @@ public static class CommandsServices
             .As<ICommandMiddleware>();
 
         services.AddSingletonAs<AssetCommandMiddleware>()
-            .As<ICommandMiddleware>();
-
-        services.AddSingletonAs<CommentsCommandMiddleware>()
             .As<ICommandMiddleware>();
 
         services.AddSingletonAs<ContentsBulkUpdateCommandMiddleware>()

@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Events.Comments;
+namespace Migrations.OldEvents;
 
-public abstract class CommentsEvent : AppEvent
+[EventType(nameof(CommentDeleted))]
+public sealed class CommentDeleted : IEvent
 {
-    public DomainId CommentsId { get; set; }
-
-    public DomainId CommentId { get; set; }
 }

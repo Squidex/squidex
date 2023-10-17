@@ -11,9 +11,6 @@ namespace Squidex.Infrastructure.EventSourcing;
 
 public interface IEventStore
 {
-    Task<IReadOnlyList<StoredEvent>> QueryStreamReverseAsync(string streamName, int take = int.MaxValue,
-        CancellationToken ct = default);
-
     Task<IReadOnlyList<StoredEvent>> QueryStreamAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
         CancellationToken ct = default);
 

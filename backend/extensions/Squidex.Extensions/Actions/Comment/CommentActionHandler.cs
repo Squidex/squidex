@@ -7,31 +7,31 @@
 
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Entities.Comments.Commands;
+using Squidex.Domain.Apps.Entities.Comments;
+using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Extensions.Actions.Comment;
 
-public sealed class CommentActionHandler : RuleActionHandler<CommentAction, CreateComment>
+public sealed class CommentActionHandler : RuleActionHandler<CommentAction, CommentCreated>
 {
     private const string Description = "Send a Comment";
-    private readonly ICommandBus commandBus;
+    private readonly INotificationPublisher publisher;
 
-    public CommentActionHandler(RuleEventFormatter formatter, ICommandBus commandBus)
+    public CommentActionHandler(RuleEventFormatter formatter, INotificationPublisher publisher)
         : base(formatter)
     {
-        this.commandBus = commandBus;
+        this.publisher = publisher;
     }
 
-    protected override async Task<(string Description, CreateComment Data)> CreateJobAsync(EnrichedEvent @event, CommentAction action)
+    protected override async Task<(string Description, CommentCreated Data)> CreateJobAsync(EnrichedEvent @event, CommentAction action)
     {
         if (@event is not EnrichedContentEvent contentEvent)
         {
-            return ("Ignore", new CreateComment());
+            return ("Ignore", new CommentCreated());
         }
 
-        var ruleJob = new CreateComment
+        var ruleJob = new CommentCreated
         {
             AppId = contentEvent.AppId
         };
@@ -40,7 +40,7 @@ public sealed class CommentActionHandler : RuleActionHandler<CommentAction, Crea
 
         if (string.IsNullOrWhiteSpace(text))
         {
-            return ("NoText", new CreateComment());
+            return ("NoText", new CommentCreated());
         }
 
         ruleJob.Text = text;
@@ -59,20 +59,16 @@ public sealed class CommentActionHandler : RuleActionHandler<CommentAction, Crea
         return (Description, ruleJob);
     }
 
-    protected override async Task<Result> ExecuteJobAsync(CreateComment job,
+    protected override async Task<Result> ExecuteJobAsync(CommentCreated job,
         CancellationToken ct = default)
     {
-        var command = job;
-
-        if (command.CommentsId == default)
+        if (job.CommentsId == default)
         {
             return Result.Ignored();
         }
 
-        command.FromRule = true;
+        await publisher.CommentAsync(job.AppId, job.CommentsId, job.Text, job.Actor, job.Url, true, ct);
 
-        await commandBus.PublishAsync(command, ct);
-
-        return Result.Success($"Commented: {command.Text}");
+        return Result.Success($"Commented: {job.Text}");
     }
 }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Comments;
+using YDotNet.Server;
 
 namespace Squidex.Config.Domain;
 
@@ -13,10 +14,7 @@ public static class CommentsServices
 {
     public static void AddSquidexComments(this IServiceCollection services)
     {
-        services.AddSingletonAs<CommentsLoader>()
-            .As<ICommentsLoader>();
-
-        services.AddSingletonAs<WatchingService>()
-            .As<IWatchingService>();
+        services.AddSingletonAs<NotificationCreator>()
+            .As<INotificationPublisher>().As<IDocumentCallback>();
     }
 }

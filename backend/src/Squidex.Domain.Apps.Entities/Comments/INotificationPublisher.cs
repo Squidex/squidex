@@ -9,8 +9,15 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Comments;
 
-public interface ICommentsLoader
+public interface INotificationPublisher
 {
-    Task<CommentsResult> GetCommentsAsync(DomainId id, long version = EtagVersion.Any,
+    Task NotifyAsync(string userId, string text, RefToken actor, Uri? url, bool skipHandlers,
         CancellationToken ct = default);
+
+    Task CommentAsync(NamedId<DomainId> appId, DomainId resourceId, string text, RefToken actor, Uri? url, bool skipHandlers,
+        CancellationToken ct = default);
+
+    string UserDocument(string userId);
+
+    string ResourceDocument(NamedId<DomainId> appId, DomainId resourceId);
 }

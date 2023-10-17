@@ -52,12 +52,6 @@ public class CommentTriggerHandlerTests
     }
 
     [Fact]
-    public void Should_not_handle_comment_update_event()
-    {
-        Assert.False(sut.Handles(new CommentUpdated()));
-    }
-
-    [Fact]
     public void Should_not_handle_other_event()
     {
         Assert.False(sut.Handles(new ContentCreated()));

@@ -89,29 +89,6 @@ public sealed class GetEventStore : IEventStore, IInitializable
         }
     }
 
-    public async Task<IReadOnlyList<StoredEvent>> QueryStreamReverseAsync(string streamName, int count = int.MaxValue,
-        CancellationToken ct = default)
-    {
-        if (count <= 0)
-        {
-            return EmptyEvents;
-        }
-
-        using (Telemetry.Activities.StartActivity("GetEventStore/GetEventStore"))
-        {
-            var result = new List<StoredEvent>();
-
-            var stream = QueryReverseAsync(streamName, StreamPosition.End, count, ct);
-
-            await foreach (var storedEvent in stream.IgnoreNotFound(ct))
-            {
-                result.Add(storedEvent);
-            }
-
-            return result.ToList();
-        }
-    }
-
     public async Task<IReadOnlyList<StoredEvent>> QueryStreamAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
         CancellationToken ct = default)
     {

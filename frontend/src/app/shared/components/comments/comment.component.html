@@ -28,7 +28,7 @@
             </button>
         
             <button *ngIf="isDeletable || canDelete" type="button" class="btn btn-sm btn-text-danger"
-                (sqxConfirmClick)="doDelete()"
+                (sqxConfirmClick)="delete()"
                 confirmTitle="i18n:comments.deleteConfirmTitle"
                 confirmText="i18n:comments.deleteConfirmText"
                 confirmRememberKey="deleteComment"
@@ -41,7 +41,7 @@
     <ng-template #editing>
         <div class="col">
             <form (ngSubmit)="update()">
-                <textarea class="form-control mb-1" name="{{commentId}}" sqxFocusOnInit [(ngModel)]="editingText" 
+                <textarea class="form-control mb-1" name="{{commentIndex}}" sqxFocusOnInit [(ngModel)]="editingText" 
                     [mention]="$any(mentionUsers)"
                     [mentionConfig]="mentionConfig"
                     (keydown)="updateWhenEnter($event)">

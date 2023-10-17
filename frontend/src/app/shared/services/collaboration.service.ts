@@ -33,13 +33,12 @@ export class CollaborationService {
                         let result: Profile[] = [];
 
                         awareness!.getStates().forEach(state => {
-                            if (Object.keys(state).length > 0) {
-                                result.push(state as Profile);
+                            if (Object.keys(state?.user).length > 0) {
+                                result.push(state.user as Profile);
                             }
                         });
 
                         result.sortByString(x => x.displayName);
-
                         observer.next(result);
                     };
 
@@ -84,7 +83,7 @@ export class CollaborationService {
         if (user) {
             const { id, email, displayName } = user;
 
-            yProvider.awareness?.setLocalState({ id, email, displayName });
+            yProvider.awareness?.setLocalStateField('user', { id, email, displayName });
         }
 
         this.provider.next({ provider: yProvider, doc: yDocument });

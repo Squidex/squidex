@@ -34,28 +34,6 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
         }
     }
 
-    public async Task<IReadOnlyList<StoredEvent>> QueryStreamReverseAsync(string streamName, int count = int.MaxValue,
-        CancellationToken ct = default)
-    {
-        if (count <= 0)
-        {
-            return EmptyEvents;
-        }
-
-        using (Telemetry.Activities.StartActivity("MongoEventStore/QueryLatestAsync"))
-        {
-            var filter = FilterExtensions.ByStream(StreamFilter.Name(streamName));
-
-            var commits =
-                await Collection.Find(filter).Sort(Sort.Descending(x => x.Timestamp)).Limit(count)
-                    .ToListAsync(ct);
-
-            var result = commits.Select(x => x.Filtered()).Reverse().SelectMany(x => x).TakeLast(count).ToList();
-
-            return result;
-        }
-    }
-
     public async Task<IReadOnlyList<StoredEvent>> QueryStreamAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
         CancellationToken ct = default)
     {

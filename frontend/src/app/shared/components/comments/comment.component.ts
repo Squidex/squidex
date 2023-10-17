@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MentionConfig } from 'angular-mentions';
-import { Comment, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
+import { Comment, ContributorDto, DialogService, Keys, SharedArray, StatefulComponent } from '@app/shared/internal';
 
 interface State {
     isEditing: boolean;
@@ -20,12 +20,6 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentComponent extends StatefulComponent<State> {
-    @Output()
-    public delete = new EventEmitter();
-
-    @Output()
-    public edit = new EventEmitter<string>();
-
     @Input({ transform: booleanAttribute })
     public canFollow?: boolean | null;
 
@@ -42,7 +36,10 @@ export class CommentComponent extends StatefulComponent<State> {
     public comment!: Comment;
 
     @Input({ required: true })
-    public commentId!: any;
+    public commentIndex!: number;
+
+    @Input({ required: true })
+    public comments!: SharedArray<Comment>;
 
     @Input()
     public userToken = '';
@@ -80,12 +77,12 @@ export class CommentComponent extends StatefulComponent<State> {
         this.next({ isEditing: false });
     }
 
-    public doDelete() {
+    public delete() {
         if (!this.isDeletable && !this.canDelete) {
             return;
         }
 
-        this.delete.emit();
+        this.comments.remove(this.commentIndex);
     }
 
     public updateWhenEnter(event: KeyboardEvent) {
@@ -109,12 +106,11 @@ export class CommentComponent extends StatefulComponent<State> {
             this.dialogs.confirm('i18n:comments.deleteConfirmTitle', 'i18n:comments.deleteConfirmText')
                 .subscribe(confirmed => {
                     if (confirmed) {
-                        this.doDelete();
+                        this.delete();
                     }
                 });
         } else {
-            this.edit.emit(text);
-
+            this.comments.set(this.commentIndex, { ...this.comment, text });
             this.cancelEdit();
         }
     }

@@ -2,7 +2,7 @@
     <span class="nav-link dropdown-toggle" (click)="modalMenu.show()">
         <i class="icon-comments"></i>
 
-        <span class="badge rounded-pill badge-danger" *ngIf="commentsUnread">{{commentsUnread}}</span>
+        <span class="badge rounded-pill badge-danger" *ngIf="commentsUnread | async; let unread">{{unread}}</span>
     </span>
 </li>
 
@@ -12,13 +12,13 @@
             {{ 'notifications.empty' | sqxTranslate}}
         </small>
 
-        <sqx-comment *ngFor="let comment of comments; trackBy: trackByComment; let i = index"
+        <sqx-comment *ngFor="let comment of comments.slice().reverse(); trackBy: trackByComment; let i = index"
             [comment]="$any(comment)"
-            [commentId]="i"
+            [commentIndex]="i"
+            [comments]="commentsArray!"
             confirmDelete="false"
             canDelete="true"
             canFollow="true"
-            (remove)="delete(i)"
             [userToken]="userToken">
         </sqx-comment>
     </ng-container>

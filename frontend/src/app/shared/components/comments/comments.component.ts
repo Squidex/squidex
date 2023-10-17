@@ -9,16 +9,13 @@ import { Component, ElementRef, Input, QueryList, ViewChild, ViewChildren } from
 import { Router } from '@angular/router';
 import { MentionConfig } from 'angular-mentions';
 import { Observable } from 'rxjs';
-import { AppsState, AuthService, CollaborationService, Comment, ContributorsState, SharedArray, UpsertCommentForm } from '@app/shared/internal';
+import { AuthService, CollaborationService, Comment, ContributorsState, SharedArray, UpsertCommentForm } from '@app/shared/internal';
 import { CommentComponent } from './comment.component';
 
 @Component({
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
-    providers: [
-        CollaborationService,
-    ],
 })
 export class CommentsComponent {
     @ViewChild('commentsList', { static: false })
@@ -40,7 +37,6 @@ export class CommentsComponent {
     public userToken = '';
 
     constructor(authService: AuthService,
-        private readonly appsState: AppsState,
         private readonly collaboration: CollaborationService,
         private readonly contributorsState: ContributorsState,
         private readonly router: Router,
@@ -49,9 +45,6 @@ export class CommentsComponent {
     }
 
     public ngOnChanges() {
-        const basePath = `apps/${this.appsState.appName}/comments2/${this.commentsId}`;
-
-        this.collaboration.connect(basePath);
         this.commentsArray = this.collaboration.getArray<Comment>('stream');
     }
 
@@ -69,14 +62,6 @@ export class CommentsComponent {
                 this.commentsList.nativeElement.scrollTop = height;
             }
         }
-    }
-
-    public delete(comments: SharedArray<Comment>, index: number) {
-        comments.remove(index);
-    }
-
-    public replace(comments: SharedArray<Comment>, comment: Comment, text: string, index: number) {
-        comments.set(index, { ...comment, text });
     }
 
     public comment(comments: SharedArray<Comment>) {

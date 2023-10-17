@@ -5,13 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Comments;
 
 [EventType(nameof(CommentCreated))]
-public sealed class CommentCreated : CommentsEvent
+public sealed class CommentCreated : AppEvent
 {
+    public DomainId CommentsId { get; set; }
+
+    public DomainId CommentId { get; set; }
+
     public string Text { get; set; }
 
     public string[]? Mentions { get; set; }

@@ -4,7 +4,8 @@
             <div (sqxResized)="scrollDown()">
                 <sqx-comment *ngFor="let comment of comments.itemsChanges | async; trackBy: trackByComment; let i = index"
                     [comment]="comment"
-                    [commentId]="i"
+                    [commentIndex]="i"
+                    [comments]="comments"
                     [mentionUsers]="users"
                     canEdit="true"
                     canFollow="false"
