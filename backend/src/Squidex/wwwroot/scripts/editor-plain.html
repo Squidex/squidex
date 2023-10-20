@@ -4,39 +4,31 @@
 
     <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
     <script src="editor-sdk.js"></script>
-	
+
+    <link rel="stylesheet" type="text/css" href="https://cloud.squidex.io/styles.css">
     <style>
-        .editor {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            height: 500px;
-			width: 100%;
+        body {
+            background-color: white;
         }
 
-        .btn {
-			background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-			padding: 8px 15px;
-			margin-right: 5px;
-			margin-bottom: 5px;
+        textarea {
+            height: 300px;
         }
     </style>
-
 </head>
 
 <body style="margin: 0px; padding: 0px;">
-	<div>
-		<button class="btn" id="expanded">
+	<div class="mb-2">
+		<button class="btn btn-outline-secondary" id="expanded">
 			Toggle Expanded
 		</button>
-		<button class="btn" id="fullscreen">
+		<button class="btn btn-outline-secondary" id="fullscreen">
 			Toggle Fullscreen
 		</button>
 	</div>
 
 	<div>
-		<textarea name="content" class="editor" id="editor"></textarea>
+		<textarea class="form-control" id="editor"></textarea>
 	</div>
 
 	<script>

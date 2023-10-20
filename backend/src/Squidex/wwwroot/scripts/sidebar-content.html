@@ -7,14 +7,10 @@
     <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
     <script src="editor-sdk.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="https://cloud.squidex.io/styles.css">
     <style>
-        textarea {
-            box-sizing: border-box; 
-            border: 0;
-            border-radius: 0;
-            resize: none;
-            overflow: hidden;
-            width: 100%;
+        body {
+            background-color: white;
         }
     </style>
 </head>
@@ -27,7 +23,7 @@
         }
     </script>
 
-    <textarea oninput="grow(this)" name="content" id="editor"></textarea>
+    <textarea class="form-control" oninput="grow(this)" id="editor"></textarea>
 
     <script>
         var element = document.getElementById('editor');

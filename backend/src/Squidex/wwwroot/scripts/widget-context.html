@@ -7,23 +7,16 @@
     <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
     <script src="editor-sdk.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="https://cloud.squidex.io/styles.css">
     <style>
-        textarea {
-            border-radius: 0;
-            border: 0;
-            bottom: 0;
-            box-sizing: border-box; 
-            left: 0;
-            position: fixed;
-            resize: none;
-            right: 0;
-            top: 0;
+        body {
+            background-color: white;
         }
     </style>
 </head>
 
 <body>
-    <textarea name="content" id="editor"></textarea>
+    <textarea class="form-control" id="editor"></textarea>
 
     <script>
         var element = document.getElementById('editor');

@@ -43,7 +43,6 @@ export * from './components/contents/content-value-editor.component';
 export * from './components/contents/content-value.component';
 export * from './components/contents/translation-status.component';
 export * from './components/forms/geolocation-editor.component';
-export * from './components/forms/markdown-editor.component';
 export * from './components/forms/rich-editor.component';
 export * from './components/help/help-markdown.pipe';
 export * from './components/help/help.component';
