@@ -43,6 +43,9 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     public isExpanded = false;
 
     @Input({ required: true })
+    public schemaIds?: ReadonlyArray<string>;
+
+    @Input({ required: true })
     public context: any = {};
 
     @Input({ required: true })
@@ -213,7 +216,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
                 if (correlationId) {
                     this.contentsQuery = query;
                     this.contentsCorrelationId = correlationId;
-                    this.contentsSchemas = schemas;
+                    this.contentsSchemas = this.schemaIds && this.schemaIds.length > 0 ? this.schemaIds : schemas;
                     this.contentsDialog.show();
                 }
             }

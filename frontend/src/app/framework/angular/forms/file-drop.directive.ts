@@ -121,7 +121,6 @@ export class FileDropDirective {
         }
 
         const files: File[] = [];
-
         const items = getItems(dataTransfer);
 
         // Loop over files first, otherwise Chromes deletes them in the async call.
@@ -139,7 +138,7 @@ export class FileDropDirective {
 
                 if (webkitEntry && webkitEntry.isDirectory) {
                     // eslint-disable-next-line no-await-in-loop
-                    await this.transferWebkitTree(webkitEntry, files);
+                    await this.traverseWebkitTree(webkitEntry, files);
                 }
             }
         }
@@ -151,7 +150,7 @@ export class FileDropDirective {
         return files;
     }
 
-    private async transferWebkitTree(item: any, files: File[]) {
+    private async traverseWebkitTree(item: any, files: File[]) {
         if (item.isFile) {
             const file = await getFilePromise(item);
 
@@ -163,7 +162,7 @@ export class FileDropDirective {
 
             for (const entry of entries) {
                 // eslint-disable-next-line no-await-in-loop
-                await this.transferWebkitTree(entry, files);
+                await this.traverseWebkitTree(entry, files);
             }
         }
     }
