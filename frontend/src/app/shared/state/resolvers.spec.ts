@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { UIOptions } from '@app/framework';
@@ -34,8 +35,11 @@ describe('ResolveContents', () => {
     ];
 
     beforeEach(() => {
-        contentsService = Mock.ofType<ContentsService>();
-        contentsResolver = new ResolveContents(uiOptions, appsState.object, contentsService.object);
+        TestBed.configureTestingModule({ providers: [{ provide: UIOptions, useValue: uiOptions }] });
+        TestBed.runInInjectionContext(() => {
+            contentsService = Mock.ofType<ContentsService>();
+            contentsResolver = new ResolveContents(appsState.object, contentsService.object);
+        });
     });
 
     it('should not resolve contents immediately', () => {
