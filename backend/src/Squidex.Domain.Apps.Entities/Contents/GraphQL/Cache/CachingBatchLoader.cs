@@ -21,11 +21,11 @@ internal class CachingBatchDataLoader<TKey, T> : DataLoaderBase<CacheableId<TKey
     private readonly IQueryCache<TKey, T> queryCache;
     private readonly Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> queryDelegate;
 
-    public CachingBatchDataLoader(IQueryCache<TKey, T> queryStore,
+    public CachingBatchDataLoader(IQueryCache<TKey, T> queryCache,
         Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> queryDelegate, bool canCache = true, int maxBatchSize = int.MaxValue)
         : base(canCache, maxBatchSize)
     {
-        this.queryCache = queryStore;
+        this.queryCache = queryCache;
         this.queryDelegate = queryDelegate;
     }
 

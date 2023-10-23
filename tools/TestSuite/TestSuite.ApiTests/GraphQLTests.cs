@@ -47,13 +47,17 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var query = new
         {
             query = @"
-                {
-                    findMyWritesContent(id: ""<ID>"") {
+                query ContentsQuery($id: String!) {
+                    findMyWritesContent(id: $id) {
                         flatData {
                             json
                         }   
                     }
-                }".Replace("<ID>", content_0.Id, StringComparison.Ordinal)
+                }",
+            variables = new
+            {
+                id = content_0.Id,
+            }
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -388,6 +392,44 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Order();
 
         Assert.Equal(new[] { "Bavaria", "Leipzig", "Munich", "Saxony" }, names);
+    }
+
+    [Fact]
+    public async Task Should_query_multiple_items_with_separate_queries()
+    {
+        var allCities = await _.Cities.GetAsync();
+
+        var query = new
+        {
+            query = @"
+                query ContentsQuery($id1: String!, $id2: String!) {
+                    a: findCitiesContent(id: $id1, version: 0) {
+                        id,
+                        flatData {
+                            name
+                        }
+                    },
+                    b: findCitiesContent(id: $id2, version: 0) {
+                        id,
+                        flatData {
+                            name
+                        }
+                    }
+                }",
+            variables = new
+            {
+                id1 = allCities.Items[0].Id,
+                id2 = allCities.Items[1].Id,
+            }
+        };
+
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
+
+        var city1Id = result["a"]["id"].ToString();
+        var city2Id = result["b"]["id"].ToString();
+
+        Assert.Equal(allCities.Items[0].Id, city1Id);
+        Assert.Equal(allCities.Items[1].Id, city2Id);
     }
 
     [Fact]

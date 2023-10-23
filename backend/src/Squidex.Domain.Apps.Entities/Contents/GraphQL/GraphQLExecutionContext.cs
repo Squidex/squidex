@@ -77,7 +77,9 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
 
     public IDataLoaderResult<IEnrichedContentEntity?> GetContent(DomainId schemaId, DomainId id, long version)
     {
-        return dataLoaders.Context!.GetOrAddLoader(nameof(GetContent), ct =>
+        var cacheKey = $"{nameof(GetContent)}_{schemaId}_{id}_{version}";
+
+        return dataLoaders.Context!.GetOrAddLoader(cacheKey, ct =>
         {
             return FindContentAsync(schemaId.ToString(), id, version, ct);
         }).LoadAsync();
