@@ -242,6 +242,13 @@ function SquidexFormField() {
     var value;
     var valueHandler;
 
+    function raiseInit() {
+        if (initHandler && !initCalled && context) {
+            initHandler(context);
+            initCalled = true;
+        }
+    }
+
     function raiseDisabled() {
         if (disabledHandler) {
             disabledHandler(disabled);
@@ -281,13 +288,6 @@ function SquidexFormField() {
     function raisedMoved() {
         if (movedHandler && isNumber(index)) {
             movedHandler(index);
-        }
-    }
-
-    function raiseInit() {
-        if (initHandler && !initCalled && context) {
-            initHandler(context);
-            initCalled = true;
         }
     }
 
@@ -451,7 +451,7 @@ function SquidexFormField() {
         },
 
         /**
-         * Notifies the parent to go to fullscreen mode.
+         * Notifies the parent to toggle the fullscreen mode.
          */
         toggleFullscreen: function () {
             if (window.parent) {
@@ -460,7 +460,7 @@ function SquidexFormField() {
         },
 
         /**
-         * Notifies the parent to go to expanded mode.
+         * Notifies the parent to toggle the expanded mode.
          */
         toggleExpanded: function () {
             if (window.parent) {
@@ -517,10 +517,7 @@ function SquidexFormField() {
 
             var correlationId = new Date().getTime().toString();
 
-            currentConfirm = {
-                correlationId: correlationId,
-                callback: callback
-            };
+            currentConfirm = { correlationId: correlationId, callback: callback };
 
             if (window.parent) {
                 window.parent.postMessage({ type: 'confirm', title: title, text: text, correlationId: correlationId }, '*');
@@ -539,10 +536,7 @@ function SquidexFormField() {
 
             var correlationId = new Date().getTime().toString();
 
-            currentPickAssets = {
-                correlationId: correlationId,
-                callback: callback
-            };
+            currentPickAssets = { correlationId: correlationId, callback: callback };
 
             if (window.parent) {
                 window.parent.postMessage({ type: 'pickAssets', correlationId: correlationId }, '*');
@@ -563,13 +557,19 @@ function SquidexFormField() {
 
             var correlationId = new Date().getTime().toString();
 
-            currentPickContents = {
-                correlationId: correlationId,
-                callback: callback,
-            };
+            currentPickContents = { correlationId: correlationId, callback: callback };
 
             if (window.parent) {
                 window.parent.postMessage({ type: 'pickContents', correlationId: correlationId, schemas: schemas, query: query }, '*');
+            }
+        },
+
+        /**
+         * Shows a dialog to pick a file.
+         */
+        pickFile: function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'pickFile' }, '*');
             }
         },
 

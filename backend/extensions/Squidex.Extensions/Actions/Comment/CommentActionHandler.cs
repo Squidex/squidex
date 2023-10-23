@@ -7,7 +7,7 @@
 
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Entities.Comments;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 
@@ -16,12 +16,12 @@ namespace Squidex.Extensions.Actions.Comment;
 public sealed class CommentActionHandler : RuleActionHandler<CommentAction, CommentCreated>
 {
     private const string Description = "Send a Comment";
-    private readonly INotificationPublisher publisher;
+    private readonly ICollaborationService collaboration;
 
-    public CommentActionHandler(RuleEventFormatter formatter, INotificationPublisher publisher)
+    public CommentActionHandler(RuleEventFormatter formatter, ICollaborationService collaboration)
         : base(formatter)
     {
-        this.publisher = publisher;
+        this.collaboration = collaboration;
     }
 
     protected override async Task<(string Description, CommentCreated Data)> CreateJobAsync(EnrichedEvent @event, CommentAction action)
@@ -67,7 +67,7 @@ public sealed class CommentActionHandler : RuleActionHandler<CommentAction, Comm
             return Result.Ignored();
         }
 
-        await publisher.CommentAsync(job.AppId, job.CommentsId, job.Text, job.Actor, job.Url, true, ct);
+        await collaboration.CommentAsync(job.AppId, job.CommentsId, job.Text, job.Actor, job.Url, true, ct);
 
         return Result.Success($"Commented: {job.Text}");
     }

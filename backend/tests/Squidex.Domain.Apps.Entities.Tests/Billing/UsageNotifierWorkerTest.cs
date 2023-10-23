@@ -8,7 +8,7 @@
 using NodaTime;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Notifications;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.TestHelpers;

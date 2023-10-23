@@ -7,14 +7,16 @@
 
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { DialogService, LoadingService, Notification, ResourceOwner, UIOptions } from '@app/shared';
+import { DialogService, LoadingService, Notification, Subscriptions, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-internal-area',
     styleUrls: ['./internal-area.component.scss'],
     templateUrl: './internal-area.component.html',
 })
-export class InternalAreaComponent extends ResourceOwner implements OnInit {
+export class InternalAreaComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public readonly isEmbedded = inject(UIOptions).value.embedded;
 
     constructor(
@@ -22,11 +24,10 @@ export class InternalAreaComponent extends ResourceOwner implements OnInit {
         private readonly dialogs: DialogService,
         private readonly route: ActivatedRoute,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.route.queryParams.subscribe(params => {
                 const successMessage = params['successMessage'];
 

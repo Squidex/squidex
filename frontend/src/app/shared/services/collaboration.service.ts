@@ -5,62 +5,66 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, of, switchMap } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { BehaviorSubject, distinctUntilChanged, map, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
-import { ApiUrlConfig } from '../internal';
+import { Types, UIOptions } from '@app/framework';
 import { AuthService, Profile } from './auth.service';
+
+type AwarenessState = { user: Profile; [key: string]: any };
 
 @Injectable()
 export class CollaborationService {
     private readonly provider = new BehaviorSubject<{ doc: Y.Doc; provider: WebsocketProvider } | null>(null);
-    private readonly basePath: string;
+    private readonly basePath = inject(UIOptions).value.collaborationService;
+    private readonly profile: Profile;
     private previousName?: string | null;
 
-    public awareness =
+    public awarenessChanges =
         this.provider.pipe(map(x => x?.provider.awareness));
 
-    public users =
-        this.awareness.pipe(
+    public userChanges =
+        this.awarenessChanges.pipe(
             switchMap(awareness => {
                 if (!awareness) {
                     return of([]);
                 }
 
-                return new Observable<Profile[]>(observer => {
-                    const updateUsers = () => {
-                        let result: Profile[] = [];
+                return new Observable<AwarenessState[]>(observer => {
+                    const getStates = () => {
+                        let result: AwarenessState[] = [];
 
-                        awareness!.getStates().forEach(state => {
-                            if (Object.keys(state?.user).length > 0) {
-                                result.push(state.user as Profile);
+                        awareness!.getStates().forEach((state, clientId) => {
+                            if (clientId == awareness.clientID) {
+                                return;
                             }
+
+                            if (!state.user || state.user.id === this.profile.id) {
+                                return;
+                            }
+
+                            result.push({ user: state.user, ...state });
                         });
 
-                        result.sortByString(x => x.displayName);
+                        result.sortByString(x => x.user.displayName);
+
                         observer.next(result);
                     };
 
-                    updateUsers();
-                    awareness.on('change', updateUsers);
+                    getStates();
+                    awareness.on('change', getStates);
 
                     return () => {
-                        awareness.off('change', updateUsers);
+                        awareness.off('change', getStates);
                     };
                 });
-            }));
+            }),
+            distinctUntilChanged<AwarenessState[]>(Types.equals),
+            shareReplay());
 
-    public otherUsers =
-        this.users.pipe(map(x => x.filter(u => u.id !== this.authService.user?.id)));
-
-    constructor(apiUrl: ApiUrlConfig,
-        private readonly authService: AuthService,
-    ) {
-        this.basePath =
-            apiUrl.buildUrl('/api/')
-                .replace('http://', 'ws://')
-                .replace('https://', 'wss://');
+    constructor(authService: AuthService) {
+        this.profile = authService.user!;
     }
 
     public connect(name: string | null) {
@@ -76,15 +80,11 @@ export class CollaborationService {
         }
 
         const yDocument = new Y.Doc();
-        const yProvider = new WebsocketProvider(this.basePath, `${name}?access_token=${this.authService.user?.accessToken}`, yDocument);
+        const yProvider = new WebsocketProvider(this.basePath, `api/${name}?access_token=${this.profile.accessToken}`, yDocument);
 
-        const user = this.authService.user!;
+        const { id, email, displayName } = this.profile;
 
-        if (user) {
-            const { id, email, displayName } = user;
-
-            yProvider.awareness?.setLocalStateField('user', { id, email, displayName });
-        }
+        yProvider.awareness?.setLocalStateField('user', { id, email, displayName });
 
         this.provider.next({ provider: yProvider, doc: yDocument });
     }
@@ -100,6 +100,10 @@ export class CollaborationService {
 
     public getMap<T>(name: string) {
         return this.provider.pipe(map(p => new SharedMap<T>(p?.doc.getMap(name))));
+    }
+
+    public updateAwareness(key: string, value: any) {
+        this.provider.value?.provider.awareness.setLocalStateField(key, value);
     }
 }
 

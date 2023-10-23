@@ -6,12 +6,14 @@
  */
 
 import { Directive, ElementRef, HostBinding, Input, NgZone, OnInit, Renderer2 } from '@angular/core';
-import { ResourceOwner } from '@app/framework/internal';
+import { Subscriptions } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxImageUrl]',
 })
-export class ImageUrlDirective extends ResourceOwner implements  OnInit {
+export class ImageUrlDirective implements  OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     @Input('sqxImageUrl') @HostBinding('attr.src')
     public imageUrl!: string;
 
@@ -20,17 +22,16 @@ export class ImageUrlDirective extends ResourceOwner implements  OnInit {
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
     ) {
-        super();
     }
 
     public ngOnInit() {
         this.zone.runOutsideAngular(() => {
-            this.own(
+            this.subscriptions.add(
                 this.renderer.listen(this.element.nativeElement, 'load', () => {
                     this.onLoad();
                 }));
 
-            this.own(
+            this.subscriptions.add(
                 this.renderer.listen(this.element.nativeElement, 'error', () => {
                     this.onError();
                 }));

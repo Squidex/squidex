@@ -11,7 +11,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, getTableConfig, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, getTableConfig, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, Settings, Subscriptions, switchSafe, TableSettings, TempService, TranslationStatus, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -22,7 +22,9 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
         Router2State,
     ],
 })
-export class ContentsPageComponent extends ResourceOwner implements OnInit {
+export class ContentsPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector!: DueTimeSelectorComponent;
 
@@ -71,7 +73,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         private readonly tempService: TempService,
         private readonly uiState: UIState,
     ) {
-        super();
     }
 
     public ngOnInit() {
@@ -79,13 +80,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             this.contributorsState.loadIfNotLoaded();
         }
 
-        this.own(
+        this.subscriptions.add(
             this.languagesState.isoMasterLanguage
                 .subscribe(language => {
                     this.language = language;
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.languagesState.isoLanguages
                 .subscribe(languages => {
                     this.languages = languages;
@@ -102,7 +103,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
         this.tableSettings = tableSetting$;
 
-        this.own(
+        this.subscriptions.add(
             tableConfig$
                 .subscribe(({ fieldNames, schema }) => {
                     if (this.schema?.id !== schema.id) {
@@ -131,7 +132,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     }
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.contentsState.contents
                 .subscribe(contents => {
                     this.updateSelectionSummary();

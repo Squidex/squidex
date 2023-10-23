@@ -28,15 +28,19 @@
     </ng-container>
 
     <ng-container>
-        <sqx-content-section *ngFor="let section of contentForm.sections; trackBy: trackBySection"
-            [(language)]="language"
-            [form]="contentForm"
-            [formCompare]="contentFormCompare"
-            [formContext]="formContext"
-            [formLevel]="0"
-            [formSection]="section"
-            [languages]="languages"
-            [schema]="schema">
-        </sqx-content-section>
+        <div class="cursors" sqxCursors>
+            <sqx-content-section *ngFor="let section of contentForm.sections; trackBy: trackBySection"
+                [(language)]="language"
+                [form]="contentForm"
+                [formCompare]="contentFormCompare"
+                [formContext]="formContext"
+                [formLevel]="0"
+                [formSection]="section"
+                [languages]="languages"
+                [schema]="schema">
+            </sqx-content-section>
+
+            <sqx-cursors></sqx-cursors>
+        </div>
     </ng-container>
 </sqx-list-view>

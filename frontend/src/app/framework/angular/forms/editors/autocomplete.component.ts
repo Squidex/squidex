@@ -9,7 +9,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, Ele
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
-import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
+import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Subscriptions, Types } from '@app/framework/internal';
 
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
@@ -45,6 +45,7 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
+    private readonly subscriptions = new Subscriptions();
     private readonly modalStream = new Subject<string>();
     private timer: any;
 
@@ -133,7 +134,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                 }),
                 debounceTime(this.debounceTime));
 
-        this.own(
+        this.subscriptions.add(
             merge(inputStream, this.modalStream).pipe(
                 switchMap(query => {
                     if (!this.itemsSource) {

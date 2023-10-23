@@ -1,0 +1,19 @@
+@import 'mixins';
+@import 'vars';
+
+.root {
+    position: relative;
+}
+
+.cursor {
+    position: absolute;
+}
+
+.user {
+    @include absolute(-20px, null, null, 10px);
+    color: $color-white;
+    font-size: $font-small;
+    font-weight: normal;
+    padding: .125rem .25rem;
+    white-space: nowrap;
+}

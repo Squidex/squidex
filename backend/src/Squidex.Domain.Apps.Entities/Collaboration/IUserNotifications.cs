@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Notifications;
+namespace Squidex.Domain.Apps.Entities.Collaboration;
 
 public interface IUserNotifications
 {

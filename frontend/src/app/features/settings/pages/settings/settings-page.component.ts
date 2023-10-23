@@ -6,14 +6,16 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { AppSettingsDto, AppsState, EditAppSettingsForm, ResourceOwner } from '@app/shared';
+import { AppSettingsDto, AppsState, EditAppSettingsForm, Subscriptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-settings-page',
     styleUrls: ['./settings-page.component.scss'],
     templateUrl: './settings-page.component.html',
 })
-export class SettingsPageComponent extends ResourceOwner implements OnInit {
+export class SettingsPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public isEditable = false;
 
     public editForm = new EditAppSettingsForm();
@@ -22,13 +24,12 @@ export class SettingsPageComponent extends ResourceOwner implements OnInit {
     constructor(
         private readonly appsState: AppsState,
     ) {
-        super();
     }
 
     public ngOnInit() {
         this.appsState.loadSettings();
 
-        this.own(
+        this.subscriptions.add(
             this.appsState.selectedSettings
                 .subscribe(settings => {
                     if (settings) {

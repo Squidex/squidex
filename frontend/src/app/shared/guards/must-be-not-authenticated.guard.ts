@@ -15,7 +15,7 @@ import { AuthService } from './../services/auth.service';
 
 @Injectable()
 export class MustBeNotAuthenticatedGuard  {
-    private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;
+    private readonly options = inject(UIOptions);
 
     constructor(
         private readonly authService: AuthService,
@@ -25,7 +25,7 @@ export class MustBeNotAuthenticatedGuard  {
     }
 
     public canActivate(snapshot: ActivatedRouteSnapshot): Observable<boolean> {
-        const redirect = this.redirectToLogin && !snapshot.queryParams.logout;
+        const redirect = this.options.value.redirectToLogin && !snapshot.queryParams.logout;
 
         return this.authService.userChanges.pipe(
             take(1),

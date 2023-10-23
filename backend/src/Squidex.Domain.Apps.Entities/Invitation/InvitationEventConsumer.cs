@@ -7,7 +7,7 @@
 
 using Microsoft.Extensions.Logging;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Notifications;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure;

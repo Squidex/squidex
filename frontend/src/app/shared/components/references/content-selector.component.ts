@@ -8,7 +8,7 @@
 import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState, Subscriptions } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-selector',
@@ -18,7 +18,8 @@ import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDt
         ComponentContentsState,
     ],
 })
-export class ContentSelectorComponent extends ResourceOwner implements OnInit {
+export class ContentSelectorComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
     private initialQuery?: string = undefined;
 
     public readonly metaFields = META_FIELDS;
@@ -78,13 +79,12 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         public readonly schemasState: SchemasState,
         public readonly schemasService: SchemasService,
     ) {
-        super();
     }
 
     public ngOnInit() {
         this.initialQuery = this.query;
 
-        this.own(
+        this.subscriptions.add(
             this.contentsState.statuses
                 .subscribe(() => {
                     this.updateModel();

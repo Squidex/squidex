@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { fadeAnimation, StatefulComponent, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
+import { fadeAnimation, StatefulComponent, Subscriptions, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
 
 interface State {
     // The when the section is collapsed.
@@ -23,6 +23,8 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TourGuideComponent extends StatefulComponent<State> implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     constructor(
         public readonly tourState: TourState,
         public readonly tourService: TourService,
@@ -31,13 +33,13 @@ export class TourGuideComponent extends StatefulComponent<State> implements OnIn
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.tourService.stepShow$
                 .subscribe(() => {
                     this.next({ isCollapsed: true });
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.tourService.end$
                 .subscribe(() => {
                     this.next({ isCollapsed: false });

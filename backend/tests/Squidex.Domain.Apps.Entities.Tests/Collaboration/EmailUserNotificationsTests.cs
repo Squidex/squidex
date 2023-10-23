@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Email;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Notifications;
+namespace Squidex.Domain.Apps.Entities.Collaboration;
 
 public class EmailUserNotificationsTests : GivenContext
 {

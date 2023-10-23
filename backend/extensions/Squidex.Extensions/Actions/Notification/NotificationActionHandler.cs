@@ -7,7 +7,7 @@
 
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Entities.Comments;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
@@ -17,13 +17,13 @@ namespace Squidex.Extensions.Actions.Notification;
 public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, CommentCreated>
 {
     private const string Description = "Send a Notification";
-    private readonly INotificationPublisher publisher;
+    private readonly ICollaborationService collaboration;
     private readonly IUserResolver userResolver;
 
-    public NotificationActionHandler(RuleEventFormatter formatter, INotificationPublisher publisher, IUserResolver userResolver)
+    public NotificationActionHandler(RuleEventFormatter formatter, ICollaborationService collaboration, IUserResolver userResolver)
         : base(formatter)
     {
-        this.publisher = publisher;
+        this.collaboration = collaboration;
         this.userResolver = userResolver;
     }
 
@@ -78,7 +78,7 @@ public sealed class NotificationActionHandler : RuleActionHandler<NotificationAc
             return Result.Ignored();
         }
 
-        await publisher.NotifyAsync(job.CommentsId.ToString(), job.Text, job.Actor, job.Url, true, ct);
+        await collaboration.NotifyAsync(job.CommentsId.ToString(), job.Text, job.Actor, job.Url, true, ct);
 
         return Result.Success($"Notified: {job.Text}");
     }

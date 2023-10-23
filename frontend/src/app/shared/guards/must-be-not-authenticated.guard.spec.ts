@@ -6,6 +6,7 @@
  */
 
 import { Location } from '@angular/common';
+import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
@@ -24,13 +25,15 @@ describe('MustBeNotAuthenticatedGuard', () => {
         uiOptions.value.redirectToLogin = false;
 
         location = Mock.ofType<Location>();
-
-        location.setup(x => x.path(true))
-            .returns(() => '/my-path');
+        location.setup(x => x.path(true)).returns(() => '/my-path');
 
         router = Mock.ofType<Router>();
-        authService = Mock.ofType<AuthService>();
-        authGuard = new MustBeNotAuthenticatedGuard(authService.object, location.object, router.object, uiOptions);
+
+        TestBed.configureTestingModule({ providers: [{ provide: UIOptions, useValue: uiOptions }] });
+        TestBed.runInInjectionContext(() => {
+            authService = Mock.ofType<AuthService>();
+            authGuard = new MustBeNotAuthenticatedGuard(authService.object, location.object, router.object);
+        });
     });
 
     it('should navigate to app page if authenticated', async () => {

@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CollaborationService } from '@app/shared/internal';
+import { CollaborationService, Profile } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-watching-users',
@@ -18,5 +18,9 @@ export class WatchingUsersComponent {
     constructor(
         public readonly collaboration: CollaborationService,
     ) {
+    }
+
+    public trackByUser(_: number, item: { user: Profile }) {
+        return item.user.id;
     }
 }

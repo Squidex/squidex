@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { ApiUrlConfig, AuthService, Cookies, ModalModel, StatefulComponent, UILanguages, UIOptions, UIState } from '@app/shared';
+import { ApiUrlConfig, AuthService, Cookies, ModalModel, StatefulComponent, Subscriptions, UILanguages, UIOptions, UIState } from '@app/shared';
 
 interface State {
     // The display name of the user.
@@ -32,6 +32,8 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public readonly modalMenu = new ModalModel();
 
     public readonly language = inject(UIOptions).value.culture;
@@ -52,7 +54,7 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.authService.userChanges
                 .subscribe(user => {
                     if (user) {

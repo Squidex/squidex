@@ -9,7 +9,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ContentsDto } from '@app/shared';
-import { ContentDto, getContentValue, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent, TypedSimpleChanges, Types, value$ } from '@app/shared/internal';
+import { ContentDto, getContentValue, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared/internal';
 
 export const SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceDropdownComponent), multi: true,
@@ -40,6 +40,7 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
+    private readonly subscriptions = new Subscriptions();
     private readonly contents: ContentDto[] = [];
     private isOpenedBefore = false;
     private isLoadingFailed = false;
@@ -73,7 +74,7 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
     ) {
         super({ contentNames: [] });
 
-        this.own(
+        this.subscriptions.add(
             value$(this.control)
                 .subscribe((id: string) => {
                     if (this.control.enabled) {

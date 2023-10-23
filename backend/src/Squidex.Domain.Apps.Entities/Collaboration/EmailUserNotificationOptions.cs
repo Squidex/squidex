@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Notifications;
+namespace Squidex.Domain.Apps.Entities.Collaboration;
 
 public sealed class EmailUserNotificationOptions
 {

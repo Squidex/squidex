@@ -6,16 +6,17 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Entities.Invitation;
-using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.EventSourcing;
+using YDotNet.Server;
 
 namespace Squidex.Config.Domain;
 
-public static class NotificationsServices
+public static class CollaborationServices
 {
-    public static void AddSquidexNotifications(this IServiceCollection services, IConfiguration config)
+    public static void AddSquidexCollaborations(this IServiceCollection services, IConfiguration config)
     {
         var emailOptions = config.GetSection("email:smtp").Get<SmtpOptions>() ?? new ();
 
@@ -40,5 +41,8 @@ public static class NotificationsServices
 
         services.AddSingletonAs<InvitationEventConsumer>()
             .As<IEventConsumer>();
+
+        services.AddSingletonAs<CommentCollaborationHandler>()
+            .As<ICollaborationService>().As<IDocumentCallback>();
     }
 }

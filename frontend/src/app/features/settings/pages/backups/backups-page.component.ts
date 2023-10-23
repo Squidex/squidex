@@ -8,25 +8,26 @@
 import { Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { ApiUrlConfig, BackupDto, BackupsState, ResourceOwner } from '@app/shared';
+import { ApiUrlConfig, BackupDto, BackupsState, Subscriptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-backups-page',
     styleUrls: ['./backups-page.component.scss'],
     templateUrl: './backups-page.component.html',
 })
-export class BackupsPageComponent extends ResourceOwner implements OnInit {
+export class BackupsPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     constructor(
         public readonly apiUrl: ApiUrlConfig,
         public readonly backupsState: BackupsState,
     ) {
-        super();
     }
 
     public ngOnInit() {
         this.backupsState.load(true);
 
-        this.own(timer(3000, 3000).pipe(switchMap(() => this.backupsState.load(false, true))));
+        this.subscriptions.add(timer(3000, 3000).pipe(switchMap(() => this.backupsState.load(false, true))));
     }
 
     public reload() {

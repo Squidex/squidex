@@ -20,9 +20,9 @@ using YDotNet.Document.Types.Events;
 using YDotNet.Extensions;
 using YDotNet.Server;
 
-namespace Squidex.Domain.Apps.Entities.Comments;
+namespace Squidex.Domain.Apps.Entities.Collaboration;
 
-public sealed partial class NotificationCreator : IDocumentCallback, INotificationPublisher
+public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICollaborationService
 {
     private static readonly Regex MentionRegex = BuildMentionRegex();
     private readonly IJsonSerializer jsonSerializer;
@@ -31,8 +31,11 @@ public sealed partial class NotificationCreator : IDocumentCallback, INotificati
     private readonly IUserResolver userResolver;
     private readonly IClock clock;
     private IDocumentManager? currentManager;
+    private int pendingJobs;
 
-    public NotificationCreator(
+    public bool HasPendingJobs => pendingJobs > 0;
+
+    public CommentCollaborationHandler(
         IJsonSerializer jsonSerializer,
         IEventStore eventStore,
         IEventFormatter eventFormatter,
@@ -112,48 +115,62 @@ public sealed partial class NotificationCreator : IDocumentCallback, INotificati
                 return;
             }
 
+            Interlocked.Increment(ref pendingJobs);
+
             Task.Run(async () =>
             {
-                var comments = new List<Comment>();
-
-                await @event.Source.UpdateDocAsync(@event.Context, (doc) =>
+                try
                 {
-                    using (var transaction = @event.Document.ReadTransaction())
-                    {
-                        foreach (var output in newComments)
-                        {
-                            var json = output.ToJson(transaction);
-
-                            var comment = jsonSerializer.Deserialize<Comment>(json);
-
-                            if (!comment.SkipHandlers)
-                            {
-                                comments.Add(comment);
-                            }
-                        }
-                    }
-                });
-
-                var commentsId = DomainId.Create(@event.Context.DocumentName);
-
-                foreach (var comment in comments)
+                    await HandleAsync(@event, appId, resourceId, newComments);
+                }
+                finally
                 {
-                    var @event = await CreateEventAsync(comment, appId, commentsId);
-
-                    var eventBody = Envelope.Create<IEvent>(@event);
-                    var eventData = eventFormatter.ToEventData(eventBody, Guid.NewGuid());
-
-                    await eventStore.AppendAsync(Guid.NewGuid(), commentsId.ToString(), EtagVersion.Any, new List<EventData> { eventData });
-
-                    foreach (var mentionedUser in @event.Mentions.OrEmpty())
-                    {
-                        await NotifyAsync(mentionedUser, comment.Text, RefToken.User(mentionedUser), comment.Url, true);
-                    }
+                    Interlocked.Decrement(ref pendingJobs);
                 }
             }).Forget();
         });
 
         return default;
+    }
+
+    private async Task HandleAsync(DocumentLoadEvent @event, NamedId<DomainId> appId, DomainId resourceId, Output[] newComments)
+    {
+        var comments = new List<Comment>();
+
+        await @event.Source.UpdateDocAsync(@event.Context, (doc) =>
+        {
+            using (var transaction = @event.Document.ReadTransaction())
+            {
+                foreach (var output in newComments)
+                {
+                    var json = output.ToJson(transaction);
+
+                    var comment = jsonSerializer.Deserialize<Comment>(json);
+
+                    if (!comment.SkipHandlers)
+                    {
+                        comments.Add(comment);
+                    }
+                }
+            }
+        });
+
+        var streamName = $"comments-{DomainId.Combine(appId, resourceId)}";
+
+        foreach (var comment in comments)
+        {
+            var commentEvent = await CreateEventAsync(comment, appId, resourceId);
+
+            var eventBody = Envelope.Create<IEvent>(commentEvent);
+            var eventData = eventFormatter.ToEventData(eventBody, Guid.NewGuid());
+
+            await eventStore.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, new List<EventData> { eventData });
+
+            foreach (var mentionedUser in commentEvent.Mentions.OrEmpty())
+            {
+                await NotifyAsync(mentionedUser, comment.Text, RefToken.User(mentionedUser), comment.Url, true);
+            }
+        }
     }
 
     private async Task<CommentCreated> CreateEventAsync(Comment comment, NamedId<DomainId> appId, DomainId commentsId)
@@ -206,12 +223,12 @@ public sealed partial class NotificationCreator : IDocumentCallback, INotificati
 
     public string UserDocument(string userId)
     {
-        return $"notifications/{userId}";
+        return $"users/{userId}";
     }
 
     public string ResourceDocument(NamedId<DomainId> appId, DomainId resourceId)
     {
-        return $"apps/{appId}/comments/{resourceId}";
+        return $"apps/{appId}/{resourceId}";
     }
 
     private static bool IsResourceDocument(string name, out NamedId<DomainId> appId, out DomainId resourceId)
@@ -226,13 +243,13 @@ public sealed partial class NotificationCreator : IDocumentCallback, INotificati
 
         var parts = name.Split('/');
 
-        if (parts.Length < 4 || !NamedId<DomainId>.TryParse(parts[1], DomainId.TryParse, out appId!))
+        if (parts.Length < 3 || !NamedId<DomainId>.TryParse(parts[1], DomainId.TryParse, out appId!))
         {
             appId = default!;
             return false;
         }
 
-        resourceId = DomainId.Create(string.Join('/', parts.Skip(3)));
+        resourceId = DomainId.Create(string.Join('/', parts.Skip(2)));
         return true;
     }
 

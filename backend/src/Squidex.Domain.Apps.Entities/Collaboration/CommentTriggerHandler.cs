@@ -17,7 +17,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Comments;
+namespace Squidex.Domain.Apps.Entities.Collaboration;
 
 public sealed class CommentTriggerHandler : IRuleTriggerHandler
 {
@@ -29,7 +29,6 @@ public sealed class CommentTriggerHandler : IRuleTriggerHandler
     public CommentTriggerHandler(IScriptEngine scriptEngine, IUserResolver userResolver)
     {
         this.scriptEngine = scriptEngine;
-
         this.userResolver = userResolver;
     }
 

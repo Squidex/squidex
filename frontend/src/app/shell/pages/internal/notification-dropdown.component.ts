@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { AuthService, CollaborationService, Comment, ModalModel, ResourceOwner, SharedArray } from '@app/shared';
+import { AuthService, CollaborationService, Comment, ModalModel, SharedArray, Subscriptions } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -19,7 +19,9 @@ import { Observable } from 'rxjs';
         CollaborationService,
     ],
 })
-export class NotificationDropdownComponent extends ResourceOwner implements OnInit {
+export class NotificationDropdownComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public modalMenu = new ModalModel();
 
     public commentsArray?: SharedArray<Comment>;
@@ -30,8 +32,6 @@ export class NotificationDropdownComponent extends ResourceOwner implements OnIn
     constructor(authService: AuthService,
         private readonly collaborations: CollaborationService,
     ) {
-        super();
-
         this.userToken = authService.user!.token;
     }
 
@@ -46,13 +46,13 @@ export class NotificationDropdownComponent extends ResourceOwner implements OnIn
                     return array.filter(x => !x.isRead).length;
                 }));
 
-        this.own(
+        this.subscriptions.add(
             comments$
                 .subscribe(array => {
                     this.commentsArray = array;
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.modalMenu.isOpenChanges.pipe(
                 tap(_ => {
                     this.markRead();

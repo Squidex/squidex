@@ -8,14 +8,16 @@
 import { Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FieldDto, ResourceOwner, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, valueProjection$, TypedSimpleChanges } from '@app/shared';
+import { FieldDto, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, Subscriptions, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui',
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',
 })
-export class StringUIComponent extends ResourceOwner {
+export class StringUIComponent  {
+    private readonly subscriptions = new Subscriptions();
+
     public readonly editors = STRING_FIELD_EDITORS;
 
     @Input({ required: true })
@@ -34,12 +36,11 @@ export class StringUIComponent extends ResourceOwner {
     constructor(
         public readonly schemasSource: SchemaTagSource,
     ) {
-        super();
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.fieldForm) {
-            this.unsubscribeAll();
+            this.subscriptions.unsubscribeAll();
 
             const editor = this.fieldForm.controls['editor'];
 
@@ -52,14 +53,14 @@ export class StringUIComponent extends ResourceOwner {
             this.hideSchemaIds =
                 valueProjection$(this.fieldForm.controls['isEmbeddable'], x => !x);
 
-            this.own(
+            this.subscriptions.add(
                 this.hideAllowedValues.subscribe(isSelection => {
                     if (isSelection) {
                         this.fieldForm.controls['allowedValues'].setValue(undefined);
                     }
                 }));
 
-            this.own(
+            this.subscriptions.add(
                 this.hideInlineEditable.subscribe(isSelection => {
                     if (isSelection) {
                         this.fieldForm.controls['inlineEditable'].setValue(false);

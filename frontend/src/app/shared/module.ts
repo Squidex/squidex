@@ -13,7 +13,7 @@ import { MentionModule } from 'angular-mentions';
 import { NgChartsModule } from 'ng2-charts';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { SqxFrameworkModule } from '@app/framework';
-import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetFolderDropdownComponent, AssetFolderDropdownItemComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetScriptsState, AssetSelectorComponent, AssetsListComponent, AssetsService, AssetsState, AssetTextEditorComponent, AssetUploaderComponent, AssetUploaderState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, buildTasks, ClientsService, ClientsState, CommentComponent, CommentsComponent, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthDirective, ContentMustExistGuard, ContentsColumnsPipe, ContentSelectorComponent, ContentSelectorItemComponent, ContentsService, ContentsState, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, FilterOperatorPipe, GeolocationEditorComponent, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, IFrameCardComponent, ImageCropperComponent, ImageFocusPointComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, LoadSchemasGuard, LoadSettingsGuard, LoadTeamsGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PlansService, PlansState, PreviewableType, QueryComponent, QueryListComponent, QueryPathComponent, RandomCatCardComponent, RandomDogCardComponent, ReferenceInputComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RuleMustExistGuard, RuleSimulatorState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, ScriptNamePipe, SearchFormComponent, SearchService, SortingComponent, StockPhotoService, SupportCardComponent, TableHeaderComponent, TASK_CONFIGURATION, TeamFormComponent, TeamMustExistGuard, TeamsService, TeamsState, TemplatesService, TemplatesState, TourGuideComponent, TourHintDirective, TourState, TranslationsService, TranslationStatusComponent, UIService, UIState, UnsetAppGuard, UnsetTeamGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WatchingUsersComponent, WorkflowsService, WorkflowsState } from './declarations';
+import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetFolderDropdownComponent, AssetFolderDropdownItemComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetScriptsState, AssetSelectorComponent, AssetsListComponent, AssetsService, AssetsState, AssetTextEditorComponent, AssetUploaderComponent, AssetUploaderState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, buildTasks, ClientsService, ClientsState, CommentComponent, CommentsComponent, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthDirective, ContentMustExistGuard, ContentsColumnsPipe, ContentSelectorComponent, ContentSelectorItemComponent, ContentsService, ContentsState, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, ContributorsService, ContributorsState, CursorsComponent, CursorsDirective, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, FilterOperatorPipe, GeolocationEditorComponent, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, IFrameCardComponent, ImageCropperComponent, ImageFocusPointComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, LoadSchemasGuard, LoadSettingsGuard, LoadTeamsGuard, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PlansService, PlansState, PreviewableType, QueryComponent, QueryListComponent, QueryPathComponent, RandomCatCardComponent, RandomDogCardComponent, ReferenceInputComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RuleMustExistGuard, RuleSimulatorState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, ScriptNamePipe, SearchFormComponent, SearchService, SortingComponent, StockPhotoService, SupportCardComponent, TableHeaderComponent, TASK_CONFIGURATION, TeamFormComponent, TeamMustExistGuard, TeamsService, TeamsState, TemplatesService, TemplatesState, TourGuideComponent, TourHintDirective, TourState, TranslationsService, TranslationStatusComponent, UIService, UIState, UnsetAppGuard, UnsetTeamGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WatchingUsersComponent, WorkflowsService, WorkflowsState } from './declarations';
 
 @NgModule({
     imports: [
@@ -61,6 +61,8 @@ import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCard
         ContentStatusComponent,
         ContentValueComponent,
         ContentValueEditorComponent,
+        CursorsComponent,
+        CursorsDirective,
         FileIconPipe,
         FilterComparisonComponent,
         FilterLogicalComponent,
@@ -75,7 +77,6 @@ import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCard
         IFrameCardComponent,
         ImageCropperComponent,
         ImageFocusPointComponent,
-        MarkdownEditorComponent,
         NotifoComponent,
         PreviewableType,
         QueryComponent,
@@ -138,6 +139,8 @@ import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCard
         ContentStatusComponent,
         ContentValueComponent,
         ContentValueEditorComponent,
+        CursorsComponent,
+        CursorsDirective,
         DragDropModule,
         FileIconPipe,
         GeolocationEditorComponent,
@@ -147,7 +150,6 @@ import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCard
         HistoryListComponent,
         HistoryMessagePipe,
         IFrameCardComponent,
-        MarkdownEditorComponent,
         NotifoComponent,
         PreviewableType,
         QueryListComponent,

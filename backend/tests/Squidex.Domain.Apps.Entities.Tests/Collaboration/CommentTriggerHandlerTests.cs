@@ -20,7 +20,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Comments;
+namespace Squidex.Domain.Apps.Entities.Collaboration;
 
 public class CommentTriggerHandlerTests
 {

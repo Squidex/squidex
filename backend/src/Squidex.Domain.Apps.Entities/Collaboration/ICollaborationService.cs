@@ -7,9 +7,9 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Comments;
+namespace Squidex.Domain.Apps.Entities.Collaboration;
 
-public interface INotificationPublisher
+public interface ICollaborationService
 {
     Task NotifyAsync(string userId, string text, RefToken actor, Uri? url, bool skipHandlers,
         CancellationToken ct = default);

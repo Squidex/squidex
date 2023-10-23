@@ -1,7 +1,7 @@
-<ng-container *ngIf="collaboration.otherUsers | async; let currentUsers">
+<ng-container *ngIf="collaboration.userChanges | async; let currentUsers">
     <ng-container *ngIf="currentUsers.length > 0">
-        <div class="user-item" *ngFor="let user of currentUsers | slice:0:5; let i = index" [style]="{ zIndex: i }">
-            <img class="user-picture" title="{{user.displayName}}" [src]="user.id | sqxUserPicture">
+        <div class="user-item" *ngFor="let state of currentUsers | slice:0:5; trackBy: trackByUser; let i = index" [style]="{ zIndex: i }">
+            <img class="user-picture" title="{{state.user.displayName}}" [src]="state.user.id | sqxUserPicture" [style.borderColor]="state.user.id | sqxStringColor">
         </div>
     
         <div class="user-item" *ngIf="currentUsers.length > 5" [style]="{ zIndex: 6 }">

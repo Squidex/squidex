@@ -5,7 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DarkenPipe, LightenPipe } from './colors.pipes';
+/* eslint-disable @typescript-eslint/naming-convention */
+
+import { DarkenPipe, LightenPipe, StringColorPipe } from './colors.pipes';
 
 describe('DarkenPipe', () => {
     const pipe = new DarkenPipe();
@@ -60,5 +62,19 @@ describe('LightenPipe', () => {
         const result = pipe.transform('#7F4868', 20);
 
         expect(result).toEqual('#98567d');
+    });
+});
+
+describe('StringColorPipe', () => {
+    const pipe = new StringColorPipe();
+
+    it('should compute color from string', () => {
+        const color1_1 = pipe.transform('sebastian@squidex.io');
+        const color1_2 = pipe.transform('sebastian@squidex.io');
+
+        const color2 = pipe.transform('hello@squidex.io');
+
+        expect(color1_1).toEqual(color1_2);
+        expect(color1_1).not.toEqual(color2);
     });
 });

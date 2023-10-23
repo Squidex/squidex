@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { defined, MessageBus, ModalModel, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
+import { defined, MessageBus, ModalModel, SchemaDto, SchemasState, Subscriptions } from '@app/shared';
 import { SchemaCloning } from './../messages';
 
 @Component({
@@ -16,7 +16,9 @@ import { SchemaCloning } from './../messages';
     styleUrls: ['./schema-page.component.scss'],
     templateUrl: './schema-page.component.html',
 })
-export class SchemaPageComponent extends ResourceOwner implements OnInit {
+export class SchemaPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public readonly exact = { exact: true };
 
     public schema!: SchemaDto;
@@ -30,11 +32,10 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         private readonly router: Router,
         private readonly messageBus: MessageBus,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.schemasState.selectedSchema.pipe(defined())
                 .subscribe(schema => {
                     this.schema = schema;

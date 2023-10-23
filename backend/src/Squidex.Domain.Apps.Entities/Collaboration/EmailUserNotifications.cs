@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Email;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Notifications;
+namespace Squidex.Domain.Apps.Entities.Collaboration;
 
 public sealed class EmailUserNotifications : IUserNotifications
 {

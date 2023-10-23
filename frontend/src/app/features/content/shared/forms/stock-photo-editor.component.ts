@@ -9,7 +9,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
-import { DialogModel, StatefulControlComponent, StockPhotoDto, StockPhotoService, thumbnail, Types, value$, valueProjection$ } from '@app/shared';
+import { DialogModel, StatefulControlComponent, StockPhotoDto, StockPhotoService, Subscriptions, thumbnail, Types, value$, valueProjection$ } from '@app/shared';
 
 export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true,
@@ -41,6 +41,8 @@ type Request = { search?: string; page: number };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
@@ -61,26 +63,26 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             value$(this.valueControl)
                 .subscribe(() => {
                     this.next({ thumbnailStatus: undefined });
                 }));
 
-        this.own(
+        this.subscriptions.add(
             value$(this.stockPhotoSearch)
                 .subscribe(search => {
                     this.stockPhotoRequests.next({ search, page: 1 });
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.valueControl.valueChanges
                 .subscribe(value => {
                     this.callChange(value);
                     this.callTouched();
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.stockPhotoRequests.pipe(
                 debounceTime(500),
                 tap(request => {

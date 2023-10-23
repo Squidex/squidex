@@ -15,7 +15,7 @@ import { AuthService } from './../services/auth.service';
 
 @Injectable()
 export class MustBeAuthenticatedGuard  {
-    private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;
+    private readonly uiOptions = inject(UIOptions);
 
     constructor(
         private readonly authService: AuthService,
@@ -34,7 +34,7 @@ export class MustBeAuthenticatedGuard  {
 
                 const redirectPath = this.location.path(true);
 
-                if (this.redirectToLogin) {
+                if (this.uiOptions.value.redirectToLogin) {
                     this.authService.loginRedirect(redirectPath);
                 } else {
                     this.router.navigate([''], { queryParams: { redirectPath } });

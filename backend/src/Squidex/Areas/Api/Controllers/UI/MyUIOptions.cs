@@ -53,6 +53,9 @@ public sealed record MyUIOptions
     [JsonPropertyName("markerProject")]
     public string MarkerProject { get; set; }
 
+    [JsonPropertyName("collaborationService")]
+    public string CollaborationService { get; set; }
+
     public sealed class MapOptions
     {
         [JsonPropertyName("type")]

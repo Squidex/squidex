@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResolveAssets, ResolveContents, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResolveAssets, ResolveContents, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator',
@@ -18,7 +18,7 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, Re
         ComponentContentsState,
     ],
 })
-export class ContentCreatorComponent extends ResourceOwner implements OnInit {
+export class ContentCreatorComponent implements OnInit {
     @Output()
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
 
@@ -49,7 +49,6 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
         private readonly contentsState: ComponentContentsState,
         private readonly schemasState: SchemasState,
     ) {
-        super();
     }
 
     public ngOnInit() {

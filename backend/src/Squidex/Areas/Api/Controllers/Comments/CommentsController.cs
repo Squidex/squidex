@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Comments;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -19,19 +19,19 @@ namespace Squidex.Areas.Api.Controllers.Comments;
 
 public sealed class CommentsController : ApiController
 {
-    private readonly INotificationPublisher notificationPublisher;
+    private readonly ICollaborationService collaboration;
 
-    public CommentsController(ICommandBus commandBus, INotificationPublisher notificationPublisher)
+    public CommentsController(ICommandBus commandBus, ICollaborationService collaboration)
         : base(commandBus)
     {
-        this.notificationPublisher = notificationPublisher;
+        this.collaboration = collaboration;
     }
 
     [Route("users/collaboration")]
     [ApiPermission]
     public IActionResult UserDocument()
     {
-        return new YDotNetActionResult(notificationPublisher.UserDocument(User.UserOrClientId()!));
+        return new YDotNetActionResult(collaboration.UserDocument(User.UserOrClientId()!));
     }
 
     [Route("apps/{app}/collaboration/{commentsId}")]
@@ -39,6 +39,6 @@ public sealed class CommentsController : ApiController
     [ApiCosts(0)]
     public IActionResult CollaborationDocument(string app, DomainId commentsId)
     {
-        return new YDotNetActionResult(notificationPublisher.ResourceDocument(App.NamedId(), commentsId));
+        return new YDotNetActionResult(collaboration.ResourceDocument(App.NamedId(), commentsId));
     }
 }

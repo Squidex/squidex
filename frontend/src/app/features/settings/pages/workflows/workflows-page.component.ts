@@ -6,14 +6,16 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ResourceOwner, RolesState, SchemaTagSource, WorkflowDto, WorkflowsState } from '@app/shared';
+import { RolesState, SchemaTagSource, Subscriptions, WorkflowDto, WorkflowsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-workflows-page',
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html',
 })
-export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
+export class WorkflowsPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public roles: ReadonlyArray<string> = [];
 
     constructor(
@@ -21,11 +23,10 @@ export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
         public readonly schemasSource: SchemaTagSource,
         public readonly workflowsState: WorkflowsState,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.rolesState.roles
                 .subscribe(roles => {
                     this.roles = roles.map(x => x.name);

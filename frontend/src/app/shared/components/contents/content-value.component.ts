@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy,  Component, Input } from '@angular/core';
-import { ModalModel, StatefulComponent, TypedSimpleChanges } from '@app/framework';
+import { ModalModel, StatefulComponent, Subscriptions, TypedSimpleChanges } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
 interface State {
@@ -20,6 +20,8 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentValueComponent extends StatefulComponent<State> {
+    private readonly subscriptions = new Subscriptions();
+
     @Input({ required: true })
     public value!: any;
 
@@ -49,9 +51,9 @@ export class ContentValueComponent extends StatefulComponent<State> {
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.fields) {
-            this.unsubscribeAll();
+            this.subscriptions.unsubscribeAll();
 
-            this.own(this.fields?.fieldWrappings
+            this.subscriptions.add(this.fields?.fieldWrappings
                 .subscribe(wrappings => {
                     const wrapping = wrappings[this.field?.name!];
 
