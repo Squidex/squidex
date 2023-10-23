@@ -44,6 +44,7 @@ export * from './components/contents/content-value.component';
 export * from './components/contents/translation-status.component';
 export * from './components/cursors.component';
 export * from './components/cursors.directive';
+export * from './components/focus-marker.component';
 export * from './components/forms/geolocation-editor.component';
 export * from './components/forms/rich-editor.component';
 export * from './components/help/help-markdown.pipe';

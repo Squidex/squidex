@@ -7,6 +7,7 @@
 
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, distinctUntilChanged, map, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { Awareness } from 'y-protocols/awareness';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 import { Types, UIOptions } from '@app/framework';
@@ -14,15 +15,17 @@ import { AuthService, Profile } from './auth.service';
 
 type AwarenessState = { user: Profile; [key: string]: any };
 
+export type CollaborationProvider = { awareness: Awareness; doc: Y.Doc; destroy: () => void };
+
 @Injectable()
 export class CollaborationService {
-    private readonly provider = new BehaviorSubject<{ doc: Y.Doc; provider: WebsocketProvider } | null>(null);
+    private readonly provider = new BehaviorSubject<CollaborationProvider | null>(null);
     private readonly basePath = inject(UIOptions).value.collaborationService;
     private readonly profile: Profile;
     private previousName?: string | null;
 
     public awarenessChanges =
-        this.provider.pipe(map(x => x?.provider.awareness));
+        this.provider.pipe(map(p => p?.awareness));
 
     public userChanges =
         this.awarenessChanges.pipe(
@@ -33,7 +36,7 @@ export class CollaborationService {
 
                 return new Observable<AwarenessState[]>(observer => {
                     const getStates = () => {
-                        let result: AwarenessState[] = [];
+                        const byUser: { [userId: string]: AwarenessState } = {};
 
                         awareness!.getStates().forEach((state, clientId) => {
                             if (clientId == awareness.clientID) {
@@ -44,12 +47,12 @@ export class CollaborationService {
                                 return;
                             }
 
-                            result.push({ user: state.user, ...state });
+                            byUser[state.user.id] = state as any;
                         });
 
-                        result.sortByString(x => x.user.displayName);
+                        const sorted = Object.values(byUser).sortByString(x => x.user.displayName);
 
-                        observer.next(result);
+                        observer.next(sorted);
                     };
 
                     getStates();
@@ -63,8 +66,16 @@ export class CollaborationService {
             distinctUntilChanged<AwarenessState[]>(Types.equals),
             shareReplay());
 
+    public providerFactory: (name: string, doc: Y.Doc) => CollaborationProvider;
+
     constructor(authService: AuthService) {
         this.profile = authService.user!;
+
+        this.providerFactory = (name, doc) => {
+            const websocket = new WebsocketProvider(this.basePath, `api/${name}?access_token=${this.profile.accessToken}`, doc);
+
+            return { doc, awareness: websocket.awareness, destroy: () => websocket.destroy() };
+        };
     }
 
     public connect(name: string | null) {
@@ -80,17 +91,17 @@ export class CollaborationService {
         }
 
         const yDocument = new Y.Doc();
-        const yProvider = new WebsocketProvider(this.basePath, `api/${name}?access_token=${this.profile.accessToken}`, yDocument);
+        const yProvider = this.providerFactory(name, yDocument);
 
         const { id, email, displayName } = this.profile;
 
         yProvider.awareness?.setLocalStateField('user', { id, email, displayName });
 
-        this.provider.next({ provider: yProvider, doc: yDocument });
+        this.provider.next(yProvider);
     }
 
     private cleanup() {
-        this.provider.value?.provider.destroy();
+        this.provider.value?.destroy();
         this.provider.next(null);
     }
 
@@ -103,7 +114,7 @@ export class CollaborationService {
     }
 
     public updateAwareness(key: string, value: any) {
-        this.provider.value?.provider.awareness.setLocalStateField(key, value);
+        this.provider.value?.awareness.setLocalStateField(key, value);
     }
 }
 

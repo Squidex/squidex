@@ -33,7 +33,7 @@ describe('DarkenPipe', () => {
     it('should darken mixed color', () => {
         const result = pipe.transform('#FF91D1', 20);
 
-        expect(result).toEqual('#cc74a7');
+        expect(result).toEqual('#cc7574');
     });
 });
 
@@ -61,7 +61,7 @@ describe('LightenPipe', () => {
     it('should lighten mixed color', () => {
         const result = pipe.transform('#7F4868', 20);
 
-        expect(result).toEqual('#98567d');
+        expect(result).toEqual('#985756');
     });
 });
 

@@ -14,7 +14,7 @@ describe('ColorHelper', () => {
         { r: 1, g: 0, b: 0, h: 0, name: 'red' },
         { r: 1, g: 1, b: 0, h: 60, name: 'yellow' },
         { r: 0, g: 1, b: 0, h: 120, name: 'green' },
-        { r: 0, g: 1, b: 1, h: 180, name: 'turkis' },
+        { r: 0, g: 1, b: 1, h: 180, name: 'cyan' },
         { r: 0, g: 0, b: 1, h: 240, name: 'blue' },
         { r: 1, g: 0, b: 1, h: 300, name: 'pink' },
         { r: 1, g: 0, b: 0, h: 360, name: 'red2' },
@@ -22,9 +22,7 @@ describe('ColorHelper', () => {
         it(`should convert from hsv ${test.name}`, () => {
             const color = ColorHelper.hsvToRgb({ h: test.h, s: 1, v: 1 });
 
-            expect(color.r).toBe(test.r);
-            expect(color.g).toBe(test.g);
-            expect(color.b).toBe(test.b);
+            expect(color).toEqual({ r: test.r, g: test.g, b: test.b });
         });
     });
 

@@ -97,24 +97,32 @@ export module ColorHelper {
     }
 
     export function hsvToRgb({ h, s, v }: HSVColor): RGBColor {
-        let r = 0, g = 0, b = 0;
+        h /= 60;
 
-        const i = Math.floor(h * 6);
-        const f = h * 6 - i;
-        const p = v * (1 - s);
-        const q = v * (1 - f * s);
-        const t = v * (1 - (1 - f) * s);
+        const i = Math.floor(h);
+        const f = (h - i);
+        const p = (v * (1 - s));
+        const q = (v * (1 - (f * s)));
+        const t = (v * (1 - ((1 - f) * s)));
 
-        switch (i % 6) {
-            case 0: r = v, g = t, b = p; break;
-            case 1: r = q, g = v, b = p; break;
-            case 2: r = p, g = v, b = t; break;
-            case 3: r = p, g = q, b = v; break;
-            case 4: r = t, g = p, b = v; break;
-            case 5: r = v, g = p, b = q; break;
+        function color(r: number, g: number, b: number) {
+            return { r, g, b };
         }
 
-        return { r, g, b };
+        switch (i % 6) {
+            case 0:
+                return color(v, t, p);
+            case 1:
+                return color(q, v, p);
+            case 2:
+                return color(p, v, t);
+            case 3:
+                return color(p, q, v);
+            case 4:
+                return color(t, p, v);
+            default:
+                return color(v, p, q);
+        }
     }
 
     export function colorString({ r, g, b }: RGBColor) {

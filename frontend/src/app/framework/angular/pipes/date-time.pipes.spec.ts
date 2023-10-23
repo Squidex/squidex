@@ -8,8 +8,9 @@
 import { DateHelper, DateTime, Duration } from '@app/framework/internal';
 import { DatePipe, DayOfWeekPipe, DayPipe, DurationPipe, FromNowPipe, FullDateTimePipe, ISODatePipe, MonthPipe, ShortDatePipe, ShortTimePipe } from './date-time.pipes';
 
-const dateString = '2013-10-03T12:13:14.125';
-const dateTime = DateTime.parseISO(dateString, false);
+const dateSource = '2013-10-03T12:13:14.125';
+const dateTime = DateTime.parseISO(dateSource, false);
+const dateString = dateTime.toISOString();
 
 const TestCases = [{
     value: dateString,
@@ -49,7 +50,7 @@ describe('FromNowPipe', () => {
         DateHelper.setlocale(null);
     });
 
-    it(`should format to from now string from DateTime`, () => {
+    it('should format to from now string from DateTime', () => {
         const pipe = new FromNowPipe();
 
         const actual = pipe.transform(DateTime.now().addMinutes(-4));
@@ -58,7 +59,7 @@ describe('FromNowPipe', () => {
         expect(actual).toBe(expected);
     });
 
-    it(`should format to from now string from String`, () => {
+    it('should format to from now string from String', () => {
         const pipe = new FromNowPipe();
 
         const actual = pipe.transform(DateTime.now().addMinutes(-4).toISOString());
@@ -158,13 +159,12 @@ describe('FullDateTimePipe', () => {
 
     TestCases.forEach(x => {
         it(`should format to nice string from ${x.name}`, () => {
-                const pipe = new FullDateTimePipe();
+            const pipe = new FullDateTimePipe();
 
-                const actual = pipe.transform(x.value);
-                const expected = 'Oct 3, 2013, 12:13:14 PM';
+            const actual = pipe.transform(x.value);
+            const expected = 'Oct 3, 2013, 12:13:14 PM';
 
-                expect(actual).toBe(expected);
-            });
+            expect(actual).toBe(expected);
         });
     });
 

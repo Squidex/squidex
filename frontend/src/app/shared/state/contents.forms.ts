@@ -209,12 +209,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, UntypedFormGrou
     public readonly translationStatus =
         value$(this.form).pipe(map(x => fieldTranslationStatus(x)));
 
-    constructor(
-        globals: FormGlobals,
-        field: RootFieldDto,
-        fieldPath: string,
-        rules: RulesProvider,
-    ) {
+    constructor(globals: FormGlobals, field: RootFieldDto, fieldPath: string, rules: RulesProvider) {
         super(globals, field, fieldPath, FieldForm.buildForm(), false, rules);
 
         for (const { key, isOptional } of globals.partitions.getAll(field)) {
