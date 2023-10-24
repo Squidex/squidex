@@ -75,13 +75,13 @@
     <PackageReference Include="Squidex.Messaging.All" Version="5.19.0" />
     <PackageReference Include="Squidex.Messaging.Subscriptions" Version="5.19.0" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="4.0.1-dev" />
-    <PackageReference Include="Squidex.YDotNet" Version="0.2.8" />
-    <PackageReference Include="Squidex.YDotNet.Server" Version="0.2.8" />
-    <PackageReference Include="Squidex.YDotNet.Server.MongoDB" Version="0.2.8" />
-    <PackageReference Include="Squidex.YDotNet.Server.Redis" Version="0.2.8" />
-    <PackageReference Include="Squidex.YDotNet.Server.WebSockets" Version="0.2.8" />
+    <PackageReference Include="Squidex.YDotNet" Version="0.2.9" />
+    <PackageReference Include="Squidex.YDotNet.Native" Version="0.2.9" />
+    <PackageReference Include="Squidex.YDotNet.Server" Version="0.2.9" />
+    <PackageReference Include="Squidex.YDotNet.Server.MongoDB" Version="0.2.9" />
+    <PackageReference Include="Squidex.YDotNet.Server.Redis" Version="0.2.9" />
+    <PackageReference Include="Squidex.YDotNet.Server.WebSockets" Version="0.2.9" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
-    <PackageReference Include="YDotNetTest.Native" Version="0.2.0" />
   </ItemGroup>
 
   <PropertyGroup>
