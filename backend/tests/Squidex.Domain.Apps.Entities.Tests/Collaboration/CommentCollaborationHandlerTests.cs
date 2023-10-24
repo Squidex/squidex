@@ -254,7 +254,7 @@ public class CommentCollaborationHandlerTests : GivenContext
             stream.InsertRange(transaction, 0, InputFactory.FromJson(commentJson));
         }
 
-        await WaitForCompletion();
+        await sut.LastTask;
 
         var streamName = $"comments-{DomainId.Combine(AppId.Id, commentsId)}";
 
@@ -270,17 +270,5 @@ public class CommentCollaborationHandlerTests : GivenContext
 
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(email, default))
             .Returns(user);
-    }
-
-    private async Task WaitForCompletion()
-    {
-        using var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(5000));
-
-        while (sut.HasPendingJobs)
-        {
-            tcs.Token.ThrowIfCancellationRequested();
-
-            await Task.Delay(20, tcs.Token);
-        }
     }
 }

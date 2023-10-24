@@ -31,9 +31,8 @@ public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICo
     private readonly IUserResolver userResolver;
     private readonly IClock clock;
     private IDocumentManager? currentManager;
-    private int pendingJobs;
 
-    public bool HasPendingJobs => pendingJobs > 0;
+    public Task LastTask { get; private set; }
 
     public CommentCollaborationHandler(
         IJsonSerializer jsonSerializer,
@@ -112,22 +111,14 @@ public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICo
 
             if (newComments.Length == 0)
             {
+                LastTask = Task.CompletedTask;
                 return;
             }
 
-            Interlocked.Increment(ref pendingJobs);
-
-            Task.Run(async () =>
+            LastTask = Task.Run(async () =>
             {
-                try
-                {
-                    await HandleAsync(@event, appId, resourceId, newComments);
-                }
-                finally
-                {
-                    Interlocked.Decrement(ref pendingJobs);
-                }
-            }).Forget();
+                await HandleAsync(@event, appId, resourceId, newComments);
+            });
         });
 
         return default;
