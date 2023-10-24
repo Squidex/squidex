@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/directive-selector */
+
 import { Directive, ElementRef, HostListener, Input, numberAttribute, OnDestroy, Renderer2 } from '@angular/core';
 import { DialogService, FloatingPlacement, Tooltip } from '@app/framework/internal';
 

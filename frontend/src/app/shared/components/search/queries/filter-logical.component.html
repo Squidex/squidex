@@ -26,8 +26,8 @@
             <span class="filter-line-h"></span>
     
             <sqx-filter-node
-                (change)="emitChange()"
                 [filter]="filter"
+                (filterChange)="emitChange()"
                 [language]="language"
                 [languages]="languages"
                 [level]="level + 1"

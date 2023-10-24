@@ -21,7 +21,7 @@ import { TourState, UsersService } from '@app/shared';
 export class OnboardingDialogComponent {
 
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     public answersForm =
         this.formBuilder.group({
@@ -46,12 +46,12 @@ export class OnboardingDialogComponent {
 
     public start() {
         this.tourState.start();
-        this.close.emit();
+        this.dialogClose.emit();
     }
 
     public cancel() {
         this.tourState.complete();
-        this.close.emit();
+        this.dialogClose.emit();
     }
 
     public next() {

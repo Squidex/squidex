@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { delay } from 'rxjs/operators';
-import { AppsState, AuthService, StatefulComponent, TranslationsService } from '@app/shared';
+import { AppsState, AuthService, StatefulComponent, TranslationsService } from '@app/shared/internal';
 
 interface State {
     // True, when running
@@ -27,10 +27,13 @@ interface State {
 })
 export class ChatDialogComponent extends StatefulComponent<State> {
     @Output()
-    public close = new EventEmitter();
+    public textSelect = new EventEmitter<string | undefined | null>();
 
-    @Output()
-    public select = new EventEmitter<string>();
+    @Input({ required: true, transform: booleanAttribute })
+    public showFormatHint = false;
+
+    @ViewChild('scrollContainer', { static: false })
+    public scrollContainer!: ElementRef<HTMLDivElement>;
 
     @ViewChild('input', { static: false })
     public input!: ElementRef<HTMLInputElement>;
@@ -47,6 +50,14 @@ export class ChatDialogComponent extends StatefulComponent<State> {
             chatQuestion: '',
             chatTalk: [],
         });
+    }
+
+    public scrollDown() {
+        if (this.scrollContainer && this.scrollContainer.nativeElement) {
+            const height = this.scrollContainer.nativeElement.scrollHeight;
+
+            this.scrollContainer.nativeElement.scrollTop = height;
+        }
     }
 
     public setQuestion(chatQuestion: string) {

@@ -197,6 +197,7 @@
                                 mode="Html"
                                 [formControl]="$any(fieldForm)"
                                 [folderId]="field.rawProperties.folderId"
+                                [hasChatBot]="hasChatBot"
                                 [language]="language"
                                 [languages]="languages"
                                 [schemaIds]="field.rawProperties.schemaIds">
@@ -210,6 +211,7 @@
                                 mode="Markdown"
                                 [formControl]="$any(fieldForm)"
                                 [folderId]="field.rawProperties.folderId"
+                                [hasChatBot]="hasChatBot"
                                 [language]="language"
                                 [languages]="languages"
                                 [schemaIds]="field.rawProperties.schemaIds">
@@ -259,6 +261,6 @@
     </sqx-form-hint>
 </div>
 
-<sqx-chat-dialog *sqxModal="chatDialog"
-    (close)="chatDialog.hide()" (select)="setValue($event)">
+<sqx-chat-dialog *sqxModal="chatDialog" showFormatHint="true"
+    (select)="setValue($event)">
 </sqx-chat-dialog>

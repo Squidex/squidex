@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable no-return-assign */
+
 import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { AppsState, AutocompleteSource, RoleDto, RolesService, RolesState, SchemasState } from '@app/shared';
-
-/* eslint-disable no-return-assign */
 
 class PermissionsAutocomplete implements AutocompleteSource {
     private permissions: ReadonlyArray<string> = [];

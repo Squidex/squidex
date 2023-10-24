@@ -16,7 +16,7 @@ import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto, TypedS
     templateUrl: './content-extension.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentExtensionComponent  {
+export class ContentExtensionComponent {
     private readonly context: any;
     private isInitialized = false;
 

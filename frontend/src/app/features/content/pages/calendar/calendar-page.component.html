@@ -23,7 +23,7 @@
     </ng-container>
 </sqx-layout>
 
-<sqx-modal-dialog *sqxModal="contentDialog" (close)="contentDialog.hide()">
+<sqx-modal-dialog *sqxModal="contentDialog" (dialogClose)="contentDialog.hide()">
     <ng-container title>
         {{ 'common.content' | sqxTranslate }}
     </ng-container>

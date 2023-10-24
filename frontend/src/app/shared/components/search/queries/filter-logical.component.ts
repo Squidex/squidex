@@ -18,7 +18,7 @@ export class FilterLogicalComponent {
     private filterValue!: FilterLogical;
 
     @Output()
-    public change = new EventEmitter();
+    public filterChange = new EventEmitter();
 
     @Output()
     public remove = new EventEmitter();
@@ -103,6 +103,6 @@ export class FilterLogicalComponent {
     }
 
     public emitChange() {
-        this.change.emit();
+        this.filterChange.emit();
     }
 }

@@ -24,7 +24,7 @@ const TRANSLATIONS = {
                 [allowOpen]="true" 
                 [itemsSource]="itemsSource"
                 [itemsSourceLoading]="itemsSourceLoading"
-                (open)="load()">
+                (dropdownOpen)="load()">
             </sqx-tag-editor>
         </sqx-root-view>
     `,

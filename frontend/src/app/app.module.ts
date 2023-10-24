@@ -10,7 +10,7 @@
 
 import { APP_BASE_HREF, CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { ApplicationRef, NgModule } from '@angular/core';
+import { ApplicationRef, DoBootstrap, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -117,7 +117,7 @@ export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
         { provide: APP_BASE_HREF, useValue: basePath() },
     ],
 })
-export class AppModule {
+export class AppModule implements DoBootstrap {
     public ngDoBootstrap(appRef: ApplicationRef) {
         try {
             appRef.bootstrap(AppComponent);

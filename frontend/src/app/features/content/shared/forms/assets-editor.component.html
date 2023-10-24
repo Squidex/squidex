@@ -82,12 +82,12 @@
 </div>
 
 <sqx-asset-selector *sqxModal="assetsDialog"
-    (select)="selectAssets($event)">
+    (assetSelect)="selectAssets($event)">
 </sqx-asset-selector>
 
 <sqx-asset-dialog *sqxModal="snapshot.editAsset;isDialog:true"
     [asset]="snapshot.editAsset!" 
     (assetReplaced)="notifyOthers($event)"
     (assetUpdated)="notifyOthers($event)"
-    (close)="editDone()">
+    (dialogClose)="editDone()">
 </sqx-asset-dialog>

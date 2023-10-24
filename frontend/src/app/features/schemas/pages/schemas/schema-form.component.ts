@@ -18,7 +18,7 @@ export class SchemaFormComponent implements OnInit {
     public create = new EventEmitter<SchemaDto>();
 
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     @Input()
     public import: any;
@@ -51,7 +51,7 @@ export class SchemaFormComponent implements OnInit {
     }
 
     public emitClose() {
-        this.close.emit();
+        this.dialogClose.emit();
     }
 
     public createSchema() {

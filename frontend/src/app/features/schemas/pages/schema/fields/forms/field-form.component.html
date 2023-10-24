@@ -23,7 +23,7 @@
     </ul>
 
     <div class="float-end" *ngIf="showButtons">
-        <button [disabled]="field.isLocked" type="reset" class="btn btn-text-secondary" (click)="close.emit()">
+        <button [disabled]="field.isLocked" type="reset" class="btn btn-text-secondary" (click)="dialogClose.emit()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 

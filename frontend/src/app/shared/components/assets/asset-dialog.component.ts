@@ -22,7 +22,7 @@ import { ImageFocusPointComponent } from './image-focus-point.component';
 })
 export class AssetDialogComponent implements OnInit {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     @Output()
     public assetReplaced = new EventEmitter<AssetDto>();

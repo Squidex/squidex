@@ -33,7 +33,7 @@
             <ng-container>
                 <table class="table table-items table-fixed" [sqxSyncWidth]="header">        
                     <tbody *ngFor="let eventConsumer of eventConsumersState.eventConsumers | async; trackBy: trackByEventConsumer"
-                        [sqxEventConsumer]="eventConsumer" (error)="showError(eventConsumer)">
+                        [sqxEventConsumer]="eventConsumer" (failure)="showError(eventConsumer)">
                     </tbody>
                 </table>
             </ng-container>
@@ -57,7 +57,7 @@
 
 <router-outlet></router-outlet>
 
-<sqx-modal-dialog *sqxModal="eventConsumerErrorDialog" (close)="eventConsumerErrorDialog.hide()">
+<sqx-modal-dialog *sqxModal="eventConsumerErrorDialog" (dialogClose)="eventConsumerErrorDialog.hide()">
     <ng-container title>
         {{ 'common.error' | sqxTranslate }}
     </ng-container>

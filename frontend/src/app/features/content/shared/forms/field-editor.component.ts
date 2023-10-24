@@ -101,7 +101,9 @@ export class FieldEditorComponent {
     }
 
     public setValue(value: any) {
-        this.formModel.setValue(value);
+        if (value) {
+            this.formModel.setValue(value);
+        }
 
         this.chatDialog.hide();
     }

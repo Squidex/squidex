@@ -5,11 +5,11 @@
 </div>
 
 <sqx-asset-selector *sqxModal="assetsDialog"
-    (select)="pickAssets($event)">
+    (assetSelect)="pickAssets($event)">
 </sqx-asset-selector>
 
 <sqx-content-selector *sqxModal="contentsDialog"
-    (select)="pickContents($event)"
+    (contentSelect)="pickContents($event)"
     [query]="contentsQuery"
     [language]="language"
     [languages]="languages"

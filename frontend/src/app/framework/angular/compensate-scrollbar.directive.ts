@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
+import { AfterViewInit, booleanAttribute, Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
 import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxCompensateScrollbar]',
 })
-export class CompensateScrollbarDirective implements ResizeListener {
+export class CompensateScrollbarDirective implements AfterViewInit, ResizeListener {
     private readonly subscriptions = new Subscriptions();
     private previousScrollbarWidth = -1;
 

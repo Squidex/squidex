@@ -72,8 +72,8 @@
                                 <sqx-custom-view-editor
                                     [allFields]="tableSettings.schemaFields" 
                                     (listFieldsChange)="tableSettings.updateFields($event)"
-                                    [listFields]="$any(tableFields)"
-                                    (reset)="tableSettings.reset()">
+                                    (listFieldsReset)="tableSettings.reset()"
+                                    [listFields]="$any(tableFields)">
                                 </sqx-custom-view-editor>
                             </sqx-dropdown-menu>
                         </div>

@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { AppsState, EditSchemaScriptsForm, ScriptCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
+import { AppsState, EditSchemaScriptsForm, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-scripts-form',

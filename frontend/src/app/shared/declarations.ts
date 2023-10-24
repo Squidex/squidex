@@ -33,6 +33,7 @@ export * from './components/cards/iframe-card.component';
 export * from './components/cards/random-cat-card.component';
 export * from './components/cards/random-dog-card.component';
 export * from './components/cards/support-card.component';
+export * from './components/chat-dialog.component';
 export * from './components/comments/comment.component';
 export * from './components/comments/comments.component';
 export * from './components/contents/content-list-cell.directive';

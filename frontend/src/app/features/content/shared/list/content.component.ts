@@ -1,3 +1,4 @@
+
 /*
  * Squidex Headless CMS
  *
@@ -5,10 +6,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/component-selector */
+
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, SchemaDto, TableField, TableSettings, TypedSimpleChanges } from '@app/shared';
-
-/* tslint:disable: component-selector */
 
 @Component({
     selector: '[sqxContent][language][languages][tableFields][schema][tableSettings]',

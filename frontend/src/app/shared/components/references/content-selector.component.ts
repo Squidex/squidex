@@ -25,7 +25,7 @@ export class ContentSelectorComponent implements OnInit {
     public readonly metaFields = META_FIELDS;
 
     @Output()
-    public select = new EventEmitter<ReadonlyArray<ContentDto>>();
+    public contentSelect = new EventEmitter<ReadonlyArray<ContentDto>>();
 
     @Input({ transform: numberAttribute })
     public maxItems = Number.MAX_VALUE;
@@ -136,11 +136,11 @@ export class ContentSelectorComponent implements OnInit {
     }
 
     public emitClose() {
-        this.select.emit([]);
+        this.contentSelect.emit([]);
     }
 
     public emitSelect() {
-        this.select.emit(Object.values(this.selectedItems));
+        this.contentSelect.emit(Object.values(this.selectedItems));
     }
 
     public selectAll(isSelected: boolean) {

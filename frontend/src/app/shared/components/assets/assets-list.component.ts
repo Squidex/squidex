@@ -25,7 +25,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public edit = new EventEmitter<AssetDto>();
 
     @Output()
-    public select = new EventEmitter<AssetDto>();
+    public assetSelect = new EventEmitter<AssetDto>();
 
     @Input({ required: true })
     public assetsState!: AssetsState;

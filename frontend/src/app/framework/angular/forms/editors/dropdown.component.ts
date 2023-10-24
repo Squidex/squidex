@@ -42,10 +42,10 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     private value: any;
 
     @Output()
-    public open = new EventEmitter();
+    public dropdownOpen = new EventEmitter();
 
     @Output()
-    public close = new EventEmitter();
+    public dropdownClose = new EventEmitter();
 
     @Input({ transform: booleanAttribute })
     public itemsLoading?: boolean | null;
@@ -191,7 +191,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         }
 
         if (!this.dropdown.isOpen) {
-            this.open.emit();
+            this.dropdownOpen.emit();
 
             this.dropdown.show();
         }
@@ -207,7 +207,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public closeModal() {
         if (this.dropdown.isOpen) {
-            this.close.emit();
+            this.dropdownClose.emit();
 
             this.dropdown.hide();
         }

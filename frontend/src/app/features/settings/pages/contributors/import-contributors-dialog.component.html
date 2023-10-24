@@ -1,5 +1,5 @@
 <form [formGroup]="importForm.form" (ngSubmit)="detect()">  
-    <sqx-modal-dialog (close)="close.emit()">
+    <sqx-modal-dialog (dialogClose)="dialogClose.emit()">
         <ng-container title>
             {{ 'contributors.importTitle' | sqxTranslate }}
         </ng-container>
@@ -47,7 +47,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-text-secondary" (click)="close.emit()">
+            <button type="button" class="btn btn-text-secondary" (click)="dialogClose.emit()">
                 {{ 'common.cancel' | sqxTranslate }}
             </button>
 

@@ -6,9 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { AuthService, CollaborationService, Comment, ModalModel, SharedArray, Subscriptions } from '@app/shared';
-import { Observable } from 'rxjs';
 
 @Component({
     selector: 'sqx-notification-dropdown',

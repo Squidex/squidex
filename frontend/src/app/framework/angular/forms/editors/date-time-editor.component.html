@@ -11,7 +11,10 @@
         <div class="input-group flex-grow">
             <input class="form-control form-date" [formControl]="dateControl" placeholder="{{ 'common.date' | sqxTranslate }}"
                 [class.with-buttons]="isDateTimeMode && shouldShowDateTimeModeButton" 
-                (blur)="callTouched()" maxlength="10" #dateInput>
+                (blur)="callTouched()"
+                minlength="0"
+                maxlength="10"
+                #dateInput>
 
             <input class="form-control form-time" [formControl]="timeControl" placeholder="{{ 'common.time' | sqxTranslate }}" (blur)="callTouched()" *ngIf="isDateTimeMode">
         </div>

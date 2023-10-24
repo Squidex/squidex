@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitClose()" size="lg" fullHeight="true" flexBody="true" hasTabs="false">
+<sqx-modal-dialog (dialogClose)="emitClose()" size="lg" fullHeight="true" flexBody="true" hasTabs="false">
     <ng-container title>
         {{ 'assets.selectMany' | sqxTranslate }}
     </ng-container>
@@ -46,11 +46,11 @@
     <ng-container content>
         <sqx-list-view [isLoading]="assetsState.isLoading | async" overflow="true">
             <ng-container content>
-                <sqx-assets-list 
+                <sqx-assets-list
+                    (assetSelect)="selectAsset($event)"
                     [assetsState]="assetsState"
                     [isDisabled]="true"
-                    [isListView]="snapshot.isListView" 
-                    (select)="selectAsset($event)" 
+                    [isListView]="snapshot.isListView"
                     [selectedIds]="snapshot.selectedAssets">
                 </sqx-assets-list>
             </ng-container>

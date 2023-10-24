@@ -5,10 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable one-var-declaration-per-line */
-/* eslint-disable one-var */
-/* eslint-disable no-sequences */
-
 import { Pipe, PipeTransform } from '@angular/core';
 import { ColorHelper } from '@app/framework/utils/color-helper';
 

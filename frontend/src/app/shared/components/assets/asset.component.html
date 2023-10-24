@@ -1,5 +1,5 @@
 <ng-container *ngIf="!isListView; else listTemplate">
-    <div class="card" (click)="select.emit()"
+    <div class="card" (click)="selectAsset.emit()"
         [class.selectable]="isSelectable"
         [class.border-primary]="isSelected"
         (sqxDropFile)="updateFile($event)"
@@ -102,7 +102,7 @@
 </ng-container>
 
 <ng-template #listTemplate>
-    <div class="table-items-row table-items-row-summary" (click)="select.emit()" 
+    <div class="table-items-row table-items-row-summary" (click)="selectAsset.emit()" 
         [class.selectable]="isSelectable" 
         (sqxDropFile)="updateFile($event)"
         [sqxDropDisabled]="!asset || !asset.canUpload"

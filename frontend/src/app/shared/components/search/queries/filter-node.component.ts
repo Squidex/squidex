@@ -18,7 +18,7 @@ export class FilterNodeComponent {
     public comparison?: FilterComparison;
 
     @Output()
-    public change = new EventEmitter();
+    public filterChange = new EventEmitter();
 
     @Output()
     public remove = new EventEmitter();

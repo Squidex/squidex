@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-input-rename */
+
 import { booleanAttribute, Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 import { Types } from '@app/framework/internal';
 
@@ -27,7 +29,7 @@ export class FileDropDirective {
     public disabled = false;
 
     @Output('sqxDropFile')
-    public drop = new EventEmitter<ReadonlyArray<File>>();
+    public fileDrop = new EventEmitter<ReadonlyArray<File>>();
 
     constructor(
         private readonly element: ElementRef,
@@ -43,7 +45,7 @@ export class FileDropDirective {
             const files = await this.getAllowedFiles(event.clipboardData);
 
             if (files && !this.disabled) {
-                this.drop.emit(files);
+                this.fileDrop.emit(files);
             }
         }
     }
@@ -84,7 +86,7 @@ export class FileDropDirective {
             const files = await this.getAllowedFiles(event.dataTransfer);
 
             if (files && !this.disabled) {
-                this.drop.emit(files);
+                this.fileDrop.emit(files);
             }
         }
     }
