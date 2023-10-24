@@ -23,6 +23,13 @@ textarea {
     flex-direction: row-reverse;
 }
 
+.scroll-container {
+    flex-grow: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
 .bubble {
     background-color: $color-white;
     border: 0;

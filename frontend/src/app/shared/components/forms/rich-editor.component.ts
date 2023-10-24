@@ -139,11 +139,17 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     public writeValue(obj: any) {
-        this.editorWrapper?.setValue(obj);
+        if (this.editorWrapper) {
+            this.editorWrapper?.setValue(obj);
+        } else {
+            this.value = obj;
+        }
     }
 
     public onDisabled() {
-        this.editorWrapper?.setIsDisabled(this.snapshot.isDisabled);
+        if (this.editorWrapper) {
+            this.editorWrapper?.setIsDisabled(this.snapshot.isDisabled);
+        }
     }
 
     public insertText(text: string | undefined | null) {

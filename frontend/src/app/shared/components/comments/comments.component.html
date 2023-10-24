@@ -1,6 +1,6 @@
 <ng-container *ngIf="commentsArray | async; let comments">
     <ng-container *ngIf="mentionUsers | async; let users">
-        <div class="comments-list" #commentsList>
+        <div class="comments-list" #scrollContainer>
             <div (sqxResized)="scrollDown()">
                 <sqx-comment *ngFor="let comment of comments.itemsChanges | async; trackBy: trackByComment; let i = index"
                     [comment]="comment"

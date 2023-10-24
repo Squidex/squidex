@@ -45,17 +45,17 @@ export class ScrollActiveDirective implements AfterViewInit {
 
         const body = document.body;
 
-        const scrollOffset = (targetRect.top + body.scrollTop) - (parentRect.top + body.scrollTop);
+        const scrollDiff = (targetRect.top + body.scrollTop) - (parentRect.top + body.scrollTop);
         const scrollTop = parent.scrollTop;
 
-        if (scrollOffset < 0) {
-            this.renderer.setProperty(parent, 'scrollTop', scrollTop + scrollOffset);
+        if (scrollDiff < 0) {
+            this.renderer.setProperty(parent, 'scrollTop', scrollTop + scrollDiff);
         } else {
             const targetHeight = targetRect.height;
             const parentHeight = parentRect.height;
 
-            if ((scrollOffset + targetHeight) > parentHeight) {
-                this.renderer.setProperty(parent, 'scrollTop', scrollTop + scrollOffset - parentHeight + targetHeight);
+            if ((scrollDiff + targetHeight) > parentHeight) {
+                this.renderer.setProperty(parent, 'scrollTop', scrollTop + scrollDiff - parentHeight + targetHeight);
             }
         }
     }

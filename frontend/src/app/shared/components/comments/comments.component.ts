@@ -18,8 +18,8 @@ import { CommentComponent } from './comment.component';
     templateUrl: './comments.component.html',
 })
 export class CommentsComponent {
-    @ViewChild('commentsList', { static: false })
-    public commentsList!: ElementRef<HTMLDivElement>;
+    @ViewChild('scrollContainer', { static: false })
+    public scrollContainer!: ElementRef<HTMLDivElement>;
 
     @ViewChildren(CommentComponent)
     public children!: QueryList<CommentComponent>;
@@ -49,7 +49,7 @@ export class CommentsComponent {
     }
 
     public scrollDown() {
-        if (this.commentsList && this.commentsList.nativeElement) {
+        if (this.scrollContainer && this.scrollContainer.nativeElement) {
             let isEditing = false;
 
             this.children.forEach(x => {
@@ -57,9 +57,9 @@ export class CommentsComponent {
             });
 
             if (!isEditing) {
-                const height = this.commentsList.nativeElement.scrollHeight;
+                const height = this.scrollContainer.nativeElement.scrollHeight;
 
-                this.commentsList.nativeElement.scrollTop = height;
+                this.scrollContainer.nativeElement.scrollTop = height;
             }
         }
     }
