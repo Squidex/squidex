@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using LoremNET;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Comments;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -23,11 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Collaboration;
 
 public class CommentCollaborationHandlerTests : GivenContext
 {
+    private readonly SimpleDocumentManager documentManager = new SimpleDocumentManager();
     private readonly IClock clock = A.Fake<IClock>();
     private readonly IEventFormatter eventFormatter = A.Fake<IEventFormatter>();
     private readonly IEventStore eventStore = A.Fake<IEventStore>();
     private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-    private readonly IDocumentManager documentManager = A.Fake<IDocumentManager>();
     private readonly CommentCollaborationHandler sut;
 
     public CommentCollaborationHandlerTests()
@@ -40,13 +41,9 @@ public class CommentCollaborationHandlerTests : GivenContext
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>._, default))
             .Returns(Task.FromResult<IUser?>(null));
 
-        A.CallTo(() => documentManager.UpdateDocAsync(A<DocumentContext>._, A<Action<Doc>>._, A<CancellationToken>._))
-            .Invokes(c =>
-            {
-                c.GetArgument<Action<Doc>>(1)!(null!);
-            });
+        var log = A.Fake<ILogger<CommentCollaborationHandler>>();
 
-        sut = new CommentCollaborationHandler(TestUtils.DefaultSerializer, eventStore, eventFormatter, userResolver, clock);
+        sut = new CommentCollaborationHandler(TestUtils.DefaultSerializer, eventStore, eventFormatter, userResolver, clock, log);
     }
 
     [Fact]
@@ -75,20 +72,13 @@ public class CommentCollaborationHandlerTests : GivenContext
         var document = new Doc();
         var docName = sut.ResourceDocument(AppId, commentsId);
 
+        documentManager.Doc = document;
+
         Output? addedInput = null;
         document.Array("stream").ObserveDeep(events =>
         {
             addedInput = events.Single().ArrayEvent.Delta.Single().Values.Single();
         });
-
-        A.CallTo(() => documentManager.UpdateDocAsync(
-                A<DocumentContext>.That.Matches(x => x.DocumentName == docName),
-                A<Action<Doc>>._,
-                A<CancellationToken>._))
-            .Invokes(c =>
-            {
-                c.GetArgument<Action<Doc>>(1)!(document);
-            });
 
         await sut.CommentAsync(AppId, commentsId, "My Comment", User, null, true, default);
 
@@ -107,20 +97,13 @@ public class CommentCollaborationHandlerTests : GivenContext
         var document = new Doc();
         var docName = sut.UserDocument(User.Identifier);
 
+        documentManager.Doc = document;
+
         Output? addedInput = null;
         document.Array("stream").ObserveDeep(events =>
         {
             addedInput = events.Single().ArrayEvent.Delta.Single().Values.Single();
         });
-
-        A.CallTo(() => documentManager.UpdateDocAsync(
-                A<DocumentContext>.That.Matches(x => x.DocumentName == docName),
-                A<Action<Doc>>._,
-                A<CancellationToken>._))
-            .Invokes(c =>
-            {
-                c.GetArgument<Action<Doc>>(1)!(document);
-            });
 
         await sut.NotifyAsync(User.Identifier, "My Notification", User, null, true, default);
 
@@ -230,6 +213,8 @@ public class CommentCollaborationHandlerTests : GivenContext
         var document = new Doc();
         var docName = sut.ResourceDocument(AppId, commentsId);
 
+        documentManager.Doc = document;
+
         var stream = document.Array("stream");
 
         await sut.OnDocumentLoadedAsync(new DocumentLoadEvent
@@ -249,10 +234,13 @@ public class CommentCollaborationHandlerTests : GivenContext
                 storedEvent = c.GetArgument<Envelope<IEvent>>(0);
             });
 
-        using (var transaction = document.WriteTransaction())
+        await documentManager.UpdateDocAsync(null!, doc =>
         {
-            stream.InsertRange(transaction, 0, InputFactory.FromJson(commentJson));
-        }
+            using (var transaction = doc.WriteTransaction())
+            {
+                stream.InsertRange(transaction, 0, InputFactory.FromJson(commentJson));
+            }
+        }, default);
 
         await sut.LastTask;
 
@@ -270,5 +258,78 @@ public class CommentCollaborationHandlerTests : GivenContext
 
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(email, default))
             .Returns(user);
+    }
+
+    private sealed class SimpleDocumentManager : IDocumentManager
+    {
+        private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1);
+
+        public Doc Doc { get; set; }
+
+        public async ValueTask UpdateDocAsync(DocumentContext context, Action<Doc> action,
+            CancellationToken ct = default)
+        {
+            await lockObject.WaitAsync(ct);
+            try
+            {
+                action(Doc);
+            }
+            finally
+            {
+                lockObject.Release();
+            }
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public ValueTask CleanupAsync(
+            CancellationToken ct = default)
+        {
+            return default;
+        }
+
+        public ValueTask PingAsync(DocumentContext context, ulong clock, string? state = null,
+            CancellationToken ct = default)
+        {
+            return default;
+        }
+
+        public ValueTask DisconnectAsync(DocumentContext context,
+            CancellationToken ct = default)
+        {
+            return default;
+        }
+
+        public ValueTask<IReadOnlyDictionary<ulong, ConnectedUser>> GetAwarenessAsync(DocumentContext context,
+            CancellationToken ct = default)
+        {
+            return default;
+        }
+
+        public ValueTask<byte[]> GetStateVectorAsync(DocumentContext context,
+            CancellationToken ct = default)
+        {
+            return default;
+        }
+
+        public ValueTask<byte[]> GetUpdateAsync(DocumentContext context, byte[] stateVector,
+            CancellationToken ct = default)
+        {
+            return default;
+        }
+
+        public ValueTask<UpdateResult> ApplyUpdateAsync(DocumentContext context, byte[] stateDiff,
+            CancellationToken ct = default)
+        {
+            return default;
+        }
     }
 }

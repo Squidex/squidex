@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using NodaTime;
-using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Comments;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
@@ -30,6 +30,7 @@ public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICo
     private readonly IEventFormatter eventFormatter;
     private readonly IUserResolver userResolver;
     private readonly IClock clock;
+    private readonly ILogger<CommentCollaborationHandler> log;
     private IDocumentManager? currentManager;
 
     public Task LastTask { get; private set; }
@@ -39,13 +40,15 @@ public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICo
         IEventStore eventStore,
         IEventFormatter eventFormatter,
         IUserResolver userResolver,
-        IClock clock)
+        IClock clock,
+        ILogger<CommentCollaborationHandler> log)
     {
         this.jsonSerializer = jsonSerializer;
         this.eventStore = eventStore;
         this.eventFormatter = eventFormatter;
         this.userResolver = userResolver;
         this.clock = clock;
+        this.log = log;
     }
 
     public ValueTask OnInitializedAsync(IDocumentManager manager)
@@ -76,7 +79,8 @@ public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICo
 
         var notificationsContext = new DocumentContext(documentName, 0);
 
-        await currentManager.UpdateDocAsync(notificationsContext, (doc) =>
+        // Use the update method to ensure that only one thread has access to the doc.
+        await currentManager.UpdateDocAsync(notificationsContext, doc =>
         {
             var stream = doc.Array("stream");
 
@@ -111,13 +115,24 @@ public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICo
 
             if (newComments.Length == 0)
             {
+                // Just store the last task for tests.
                 LastTask = Task.CompletedTask;
                 return;
             }
 
             LastTask = Task.Run(async () =>
             {
-                await HandleAsync(@event, appId, resourceId, newComments);
+                try
+                {
+                    // Run in an extra task to prevent deadlocks with the outer transaction.
+                    await HandleAsync(@event, appId, resourceId, newComments);
+                }
+                catch (Exception ex)
+                {
+                    // We are in an extra task, so the exception would be probably swallowed.
+                    log.LogError(ex, "Failed to handle yjs event.");
+                    throw;
+                }
             });
         });
 
@@ -128,12 +143,14 @@ public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICo
     {
         var comments = new List<Comment>();
 
+        // Use the update method to ensure that only one thread has access to the doc.
         await @event.Source.UpdateDocAsync(@event.Context, (doc) =>
         {
             using (var transaction = @event.Document.ReadTransaction())
             {
                 foreach (var output in newComments)
                 {
+                    // Just use the json string for debuggability.
                     var json = output.ToJson(transaction);
 
                     var comment = jsonSerializer.Deserialize<Comment>(json);
