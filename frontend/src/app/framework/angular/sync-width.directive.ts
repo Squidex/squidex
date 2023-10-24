@@ -6,12 +6,14 @@
  */
 
 import { AfterViewInit, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
-import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/internal';
+import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxSyncWidth]',
 })
-export class SyncWidthDirective extends ResourceOwner implements AfterViewInit, ResizeListener {
+export class SyncWidthDirective implements AfterViewInit, ResizeListener {
+    private readonly subscriptions = new Subscriptions();
+
     @Input('sqxSyncWidth')
     public target!: HTMLElement;
 
@@ -20,9 +22,7 @@ export class SyncWidthDirective extends ResourceOwner implements AfterViewInit, 
         private readonly renderer: Renderer2,
         private readonly resizeService: ResizeService,
     ) {
-        super();
-
-        this.own(this.resizeService.listen(this.element.nativeElement, this));
+        this.subscriptions.add(this.resizeService.listen(this.element.nativeElement, this));
     }
 
     public ngAfterViewInit() {

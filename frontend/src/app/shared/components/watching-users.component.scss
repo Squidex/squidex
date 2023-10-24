@@ -8,9 +8,12 @@
 }
 
 .user-item {
+    @include circle(2.3rem);
+    background-color: $color-white;
     display: inline-block;
     margin-right: 0;
     margin-left: -1.1rem;
+    padding: 2px;
     position: relative;
 
     &:hover {
@@ -19,8 +22,9 @@
 
     .user-picture,
     .user-more {
-        @include circle(2.3rem);
-        border: 2px solid $color-white;
+        border-radius: 1000px;
+        border-style: solid;
+        border-width: 3px;
     }
 
     .user-more {

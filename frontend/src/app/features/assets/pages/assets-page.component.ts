@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { AssetDto, AssetsState, DialogModel, LocalStoreService, MathHelper, Queries, Query, QueryFullTextSynchronizer, ResourceOwner, Router2State, UIState } from '@app/shared';
+import { AssetDto, AssetsState, DialogModel, LocalStoreService, MathHelper, Queries, Query, QueryFullTextSynchronizer, Router2State, UIState } from '@app/shared';
 import { Settings } from '@app/shared/state/settings';
 
 @Component({
@@ -17,7 +17,7 @@ import { Settings } from '@app/shared/state/settings';
         Router2State,
     ],
 })
-export class AssetsPageComponent extends ResourceOwner implements OnInit {
+export class AssetsPageComponent implements OnInit {
     public editAsset?: AssetDto;
 
     public listQueries = new Queries(this.uiState, 'assets');
@@ -31,8 +31,6 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         private readonly localStore: LocalStoreService,
         private readonly uiState: UIState,
     ) {
-        super();
-
         this.listMode = this.localStore.getBoolean(Settings.Local.ASSETS_MODE);
     }
 

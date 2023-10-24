@@ -7,32 +7,31 @@
 
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Entities.Comments.Commands;
+using Squidex.Domain.Apps.Entities.Collaboration;
+using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 
 namespace Squidex.Extensions.Actions.Notification;
 
-public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, CreateComment>
+public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, CommentCreated>
 {
     private const string Description = "Send a Notification";
-    private readonly ICommandBus commandBus;
+    private readonly ICollaborationService collaboration;
     private readonly IUserResolver userResolver;
 
-    public NotificationActionHandler(RuleEventFormatter formatter, ICommandBus commandBus, IUserResolver userResolver)
+    public NotificationActionHandler(RuleEventFormatter formatter, ICollaborationService collaboration, IUserResolver userResolver)
         : base(formatter)
     {
-        this.commandBus = commandBus;
-
+        this.collaboration = collaboration;
         this.userResolver = userResolver;
     }
 
-    protected override async Task<(string Description, CreateComment Data)> CreateJobAsync(EnrichedEvent @event, NotificationAction action)
+    protected override async Task<(string Description, CommentCreated Data)> CreateJobAsync(EnrichedEvent @event, NotificationAction action)
     {
         if (@event is not EnrichedUserEventBase userEvent)
         {
-            return ("Ignore", new CreateComment());
+            return ("Ignore", new CommentCreated());
         }
 
         var user = await userResolver.FindByIdOrEmailAsync(action.User);
@@ -49,9 +48,8 @@ public sealed class NotificationActionHandler : RuleActionHandler<NotificationAc
             actor = RefToken.Client(action.Client);
         }
 
-        var ruleJob = new CreateComment
+        var ruleJob = new CommentCreated
         {
-            AppId = CommentsCommand.NoApp,
             Actor = actor,
             CommentId = DomainId.NewGuid(),
             CommentsId = DomainId.Create(user.Id),
@@ -72,18 +70,16 @@ public sealed class NotificationActionHandler : RuleActionHandler<NotificationAc
         return (Description, ruleJob);
     }
 
-    protected override async Task<Result> ExecuteJobAsync(CreateComment job,
+    protected override async Task<Result> ExecuteJobAsync(CommentCreated job,
         CancellationToken ct = default)
     {
-        var command = job;
-
-        if (command.CommentsId == default)
+        if (job.CommentsId == default)
         {
             return Result.Ignored();
         }
 
-        await commandBus.PublishAsync(command, ct);
+        await collaboration.NotifyAsync(job.CommentsId.ToString(), job.Text, job.Actor, job.Url, true, ct);
 
-        return Result.Success($"Notified: {command.Text}");
+        return Result.Success($"Notified: {job.Text}");
     }
 }

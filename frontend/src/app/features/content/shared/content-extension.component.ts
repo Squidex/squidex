@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiUrlConfig, ResourceOwner, Types } from '@app/framework/internal';
+import { ApiUrlConfig, Types } from '@app/framework/internal';
 import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto, TypedSimpleChanges } from '@app/shared';
 
 @Component({
@@ -16,7 +16,7 @@ import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto, TypedS
     templateUrl: './content-extension.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentExtensionComponent extends ResourceOwner {
+export class ContentExtensionComponent  {
     private readonly context: any;
     private isInitialized = false;
 
@@ -40,8 +40,6 @@ export class ContentExtensionComponent extends ResourceOwner {
         private readonly appsState: AppsState,
         private readonly router: Router,
     ) {
-        super();
-
         this.context = {
             apiUrl: apiUrl.buildUrl('api'),
             appId: appsState.snapshot.selectedApp!.id,

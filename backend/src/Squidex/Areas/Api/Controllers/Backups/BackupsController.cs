@@ -34,8 +34,8 @@ public class BackupsController : ApiController
     /// Get all backup jobs.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Backups returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Backups returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/backups/")]
     [ProducesResponseType(typeof(BackupJobsDto), StatusCodes.Status200OK)]
@@ -54,9 +54,9 @@ public class BackupsController : ApiController
     /// Start a new backup.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="204">Backup started.</response>.
-    /// <response code="400">Backup contingent reached.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="204">Backup started.</response>
+    /// <response code="400">Backup contingent reached.</response>
+    /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/backups/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -74,8 +74,8 @@ public class BackupsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the backup to delete.</param>
-    /// <response code="204">Backup deleted.</response>.
-    /// <response code="404">Backup or app not found.</response>.
+    /// <response code="204">Backup deleted.</response>
+    /// <response code="404">Backup or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/backups/{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

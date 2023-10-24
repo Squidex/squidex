@@ -41,8 +41,8 @@ public sealed class ContentsSharedController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The request parameters.</param>
-    /// <response code="200">Contents returned or mutated.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Contents returned or mutated.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -66,8 +66,8 @@ public sealed class ContentsSharedController : ApiController
     /// GraphQL endpoint.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Contents returned or mutated.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Contents returned or mutated.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -93,8 +93,8 @@ public sealed class ContentsSharedController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The request object.</param>
-    /// <response code="200">Contents returned or mutated.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Contents returned or mutated.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -118,8 +118,8 @@ public sealed class ContentsSharedController : ApiController
     /// GraphQL batch endpoint.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Contents returned or mutated.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Contents returned or mutated.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -145,8 +145,8 @@ public sealed class ContentsSharedController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="query">The query object.</param>
-    /// <response code="200">Contents returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Contents returned.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -178,8 +178,8 @@ public sealed class ContentsSharedController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="query">The required query object.</param>
-    /// <response code="200">Contents returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Contents returned.</response>
+    /// <response code="404">App not found.</response>
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>
@@ -212,9 +212,9 @@ public sealed class ContentsSharedController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The bulk update request.</param>
-    /// <response code="201">Contents created, update or delete.</response>.
-    /// <response code="400">Contents request not valid.</response>.
-    /// <response code="404">Contents references, schema or app not found.</response>.
+    /// <response code="201">Contents created, update or delete.</response>
+    /// <response code="400">Contents request not valid.</response>
+    /// <response code="404">Contents references, schema or app not found.</response>
     /// <remarks>
     /// You can read the generated documentation for your app at /api/content/{appName}/docs.
     /// </remarks>

@@ -6,7 +6,7 @@
  */
 
 import { Directive, ElementRef, Input, numberAttribute, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
-import { ResourceOwner } from '@app/framework';
+import { Subscriptions } from '@app/framework';
 import { ContentDto, FieldSizes, META_FIELDS, TableField, TableSettings } from '@app/shared/internal';
 
 export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | null) {
@@ -63,7 +63,8 @@ export class ContentsColumnsPipe implements PipeTransform {
 @Directive({
     selector: '[sqxContentListWidth]',
 })
-export class ContentListWidthDirective extends ResourceOwner {
+export class ContentListWidthDirective  {
+    private readonly subscriptions = new Subscriptions();
     private sizes?: FieldSizes;
     private size = -1;
 
@@ -72,9 +73,9 @@ export class ContentListWidthDirective extends ResourceOwner {
 
     @Input('fields')
     public set tableSettings(value: TableSettings | undefined | null) {
-        this.unsubscribeAll();
+        this.subscriptions.unsubscribeAll();
 
-        this.own(value?.fieldSizes.subscribe(sizes => {
+        this.subscriptions.add(value?.fieldSizes.subscribe(sizes => {
             this.sizes = sizes;
 
             this.updateSize();
@@ -85,7 +86,6 @@ export class ContentListWidthDirective extends ResourceOwner {
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
     ) {
-        super();
     }
 
     public ngOnChanges() {
@@ -107,9 +107,7 @@ export class ContentListWidthDirective extends ResourceOwner {
             return;
         }
 
-        const width = `${size}px`;
-
-        this.renderer.setStyle(this.element.nativeElement, 'min-width', width);
+        this.renderer.setStyle(this.element.nativeElement, 'min-width', `${size}px`);
 
         this.size === size;
     }
@@ -118,7 +116,8 @@ export class ContentListWidthDirective extends ResourceOwner {
 @Directive({
     selector: '[sqxContentListCell]',
 })
-export class ContentListCellDirective extends ResourceOwner {
+export class ContentListCellDirective  {
+    private readonly subscriptions = new Subscriptions();
     private sizes?: FieldSizes;
     private size = -1;
 
@@ -127,9 +126,9 @@ export class ContentListCellDirective extends ResourceOwner {
 
     @Input('fields')
     public set tableFields(value: TableSettings | undefined | null) {
-        this.unsubscribeAll();
+        this.subscriptions.unsubscribeAll();
 
-        this.own(value?.fieldSizes.subscribe(sizes => {
+        this.subscriptions.add(value?.fieldSizes.subscribe(sizes => {
             this.sizes = sizes;
 
             this.updateSize();
@@ -140,7 +139,6 @@ export class ContentListCellDirective extends ResourceOwner {
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
     ) {
-        super();
     }
 
     public ngOnChanges() {

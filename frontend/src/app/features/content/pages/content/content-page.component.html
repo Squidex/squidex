@@ -51,7 +51,7 @@
         <ng-container menu>
             <div class="menu">
                 <ng-container *ngIf="content; else noContentMenu">
-                    <sqx-watching-users resource="{{schema.id}}/{{content.id}}"></sqx-watching-users>
+                    <sqx-watching-users></sqx-watching-users>
 
                     <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema.id}}/contents/{{content.id}}"></sqx-notifo>
         

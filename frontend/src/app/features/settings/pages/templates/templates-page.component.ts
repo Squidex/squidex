@@ -6,19 +6,18 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ClientsState, ResourceOwner, TemplateDto, TemplatesState } from '@app/shared';
+import { ClientsState, TemplateDto, TemplatesState } from '@app/shared';
 
 @Component({
     selector: 'sqx-templates-page',
     styleUrls: ['./templates-page.component.scss'],
     templateUrl: './templates-page.component.html',
 })
-export class TemplatesPageComponent extends ResourceOwner implements OnInit {
+export class TemplatesPageComponent implements OnInit {
     constructor(
         public readonly clientsState: ClientsState,
         public readonly templatesState: TemplatesState,
     ) {
-        super();
     }
 
     public ngOnInit() {

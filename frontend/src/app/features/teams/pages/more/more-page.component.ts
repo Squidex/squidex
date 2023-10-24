@@ -6,14 +6,16 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { defined, ResourceOwner, TeamDto, TeamsState, UpdateTeamForm } from '@app/shared';
+import { defined, Subscriptions, TeamDto, TeamsState, UpdateTeamForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
 })
-export class MorePageComponent extends ResourceOwner implements OnInit {
+export class MorePageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public team!: TeamDto;
 
     public isEditable = false;
@@ -23,11 +25,10 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
     constructor(
         private readonly teamsState: TeamsState,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.teamsState.selectedTeam.pipe(defined())
                 .subscribe(team => {
                     this.team = team;

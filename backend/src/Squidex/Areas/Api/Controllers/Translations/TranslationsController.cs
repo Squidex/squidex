@@ -37,7 +37,7 @@ public sealed class TranslationsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The translation request.</param>
-    /// <response code="200">Text translated.</response>.
+    /// <response code="200">Text translated.</response>
     [HttpPost]
     [Route("apps/{app}/translations/")]
     [ProducesResponseType(typeof(TranslationDto), StatusCodes.Status200OK)]
@@ -56,7 +56,7 @@ public sealed class TranslationsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The question request.</param>
-    /// <response code="200">Question asked.</response>.
+    /// <response code="200">Question asked.</response>
     [HttpPost]
     [Route("apps/{app}/ask/")]
     [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]

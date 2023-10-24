@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Notifications;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;

@@ -50,6 +50,7 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
+using YDotNet.Server.MongoDB;
 
 namespace Squidex.Config.Domain;
 
@@ -67,6 +68,12 @@ public static class StoreServices
 
                 services.AddMongoAssetKeyValueStore();
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(MongoSnapshotStore<>));
+
+                services.AddYDotNet()
+                    .AddMongoStorage(options =>
+                    {
+                        options.DatabaseName = mongoDatabaseName;
+                    });
 
                 services.AddSingletonAs(c => GetMongoClient(mongoConfiguration))
                     .As<IMongoClient>();

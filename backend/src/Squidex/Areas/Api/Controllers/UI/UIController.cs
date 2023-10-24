@@ -36,7 +36,7 @@ public sealed class UIController : ApiController
     /// <summary>
     /// Get ui settings.
     /// </summary>
-    /// <response code="200">UI settings returned.</response>.
+    /// <response code="200">UI settings returned.</response>
     [HttpGet]
     [Route("ui/settings/")]
     [ProducesResponseType(typeof(Dictionary<string, JsonValue>), StatusCodes.Status200OK)]
@@ -63,8 +63,8 @@ public sealed class UIController : ApiController
     /// Get ui settings.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">UI settings returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">UI settings returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/ui/settings/")]
     [ProducesResponseType(typeof(Dictionary<string, JsonValue>), StatusCodes.Status200OK)]
@@ -80,8 +80,8 @@ public sealed class UIController : ApiController
     /// Get my ui settings.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">UI settings returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">UI settings returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/ui/settings/me")]
     [ProducesResponseType(typeof(Dictionary<string, JsonValue>), StatusCodes.Status200OK)]
@@ -98,8 +98,8 @@ public sealed class UIController : ApiController
     /// </summary>
     /// <param name="key">The name of the setting.</param>
     /// <param name="request">The request with the value to update.</param>
-    /// <response code="200">UI setting set.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">UI setting set.</response>
+    /// <response code="404">App not found.</response>
     [HttpPut]
     [Route("ui/settings/{key}")]
     [ApiPermission]
@@ -116,8 +116,8 @@ public sealed class UIController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="key">The name of the setting.</param>
     /// <param name="request">The request with the value to update.</param>
-    /// <response code="200">UI setting set.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">UI setting set.</response>
+    /// <response code="404">App not found.</response>
     [HttpPut]
     [Route("apps/{app}/ui/settings/{key}")]
     [ApiPermission]
@@ -134,8 +134,8 @@ public sealed class UIController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="key">The name of the setting.</param>
     /// <param name="request">The request with the value to update.</param>
-    /// <response code="200">UI setting set.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">UI setting set.</response>
+    /// <response code="404">App not found.</response>
     [HttpPut]
     [Route("apps/{app}/ui/settings/me/{key}")]
     [ApiPermission]
@@ -150,8 +150,8 @@ public sealed class UIController : ApiController
     /// Remove ui settings.
     /// </summary>
     /// <param name="key">The name of the setting.</param>
-    /// <response code="200">UI setting removed.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">UI setting removed.</response>
+    /// <response code="404">App not found.</response>
     [HttpDelete]
     [Route("ui/settings/{key}")]
     [ApiPermission]
@@ -167,8 +167,8 @@ public sealed class UIController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="key">The name of the setting.</param>
-    /// <response code="200">UI setting removed.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">UI setting removed.</response>
+    /// <response code="404">App not found.</response>
     [HttpDelete]
     [Route("apps/{app}/ui/settings/{key}")]
     [ApiPermission]
@@ -184,8 +184,8 @@ public sealed class UIController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="key">The name of the setting.</param>
-    /// <response code="200">UI setting removed.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">UI setting removed.</response>
+    /// <response code="404">App not found.</response>
     [HttpDelete]
     [Route("apps/{app}/ui/settings/me/{key}")]
     [ApiPermission]

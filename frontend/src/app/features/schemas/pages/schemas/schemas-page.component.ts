@@ -10,7 +10,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { CreateCategoryForm, DialogModel, getCategoryTree, MessageBus, ResourceOwner, SchemaCategory, SchemaDto, SchemasState, value$ } from '@app/shared';
+import { CreateCategoryForm, DialogModel, getCategoryTree, MessageBus, SchemaCategory, SchemaDto, SchemasState, Subscriptions, value$ } from '@app/shared';
 import { SchemaCloning } from './../messages';
 
 @Component({
@@ -18,7 +18,9 @@ import { SchemaCloning } from './../messages';
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
 })
-export class SchemasPageComponent extends ResourceOwner implements OnInit {
+export class SchemasPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public addSchemaDialog = new DialogModel();
     public addCategoryForm = new CreateCategoryForm();
 
@@ -41,11 +43,10 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.messageBus.of(SchemaCloning)
                 .subscribe(event => {
                     this.import = event.schema;
@@ -53,7 +54,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
                     this.addSchemaDialog.show();
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.route.params.pipe(map(q => q['showDialog']))
                 .subscribe(showDialog => {
                     if (showDialog) {

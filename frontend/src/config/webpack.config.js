@@ -1,3 +1,4 @@
+const process = require('process');
 const plugins = {
     // https://webpack.js.org/plugins/eslint-webpack-plugin/
     ESLintPlugin: require('eslint-webpack-plugin'),
@@ -8,6 +9,11 @@ const plugins = {
     // https://webpack.js.org/plugins/copy-webpack-plugin/
     CopyPlugin: require('copy-webpack-plugin'),
 };
+
+process.on('uncaughtException', err => {
+    // Prevent ECONNRESET errors
+    console.log(err);
+});
 
 module.exports = (config, _, options) => {
     /*

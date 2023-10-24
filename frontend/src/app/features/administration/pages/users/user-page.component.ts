@@ -8,14 +8,16 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UpsertUserDto, UserDto, UserForm, UsersState } from '@app/features/administration/internal';
-import { ResourceOwner } from '@app/shared';
+import { Subscriptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-user-page',
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html',
 })
-export class UserPageComponent extends ResourceOwner implements OnInit {
+export class UserPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public isEditable = false;
 
     public user?: UserDto | null;
@@ -26,11 +28,10 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.usersState.selectedUser
                 .subscribe(user => {
                     this.user = user;

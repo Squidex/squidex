@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MessageBus, ResourceOwner, RuleSimulatorState, SimulatedRuleEventDto } from '@app/shared';
+import { MessageBus, RuleSimulatorState, SimulatedRuleEventDto, Subscriptions } from '@app/shared';
 import { RuleConfigured } from './../messages';
 
 @Component({
@@ -15,7 +15,9 @@ import { RuleConfigured } from './../messages';
     styleUrls: ['./rule-simulator-page.component.scss'],
     templateUrl: './rule-simulator-page.component.html',
 })
-export class RuleSimulatorPageComponent extends ResourceOwner implements OnInit {
+export class RuleSimulatorPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public selectedRuleEvent?: string | null;
 
     constructor(
@@ -23,17 +25,16 @@ export class RuleSimulatorPageComponent extends ResourceOwner implements OnInit 
         private readonly route: ActivatedRoute,
         private readonly messageBus: MessageBus,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.messageBus.of(RuleConfigured)
                 .subscribe(message => {
                     this.ruleSimulatorState.setRule(message.trigger, message.action);
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.route.queryParams
                 .subscribe(query => {
                     this.ruleSimulatorState.selectRule(query['ruleId']);

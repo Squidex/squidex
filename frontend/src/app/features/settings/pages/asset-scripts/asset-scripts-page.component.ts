@@ -7,14 +7,14 @@
 
 import { Component, OnInit } from '@angular/core';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { AppsState, AssetScriptsState, AssetsService, EditAssetScriptsForm, ResourceOwner, ScriptCompletions } from '@app/shared';
+import { AppsState, AssetScriptsState, AssetsService, EditAssetScriptsForm, ScriptCompletions } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-scripts-page',
     styleUrls: ['./asset-scripts-page.component.scss'],
     templateUrl: './asset-scripts-page.component.html',
 })
-export class AssetScriptsPageComponent extends ResourceOwner implements OnInit {
+export class AssetScriptsPageComponent implements OnInit {
     public assetScript = 'query';
     public assetCompletions: Observable<ScriptCompletions> = EMPTY;
 
@@ -27,7 +27,6 @@ export class AssetScriptsPageComponent extends ResourceOwner implements OnInit {
         private readonly assetScriptsState: AssetScriptsState,
         private readonly assetsService: AssetsService,
     ) {
-        super();
     }
 
     public ngOnInit() {

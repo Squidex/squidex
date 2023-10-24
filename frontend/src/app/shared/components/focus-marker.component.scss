@@ -1,0 +1,23 @@
+@import 'mixins';
+@import 'vars';
+
+.focus-container {
+    position: relative;
+}
+
+.focus-border {
+    @include absolute(-2px, -2px, -2px, -2px);
+    border: 2px solid transparent;
+    border-radius: 6px;
+}
+
+.focus-user {
+    @include absolute(null, 4px, 100%);
+    color: $color-white;
+    font-size: $font-small;
+    font-weight: normal;
+    margin-right: 0;
+    margin-bottom: 2px;
+    padding: .125rem .25rem;
+    white-space: nowrap;
+}

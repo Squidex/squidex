@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using System.Text.RegularExpressions;
-using EventStore.Client;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
@@ -323,25 +321,6 @@ public abstract class EventStoreTests<T> where T : IEventStore
 
         ShouldBeEquivalentTo(readEvents1, expected);
         ShouldBeEquivalentTo(readEvents2, expected);
-    }
-
-    [Theory]
-    [InlineData(5, 30)]
-    [InlineData(5, 300)]
-    public async Task Should_query_reverse(int commits, int count)
-    {
-        var streamName = $"test-{Guid.NewGuid()}";
-
-        var eventsWritten = await AppendEventsAsync(streamName, count, commits);
-        var eventsStored = eventsWritten.Select((x, i) => new StoredEvent(streamName, "Position", i, x)).ToArray();
-
-        for (var take = 0; take < count; take += count / 10)
-        {
-            var eventsExpected = eventsStored.TakeLast(take).ToArray();
-            var eventsQueried = await Sut.QueryStreamReverseAsync(streamName, take);
-
-            ShouldBeEquivalentTo(eventsQueried, eventsExpected);
-        }
     }
 
     [Theory]

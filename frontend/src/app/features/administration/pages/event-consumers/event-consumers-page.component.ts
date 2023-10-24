@@ -9,27 +9,28 @@ import { Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { EventConsumerDto, EventConsumersState } from '@app/features/administration/internal';
-import { DialogModel, ResourceOwner } from '@app/shared';
+import { DialogModel, Subscriptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-event-consumers-page',
     styleUrls: ['./event-consumers-page.component.scss'],
     templateUrl: './event-consumers-page.component.html',
 })
-export class EventConsumersPageComponent extends ResourceOwner implements OnInit {
+export class EventConsumersPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public eventConsumerErrorDialog = new DialogModel();
     public eventConsumerError?: string;
 
     constructor(
         public readonly eventConsumersState: EventConsumersState,
     ) {
-        super();
     }
 
     public ngOnInit() {
         this.eventConsumersState.load();
 
-        this.own(timer(1000, 1000).pipe(switchMap(() => this.eventConsumersState.load(false, true))));
+        this.subscriptions.add(timer(1000, 1000).pipe(switchMap(() => this.eventConsumersState.load(false, true))));
     }
 
     public reload() {

@@ -6,12 +6,13 @@
  */
 
 import { booleanAttribute, Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
-import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/internal';
+import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxCompensateScrollbar]',
 })
-export class CompensateScrollbarDirective extends ResourceOwner implements ResizeListener {
+export class CompensateScrollbarDirective implements ResizeListener {
+    private readonly subscriptions = new Subscriptions();
     private previousScrollbarWidth = -1;
 
     @Input({ alias: 'sqxCompensateScrollbar', transform: booleanAttribute })
@@ -22,9 +23,7 @@ export class CompensateScrollbarDirective extends ResourceOwner implements Resiz
         private readonly element: ElementRef<HTMLElement>,
         private readonly resizeService: ResizeService,
     ) {
-        super();
-
-        this.own(this.resizeService.listen(this.element.nativeElement, this));
+        this.subscriptions.add(this.resizeService.listen(this.element.nativeElement, this));
     }
 
     public ngAfterViewInit() {

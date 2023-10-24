@@ -33,8 +33,8 @@ public sealed class HistoryController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="channel">The name of the channel.</param>
-    /// <response code="200">Events returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Events returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/history/")]
     [ProducesResponseType(typeof(HistoryEventDto[]), StatusCodes.Status200OK)]
@@ -54,8 +54,8 @@ public sealed class HistoryController : ApiController
     /// </summary>
     /// <param name="team">The ID of the team.</param>
     /// <param name="channel">The name of the channel.</param>
-    /// <response code="200">Events returned.</response>.
-    /// <response code="404">Team not found.</response>.
+    /// <response code="200">Events returned.</response>
+    /// <response code="404">Team not found.</response>
     [HttpGet]
     [Route("teams/{team}/history/")]
     [ProducesResponseType(typeof(HistoryEventDto[]), StatusCodes.Status200OK)]

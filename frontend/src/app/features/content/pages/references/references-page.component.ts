@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentContentsState, ContentDto, LanguagesState, QuerySynchronizer, ResourceOwner, Router2State } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, LanguagesState, QuerySynchronizer, Router2State, Subscriptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-page',
@@ -19,7 +19,9 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, LanguagesState, Que
         Router2State, ComponentContentsState,
     ],
 })
-export class ReferencesPageComponent extends ResourceOwner implements OnInit {
+export class ReferencesPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public language!: AppLanguageDto;
     public languages!: ReadonlyArray<AppLanguageDto>;
 
@@ -29,23 +31,22 @@ export class ReferencesPageComponent extends ResourceOwner implements OnInit {
         public readonly languagesState: LanguagesState,
         private readonly route: ActivatedRoute,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.languagesState.isoMasterLanguage
                 .subscribe(language => {
                     this.language = language;
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.languagesState.isoLanguages
                 .subscribe(languages => {
                     this.languages = languages;
                 }));
 
-        this.own(
+        this.subscriptions.add(
             getReferenceId(this.route)
                 .subscribe(referenceId => {
                     const initial =

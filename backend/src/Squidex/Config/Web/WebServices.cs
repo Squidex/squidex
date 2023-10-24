@@ -75,6 +75,9 @@ public static class WebServices
 
         services.AddLocalization();
 
+        services.AddYDotNet()
+            .AddWebSockets();
+
         services.AddMvc(options =>
         {
             // Never change this order here.

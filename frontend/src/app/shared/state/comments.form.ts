@@ -7,9 +7,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form } from '@app/framework';
-import { UpsertCommentDto } from './../services/comments.service';
+import { Comment } from './comments';
 
-export class UpsertCommentForm extends Form<ExtendedFormGroup, UpsertCommentDto> {
+export class UpsertCommentForm extends Form<ExtendedFormGroup, Comment> {
     constructor() {
         super(new ExtendedFormGroup({
             text: new UntypedFormControl('',

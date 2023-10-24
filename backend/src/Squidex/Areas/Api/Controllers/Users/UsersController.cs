@@ -60,7 +60,7 @@ public sealed class UsersController : ApiController
     /// <summary>
     /// Get the user resources.
     /// </summary>
-    /// <response code="200">User resources returned.</response>.
+    /// <response code="200">User resources returned.</response>
     [HttpGet]
     [Route("")]
     [ProducesResponseType(typeof(ResourcesDto), StatusCodes.Status200OK)]
@@ -76,7 +76,7 @@ public sealed class UsersController : ApiController
     /// Update the user profile.
     /// </summary>
     /// <param name="request">The values to update.</param>
-    /// <response code="204">User updated.</response>.
+    /// <response code="204">User updated.</response>
     [HttpPost]
     [Route("user")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -95,7 +95,7 @@ public sealed class UsersController : ApiController
     /// <remarks>
     /// Search the user by query that contains the email address or the part of the email address.
     /// </remarks>
-    /// <response code="200">Users returned.</response>.
+    /// <response code="200">Users returned.</response>
     [HttpGet]
     [Route("users/")]
     [ProducesResponseType(typeof(UserDto[]), StatusCodes.Status200OK)]
@@ -122,8 +122,8 @@ public sealed class UsersController : ApiController
     /// Get user by id.
     /// </summary>
     /// <param name="id">The ID of the user (GUID).</param>
-    /// <response code="200">User found.</response>.
-    /// <response code="404">User not found.</response>.
+    /// <response code="200">User found.</response>
+    /// <response code="404">User not found.</response>
     [HttpGet]
     [Route("users/{id}/")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
@@ -153,8 +153,8 @@ public sealed class UsersController : ApiController
     /// Get user picture by id.
     /// </summary>
     /// <param name="id">The ID of the user (GUID).</param>
-    /// <response code="200">User found and image or fallback returned.</response>.
-    /// <response code="404">User not found.</response>.
+    /// <response code="200">User found and image or fallback returned.</response>
+    /// <response code="404">User not found.</response>
     [HttpGet]
     [Route("users/{id}/picture/")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]

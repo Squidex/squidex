@@ -8,7 +8,7 @@
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, TextMeasurer, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, Subscriptions, TagValue, TextMeasurer, TypedSimpleChanges, Types } from '@app/framework/internal';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
@@ -38,6 +38,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnInit {
+    private readonly subscriptions = new Subscriptions();
     private readonly textMeasurer: TextMeasurer;
     private latestValue: any;
     private latestInput?: string;
@@ -147,7 +148,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.addInput.valueChanges.pipe(
                     tap(() => {
                         this.resetSize();

@@ -6,6 +6,7 @@
  */
 
 import MersenneTwister from 'mersenne-twister';
+import { StringHelper } from './string-helper';
 
 const ALL_COLORS: ReadonlyArray<string> = [
     'rgb(226,27,12)',
@@ -32,23 +33,8 @@ const RADIUSES: ReadonlyArray<number> = [20, 25, 30, 35, 40, 45, 50];
 const X_CENTERS: ReadonlyArray<number> = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 const Y_CENTERS: ReadonlyArray<number> = [30, 40, 50, 60, 70];
 
-function hash(str: string) {
-    if (str.length === 0) {
-        return 0;
-    }
-
-    let result = 0;
-
-    for (let i = 0; i < str.length; i++) {
-        result = result * 31 + str.charCodeAt(i);
-        result %= (2 ** 32);
-    }
-
-    return result;
-}
-
 export function picasso(content: string) {
-    const seed = hash(content);
+    const seed = StringHelper.hashCode(content);
     const rand = new MersenneTwister(seed);
 
     const colors = [...ALL_COLORS];

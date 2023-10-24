@@ -7,12 +7,13 @@
 
 import { booleanAttribute, Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
-import { ResourceOwner } from '@app/framework/internal';
+import { Subscriptions } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxParentLink]',
 })
-export class ParentLinkDirective extends ResourceOwner implements OnInit {
+export class ParentLinkDirective implements OnInit {
+    private readonly subscriptions = new Subscriptions();
     private url?: string;
 
     @Input({ transform: booleanAttribute })
@@ -27,17 +28,16 @@ export class ParentLinkDirective extends ResourceOwner implements OnInit {
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.route.url
                 .subscribe(() => {
                     this.updateUrl();
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.router.events
                 .subscribe(event => {
                     if (event instanceof NavigationEnd) {

@@ -7,7 +7,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MentionConfig } from 'angular-mentions';
-import { CommentDto, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
+import { Comment, ContributorDto, DialogService, Keys, SharedArray, StatefulComponent } from '@app/shared/internal';
 
 interface State {
     isEditing: boolean;
@@ -29,14 +29,17 @@ export class CommentComponent extends StatefulComponent<State> {
     @Input({ transform: booleanAttribute })
     public canEdit?: boolean | null;
 
-    @Input({ required: true })
-    public commentsState!: CommentsState;
-
     @Input({ transform: booleanAttribute })
     public confirmDelete?: boolean | null = true;
 
     @Input({ required: true })
-    public comment!: CommentDto;
+    public comment!: Comment;
+
+    @Input({ required: true })
+    public commentIndex!: number;
+
+    @Input({ required: true })
+    public comments!: SharedArray<Comment>;
 
     @Input()
     public userToken = '';
@@ -79,7 +82,7 @@ export class CommentComponent extends StatefulComponent<State> {
             return;
         }
 
-        this.commentsState.delete(this.comment);
+        this.comments.remove(this.commentIndex);
     }
 
     public updateWhenEnter(event: KeyboardEvent) {
@@ -107,8 +110,7 @@ export class CommentComponent extends StatefulComponent<State> {
                     }
                 });
         } else {
-            this.commentsState.update(this.comment, text);
-
+            this.comments.set(this.commentIndex, { ...this.comment, text });
             this.cancelEdit();
         }
     }

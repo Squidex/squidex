@@ -9,6 +9,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Entities.History;
+using Squidex.Hosting;
 using Squidex.Text.ChatBots;
 using Squidex.Text.Translations;
 using Squidex.Web;
@@ -53,6 +54,21 @@ public static class FontendServices
             var chatBot = services.GetRequiredService<IChatBot>();
 
             options.More["canUseChatBot"] = chatBot.IsConfigured;
+        });
+
+        services.Configure<MyUIOptions>((services, options) =>
+        {
+            if (string.IsNullOrWhiteSpace(options.CollaborationService))
+            {
+                var urlGenerator = services.GetRequiredService<IUrlGenerator>();
+
+                var collaborationUrl =
+                    urlGenerator.BuildUrl()
+                        .Replace("https://", "wss://", StringComparison.OrdinalIgnoreCase)
+                        .Replace("http://", "ws://", StringComparison.OrdinalIgnoreCase);
+
+                options.CollaborationService = collaborationUrl;
+            }
         });
     }
 }

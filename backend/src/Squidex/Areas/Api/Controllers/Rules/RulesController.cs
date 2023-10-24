@@ -58,7 +58,7 @@ public sealed class RulesController : ApiController
     /// <summary>
     /// Get supported rule actions.
     /// </summary>
-    /// <response code="200">Rule actions returned.</response>.
+    /// <response code="200">Rule actions returned.</response>
     [HttpGet]
     [Route("rules/actions/")]
     [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), StatusCodes.Status200OK)]
@@ -82,8 +82,8 @@ public sealed class RulesController : ApiController
     /// Get rules.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Rules returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Rules returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/rules/")]
     [ProducesResponseType(typeof(RulesDto), StatusCodes.Status200OK)]
@@ -106,9 +106,9 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The rule object that needs to be added to the app.</param>
-    /// <response code="201">Rule created.</response>.
-    /// <response code="400">Rule request not valid.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="201">Rule created.</response>
+    /// <response code="400">Rule request not valid.</response>
+    /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/rules/")]
     [ProducesResponseType(typeof(RuleDto), 201)]
@@ -127,7 +127,7 @@ public sealed class RulesController : ApiController
     /// Cancel the current run.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="204">Rule run cancelled.</response>.
+    /// <response code="204">Rule run cancelled.</response>
     [HttpDelete]
     [Route("apps/{app}/rules/run")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -146,9 +146,9 @@ public sealed class RulesController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to update.</param>
     /// <param name="request">The rule object that needs to be added to the app.</param>
-    /// <response code="200">Rule updated.</response>.
-    /// <response code="400">Rule request not valid.</response>.
-    /// <response code="404">Rule or app not found.</response>.
+    /// <response code="200">Rule updated.</response>
+    /// <response code="400">Rule request not valid.</response>
+    /// <response code="404">Rule or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/rules/{id}/")]
     [ProducesResponseType(typeof(RuleDto), StatusCodes.Status200OK)]
@@ -168,8 +168,8 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to enable.</param>
-    /// <response code="200">Rule enabled.</response>.
-    /// <response code="404">Rule or app not found.</response>.
+    /// <response code="200">Rule enabled.</response>
+    /// <response code="404">Rule or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/rules/{id}/enable/")]
     [ProducesResponseType(typeof(RuleDto), StatusCodes.Status200OK)]
@@ -189,8 +189,8 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to disable.</param>
-    /// <response code="200">Rule disabled.</response>.
-    /// <response code="404">Rule or app not found.</response>.
+    /// <response code="200">Rule disabled.</response>
+    /// <response code="404">Rule or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/rules/{id}/disable/")]
     [ProducesResponseType(typeof(RuleDto), StatusCodes.Status200OK)]
@@ -210,8 +210,8 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to disable.</param>
-    /// <response code="204">Rule triggered.</response>.
-    /// <response code="404">Rule or app not found.</response>.
+    /// <response code="204">Rule triggered.</response>
+    /// <response code="404">Rule or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/rules/{id}/trigger/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -232,7 +232,7 @@ public sealed class RulesController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to run.</param>
     /// <param name="fromSnapshots">Runs the rule from snapeshots if possible.</param>
-    /// <response code="204">Rule started.</response>.
+    /// <response code="204">Rule started.</response>
     [HttpPut]
     [Route("apps/{app}/rules/{id}/run")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -250,7 +250,7 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to cancel.</param>
-    /// <response code="204">Rule events cancelled.</response>.
+    /// <response code="204">Rule events cancelled.</response>
     [HttpDelete]
     [Route("apps/{app}/rules/{id}/events/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -268,8 +268,8 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The rule to simulate.</param>
-    /// <response code="200">Rule simulated.</response>.
-    /// <response code="404">Rule or app not found.</response>.
+    /// <response code="200">Rule simulated.</response>
+    /// <response code="404">Rule or app not found.</response>
     [HttpPost]
     [Route("apps/{app}/rules/simulate/")]
     [ProducesResponseType(typeof(SimulatedRuleEventsDto), StatusCodes.Status200OK)]
@@ -291,8 +291,8 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to simulate.</param>
-    /// <response code="200">Rule simulated.</response>.
-    /// <response code="404">Rule or app not found.</response>.
+    /// <response code="200">Rule simulated.</response>
+    /// <response code="404">Rule or app not found.</response>
     [HttpGet]
     [Route("apps/{app}/rules/{id}/simulate/")]
     [ProducesResponseType(typeof(SimulatedRuleEventsDto), StatusCodes.Status200OK)]
@@ -319,8 +319,8 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to delete.</param>
-    /// <response code="204">Rule deleted.</response>.
-    /// <response code="404">Rule or app not found.</response>.
+    /// <response code="204">Rule deleted.</response>
+    /// <response code="404">Rule or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/rules/{id}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -342,8 +342,8 @@ public sealed class RulesController : ApiController
     /// <param name="ruleId">The optional rule id to filter to events.</param>
     /// <param name="skip">The number of events to skip.</param>
     /// <param name="take">The number of events to take.</param>
-    /// <response code="200">Rule events returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Rule events returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/rules/events/")]
     [ProducesResponseType(typeof(RuleEventsDto), StatusCodes.Status200OK)]
@@ -363,8 +363,8 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The event to enqueue.</param>
-    /// <response code="204">Rule enqueued.</response>.
-    /// <response code="404">App or rule event not found.</response>.
+    /// <response code="204">Rule enqueued.</response>
+    /// <response code="404">App or rule event not found.</response>
     [HttpPut]
     [Route("apps/{app}/rules/events/{id}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -389,8 +389,8 @@ public sealed class RulesController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The event to cancel.</param>
-    /// <response code="204">Rule event cancelled.</response>.
-    /// <response code="404">App or rule event not found.</response>.
+    /// <response code="204">Rule event cancelled.</response>
+    /// <response code="404">App or rule event not found.</response>
     [HttpDelete]
     [Route("apps/{app}/rules/events/{id}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -414,7 +414,7 @@ public sealed class RulesController : ApiController
     /// Cancels all events.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="204">Events cancelled.</response>.
+    /// <response code="204">Events cancelled.</response>
     [HttpDelete]
     [Route("apps/{app}/rules/events/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -430,7 +430,7 @@ public sealed class RulesController : ApiController
     /// <summary>
     /// Provide a list of all event types that are used in rules.
     /// </summary>
-    /// <response code="200">Rule events returned.</response>.
+    /// <response code="200">Rule events returned.</response>
     [HttpGet]
     [Route("rules/eventtypes")]
     [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
@@ -446,8 +446,8 @@ public sealed class RulesController : ApiController
     /// Provide the json schema for the event with the specified name.
     /// </summary>
     /// <param name="type">The type name of the event.</param>
-    /// <response code="200">Rule event type found.</response>.
-    /// <response code="404">Rule event not found.</response>.
+    /// <response code="200">Rule event type found.</response>
+    /// <response code="404">Rule event not found.</response>
     [HttpGet]
     [Route("rules/eventtypes/{type}")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]

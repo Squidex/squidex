@@ -8,7 +8,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, numberAttribute, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DialogModel, DialogService, disabled$, StatefulComponent, TypedSimpleChanges, Types, value$ } from '@app/framework';
+import { DialogModel, DialogService, disabled$, StatefulComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/framework';
 import { AppLanguageDto, AppsState, AssetDto, computeEditorUrl, ContentDto } from '@app/shared';
 
 interface State {
@@ -23,6 +23,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IFrameEditorComponent extends StatefulComponent<State> implements  OnDestroy {
+    private readonly subscriptions = new Subscriptions();
     private value: any;
     private isInitialized = false;
     private isDisabled = false;
@@ -119,17 +120,17 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
         }
 
         if (changes.formControlBinding) {
-            this.unsubscribeAll();
+            this.subscriptions.unsubscribeAll();
 
             const control = this.formControlBinding;
 
             if (control) {
-                this.own(value$(control)
+                this.subscriptions.add(value$(control)
                     .subscribe(value => {
                         this.updateValue(value);
                     }));
 
-                this.own(disabled$(control)
+                this.subscriptions.add(disabled$(control)
                     .subscribe(isDisabled => {
                         this.updatedisabled(isDisabled);
                     }));
