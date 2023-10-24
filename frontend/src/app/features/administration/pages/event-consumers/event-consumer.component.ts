@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/component-selector */
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { EventConsumerDto, EventConsumersState } from '@app/features/administration/internal';
 
@@ -16,7 +18,7 @@ import { EventConsumerDto, EventConsumersState } from '@app/features/administrat
 })
 export class EventConsumerComponent {
     @Output()
-    public error = new EventEmitter();
+    public failure = new EventEmitter();
 
     @Input('sqxEventConsumer')
     public eventConsumer!: EventConsumerDto;

@@ -22,7 +22,7 @@ interface State {
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IFrameEditorComponent extends StatefulComponent<State> implements  OnDestroy {
+export class IFrameEditorComponent extends StatefulComponent<State> implements OnDestroy {
     private readonly subscriptions = new Subscriptions();
     private value: any;
     private isInitialized = false;

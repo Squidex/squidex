@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AppsState, ContentDto, ContentsService, DateTime, DialogModel, getContentValue, LanguageDto, LanguagesState, LocalizerService, ResourceLoaderService } from '@app/shared';
 
 declare const tui: any;
@@ -17,7 +17,7 @@ type ViewMode = 'day' | 'week' | 'month';
     styleUrls: ['./calendar-page.component.scss'],
     templateUrl: './calendar-page.component.html',
 })
-export class CalendarPageComponent implements AfterViewInit, OnDestroy {
+export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
     private calendar: any;
     private language!: LanguageDto;
 

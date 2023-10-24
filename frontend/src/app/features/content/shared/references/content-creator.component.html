@@ -1,4 +1,4 @@
--<sqx-modal-dialog (close)="emitClose()" size="lg" showFooter="false">
+-<sqx-modal-dialog (dialogClose)="emitClose()" size="lg" showFooter="false">
     <ng-container title>
         <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)" *ngIf="schemas.length > 1">
             <option *ngFor="let schema of schemas" [ngValue]="schema">

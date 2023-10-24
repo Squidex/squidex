@@ -18,7 +18,7 @@ import { DialogModel, TagItem, TagsSelected } from '@app/shared';
 })
 export class AssetTagsComponent {
     @Output()
-    public reset = new EventEmitter();
+    public tagsReset = new EventEmitter();
 
     @Output()
     public toggle = new EventEmitter<string>();

@@ -2,11 +2,11 @@
     <sqx-filter-logical 
         [model]="model" 
         [filter]="logical"
+        (filterChange)="filterChange.emit()"
         [language]="language"
         [languages]="languages" 
         [level]="level" 
         [statuses]="statuses"
-        (change)="change.emit()"
         (remove)="remove.emit()">
     </sqx-filter-logical>
 </ng-container>
@@ -15,10 +15,10 @@
     <sqx-filter-comparison
         [model]="model" 
         [filter]="comparison"
+        (filterChange)="filterChange.emit()"
         [language]="language"
         [languages]="languages" 
-        [statuses]="statuses"
-        (change)="change.emit()"
-        (remove)="remove.emit()">
+        (remove)="remove.emit()"
+        [statuses]="statuses">
     </sqx-filter-comparison>
 </ng-container>

@@ -1,5 +1,5 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createTeam()">
-    <sqx-modal-dialog (close)="emitClose()">
+    <sqx-modal-dialog (dialogClose)="emitClose()">
         <ng-container title>
             {{ 'teams.create' | sqxTranslate }}
         </ng-container>

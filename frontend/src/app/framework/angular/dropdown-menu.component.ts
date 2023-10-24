@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-host-metadata-property */
+
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding } from '@angular/core';
 import { fadeAnimation } from './animations';
 

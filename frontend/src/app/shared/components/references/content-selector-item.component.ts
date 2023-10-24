@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* tslint:disable: component-selector */
+/* eslint-disable @angular-eslint/component-selector */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ContentDto, LanguageDto, META_FIELDS, SchemaDto } from '@app/shared/internal';

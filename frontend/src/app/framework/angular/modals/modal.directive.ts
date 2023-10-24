@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-input-rename */
+
 import { booleanAttribute, ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
 import { DialogModel, ModalModel, Subscriptions, Types } from '@app/framework/internal';
 import { RootViewComponent } from './root-view.component';

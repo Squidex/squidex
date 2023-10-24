@@ -14,7 +14,12 @@
         </span>
 
         <input class="blank text-input" #input
-            (blur)="markTouched()" (copy)="onCopy($event)" (cut)="onCut($event)" (focus)="focus()" (keydown)="onKeyDown($event)" (paste)="onPaste($event)"
+            (blur)="markTouched()" 
+            (copy)="onCopy($event)"
+            (cut)="onCut($event)"
+            (focus)="focus()"
+            (keydown)="onKeyDown($event)"
+            (paste)="onPaste($event)"
             [placeholder]="placeholder | sqxTranslate"
             autocomplete="off"
             autocorrect="off"

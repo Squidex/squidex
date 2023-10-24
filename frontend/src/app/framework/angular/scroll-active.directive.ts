@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-input-rename */
+
 import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
 
 @Directive({

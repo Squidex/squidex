@@ -25,7 +25,7 @@ type ImportStatus = {
 })
 export class ImportContributorsDialogComponent {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     public importForm = new ImportContributorsForm();
     public importStatus: ReadonlyArray<ImportStatus> = [];

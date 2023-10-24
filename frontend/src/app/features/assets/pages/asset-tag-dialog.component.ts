@@ -15,7 +15,7 @@ import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
 })
 export class AssetTagDialogComponent implements OnInit {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     @Input({ required: true })
     public tagName!: string;
@@ -32,7 +32,7 @@ export class AssetTagDialogComponent implements OnInit {
     }
 
     public emitClose() {
-        this.close.emit();
+        this.dialogClose.emit();
     }
 
     public renameAssetTag() {

@@ -42,7 +42,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     private suppressEvents = false;
 
     @Output()
-    public blur = new EventEmitter();
+    public editorBlur = new EventEmitter();
 
     @Input()
     public mode: 'DateTime' | 'Date' = 'Date';
@@ -120,7 +120,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     }
 
     public callTouched() {
-        this.blur.next(true);
+        this.editorBlur.next(true);
 
         super.callTouched();
     }

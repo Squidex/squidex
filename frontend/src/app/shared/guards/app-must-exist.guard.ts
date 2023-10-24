@@ -9,8 +9,8 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
+import { UIState } from './../internal';
 import { AppsState } from './../state/apps.state';
-import { UIState } from '../internal';
 
 @Injectable()
 export class AppMustExistGuard  {

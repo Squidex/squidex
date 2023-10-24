@@ -36,7 +36,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public edit = new EventEmitter<AssetDto>();
 
     @Output()
-    public select = new EventEmitter();
+    public selectAsset = new EventEmitter();
 
     @Output()
     public selectFolder = new EventEmitter<string>();

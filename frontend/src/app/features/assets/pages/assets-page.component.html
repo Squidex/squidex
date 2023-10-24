@@ -89,12 +89,12 @@
 <router-outlet></router-outlet>
 
 <sqx-asset-folder-dialog *sqxModal="addAssetFolderDialog"
-    (close)="addAssetFolderDialog.hide()">
+    (dialogClose)="addAssetFolderDialog.hide()">
 </sqx-asset-folder-dialog>
 
 <sqx-asset-dialog *sqxModal="editAsset;isDialog:true"
     [asset]="editAsset!" 
     (assetUpdated)="replaceAsset($event)"
     (assetReplaced)="replaceAsset($event)"
-    (close)="editDone()">
+    (dialogClose)="editDone()">
 </sqx-asset-dialog>

@@ -59,7 +59,7 @@ export class Queries {
     }
 
     public addShared(key: string, query: Query) {
-        this.uiState.setAppShared(this.getPath(key), JSON.stringify(query),);
+        this.uiState.setAppShared(this.getPath(key), JSON.stringify(query));
     }
 
     public removeShared(saved: SavedQuery | string) {

@@ -16,7 +16,7 @@ import { ApiUrlConfig, AppsState, CreateAppForm, TemplateDto } from '@app/shared
 })
 export class AppFormComponent {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     @Input()
     public template?: TemplateDto;
@@ -30,7 +30,7 @@ export class AppFormComponent {
     }
 
     public emitClose() {
-        this.close.emit();
+        this.dialogClose.emit();
     }
 
     public createApp() {

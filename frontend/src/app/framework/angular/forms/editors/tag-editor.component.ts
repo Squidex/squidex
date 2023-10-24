@@ -50,13 +50,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public inputElement!: ElementRef<HTMLInputElement>;
 
     @Output()
-    public open = new EventEmitter();
+    public dropdownOpen = new EventEmitter();
 
     @Output()
-    public close = new EventEmitter();
+    public dropdownClose = new EventEmitter();
 
     @Output()
-    public blur = new EventEmitter();
+    public editorBlur = new EventEmitter();
 
     @Input()
     public itemConverter = StringConverter.INSTANCE;
@@ -164,7 +164,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                         if (!query) {
                             this.resetAutocompletion();
                         } else if (!this.latestInput) {
-                            this.open.emit();
+                            this.dropdownOpen.emit();
                         }
 
                         this.latestInput = query;
@@ -373,7 +373,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public closeModal() {
         if (this.itemsModal.isOpen) {
-            this.close.emit();
+            this.dropdownClose.emit();
 
             this.itemsModal.hide();
         }
@@ -381,14 +381,14 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public openModal() {
         if (!this.itemsModal.isOpen) {
-            this.open.emit();
+            this.dropdownOpen.emit();
 
             this.itemsModal.show();
         }
     }
 
     public callTouched() {
-        this.blur.next(true);
+        this.editorBlur.next(true);
 
         super.callTouched();
     }

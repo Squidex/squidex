@@ -42,6 +42,7 @@ type Content = {
     title: string;
 };
 
+type OnSelectAIText = () => Promise<string | undefined | null>;
 type OnSelectAssets = () => Promise<Asset[]>;
 type OnSelectContents = () => Promise<Content[]>;
 
@@ -67,17 +68,23 @@ interface EditorProps {
     // Called when the value has been changed.
     onChange?: OnChange;
 
+    // Called when AI text selected.
+    onSelectAIText?: OnSelectAIText;
+
     // Called when assets are selected.
-    onSelectAssets: OnSelectAssets;
+    onSelectAssets?: OnSelectAssets;
 
     // Called when content items should be selected.
-    onSelectContents: OnSelectContents;
+    onSelectContents?: OnSelectContents;
 
     // Called when a file needs to be uploaded.
     onUpload?: (images: UploadRequest[]) => DelayedPromiseCreator<Asset>[];
 
     // True, if disabled.
     isDisabled?: boolean;
+
+    // Indicates whether AI text can be selected.
+    canSelectAIText?: boolean;
 
     // Indicates whether assets can be selected.
     canSelectAssets?: boolean;

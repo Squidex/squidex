@@ -1,7 +1,7 @@
 <ng-content></ng-content>
 
 <ng-container *sqxModal="dialogView">
-    <sqx-modal-dialog [showClose]="false" (close)="cancel()" *ngIf="snapshot.dialogRequest; let request">
+    <sqx-modal-dialog [showClose]="false" (dialogClose)="cancel()" *ngIf="snapshot.dialogRequest; let request">
         <ng-container title>
             {{request.title | sqxTranslate}}
         </ng-container>
@@ -32,7 +32,7 @@
 
 <div class="notification-container notification-container-bottom-right">
     <div class="alert alert-dismissible alert-{{notification.messageType}} shadowed" *ngFor="let notification of snapshot.notifications" (click)="close(notification)" @fade>
-        <button type="button" class="btn-close" data-dismiss="alert" (close)="close(notification)"></button>
+        <button type="button" class="btn-close" data-dismiss="alert" (dialogClose)="close(notification)"></button>
 
         <div class="shadow"></div>
         <div class="shadowed" [innerHTML]="notification.message | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>

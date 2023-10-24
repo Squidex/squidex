@@ -80,7 +80,7 @@
                 [isSelectable]="!!selectedIds"
                 [isSelected]="!!isSelected(asset)"
                 (loadDone)="replaceAsset($event)"
-                (select)="select.emit(asset)" 
+                (selectAsset)="assetSelect.emit(asset)" 
                 (selectFolder)="selectFolder(asset)">
             </sqx-asset>
         </div>

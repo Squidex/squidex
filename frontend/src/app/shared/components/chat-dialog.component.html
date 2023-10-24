@@ -1,4 +1,4 @@
-<sqx-modal-dialog size="lg" (close)="close.emit()" fullHeight="true">
+<sqx-modal-dialog size="lg" (dialogClose)="textSelect.emit()" fullHeight="true">
     <ng-container title>
         {{ 'chat.title' | sqxTranslate }}
     </ng-container>
@@ -13,7 +13,8 @@
                 </div>
                 <div class="col">
                     <div class="bubble bubble-right">
-                        <span [sqxMarkdown]="'chat.description' | sqxTranslate" inline="false"></span>
+                        <p>{{ 'chat.description' | sqxTranslate }}</p>
+                        <p *ngIf="showFormatHint">{{ 'chat.describeFormat' | sqxTranslate }}</p>
                     </div>
                 </div>
             </div>
@@ -59,7 +60,7 @@
                         <textarea class="form-control" readonly [ngModel]="item.text"></textarea>
 
                         <div class="mt-2">
-                            <button type="button" class="btn btn-primary" (click)="select.emit(item.text)">
+                            <button type="button" class="btn btn-primary" (click)="textSelect.emit(item.text)">
                                 {{ 'chat.use' | sqxTranslate }}
                             </button>
                         </div>
@@ -77,9 +78,9 @@
             <div class="col">
                 <div class="bubble bubble-right">
                     <svg height="40" width="40" class="loader">
-                    <circle class="dot" cx="10" cy="20" r="3" />
-                    <circle class="dot" cx="20" cy="20" r="3" />
-                    <circle class="dot" cx="30" cy="20" r="3" />
+                        <circle class="dot" cx="10" cy="20" r="3" />
+                        <circle class="dot" cx="20" cy="20" r="3" />
+                        <circle class="dot" cx="30" cy="20" r="3" />
                     </svg>
                 </div>
             </div>

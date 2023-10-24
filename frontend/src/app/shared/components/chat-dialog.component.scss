@@ -5,6 +5,10 @@
     .modal-body {
         background-color: $color-background;
     }
+
+    p:last-child {
+        margin-bottom: 0;
+    }
 }
 
 form {

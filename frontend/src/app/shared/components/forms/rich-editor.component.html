@@ -1,12 +1,16 @@
 <div class="editor" #editor></div>
 
 <sqx-asset-selector *sqxModal="assetsDialog"
-    (select)="insertAssets($event)">
+    (assetSelect)="insertAssets($event)">
 </sqx-asset-selector>
 
 <sqx-content-selector *sqxModal="contentsDialog"
+(contentSelect)="insertContents($event)"
     [language]="language"
     [languages]="languages"
-    [schemaIds]="schemaIds"
-    (select)="insertContents($event)">
+    [schemaIds]="schemaIds">
 </sqx-content-selector>
+
+<sqx-chat-dialog *sqxModal="chatDialog" showFormatHint="false"
+    (textSelect)="insertText($event)">
+</sqx-chat-dialog>

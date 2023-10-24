@@ -28,9 +28,13 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     private value?: string;
     private currentContents?: ResolvablePromise<any>;
     private currentAssets?: ResolvablePromise<any>;
+    private currentChat?: ResolvablePromise<string | undefined | null>;
 
     @Output()
     public assetPluginClick = new EventEmitter<any>();
+
+    @Input({ required: true })
+    public hasChatBot = false;
 
     @Input()
     public schemaIds?: ReadonlyArray<string>;
@@ -57,6 +61,8 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
 
     public assetsDialog = new DialogModel();
 
+    public chatDialog = new DialogModel();
+
     public contentsDialog = new DialogModel();
 
     constructor(
@@ -80,6 +86,16 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
             this.editorWrapper = new SquidexEditorWrapper(this.editor.nativeElement, {
                 value: this.value || '',
                 isDisabled: this.snapshot.isDisabled,
+                onSelectAIText: async () => {
+                    if (this.snapshot.isDisabled) {
+                        return;
+                    }
+
+                    this.currentChat = new ResolvablePromise<string | undefined | null>();
+                    this.chatDialog.show();
+
+                    return await this.currentChat.promise;
+                },
                 onSelectAssets: async () => {
                     if (this.snapshot.isDisabled) {
                         return;
@@ -106,6 +122,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                 onChange: (value: string | undefined) => {
                     this.callChange(value);
                 },
+                canSelectAIText: this.hasChatBot,
                 canSelectAssets: true,
                 canSelectContents: !!this.schemaIds,
                 mode: this.mode,
@@ -127,6 +144,17 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
 
     public onDisabled() {
         this.editorWrapper?.setIsDisabled(this.snapshot.isDisabled);
+    }
+
+    public insertText(text: string | undefined | null) {
+        this.chatDialog.hide();
+
+        if (!this.currentChat) {
+            return;
+        }
+
+        this.currentChat.resolve(text);
+        this.currentChat = undefined;
     }
 
     public insertAssets(assets: ReadonlyArray<AssetDto>) {

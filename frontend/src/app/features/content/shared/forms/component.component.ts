@@ -16,7 +16,7 @@ import { ComponentSectionComponent } from './component-section.component';
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ComponentComponent  {
+export class ComponentComponent {
     private readonly subscriptions = new Subscriptions();
 
     @Input({ required: true })

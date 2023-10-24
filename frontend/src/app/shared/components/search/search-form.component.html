@@ -42,7 +42,7 @@
     </div>
 </form>
 
-<sqx-modal-dialog *sqxModal="searchDialog" (close)="searchDialog.hide()" size="lg">
+<sqx-modal-dialog *sqxModal="searchDialog" (dialogClose)="searchDialog.hide()" size="lg">
     <ng-container title>
         {{ 'search.customQuery' | sqxTranslate }}
     </ng-container>
@@ -109,7 +109,7 @@
 
 <ng-container *sqxModal="saveQueryDialog">
     <form [formGroup]="saveQueryForm.form" (ngSubmit)="saveQueryComplete()">
-        <sqx-modal-dialog (close)="saveQueryDialog.hide()">
+        <sqx-modal-dialog (dialogClose)="saveQueryDialog.hide()">
             <ng-container title>
                 {{ 'search.nameQuery' | sqxTranslate }}
             </ng-container>

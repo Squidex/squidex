@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/component-selector */
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { UserDto, UsersState } from '@app/features/administration/internal';
 

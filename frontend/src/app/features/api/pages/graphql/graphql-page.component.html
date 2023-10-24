@@ -8,7 +8,7 @@
     </button>
 </sqx-layout>
 
-<sqx-modal-dialog *sqxModal="clientsDialog" (close)="clientsDialog.hide()">
+<sqx-modal-dialog *sqxModal="clientsDialog" (dialogClose)="clientsDialog.hide()">
     <ng-container title>
         {{ 'api.selectClient' | sqxTranslate }}
     </ng-container>

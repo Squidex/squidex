@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-input-rename */
+
 import { Directive, ElementRef, Input, numberAttribute, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
 import { Subscriptions } from '@app/framework';
 import { ContentDto, FieldSizes, META_FIELDS, TableField, TableSettings } from '@app/shared/internal';

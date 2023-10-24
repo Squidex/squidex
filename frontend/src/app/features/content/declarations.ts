@@ -28,7 +28,6 @@ export * from './shared/due-time-selector.component';
 export * from './shared/forms/array-editor.component';
 export * from './shared/forms/array-item.component';
 export * from './shared/forms/assets-editor.component';
-export * from './shared/forms/chat-dialog.component';
 export * from './shared/forms/component-section.component';
 export * from './shared/forms/component.component';
 export * from './shared/forms/field-editor.component';

@@ -5,6 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-input-rename */
+/* eslint-disable @angular-eslint/directive-selector */
+
 import { Directive, Input, numberAttribute, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 import { FloatingPlacement, StepDefinition, Subscriptions, TourService, TourState, Types } from '@app/shared/internal';

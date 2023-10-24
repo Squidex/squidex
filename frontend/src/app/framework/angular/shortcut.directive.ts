@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/directive-selector */
+
 import { Directive, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { ShortcutService } from '@app/framework/internal';
 

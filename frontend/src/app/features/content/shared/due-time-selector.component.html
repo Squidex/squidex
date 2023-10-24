@@ -1,4 +1,4 @@
-<sqx-modal-dialog *sqxModal="dueTimeDialog" (close)="cancelStatusChange()">
+<sqx-modal-dialog *sqxModal="dueTimeDialog" (dialogClose)="cancelStatusChange()">
     <ng-container title>
         {{ 'contents.changeStatusTo' | sqxTranslate: { action: dueTimeAction } }}
     </ng-container>

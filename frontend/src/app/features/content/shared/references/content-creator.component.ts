@@ -20,7 +20,7 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, Re
 })
 export class ContentCreatorComponent implements OnInit {
     @Output()
-    public select = new EventEmitter<ReadonlyArray<ContentDto>>();
+    public contentCreate = new EventEmitter<ReadonlyArray<ContentDto>>();
 
     @Input()
     public initialData: any;
@@ -122,10 +122,10 @@ export class ContentCreatorComponent implements OnInit {
     }
 
     public emitClose() {
-        this.select.emit([]);
+        this.contentCreate.emit([]);
     }
 
     public emitSelect(content: ContentDto) {
-        this.select.emit([content]);
+        this.contentCreate.emit([content]);
     }
 }

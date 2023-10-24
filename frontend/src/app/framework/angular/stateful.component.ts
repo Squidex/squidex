@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Directive, inject } from '@angular/core';
+import { ChangeDetectorRef, Directive, inject, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { skip, Subscription } from 'rxjs';
 import { State } from './../state';
 
 @Directive()
-export abstract class StatefulComponent<T extends {} = object> extends State<T> {
+export abstract class StatefulComponent<T extends {} = object> extends State<T> implements OnDestroy {
     private readonly subscription: Subscription;
     private readonly changeDetector = inject(ChangeDetectorRef);
 

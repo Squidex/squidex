@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-input-rename */
+
 import { Directive, ElementRef, EventEmitter, Input, NgZone, numberAttribute, Output } from '@angular/core';
 import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
 
@@ -26,7 +28,7 @@ export class ResizedDirective implements ResizeListener {
     public resizeCondition = new EventEmitter<boolean>();
 
     @Output('sqxResized')
-    public resize = new EventEmitter<DOMRect>();
+    public resizeChange = new EventEmitter<DOMRect>();
 
     constructor(resizeService: ResizeService, element: ElementRef,
         private readonly zone: NgZone,
@@ -62,7 +64,7 @@ export class ResizedDirective implements ResizeListener {
             }
         } else {
             this.zone.run(() => {
-                this.resize.emit(rect);
+                this.resizeChange.emit(rect);
             });
         }
     }
