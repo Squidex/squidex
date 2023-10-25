@@ -93,7 +93,7 @@ export module ColorHelper {
             h /= 6;
         }
 
-        return { h, s, v };
+        return { h: h * 360, s, v };
     }
 
     export function hsvToRgb({ h, s, v }: HSVColor): RGBColor {
