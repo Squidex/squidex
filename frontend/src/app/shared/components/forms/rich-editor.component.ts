@@ -8,7 +8,7 @@
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ContentDto } from '@app/shared';
-import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, AssetDto, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
 
 export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true,
@@ -67,6 +67,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
 
     constructor(
         private readonly apiUrl: ApiUrlConfig,
+        private readonly appsState: AppsState,
         private readonly assetUploader: AssetUploaderState,
         private readonly resourceLoader: ResourceLoaderService,
     ) {
@@ -122,6 +123,8 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                 onChange: (value: string | undefined) => {
                     this.callChange(value);
                 },
+                appName: this.appsState.appName,
+                baseUrl: this.apiUrl.buildUrl(''),
                 canSelectAIText: this.hasChatBot,
                 canSelectAssets: true,
                 canSelectContents: !!this.schemaIds,
@@ -208,16 +211,16 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         return requests.map(r => () => uploadFile(r));
     }
 
-    private buildAsset(asset: AssetDto) {
+    private buildAsset(asset: AssetDto): Asset {
         return { type: asset.mimeType, src: asset.fullUrl(this.apiUrl), fileName: asset.fileName };
     }
 
-    private buildContent(content: ContentDto) {
-        return { url: this.apiUrl.buildUrl(content._links['self'].href), name: buildContentName(content, this.language) };
+    private buildContent(content: ContentDto): Content {
+        return { ...content, title: buildContentTitle(content, this.language) };
     }
 }
 
-function buildContentName(content: ContentDto, language: LanguageDto) {
+function buildContentTitle(content: ContentDto, language: LanguageDto) {
     const name =
         content.referenceFields
             .map(f => getContentValue(content, language, f, false))

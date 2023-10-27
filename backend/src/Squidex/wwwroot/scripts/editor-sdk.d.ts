@@ -153,8 +153,9 @@ declare class SquidexFormField {
      * @param schemas: The list of schema names.
      * @param callback The callback to invoke when the dialog is completed or closed.
      * @param query: The initial query that is used in the UI.
+     * @param selectedIds: The selected ids to mark them as selected in the content selector dialog.
      */
-    pickContents(schemas: string[], callback: (assets: any[]) => void, query?: string): void;
+    pickContents(schemas: string[], callback: (assets: any[]) => void, query?: string, selectedIds?: string[]): void;
 
     /**
      * Shows a dialog to pick a file.

@@ -52,7 +52,12 @@ export class ContentSelectorComponent implements OnInit {
     public allowDuplicates?: boolean | null;
 
     @Input()
-    public alreadySelected: ReadonlyArray<ContentDto> | undefined | null;
+    public alreadySelectedIds: ReadonlyArray<string> | undefined | null;
+
+    @Input()
+    public set alreadySelected(value: ReadonlyArray<ContentDto> | undefined | null) {
+        this.alreadySelectedIds = value?.map(x => x.id);
+    }
 
     public schema!: SchemaDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
@@ -132,7 +137,7 @@ export class ContentSelectorComponent implements OnInit {
     }
 
     public isItemAlreadySelected(content: ContentDto) {
-        return !this.allowDuplicates && this.alreadySelected && !!this.alreadySelected.find(x => x.id === content.id);
+        return !this.allowDuplicates && this.alreadySelectedIds && this.alreadySelectedIds.indexOf(content.id) >= 0;
     }
 
     public emitClose() {

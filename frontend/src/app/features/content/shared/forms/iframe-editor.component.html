@@ -10,6 +10,7 @@
 
 <sqx-content-selector *sqxModal="contentsDialog"
     (contentSelect)="pickContents($event)"
+    [alreadySelectedIds]="contentsSelectedIds"
     [query]="contentsQuery"
     [language]="language"
     [languages]="languages"

@@ -84,8 +84,9 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
 
     public contentsQuery?: string = undefined;
     public contentsCorrelationId: any;
-    public contentsSchemas?: string[];
+    public contentsSchemas?: ReadonlyArray<string>;
     public contentsDialog = new DialogModel();
+    public contentsSelectedIds?: ReadonlyArray<string>;
 
     constructor(
         private readonly appsState: AppsState,
@@ -212,12 +213,13 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
                     this.assetsDialog.show();
                 }
             } else if (type === 'pickContents') {
-                const { correlationId, schemas, query } = event.data;
+                const { correlationId, schemas, query, selectedIds } = event.data;
 
                 if (correlationId) {
                     this.contentsQuery = query;
                     this.contentsCorrelationId = correlationId;
-                    this.contentsSchemas = this.schemaIds && this.schemaIds.length > 0 ? this.schemaIds : schemas;
+                    this.contentsSelectedIds = Types.isArrayOfString(selectedIds) ? selectedIds : undefined;
+                    this.contentsSchemas = this.schemaIds && this.schemaIds.length > 0 ? this.schemaIds : Types.isArrayOfString(schemas) ? schemas : undefined;
                     this.contentsDialog.show();
                 }
             }

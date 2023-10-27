@@ -546,12 +546,13 @@ function SquidexFormField() {
         /**
          * Shows the dialog to pick assets.
          * 
-         * @param {string} schemas: The list of schema names.
+         * @param {string[]} schemas: The list of schema names.
          * @param {function} callback The callback to invoke when the dialog is completed or closed.
          * @param {string} query: The initial filter that is used in the UI.
+         * @param {string[]} selectedIds: The selected ids to mark them as selected in the content selector dialog.
          */
-        pickContents: function (schemas, callback, query) {
-            if (!isFunction(callback) || !isArrayOfStrings(schemas)) {
+        pickContents: function (schemas, callback, query, selectedIds) {
+            if (!isFunction(callback)) {
                 return;
             }
 
@@ -560,7 +561,7 @@ function SquidexFormField() {
             currentPickContents = { correlationId: correlationId, callback: callback };
 
             if (window.parent) {
-                window.parent.postMessage({ type: 'pickContents', correlationId: correlationId, schemas: schemas, query: query }, '*');
+                window.parent.postMessage({ type: 'pickContents', correlationId: correlationId, schemas: schemas, query: query, selectedIds: selectedIds }, '*');
             }
         },
 
