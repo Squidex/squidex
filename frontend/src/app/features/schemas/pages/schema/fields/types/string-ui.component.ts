@@ -30,6 +30,7 @@ export class StringUIComponent  {
     public properties!: StringFieldPropertiesDto;
 
     public hideAllowedValues?: Observable<boolean>;
+    public hideClassNames?: Observable<boolean>;
     public hideInlineEditable?: Observable<boolean>;
     public hideSchemaIds?: Observable<boolean>;
 
@@ -46,6 +47,9 @@ export class StringUIComponent  {
 
             this.hideAllowedValues =
                 valueProjection$(editor, x => !(x && (x === 'Radio' || x === 'Dropdown')));
+
+            this.hideClassNames =
+                valueProjection$(editor, x => !(x && (x === 'RichText')));
 
             this.hideInlineEditable =
                 valueProjection$(editor, x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug')));

@@ -333,6 +333,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
 
     public visitString() {
         this.config['allowedValues'] = new UntypedFormControl(undefined);
+        this.config['classNames'] = new UntypedFormControl(undefined);
         this.config['contentType'] = new UntypedFormControl(undefined);
         this.config['createEnum'] = new UntypedFormControl(undefined);
         this.config['defaultValue'] = new UntypedFormControl(undefined);

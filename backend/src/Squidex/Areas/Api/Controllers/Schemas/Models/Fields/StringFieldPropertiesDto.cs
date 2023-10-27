@@ -72,6 +72,11 @@ public sealed class StringFieldPropertiesDto : FieldPropertiesDto
     public int? MaxWords { get; set; }
 
     /// <summary>
+    /// The class names for the editor.
+    /// </summary>
+    public ReadonlyList<string>? ClassNames { get; set; }
+
+    /// <summary>
     /// The allowed values for the field value.
     /// </summary>
     public ReadonlyList<string>? AllowedValues { get; set; }

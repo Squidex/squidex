@@ -49,6 +49,9 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     public folderId = '';
 
     @Input({ required: true })
+    public classNames?: ReadonlyArray<string>;
+
+    @Input({ required: true })
     public mode: SquidexEditorMode = 'Html';
 
     @Input({ transform: booleanAttribute })
@@ -128,6 +131,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                 canSelectAIText: this.hasChatBot,
                 canSelectAssets: true,
                 canSelectContents: !!this.schemaIds,
+                classNames: this.classNames,
                 mode: this.mode,
             });
         });
@@ -212,7 +216,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     private buildAsset(asset: AssetDto): Asset {
-        return { type: asset.mimeType, src: asset.fullUrl(this.apiUrl), fileName: asset.fileName };
+        return { ...asset, src: asset.fullUrl(this.apiUrl) };
     }
 
     private buildContent(content: ContentDto): Content {

@@ -921,6 +921,8 @@
   "schemas.fieldTypes.string.characters": "Karakters",
   "schemas.fieldTypes.string.charactersMax": "Max. karakters",
   "schemas.fieldTypes.string.charactersMin": "Min. karakters",
+  "schemas.fieldTypes.string.classNames": "Class Names",
+  "schemas.fieldTypes.string.classNamesHint": "The allowed CSS classes that the content creator can choose from.",
   "schemas.fieldTypes.string.contentType": "Inhoudstype",
   "schemas.fieldTypes.string.description": "Titels, namen, alinea's.",
   "schemas.fieldTypes.string.folderId": "Documenten map",

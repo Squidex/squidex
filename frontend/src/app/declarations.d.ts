@@ -74,6 +74,9 @@ interface EditorProps {
     // The name to the app.
     appName: string;
 
+    // The class names.
+    classNames?: ReadonlyArray<string>;
+
     // Called when the value has been changed.
     onChange?: OnChange;
 

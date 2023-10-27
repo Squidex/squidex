@@ -921,6 +921,8 @@
   "schemas.fieldTypes.string.characters": "Caratteri",
   "schemas.fieldTypes.string.charactersMax": "Max numero di Caratteri",
   "schemas.fieldTypes.string.charactersMin": "Min numero di Caratteri",
+  "schemas.fieldTypes.string.classNames": "Class Names",
+  "schemas.fieldTypes.string.classNamesHint": "The allowed CSS classes that the content creator can choose from.",
   "schemas.fieldTypes.string.contentType": "Content Type",
   "schemas.fieldTypes.string.description": "Titoli, nomi, paragrafi.",
   "schemas.fieldTypes.string.folderId": "Asset folder",

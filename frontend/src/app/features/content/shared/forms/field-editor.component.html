@@ -195,6 +195,7 @@
 						<ng-container *ngSwitchCase="'RichText'">
 							<sqx-rich-editor #editor
                                 mode="Html"
+                                [classNames]="field.rawProperties.classNames"
                                 [formControl]="$any(fieldForm)"
                                 [folderId]="field.rawProperties.folderId"
                                 [hasChatBot]="hasChatBot"
@@ -209,6 +210,7 @@
 						<ng-container *ngSwitchCase="'Markdown'">
 							<sqx-rich-editor #editor
                                 mode="Markdown"
+                                [classNames]="undefined"
                                 [formControl]="$any(fieldForm)"
                                 [folderId]="field.rawProperties.folderId"
                                 [hasChatBot]="hasChatBot"

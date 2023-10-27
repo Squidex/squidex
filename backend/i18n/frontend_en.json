@@ -921,6 +921,8 @@
   "schemas.fieldTypes.string.characters": "Characters",
   "schemas.fieldTypes.string.charactersMax": "Max Characters",
   "schemas.fieldTypes.string.charactersMin": "Min Characters",
+  "schemas.fieldTypes.string.classNames": "Class Names",
+  "schemas.fieldTypes.string.classNamesHint": "The allowed CSS classes that the content creator can choose from.",
   "schemas.fieldTypes.string.contentType": "Content Type",
   "schemas.fieldTypes.string.description": "Titles, names, paragraphs.",
   "schemas.fieldTypes.string.folderId": "Asset folder",

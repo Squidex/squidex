@@ -433,6 +433,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'String';
 
     public readonly allowedValues?: ReadonlyArray<string>;
+    public readonly classNames?: ReadonlyArray<string>;
     public readonly contentType?: StringContentType;
     public readonly createEnum: boolean = false;
     public readonly defaultValue?: string;

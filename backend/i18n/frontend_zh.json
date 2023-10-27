@@ -921,6 +921,8 @@
   "schemas.fieldTypes.string.characters": "字符",
   "schemas.fieldTypes.string.charactersMax": "最大字符数",
   "schemas.fieldTypes.string.charactersMin": "最小字符数",
+  "schemas.fieldTypes.string.classNames": "Class Names",
+  "schemas.fieldTypes.string.classNamesHint": "The allowed CSS classes that the content creator can choose from.",
   "schemas.fieldTypes.string.contentType": "内容类型",
   "schemas.fieldTypes.string.description": "标题、名称、段落。",
   "schemas.fieldTypes.string.folderId": "资源文件夹",

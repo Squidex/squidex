@@ -921,6 +921,8 @@
   "schemas.fieldTypes.string.characters": "Personagens",
   "schemas.fieldTypes.string.charactersMax": "Personagens Max",
   "schemas.fieldTypes.string.charactersMin": "Personagens de Min",
+  "schemas.fieldTypes.string.classNames": "Class Names",
+  "schemas.fieldTypes.string.classNamesHint": "The allowed CSS classes that the content creator can choose from.",
   "schemas.fieldTypes.string.contentType": "Tipo de Conteúdo",
   "schemas.fieldTypes.string.description": "Títulos, nomes, parágrafos.",
   "schemas.fieldTypes.string.folderId": "Pasta de ativos",
