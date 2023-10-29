@@ -81,12 +81,6 @@ public static class IdentityServerServices
             })
             .AddServer(builder =>
             {
-                builder.AddEventHandler<ValidateTokenRequestContext>(builder =>
-                {
-                    builder.UseSingletonHandler<TestHandler>()
-                        .SetOrder(int.MinValue);
-                });
-
                 builder.AddEventHandler<ProcessSignInContext>(builder =>
                 {
                     builder.UseSingletonHandler<AlwaysAddScopeHandler>()
@@ -175,13 +169,5 @@ public static class IdentityServerServices
     {
         endpointUris.Clear();
         endpointUris.Add(uri);
-    }
-}
-
-public sealed class TestHandler : IOpenIddictServerHandler<ValidateTokenRequestContext>
-{
-    public ValueTask HandleAsync(ValidateTokenRequestContext context)
-    {
-        return default;
     }
 }

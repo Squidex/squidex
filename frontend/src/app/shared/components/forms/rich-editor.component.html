@@ -4,8 +4,12 @@
     (assetSelect)="insertAssets($event)">
 </sqx-asset-selector>
 
+<sqx-asset-dialog *sqxModal="assetToEdit | async; let asset;isDialog:true" (dialogClose)="closeAssetDialog()"
+    [asset]="asset" >
+</sqx-asset-dialog>
+
 <sqx-content-selector *sqxModal="contentsDialog"
-(contentSelect)="insertContents($event)"
+    (contentSelect)="insertContents($event)"
     [language]="language"
     [languages]="languages"
     [schemaIds]="schemaIds">

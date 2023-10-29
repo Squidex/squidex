@@ -7,8 +7,9 @@
 
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { BehaviorSubject, catchError, of, switchMap } from 'rxjs';
 import { ContentDto } from '@app/shared';
-import { ApiUrlConfig, AppsState, AssetDto, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, AssetDto, AssetsService, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
 
 export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true,
@@ -24,6 +25,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {
+    private readonly assetId = new BehaviorSubject<string | null>(null);
     private editorWrapper: any;
     private value?: string;
     private currentContents?: ResolvablePromise<any>;
@@ -62,9 +64,18 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     @ViewChild('editor', { static: false })
     public editor!: ElementRef;
 
-    public assetsDialog = new DialogModel();
-
     public chatDialog = new DialogModel();
+
+    public assetsDialog = new DialogModel();
+    public assetToEdit = this.assetId.pipe(
+        switchMap(id => {
+            if (id) {
+                return this.assetService.getAsset(this.appsState.appName, id);
+            } else {
+                return of<AssetDto | null>(null);
+            }
+        }),
+        catchError(() => of<AssetDto | null>(null)));
 
     public contentsDialog = new DialogModel();
 
@@ -72,6 +83,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         private readonly apiUrl: ApiUrlConfig,
         private readonly appsState: AppsState,
         private readonly assetUploader: AssetUploaderState,
+        private readonly assetService: AssetsService,
         private readonly resourceLoader: ResourceLoaderService,
     ) {
         super({});
@@ -125,6 +137,14 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                 },
                 onChange: (value: string | undefined) => {
                     this.callChange(value);
+                },
+                onEditContent: (schemaName, id) => {
+                    const url = this.apiUrl.buildUrl(`/app/${this.appsState.appName}/content/${schemaName}/${id}`);
+
+                    window.open(url, '_blank');
+                },
+                onEditAsset: id => {
+                    this.assetId.next(id);
                 },
                 appName: this.appsState.appName,
                 baseUrl: this.apiUrl.buildUrl(''),
@@ -221,6 +241,10 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
 
     private buildContent(content: ContentDto): Content {
         return { ...content, title: buildContentTitle(content, this.language) };
+    }
+
+    public closeAssetDialog() {
+        this.assetId.next(null);
     }
 }
 

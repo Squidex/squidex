@@ -89,6 +89,13 @@ interface EditorProps {
     // Called when content items should be selected.
     onSelectContents?: OnSelectContents;
 
+    // Called when an asset is to be edited.
+    onEditAsset: (assetId: string) => void;
+
+    // Called when a content is to be edited.
+    onEditContent: (schemaName: string, contentId: string) => void;
+
+
     // Called when a file needs to be uploaded.
     onUpload?: (images: UploadRequest[]) => DelayedPromiseCreator<Asset>[];
 
