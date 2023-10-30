@@ -41,8 +41,8 @@ public sealed class AppImageController : ApiController
     /// Get the app image.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">App image found and content or (resized) image returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">App image found and content or (resized) image returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/image")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]

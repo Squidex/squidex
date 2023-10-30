@@ -29,7 +29,7 @@ public class SubscriptionPublisherTests
     [Fact]
     public void Should_return_content_and_asset_filter_for_events_filter()
     {
-        Assert.Equal("^(content-|asset-)", sut.EventsFilter);
+        Assert.Equal(StreamFilter.Prefix("content-", "asset-"), sut.EventsFilter);
     }
 
     [Fact]

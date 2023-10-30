@@ -15,7 +15,7 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
 })
 export class AssetFolderDialogComponent implements OnInit {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     @Input()
     public assetFolder?: AssetFolderDto;
@@ -34,7 +34,7 @@ export class AssetFolderDialogComponent implements OnInit {
     }
 
     public emitClose() {
-        this.close.emit();
+        this.dialogClose.emit();
     }
 
     public createAssetFolder() {

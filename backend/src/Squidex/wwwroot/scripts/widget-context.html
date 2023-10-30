@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cloud.squidex.io/styles.css">
+    <style>
+        body {
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <textarea class="form-control" id="editor"></textarea>
+
+    <script>
+        var element = document.getElementById('editor');
+
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
+        var field = new SquidexFormField();
+
+        // Init is called once with a context that contains the app name, schema name and authentication information.
+        field.onInit(function (context) {
+            element.innerHTML = JSON.stringify(context, null, 2);
+
+            grow(element);
+        });
+    </script>
+</body>
+
+</html>

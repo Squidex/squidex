@@ -8,14 +8,16 @@
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, TypedSimpleChanges, Types, value$ } from '@app/shared';
+import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
 })
-export class StringValidationComponent extends ResourceOwner {
+export class StringValidationComponent  {
+    private readonly subscriptions = new Subscriptions();
+
     public readonly contentTypes = STRING_CONTENT_TYPES;
 
     @Input({ required: true })
@@ -55,7 +57,7 @@ export class StringValidationComponent extends ResourceOwner {
         }
 
         if (changes.fieldForm) {
-            this.unsubscribeAll();
+            this.subscriptions.unsubscribeAll();
 
             this.showPatternSuggestions =
                 hasNoValue$(this.fieldForm.controls['pattern']);
@@ -66,7 +68,7 @@ export class StringValidationComponent extends ResourceOwner {
             this.showPatternMessage =
                 hasValue$(this.fieldForm.controls['pattern']);
 
-            this.own(
+            this.subscriptions.add(
                 value$(this.fieldForm.controls['pattern'])
                     .subscribe((value: string) => {
                         if (!value) {

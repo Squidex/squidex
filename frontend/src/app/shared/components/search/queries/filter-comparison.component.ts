@@ -17,7 +17,7 @@ import { ContributorsState } from '@app/shared/state/contributors.state';
 })
 export class FilterComparisonComponent {
     @Output()
-    public change = new EventEmitter();
+    public filterChange = new EventEmitter();
 
     @Output()
     public remove = new EventEmitter();
@@ -89,6 +89,6 @@ export class FilterComparisonComponent {
     }
 
     public emitChange() {
-        this.change.emit();
+        this.filterChange.emit();
     }
 }

@@ -7,10 +7,9 @@
 
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { BehaviorSubject, catchError, of, switchMap } from 'rxjs';
 import { ContentDto } from '@app/shared';
-import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
-
-declare const tinymce: any;
+import { ApiUrlConfig, AppsState, AssetDto, AssetsService, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
 
 export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true,
@@ -26,11 +25,18 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {
-    private tinyEditor: any;
+    private readonly assetId = new BehaviorSubject<string | null>(null);
+    private editorWrapper: any;
     private value?: string;
+    private currentContents?: ResolvablePromise<any>;
+    private currentAssets?: ResolvablePromise<any>;
+    private currentChat?: ResolvablePromise<string | undefined | null>;
 
     @Output()
     public assetPluginClick = new EventEmitter<any>();
+
+    @Input({ required: true })
+    public hasChatBot = false;
 
     @Input()
     public schemaIds?: ReadonlyArray<string>;
@@ -44,6 +50,12 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     @Input()
     public folderId = '';
 
+    @Input({ required: true })
+    public classNames?: ReadonlyArray<string>;
+
+    @Input({ required: true })
+    public mode: SquidexEditorMode = 'Html';
+
     @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
@@ -52,36 +64,96 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     @ViewChild('editor', { static: false })
     public editor!: ElementRef;
 
+    public chatDialog = new DialogModel();
+
     public assetsDialog = new DialogModel();
+    public assetToEdit = this.assetId.pipe(
+        switchMap(id => {
+            if (id) {
+                return this.assetService.getAsset(this.appsState.appName, id);
+            } else {
+                return of<AssetDto | null>(null);
+            }
+        }),
+        catchError(() => of<AssetDto | null>(null)));
 
     public contentsDialog = new DialogModel();
 
     constructor(
         private readonly apiUrl: ApiUrlConfig,
+        private readonly appsState: AppsState,
         private readonly assetUploader: AssetUploaderState,
+        private readonly assetService: AssetsService,
         private readonly resourceLoader: ResourceLoaderService,
     ) {
         super({});
     }
 
     public ngOnDestroy() {
-        if (this.tinyEditor) {
-            this.tinyEditor.destroy();
-            this.tinyEditor = null;
+        if (this.editorWrapper) {
+            this.editorWrapper.destroy?.();
+            this.editorWrapper = null;
         }
     }
 
     public ngAfterViewInit() {
-        this.resourceLoader.loadLocalScript('dependencies/tinymce/tinymce.min.js').then(() => {
-            const timer = setInterval(() => {
-                const target = this.editor.nativeElement;
+        this.resourceLoader.loadLocalStyle('editor/squidex-editor.css');
+        this.resourceLoader.loadLocalScript('editor/squidex-editor.js').then(() => {
+            this.editorWrapper = new SquidexEditorWrapper(this.editor.nativeElement, {
+                value: this.value || '',
+                isDisabled: this.snapshot.isDisabled,
+                onSelectAIText: async () => {
+                    if (this.snapshot.isDisabled) {
+                        return;
+                    }
 
-                if (document.body.contains(target)) {
-                    tinymce.init(this.getEditorOptions(target));
+                    this.currentChat = new ResolvablePromise<string | undefined | null>();
+                    this.chatDialog.show();
 
-                    clearInterval(timer);
-                }
-            }, 10);
+                    return await this.currentChat.promise;
+                },
+                onSelectAssets: async () => {
+                    if (this.snapshot.isDisabled) {
+                        return;
+                    }
+
+                    this.currentAssets = new ResolvablePromise<any>();
+                    this.assetsDialog.show();
+
+                    return await this.currentAssets.promise;
+                },
+                onSelectContents: async () => {
+                    if (this.snapshot.isDisabled) {
+                        return;
+                    }
+
+                    this.currentContents = new ResolvablePromise<any>();
+                    this.contentsDialog.show();
+
+                    return await this.currentContents.promise;
+                },
+                onUpload: (requests: UploadRequest[]) => {
+                    return this.uploadFiles(requests);
+                },
+                onChange: (value: string | undefined) => {
+                    this.callChange(value);
+                },
+                onEditContent: (schemaName, id) => {
+                    const url = this.apiUrl.buildUrl(`/app/${this.appsState.appName}/content/${schemaName}/${id}`);
+
+                    window.open(url, '_blank');
+                },
+                onEditAsset: id => {
+                    this.assetId.next(id);
+                },
+                appName: this.appsState.appName,
+                baseUrl: this.apiUrl.buildUrl(''),
+                canSelectAIText: this.hasChatBot,
+                canSelectAssets: true,
+                canSelectContents: !!this.schemaIds,
+                classNames: this.classNames,
+                mode: this.mode,
+            });
         });
     }
 
@@ -93,273 +165,108 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         });
     }
 
-    private showAssetsSelector = () => {
-        if (this.snapshot.isDisabled) {
-            return;
-        }
-
-        this.assetsDialog.show();
-    };
-
-    private showContentsSelector = () => {
-        if (this.snapshot.isDisabled) {
-            return;
-        }
-
-        this.contentsDialog.show();
-    };
-
-    private getEditorOptions(target: any): any {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const self = this;
-
-        return {
-            ...DEFAULT_PROPS,
-
-            images_upload_handler: (blob: any, success: (url: string) => void, failure: (message: string) => void) => {
-                const file = new File([blob.blob()], blob.filename(), { lastModified: new Date().getTime() });
-
-                self.assetUploader.uploadFile(file, this.folderId)
-                    .subscribe({
-                        next: asset => {
-                            if (Types.is(asset, AssetDto)) {
-                                success(asset.fullUrl(self.apiUrl));
-                            }
-                        },
-                        error: error => {
-                            if (!Types.is(error, UploadCanceled)) {
-                                failure('Failed');
-                            }
-                        },
-                    });
-            },
-
-            setup: (editor: any) => {
-                editor.ui.registry.addButton('assets', {
-                    onAction: self.showAssetsSelector,
-                    icon: 'gallery',
-                    text: '',
-                    tooltip: 'Insert Assets',
-                });
-
-                if (this.schemaIds && this.schemaIds.length > 0) {
-                    editor.ui.registry.addButton('contents', {
-                        onAction: self.showContentsSelector,
-                        icon: 'duplicate',
-                        text: '',
-                        tooltip: 'Insert Contents',
-                    });
-                }
-
-                editor.on('init', () => {
-                    self.tinyEditor = editor;
-
-                    self.setContent();
-                    self.setReadOnly();
-                });
-
-                editor.on('change', () => {
-                    self.onValueChanged();
-                });
-
-                editor.on('paste', (event: ClipboardEvent) => {
-                    let hasFileDropped = false;
-
-                    if (event.clipboardData) {
-                        for (let i = 0; i < event.clipboardData.items.length; i++) {
-                            const file = event.clipboardData.items[i].getAsFile();
-
-                            if (file) {
-                                self.uploadFile(file);
-
-                                hasFileDropped = true;
-                            }
-                        }
-                    }
-
-                    if (!hasFileDropped) {
-                        self.onValueChanged();
-                    } else {
-                        return false;
-                    }
-
-                    return undefined;
-                });
-
-                editor.on('drop', (event: DragEvent) => {
-                    let hasFileDropped = false;
-
-                    if (event.dataTransfer) {
-                        for (let i = 0; i < event.dataTransfer.files.length; i++) {
-                            const file = event.dataTransfer.files.item(i);
-
-                            if (file) {
-                                self.uploadFile(file);
-
-                                hasFileDropped = true;
-                            }
-                        }
-                    }
-
-                    if (!hasFileDropped) {
-                        self.onValueChanged();
-                    }
-
-                    return false;
-                });
-
-                editor.on('blur', () => {
-                    self.callTouched();
-                });
-            },
-
-            target,
-        };
-    }
-
-    private onValueChanged() {
-        const value = this.tinyEditor.getContent();
-
-        if (this.value !== value) {
-            this.value = value;
-
-            this.callChange(value);
-        }
-    }
-
     public writeValue(obj: any) {
-        const newValue = Types.isString(obj) ? obj : '';
-
-        if (newValue == this.value) {
-            return;
-        }
-
-        this.value = newValue;
-
-        if (this.tinyEditor && this.tinyEditor.initialized) {
-            this.setContent();
+        if (this.editorWrapper) {
+            this.editorWrapper?.setValue(obj);
+        } else {
+            this.value = obj;
         }
     }
 
     public onDisabled() {
-        if (this.tinyEditor && this.tinyEditor.initialized) {
-            this.setReadOnly();
+        if (this.editorWrapper) {
+            this.editorWrapper?.setIsDisabled(this.snapshot.isDisabled);
         }
     }
 
-    private setContent() {
-        this.tinyEditor.setContent(this.value || '');
-    }
+    public insertText(text: string | undefined | null) {
+        this.chatDialog.hide();
 
-    private setReadOnly() {
-        this.tinyEditor.setMode(this.snapshot.isDisabled ? 'readonly' : 'design');
+        if (!this.currentChat) {
+            return;
+        }
+
+        this.currentChat.resolve(text);
+        this.currentChat = undefined;
     }
 
     public insertAssets(assets: ReadonlyArray<AssetDto>) {
-        const content = this.buildAssetsMarkup(assets);
+        this.assetsDialog.hide();
 
-        if (content.length > 0) {
-            this.tinyEditor.execCommand('mceInsertContent', false, content);
+        if (!this.currentAssets) {
+            return;
         }
 
-        this.assetsDialog.hide();
+        const items = assets.map(a => this.buildAsset(a));
+
+        this.currentAssets.resolve(items);
+        this.currentAssets = undefined;
     }
 
     public insertContents(contents: ReadonlyArray<ContentDto>) {
-        const content = this.buildContentsMarkup(contents);
-
-        if (content.length > 0) {
-            this.tinyEditor.execCommand('mceInsertContent', false, content);
-        }
-
         this.contentsDialog.hide();
-    }
-
-    public insertFiles(files: ReadonlyArray<File>) {
-        for (const file of files) {
-            this.uploadFile(file);
+        if (!this.currentContents) {
+            return;
         }
+
+        const items = contents.map(c => this.buildContent(c));
+
+        this.currentContents.resolve(items);
+        this.currentContents = undefined;
     }
 
-    private uploadFile(file: File) {
-        const uploadText = `[Uploading file...${new Date()}]`;
-
-        this.tinyEditor.execCommand('mceInsertContent', false, uploadText);
-
-        const replaceText = (replacement: string) => {
-            const content = this.tinyEditor.getContent().replace(uploadText, replacement);
-
-            this.tinyEditor.setContent(content);
+    private uploadFiles(requests: UploadRequest[]) {
+        const uploadFile = (request: UploadRequest) => {
+            return new Promise<any>((resolve, reject) => {
+                this.assetUploader.uploadFile(request.file, this.folderId)
+                    .subscribe({
+                        next: value => {
+                            if (Types.is(value, AssetDto)) {
+                                resolve(this.buildAsset(value));
+                            } else {
+                                request.progress(value / 100);
+                            }
+                        },
+                        error: reject,
+                    });
+            });
         };
 
-        this.assetUploader.uploadFile(file, this.folderId)
-            .subscribe({
-                next: asset => {
-                    if (Types.is(asset, AssetDto)) {
-                        replaceText(this.buildAssetMarkup(asset));
-                    }
-                },
-                error: error => {
-                    if (!Types.is(error, UploadCanceled)) {
-                        replaceText('FAILED');
-                    }
-                },
-            });
+        return requests.map(r => () => uploadFile(r));
     }
 
-    private buildAssetsMarkup(assets: ReadonlyArray<AssetDto>) {
-        let markup = '';
-
-        for (const asset of assets) {
-            markup += this.buildAssetMarkup(asset);
-        }
-
-        return markup;
+    private buildAsset(asset: AssetDto): Asset {
+        return { ...asset, src: asset.fullUrl(this.apiUrl) };
     }
 
-    private buildContentsMarkup(contents: ReadonlyArray<ContentDto>) {
-        let markup = '';
-
-        for (const content of contents) {
-            markup += this.buildContentMarkup(content);
-        }
-
-        return markup;
+    private buildContent(content: ContentDto): Content {
+        return { ...content, title: buildContentTitle(content, this.language) };
     }
 
-    private buildContentMarkup(content: ContentDto) {
-        const name =
-            content.referenceFields
-                .map(f => getContentValue(content, this.language, f, false))
-                .map(v => v.formatted)
-                .defined()
-                .join(', ')
-            || 'content';
-
-        return `<a href="${this.apiUrl.buildUrl(content._links['self'].href)}" alt="${name}">${name}</a>`;
-    }
-
-    private buildAssetMarkup(asset: AssetDto) {
-        const name = asset.fileNameWithoutExtension;
-
-        if (asset.type === 'Image' || asset.mimeType === 'image/svg+xml' || asset.fileName.endsWith('.svg')) {
-            return `<img src="${asset.fullUrl(this.apiUrl)}" alt="${name}" />`;
-        } else if (asset.type === 'Video') {
-            return `<video src="${asset.fullUrl(this.apiUrl)}" />`;
-        } else {
-            return `<a href="${asset.fullUrl(this.apiUrl)}" alt="${name}">${name}</a>`;
-        }
+    public closeAssetDialog() {
+        this.assetId.next(null);
     }
 }
 
-const DEFAULT_PROPS = {
-    convert_fonts_to_spans: true,
-    convert_urls: false,
-    paste_data_images: true,
-    plugins: 'code image media link lists advlist paste',
-    min_height: 400,
-    max_height: 800,
-    removed_menuitems: 'newdocument',
-    resize: true,
-    toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets contents',
-};
+function buildContentTitle(content: ContentDto, language: LanguageDto) {
+    const name =
+        content.referenceFields
+            .map(f => getContentValue(content, language, f, false))
+            .map(v => v.formatted)
+            .defined()
+            .join(', ');
+
+    return name || 'Content';
+}
+
+class ResolvablePromise<T> {
+    private resolver?: (value: T) => void;
+
+    public readonly promise = new Promise<T>(resolve => {
+        this.resolver = resolve;
+    });
+
+    public resolve(value: T) {
+        this.resolver?.(value);
+    }
+}

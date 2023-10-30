@@ -9,7 +9,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { HelpService } from '@app/shared/internal';
+import { HelpService, SDKEntry } from '@app/shared/internal';
 
 describe('HelpService', () => {
     beforeEach(() => {
@@ -61,5 +61,45 @@ describe('HelpService', () => {
             req.error(<any>{});
 
             expect(helpSections!).toEqual('');
+        }));
+
+    it('should make get request to get sdks',
+        inject([HelpService, HttpTestingController], (helpService: HelpService, httpMock: HttpTestingController) => {
+            let sdks: Record<string, SDKEntry>;
+
+            helpService.getSDKs().subscribe(result => {
+                sdks = result;
+            });
+
+            const req = httpMock.expectOne('https://raw.githubusercontent.com/Squidex/sdk-fern/main/sdks.json');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush({
+                dotnet: {},
+            });
+
+            expect(sdks!).toEqual({
+                dotnet: {} as any,
+            });
+        }));
+
+    it('should return empty sdks if get request fails',
+        inject([HelpService, HttpTestingController], (helpService: HelpService, httpMock: HttpTestingController) => {
+            let sdks: Record<string, SDKEntry>;
+
+            helpService.getSDKs().subscribe(result => {
+                sdks = result;
+            });
+
+            const req = httpMock.expectOne('https://raw.githubusercontent.com/Squidex/sdk-fern/main/sdks.json');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.error(<any>{});
+
+            expect(sdks!).toEqual({});
         }));
 });

@@ -37,7 +37,7 @@
 </div>
 
 <sqx-content-creator *sqxModal="contentCreatorDialog"
-    (select)="select($event)"
+    (contentCreate)="select($event)"
     [formContext]="formContext"
     [initialData]="clonedContent?.data"
     [language]="language"
@@ -47,10 +47,11 @@
 </sqx-content-creator>
 
 <sqx-content-selector *sqxModal="contentSelectorDialog"
-    (select)="select($event)"
+    (contentSelect)="select($event)"
     [allowDuplicates]="allowDuplicates"
     [alreadySelected]="snapshot.contentItems"
     [language]="language"
     [languages]="languages"
+    [query]="query"
     [schemaIds]="schemaIds">
 </sqx-content-selector>

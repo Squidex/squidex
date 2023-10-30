@@ -6,7 +6,9 @@ module.exports = {
         "node": true
     },
     "extends": [
-        "airbnb-typescript/base"
+        "airbnb-typescript/base",
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -19,6 +21,25 @@ module.exports = {
     ],
     "rules": {
         "deprecation/deprecation": "warn",
+        "@angular-eslint/directive-selector": [
+            "error",
+            {
+                "type": "attribute",
+                "prefix": "sqx",
+                "style": "camelCase"
+            }
+        ],
+        "@angular-eslint/component-selector": [
+            "error",
+            {
+                "type": "element",
+                "prefix": "sqx",
+                "style": "kebab-case"
+            }
+        ],
+        "@angular-eslint/use-lifecycle-interface": [
+            "off"
+        ],
         "@typescript-eslint/dot-notation": "off",
         "@typescript-eslint/indent": "off",
         "@typescript-eslint/lines-between-class-members": "off",

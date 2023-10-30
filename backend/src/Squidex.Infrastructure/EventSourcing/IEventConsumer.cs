@@ -13,9 +13,9 @@ public interface IEventConsumer
 
     int BatchSize => 1;
 
-    string Name { get; }
+    string Name => GetType().Name;
 
-    string EventsFilter => ".*";
+    StreamFilter EventsFilter => default;
 
     bool StartLatest => false;
 

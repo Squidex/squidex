@@ -96,6 +96,36 @@ internal static class ContentActions
         });
     }
 
+    public static class FindSingleton
+    {
+        public static readonly QueryArguments Arguments = new QueryArguments
+        {
+            new QueryArgument(Scalars.Int)
+            {
+                Name = "version",
+                Description = FieldDescriptions.QueryVersion,
+                DefaultValue = null
+            }
+        };
+
+        public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
+        {
+            var contentSchemaId = fieldContext.FieldDefinition.SchemaId();
+            var contentVersion = fieldContext.GetArgument<int?>("version");
+
+            if (contentVersion >= 0)
+            {
+                return context.GetContent(contentSchemaId, contentSchemaId, contentVersion.Value);
+            }
+            else
+            {
+                return context.GetContent(contentSchemaId, contentSchemaId,
+                    fieldContext.FieldNames(),
+                    fieldContext.CacheDuration());
+            }
+        });
+    }
+
     public static class QueryByIds
     {
         public static readonly QueryArguments Arguments = new QueryArguments

@@ -10,8 +10,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay, switchMap, take, tap, withLatestFrom } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, getTableFields, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, TranslationStatus, Types, UIState } from '@app/shared';
+import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, getTableConfig, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, Settings, Subscriptions, switchSafe, TableSettings, TempService, TranslationStatus, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -22,7 +22,9 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
         Router2State,
     ],
 })
-export class ContentsPageComponent extends ResourceOwner implements OnInit {
+export class ContentsPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector!: DueTimeSelectorComponent;
 
@@ -71,7 +73,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         private readonly tempService: TempService,
         private readonly uiState: UIState,
     ) {
-        super();
     }
 
     public ngOnInit() {
@@ -79,13 +80,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             this.contributorsState.loadIfNotLoaded();
         }
 
-        this.own(
+        this.subscriptions.add(
             this.languagesState.isoMasterLanguage
                 .subscribe(language => {
                     this.language = language;
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.languagesState.isoLanguages
                 .subscribe(languages => {
                     this.languages = languages;
@@ -95,16 +96,16 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             getSchemaName(this.route).pipe(switchMap(() => this.schemasState.selectedSchema.pipe(defined(), take(1), shareReplay(1))));
 
         const tableSetting$ =
-            schema$.pipe(map(s => new TableSettings(this.uiState, s)), shareReplay(1));
+            schema$.pipe(map(schema => new TableSettings(this.uiState, schema)), shareReplay(1));
 
-        const tableName$ =
-            tableSetting$.pipe(switchMap(s => s.listFields), map(s => getTableFields(s)), distinctUntilChanged(Types.equals));
+        const tableConfig$ =
+            tableSetting$.pipe(switchMap(getTableConfig));
 
         this.tableSettings = tableSetting$;
 
-        this.own(
-            tableName$.pipe(withLatestFrom(schema$))
-                .subscribe(([fieldNames, schema]) => {
+        this.subscriptions.add(
+            tableConfig$
+                .subscribe(({ fieldNames, schema }) => {
                     if (this.schema?.id !== schema.id) {
                         this.resetSelection();
 
@@ -131,7 +132,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     }
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.contentsState.contents
                 .subscribe(contents => {
                     this.updateSelectionSummary();

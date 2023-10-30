@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Comments;
 
-public sealed record Comment(DomainId Id, Instant Time, RefToken User, string Text, Uri? Url = null)
+public sealed record Comment(Instant Time, RefToken User, string Text, Uri? Url = null, bool SkipHandlers = false)
 {
     public RefToken User { get; } = Guard.NotNull(User);
 

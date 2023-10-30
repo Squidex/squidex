@@ -5,52 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Directive, inject, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
-import { catchError, EMPTY, Observable, skip, Subscription } from 'rxjs';
+import { skip, Subscription } from 'rxjs';
 import { State } from './../state';
-import { Types } from './../utils/types';
-
-declare type UnsubscribeFunction = () => void;
-
-@Directive()
-export class ResourceOwner implements OnDestroy {
-    private subscriptions: (Subscription | UnsubscribeFunction)[] = [];
-
-    public own<T>(subscription: Subscription | UnsubscribeFunction | Observable<T> | null | undefined) {
-        if (subscription) {
-            if (Types.isFunction((subscription as any)['subscribe'])) {
-                const observable = <Observable<T>>subscription;
-
-                this.subscriptions.push(observable.pipe(catchError(_ => EMPTY)).subscribe());
-            } else {
-                this.subscriptions.push(<any>subscription);
-            }
-        }
-    }
-
-    public ngOnDestroy() {
-        this.unsubscribeAll();
-    }
-
-    public unsubscribeAll() {
-        try {
-            for (const subscription of this.subscriptions) {
-                if (Types.isFunction(subscription)) {
-                    subscription();
-                } else {
-                    subscription.unsubscribe();
-                }
-            }
-        } finally {
-            this.subscriptions = [];
-        }
-    }
-}
 
 @Directive()
 export abstract class StatefulComponent<T extends {} = object> extends State<T> implements OnDestroy {
-    private readonly subscriptions = new ResourceOwner();
     private readonly subscription: Subscription;
     private readonly changeDetector = inject(ChangeDetectorRef);
 
@@ -65,12 +26,6 @@ export abstract class StatefulComponent<T extends {} = object> extends State<T> 
 
     public ngOnDestroy() {
         this.subscription.unsubscribe();
-
-        this.unsubscribeAll();
-    }
-
-    protected unsubscribeAll() {
-        this.subscriptions.unsubscribeAll();
     }
 
     protected detach() {
@@ -79,10 +34,6 @@ export abstract class StatefulComponent<T extends {} = object> extends State<T> 
 
     protected detectChanges() {
         this.changeDetector.detectChanges();
-    }
-
-    public own<R>(subscription: Subscription | UnsubscribeFunction | Observable<R> | null | undefined) {
-        this.subscriptions.own(subscription);
     }
 }
 

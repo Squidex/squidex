@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, Subscription } from 'rxjs';
-import { ActionForm, ALL_TRIGGERS, MessageBus, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm, TriggerType, value$ } from '@app/shared';
+import { ActionForm, ALL_TRIGGERS, MessageBus, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, Subscriptions, TriggerForm, TriggerType, value$ } from '@app/shared';
 import { RuleConfigured } from './../messages';
 
 @Component({
@@ -17,7 +17,8 @@ import { RuleConfigured } from './../messages';
     styleUrls: ['./rule-page.component.scss'],
     templateUrl: './rule-page.component.html',
 })
-export class RulePageComponent extends ResourceOwner implements OnInit {
+export class RulePageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
     private currentTriggerSubscription?: Subscription;
     private currentActionSubscription?: Subscription;
 
@@ -52,7 +53,6 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
-        super();
     }
 
     public ngOnInit() {
@@ -63,7 +63,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
                 this.initFromRule();
             });
 
-        this.own(
+        this.subscriptions.add(
             this.rulesState.selectedRule
                 .subscribe(rule => {
                     this.rule = rule;

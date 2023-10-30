@@ -7,14 +7,16 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppDto, AppsState, defined, DialogService, ResourceOwner, TeamsState, TransferAppForm, Types, UpdateAppForm } from '@app/shared';
+import { AppDto, AppsState, defined, DialogService, Subscriptions, TeamsState, TransferAppForm, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
 })
-export class MorePageComponent extends ResourceOwner implements OnInit {
+export class MorePageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public app!: AppDto;
 
     public teams: { id: string | null; name: string }[] = [];
@@ -37,11 +39,10 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
         private readonly router: Router,
         public readonly teamsState: TeamsState,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.appsState.selectedApp.pipe(defined())
                 .subscribe(app => {
                     this.app = app;

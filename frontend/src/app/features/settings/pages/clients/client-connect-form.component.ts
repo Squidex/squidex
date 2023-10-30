@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, DialogService, MessageBus } from '@app/shared';
+import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, DialogService, HelpService, MessageBus, SDKEntry } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-connect-form',
@@ -15,19 +15,18 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
 })
 export class ClientConnectFormComponent implements OnInit {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     @Input({ required: true })
     public client!: ClientDto;
+
+    public sdks = this.helpService.getSDKs();
+    public sdk?: SDKEntry;
 
     public appName!: string;
     public appToken?: AccessTokenDto;
 
     public step = 'Start';
-
-    public get isStart() {
-        return this.step === 'Start';
-    }
 
     constructor(
         public readonly appsState: AppsState,
@@ -35,6 +34,7 @@ export class ClientConnectFormComponent implements OnInit {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly clientsService: ClientsService,
         private readonly dialogs: DialogService,
+        private readonly helpService: HelpService,
         private readonly messageBus: MessageBus,
     ) {
     }
@@ -55,6 +55,15 @@ export class ClientConnectFormComponent implements OnInit {
             });
 
         this.messageBus.emit(new ClientTourStated());
+    }
+
+    public select(sdk: SDKEntry) {
+        sdk.instructions = sdk.instructions.replace(/<APP_NAME>/g, this.appName);
+        sdk.instructions = sdk.instructions.replace(/<CLIENT_ID>/g, `${this.appName}:${this.client.id}`);
+        sdk.instructions = sdk.instructions.replace(/<CLIENT_SECRET>/g, this.client.secret);
+        sdk.instructions = sdk.instructions.replace(/<URL>/g, this.apiUrl.value);
+
+        this.sdk = sdk;
     }
 
     public go(step: string) {

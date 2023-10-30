@@ -154,11 +154,23 @@
             "compodoc": false,
             "outputDir": "storybook-static"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": "a157454d-c7c0-4947-986a-982746edc974"
+    "analytics": "a157454d-c7c0-4947-986a-982746edc974",
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

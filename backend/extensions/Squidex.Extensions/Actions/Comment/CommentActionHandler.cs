@@ -7,65 +7,68 @@
 
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Entities.Comments.Commands;
+using Squidex.Domain.Apps.Entities.Collaboration;
+using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Extensions.Actions.Comment;
 
-public sealed class CommentActionHandler : RuleActionHandler<CommentAction, CreateComment>
+public sealed class CommentActionHandler : RuleActionHandler<CommentAction, CommentCreated>
 {
     private const string Description = "Send a Comment";
-    private readonly ICommandBus commandBus;
+    private readonly ICollaborationService collaboration;
 
-    public CommentActionHandler(RuleEventFormatter formatter, ICommandBus commandBus)
+    public CommentActionHandler(RuleEventFormatter formatter, ICollaborationService collaboration)
         : base(formatter)
     {
-        this.commandBus = commandBus;
+        this.collaboration = collaboration;
     }
 
-    protected override async Task<(string Description, CreateComment Data)> CreateJobAsync(EnrichedEvent @event, CommentAction action)
+    protected override async Task<(string Description, CommentCreated Data)> CreateJobAsync(EnrichedEvent @event, CommentAction action)
     {
-        if (@event is EnrichedContentEvent contentEvent)
+        if (@event is not EnrichedContentEvent contentEvent)
         {
-            var ruleJob = new CreateComment
-            {
-                AppId = contentEvent.AppId
-            };
-
-            ruleJob.Text = (await FormatAsync(action.Text, @event))!;
-
-            if (!string.IsNullOrEmpty(action.Client))
-            {
-                ruleJob.Actor = RefToken.Client(action.Client);
-            }
-            else
-            {
-                ruleJob.Actor = contentEvent.Actor;
-            }
-
-            ruleJob.CommentsId = contentEvent.Id;
-
-            return (Description, ruleJob);
+            return ("Ignore", new CommentCreated());
         }
 
-        return ("Ignore", new CreateComment());
+        var ruleJob = new CommentCreated
+        {
+            AppId = contentEvent.AppId
+        };
+
+        var text = await FormatAsync(action.Text, @event);
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return ("NoText", new CommentCreated());
+        }
+
+        ruleJob.Text = text;
+
+        if (!string.IsNullOrEmpty(action.Client))
+        {
+            ruleJob.Actor = RefToken.Client(action.Client);
+        }
+        else
+        {
+            ruleJob.Actor = contentEvent.Actor;
+        }
+
+        ruleJob.CommentsId = contentEvent.Id;
+
+        return (Description, ruleJob);
     }
 
-    protected override async Task<Result> ExecuteJobAsync(CreateComment job,
+    protected override async Task<Result> ExecuteJobAsync(CommentCreated job,
         CancellationToken ct = default)
     {
-        var command = job;
-
-        if (command.CommentsId == default)
+        if (job.CommentsId == default)
         {
             return Result.Ignored();
         }
 
-        command.FromRule = true;
+        await collaboration.CommentAsync(job.AppId, job.CommentsId, job.Text, job.Actor, job.Url, true, ct);
 
-        await commandBus.PublishAsync(command, ct);
-
-        return Result.Success($"Commented: {command.Text}");
+        return Result.Success($"Commented: {job.Text}");
     }
 }

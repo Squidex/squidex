@@ -16,7 +16,7 @@ import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
 })
 export class TeamFormComponent {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     public createForm = new CreateTeamForm();
 
@@ -27,7 +27,7 @@ export class TeamFormComponent {
     }
 
     public emitClose() {
-        this.close.emit();
+        this.dialogClose.emit();
     }
 
     public createTeam() {

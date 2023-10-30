@@ -6,14 +6,15 @@
  */
 
 import { AfterViewInit, Directive, ElementRef, Input, NgZone, numberAttribute, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { MathHelper, ResourceOwner, StringHelper } from '@app/framework/internal';
+import { MathHelper, StringHelper, Subscriptions } from '@app/framework/internal';
 
 const LAYOUT_CACHE: { [key: string]: { width: number; height: number } } = {};
 
 @Directive({
     selector: '[sqxImageSource]',
 })
-export class ImageSourceDirective extends ResourceOwner implements  OnDestroy, OnInit, AfterViewInit {
+export class ImageSourceDirective implements OnDestroy, OnInit, AfterViewInit {
+    private readonly subscriptions = new Subscriptions();
     private size: any;
     private loadTimer: any;
     private loadRetries = 0;
@@ -36,12 +37,9 @@ export class ImageSourceDirective extends ResourceOwner implements  OnDestroy, O
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
     ) {
-        super();
     }
 
     public ngOnDestroy() {
-        super.ngOnDestroy();
-
         clearTimeout(this.loadTimer);
     }
 
@@ -51,17 +49,17 @@ export class ImageSourceDirective extends ResourceOwner implements  OnDestroy, O
         }
 
         this.zone.runOutsideAngular(() => {
-            this.own(
+            this.subscriptions.add(
                 this.renderer.listen(this.parent, 'resize', () => {
                     this.resize();
                 }));
 
-            this.own(
+            this.subscriptions.add(
                 this.renderer.listen(this.element.nativeElement, 'load', () => {
                     this.onLoad();
                 }));
 
-            this.own(
+            this.subscriptions.add(
                 this.renderer.listen(this.element.nativeElement, 'error', () => {
                     this.onError();
                 }));

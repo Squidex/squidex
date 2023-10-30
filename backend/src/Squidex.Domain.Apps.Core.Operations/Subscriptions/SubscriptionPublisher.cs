@@ -16,25 +16,13 @@ public sealed class SubscriptionPublisher : IEventConsumer
     private readonly ISubscriptionService subscriptionService;
     private readonly IEnumerable<ISubscriptionEventCreator> subscriptionEventCreators;
 
-    public string Name
-    {
-        get => "Subscriptions";
-    }
+    public string Name => "Subscriptions";
 
-    public string EventsFilter
-    {
-        get => "^(content-|asset-)";
-    }
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("content-", "asset-");
 
-    public bool StartLatest
-    {
-        get => true;
-    }
+    public bool StartLatest => true;
 
-    public bool CanClear
-    {
-        get => false;
-    }
+    public bool CanClear => false;
 
     public SubscriptionPublisher(ISubscriptionService subscriptionService, IEnumerable<ISubscriptionEventCreator> subscriptionEventCreators)
     {

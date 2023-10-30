@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Inject, Injectable } from '@angular/core';
+import { inject, Inject, Injectable } from '@angular/core';
 import { filter, skip, take } from 'rxjs';
 import { debug, State, TourService, UIOptions } from '@app/framework';
 import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
@@ -32,6 +32,8 @@ interface Snapshot {
 
 @Injectable()
 export class TourState extends State<Snapshot> {
+    private readonly isDisabled = inject(UIOptions).value.hideOnboarding;
+
     public completedTasks =
         this.project(x => x.completedTasks);
 
@@ -48,7 +50,6 @@ export class TourState extends State<Snapshot> {
         @Inject(TASK_CONFIGURATION) private readonly definition: TaskConfiguration,
         private readonly tourService: TourService,
         private readonly uiState: UIState,
-        private readonly uiOptions: UIOptions,
     ) {
         super({});
 
@@ -113,10 +114,6 @@ export class TourState extends State<Snapshot> {
 
     private disableHintCore(key: string) {
         this.next(s => ({ ...s, shownHints: { ...s.shownHints || {}, [key]: true } }), 'Disable Hint');
-    }
-
-    private get isDisabled() {
-        return this.uiOptions.get('hideOnboarding');
     }
 }
 

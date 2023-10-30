@@ -29,7 +29,7 @@ export class FieldWizardComponent implements OnInit {
     public parent: RootFieldDto | null | undefined;
 
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     public fieldTypes = fieldTypes;
     public field!: FieldDto;
@@ -55,7 +55,7 @@ export class FieldWizardComponent implements OnInit {
     }
 
     public emitClose() {
-        this.close.emit();
+        this.dialogClose.emit();
     }
 
     public addField(addNew: boolean, edit = false) {

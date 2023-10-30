@@ -6,16 +6,20 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { DateTime, Duration } from '@app/framework/internal';
+import { DateTime, Duration, Types } from '@app/framework/internal';
 
 @Pipe({
     name: 'sqxShortDate',
     pure: true,
 })
 export class ShortDatePipe implements PipeTransform {
-    public transform(value: DateTime | undefined | null, fallback = ''): string {
+    public transform(value: DateTime | string | undefined | null, fallback = ''): string {
         if (!value) {
             return fallback;
+        }
+
+        if (Types.isString(value)) {
+            value = DateTime.parseISO(value);
         }
 
         return value.toStringFormat('dd. MMM');
@@ -27,9 +31,13 @@ export class ShortDatePipe implements PipeTransform {
     pure: true,
 })
 export class ISODatePipe implements PipeTransform {
-    public transform(value: DateTime | undefined | null, fallback = ''): string {
+    public transform(value: DateTime | string | undefined | null, fallback = ''): string {
         if (!value) {
             return fallback;
+        }
+
+        if (Types.isString(value)) {
+            value = DateTime.parseISO(value);
         }
 
         return value.toISOString();
@@ -41,9 +49,13 @@ export class ISODatePipe implements PipeTransform {
     pure: true,
 })
 export class DatePipe implements PipeTransform {
-    public transform(value: DateTime | undefined | null, fallback = ''): string {
+    public transform(value: DateTime | string | undefined | null, fallback = ''): string {
         if (!value) {
             return fallback;
+        }
+
+        if (Types.isString(value)) {
+            value = DateTime.parseISO(value);
         }
 
         return value.toStringFormat('dd. LLL yyyy');
@@ -55,9 +67,13 @@ export class DatePipe implements PipeTransform {
     pure: true,
 })
 export class MonthPipe implements PipeTransform {
-    public transform(value: DateTime | undefined | null, fallback = ''): string {
+    public transform(value: DateTime | string | undefined | null, fallback = ''): string {
         if (!value) {
             return fallback;
+        }
+
+        if (Types.isString(value)) {
+            value = DateTime.parseISO(value);
         }
 
         return value.toStringFormat('LLLL');
@@ -69,9 +85,13 @@ export class MonthPipe implements PipeTransform {
     pure: true,
 })
 export class FromNowPipe implements PipeTransform {
-    public transform(value: DateTime | undefined | null, fallback = ''): string {
+    public transform(value: DateTime | string | undefined | null, fallback = ''): string {
         if (!value) {
             return fallback;
+        }
+
+        if (Types.isString(value)) {
+            value = DateTime.parseISO(value);
         }
 
         return value.toFromNow();
@@ -83,9 +103,13 @@ export class FromNowPipe implements PipeTransform {
     pure: true,
 })
 export class DayOfWeekPipe implements PipeTransform {
-    public transform(value: DateTime | undefined | null, fallback = ''): string {
+    public transform(value: DateTime | string | undefined | null, fallback = ''): string {
         if (!value) {
             return fallback;
+        }
+
+        if (Types.isString(value)) {
+            value = DateTime.parseISO(value);
         }
 
         return value.toStringFormat('E');
@@ -97,9 +121,13 @@ export class DayOfWeekPipe implements PipeTransform {
     pure: true,
 })
 export class DayPipe implements PipeTransform {
-    public transform(value: DateTime | undefined | null, fallback = ''): string {
+    public transform(value: DateTime | string | undefined | null, fallback = ''): string {
         if (!value) {
             return fallback;
+        }
+
+        if (Types.isString(value)) {
+            value = DateTime.parseISO(value);
         }
 
         return value.toStringFormat('dd');
@@ -111,9 +139,13 @@ export class DayPipe implements PipeTransform {
     pure: true,
 })
 export class ShortTimePipe implements PipeTransform {
-    public transform(value: DateTime | undefined | null, fallback = ''): string {
+    public transform(value: DateTime | string | undefined | null, fallback = ''): string {
         if (!value) {
             return fallback;
+        }
+
+        if (Types.isString(value)) {
+            value = DateTime.parseISO(value);
         }
 
         return value.toStringFormat('HH:mm');
@@ -125,9 +157,13 @@ export class ShortTimePipe implements PipeTransform {
     pure: true,
 })
 export class FullDateTimePipe implements PipeTransform {
-    public transform(value: DateTime | undefined | null, fallback = ''): string {
+    public transform(value: DateTime | string | undefined | null, fallback = ''): string {
         if (!value) {
             return fallback;
+        }
+
+        if (Types.isString(value)) {
+            value = DateTime.parseISO(value);
         }
 
         return value.toStringFormat('PPpp');

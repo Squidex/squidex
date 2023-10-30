@@ -32,10 +32,10 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The field object that needs to be added to the schema.</param>
-    /// <response code="201">Schema field created.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="404">Schema or app not found.</response>.
-    /// <response code="409">Schema field name already in use.</response>.
+    /// <response code="201">Schema field created.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="404">Schema or app not found.</response>
+    /// <response code="409">Schema field name already in use.</response>
     [HttpPost]
     [Route("apps/{app}/schemas/{schema}/fields/")]
     [ProducesResponseType(typeof(SchemaDto), 201)]
@@ -57,10 +57,10 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="parentId">The parent field id.</param>
     /// <param name="request">The field object that needs to be added to the schema.</param>
-    /// <response code="201">Schema field created.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="409">Schema field name already in use.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="201">Schema field created.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="409">Schema field name already in use.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     [HttpPost]
     [Route("apps/{app}/schemas/{schema}/fields/{parentId:long}/nested/")]
     [ProducesResponseType(typeof(SchemaDto), 201)]
@@ -81,9 +81,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The request that contains the field names.</param>
-    /// <response code="200">Schema UI fields defined.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema UI fields defined.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/fields/ui/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -104,9 +104,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The request that contains the field ids.</param>
-    /// <response code="200">Schema fields reordered.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema fields reordered.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/fields/ordering/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -128,9 +128,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="parentId">The parent field id.</param>
     /// <param name="request">The request that contains the field ids.</param>
-    /// <response code="200">Schema fields reordered.</response>.
-    /// <response code="400">Schema field request not valid.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema fields reordered.</response>
+    /// <response code="400">Schema field request not valid.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/fields/{parentId:long}/nested/ordering/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -152,9 +152,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the field to update.</param>
     /// <param name="request">The field object that needs to be added to the schema.</param>
-    /// <response code="200">Schema field updated.</response>.
-    /// <response code="400">Schema field request not valid.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field updated.</response>
+    /// <response code="400">Schema field request not valid.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/fields/{id:long}/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -177,9 +177,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="parentId">The parent field id.</param>
     /// <param name="id">The ID of the field to update.</param>
     /// <param name="request">The field object that needs to be added to the schema.</param>
-    /// <response code="200">Schema field updated.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field updated.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/fields/{parentId:long}/nested/{id:long}/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -200,9 +200,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the field to lock.</param>
-    /// <response code="200">Schema field shown.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field shown.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     /// <remarks>
     /// A locked field cannot be updated or deleted.
     /// </remarks>
@@ -227,9 +227,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="parentId">The parent field id.</param>
     /// <param name="id">The ID of the field to lock.</param>
-    /// <response code="200">Schema field hidden.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Field, schema, or app not found.</response>.
+    /// <response code="200">Schema field hidden.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Field, schema, or app not found.</response>
     /// <remarks>
     /// A locked field cannot be edited or deleted.
     /// </remarks>
@@ -253,9 +253,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the field to hide.</param>
-    /// <response code="200">Schema field hidden.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field hidden.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     /// <remarks>
     /// A hidden field is not part of the API response, but can still be edited in the portal.
     /// </remarks>
@@ -280,9 +280,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="parentId">The parent field id.</param>
     /// <param name="id">The ID of the field to hide.</param>
-    /// <response code="200">Schema field hidden.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Field, schema, or app not found.</response>.
+    /// <response code="200">Schema field hidden.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Field, schema, or app not found.</response>
     /// <remarks>
     /// A hidden field is not part of the API response, but can still be edited in the portal.
     /// </remarks>
@@ -306,9 +306,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the field to show.</param>
-    /// <response code="200">Schema field shown.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field shown.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     /// <remarks>
     /// A hidden field is not part of the API response, but can still be edited in the portal.
     /// </remarks>
@@ -333,9 +333,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="parentId">The parent field id.</param>
     /// <param name="id">The ID of the field to show.</param>
-    /// <response code="200">Schema field shown.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field shown.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     /// <remarks>
     /// A hidden field is not part of the API response, but can still be edited in the portal.
     /// </remarks>
@@ -359,9 +359,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the field to enable.</param>
-    /// <response code="200">Schema field enabled.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field enabled.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     /// <remarks>
     /// A disabled field cannot not be edited in the squidex portal anymore, but will be part of the API response.
     /// </remarks>
@@ -386,9 +386,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="parentId">The parent field id.</param>
     /// <param name="id">The ID of the field to enable.</param>
-    /// <response code="200">Schema field enabled.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field enabled.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     /// <remarks>
     /// A disabled field cannot not be edited in the squidex portal anymore, but will be part of the API response.
     /// </remarks>
@@ -412,9 +412,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the field to disable.</param>
-    /// <response code="200">Schema field disabled.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field disabled.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     /// <remarks>
     /// A disabled field cannot not be edited in the squidex portal anymore, but will be part of the API response.
     /// </remarks>
@@ -439,9 +439,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="parentId">The parent field id.</param>
     /// <param name="id">The ID of the field to disable.</param>
-    /// <response code="200">Schema field disabled.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field disabled.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     /// <remarks>
     /// A disabled field cannot not be edited in the squidex portal anymore, but will be part of the API response.
     /// </remarks>
@@ -465,9 +465,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the field to disable.</param>
-    /// <response code="200">Schema field deleted.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field deleted.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/schemas/{schema}/fields/{id:long}/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -489,9 +489,9 @@ public sealed class SchemaFieldsController : ApiController
     /// <param name="schema">The name of the schema.</param>
     /// <param name="parentId">The parent field id.</param>
     /// <param name="id">The ID of the field to disable.</param>
-    /// <response code="200">Schema field deleted.</response>.
-    /// <response code="400">Schema field request not valid or field locked.</response>.
-    /// <response code="404">Schema, field or app not found.</response>.
+    /// <response code="200">Schema field deleted.</response>
+    /// <response code="400">Schema field request not valid or field locked.</response>
+    /// <response code="404">Schema, field or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/schemas/{schema}/fields/{parentId:long}/nested/{id:long}/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]

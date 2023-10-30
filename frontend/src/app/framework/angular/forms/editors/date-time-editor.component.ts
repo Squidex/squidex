@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import * as Pikaday from 'pikaday/pikaday';
-import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
+import { DateHelper, DateTime, StatefulControlComponent, Subscriptions, UIOptions } from '@app/framework/internal';
 import { FocusComponent } from './../forms-helper';
 
 declare module 'pikaday/pikaday';
@@ -34,14 +34,15 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements OnInit, AfterViewInit, FocusComponent {
-    private readonly hideDateButtonsSettings: boolean;
-    private readonly hideDateTimeModeButtonSetting: boolean;
+    private readonly subscriptions = new Subscriptions();
+    private readonly hideDateButtonsSettings: boolean = !!inject(UIOptions).value.hideDateButtons;
+    private readonly hideDateTimeModeButtonSetting: boolean = !!inject(UIOptions).value.hideDateTimeModeButton;
     private picker: any;
     private dateTime?: DateTime | null;
     private suppressEvents = false;
 
     @Output()
-    public blur = new EventEmitter();
+    public editorBlur = new EventEmitter();
 
     @Input()
     public mode: 'DateTime' | 'Date' = 'Date';
@@ -88,22 +89,19 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
         return !!this.dateTime;
     }
 
-    constructor(uiOptions: UIOptions) {
+    constructor() {
         super({ isLocal: true });
-
-        this.hideDateButtonsSettings = !!uiOptions.get('hideDateButtons');
-        this.hideDateTimeModeButtonSetting = !!uiOptions.get('hideDateTimeModeButton');
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.timeControl.valueChanges.subscribe(() => {
                 this.dateTime = this.getValue();
 
                 this.callChangeFormatted();
             }));
 
-        this.own(
+        this.subscriptions.add(
             this.dateControl.valueChanges.subscribe(() => {
                 this.dateTime = this.getValue();
 
@@ -122,7 +120,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     }
 
     public callTouched() {
-        this.blur.next(true);
+        this.editorBlur.next(true);
 
         super.callTouched();
     }

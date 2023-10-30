@@ -36,8 +36,8 @@ public sealed class TeamContributorsController : ApiController
     /// Get team contributors.
     /// </summary>
     /// <param name="team">The ID of the team.</param>
-    /// <response code="200">Contributors returned.</response>.
-    /// <response code="404">Team not found.</response>.
+    /// <response code="200">Contributors returned.</response>
+    /// <response code="404">Team not found.</response>
     [HttpGet]
     [Route("teams/{team}/contributors/")]
     [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
@@ -60,9 +60,9 @@ public sealed class TeamContributorsController : ApiController
     /// </summary>
     /// <param name="team">The ID of the team.</param>
     /// <param name="request">Contributor object that needs to be added to the team.</param>
-    /// <response code="201">Contributor assigned to team.</response>.
-    /// <response code="400">Contributor request not valid.</response>.
-    /// <response code="404">Team not found.</response>.
+    /// <response code="201">Contributor assigned to team.</response>
+    /// <response code="400">Contributor request not valid.</response>
+    /// <response code="404">Team not found.</response>
     [HttpPost]
     [Route("teams/{team}/contributors/")]
     [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status201Created)]
@@ -81,8 +81,8 @@ public sealed class TeamContributorsController : ApiController
     /// Remove yourself.
     /// </summary>
     /// <param name="team">The ID of the team.</param>
-    /// <response code="200">Contributor removed.</response>.
-    /// <response code="404">Contributor or team not found.</response>.
+    /// <response code="200">Contributor removed.</response>
+    /// <response code="404">Contributor or team not found.</response>
     [HttpDelete]
     [Route("teams/{team}/contributors/me/")]
     [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]
@@ -102,8 +102,8 @@ public sealed class TeamContributorsController : ApiController
     /// </summary>
     /// <param name="team">The ID of the team.</param>
     /// <param name="id">The ID of the contributor.</param>
-    /// <response code="200">Contributor removed.</response>.
-    /// <response code="404">Contributor or team not found.</response>.
+    /// <response code="200">Contributor removed.</response>
+    /// <response code="404">Contributor or team not found.</response>
     [HttpDelete]
     [Route("teams/{team}/contributors/{id}/")]
     [ProducesResponseType(typeof(ContributorsDto), StatusCodes.Status200OK)]

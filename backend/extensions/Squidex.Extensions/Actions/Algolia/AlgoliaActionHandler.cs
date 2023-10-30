@@ -40,65 +40,65 @@ public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, Algo
 
     protected override async Task<(string Description, AlgoliaJob Data)> CreateJobAsync(EnrichedEvent @event, AlgoliaAction action)
     {
-        if (@event is IEnrichedEntityEvent entityEvent)
+        if (@event is not IEnrichedEntityEvent entityEvent)
         {
-            var delete = @event.ShouldDelete(scriptEngine, action.Delete);
-
-            var ruleDescription = string.Empty;
-            var contentId = entityEvent.Id.ToString();
-            var content = (AlgoliaContent?)null;
-
-            if (delete)
-            {
-                ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
-            }
-            else
-            {
-                ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
-
-                try
-                {
-                    string? jsonString;
-
-                    if (!string.IsNullOrEmpty(action.Document))
-                    {
-                        jsonString = await FormatAsync(action.Document, @event);
-                        jsonString = jsonString?.Trim();
-                    }
-                    else
-                    {
-                        jsonString = ToJson(@event);
-                    }
-
-                    content = serializer.Deserialize<AlgoliaContent>(jsonString!);
-                }
-                catch (Exception ex)
-                {
-                    content = new AlgoliaContent
-                    {
-                        More = new Dictionary<string, object>
-                        {
-                            ["error"] = $"Invalid JSON: {ex.Message}"
-                        }
-                    };
-                }
-
-                content.ObjectID = contentId;
-            }
-
-            var ruleJob = new AlgoliaJob
-            {
-                AppId = action.AppId,
-                ApiKey = action.ApiKey,
-                Content = serializer.Serialize(content, true),
-                ContentId = contentId,
-                IndexName = (await FormatAsync(action.IndexName, @event))!
-            };
-
-            return (ruleDescription, ruleJob);
+            return ("Ignore", new AlgoliaJob());
         }
 
-        return ("Ignore", new AlgoliaJob());
+        var delete = @event.ShouldDelete(scriptEngine, action.Delete);
+
+        var ruleDescription = string.Empty;
+        var contentId = entityEvent.Id.ToString();
+        var content = (AlgoliaContent?)null;
+
+        if (delete)
+        {
+            ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
+        }
+        else
+        {
+            ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
+
+            try
+            {
+                string? jsonString;
+
+                if (!string.IsNullOrEmpty(action.Document))
+                {
+                    jsonString = await FormatAsync(action.Document, @event);
+                    jsonString = jsonString?.Trim();
+                }
+                else
+                {
+                    jsonString = ToJson(@event);
+                }
+
+                content = serializer.Deserialize<AlgoliaContent>(jsonString!);
+            }
+            catch (Exception ex)
+            {
+                content = new AlgoliaContent
+                {
+                    More = new Dictionary<string, object>
+                    {
+                        ["error"] = $"Invalid JSON: {ex.Message}"
+                    }
+                };
+            }
+
+            content.ObjectID = contentId;
+        }
+
+        var ruleJob = new AlgoliaJob
+        {
+            AppId = action.AppId,
+            ApiKey = action.ApiKey,
+            Content = serializer.Serialize(content, true),
+            ContentId = contentId,
+            IndexName = (await FormatAsync(action.IndexName, @event))!
+        };
+
+        return (ruleDescription, ruleJob);
     }
 
     protected override async Task<Result> ExecuteJobAsync(AlgoliaJob job,

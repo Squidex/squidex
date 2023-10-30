@@ -17,7 +17,7 @@ import { TableField } from '@app/shared';
 })
 export class CustomViewEditorComponent {
     @Output()
-    public reset = new EventEmitter();
+    public listFieldsReset = new EventEmitter();
 
     @Output()
     public listFieldsChange = new EventEmitter<ReadonlyArray<TableField>>();
@@ -53,6 +53,6 @@ export class CustomViewEditorComponent {
     }
 
     public resetDefault() {
-        this.reset.emit();
+        this.listFieldsReset.emit();
     }
 }

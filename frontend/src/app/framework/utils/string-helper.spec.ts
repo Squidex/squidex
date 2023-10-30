@@ -46,6 +46,18 @@ describe('StringHelper', () => {
         expect(StringHelper.appendLast('text.', '.')).toBe('text.');
     });
 
+    it('should return hash for null value', () => {
+        expect(StringHelper.hashCode(null!)).toBe(0);
+    });
+
+    it('should return hash for empty value', () => {
+        expect(StringHelper.hashCode('')).toBe(0);
+    });
+
+    it('should return hash for concrete values', () => {
+        expect(StringHelper.hashCode('ABC')).not.toBe(StringHelper.hashCode('XYZ'));
+    });
+
     it('should append query string to url if url already contains query', () => {
         const url = StringHelper.appendToUrl('http://squidex.io?query=value', 'other', 1);
 

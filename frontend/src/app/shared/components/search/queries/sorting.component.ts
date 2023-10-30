@@ -16,7 +16,7 @@ import { QueryModel, QuerySorting, SORT_MODES } from '@app/shared/internal';
  })
 export class SortingComponent {
     @Output()
-    public change = new EventEmitter();
+    public sortingChange = new EventEmitter();
 
     @Output()
     public remove = new EventEmitter();
@@ -42,6 +42,6 @@ export class SortingComponent {
     }
 
     private emitChange() {
-        this.change.emit();
+        this.sortingChange.emit();
     }
 }

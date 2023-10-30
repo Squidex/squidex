@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-input-rename */
+
 import { booleanAttribute, Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 import { Types } from '@app/framework/internal';
 
@@ -27,7 +29,7 @@ export class FileDropDirective {
     public disabled = false;
 
     @Output('sqxDropFile')
-    public drop = new EventEmitter<ReadonlyArray<File>>();
+    public fileDrop = new EventEmitter<ReadonlyArray<File>>();
 
     constructor(
         private readonly element: ElementRef,
@@ -43,7 +45,7 @@ export class FileDropDirective {
             const files = await this.getAllowedFiles(event.clipboardData);
 
             if (files && !this.disabled) {
-                this.drop.emit(files);
+                this.fileDrop.emit(files);
             }
         }
     }
@@ -84,7 +86,7 @@ export class FileDropDirective {
             const files = await this.getAllowedFiles(event.dataTransfer);
 
             if (files && !this.disabled) {
-                this.drop.emit(files);
+                this.fileDrop.emit(files);
             }
         }
     }
@@ -121,7 +123,6 @@ export class FileDropDirective {
         }
 
         const files: File[] = [];
-
         const items = getItems(dataTransfer);
 
         // Loop over files first, otherwise Chromes deletes them in the async call.
@@ -139,7 +140,7 @@ export class FileDropDirective {
 
                 if (webkitEntry && webkitEntry.isDirectory) {
                     // eslint-disable-next-line no-await-in-loop
-                    await this.transferWebkitTree(webkitEntry, files);
+                    await this.traverseWebkitTree(webkitEntry, files);
                 }
             }
         }
@@ -151,7 +152,7 @@ export class FileDropDirective {
         return files;
     }
 
-    private async transferWebkitTree(item: any, files: File[]) {
+    private async traverseWebkitTree(item: any, files: File[]) {
         if (item.isFile) {
             const file = await getFilePromise(item);
 
@@ -163,7 +164,7 @@ export class FileDropDirective {
 
             for (const entry of entries) {
                 // eslint-disable-next-line no-await-in-loop
-                await this.transferWebkitTree(entry, files);
+                await this.traverseWebkitTree(entry, files);
             }
         }
     }

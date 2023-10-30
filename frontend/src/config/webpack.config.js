@@ -1,3 +1,4 @@
+const process = require('process');
 const plugins = {
     // https://webpack.js.org/plugins/eslint-webpack-plugin/
     ESLintPlugin: require('eslint-webpack-plugin'),
@@ -9,26 +10,17 @@ const plugins = {
     CopyPlugin: require('copy-webpack-plugin'),
 };
 
+process.on('uncaughtException', err => {
+    // Prevent ECONNRESET errors
+    console.log(err);
+});
+
 module.exports = (config, _, options) => {
     /*
      * Copy lazy loaded libraries to output.
      */
     config.plugins.push(new plugins.CopyPlugin({
         patterns: [
-            { from: './node_modules/simplemde/dist', to: 'dependencies/simplemde' },
-
-            { from: './node_modules/tinymce/icons/default/icons.min.js', to: 'dependencies/tinymce/icons/default' },
-            { from: './node_modules/tinymce/plugins/advlist', to: 'dependencies/tinymce/plugins/advlist' },
-            { from: './node_modules/tinymce/plugins/code', to: 'dependencies/tinymce/plugins/code' },
-            { from: './node_modules/tinymce/plugins/image', to: 'dependencies/tinymce/plugins/image' },
-            { from: './node_modules/tinymce/plugins/link', to: 'dependencies/tinymce/plugins/link' },
-            { from: './node_modules/tinymce/plugins/lists', to: 'dependencies/tinymce/plugins/lists' },
-            { from: './node_modules/tinymce/plugins/media', to: 'dependencies/tinymce/plugins/media' },
-            { from: './node_modules/tinymce/plugins/paste', to: 'dependencies/tinymce/plugins/paste' },
-            { from: './node_modules/tinymce/skins', to: 'dependencies/tinymce/skins' },
-            { from: './node_modules/tinymce/themes/silver', to: 'dependencies/tinymce/themes/silver' },
-            { from: './node_modules/tinymce/tinymce.min.js', to: 'dependencies/tinymce' },
-
             { from: './node_modules/tui-code-snippet/dist', to: 'dependencies/tui-calendar' },
             { from: './node_modules/tui-calendar/dist', to: 'dependencies/tui-calendar' },
 

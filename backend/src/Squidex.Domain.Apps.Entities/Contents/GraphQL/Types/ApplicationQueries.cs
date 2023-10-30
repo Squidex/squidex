@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+using static Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents.ContentActions;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
@@ -28,34 +30,62 @@ internal sealed class ApplicationQueries : ObjectGraphType
                 continue;
             }
 
-            AddContentFind(schemaInfo, contentType);
-            AddContentQueries(builder, schemaInfo, contentType);
+            if (schemaInfo.Schema.SchemaDef.Type == SchemaType.Singleton)
+            {
+                // Mark the normal queries as deprecated to motivate using the new endpoint.
+                var deprecation = $"Use 'find{schemaInfo.TypeName}Singleton' instead.";
+
+                AddContentFind(schemaInfo, contentType, deprecation);
+                AddContentFindSingleton(schemaInfo, contentType);
+                AddContentQueries(builder, schemaInfo, contentType, deprecation);
+            }
+            else
+            {
+                AddContentFind(schemaInfo, contentType, null);
+                AddContentQueries(builder, schemaInfo, contentType, null);
+            }
         }
 
         Description = "The app queries.";
     }
 
-    private void AddContentFind(SchemaInfo schemaInfo, IGraphType contentType)
+    private void AddContentFind(SchemaInfo schemaInfo, IGraphType contentType, string? deprecatedReason)
     {
         AddField(new FieldTypeWithSchemaId
         {
             Name = $"find{schemaInfo.TypeName}Content",
-            Arguments = ContentActions.Find.Arguments,
+            Arguments = Find.Arguments,
             ResolvedType = contentType,
-            Resolver = ContentActions.Find.Resolver,
+            Resolver = Find.Resolver,
+            DeprecationReason = deprecatedReason,
             Description = $"Find an {schemaInfo.DisplayName} content by id.",
             SchemaId = schemaInfo.Schema.Id
         });
     }
 
-    private void AddContentQueries(Builder builder, SchemaInfo schemaInfo, IGraphType contentType)
+    private void AddContentFindSingleton(SchemaInfo schemaInfo, IGraphType contentType)
+    {
+        AddField(new FieldTypeWithSchemaId
+        {
+            Name = $"find{schemaInfo.TypeName}Singleton",
+            Arguments = FindSingleton.Arguments,
+            ResolvedType = contentType,
+            Resolver = FindSingleton.Resolver,
+            DeprecationReason = null,
+            Description = $"Find an {schemaInfo.DisplayName} singleton.",
+            SchemaId = schemaInfo.Schema.Id
+        });
+    }
+
+    private void AddContentQueries(Builder builder, SchemaInfo schemaInfo, IGraphType contentType, string? deprecatedReason)
     {
         AddField(new FieldTypeWithSchemaId
         {
             Name = $"query{schemaInfo.TypeName}Contents",
-            Arguments = ContentActions.QueryOrReferencing.Arguments,
+            Arguments = QueryOrReferencing.Arguments,
             ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
-            Resolver = ContentActions.QueryOrReferencing.Query,
+            Resolver = QueryOrReferencing.Query,
+            DeprecationReason = deprecatedReason,
             Description = $"Query {schemaInfo.DisplayName} content items.",
             SchemaId = schemaInfo.Schema.Id
         });
@@ -70,9 +100,10 @@ internal sealed class ApplicationQueries : ObjectGraphType
         AddField(new FieldTypeWithSchemaId
         {
             Name = $"query{schemaInfo.TypeName}ContentsWithTotal",
-            Arguments = ContentActions.QueryOrReferencing.Arguments,
+            Arguments = QueryOrReferencing.Arguments,
             ResolvedType = contentResultTyp,
-            Resolver = ContentActions.QueryOrReferencing.QueryWithTotal,
+            Resolver = QueryOrReferencing.QueryWithTotal,
+            DeprecationReason = deprecatedReason,
             Description = $"Query {schemaInfo.DisplayName} content items with total count.",
             SchemaId = schemaInfo.Schema.Id
         });
@@ -90,9 +121,9 @@ internal sealed class ApplicationQueries : ObjectGraphType
         AddField(new FieldType
         {
             Name = "queryContentsByIds",
-            Arguments = ContentActions.QueryByIds.Arguments,
+            Arguments = QueryByIds.Arguments,
             ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(unionType))),
-            Resolver = ContentActions.QueryByIds.Resolver,
+            Resolver = QueryByIds.Resolver,
             Description = "Query content items by IDs across schemeas."
         });
     }

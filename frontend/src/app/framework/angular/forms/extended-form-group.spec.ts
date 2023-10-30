@@ -8,7 +8,7 @@
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { ExtendedFormGroup, UndefinableFormGroup } from './extended-form-group';
 
-describe('UndefinableFormGroup', () => {
+describe('ExtendedFormGroup', () => {
     it('should provide value even if controls are disabled', () => {
         const control = new ExtendedFormGroup({
             test1: new UntypedFormControl('1'),
@@ -23,7 +23,7 @@ describe('UndefinableFormGroup', () => {
     });
 });
 
-describe('ExtendedFormGroup', () => {
+describe('UndefinableFormGroup', () => {
     const tests = [{
         name: 'undefined (on)',
         undefinable: true,
@@ -41,8 +41,20 @@ describe('ExtendedFormGroup', () => {
         valueActual: { field: 1 },
     }];
 
+    it('should initialize with undefined', () => {
+        const control = new UndefinableFormGroup();
+
+        expect(control.value).toBeUndefined();
+    });
+
+    it('should initialize with empty array', () => {
+        const control = new UndefinableFormGroup({});
+
+        expect(control.value).toEqual({});
+    });
+
     it('should provide value even if controls are disabled', () => {
-        const control = new ExtendedFormGroup({
+        const control = new UndefinableFormGroup({
             test1: new UntypedFormControl('1'),
             test2: new UntypedFormControl('2'),
         });

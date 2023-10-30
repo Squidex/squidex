@@ -19,6 +19,7 @@ public static class TestSchemas
     public static readonly ISchemaEntity Default;
     public static readonly ISchemaEntity Reference1;
     public static readonly ISchemaEntity Reference2;
+    public static readonly ISchemaEntity Singleton;
     public static readonly ISchemaEntity Component;
 
     static TestSchemas()
@@ -56,6 +57,11 @@ public static class TestSchemas
             new Schema("my-reference2")
                 .Publish()
                 .AddString(1, "reference2-field", Partitioning.Invariant));
+
+        Singleton = Mocks.Schema(TestApp.DefaultId, DomainId.NewGuid(),
+            new Schema("my-singleton", type: SchemaType.Singleton)
+                .Publish()
+                .AddString(1, "singleton-field", Partitioning.Invariant));
 
         Default = Mocks.Schema(TestApp.DefaultId, DomainId.NewGuid(),
             new Schema("my-schema")

@@ -8,7 +8,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, numberAttribute, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DialogModel, DialogService, disabled$, StatefulComponent, TypedSimpleChanges, Types, value$ } from '@app/framework';
+import { DialogModel, DialogService, disabled$, StatefulComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/framework';
 import { AppLanguageDto, AppsState, AssetDto, computeEditorUrl, ContentDto } from '@app/shared';
 
 interface State {
@@ -22,7 +22,8 @@ interface State {
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IFrameEditorComponent extends StatefulComponent<State> implements  OnDestroy {
+export class IFrameEditorComponent extends StatefulComponent<State> implements OnDestroy {
+    private readonly subscriptions = new Subscriptions();
     private value: any;
     private isInitialized = false;
     private isDisabled = false;
@@ -41,6 +42,9 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
 
     @Input({ transform: booleanAttribute })
     public isExpanded = false;
+
+    @Input({ required: true })
+    public schemaIds?: ReadonlyArray<string>;
 
     @Input({ required: true })
     public context: any = {};
@@ -78,9 +82,11 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
     public assetsCorrelationId: any;
     public assetsDialog = new DialogModel();
 
+    public contentsQuery?: string = undefined;
     public contentsCorrelationId: any;
-    public contentsSchemas?: string[];
+    public contentsSchemas?: ReadonlyArray<string>;
     public contentsDialog = new DialogModel();
+    public contentsSelectedIds?: ReadonlyArray<string>;
 
     constructor(
         private readonly appsState: AppsState,
@@ -115,17 +121,17 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
         }
 
         if (changes.formControlBinding) {
-            this.unsubscribeAll();
+            this.subscriptions.unsubscribeAll();
 
             const control = this.formControlBinding;
 
             if (control) {
-                this.own(value$(control)
+                this.subscriptions.add(value$(control)
                     .subscribe(value => {
                         this.updateValue(value);
                     }));
 
-                this.own(disabled$(control)
+                this.subscriptions.add(disabled$(control)
                     .subscribe(isDisabled => {
                         this.updatedisabled(isDisabled);
                     }));
@@ -207,11 +213,13 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements  
                     this.assetsDialog.show();
                 }
             } else if (type === 'pickContents') {
-                const { correlationId, schemas } = event.data;
+                const { correlationId, schemas, query, selectedIds } = event.data;
 
                 if (correlationId) {
+                    this.contentsQuery = query;
                     this.contentsCorrelationId = correlationId;
-                    this.contentsSchemas = schemas;
+                    this.contentsSelectedIds = Types.isArrayOfString(selectedIds) ? selectedIds : undefined;
+                    this.contentsSchemas = this.schemaIds && this.schemaIds.length > 0 ? this.schemaIds : Types.isArrayOfString(schemas) ? schemas : undefined;
                     this.contentsDialog.show();
                 }
             }

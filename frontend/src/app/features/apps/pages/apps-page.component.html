@@ -67,13 +67,13 @@
 </div>
 
 <sqx-app-form *sqxModal="addAppDialog"
-    (close)="addAppDialog.hide()" [template]="addAppTemplate">
+    (dialogClose)="addAppDialog.hide()" [template]="addAppTemplate">
 </sqx-app-form>
 
 <sqx-onboarding-dialog *sqxModal="onboardingDialog"
-    (close)="onboardingDialog.hide()">
+    (dialogClose)="onboardingDialog.hide()">
 </sqx-onboarding-dialog>
 
 <sqx-news-dialog *sqxModal="newsDialog" [features]="newsFeatures!"
-    (close)="newsDialog.hide()">
+    (dialogClose)="newsDialog.hide()">
 </sqx-news-dialog>

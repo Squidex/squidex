@@ -9,19 +9,21 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, LanguagesState, LocalStoreService, ModalModel, ResolveAssets, ResolveContents, ResourceOwner, SchemaDto, SchemasState, Settings, TempService, ToolbarService, Types, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, ContentDto, ContentsState, defined, DialogService, EditContentForm, LanguagesState, LocalStoreService, ModalModel, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, Subscriptions, TempService, ToolbarService, Types, Version } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
     templateUrl: './content-page.component.html',
     providers: [
+        CollaborationService,
         ResolveAssets,
         ResolveContents,
         ToolbarService,
     ],
 })
-export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
+export class ContentPageComponent implements CanComponentDeactivate, OnInit {
+    private readonly subscriptions = new Subscriptions();
     private autoSaveKey!: AutoSaveKey;
 
     public schema!: SchemaDto;
@@ -49,6 +51,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     constructor(apiUrl: ApiUrlConfig, authService: AuthService, appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly autoSaveService: AutoSaveService,
+        private readonly collaboration: CollaborationService,
         private readonly dialogs: DialogService,
         private readonly languagesState: LanguagesState,
         private readonly localStore: LocalStoreService,
@@ -57,8 +60,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         private readonly schemasState: SchemasState,
         private readonly tempService: TempService,
     ) {
-        super();
-
         const role = appsState.snapshot.selectedApp?.roleName;
 
         this.formContext = {
@@ -74,19 +75,19 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public ngOnInit() {
         this.contentsState.loadIfNotLoaded();
 
-        this.own(
+        this.subscriptions.add(
             this.languagesState.isoMasterLanguage
                 .subscribe(language => {
                     this.language = language;
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.languagesState.isoLanguages
                 .subscribe(languages => {
                     this.languages = languages;
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.schemasState.selectedSchema.pipe(defined())
                 .subscribe(schema => {
                     this.schema = schema;
@@ -101,7 +102,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, this.formContext);
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.contentsState.selectedContent
                 .subscribe(content => {
                     const isNewContent = isOtherContent(content, this.content);
@@ -109,9 +110,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     this.formContext['languages'] = this.languages;
                     this.formContext['schema'] = this.schema;
                     this.formContext['initialContent'] = content;
+                    this.contentForm.setContext(this.formContext);
 
                     this.content = content;
-                    this.contentForm.setContext(this.formContext);
 
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
@@ -136,9 +137,15 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                                 }
                             });
                     }
+
+                    if (content) {
+                        this.collaboration.connect(`apps/${this.schemasState.appName}/collaboration/${content.id}`);
+                    } else {
+                        this.collaboration.connect(null);
+                    }
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.contentForm.valueChanges.pipe(filter(_ => this.contentForm.form.enabled))
                 .subscribe(value => {
                     if (!Types.equals(value, this.content?.data)) {

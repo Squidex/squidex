@@ -14,6 +14,8 @@ public sealed record StringFieldProperties : FieldProperties
 {
     public ReadonlyList<string>? AllowedValues { get; init; }
 
+    public ReadonlyList<string>? ClassNames { get; set; }
+
     public LocalizedValue<string?> DefaultValues { get; init; }
 
     public string? DefaultValue { get; init; }

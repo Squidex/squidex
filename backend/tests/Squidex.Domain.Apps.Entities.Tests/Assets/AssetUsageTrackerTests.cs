@@ -35,7 +35,7 @@ public class AssetUsageTrackerTests : GivenContext
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        Assert.Equal("^asset-", sut.EventsFilter);
+        Assert.Equal(StreamFilter.Prefix("asset-"), sut.EventsFilter);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class AssetUsageTrackerTests : GivenContext
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        Assert.Equal(nameof(AssetUsageTracker), sut.Name);
+        Assert.Equal(nameof(AssetUsageTracker), ((IEventConsumer)sut).Name);
     }
 
     [Fact]

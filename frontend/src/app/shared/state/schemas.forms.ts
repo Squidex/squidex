@@ -249,6 +249,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 
     public visitArray() {
+        this.config['calculatedDefaultValue'] = new UntypedFormControl('EmptyArray');
         this.config['maxItems'] = new UntypedFormControl(undefined);
         this.config['minItems'] = new UntypedFormControl(undefined);
         this.config['uniqueFields'] = new UntypedFormControl(undefined);
@@ -288,6 +289,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 
     public visitComponents() {
+        this.config['calculatedDefaultValue'] = new UntypedFormControl('EmptyArray');
         this.config['schemaIds'] = new UntypedFormControl(undefined);
         this.config['maxItems'] = new UntypedFormControl(undefined);
         this.config['minItems'] = new UntypedFormControl(undefined);
@@ -324,12 +326,14 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['maxItems'] = new UntypedFormControl(undefined);
         this.config['minItems'] = new UntypedFormControl(undefined);
         this.config['mustBePublished'] = new UntypedFormControl(false);
+        this.config['query'] = new UntypedFormControl(undefined);
         this.config['resolveReference'] = new UntypedFormControl(false);
         this.config['schemaIds'] = new UntypedFormControl(undefined);
     }
 
     public visitString() {
         this.config['allowedValues'] = new UntypedFormControl(undefined);
+        this.config['classNames'] = new UntypedFormControl(undefined);
         this.config['contentType'] = new UntypedFormControl(undefined);
         this.config['createEnum'] = new UntypedFormControl(undefined);
         this.config['defaultValue'] = new UntypedFormControl(undefined);

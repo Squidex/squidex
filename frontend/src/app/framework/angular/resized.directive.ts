@@ -5,13 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, NgZone, numberAttribute, OnDestroy, Output } from '@angular/core';
-import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/internal';
+/* eslint-disable @angular-eslint/no-input-rename */
+
+import { Directive, ElementRef, EventEmitter, Input, NgZone, numberAttribute, Output } from '@angular/core';
+import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxResized], [sqxResizeCondition]',
 })
-export class ResizedDirective extends ResourceOwner implements OnDestroy, ResizeListener {
+export class ResizedDirective implements ResizeListener {
+    private readonly subscriptions = new Subscriptions();
     private condition: ((rect: DOMRect) => boolean) | undefined;
     private conditionValue = false;
 
@@ -25,14 +28,12 @@ export class ResizedDirective extends ResourceOwner implements OnDestroy, Resize
     public resizeCondition = new EventEmitter<boolean>();
 
     @Output('sqxResized')
-    public resize = new EventEmitter<DOMRect>();
+    public resizeChange = new EventEmitter<DOMRect>();
 
     constructor(resizeService: ResizeService, element: ElementRef,
         private readonly zone: NgZone,
     ) {
-        super();
-
-        this.own(resizeService.listen(element.nativeElement, this));
+        this.subscriptions.add(resizeService.listen(element.nativeElement, this));
     }
 
     public ngOnChanges() {
@@ -63,7 +64,7 @@ export class ResizedDirective extends ResourceOwner implements OnDestroy, Resize
             }
         } else {
             this.zone.run(() => {
-                this.resize.emit(rect);
+                this.resizeChange.emit(rect);
             });
         }
     }

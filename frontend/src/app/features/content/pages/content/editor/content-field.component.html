@@ -1,56 +1,60 @@
 <div class="row g-0" [class.compare]="formModelCompare">
     <div [class.col-12]="!formModelCompare" [class.col-6]="formModelCompare">
-        <div class="table-items-row table-items-row-summary" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
-            <div class="languages-container">
-                <div class="languages-buttons">
-                    <div class="languages-inner">
-                        <sqx-field-languages 
-                            [formModel]="formModel"
-                            (languageChange)="languageChange.emit($event)"
-                            [language]="language"
-                            [languages]="languages"
-                            [showAllControls]="showAllControls"
-                            (showAllControlsChange)="changeShowAllControls($event)">
-                        </sqx-field-languages>
-    
-                        <sqx-field-copy-button [formModel]="formModel" [languages]="languages"></sqx-field-copy-button>
+        <sqx-focus-marker [controlId]="formModel.fieldPath">
+            <div class="table-items-row table-items-row-summary" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
+                <div class="languages-container">
+                    <div class="languages-buttons">
+                        <div class="languages-inner">
+                            <sqx-field-languages 
+                                [formModel]="formModel"
+                                (languageChange)="languageChange.emit($event)"
+                                [language]="language"
+                                [languages]="languages"
+                                [showAllControls]="showAllControls"
+                                (showAllControlsChange)="changeShowAllControls($event)">
+                            </sqx-field-languages>
+        
+                            <sqx-field-copy-button [formModel]="formModel" [languages]="languages"></sqx-field-copy-button>
 
-                        <button *ngIf="!formModel.field.isDisabled && isTranslatable" type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1" title="i18n:contents.autotranslate" (click)="translate()" tabindex="-1">
-                            <i class="icon-translate"></i>
-                        </button>
+                            <button *ngIf="isTranslatable" type="button" [disabled]="formModel.field.isDisabled" class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1" title="i18n:contents.autotranslate" (click)="translate()" tabindex="-1">
+                                <i class="icon-translate"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+                
+                <ng-container *ngIf="showAllControls; else singleControl">
+                    <div class="form-group" *ngFor="let language of languages">
+                        <sqx-field-editor
+                            [canUnset]="!(isDisabled | async)"
+                            [displaySuffix]="prefix(language)"
+                            [form]="form"
+                            [formContext]="formContext"
+                            [formLevel]="formLevel"
+                            [formModel]="formModel.get(language)"
+                            [isComparing]="!!formModelCompare"
+                            [hasChatBot]="hasChatBot"
+                            [language]="language"
+                            [languages]="languages">
+                        </sqx-field-editor>
+                    </div>
+                </ng-container>
             
-            <ng-container *ngIf="showAllControls; else singleControl">
-                <div class="form-group" *ngFor="let language of languages">
+                <ng-template #singleControl>
                     <sqx-field-editor
                         [canUnset]="!(isDisabled | async)"
-                        [displaySuffix]="prefix(language)"
                         [form]="form"
                         [formContext]="formContext"
                         [formLevel]="formLevel"
-                        [formModel]="formModel.get(language)"
+                        [formModel]="getControl()"
                         [isComparing]="!!formModelCompare"
+                        [hasChatBot]="hasChatBot"
                         [language]="language"
                         [languages]="languages">
                     </sqx-field-editor>
-                </div>
-            </ng-container>
-        
-            <ng-template #singleControl>
-                <sqx-field-editor
-                    [canUnset]="!(isDisabled | async)"
-                    [form]="form"
-                    [formContext]="formContext"
-                    [formLevel]="formLevel"
-                    [formModel]="getControl()"
-                    [isComparing]="!!formModelCompare"
-                    [language]="language"
-                    [languages]="languages">
-                </sqx-field-editor>
-            </ng-template>
-        </div>
+                </ng-template>
+            </div>
+        </sqx-focus-marker>
     </div>
 
     <div class="col-6 col-right" *ngIf="formModelCompare && formCompare">
@@ -85,6 +89,7 @@
                         [formLevel]="formLevel"
                         [formModel]="formModelCompare.get(language)"
                         [isComparing]="!!formModelCompare"
+                        [hasChatBot]="hasChatBot"
                         [language]="language"
                         [languages]="languages">
                     </sqx-field-editor>
@@ -99,7 +104,8 @@
                     [formModel]="getControlCompare()!"
                     [language]="language"
                     [languages]="languages"
-                    [isComparing]="!!formModelCompare">
+                    [isComparing]="!!formModelCompare"
+                    [hasChatBot]="hasChatBot">
                 </sqx-field-editor>
             </ng-template>
         </div>

@@ -45,11 +45,12 @@ public sealed class Startup
         services.AddSquidexAssetInfrastructure(config);
         services.AddSquidexAssets(config);
         services.AddSquidexBackups();
+        services.AddSquidexCollaborations(config);
         services.AddSquidexCommands(config);
-        services.AddSquidexComments();
         services.AddSquidexContents(config);
         services.AddSquidexControllerServices(config);
         services.AddSquidexEventSourcing(config);
+        services.AddSquidexFrontend();
         services.AddSquidexGraphQL();
         services.AddSquidexHealthChecks(config);
         services.AddSquidexHistory(config);
@@ -58,7 +59,6 @@ public sealed class Startup
         services.AddSquidexLocalization();
         services.AddSquidexMessaging(config);
         services.AddSquidexMigration(config);
-        services.AddSquidexNotifications(config);
         services.AddSquidexOpenApiSettings();
         services.AddSquidexQueries(config);
         services.AddSquidexRules(config);

@@ -37,7 +37,7 @@ public sealed class UserManagementController : ApiController
     /// <param name="query">Optional query to search by email address or username.</param>
     /// <param name="skip">The number of users to skip.</param>
     /// <param name="take">The number of users to return.</param>
-    /// <response code="200">Users returned.</response>.
+    /// <response code="200">Users returned.</response>
     [HttpGet]
     [Route("user-management/")]
     [ProducesResponseType(typeof(UsersDto), StatusCodes.Status200OK)]
@@ -55,8 +55,8 @@ public sealed class UserManagementController : ApiController
     /// Get a user by ID.
     /// </summary>
     /// <param name="id">The ID of the user.</param>
-    /// <response code="200">User returned.</response>.
-    /// <response code="404">User not found.</response>.
+    /// <response code="200">User returned.</response>
+    /// <response code="404">User not found.</response>
     [HttpGet]
     [Route("user-management/{id}/")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
@@ -79,8 +79,8 @@ public sealed class UserManagementController : ApiController
     /// Create a new user.
     /// </summary>
     /// <param name="request">The user object that needs to be added.</param>
-    /// <response code="201">User created.</response>.
-    /// <response code="400">User request not valid.</response>.
+    /// <response code="201">User created.</response>
+    /// <response code="400">User request not valid.</response>
     [HttpPost]
     [Route("user-management/")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
@@ -99,9 +99,9 @@ public sealed class UserManagementController : ApiController
     /// </summary>
     /// <param name="id">The ID of the user.</param>
     /// <param name="request">The user object that needs to be updated.</param>
-    /// <response code="200">User created.</response>.
-    /// <response code="400">User request not valid.</response>.
-    /// <response code="404">User not found.</response>.
+    /// <response code="200">User created.</response>
+    /// <response code="400">User request not valid.</response>
+    /// <response code="404">User not found.</response>
     [HttpPut]
     [Route("user-management/{id}/")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
@@ -119,9 +119,9 @@ public sealed class UserManagementController : ApiController
     /// Lock a user.
     /// </summary>
     /// <param name="id">The ID of the user to lock.</param>
-    /// <response code="200">User locked.</response>.
-    /// <response code="403">User is the current user.</response>.
-    /// <response code="404">User not found.</response>.
+    /// <response code="200">User locked.</response>
+    /// <response code="403">User is the current user.</response>
+    /// <response code="404">User not found.</response>
     [HttpPut]
     [Route("user-management/{id}/lock/")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
@@ -144,9 +144,9 @@ public sealed class UserManagementController : ApiController
     /// Unlock a user.
     /// </summary>
     /// <param name="id">The ID of the user to unlock.</param>
-    /// <response code="200">User unlocked.</response>.
-    /// <response code="403">User is the current user.</response>.
-    /// <response code="404">User not found.</response>.
+    /// <response code="200">User unlocked.</response>
+    /// <response code="403">User is the current user.</response>
+    /// <response code="404">User not found.</response>
     [HttpPut]
     [Route("user-management/{id}/unlock/")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
@@ -169,9 +169,9 @@ public sealed class UserManagementController : ApiController
     /// Delete a User.
     /// </summary>
     /// <param name="id">The ID of the user to delete.</param>
-    /// <response code="204">User deleted.</response>.
-    /// <response code="403">User is the current user.</response>.
-    /// <response code="404">User not found.</response>.
+    /// <response code="204">User deleted.</response>
+    /// <response code="403">User is the current user.</response>
+    /// <response code="404">User not found.</response>
     [HttpDelete]
     [Route("user-management/{id}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

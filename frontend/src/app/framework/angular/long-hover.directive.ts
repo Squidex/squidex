@@ -5,6 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-input-rename */
+/* eslint-disable @angular-eslint/no-output-rename */
+
 import { Directive, EventEmitter, HostListener, Input, numberAttribute, Output, Renderer2 } from '@angular/core';
 
 @Directive({

@@ -7,9 +7,10 @@
 </div>
 
 <sqx-content-selector *sqxModal="contentSelectorDialog"
-    (select)="select($event)"
+    (contentSelect)="select($event)"
     [language]="language"
     [languages]="languages"
-    maxItems="1"
-    [schemaIds]="schemaIds">
+    [query]="query"
+    [schemaIds]="schemaIds"
+    maxItems="1">
 </sqx-content-selector>

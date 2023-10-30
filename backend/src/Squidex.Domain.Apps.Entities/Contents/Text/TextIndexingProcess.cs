@@ -21,25 +21,13 @@ public sealed class TextIndexingProcess : IEventConsumer
     private readonly ITextIndex textIndex;
     private readonly ITextIndexerState textIndexerState;
 
-    public int BatchSize
-    {
-        get => 1000;
-    }
+    public int BatchSize => 1000;
 
-    public int BatchDelay
-    {
-        get => 1000;
-    }
+    public int BatchDelay => 1000;
 
-    public string Name
-    {
-        get => "TextIndexer5";
-    }
+    public string Name => "TextIndexer5";
 
-    public string EventsFilter
-    {
-        get => "^content-";
-    }
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("content-");
 
     public ITextIndex TextIndex
     {

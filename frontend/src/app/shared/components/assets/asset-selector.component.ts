@@ -30,7 +30,7 @@ interface State {
 })
 export class AssetSelectorComponent extends StatefulComponent<State> implements OnInit {
     @Output()
-    public select = new EventEmitter<ReadonlyArray<AssetDto>>();
+    public assetSelect = new EventEmitter<ReadonlyArray<AssetDto>>();
 
     constructor(localStore: LocalStoreService,
         public readonly assetsState: ComponentAssetsState,
@@ -63,11 +63,11 @@ export class AssetSelectorComponent extends StatefulComponent<State> implements 
     }
 
     public emitClose() {
-        this.select.emit([]);
+        this.assetSelect.emit([]);
     }
 
     public emitSelect() {
-        this.select.emit(Object.values(this.snapshot.selectedAssets));
+        this.assetSelect.emit(Object.values(this.snapshot.selectedAssets));
     }
 
     public selectTags(tags: ReadonlyArray<string>) {

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Notifications;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
@@ -43,6 +43,24 @@ public class InvitationEventConsumerTests : GivenContext
             .Returns(assignee);
 
         sut = new InvitationEventConsumer(AppProvider, userNotifications, userResolver, log);
+    }
+
+    [Fact]
+    public void Should_return_app_filter_for_events_filter()
+    {
+        Assert.Equal(StreamFilter.Prefix("app-"), sut.EventsFilter);
+    }
+
+    [Fact]
+    public async Task Should_do_nothing_on_clear()
+    {
+        await ((IEventConsumer)sut).ClearAsync();
+    }
+
+    [Fact]
+    public void Should_return_custom_name()
+    {
+        Assert.Equal("NotificationEmailSender", sut.Name);
     }
 
     [Fact]

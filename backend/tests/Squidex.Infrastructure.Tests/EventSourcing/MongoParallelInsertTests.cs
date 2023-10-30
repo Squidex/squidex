@@ -38,7 +38,7 @@ public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreFixt
 
         public string Name { get; } = RandomHash.Simple();
 
-        public string EventsFilter => $"^{Name}";
+        public StreamFilter EventsFilter => StreamFilter.Prefix(Name);
 
         public Task Completed => tcs.Task;
 

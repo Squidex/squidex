@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.8.2] - 2023-09-19
+
+### Fixed
+
+* **Assets**: Fixed S3 configuration.
+* **Contents**: Fixed a query that was causing exceptions when using pagination.
+* **UI**: Generate unique IDs for radio groups to fix a problem when multiple groups exist per page.
+
+### Changed
+
+* **UI**: Migration to angular 16.
+* **UI**: Better chat dialog.
+
+### Added
+
+* **Contents**: Default values for array fields.
+* **Contents**: Default values for components fields.
+* **Rules**: Support for deep detect to annotate images with AI models.
+* **UI**: Widget plugins for teams and app dashboard.
+
 ## [7.8.1] - 2023-08-04
 
 ### Fixed

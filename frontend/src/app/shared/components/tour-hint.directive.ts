@@ -5,14 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, Input, numberAttribute, OnDestroy, OnInit } from '@angular/core';
+/* eslint-disable @angular-eslint/no-input-rename */
+/* eslint-disable @angular-eslint/directive-selector */
+
+import { Directive, Input, numberAttribute, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
-import { FloatingPlacement, ResourceOwner, StepDefinition, TourService, TourState, Types } from '@app/shared/internal';
+import { FloatingPlacement, StepDefinition, Subscriptions, TourService, TourState, Types } from '@app/shared/internal';
 
 @Directive({
     selector: '[hintText]',
 })
-export class TourHintDirective extends ResourceOwner implements OnDestroy, OnInit {
+export class TourHintDirective implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     @Input('sqxTourStep')
     public anchorId!: string;
 
@@ -32,7 +37,6 @@ export class TourHintDirective extends ResourceOwner implements OnDestroy, OnIni
         private readonly tourService: TourService,
         private readonly tourState: TourState,
     ) {
-        super();
     }
 
     public ngOnInit() {
@@ -49,7 +53,7 @@ export class TourHintDirective extends ResourceOwner implements OnDestroy, OnIni
             this.hintAfter :
             parseInt(this.hintAfter, 10);
 
-        this.own(
+        this.subscriptions.add(
             timer(after).subscribe(() => {
                 if (this.tourState.snapshot.status === 'Started') {
                     return;

@@ -5,7 +5,14 @@ type PluginOptions = {
     acceptedOrigins?: string[];
 }
 
-declare class EditorPlugin {
+declare class SquidexSidebar {
+    /** 
+     * The constructor.
+     * 
+     * @param options: The plugin options.
+    */
+    constructor(options?: PluginOptions);
+    
     /**
      * Get the current context.
      */
@@ -35,6 +42,33 @@ declare class EditorPlugin {
      */
     clean(): void; 
 }
+
+declare class SquidexWidget {
+    /** 
+     * The constructor.
+     * 
+     * @param options: The plugin options.
+    */
+    constructor(options?: PluginOptions);
+
+    /**
+     * Get the current context.
+     */
+    getContext(): any;
+
+    /**
+     * Register an function that is called when the sidebar is initialized.
+     *
+     * @param callback: The callback to invoke.
+     */
+    onInit(callback: () => void): void;
+
+    /**
+     * Clean the editor SDK.
+     */
+    clean(): void; 
+}
+
 
 declare class SquidexFormField {
     /** 
@@ -96,12 +130,12 @@ declare class SquidexFormField {
     navigate(url: string): void;
 
     /**
-     * Notifies the parent to go to fullscreen mode.
+     * Notifies the parent to toggle the fullscreen mode.
      */
     toggleFullscreen(): void;
 
     /**
-     * Notifies the parent to go to expanded mode.
+     * Notifies the parent to toggle the expanded mode.
      */
     toggleExpanded(): void;
 
@@ -147,8 +181,18 @@ declare class SquidexFormField {
      * 
      * @param schemas: The list of schema names.
      * @param callback The callback to invoke when the dialog is completed or closed.
+<<<<<<< HEAD
+=======
+     * @param query: The initial query that is used in the UI.
+     * @param selectedIds: The selected ids to mark them as selected in the content selector dialog.
      */
-    pickContents(schemas: string[], callback: (assets: any[]) => void): void;
+    pickContents(schemas: string[], callback: (assets: any[]) => void, query?: string, selectedIds?: string[]): void;
+
+    /**
+     * Shows a dialog to pick a file.
+>>>>>>> 8f149db852d984489e6ca1a07af988dac917ab56
+     */
+    pickFile(): void;
 
     /**
      * Register an function that is called when the field is initialized.

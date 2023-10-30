@@ -29,8 +29,8 @@ public sealed class AppAssetsController : ApiController
     /// Get the app asset scripts.
     /// </summary>
     /// <param name="app">The name of the app to get the asset scripts for.</param>
-    /// <response code="200">Asset scripts returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Asset scripts returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/assets/scripts")]
     [ProducesResponseType(typeof(AssetScriptsDto), StatusCodes.Status200OK)]
@@ -51,9 +51,9 @@ public sealed class AppAssetsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
     /// <param name="request">The values to update.</param>
-    /// <response code="200">Asset scripts updated.</response>.
-    /// <response code="400">Asset request not valid.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Asset scripts updated.</response>
+    /// <response code="400">Asset request not valid.</response>
+    /// <response code="404">App not found.</response>
     [HttpPut]
     [Route("apps/{app}/assets/scripts")]
     [ProducesResponseType(typeof(AssetScriptsDto), StatusCodes.Status200OK)]

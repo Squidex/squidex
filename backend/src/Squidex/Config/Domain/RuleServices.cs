@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Comments;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Queries;

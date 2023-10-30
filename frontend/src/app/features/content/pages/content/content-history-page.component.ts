@@ -8,7 +8,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppsState, ContentDto, ContentsState, defined, HistoryEventDto, HistoryService, ModalModel, ResourceOwner, SchemasState, switchSafe } from '@app/shared';
+import { AppsState, ContentDto, ContentsState, defined, HistoryEventDto, HistoryService, ModalModel, SchemasState, Subscriptions, switchSafe } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 import { ContentPageComponent } from './content-page.component';
 
@@ -17,7 +17,9 @@ import { ContentPageComponent } from './content-page.component';
     styleUrls: ['./content-history-page.component.scss'],
     templateUrl: './content-history-page.component.html',
 })
-export class ContentHistoryPageComponent extends ResourceOwner implements OnInit {
+export class ContentHistoryPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector!: DueTimeSelectorComponent;
 
@@ -38,11 +40,10 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
         private readonly historyService: HistoryService,
         private readonly schemasState: SchemasState,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.contentsState.selectedContent.pipe(defined())
                 .subscribe(content => {
                     this.content = content;

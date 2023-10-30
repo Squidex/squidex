@@ -8,7 +8,7 @@
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, TextMeasurer, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, Subscriptions, TagValue, TextMeasurer, TypedSimpleChanges, Types } from '@app/framework/internal';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
@@ -38,6 +38,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnInit {
+    private readonly subscriptions = new Subscriptions();
     private readonly textMeasurer: TextMeasurer;
     private latestValue: any;
     private latestInput?: string;
@@ -49,13 +50,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public inputElement!: ElementRef<HTMLInputElement>;
 
     @Output()
-    public open = new EventEmitter();
+    public dropdownOpen = new EventEmitter();
 
     @Output()
-    public close = new EventEmitter();
+    public dropdownClose = new EventEmitter();
 
     @Output()
-    public blur = new EventEmitter();
+    public editorBlur = new EventEmitter();
 
     @Input()
     public itemConverter = StringConverter.INSTANCE;
@@ -147,7 +148,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.addInput.valueChanges.pipe(
                     tap(() => {
                         this.resetSize();
@@ -163,7 +164,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                         if (!query) {
                             this.resetAutocompletion();
                         } else if (!this.latestInput) {
-                            this.open.emit();
+                            this.dropdownOpen.emit();
                         }
 
                         this.latestInput = query;
@@ -372,7 +373,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public closeModal() {
         if (this.itemsModal.isOpen) {
-            this.close.emit();
+            this.dropdownClose.emit();
 
             this.itemsModal.hide();
         }
@@ -380,14 +381,14 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public openModal() {
         if (!this.itemsModal.isOpen) {
-            this.open.emit();
+            this.dropdownOpen.emit();
 
             this.itemsModal.show();
         }
     }
 
     public callTouched() {
-        this.blur.next(true);
+        this.editorBlur.next(true);
 
         super.callTouched();
     }

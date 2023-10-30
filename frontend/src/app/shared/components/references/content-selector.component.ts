@@ -8,7 +8,7 @@
 import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState, Subscriptions } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-selector',
@@ -18,11 +18,14 @@ import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDt
         ComponentContentsState,
     ],
 })
-export class ContentSelectorComponent extends ResourceOwner implements OnInit {
+export class ContentSelectorComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+    private initialQuery?: string = undefined;
+
     public readonly metaFields = META_FIELDS;
 
     @Output()
-    public select = new EventEmitter<ReadonlyArray<ContentDto>>();
+    public contentSelect = new EventEmitter<ReadonlyArray<ContentDto>>();
 
     @Input({ transform: numberAttribute })
     public maxItems = Number.MAX_VALUE;
@@ -36,6 +39,9 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Input()
     public schemaNames?: ReadonlyArray<string>;
 
+    @Input()
+    public query?: string;
+
     @Input({ required: true })
     public language!: LanguageDto;
 
@@ -46,7 +52,12 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     public allowDuplicates?: boolean | null;
 
     @Input()
-    public alreadySelected: ReadonlyArray<ContentDto> | undefined | null;
+    public alreadySelectedIds: ReadonlyArray<string> | undefined | null;
+
+    @Input()
+    public set alreadySelected(value: ReadonlyArray<ContentDto> | undefined | null) {
+        this.alreadySelectedIds = value?.map(x => x.id);
+    }
 
     public schema!: SchemaDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
@@ -73,11 +84,12 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         public readonly schemasState: SchemasState,
         public readonly schemasService: SchemasService,
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
+        this.initialQuery = this.query;
+
+        this.subscriptions.add(
             this.contentsState.statuses
                 .subscribe(() => {
                     this.updateModel();
@@ -101,7 +113,8 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
 
         if (schema) {
             this.contentsState.schema = schema;
-            this.contentsState.load();
+            this.contentsState.search({ fullText: this.initialQuery || undefined });
+            this.initialQuery = undefined;
 
             this.updateModel();
         }
@@ -124,15 +137,15 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     }
 
     public isItemAlreadySelected(content: ContentDto) {
-        return !this.allowDuplicates && this.alreadySelected && !!this.alreadySelected.find(x => x.id === content.id);
+        return !this.allowDuplicates && this.alreadySelectedIds && this.alreadySelectedIds.indexOf(content.id) >= 0;
     }
 
     public emitClose() {
-        this.select.emit([]);
+        this.contentSelect.emit([]);
     }
 
     public emitSelect() {
-        this.select.emit(Object.values(this.selectedItems));
+        this.contentSelect.emit(Object.values(this.selectedItems));
     }
 
     public selectAll(isSelected: boolean) {

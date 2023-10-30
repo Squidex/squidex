@@ -8,7 +8,7 @@
 
                 <ng-content select="[plainTitle]"></ng-content>
 
-                <button type="button" class="btn btn-close" (click)="close.emit()"></button>
+                <button type="button" class="btn btn-close" (click)="dialogClose.emit()"></button>
             </div>
 
             <div class="modal-tabs clearfix" #tabsElement>
@@ -26,4 +26,4 @@
     </div>
 </div>
 
-<sqx-shortcut keys="escape" (trigger)="close.emit()"></sqx-shortcut>
+<sqx-shortcut keys="escape" (trigger)="dialogClose.emit()"></sqx-shortcut>

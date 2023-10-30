@@ -23,7 +23,7 @@ export class ClientComponent {
 
     public apiCallsLimit = 0;
 
-    public connectDialog = new DialogModel();
+    public connectDialog = new DialogModel(false);
 
     constructor(
         public readonly appsState: AppsState,

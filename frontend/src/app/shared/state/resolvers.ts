@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { from, Observable, of, shareReplay } from 'rxjs';
 import { UIOptions } from '@app/framework';
 import { AssetDto, AssetsDto, AssetsService } from './../services/assets.service';
@@ -105,16 +105,13 @@ abstract class ResolverBase<T extends { id: string }, TResult extends { items: R
 @Injectable()
 export class ResolveContents extends ResolverBase<ContentDto, ContentsDto> {
     private readonly schemas: { [name: string]: Observable<ContentsDto> } = {};
-    private readonly itemCount;
+    private readonly itemCount = inject(UIOptions).value.referencesDropdownItemCount;
 
     constructor(
-        uiOptions: UIOptions,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
     ) {
         super();
-
-        this.itemCount = uiOptions.get('referencesDropdownItemCount');
     }
 
     public resolveAll(schema: string) {

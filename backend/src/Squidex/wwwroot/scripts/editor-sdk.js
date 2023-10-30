@@ -54,11 +54,11 @@ function isArrayOfStrings(value) {
 }
 
 /**
- * Creates a new plugin for sidebars or widgets.
+ * Creates a new plugin for sidebars.
  * 
  * @param {object} options with the accepted origins.
  */
-function SquidexPlugin(options) {
+function SquidexSidebar(options) {
     var initHandler;
     var initCalled = false;
     var contentHandler;
@@ -82,6 +82,7 @@ function SquidexPlugin(options) {
 
     function eventListener(event) {
         if (acceptedOrigins && acceptedOrigins.indexOf(event.origin) < 0) {
+            console.log('Origin not accepted: ' + event.origin);
             return;
         }
 
@@ -100,13 +101,15 @@ function SquidexPlugin(options) {
 
             raiseInit();
         }
+
+        console.log('Received Message: ' + type);
     }
 
     window.addEventListener('message', eventListener, false);
 
     timer = measureAndNotifyParent();
 
-    var editor = {
+    var plugin = {
         /**
          * Get the current context.
          */
@@ -165,9 +168,93 @@ function SquidexPlugin(options) {
         }
     };
 
-    return editor;
+    return plugin;
 }
 
+
+/**
+ * Creates a new plugin for widgets.
+ * 
+ * @param {object} options with the accepted origins.
+ */
+function SquidexWidget(options) {
+    var initHandler;
+    var initCalled = false;
+    var context;
+    var acceptedOrigins = options && isArrayOfStrings(options.acceptedOrigins) ? options.acceptedOrigins : null;
+
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+
+    function raiseInit() {
+        if (initHandler && !initCalled && context) {
+            initHandler(context);
+            initCalled = true;
+        }
+    }
+
+    function eventListener(event) {
+        if (acceptedOrigins && acceptedOrigins.indexOf(event.origin) < 0) {
+            console.log('Origin not accepted: ' + event.origin);
+            return;
+        }
+
+        if (event.source === window) {
+            return;
+        }
+
+        var type = event.data.type;
+        
+        if (type === 'init') {
+            context = event.data.context;
+
+            raiseInit();
+        }
+
+        console.log('Received Message: ' + type);
+    }
+
+    window.addEventListener('message', eventListener, false);
+
+    var plugin = {
+        /**
+         * Get the current context.
+         */
+        getContext: function () {
+            return context;
+        },
+
+        /**
+         * Register an function that is called when the sidebar is initialized.
+         *
+         * @param {function} callback: The callback to invoke.
+         */
+        onInit: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
+            initHandler = callback;
+
+            raiseInit();
+        },
+
+        /**
+         * Clean the editor SDK.
+         */
+        clean: function () {
+            window.removeEventListener('message', eventListener);
+        }
+    };
+
+    return plugin;
+}
+
+/**
+ * Creates a new plugin for form fields.
+ * 
+ * @param {object} options with the accepted origins.
+ */
 function SquidexFormField(options) {
     var context;
     var currentConfirm;
@@ -191,6 +278,13 @@ function SquidexFormField(options) {
     var value;
     var valueHandler;
     var acceptedOrigins = options && isArrayOfStrings(options.acceptedOrigins) ? options.acceptedOrigins : null;
+
+    function raiseInit() {
+        if (initHandler && !initCalled && context) {
+            initHandler(context);
+            initCalled = true;
+        }
+    }
 
     function raiseDisabled() {
         if (disabledHandler) {
@@ -234,15 +328,9 @@ function SquidexFormField(options) {
         }
     }
 
-    function raiseInit() {
-        if (initHandler && !initCalled && context) {
-            initHandler(context);
-            initCalled = true;
-        }
-    }
-
     function eventListener(event) {
         if (acceptedOrigins && acceptedOrigins.indexOf(event.origin) < 0) {
+            console.log('Origin not accepted: ' + event.origin);
             return;
         }
 
@@ -329,7 +417,7 @@ function SquidexFormField(options) {
 
     timer = measureAndNotifyParent();
 
-    var editor = {
+    var plugin = {
         /**
          * Get the current value.
          */
@@ -407,7 +495,7 @@ function SquidexFormField(options) {
         },
 
         /**
-         * Notifies the parent to go to fullscreen mode.
+         * Notifies the parent to toggle the fullscreen mode.
          */
         toggleFullscreen: function () {
             if (window.parent) {
@@ -416,7 +504,7 @@ function SquidexFormField(options) {
         },
 
         /**
-         * Notifies the parent to go to expanded mode.
+         * Notifies the parent to toggle the expanded mode.
          */
         toggleExpanded: function () {
             if (window.parent) {
@@ -473,10 +561,7 @@ function SquidexFormField(options) {
 
             var correlationId = new Date().getTime().toString();
 
-            currentConfirm = {
-                correlationId: correlationId,
-                callback: callback
-            };
+            currentConfirm = { correlationId: correlationId, callback: callback };
 
             if (window.parent) {
                 window.parent.postMessage({ type: 'confirm', title: title, text: text, correlationId: correlationId }, '*');
@@ -495,10 +580,7 @@ function SquidexFormField(options) {
 
             var correlationId = new Date().getTime().toString();
 
-            currentPickAssets = {
-                correlationId: correlationId,
-                callback: callback
-            };
+            currentPickAssets = { correlationId: correlationId, callback: callback };
 
             if (window.parent) {
                 window.parent.postMessage({ type: 'pickAssets', correlationId: correlationId }, '*');
@@ -508,23 +590,31 @@ function SquidexFormField(options) {
         /**
          * Shows the dialog to pick assets.
          * 
-         * @param {string} schemas: The list of schema names.
+         * @param {string[]} schemas: The list of schema names.
          * @param {function} callback The callback to invoke when the dialog is completed or closed.
+         * @param {string} query: The initial filter that is used in the UI.
+         * @param {string[]} selectedIds: The selected ids to mark them as selected in the content selector dialog.
          */
-        pickContents: function (schemas, callback) {
-            if (!isFunction(callback) || !isArrayOfStrings(schemas)) {
+        pickContents: function (schemas, callback, query, selectedIds) {
+            if (!isFunction(callback)) {
                 return;
             }
 
             var correlationId = new Date().getTime().toString();
 
-            currentPickContents = {
-                correlationId: correlationId,
-                callback: callback
-            };
+            currentPickContents = { correlationId: correlationId, callback: callback };
 
             if (window.parent) {
-                window.parent.postMessage({ type: 'pickContents', correlationId: correlationId, schemas: schemas }, '*');
+                window.parent.postMessage({ type: 'pickContents', correlationId: correlationId, schemas: schemas, query: query, selectedIds: selectedIds }, '*');
+            }
+        },
+
+        /**
+         * Shows a dialog to pick a file.
+         */
+        pickFile: function () {
+            if (window.parent) {
+                window.parent.postMessage({ type: 'pickFile' }, '*');
             }
         },
 
@@ -652,13 +742,13 @@ function SquidexFormField(options) {
          * Clean the editor SDK.
          */
         clean: function () {
-            if (timer) {
-                window.removeEventListener('message', eventListener);
+            window.removeEventListener('message', eventListener);
 
+            if (timer) {
                 timer();
             }
         }
     };
 
-    return editor;
+    return plugin;
 };

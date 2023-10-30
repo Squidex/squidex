@@ -7,22 +7,26 @@
     <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
     <script src="editor-sdk.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="https://cloud.squidex.io/styles.css">
     <style>
-        #textarea {
-            box-sizing: border-box;
-            min-width: 100%;
-            min-height: 200px;
-            margin-top: 10px;
+        body {
+            background-color: white;
+        }
+
+        textarea {
+            height: 300px;
+            font-family: monospace;
+            font-size: 12px;
         }
     </style>
 </head>
 
 <body>
-    <div>
-        <button id="button">Generate New Value</button>
+    <div class="mb-2">
+        <button class="btn btn-outline-secondary" id="button">Generate New Value</button>
     </div>
 
-    <textarea readonly id="textarea"></textarea>
+    <textarea class="form-control" readonly id="textarea"></textarea>
 
     <script>
         var numberGenerator = 1;

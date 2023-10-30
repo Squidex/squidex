@@ -8,7 +8,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { TypedSimpleChanges, Types } from '@app/framework';
+import { Subscriptions, TypedSimpleChanges, Types } from '@app/framework';
 import { ContentDto, ContentsDto, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
@@ -36,6 +36,7 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
+    private readonly subscriptions = new Subscriptions();
     private readonly contents: ContentDto[] = [];
     private isOpenedBefore = false;
     private isLoadingFailed = false;
@@ -66,7 +67,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     ) {
         super({ converter: new ReferencesTagsConverter(null!, [], localizer) });
 
-        this.own(
+        this.subscriptions.add(
             this.control.valueChanges
                 .subscribe((value: string[]) => {
                     if (value && value.length > 0) {

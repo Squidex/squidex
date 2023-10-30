@@ -24,7 +24,7 @@ type ImportStatus = {
 })
 export class ImportContributorsDialogComponent {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     @Input({ required: true })
     public roles!: ReadonlyArray<RoleDto>;

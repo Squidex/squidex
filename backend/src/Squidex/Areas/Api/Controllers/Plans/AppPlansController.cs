@@ -43,8 +43,8 @@ public sealed class AppPlansController : ApiController
     /// Get app plan information.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">App plan information returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">App plan information returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/plans/")]
     [ProducesResponseType(typeof(PlansDto), StatusCodes.Status200OK)]
@@ -101,9 +101,9 @@ public sealed class AppPlansController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">Plan object that needs to be changed.</param>
-    /// <response code="200">Plan changed or redirect url returned.</response>.
-    /// <response code="400">Plan not owned by user.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Plan changed or redirect url returned.</response>
+    /// <response code="400">Plan not owned by user.</response>
+    /// <response code="404">App not found.</response>
     [HttpPut]
     [Route("apps/{app}/plan/")]
     [ProducesResponseType(typeof(PlanChangedDto), StatusCodes.Status200OK)]

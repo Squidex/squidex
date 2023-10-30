@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
-import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, TypedSimpleChanges, UIOptions } from '@app/shared/internal';
+import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR: any = {
@@ -31,7 +31,8 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
-    private readonly itemCount: number;
+    private readonly subscriptions = new Subscriptions();
+    private readonly itemCount: number = inject(UIOptions).value.referencesDropdownItemCount;
     private contentItems: ReadonlyArray<ContentDto> | null = null;
 
     @Input({ required: true })
@@ -51,16 +52,14 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         return !!this.schemaId && !!this.language;
     }
 
-    constructor(uiOptions: UIOptions,
+    constructor(
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly localizer: LocalizerService,
     ) {
         super({ converter: new ReferencesTagsConverter(null!, [], localizer) });
 
-        this.itemCount = uiOptions.get('referencesDropdownItemCount');
-
-        this.own(
+        this.subscriptions.add(
             this.control.valueChanges
                 .subscribe((value: string[]) => {
                     if (value && value.length > 0) {

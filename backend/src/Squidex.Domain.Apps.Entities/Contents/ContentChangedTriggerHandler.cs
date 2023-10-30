@@ -97,8 +97,10 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
             yield break;
         }
 
+        var allTriggers = context.Rules.Select(x => x.Value.Trigger).OfType<ContentChangedTriggerV2>();
+
         // This method is only called once per event, therefore we check all rules.
-        if (!context.Rules.Select(x => x.Value.Trigger).OfType<ContentChangedTriggerV2>().Any(t => MatchesAnySchema(t.ReferencedSchemas, enrichedEvent)))
+        if (!allTriggers.Any(t => MatchesAnySchema(t.ReferencedSchemas, enrichedEvent)))
         {
             yield break;
         }

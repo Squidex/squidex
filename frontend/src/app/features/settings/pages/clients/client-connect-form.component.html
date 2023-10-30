@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="close.emit()" size="lg">
+<sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="lg">
     <ng-container title>
         {{ 'clients.connect' | sqxTranslate }}
     </ng-container>
@@ -9,7 +9,7 @@
                 <li class="breadcrumb-item done">
                     <i class="icon-checkmark"></i> {{ 'clients.connectWizard.step0Title' | sqxTranslate }}
                 </li>
-                <ng-container *ngIf="isStart; else noStart">
+                <ng-container *ngIf="step === 'Start'; else noStart">
                     <li class="breadcrumb-item active">
                         <span>
                             <i class="icon-checkmark"></i> {{ 'clients.connectWizard.step1Title' | sqxTranslate }}
@@ -23,7 +23,7 @@
                         </a>
                     </li>
                 </ng-template>
-                <li class="breadcrumb-item" [class.active]="!isStart">
+                <li class="breadcrumb-item" [class.active]="step !== 'Start'">
                     <i class="icon-checkmark"></i> {{ 'clients.connectWizard.step2Title' | sqxTranslate }}
                 </li>
             </ol>
@@ -54,18 +54,10 @@
                         <i class="icon-angle-right"></i>
                     </div>
             
-                    <div class="option" (click)="go('SDK_Dotnet')">
-                        <h5>{{ 'clients.connectWizard.dotnetSdk' | sqxTranslate }}</h5>
+                    <div class="option" (click)="go('SDK')">
+                        <h5>{{ 'clients.connectWizard.sdk' | sqxTranslate }}</h5>
             
-                        <sqx-form-hint>{{ 'clients.connectWizard.dotnetSdkHint' | sqxTranslate }}</sqx-form-hint>
-                        
-                        <i class="icon-angle-right"></i>
-                    </div>
-            
-                    <div class="option" (click)="go('SDK_Javascript')">
-                        <h5>{{ 'clients.connectWizard.javascriptSdk' | sqxTranslate }}</h5>
-            
-                        <sqx-form-hint>{{ 'clients.connectWizard.javascriptSdkHint' | sqxTranslate }}</sqx-form-hint>
+                        <sqx-form-hint>{{ 'clients.connectWizard.sdkHint' | sqxTranslate }}</sqx-form-hint>
                         
                         <i class="icon-angle-right"></i>
                     </div>
@@ -144,132 +136,35 @@
                     </p>
                 </div>
             </ng-container>
-            <ng-container *ngSwitchCase="'SDK_Dotnet'">
-                <div class="section step">
-                    <sqx-form-hint>
-                        {{ 'clients.connectWizard.dotnetSdkDocumentation' | sqxTranslate }} <a href="https://docs.squidex.io/02-documentation/software-development-kits/.net-standard" sqxExternalLink>{{ 'common.documentation' | sqxTranslate }}</a>
-                    </sqx-form-hint>
+            <ng-container *ngSwitchCase="'SDK'">
+                <div *ngIf="sdks | async; let sdks">
+                    <div class="sdk-header"*ngFor="let availableSDK of sdks | keyvalue" [class.active]="sdk === availableSDK.value" (click)="select(availableSDK.value)">
+                        <div class="logo d-flex align-items-center justify-content-center" [innerHTML]="availableSDK.value.logo | sqxSafeHtml"></div>
+                        {{availableSDK.value.name}}
+                    </div>
                 </div>
 
-                <div class="section step">
-                    <h5><span class="badge rounded-pill bg-dark">1</span> {{ 'clients.connectWizard.dotnetSdkStep1' | sqxTranslate }}</h5>
+                <div class="section markdown" *ngIf="sdk">
+                    <div>
+                        <a [attr.href]="sdk.documentation" sqxExternalLink>{{ 'common.documentation' | sqxTranslate }}</a>
+                        <span> &middot; </span>
+                        <a [attr.href]="sdk.repository" sqxExternalLink>{{ 'common.repository' | sqxTranslate }}</a>
+                    </div>
 
-                    <div [innerHTML]="'clients.connectWizard.dotnetSdkStep1Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-
-                    <p>              
-                        <sqx-code>dotnet add package Squidex.ClientLibrary</sqx-code>
-                    </p>
+                    <span [sqxMarkdown]="sdk.instructions" inline="false" trusted="true"></span>
                 </div>
 
-                <div class="section step">
-                    <h5><span class="badge rounded-pill bg-dark">2</span> {{ 'clients.connectWizard.dotnetSdkStep2' | sqxTranslate }}</h5>
-
-                    <p>              
-                        <sqx-code>
-                            <div ngPreserveWhitespaces>using Squidex.ClientLibrary;</div>
-                            <div ngPreserveWhitespaces>&nbsp;</div>
-                            <div ngPreserveWhitespaces>var clientManager = new SquidexClientManager(new SquidexOptions</div>
-                            <div ngPreserveWhitespaces>{{'{'}}</div>
-                            <div ngPreserveWhitespaces>    AppName = "{{appName}}",</div>
-                            <div ngPreserveWhitespaces>    ClientId = "{{appName}}:{{client.id}}",</div>
-                            <div ngPreserveWhitespaces>    ClientSecret = "{{client.secret}}",</div>
-                            <div ngPreserveWhitespaces>    Url = "{{apiUrl.value}}"</div>
-                            <div ngPreserveWhitespaces>});</div>
-                        </sqx-code>
-                    </p>
-                </div>
-
-                <div class="section step">
-                    <h5><span class="badge rounded-pill bg-dark">2</span> {{ 'clients.connectWizard.dotnetSdkStep2_15' | sqxTranslate }}</h5>
-
-                    <p>              
-                        <sqx-code>
-                            <div ngPreserveWhitespaces>using Squidex.ClientLibrary;</div>
-                            <div ngPreserveWhitespaces>&nbsp;</div>
-                            <div ngPreserveWhitespaces>var client = new SquidexClient(new SquidexOptions</div>
-                            <div ngPreserveWhitespaces>{{'{'}}</div>
-                            <div ngPreserveWhitespaces>    AppName = "{{appName}}",</div>
-                            <div ngPreserveWhitespaces>    ClientId = "{{appName}}:{{client.id}},</div>
-                            <div ngPreserveWhitespaces>    ClientSecret = "{{client.secret}}",</div>
-                            <div ngPreserveWhitespaces>    Url = "{{apiUrl.value}}"</div>
-                            <div ngPreserveWhitespaces>});</div>
-                        </sqx-code>
-                    </p>
-                </div>
-
-                <div class="section step">
-                    <h5><span class="badge rounded-pill bg-dark">3</span> {{ 'clients.connectWizard.dotnetSdkStep3' | sqxTranslate }}</h5>
-
-                    <div [innerHTML]="'clients.connectWizard.dotnetSdkStep3Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-
-                    <p>              
-                        <sqx-code>dotnet add package Squidex.ClientLibrary.ServiceExtensions</sqx-code>
-                    </p>
-                </div>
-
-                <div class="section step">
-                    <h5><span class="badge rounded-pill bg-dark">4</span> {{ 'clients.connectWizard.dotnetSdkStep4' | sqxTranslate }}</h5>
-
-                    <p>              
-                        <sqx-code>
-                            <div ngPreserveWhitespaces>using Microsoft.Extensions.DependencyInjection;</div>
-                            <div ngPreserveWhitespaces>&nbsp;</div>
-                            <div ngPreserveWhitespaces>services.AddSquidex(options =></div>
-                            <div ngPreserveWhitespaces>{{'{'}}</div>
-                            <div ngPreserveWhitespaces>    options.AppName = "{{appName}}";</div>
-                            <div ngPreserveWhitespaces>    options.ClientId = "{{appName}}:{{client.id}}";</div>
-                            <div ngPreserveWhitespaces>    options.ClientSecret = "{{client.secret}}";</div>
-                            <div ngPreserveWhitespaces>    options.Url = "{{apiUrl.value}}";</div>
-                            <div ngPreserveWhitespaces>});</div>
-                        </sqx-code>
-                    </p>
-                </div>
-
-                <div class="section step">
+                <div class="section" *ngIf="sdk">
                     <sqx-form-hint>
                         {{ 'clients.connectWizard.sdkHelp' | sqxTranslate }} <a href="https://support.squidex.io" sqxExternalLink>{{ 'clients.connectWizard.sdkHelpLink' | sqxTranslate }}</a>
                     </sqx-form-hint>
-                </div>
-            </ng-container>
-            <ng-container *ngSwitchCase="'SDK_Javascript'">
-                <div class="section step">
-                    <sqx-form-hint>
-                        {{ 'clients.connectWizard.javascriptSdkDocumentation' | sqxTranslate }} <a href="https://docs.squidex.io/02-documentation/software-development-kits/javascript" sqxExternalLink>{{ 'common.documentation' | sqxTranslate }}</a>
-                    </sqx-form-hint>
-                </div>
-
-                <div class="section step">
-                    <h5><span class="badge rounded-pill bg-dark">1</span> {{ 'clients.connectWizard.javascriptSdkStep1' | sqxTranslate }}</h5>
-
-                    <div [innerHTML]="'clients.connectWizard.javascriptSdkStep1Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-
-                    <p>              
-                        <sqx-code>npm i @squidex/squidex --save</sqx-code>
-                    </p>
-                </div>
-
-                <div class="section step">
-                    <h5><span class="badge rounded-pill bg-dark">2</span> {{ 'clients.connectWizard.javascriptSdkStep2' | sqxTranslate }}</h5>
-
-                    <p>              
-                        <sqx-code>
-                            <div ngPreserveWhitespaces>import {{'{'}} SquidexClient } from "@squidex/squidex";</div>
-                            <div ngPreserveWhitespaces>&nbsp;</div>
-                            <div ngPreserveWhitespaces>const client = new SquidexClient({{'{'}}</div>
-                            <div ngPreserveWhitespaces>    appName: "{{appName}}",</div>
-                            <div ngPreserveWhitespaces>    clientId: "{{appName}}:{{client.id}}",</div>
-                            <div ngPreserveWhitespaces>    clientSecret: "{{client.secret}}",</div>
-                            <div ngPreserveWhitespaces>    environment: "{{apiUrl.value}}"</div>
-                            <div ngPreserveWhitespaces>});</div>
-                        </sqx-code>
-                    </p>
                 </div>
             </ng-container>
         </ng-container>
     </ng-container>
 
     <ng-container footer>
-        <button class="btn btn-text-secondary" [disabled]="isStart" (click)="go('Start')">
+        <button class="btn btn-text-secondary" [disabled]="step === 'Start'" (click)="go('Start')">
             {{ 'common.back' | sqxTranslate }}
         </button>
     </ng-container>

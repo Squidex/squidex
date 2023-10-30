@@ -7,83 +7,79 @@
 
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Entities.Comments.Commands;
+using Squidex.Domain.Apps.Entities.Collaboration;
+using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 
 namespace Squidex.Extensions.Actions.Notification;
 
-public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, CreateComment>
+public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, CommentCreated>
 {
     private const string Description = "Send a Notification";
-    private readonly ICommandBus commandBus;
+    private readonly ICollaborationService collaboration;
     private readonly IUserResolver userResolver;
 
-    public NotificationActionHandler(RuleEventFormatter formatter, ICommandBus commandBus, IUserResolver userResolver)
+    public NotificationActionHandler(RuleEventFormatter formatter, ICollaborationService collaboration, IUserResolver userResolver)
         : base(formatter)
     {
-        this.commandBus = commandBus;
-
+        this.collaboration = collaboration;
         this.userResolver = userResolver;
     }
 
-    protected override async Task<(string Description, CreateComment Data)> CreateJobAsync(EnrichedEvent @event, NotificationAction action)
+    protected override async Task<(string Description, CommentCreated Data)> CreateJobAsync(EnrichedEvent @event, NotificationAction action)
     {
-        if (@event is EnrichedUserEventBase userEvent)
+        if (@event is not EnrichedUserEventBase userEvent)
         {
-            var user = await userResolver.FindByIdOrEmailAsync(action.User);
-
-            if (user == null)
-            {
-                throw new InvalidOperationException($"Cannot find user by '{action.User}'");
-            }
-
-            var actor = userEvent.Actor;
-
-            if (!string.IsNullOrEmpty(action.Client))
-            {
-                actor = RefToken.Client(action.Client);
-            }
-
-            var ruleJob = new CreateComment
-            {
-                AppId = CommentsCommand.NoApp,
-                Actor = actor,
-                CommentId = DomainId.NewGuid(),
-                CommentsId = DomainId.Create(user.Id),
-                FromRule = true,
-                Text = (await FormatAsync(action.Text, @event))!
-            };
-
-            if (!string.IsNullOrWhiteSpace(action.Url))
-            {
-                var url = await FormatAsync(action.Url, @event);
-
-                if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
-                {
-                    ruleJob.Url = uri;
-                }
-            }
-
-            return (Description, ruleJob);
+            return ("Ignore", new CommentCreated());
         }
 
-        return ("Ignore", new CreateComment());
+        var user = await userResolver.FindByIdOrEmailAsync(action.User);
+
+        if (user == null)
+        {
+            throw new InvalidOperationException($"Cannot find user by '{action.User}'");
+        }
+
+        var actor = userEvent.Actor;
+
+        if (!string.IsNullOrEmpty(action.Client))
+        {
+            actor = RefToken.Client(action.Client);
+        }
+
+        var ruleJob = new CommentCreated
+        {
+            Actor = actor,
+            CommentId = DomainId.NewGuid(),
+            CommentsId = DomainId.Create(user.Id),
+            FromRule = true,
+            Text = (await FormatAsync(action.Text, @event))!
+        };
+
+        if (!string.IsNullOrWhiteSpace(action.Url))
+        {
+            var url = await FormatAsync(action.Url, @event);
+
+            if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri))
+            {
+                ruleJob.Url = uri;
+            }
+        }
+
+        return (Description, ruleJob);
     }
 
-    protected override async Task<Result> ExecuteJobAsync(CreateComment job,
+    protected override async Task<Result> ExecuteJobAsync(CommentCreated job,
         CancellationToken ct = default)
     {
-        var command = job;
-
-        if (command.CommentsId == default)
+        if (job.CommentsId == default)
         {
             return Result.Ignored();
         }
 
-        await commandBus.PublishAsync(command, ct);
+        await collaboration.NotifyAsync(job.CommentsId.ToString(), job.Text, job.Actor, job.Url, true, ct);
 
-        return Result.Success($"Notified: {command.Text}");
+        return Result.Success($"Notified: {job.Text}");
     }
 }

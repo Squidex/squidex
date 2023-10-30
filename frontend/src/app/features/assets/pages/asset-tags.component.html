@@ -1,6 +1,6 @@
 <div class="nav nav-light flex-column">
     <div class="nav-item">
-        <a class="nav-link" (click)="reset.emit()" [class.active]="isEmpty()">
+        <a class="nav-link" (click)="tagsReset.emit()" [class.active]="isEmpty()">
             {{ 'common.tagsAll' | sqxTranslate }}
         </a>
     </div>
@@ -24,5 +24,5 @@
 </div>
 
 <sqx-asset-tag-dialog *sqxModal="tagRenameDialog"
-    (close)="tagRenameDialog.hide()" [tagName]="tagRenaming!.name">
+    (dialogClose)="tagRenameDialog.hide()" [tagName]="tagRenaming!.name">
 </sqx-asset-tag-dialog>

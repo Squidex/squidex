@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
@@ -15,16 +15,17 @@ import { AuthService } from './../services/auth.service';
 
 @Injectable()
 export class MustBeNotAuthenticatedGuard  {
+    private readonly options = inject(UIOptions);
+
     constructor(
         private readonly authService: AuthService,
         private readonly location: Location,
         private readonly router: Router,
-        private readonly uiOptions: UIOptions,
     ) {
     }
 
     public canActivate(snapshot: ActivatedRouteSnapshot): Observable<boolean> {
-        const redirect = this.uiOptions.get('redirectToLogin') && !snapshot.queryParams.logout;
+        const redirect = this.options.value.redirectToLogin && !snapshot.queryParams.logout;
 
         return this.authService.userChanges.pipe(
             take(1),

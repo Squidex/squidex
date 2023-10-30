@@ -42,14 +42,7 @@ public sealed class Counters : Dictionary<string, double>
         return (long)value;
     }
 
-    public Counters SumpUpCloned(Counters counters)
-    {
-        var result = new Counters(this);
-
-        return result.SumpUp(counters);
-    }
-
-    public Counters SumpUp(Counters source)
+    public Counters Merge(Counters source)
     {
         foreach (var (key, value) in source)
         {

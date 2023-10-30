@@ -33,7 +33,9 @@ public sealed class RebuildFiles
     public async Task RepairAsync(
         CancellationToken ct = default)
     {
-        await foreach (var storedEvent in eventStore.QueryAllAsync("^asset\\-", ct: ct))
+        var streamFilter = StreamFilter.Prefix("asset-");
+
+        await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, ct: ct))
         {
             var @event = eventFormatter.ParseIfKnown(storedEvent);
 

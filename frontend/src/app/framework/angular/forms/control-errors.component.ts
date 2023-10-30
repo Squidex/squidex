@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
 import { merge } from 'rxjs';
-import { LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
+import { LocalizerService, StatefulComponent, Subscriptions, Types } from '@app/framework/internal';
 import { formatError } from './error-formatting';
 import { touchedChange$ } from './forms-helper';
 
@@ -24,6 +24,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements  OnDestroy {
+    private readonly subscriptions = new Subscriptions();
     private controlDisplayName = '';
     private control: AbstractControl | null = null;
 
@@ -74,10 +75,10 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         }
 
         if (this.control !== previousControl) {
-            this.unsubscribeAll();
+            this.subscriptions.unsubscribeAll();
 
             if (this.control) {
-                this.own(
+                this.subscriptions.add(
                     merge(
                         this.control.valueChanges,
                         this.control.statusChanges,

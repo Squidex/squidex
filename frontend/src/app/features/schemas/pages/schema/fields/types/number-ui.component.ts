@@ -8,14 +8,16 @@
 import { Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FieldDto, FloatConverter, NUMBER_FIELD_EDITORS, NumberFieldPropertiesDto, ResourceOwner, valueProjection$, TypedSimpleChanges } from '@app/shared';
+import { FieldDto, FloatConverter, NUMBER_FIELD_EDITORS, NumberFieldPropertiesDto, Subscriptions, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-ui',
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html',
 })
-export class NumberUIComponent extends ResourceOwner {
+export class NumberUIComponent  {
+    private readonly subscriptions = new Subscriptions();
+
     public readonly converter = FloatConverter.INSTANCE;
     public readonly editors = NUMBER_FIELD_EDITORS;
 
@@ -33,7 +35,7 @@ export class NumberUIComponent extends ResourceOwner {
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.fieldForm) {
-            this.unsubscribeAll();
+            this.subscriptions.unsubscribeAll();
 
             const editor = this.fieldForm.controls['editor'];
 
@@ -43,14 +45,14 @@ export class NumberUIComponent extends ResourceOwner {
             this.hideInlineEditable =
                 valueProjection$(editor, x => x === 'Radio');
 
-            this.own(
+            this.subscriptions.add(
                 this.hideAllowedValues.subscribe(isSelection => {
                     if (isSelection) {
                         this.fieldForm.controls['allowedValues'].setValue(undefined);
                     }
                 }));
 
-            this.own(
+            this.subscriptions.add(
                 this.hideInlineEditable.subscribe(isSelection => {
                     if (isSelection) {
                         this.fieldForm.controls['inlineEditable'].setValue(false);

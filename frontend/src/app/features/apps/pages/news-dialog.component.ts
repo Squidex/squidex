@@ -15,7 +15,7 @@ import { FeatureDto } from '@app/shared';
 })
 export class NewsDialogComponent {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     @Input({ required: true })
     public features!: ReadonlyArray<FeatureDto>;

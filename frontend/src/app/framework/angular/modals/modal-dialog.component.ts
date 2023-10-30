@@ -19,7 +19,7 @@ import { fadeAnimation } from '@app/framework/internal';
 })
 export class ModalDialogComponent implements AfterViewInit {
     @Output()
-    public close = new EventEmitter();
+    public dialogClose = new EventEmitter();
 
     @Input({ transform: booleanAttribute })
     public showClose?: boolean | null = true;

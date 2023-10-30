@@ -23,7 +23,7 @@ const TRANSLATIONS = {
                 [allowOpen]="true" 
                 [items]="items"
                 [itemsLoading]="itemsLoading"
-                (open)="load()">
+                (dropdownOpen)="load()">
             </sqx-dropdown>
         </sqx-root-view>
     `,

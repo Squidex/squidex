@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { UserDto, UsersState } from '@app/features/administration/internal';
-import { ResourceOwner, Router2State } from '@app/framework';
+import { Router2State, Subscriptions } from '@app/framework';
 
 @Component({
     selector: 'sqx-users-page',
@@ -18,16 +18,16 @@ import { ResourceOwner, Router2State } from '@app/framework';
         Router2State,
     ],
 })
-export class UsersPageComponent extends ResourceOwner implements OnInit {
+export class UsersPageComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public usersFilter = new UntypedFormControl();
 
     constructor(
         public readonly usersRoute: Router2State,
         public readonly usersState: UsersState,
     ) {
-        super();
-
-        this.own(
+        this.subscriptions.add(
             this.usersState.query
                 .subscribe(q => this.usersFilter.setValue(q || '')));
     }

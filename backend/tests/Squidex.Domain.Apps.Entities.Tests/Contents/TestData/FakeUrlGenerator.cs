@@ -30,6 +30,11 @@ public sealed class FakeUrlGenerator : IUrlGenerator
         return $"assets/{appId.Name}/{idOrSlug}";
     }
 
+    public string AssetContent(NamedId<DomainId> appId, string idOrSlug, long version)
+    {
+        return $"assets/{appId.Name}/{idOrSlug}?version={version}";
+    }
+
     public string ContentUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId contentId)
     {
         return $"contents/{schemaId.Name}/{contentId}";

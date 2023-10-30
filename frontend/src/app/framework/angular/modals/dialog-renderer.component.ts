@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
-import { DialogModel, DialogRequest, DialogService, fadeAnimation, Notification, StatefulComponent, Tooltip } from '@app/framework/internal';
+import { DialogModel, DialogRequest, DialogService, fadeAnimation, Notification, StatefulComponent, Subscriptions, Tooltip } from '@app/framework/internal';
 
 interface State {
     // The pending dialog request.
@@ -30,6 +30,8 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     public dialogView = new DialogModel();
 
     constructor(
@@ -39,14 +41,14 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.dialogView.isOpenChanges.subscribe(isOpen => {
                 if (!isOpen) {
                     this.finishRequest(false);
                 }
             }));
 
-        this.own(
+        this.subscriptions.add(
             this.dialogs.notifications.subscribe(notification => {
                 this.next(s => ({
                     ...s,
@@ -54,13 +56,13 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
                 }));
 
                 if (notification.displayTime > 0) {
-                    this.own(timer(notification.displayTime).subscribe(() => {
+                    this.subscriptions.add(timer(notification.displayTime).subscribe(() => {
                         this.close(notification);
                     }));
                 }
             }));
 
-        this.own(
+        this.subscriptions.add(
             this.dialogs.dialogs
                 .subscribe(dialogRequest => {
                     this.cancel();
@@ -70,7 +72,7 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
                     this.next({ dialogRequest });
                 }));
 
-        this.own(
+        this.subscriptions.add(
             this.dialogs.tooltips
                 .subscribe(tooltip => {
                     this.next(s => {

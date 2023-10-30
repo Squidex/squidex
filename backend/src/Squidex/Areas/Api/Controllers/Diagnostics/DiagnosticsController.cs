@@ -30,8 +30,8 @@ public sealed class DiagnosticsController : ApiController
     /// <summary>
     /// Creates a dump and writes it into storage..
     /// </summary>
-    /// <response code="204">Dump created successful.</response>.
-    /// <response code="501">Not configured.</response>.
+    /// <response code="204">Dump created successful.</response>
+    /// <response code="501">Not configured.</response>
     [HttpGet]
     [Route("diagnostics/dump")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -51,8 +51,8 @@ public sealed class DiagnosticsController : ApiController
     /// <summary>
     /// Creates a gc dump and writes it into storage.
     /// </summary>
-    /// <response code="204">Dump created successful.</response>.
-    /// <response code="501">Not configured.</response>.
+    /// <response code="204">Dump created successful.</response>
+    /// <response code="501">Not configured.</response>
     [HttpGet]
     [Route("diagnostics/gcdump")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

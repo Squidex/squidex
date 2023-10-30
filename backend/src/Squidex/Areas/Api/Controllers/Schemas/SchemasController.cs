@@ -40,8 +40,8 @@ public sealed class SchemasController : ApiController
     /// Get schemas.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Schemas returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Schemas returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/schemas/")]
     [ProducesResponseType(typeof(SchemasDto), StatusCodes.Status200OK)]
@@ -66,8 +66,8 @@ public sealed class SchemasController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema to retrieve.</param>
-    /// <response code="200">Schema found.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema found.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpGet]
     [Route("apps/{app}/schemas/{schema}/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -90,9 +90,9 @@ public sealed class SchemasController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The schema object that needs to be added to the app.</param>
-    /// <response code="201">Schema created.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="409">Schema name already in use.</response>.
+    /// <response code="201">Schema created.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="409">Schema name already in use.</response>
     [HttpPost]
     [Route("apps/{app}/schemas/")]
     [ProducesResponseType(typeof(SchemaDto), 201)]
@@ -113,9 +113,9 @@ public sealed class SchemasController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The schema object that needs to updated.</param>
-    /// <response code="200">Schema updated.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema updated.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -136,9 +136,9 @@ public sealed class SchemasController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The schema object that needs to updated.</param>
-    /// <response code="200">Schema updated.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema updated.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/sync")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -159,9 +159,9 @@ public sealed class SchemasController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The schema object that needs to updated.</param>
-    /// <response code="200">Schema updated.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema updated.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/category")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -182,9 +182,9 @@ public sealed class SchemasController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The preview urls for the schema.</param>
-    /// <response code="200">Schema updated.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema updated.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/preview-urls")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -205,9 +205,9 @@ public sealed class SchemasController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The schema scripts object that needs to updated.</param>
-    /// <response code="200">Schema updated.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema updated.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/scripts/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -228,9 +228,9 @@ public sealed class SchemasController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The schema rules object that needs to updated.</param>
-    /// <response code="200">Schema updated.</response>.
-    /// <response code="400">Schema request not valid.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema updated.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/rules/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -250,8 +250,8 @@ public sealed class SchemasController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema to publish.</param>
-    /// <response code="200">Schema published.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema published.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/publish/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -271,8 +271,8 @@ public sealed class SchemasController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema to unpublish.</param>
-    /// <response code="200">Schema unpublished.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="200">Schema unpublished.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpPut]
     [Route("apps/{app}/schemas/{schema}/unpublish/")]
     [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
@@ -292,8 +292,8 @@ public sealed class SchemasController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema to delete.</param>
-    /// <response code="204">Schema deleted.</response>.
-    /// <response code="404">Schema or app not found.</response>.
+    /// <response code="204">Schema deleted.</response>
+    /// <response code="404">Schema or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/schemas/{schema}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

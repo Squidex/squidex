@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-input-rename */
+
 import { booleanAttribute, ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
-import { DialogModel, ModalModel, ResourceOwner, Types } from '@app/framework/internal';
+import { DialogModel, ModalModel, Subscriptions, Types } from '@app/framework/internal';
 import { RootViewComponent } from './root-view.component';
 
 declare type Model = DialogModel | ModalModel | any;
@@ -15,8 +17,8 @@ declare type Model = DialogModel | ModalModel | any;
     selector: '[sqxModal]',
 })
 export class ModalDirective<T = unknown> implements OnDestroy {
-    private readonly eventsView = new ResourceOwner();
-    private readonly eventsModel = new ResourceOwner();
+    private readonly eventsView = new Subscriptions();
+    private readonly eventsModel = new Subscriptions();
     private static backdrop: any;
     private currentModel: DialogModel | ModalModel | null = null;
     private currentContext: ModalContext<T> = new ModalContext<T>();
@@ -112,7 +114,7 @@ export class ModalDirective<T = unknown> implements OnDestroy {
         if (isModel(value)) {
             this.currentModel = value;
 
-            this.eventsModel.own(value.isOpenChanges.subscribe(isOpen => this.update(isOpen)));
+            this.eventsModel.add(value.isOpenChanges.subscribe(isOpen => this.update(isOpen)));
         } else {
             this.currentContext.$implicit = value;
 
@@ -143,12 +145,12 @@ export class ModalDirective<T = unknown> implements OnDestroy {
 
             insertBefore(this.renderer, this.renderRoots[0], backdrop);
 
-            this.eventsView.own(this.renderer.listen(backdrop, 'click', this.backdropListener));
+            this.eventsView.add(this.renderer.listen(backdrop, 'click', this.backdropListener));
         }
 
         if (this.closeAlways && this.renderRoots) {
             for (const node of this.renderRoots) {
-                this.eventsView.own(this.renderer.listen(node, 'click', this.elementListener));
+                this.eventsView.add(this.renderer.listen(node, 'click', this.elementListener));
             }
         }
     }

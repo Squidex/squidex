@@ -8,7 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AssetDto, DialogModel, LocalStoreService, MessageBus, ResolveAssets, Settings, sorted, StatefulControlComponent, Types } from '@app/shared';
+import { AssetDto, DialogModel, LocalStoreService, MessageBus, ResolveAssets, Settings, sorted, StatefulControlComponent, Subscriptions, Types } from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true,
@@ -49,6 +49,8 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+
     @Input()
     public folderId?: string;
 
@@ -106,7 +108,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.messageBus.of(AssetUpdated)
                 .subscribe(event => {
                     this.setAssets(this.snapshot.assets.replacedBy('id', event.asset));

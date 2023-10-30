@@ -11,28 +11,22 @@ namespace Squidex.Infrastructure.EventSourcing;
 
 public interface IEventStore
 {
-    Task<IReadOnlyList<StoredEvent>> QueryReverseAsync(string streamName, int take = int.MaxValue,
+    Task<IReadOnlyList<StoredEvent>> QueryStreamAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
         CancellationToken ct = default);
 
-    Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long afterStreamPosition = EtagVersion.Empty,
+    IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(StreamFilter filter, Instant timestamp = default, int take = int.MaxValue,
         CancellationToken ct = default);
 
-    IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, Instant timestamp = default, int take = int.MaxValue,
-        CancellationToken ct = default);
-
-    IAsyncEnumerable<StoredEvent> QueryAllAsync(string? streamFilter = null, string? position = null, int take = int.MaxValue,
+    IAsyncEnumerable<StoredEvent> QueryAllAsync(StreamFilter filter, string? position = null, int take = int.MaxValue,
         CancellationToken ct = default);
 
     Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
         CancellationToken ct = default);
 
-    Task DeleteAsync(string streamFilter,
+    Task DeleteAsync(StreamFilter filter,
         CancellationToken ct = default);
 
-    Task DeleteStreamAsync(string streamName,
-        CancellationToken ct = default);
-
-    IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> eventSubscriber, string? streamFilter = null, string? position = null);
+    IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> eventSubscriber, StreamFilter filter, string? position = null);
 
     async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits,
         CancellationToken ct = default)
@@ -41,18 +35,5 @@ public interface IEventStore
         {
             await AppendAsync(commit.Id, commit.StreamName, commit.Offset, commit.Events, ct);
         }
-    }
-
-    async Task<IReadOnlyDictionary<string, IReadOnlyList<StoredEvent>>> QueryManyAsync(IEnumerable<string> streamNames,
-        CancellationToken ct = default)
-    {
-        var result = new Dictionary<string, IReadOnlyList<StoredEvent>>();
-
-        foreach (var streamName in streamNames)
-        {
-            result[streamName] = await QueryAsync(streamName, EtagVersion.Empty, ct);
-        }
-
-        return result;
     }
 }

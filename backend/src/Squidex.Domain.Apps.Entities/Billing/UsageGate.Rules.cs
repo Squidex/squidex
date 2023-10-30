@@ -103,9 +103,13 @@ public sealed partial class UsageGate : IRuleUsageTracker
 
         var tasks = new List<Task>
         {
-            usageTracker.TrackAsync(date, appKey, ruleId.ToString(), counters, ct),
             usageTracker.TrackAsync(SummaryDate, appKey, ruleId.ToString(), counters, ct)
         };
+
+        if (date != default)
+        {
+            tasks.Add(usageTracker.TrackAsync(date, appKey, ruleId.ToString(), counters, ct));
+        }
 
         var (_, _, teamId) = await GetPlanForAppAsync(appId, true, ct);
 
@@ -113,8 +117,12 @@ public sealed partial class UsageGate : IRuleUsageTracker
         {
             var teamKey = TeamRulesKey(teamId.Value);
 
-            tasks.Add(usageTracker.TrackAsync(date, teamKey, appId.ToString(), counters, ct));
             tasks.Add(usageTracker.TrackAsync(SummaryDate, teamKey, appId.ToString(), counters, ct));
+
+            if (date != default)
+            {
+                tasks.Add(usageTracker.TrackAsync(date, teamKey, appId.ToString(), counters, ct));
+            }
         }
 
         await Task.WhenAll(tasks);

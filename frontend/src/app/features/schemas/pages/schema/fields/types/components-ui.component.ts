@@ -9,6 +9,8 @@ import { Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 
+const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
+
 @Component({
     selector: 'sqx-components-ui',
     styleUrls: ['components-ui.component.scss'],
@@ -23,4 +25,6 @@ export class ComponentsUIComponent {
 
     @Input({ required: true })
     public properties!: ReferencesFieldPropertiesDto;
+
+    public calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 }

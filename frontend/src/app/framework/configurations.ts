@@ -10,28 +10,6 @@ export class UIOptions {
         public readonly value: any,
     ) {
     }
-
-    public get(path: string) {
-        if (!path) {
-            return undefined;
-        }
-
-        let value = this.value;
-
-        if (value) {
-            const parts = path.split('.');
-
-            for (const part of parts) {
-                value = value[part];
-
-                if (!value) {
-                    break;
-                }
-            }
-        }
-
-        return value;
-    }
 }
 
 export class ApiUrlConfig {

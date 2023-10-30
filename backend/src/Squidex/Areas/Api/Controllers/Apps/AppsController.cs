@@ -37,7 +37,7 @@ public sealed class AppsController : ApiController
     /// <summary>
     /// Get your apps.
     /// </summary>
-    /// <response code="200">Apps returned.</response>.
+    /// <response code="200">Apps returned.</response>
     /// <remarks>
     /// You can only retrieve the list of apps when you are authenticated as a user (OpenID implicit flow).
     /// You will retrieve all apps, where you are assigned as a contributor.
@@ -68,7 +68,7 @@ public sealed class AppsController : ApiController
     /// Get team apps.
     /// </summary>
     /// <param name="team">The ID of the team.</param>
-    /// <response code="200">Apps returned.</response>.
+    /// <response code="200">Apps returned.</response>
     /// <remarks>
     /// You can only retrieve the list of apps when you are authenticated as a user (OpenID implicit flow).
     /// You will retrieve all apps, where you are assigned as a contributor.
@@ -96,8 +96,8 @@ public sealed class AppsController : ApiController
     /// Get an app by name.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="200">Apps returned.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">Apps returned.</response>
+    /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}")]
     [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
@@ -121,9 +121,9 @@ public sealed class AppsController : ApiController
     /// Create a new app.
     /// </summary>
     /// <param name="request">The app object that needs to be added to Squidex.</param>
-    /// <response code="201">App created.</response>.
-    /// <response code="400">App request not valid.</response>.
-    /// <response code="409">App name is already in use.</response>.
+    /// <response code="201">App created.</response>
+    /// <response code="400">App request not valid.</response>
+    /// <response code="409">App name is already in use.</response>
     /// <remarks>
     /// You can only create an app when you are authenticated as a user (OpenID implicit flow).
     /// You will be assigned as owner of the new app automatically.
@@ -145,9 +145,9 @@ public sealed class AppsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
     /// <param name="request">The values to update.</param>
-    /// <response code="200">App updated.</response>.
-    /// <response code="400">App request not valid.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">App updated.</response>
+    /// <response code="400">App request not valid.</response>
+    /// <response code="404">App not found.</response>
     [HttpPut]
     [Route("apps/{app}/")]
     [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
@@ -165,9 +165,9 @@ public sealed class AppsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
     /// <param name="request">The team information.</param>
-    /// <response code="200">App transferred.</response>.
-    /// <response code="400">App request not valid.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">App transferred.</response>
+    /// <response code="400">App request not valid.</response>
+    /// <response code="404">App not found.</response>
     [HttpPut]
     [Route("apps/{app}/team")]
     [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
@@ -185,9 +185,9 @@ public sealed class AppsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
     /// <param name="file">The file to upload.</param>
-    /// <response code="200">App image uploaded.</response>.
-    /// <response code="400">App request not valid.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">App image uploaded.</response>
+    /// <response code="400">App request not valid.</response>
+    /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/image")]
     [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
@@ -204,8 +204,8 @@ public sealed class AppsController : ApiController
     /// Remove the app image.
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
-    /// <response code="200">App image removed.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="200">App image removed.</response>
+    /// <response code="404">App not found.</response>
     [HttpDelete]
     [Route("apps/{app}/image")]
     [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
@@ -222,8 +222,8 @@ public sealed class AppsController : ApiController
     /// Delete the app.
     /// </summary>
     /// <param name="app">The name of the app to delete.</param>
-    /// <response code="204">App deleted.</response>.
-    /// <response code="404">App not found.</response>.
+    /// <response code="204">App deleted.</response>
+    /// <response code="404">App not found.</response>
     [HttpDelete]
     [Route("apps/{app}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

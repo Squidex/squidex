@@ -179,6 +179,7 @@ export abstract class FieldPropertiesDto {
 export class ArrayFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Array';
 
+    public readonly calculatedDefaultValue: 'EmptyArray' | 'Null' = 'EmptyArray';
     public readonly maxItems?: number;
     public readonly minItems?: number;
     public readonly uniqueFields?: ReadonlyArray<string>;
@@ -269,6 +270,7 @@ export class ComponentFieldPropertiesDto extends FieldPropertiesDto {
 export class ComponentsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Components';
 
+    public readonly calculatedDefaultValue: 'EmptyArray' | 'Null' = 'EmptyArray';
     public readonly schemaIds?: ReadonlyArray<string>;
     public readonly maxItems?: number;
     public readonly minItems?: number;
@@ -293,7 +295,7 @@ export const DATETIME_FIELD_EDITORS: ReadonlyArray<DateTimeFieldEditor> = [
 export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'DateTime';
 
-    public readonly calculatedDefaultValue?: string;
+    public readonly calculatedDefaultValue?: 'Now' | 'Today';
     public readonly defaultValue?: string;
     public readonly defaultValues?: DefaultValue<string>;
     public readonly format?: string;
@@ -388,6 +390,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly maxItems?: number;
     public readonly minItems?: number;
     public readonly mustBePublished?: boolean;
+    public readonly query?: string;
     public readonly resolveReference?: boolean;
     public readonly schemaIds?: ReadonlyArray<string>;
 
@@ -430,6 +433,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'String';
 
     public readonly allowedValues?: ReadonlyArray<string>;
+    public readonly classNames?: ReadonlyArray<string>;
     public readonly contentType?: StringContentType;
     public readonly createEnum: boolean = false;
     public readonly defaultValue?: string;

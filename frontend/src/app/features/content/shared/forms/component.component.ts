@@ -7,7 +7,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, EditContentForm, FieldDto, FieldSection, ModalModel, ResourceOwner, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
+import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, EditContentForm, FieldDto, FieldSection, ModalModel, SchemaDto, Subscriptions, TypedSimpleChanges, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -16,7 +16,12 @@ import { ComponentSectionComponent } from './component-section.component';
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ComponentComponent extends ResourceOwner {
+export class ComponentComponent {
+    private readonly subscriptions = new Subscriptions();
+
+    @Input({ required: true })
+    public hasChatBot!: boolean;
+
     @Input({ transform: booleanAttribute })
     public canUnset?: boolean | null;
 
@@ -52,16 +57,15 @@ export class ComponentComponent extends ResourceOwner {
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
     ) {
-        super();
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.formModel) {
-            this.unsubscribeAll();
+            this.subscriptions.unsubscribeAll();
 
             this.isDisabled = disabled$(this.formModel.form);
 
-            this.own(
+            this.subscriptions.add(
                 this.formModel.form.valueChanges
                     .subscribe(() => {
                         this.changeDetector.detectChanges();

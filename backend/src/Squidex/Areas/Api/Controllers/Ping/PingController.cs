@@ -29,7 +29,7 @@ public sealed class PingController : ApiController
     /// <summary>
     /// Get API information.
     /// </summary>
-    /// <response code="200">Infos returned.</response>.
+    /// <response code="200">Infos returned.</response>
     [HttpGet]
     [Route("info/")]
     [ProducesResponseType(typeof(ExposedValues), StatusCodes.Status200OK)]
@@ -41,7 +41,7 @@ public sealed class PingController : ApiController
     /// <summary>
     /// Get ping status of the API.
     /// </summary>
-    /// <response code="204">Service ping successful.</response>.
+    /// <response code="204">Service ping successful.</response>
     /// <remarks>
     /// Can be used to test, if the Squidex API is alive and responding.
     /// </remarks>
@@ -57,7 +57,7 @@ public sealed class PingController : ApiController
     /// Get ping status.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <response code="204">Service ping successful.</response>.
+    /// <response code="204">Service ping successful.</response>
     /// <remarks>
     /// Can be used to test, if the Squidex API is alive and responding.
     /// </remarks>

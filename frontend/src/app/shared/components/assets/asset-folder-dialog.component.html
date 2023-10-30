@@ -1,5 +1,5 @@
 <form [formGroup]="editForm.form" (ngSubmit)="createAssetFolder()">
-    <sqx-modal-dialog (close)="emitClose()">
+    <sqx-modal-dialog (dialogClose)="emitClose()">
         <ng-container title>
             <ng-container *ngIf="assetFolder; else noAssetFolder">
                 {{ 'assets.renameFolder' | sqxTranslate }}

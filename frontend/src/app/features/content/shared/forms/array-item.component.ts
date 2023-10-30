@@ -31,6 +31,9 @@ export class ArrayItemComponent {
     public clone = new EventEmitter();
 
     @Input({ required: true })
+    public hasChatBot!: boolean;
+
+    @Input({ required: true })
     public form!: EditContentForm;
 
     @Input({ required: true })

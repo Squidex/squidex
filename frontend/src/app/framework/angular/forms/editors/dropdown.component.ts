@@ -8,7 +8,7 @@
 import { AfterContentInit, booleanAttribute, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
 import { map } from 'rxjs/operators';
-import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Subscriptions, TypedSimpleChanges, Types } from '@app/framework/internal';
 
 export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
@@ -38,13 +38,14 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnInit {
+    private readonly subscriptions = new Subscriptions();
     private value: any;
 
     @Output()
-    public open = new EventEmitter();
+    public dropdownOpen = new EventEmitter();
 
     @Output()
-    public close = new EventEmitter();
+    public dropdownClose = new EventEmitter();
 
     @Input({ transform: booleanAttribute })
     public itemsLoading?: boolean | null;
@@ -100,7 +101,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.queryInput.valueChanges.pipe(
                 map((queryText: string) => {
                     if (!this.items || !queryText) {
@@ -190,7 +191,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         }
 
         if (!this.dropdown.isOpen) {
-            this.open.emit();
+            this.dropdownOpen.emit();
 
             this.dropdown.show();
         }
@@ -206,7 +207,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public closeModal() {
         if (this.dropdown.isOpen) {
-            this.close.emit();
+            this.dropdownClose.emit();
 
             this.dropdown.hide();
         }

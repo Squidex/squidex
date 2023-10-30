@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { ApiUrlConfig, AuthService, Cookies, ModalModel, StatefulComponent, UILanguages, UIOptions, UIState } from '@app/shared';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ApiUrlConfig, AuthService, Cookies, ModalModel, StatefulComponent, Subscriptions, UILanguages, UIOptions, UIState } from '@app/shared';
 
 interface State {
     // The display name of the user.
@@ -32,10 +32,12 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
-    public modalMenu = new ModalModel();
+    private readonly subscriptions = new Subscriptions();
 
-    public language = this.uiOptions.get('culture');
-    public languages = UILanguages.ALL;
+    public readonly modalMenu = new ModalModel();
+
+    public readonly language = inject(UIOptions).value.culture;
+    public readonly languages = UILanguages.ALL;
 
     constructor(apiUrl: ApiUrlConfig,
         public readonly uiState: UIState,
@@ -52,7 +54,7 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     }
 
     public ngOnInit() {
-        this.own(
+        this.subscriptions.add(
             this.authService.userChanges
                 .subscribe(user => {
                     if (user) {

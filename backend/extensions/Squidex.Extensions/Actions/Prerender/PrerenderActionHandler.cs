@@ -27,8 +27,8 @@ public sealed class PrerenderActionHandler : RuleActionHandler<PrerenderAction, 
     {
         var url = await FormatAsync(action.Url, @event);
 
-        var request = new { prerenderToken = action.Token, url };
-        var requestBody = ToJson(request);
+        var requestObject = new { prerenderToken = action.Token, url };
+        var requestBody = ToJson(requestObject);
 
         return ($"Recache {url}", new PrerenderJob { RequestBody = requestBody });
     }
