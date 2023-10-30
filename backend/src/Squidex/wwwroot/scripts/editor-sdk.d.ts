@@ -1,3 +1,10 @@
+type PluginOptions = {
+    /**
+     * Defines the accepted origins for incoming messages.
+     */
+    acceptedOrigins?: string[];
+}
+
 declare class EditorPlugin {
     /**
      * Get the current context.
@@ -12,14 +19,14 @@ declare class EditorPlugin {
     /**
      * Register an function that is called when the sidebar is initialized.
      *
-     * @param {Function} callback: The callback to invoke.
+     * @param callback: The callback to invoke.
      */
     onInit(callback: () => void): void;
 
     /**
      * Register an function that is called whenever the value of the content has changed.
      *
-     * @param {Function} callback: The callback to invoke. Argument 1: Content value (any).
+     * @param callback: The callback to invoke. Argument 1: Content value (any).
      */
     onContentChanged(callback: (content: any) => void): void;
 
@@ -30,6 +37,13 @@ declare class EditorPlugin {
 }
 
 declare class SquidexFormField {
+    /** 
+     * The constructor.
+     * 
+     * @param options: The plugin options.
+    */
+    constructor(options?: PluginOptions);
+
     /**
      * Get the current value.
      */
@@ -77,7 +91,7 @@ declare class SquidexFormField {
     /**
      * Notifies the parent to navigate to the path.
      *
-     * @param {string} url: The url to navigate to.
+     * @param url: The url to navigate to.
      */
     navigate(url: string): void;
 
@@ -94,101 +108,101 @@ declare class SquidexFormField {
     /**
      * Notifies the control container that the value has been changed.
      *
-     * @param {any} newValue: The new field value.
+     * @param newValue: The new field value.
      */
     valueChanged(newValue: any): void;
 
     /**
      * Shows an info alert.
      * 
-     * @param {string} text: The info text.
+     * @param text: The info text.
      */
     notifyInfo(text: string): void;
 
     /**
      * Shows an error alert.
      * 
-     * @param {string} text: error info text.
+     * @param text: error info text.
      */
     notifyError(text: string): void;
 
     /**
      * Shows an confirm dialog.
      * 
-     * @param {string} title The title of the dialog.
-     * @param {string} text The text of the dialog.
-     * @param {function} callback The callback to invoke when the dialog is completed or closed.
+     * @param title The title of the dialog.
+     * @param text The text of the dialog.
+     * @param callback The callback to invoke when the dialog is completed or closed.
      */
     confirm(title: string, text: string, callback: (result: boolean) => void): void;
 
     /**
      * Shows the dialog to pick assets.
      * 
-     * @param {function} callback The callback to invoke when the dialog is completed or closed.
+     * @param callback The callback to invoke when the dialog is completed or closed.
      */
     pickAssets(callback: (assets: any[]) => void): void;
 
     /**
      * Shows the dialog to pick contents.
      * 
-     * @param {string} schemas: The list of schema names.
-     * @param {function} callback The callback to invoke when the dialog is completed or closed.
+     * @param schemas: The list of schema names.
+     * @param callback The callback to invoke when the dialog is completed or closed.
      */
     pickContents(schemas: string[], callback: (assets: any[]) => void): void;
 
     /**
      * Register an function that is called when the field is initialized.
      * 
-     * @param {Function} callback: The callback to invoke.
+     * @param callback: The callback to invoke.
      */
     onInit(callback: () => void): void;
 
     /**
      * Register an function that is called when the field is moved.
      *
-     * @param {Function} callback: The callback to invoke. Argument 1: New position (number).
+     * @param callback: The callback to invoke. Argument 1: New position (number).
      */
     onMoved(callback: (index: number) => void): void;
 
     /**
      * Register an function that is called whenever the field is disabled or enabled.
      *
-     * @param {Function} callback: The callback to invoke. Argument 1: New disabled state (boolean, disabled = true, enabled = false).
+     * @param callback: The callback to invoke. Argument 1: New disabled state (boolean, disabled = true, enabled = false).
      */
     onDisabled(callback: (isDisabled: boolean) => void): void;
 
     /**
      * Register an function that is called whenever the field language is changed.
      *
-     * @param {Function} callback: The callback to invoke. Argument 1: Language code (string).
+     * @param callback: The callback to invoke. Argument 1: Language code (string).
      */
     onLanguageChanged(callback: (language: string) => void): void;
 
     /**
      * Register an function that is called whenever the value of the field has changed.
      *
-     * @param {Function} callback: The callback to invoke. Argument 1: Field value (any).
+     * @param callback: The callback to invoke. Argument 1: Field value (any).
      */
     onValueChanged(callback: (value: any) => void): void;
 
     /**
      * Register an function that is called whenever the value of the content has changed.
      *
-     * @param {Function} callback: The callback to invoke. Argument 1: Content value (any).
+     * @param callback: The callback to invoke. Argument 1: Content value (any).
      */
     onFormValueChanged(callback: (value: any) => void): void;
 
     /**
      * Register an function that is called whenever the fullscreen mode has changed.
      *
-     * @param {Function} callback: The callback to invoke. Argument 1: Fullscreen state (boolean, fullscreen on = true, fullscreen off = false).
+     * @param callback: The callback to invoke. Argument 1: Fullscreen state (boolean, fullscreen on = true, fullscreen off = false).
      */
     onFullscreen(callback: (isFullscreen: boolean) => void): void;
 
     /**
      * Register an function that is called whenever the expanded mode has changed.
      *
-     * @param {Function} callback: The callback to invoke. Argument 1: Expanded state (boolean, expanded on = true, expanded off = false).
+     * @param callback: The callback to invoke. Argument 1: Expanded state (boolean, expanded on = true, expanded off = false).
      */
     onExpanded(callback: (isExpanded: boolean) => void): void;
 

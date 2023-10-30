@@ -53,13 +53,19 @@ function isArrayOfStrings(value) {
     return true;
 }
 
-function SquidexPlugin() {
+/**
+ * Creates a new plugin for sidebars or widgets.
+ * 
+ * @param {object} options with the accepted origins.
+ */
+function SquidexPlugin(options) {
     var initHandler;
     var initCalled = false;
     var contentHandler;
     var content;
     var context;
     var timer;
+    var acceptedOrigins = options && isArrayOfStrings(options.acceptedOrigins) ? options.acceptedOrigins : null;
 
     function raiseContentChanged() {
         if (contentHandler && content) {
@@ -75,18 +81,24 @@ function SquidexPlugin() {
     }
 
     function eventListener(event) {
-        if (event.source !== window) {
-            var type = event.data.type;
-            
-            if (type === 'contentChanged') {
-                content = event.data.content;
+        if (acceptedOrigins && acceptedOrigins.indexOf(event.origin) < 0) {
+            return;
+        }
 
-                raiseContentChanged();
-            } else if (type === 'init') {
-                context = event.data.context;
+        if (event.source === window) {
+            return;
+        }
 
-                raiseInit();
-            }
+        var type = event.data.type;
+        
+        if (type === 'contentChanged') {
+            content = event.data.content;
+
+            raiseContentChanged();
+        } else if (type === 'init') {
+            context = event.data.context;
+
+            raiseInit();
         }
     }
 
@@ -114,7 +126,7 @@ function SquidexPlugin() {
         /**
          * Register an function that is called when the sidebar is initialized.
          *
-         * @param {Function} callback: The callback to invoke.
+         * @param {function} callback: The callback to invoke.
          */
         onInit: function (callback) {
             if (!isFunction(callback)) {
@@ -129,7 +141,7 @@ function SquidexPlugin() {
         /**
          * Register an function that is called whenever the value of the content has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Content value (any).
+         * @param {function} callback: The callback to invoke. Argument 1: Content value (any).
          */
         onContentChanged: function (callback) {
             if (!isFunction(callback)) {
@@ -156,7 +168,7 @@ function SquidexPlugin() {
     return editor;
 }
 
-function SquidexFormField() {
+function SquidexFormField(options) {
     var context;
     var currentConfirm;
     var currentPickAssets;
@@ -178,6 +190,7 @@ function SquidexFormField() {
     var timer;
     var value;
     var valueHandler;
+    var acceptedOrigins = options && isArrayOfStrings(options.acceptedOrigins) ? options.acceptedOrigins : null;
 
     function raiseDisabled() {
         if (disabledHandler) {
@@ -229,81 +242,87 @@ function SquidexFormField() {
     }
 
     function eventListener(event) {
-        if (event.source !== window) {
-            var type = event.data.type;
+        if (acceptedOrigins && acceptedOrigins.indexOf(event.origin) < 0) {
+            return;
+        }
 
-            console.log('Received Message: ' + type);
+        if (event.source === window) {
+            return;
+        }
+        
+        var type = event.data.type;
 
-            if (type === 'disabled') {
-                var newDisabled = event.data.isDisabled;
+        if (type === 'disabled') {
+            var newDisabled = event.data.isDisabled;
 
-                if (disabled !== newDisabled) {
-                    disabled = newDisabled;
+            if (disabled !== newDisabled) {
+                disabled = newDisabled;
 
-                    raiseDisabled();
+                raiseDisabled();
+            }
+        } else if (type === 'moved') {
+            var newIndex = event.data.index;
+
+            if (index !== newIndex) {
+                index = newIndex;
+
+                raisedMoved();
+            }
+        } else if (type === 'languageChanged') {
+            var newLanguage = event.data.language;
+
+            if (language !== newLanguage) {
+                language = newLanguage;
+
+                raiseLanguageChanged();
+            }
+        } else if (type === 'valueChanged') {
+            value = event.data.value;
+
+            raiseValueChanged();
+        } else if (type === 'formValueChanged') {
+            formValue = event.data.formValue;
+
+            raiseFormValueChanged();
+        } else if (type === 'fullscreenChanged') {
+            fullscreen = event.data.fullscreen;
+
+            raiseFullscreen();
+        } else if (type === 'expandedChanged') {
+            expanded = event.data.expanded;
+
+            raiseExpanded();
+        } else if (type === 'init') {
+            context = event.data.context;
+
+            raiseInit();
+        } else if (type === 'confirmResult') {
+            var correlationId = event.data.correlationId;
+
+            if (currentConfirm && currentConfirm.correlationId === correlationId) {
+                if (typeof currentConfirm.callback === 'function') {
+                    currentConfirm.callback(event.data.result);
                 }
-            } else if (type === 'moved') {
-                var newIndex = event.data.index;
+            }
+        } else if (type === 'pickAssetsResult') {
+            var correlationId = event.data.correlationId;
 
-                if (index !== newIndex) {
-                    index = newIndex;
-
-                    raisedMoved();
+            if (currentPickAssets && currentPickAssets.correlationId === correlationId) {
+                if (typeof currentPickAssets.callback === 'function') {
+                    currentPickAssets.callback(event.data.result);
                 }
-            } else if (type === 'languageChanged') {
-                var newLanguage = event.data.language;
+            }
+        } else if (type === 'pickContentsResult') {
+            var correlationId = event.data.correlationId;
 
-                if (language !== newLanguage) {
-                    language = newLanguage;
-
-                    raiseLanguageChanged();
-                }
-            } else if (type === 'valueChanged') {
-                value = event.data.value;
-
-                raiseValueChanged();
-            } else if (type === 'formValueChanged') {
-                formValue = event.data.formValue;
-
-                raiseFormValueChanged();
-            } else if (type === 'fullscreenChanged') {
-                fullscreen = event.data.fullscreen;
-
-                raiseFullscreen();
-            } else if (type === 'expandedChanged') {
-                expanded = event.data.expanded;
-
-                raiseExpanded();
-            } else if (type === 'init') {
-                context = event.data.context;
-
-                raiseInit();
-            } else if (type === 'confirmResult') {
-                var correlationId = event.data.correlationId;
-
-                if (currentConfirm && currentConfirm.correlationId === correlationId) {
-                    if (typeof currentConfirm.callback === 'function') {
-                        currentConfirm.callback(event.data.result);
-                    }
-                }
-            } else if (type === 'pickAssetsResult') {
-                var correlationId = event.data.correlationId;
-
-                if (currentPickAssets && currentPickAssets.correlationId === correlationId) {
-                    if (typeof currentPickAssets.callback === 'function') {
-                        currentPickAssets.callback(event.data.result);
-                    }
-                }
-            } else if (type === 'pickContentsResult') {
-                var correlationId = event.data.correlationId;
-
-                if (currentPickContents && currentPickContents.correlationId === correlationId) {
-                    if (typeof currentPickContents.callback === 'function') {
-                        currentPickContents.callback(event.data.result);
-                    }
+            if (currentPickContents && currentPickContents.correlationId === correlationId) {
+                if (typeof currentPickContents.callback === 'function') {
+                    currentPickContents.callback(event.data.result);
                 }
             }
         }
+
+        console.log('Received Message: ' + type);
     }
 
     window.addEventListener('message', eventListener, false);
@@ -512,7 +531,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called when the field is initialized.
          * 
-         * @param {Function} callback: The callback to invoke.
+         * @param {function} callback: The callback to invoke.
          */
         onInit: function (callback) {
             if (!isFunction(callback)) {
@@ -527,7 +546,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called when the field is moved.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: New position (number).
+         * @param {function} callback: The callback to invoke. Argument 1: New position (number).
          */
         onMoved: function (callback) {
             if (!isFunction(callback)) {
@@ -542,7 +561,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the field is disabled or enabled.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: New disabled state (boolean, disabled = true, enabled = false).
+         * @param {function} callback: The callback to invoke. Argument 1: New disabled state (boolean, disabled = true, enabled = false).
          */
         onDisabled: function (callback) {
             if (!isFunction(callback)) {
@@ -557,7 +576,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the field language is changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Language code (string).
+         * @param {function} callback: The callback to invoke. Argument 1: Language code (string).
          */
         onLanguageChanged: function (callback) {
             if (!isFunction(callback)) {
@@ -572,7 +591,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the value of the field has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Field value (any).
+         * @param {function} callback: The callback to invoke. Argument 1: Field value (any).
          */
         onValueChanged: function (callback) {
             if (!isFunction(callback)) {
@@ -587,7 +606,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the value of the content has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Content value (any).
+         * @param {function} callback: The callback to invoke. Argument 1: Content value (any).
          */
         onFormValueChanged: function (callback) {
             if (!isFunction(callback)) {
@@ -602,7 +621,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the fullscreen mode has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Fullscreen state (boolean, fullscreen on = true, fullscreen off = false).
+         * @param {function} callback: The callback to invoke. Argument 1: Fullscreen state (boolean, fullscreen on = true, fullscreen off = false).
          */
         onFullscreen: function (callback) {
             if (!isFunction(callback)) {
@@ -617,7 +636,7 @@ function SquidexFormField() {
         /**
          * Register an function that is called whenever the expanded mode has changed.
          *
-         * @param {Function} callback: The callback to invoke. Argument 1: Expanded state (boolean, expanded on = true, expanded off = false).
+         * @param {function} callback: The callback to invoke. Argument 1: Expanded state (boolean, expanded on = true, expanded off = false).
          */
         onExpanded: function (callback) {
             if (!isFunction(callback)) {
