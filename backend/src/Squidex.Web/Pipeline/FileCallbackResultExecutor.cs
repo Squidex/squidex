@@ -22,6 +22,11 @@ public sealed class FileCallbackResultExecutor : FileResultExecutorBase
 
     public async Task ExecuteAsync(ActionContext context, FileCallbackResult result)
     {
+        var response = context.HttpContext.Response;
+
+        // Always block execution of scripts and inline scripts for file downloads.
+        response.Headers[HeaderNames.ContentSecurityPolicy] = "script-src 'none'";
+
         try
         {
             var (range, _, serveBody) = SetHeadersAndLog(context, result, result.FileSize, result.FileSize != null);
@@ -32,14 +37,15 @@ public sealed class FileCallbackResultExecutor : FileResultExecutorBase
 
                 headerValue.SetHttpFileName(result.FileDownloadName);
 
-                context.HttpContext.Response.Headers[HeaderNames.ContentDisposition] = headerValue.ToString();
+                // This produces a nice file name without downloading it, but executes the file and shows images directly.
+                response.Headers[HeaderNames.ContentDisposition] = headerValue.ToString();
             }
 
             if (serveBody)
             {
                 var bytesRange = new BytesRange(range?.From, range?.To);
 
-                await result.Callback(context.HttpContext.Response.Body, bytesRange, context.HttpContext.RequestAborted);
+                await result.Callback(response.Body, bytesRange, context.HttpContext.RequestAborted);
             }
         }
         catch (OperationCanceledException)
@@ -50,8 +56,8 @@ public sealed class FileCallbackResultExecutor : FileResultExecutorBase
         {
             if (!context.HttpContext.Response.HasStarted && result.ErrorAs404)
             {
-                context.HttpContext.Response.Headers.Clear();
-                context.HttpContext.Response.StatusCode = 404;
+                response.Headers.Clear();
+                response.StatusCode = 404;
 
                 Logger.LogCritical(new EventId(99), e, "Failed to send result.");
             }
