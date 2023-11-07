@@ -1,4 +1,18 @@
+type PluginOptions = {
+    /**
+     * Defines the accepted origins for incoming messages.
+     */
+    acceptedOrigins?: string[];
+}
+
 declare class SquidexSidebar {
+    /** 
+     * The constructor.
+     * 
+     * @param options: The plugin options.
+    */
+    constructor(options?: PluginOptions);
+    
     /**
      * Get the current context.
      */
@@ -30,6 +44,13 @@ declare class SquidexSidebar {
 }
 
 declare class SquidexWidget {
+    /** 
+     * The constructor.
+     * 
+     * @param options: The plugin options.
+    */
+    constructor(options?: PluginOptions);
+
     /**
      * Get the current context.
      */
@@ -41,6 +62,7 @@ declare class SquidexWidget {
      * @param callback: The callback to invoke.
      */
     onInit(callback: () => void): void;
+
     /**
      * Clean the editor SDK.
      */
@@ -49,6 +71,13 @@ declare class SquidexWidget {
 
 
 declare class SquidexFormField {
+    /** 
+     * The constructor.
+     * 
+     * @param options: The plugin options.
+    */
+    constructor(options?: PluginOptions);
+
     /**
      * Get the current value.
      */
@@ -152,6 +181,8 @@ declare class SquidexFormField {
      * 
      * @param schemas: The list of schema names.
      * @param callback The callback to invoke when the dialog is completed or closed.
+<<<<<<< HEAD
+=======
      * @param query: The initial query that is used in the UI.
      * @param selectedIds: The selected ids to mark them as selected in the content selector dialog.
      */
@@ -159,6 +190,7 @@ declare class SquidexFormField {
 
     /**
      * Shows a dialog to pick a file.
+>>>>>>> 8f149db852d984489e6ca1a07af988dac917ab56
      */
     pickFile(): void;
 

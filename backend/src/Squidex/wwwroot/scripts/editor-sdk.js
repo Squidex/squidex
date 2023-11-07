@@ -53,13 +53,19 @@ function isArrayOfStrings(value) {
     return true;
 }
 
-function SquidexSidebar() {
+/**
+ * Creates a new plugin for sidebars.
+ * 
+ * @param {object} options with the accepted origins.
+ */
+function SquidexSidebar(options) {
     var initHandler;
     var initCalled = false;
     var contentHandler;
     var content;
     var context;
     var timer;
+    var acceptedOrigins = options && isArrayOfStrings(options.acceptedOrigins) ? options.acceptedOrigins : null;
 
     function raiseContentChanged() {
         if (contentHandler && content) {
@@ -75,19 +81,28 @@ function SquidexSidebar() {
     }
 
     function eventListener(event) {
-        if (event.source !== window) {
-            var type = event.data.type;
-            
-            if (type === 'contentChanged') {
-                content = event.data.content;
-
-                raiseContentChanged();
-            } else if (type === 'init') {
-                context = event.data.context;
-
-                raiseInit();
-            }
+        if (acceptedOrigins && acceptedOrigins.indexOf(event.origin) < 0) {
+            console.log('Origin not accepted: ' + event.origin);
+            return;
         }
+
+        if (event.source === window) {
+            return;
+        }
+
+        var type = event.data.type;
+        
+        if (type === 'contentChanged') {
+            content = event.data.content;
+
+            raiseContentChanged();
+        } else if (type === 'init') {
+            context = event.data.context;
+
+            raiseInit();
+        }
+
+        console.log('Received Message: ' + type);
     }
 
     window.addEventListener('message', eventListener, false);
@@ -156,10 +171,17 @@ function SquidexSidebar() {
     return plugin;
 }
 
-function SquidexWidget() {
+
+/**
+ * Creates a new plugin for widgets.
+ * 
+ * @param {object} options with the accepted origins.
+ */
+function SquidexWidget(options) {
     var initHandler;
     var initCalled = false;
     var context;
+    var acceptedOrigins = options && isArrayOfStrings(options.acceptedOrigins) ? options.acceptedOrigins : null;
 
     document.body.style.margin = '0';
     document.body.style.padding = '0';
@@ -172,15 +194,24 @@ function SquidexWidget() {
     }
 
     function eventListener(event) {
-        if (event.source !== window) {
-            var type = event.data.type;
-            
-            if (type === 'init') {
-                context = event.data.context;
-
-                raiseInit();
-            }
+        if (acceptedOrigins && acceptedOrigins.indexOf(event.origin) < 0) {
+            console.log('Origin not accepted: ' + event.origin);
+            return;
         }
+
+        if (event.source === window) {
+            return;
+        }
+
+        var type = event.data.type;
+        
+        if (type === 'init') {
+            context = event.data.context;
+
+            raiseInit();
+        }
+
+        console.log('Received Message: ' + type);
     }
 
     window.addEventListener('message', eventListener, false);
@@ -219,7 +250,12 @@ function SquidexWidget() {
     return plugin;
 }
 
-function SquidexFormField() {
+/**
+ * Creates a new plugin for form fields.
+ * 
+ * @param {object} options with the accepted origins.
+ */
+function SquidexFormField(options) {
     var context;
     var currentConfirm;
     var currentPickAssets;
@@ -241,6 +277,7 @@ function SquidexFormField() {
     var timer;
     var value;
     var valueHandler;
+    var acceptedOrigins = options && isArrayOfStrings(options.acceptedOrigins) ? options.acceptedOrigins : null;
 
     function raiseInit() {
         if (initHandler && !initCalled && context) {
@@ -292,81 +329,88 @@ function SquidexFormField() {
     }
 
     function eventListener(event) {
-        if (event.source !== window) {
-            var type = event.data.type;
+        if (acceptedOrigins && acceptedOrigins.indexOf(event.origin) < 0) {
+            console.log('Origin not accepted: ' + event.origin);
+            return;
+        }
 
-            console.log('Received Message: ' + type);
+        if (event.source === window) {
+            return;
+        }
+        
+        var type = event.data.type;
 
-            if (type === 'disabled') {
-                var newDisabled = event.data.isDisabled;
+        if (type === 'disabled') {
+            var newDisabled = event.data.isDisabled;
 
-                if (disabled !== newDisabled) {
-                    disabled = newDisabled;
+            if (disabled !== newDisabled) {
+                disabled = newDisabled;
 
-                    raiseDisabled();
+                raiseDisabled();
+            }
+        } else if (type === 'moved') {
+            var newIndex = event.data.index;
+
+            if (index !== newIndex) {
+                index = newIndex;
+
+                raisedMoved();
+            }
+        } else if (type === 'languageChanged') {
+            var newLanguage = event.data.language;
+
+            if (language !== newLanguage) {
+                language = newLanguage;
+
+                raiseLanguageChanged();
+            }
+        } else if (type === 'valueChanged') {
+            value = event.data.value;
+
+            raiseValueChanged();
+        } else if (type === 'formValueChanged') {
+            formValue = event.data.formValue;
+
+            raiseFormValueChanged();
+        } else if (type === 'fullscreenChanged') {
+            fullscreen = event.data.fullscreen;
+
+            raiseFullscreen();
+        } else if (type === 'expandedChanged') {
+            expanded = event.data.expanded;
+
+            raiseExpanded();
+        } else if (type === 'init') {
+            context = event.data.context;
+
+            raiseInit();
+        } else if (type === 'confirmResult') {
+            var correlationId = event.data.correlationId;
+
+            if (currentConfirm && currentConfirm.correlationId === correlationId) {
+                if (typeof currentConfirm.callback === 'function') {
+                    currentConfirm.callback(event.data.result);
                 }
-            } else if (type === 'moved') {
-                var newIndex = event.data.index;
+            }
+        } else if (type === 'pickAssetsResult') {
+            var correlationId = event.data.correlationId;
 
-                if (index !== newIndex) {
-                    index = newIndex;
-
-                    raisedMoved();
+            if (currentPickAssets && currentPickAssets.correlationId === correlationId) {
+                if (typeof currentPickAssets.callback === 'function') {
+                    currentPickAssets.callback(event.data.result);
                 }
-            } else if (type === 'languageChanged') {
-                var newLanguage = event.data.language;
+            }
+        } else if (type === 'pickContentsResult') {
+            var correlationId = event.data.correlationId;
 
-                if (language !== newLanguage) {
-                    language = newLanguage;
-
-                    raiseLanguageChanged();
-                }
-            } else if (type === 'valueChanged') {
-                value = event.data.value;
-
-                raiseValueChanged();
-            } else if (type === 'formValueChanged') {
-                formValue = event.data.formValue;
-
-                raiseFormValueChanged();
-            } else if (type === 'fullscreenChanged') {
-                fullscreen = event.data.fullscreen;
-
-                raiseFullscreen();
-            } else if (type === 'expandedChanged') {
-                expanded = event.data.expanded;
-
-                raiseExpanded();
-            } else if (type === 'init') {
-                context = event.data.context;
-
-                raiseInit();
-            } else if (type === 'confirmResult') {
-                var correlationId = event.data.correlationId;
-
-                if (currentConfirm && currentConfirm.correlationId === correlationId) {
-                    if (typeof currentConfirm.callback === 'function') {
-                        currentConfirm.callback(event.data.result);
-                    }
-                }
-            } else if (type === 'pickAssetsResult') {
-                var correlationId = event.data.correlationId;
-
-                if (currentPickAssets && currentPickAssets.correlationId === correlationId) {
-                    if (typeof currentPickAssets.callback === 'function') {
-                        currentPickAssets.callback(event.data.result);
-                    }
-                }
-            } else if (type === 'pickContentsResult') {
-                var correlationId = event.data.correlationId;
-
-                if (currentPickContents && currentPickContents.correlationId === correlationId) {
-                    if (typeof currentPickContents.callback === 'function') {
-                        currentPickContents.callback(event.data.result);
-                    }
+            if (currentPickContents && currentPickContents.correlationId === correlationId) {
+                if (typeof currentPickContents.callback === 'function') {
+                    currentPickContents.callback(event.data.result);
                 }
             }
         }
+
+        console.log('Received Message: ' + type);
     }
 
     window.addEventListener('message', eventListener, false);
