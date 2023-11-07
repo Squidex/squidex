@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.9.0] - 2023-11-07
+
+This release contains a breaking change. Due to security reasons content policy headers where added to prevent script execution for assets. If you have uploaded html files with scripts as assets, this will not work anymore. There is no fallback, you haveto upload your files to another location like a github repository. We might remove the header if we have a better solution for that.
+
+### Fixed
+
+* **Events**: Fixes the query to use the correct index.
+* **Rules**: Fix the UI for content trigger to always show the schem names.
+
+### Changed
+
+* **UI**: New content editor for markdown fields. The old editor is available under: https://squidex.github.io/squidex-samples/editors/markdown/index.html
+* **UI**: New content editor for rich text fields. The old editor is available under: https://squidex.github.io/squidex-samples/editors/richtext/index.html
+* **UI**: New collaboration feature based on yjs. This removes all existing comments and notifications.
+* **UI**: Improved AI chat dialog.
+* **UI**: Only show the AI button when a chat bot is enabled in the settings.
+
+### Added
+
+* **GraphQL**: Add the schema name to component types.
+
+### Security
+
+* **CVE-2023-46253 / Assets**: Fix a bug where an asset could be written outside the app folder: https://github.com/Squidex/squidex/security/advisories/GHSA-phqq-8g7v-3pg5
+* **CVE-2023-46252 / Editor**: Remove the editor js sample from the file system, because it allows to execute arbitrary JavaScript code in the context of a user authenticated to Squidex: https://github.com/Squidex/squidex/security/advisories/GHSA-7q4f-fprr-5jw8
+* **CVE-2023-46857 / Assets**: Incorrect SVG filtering. Implemented a more restrict filter: https://github.com/Squidex/squidex/security/advisories/GHSA-xfr4-qg2v-7v5m 
+
 ## [7.8.2] - 2023-09-19
 
 ### Fixed
