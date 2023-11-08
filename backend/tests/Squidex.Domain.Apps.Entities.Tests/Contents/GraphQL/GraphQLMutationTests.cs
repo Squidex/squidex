@@ -60,6 +60,14 @@ public class GraphQLMutationTests : GraphQLTestBase
                     path = new[]
                     {
                         "createMySchemaContent"
+                    },
+                    extensions = new
+                    {
+                        code = "DOMAIN_FORBIDDEN",
+                        codes = new[]
+                        {
+                            "DOMAIN_FORBIDDEN"
+                        }
                     }
                 }
             },
@@ -200,6 +208,14 @@ public class GraphQLMutationTests : GraphQLTestBase
                     path = new[]
                     {
                         "updateMySchemaContent"
+                    },
+                    extensions = new
+                    {
+                        code = "DOMAIN_FORBIDDEN",
+                        codes = new[]
+                        {
+                            "DOMAIN_FORBIDDEN"
+                        }
                     }
                 }
             },
@@ -291,6 +307,14 @@ public class GraphQLMutationTests : GraphQLTestBase
                     path = new[]
                     {
                         "upsertMySchemaContent"
+                    },
+                    extensions = new
+                    {
+                        code = "DOMAIN_FORBIDDEN",
+                        codes = new[]
+                        {
+                            "DOMAIN_FORBIDDEN"
+                        }
                     }
                 }
             },
@@ -387,6 +411,14 @@ public class GraphQLMutationTests : GraphQLTestBase
                     path = new[]
                     {
                         "patchMySchemaContent"
+                    },
+                    extensions = new
+                    {
+                        code = "DOMAIN_FORBIDDEN",
+                        codes = new[]
+                        {
+                            "DOMAIN_FORBIDDEN"
+                        }
                     }
                 }
             },
@@ -482,6 +514,14 @@ public class GraphQLMutationTests : GraphQLTestBase
                     path = new[]
                     {
                         "changeMySchemaContent"
+                    },
+                    extensions = new
+                    {
+                        code = "DOMAIN_FORBIDDEN",
+                        codes = new[]
+                        {
+                            "DOMAIN_FORBIDDEN"
+                        }
                     }
                 }
             },
@@ -660,6 +700,14 @@ public class GraphQLMutationTests : GraphQLTestBase
                     path = new[]
                     {
                         "deleteMySchemaContent"
+                    },
+                    extensions = new
+                    {
+                        code = "DOMAIN_FORBIDDEN",
+                        codes = new[]
+                        {
+                            "DOMAIN_FORBIDDEN"
+                        }
                     }
                 }
             },

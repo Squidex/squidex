@@ -33,6 +33,13 @@ internal static class ErrorVisitor
                 log.LogError(context.OriginalException, "Failed to resolve execute query.");
             }
 
+            if (context.OriginalException is ValidationException or DomainException)
+            {
+                var message = context.OriginalException.Message;
+
+                context.ErrorMessage = context.OriginalException.Message;
+            }
+
             return Task.CompletedTask;
         };
     }

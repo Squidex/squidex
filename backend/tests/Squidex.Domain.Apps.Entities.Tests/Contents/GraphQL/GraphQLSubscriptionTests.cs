@@ -95,6 +95,14 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     path = new[]
                     {
                         "assetChanges"
+                    },
+                    extensions = new
+                    {
+                        code = "DOMAIN_FORBIDDEN",
+                        codes = new[]
+                        {
+                            "DOMAIN_FORBIDDEN"
+                        }
                     }
                 }
             },
@@ -188,6 +196,14 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     path = new[]
                     {
                         "contentChanges"
+                    },
+                    extensions = new
+                    {
+                        code = "DOMAIN_FORBIDDEN",
+                        codes = new[]
+                        {
+                            "DOMAIN_FORBIDDEN"
+                        }
                     }
                 }
             },
