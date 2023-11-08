@@ -55,7 +55,9 @@ public sealed class CachingGraphQLResolver : IConfigureExecution
         options.Schema = await GetSchemaAsync(context.App);
         options.HandleError(serviceProvider);
 
-        return await next(options);
+        var a = await next(options);
+
+        return a;
     }
 
     public async Task<GraphQLSchema> GetSchemaAsync(IAppEntity app)

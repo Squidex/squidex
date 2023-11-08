@@ -7,6 +7,7 @@
 
 using GraphQL;
 using GraphQL.DI;
+using GraphQL.Execution;
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -17,6 +18,7 @@ using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Pipeline.Plugins;
@@ -107,6 +109,7 @@ public static class WebServices
         services.AddGraphQL(builder =>
         {
             builder.UseApolloTracing();
+            builder.AddErrorInfoProvider<ErrorProvider>();
             builder.AddSchema<DummySchema>();
             builder.AddSystemTextJson();
             builder.AddDataLoader();
