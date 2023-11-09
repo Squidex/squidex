@@ -91,13 +91,14 @@
 
     <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
-            <sqx-field-form showButtons="true" (cancel)="toggleEditing()"
-                [languages]="languages"
-                [fieldForm]="editForm.form"
+            <sqx-field-form showButtons="true"
+                (dialogClose)="toggleEditing()"
                 [field]="field"
-                [schema]="schema"
+                [fieldForm]="editForm.form"
                 [isEditable]="isEditable"
                 [isLocalizable]="isLocalizable"
+                [languages]="languages"
+                [schema]="schema"
                 [settings]="settings">
             </sqx-field-form>
         </form> 
@@ -111,11 +112,11 @@
                 [fields]="nested"
                 [fieldsEmpty]="nested.length === 0"
                 [languages]="languages"
+                [parent]="$any(field)"
                 [schema]="schema"
                 [settings]="settings"
                 [sortable]="isEditable === true"
-                (sorted)="sortFields($event)"
-                [parent]="$any(field)">
+                (sorted)="sortFields($event)">
             </sqx-sortable-field-list>
             
             <div class="nested-field nested-field-add" *ngIf="isEditable">
@@ -127,10 +128,10 @@
             </div>
                 
             <sqx-field-wizard *sqxModal="fieldWizard"
+                (dialogClose)="fieldWizard.hide()"
                 [parent]="$any(field)"
                 [schema]="schema"
-                [settings]="settings"
-                (dialogClose)="fieldWizard.hide()">
+                [settings]="settings">
             </sqx-field-wizard>
         </ng-container>
     </div>

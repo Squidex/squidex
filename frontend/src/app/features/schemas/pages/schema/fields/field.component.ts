@@ -55,16 +55,13 @@ export class FieldComponent {
             this.isEditable = this.field.canUpdate;
 
             this.editForm = new EditFieldForm(this.field.properties);
-            this.editForm.load(this.field.properties);
         }
     }
 
     public toggleEditing() {
         this.isEditing = !this.isEditing;
 
-        if (this.isEditing) {
-            this.editForm.load(this.field.properties);
-        }
+        this.editForm.load(this.field.properties);
     }
 
     public deleteField() {

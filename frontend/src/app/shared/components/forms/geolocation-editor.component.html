@@ -29,7 +29,7 @@
             </div>
 
             <div class="form-group col-auto" *ngIf="!snapshot.isCompact">
-                <button [class.hidden]="!hasValue" type="reset" class="btn btn-text clear" [disabled]="snapshot.isDisabled" (click)="clearValue()">
+                <button [class.hidden]="!hasValue" type="button" class="btn btn-text clear" [disabled]="snapshot.isDisabled" (click)="clearValue()">
                     {{ 'common.clear' | sqxTranslate }}
                 </button>
             </div>
