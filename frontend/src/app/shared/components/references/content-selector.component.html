@@ -13,6 +13,10 @@
         <div *ngIf="schemas.length === 1">
             {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schemas[0].displayName } }}
         </div>
+
+        <div *ngIf="schemas.length === 0">
+            {{ 'contents.referencesNoSchema' | sqxTranslate }}
+        </div>
     </ng-container>
 
     <ng-container tabs>

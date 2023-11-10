@@ -503,6 +503,7 @@
   "contents.referencesCreateNew": "Add New",
   "contents.referencesCreatePublish": "Create and Publish",
   "contents.referencesLink": "Link selected contents ({count})",
+  "contents.referencesNoSchema": "No Schema",
   "contents.referencesSelectExisting": "Select Existing",
   "contents.referencesSelectSchema": "Select {schema}",
   "contents.refreshTooltip": "Refresh Contents",

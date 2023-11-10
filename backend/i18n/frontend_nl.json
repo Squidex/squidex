@@ -503,6 +503,7 @@
   "contents.referencesCreateNew": "Nieuwe toevoegen",
   "contents.referencesCreatePublish": "Maken en publiceren",
   "contents.referencesLink": "Link geselecteerde inhoud ({count})",
+  "contents.referencesNoSchema": "No Schema",
   "contents.referencesSelectExisting": "Selecteer bestaande",
   "contents.referencesSelectSchema": "Selecteer {schema}",
   "contents.refreshTooltip": "Ververs inhoud",

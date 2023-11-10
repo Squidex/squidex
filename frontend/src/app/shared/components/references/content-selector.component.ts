@@ -34,10 +34,7 @@ export class ContentSelectorComponent implements OnInit {
     public schemaName?: string | null;
 
     @Input()
-    public schemaIds?: ReadonlyArray<string>;
-
-    @Input()
-    public schemaNames?: ReadonlyArray<string>;
+    public schemaIdentifiers?: ReadonlyArray<string>;
 
     @Input()
     public query?: string;
@@ -97,12 +94,8 @@ export class ContentSelectorComponent implements OnInit {
 
         this.schemas = this.schemasState.snapshot.schemas.filter(x => x.type === 'Default' && x.canReadContents);
 
-        if (this.schemaIds && this.schemaIds.length > 0) {
-            this.schemas = this.schemas.filter(x => this.schemaIds!.includes(x.id));
-        }
-
-        if (this.schemaNames && this.schemaNames.length > 0) {
-            this.schemas = this.schemas.filter(x => this.schemaNames!.includes(x.name));
+        if (this.schemaIdentifiers && this.schemaIdentifiers.length > 0) {
+            this.schemas = this.schemas.filter(x => this.schemaIdentifiers!.includes(x.id) || this.schemaIdentifiers!.includes(x.name));
         }
 
         this.selectSchema(this.schemas[0]);

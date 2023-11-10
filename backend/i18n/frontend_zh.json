@@ -503,6 +503,7 @@
   "contents.referencesCreateNew": "新增",
   "contents.referencesCreatePublish": "创建和发布",
   "contents.referencesLink": "链接所选内容 ({count})",
+  "contents.referencesNoSchema": "No Schema",
   "contents.referencesSelectExisting": "选择现有",
   "contents.referencesSelectSchema": "选择 {schema}",
   "contents.refreshTooltip": "刷新内容",
