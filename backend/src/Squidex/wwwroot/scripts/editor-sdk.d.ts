@@ -181,8 +181,6 @@ declare class SquidexFormField {
      * 
      * @param schemas: The list of schema names.
      * @param callback The callback to invoke when the dialog is completed or closed.
-<<<<<<< HEAD
-=======
      * @param query: The initial query that is used in the UI.
      * @param selectedIds: The selected ids to mark them as selected in the content selector dialog.
      */
@@ -190,7 +188,6 @@ declare class SquidexFormField {
 
     /**
      * Shows a dialog to pick a file.
->>>>>>> 8f149db852d984489e6ca1a07af988dac917ab56
      */
     pickFile(): void;
 
