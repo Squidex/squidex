@@ -29,7 +29,7 @@
     </ng-container>
 
     <ng-container content>
-        <div *ngIf="content && contentSelected.scheduleJob">
+        <div *ngIf="contentSelected && contentSelected.scheduleJob">
             <div class="form-group row">
                 <label class="col-4 col-form-label">{{ 'common.id' | sqxTranslate }}</label>
         
@@ -49,7 +49,7 @@
         
                 <div class="col-8">
                     <a class="truncate" [routerLink]="['../', contentSelected.schemaName, contentSelected.id]">
-                        {{createContentName(content)}}
+                        {{createContentName(contentSelected)}}
                     </a>
                 </div>
             </div>
