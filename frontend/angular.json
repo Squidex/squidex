@@ -18,7 +18,7 @@
       "prefix": "sqx",
       "architect": {
         "build": {
-          "builder": "@angular-builders/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "build",
             "index": "src/index.html",
@@ -131,10 +131,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "squidex:build:production"
+              "buildTarget": "squidex:build:production"
             },
             "development": {
-              "browserTarget": "squidex:build:development"
+              "buildTarget": "squidex:build:development"
             }
           },
           "options": {
