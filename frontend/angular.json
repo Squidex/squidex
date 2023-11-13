@@ -69,7 +69,7 @@
                 "output": "./dependencies/videojs/"
               },
               {
-                "glob": "*.min.*",
+                "glob": "**/*",
                 "input": "./node_modules/leaflet-control-geocoder/dist/",
                 "output": "./dependencies/leaflet/"
               },

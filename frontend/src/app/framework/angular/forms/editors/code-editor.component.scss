@@ -18,6 +18,15 @@
         background: $color-white;
         border: 1px solid $color-input;
         border-radius: 0;
+        line-height: 1.6;
+        padding-left: 30px;
+        padding-right: 5px;
+        white-space: normal;
+
+        .ace_icon {
+            @include absolute(5px, null, null, 5px);
+            white-space: pre;
+        }
     }
 
     .ace_active-line,
