@@ -155,7 +155,7 @@
             </sqx-list-view>
         </ng-container>
 
-        <ng-container sidebarMenu>
+        <ng-template sidebarMenu>
             <div class="panel-nav">
                 <ng-container  *ngIf="rule && (rulesState.canReadEvents | async)">
                     <a class="panel-link panel-link-gray"
@@ -192,7 +192,7 @@
                     <i class="icon-help2"></i>
                 </a>
             </div>
-        </ng-container>
+        </ng-template>
     </sqx-layout>
 </form>
 

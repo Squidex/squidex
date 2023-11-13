@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, numberAttribute, OnDestroy, OnInit, Optional, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, Input, numberAttribute, OnDestroy, OnInit, Optional, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
 import { concat, defer, filter, map, of } from 'rxjs';
 import { LayoutContainerDirective } from './layout-container.directive';
+import { SidebarMenuDirective } from './template.directive';
 
 @Component({
     selector: 'sqx-layout',
@@ -65,6 +66,9 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild('panel', { static: false })
     public panel!: ElementRef<HTMLElement>;
+
+    @ContentChild(SidebarMenuDirective)
+    public sidebarMenuTemplate?: SidebarMenuDirective;
 
     public isCollapsed = false;
     public isMinimized = false;

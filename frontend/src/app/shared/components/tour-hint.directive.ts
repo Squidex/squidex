@@ -39,6 +39,10 @@ export class TourHintDirective implements OnInit {
     ) {
     }
 
+    public ngOnDestroy() {
+        return;
+    }
+
     public ngOnInit() {
         if (!this.anchorId) {
             return;
