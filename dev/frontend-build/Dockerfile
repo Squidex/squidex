@@ -1,4 +1,4 @@
-FROM node:18.10-slim
+FROM node:20.9.0-slim
 
 ENV CHROME_BIN=/usr/bin/chromium
 

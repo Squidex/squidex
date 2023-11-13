@@ -40,7 +40,6 @@
     "core-js": "3.33.2",
     "cropperjs": "2.0.0-alpha.1",
     "date-fns": "2.30.0",
-    "font-awesome": "4.7.0",
     "graphiql": "3.0.9",
     "graphql": "16.8.1",
     "graphql-ws": "^5.14.2",

@@ -43,7 +43,7 @@ RUN dotnet tool install --tool-path /tools dotnet-counters \
 #
 # Stage 2, Build Frontend
 #
-FROM squidex/frontend-build:18.10 as frontend
+FROM squidex/frontend-build:20.9 as frontend
 
 WORKDIR /src
 
