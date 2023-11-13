@@ -24,7 +24,7 @@ export class ContentExtensionComponent {
     public iframe!: ElementRef<HTMLIFrameElement>;
 
     @Input({ required: true })
-    public content?: ContentDto | null;
+    public contentItem?: ContentDto | null;
 
     @Input({ required: true })
     public contentSchema!: SchemaDto;
@@ -54,7 +54,7 @@ export class ContentExtensionComponent {
             this.context['schemaId'] = this.contentSchema?.id;
         }
 
-        if (changes.content) {
+        if (changes.contentItem) {
             this.sendContent();
         }
     }
@@ -86,7 +86,7 @@ export class ContentExtensionComponent {
     }
 
     private sendContent() {
-        this.sendMessage('contentChanged', { content: this.content });
+        this.sendMessage('contentChanged', { content: this.contentItem });
     }
 
     private sendMessage(type: string, payload: any) {
