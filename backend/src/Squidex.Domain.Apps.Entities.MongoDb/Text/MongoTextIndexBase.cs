@@ -19,6 +19,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndexEntity<T>>, ITextIndex, IDeleter where T : class
 {
     private readonly CommandFactory<T> commandFactory;
+    private readonly string shardKey;
 
     protected sealed class MongoTextResult
     {
@@ -46,9 +47,11 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         public SearchScope SearchScope { get; set; }
     }
 
-    protected MongoTextIndexBase(IMongoDatabase database)
+    protected MongoTextIndexBase(IMongoDatabase database, string shardKey)
         : base(database)
     {
+        this.shardKey = shardKey;
+
 #pragma warning disable MA0056 // Do not call overridable members in constructor
         commandFactory = new CommandFactory<T>(BuildTexts);
 #pragma warning restore MA0056 // Do not call overridable members in constructor
@@ -65,7 +68,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
             new CreateIndexModel<MongoTextIndexEntity<T>>(
                 Index
                     .Ascending(x => x.AppId)
-                    .Ascending(x => x.ServeAll)
+                    .Ascending(x => x.ServeAlways)
                     .Ascending(x => x.ServePublished)
                     .Ascending(x => x.SchemaId)
                     .Ascending(x => x.GeoField)
@@ -75,7 +78,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
 
     protected override string CollectionName()
     {
-        return "TextIndex";
+        return $"TextIndex2{shardKey}";
     }
 
     protected abstract T BuildTexts(Dictionary<string, string> source);
@@ -216,7 +219,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
     {
         if (scope == SearchScope.All)
         {
-            return Filter.Eq(x => x.ServeAll, true);
+            return Filter.Eq(x => x.ServeAlways, true);
         }
         else
         {

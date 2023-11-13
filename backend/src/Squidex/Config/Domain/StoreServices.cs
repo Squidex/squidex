@@ -99,9 +99,6 @@ public static class StoreServices
                 services.AddTransientAs(c => new ConvertDocumentIds(GetDatabase(c, mongoDatabaseName), GetDatabase(c, mongoContentDatabaseName)))
                     .As<IMigration>();
 
-                services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
-                    .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>().As<IDeleter>();
-
                 services.AddTransientAs<ConvertRuleEventsJson>()
                     .As<IMigration>();
 
@@ -138,9 +135,6 @@ public static class StoreServices
                 services.AddSingletonAs<MongoUserStore>()
                     .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
-                services.AddSingletonAs<MongoAssetRepository>()
-                    .As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State>>().As<IDeleter>();
-
                 services.AddSingletonAs<MongoAssetFolderRepository>()
                     .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State>>().As<IDeleter>();
 
@@ -161,6 +155,20 @@ public static class StoreServices
 
                 services.AddSingletonAs<MongoTextIndexerState>()
                     .As<ITextIndexerState>().As<IDeleter>();
+
+                services.AddSingletonAs(c =>
+                {
+                    return new MongoShardedAssetRepository(GetSharding(config, "store:mongoDB:assetShardCount"),
+                        shardKey => ActivatorUtilities.CreateInstance<MongoAssetRepository>(c, shardKey));
+                }).As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State>>().As<IDeleter>();
+
+                services.AddSingletonAs(c =>
+                {
+                    var contentDatabase = GetDatabase(c, mongoContentDatabaseName);
+
+                    return new MongoShardedContentRepository(GetSharding(config, "store:mongoDB:contentShardCount"),
+                        shardKey => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, shardKey, contentDatabase));
+                }).As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>().As<IDeleter>();
 
                 services.AddOpenIddict()
                     .AddCore(builder =>
@@ -191,13 +199,19 @@ public static class StoreServices
                         };
                     });
 
-                    services.AddSingletonAs<AtlasTextIndex>()
-                        .AsOptional<ITextIndex>().As<IDeleter>();
+                    services.AddSingletonAs(c =>
+                    {
+                        return new MongoShardedTextIndex<Dictionary<string, string>>(GetSharding(config, "store:mongoDB:textShardCount"),
+                            shardKey => ActivatorUtilities.CreateInstance<AtlasTextIndex>(c, shardKey));
+                    }).AsOptional<ITextIndex>().As<IDeleter>();
                 }
                 else
                 {
-                    services.AddSingletonAs<MongoTextIndex>()
-                        .AsOptional<ITextIndex>().As<IDeleter>();
+                    services.AddSingletonAs(c =>
+                    {
+                        return new MongoShardedTextIndex<List<MongoTextIndexEntityText>>(GetSharding(config, "store:mongoDB:textShardCount"),
+                            shardKey => ActivatorUtilities.CreateInstance<MongoTextIndex>(c, shardKey));
+                    }).AsOptional<ITextIndex>().As<IDeleter>();
                 }
 
                 services.AddInitializer<JsonSerializerOptions>("Serializer (BSON)", jsonSerializerOptions =>
@@ -228,6 +242,13 @@ public static class StoreServices
                 };
             });
         });
+    }
+
+    private static IShardingStrategy GetSharding(IConfiguration config, string name)
+    {
+        var shardCount = config.GetValue<int>(name);
+
+        return shardCount > 0 && shardCount <= 100 ? new PartitionedSharding(shardCount) : SingleSharding.Instance;
     }
 
     private static IMongoDatabase GetDatabase(IServiceProvider serviceProvider, string name)

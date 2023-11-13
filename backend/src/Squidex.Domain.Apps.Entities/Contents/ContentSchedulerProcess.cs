@@ -92,7 +92,7 @@ public sealed class ContentSchedulerProcess : IBackgroundProcess
         }
         catch (DomainObjectNotFoundException)
         {
-            await contentRepository.ResetScheduledAsync(content.UniqueId, default);
+            await contentRepository.ResetScheduledAsync(content.AppId.Id, id, default);
         }
         catch (Exception ex)
         {

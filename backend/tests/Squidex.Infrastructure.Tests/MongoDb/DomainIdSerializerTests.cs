@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure.TestHelpers;
 
@@ -18,6 +16,12 @@ public class DomainIdSerializerTests
     private sealed class StringEntity<T>
     {
         [BsonRepresentation(BsonType.String)]
+        public T Id { get; set; }
+    }
+
+    private sealed class BinaryEntity<T>
+    {
+        [BsonRepresentation(BsonType.Binary)]
         public T Id { get; set; }
     }
 
@@ -34,57 +38,50 @@ public class DomainIdSerializerTests
     [Fact]
     public void Should_deserialize_from_string()
     {
-        var id = Guid.NewGuid();
+        var source = new IdEntity<string> { Id = Guid.NewGuid().ToString() };
 
-        var source = new IdEntity<string> { Id = id.ToString() };
+        var actual = TestUtils.SerializeAndDeserializeBson<IdEntity<DomainId>, IdEntity<string>>(source);
 
-        var actual = SerializeAndDeserializeBson<IdEntity<string>, IdEntity<DomainId>>(source);
-
-        Assert.Equal(actual.Id.ToString(), id.ToString());
+        Assert.Equal(actual.Id.ToString(), source.Id);
     }
 
     [Fact]
     public void Should_deserialize_from_guid_string()
     {
-        var id = Guid.NewGuid();
+        var source = new StringEntity<Guid> { Id = Guid.NewGuid() };
 
-        var source = new StringEntity<Guid> { Id = id };
+        var actual = TestUtils.SerializeAndDeserializeBson<IdEntity<DomainId>, StringEntity<Guid>>(source);
 
-        var actual = SerializeAndDeserializeBson<StringEntity<Guid>, IdEntity<DomainId>>(source);
-
-        Assert.Equal(actual.Id.ToString(), id.ToString());
+        Assert.Equal(actual.Id.ToString(), source.Id.ToString());
     }
 
     [Fact]
     public void Should_deserialize_from_guid_bytes()
     {
-        var id = Guid.NewGuid();
+        var source = new IdEntity<Guid> { Id = Guid.NewGuid() };
 
-        var source = new IdEntity<Guid> { Id = id };
+        var actual = TestUtils.SerializeAndDeserializeBson<IdEntity<DomainId>, IdEntity<Guid>>(source);
 
-        var actual = SerializeAndDeserializeBson<IdEntity<Guid>, IdEntity<DomainId>>(source);
-
-        Assert.Equal(actual.Id.ToString(), id.ToString());
+        Assert.Equal(actual.Id.ToString(), source.Id.ToString());
     }
 
-    private static TOut SerializeAndDeserializeBson<TIn, TOut>(TIn source)
+    [Fact]
+    public void Should_serialize_guid_as_bytes()
     {
-        var stream = new MemoryStream();
+        var source = new BinaryEntity<DomainId> { Id = DomainId.NewGuid() };
 
-        using (var writer = new BsonBinaryWriter(stream))
-        {
-            BsonSerializer.Serialize(writer, source);
+        var actual = TestUtils.SerializeAndDeserializeBson(source);
 
-            writer.Flush();
-        }
+        Assert.Equal(actual.Id, source.Id);
+    }
 
-        stream.Position = 0;
+    [Fact]
+    public void Should_serialize_non_guid_as_bytes()
+    {
+        var source = new BinaryEntity<DomainId> { Id = DomainId.Create("NonGuid") };
 
-        using (var reader = new BsonBinaryReader(stream))
-        {
-            var target = BsonSerializer.Deserialize<TOut>(reader);
+        var actual = TestUtils.SerializeAndDeserializeBson(source);
 
-            return target;
-        }
+        Assert.Equal(actual.Id, source.Id);
     }
 }

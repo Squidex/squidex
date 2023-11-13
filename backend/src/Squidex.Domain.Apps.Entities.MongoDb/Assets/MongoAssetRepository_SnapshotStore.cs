@@ -18,22 +18,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 
 public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObject.State>, IDeleter
 {
-    Task IDeleter.DeleteAppAsync(IAppEntity app,
+    public Task DeleteAppAsync(IAppEntity app,
         CancellationToken ct)
     {
         return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
     }
 
-    IAsyncEnumerable<SnapshotResult<AssetDomainObject.State>> ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(
-        CancellationToken ct)
+    public IAsyncEnumerable<SnapshotResult<AssetDomainObject.State>> ReadAllAsync(
+        CancellationToken ct = default)
     {
         var documents = Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct);
 
         return documents.Select(x => new SnapshotResult<AssetDomainObject.State>(x.DocumentId, x.ToState(), x.Version));
     }
 
-    async Task<SnapshotResult<AssetDomainObject.State>> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key,
-        CancellationToken ct)
+    public async Task<SnapshotResult<AssetDomainObject.State>> ReadAsync(DomainId key,
+        CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/ReadAsync"))
         {
@@ -50,8 +50,8 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObj
         }
     }
 
-    async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(SnapshotWriteJob<AssetDomainObject.State> job,
-        CancellationToken ct)
+    public async Task WriteAsync(SnapshotWriteJob<AssetDomainObject.State> job,
+        CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteAsync"))
         {
@@ -61,8 +61,8 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObj
         }
     }
 
-    async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<SnapshotWriteJob<AssetDomainObject.State>> jobs,
-        CancellationToken ct)
+    public async Task WriteManyAsync(IEnumerable<SnapshotWriteJob<AssetDomainObject.State>> jobs,
+        CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteManyAsync"))
         {
@@ -83,8 +83,8 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObj
         }
     }
 
-    async Task ISnapshotStore<AssetDomainObject.State>.RemoveAsync(DomainId key,
-        CancellationToken ct)
+    public async Task RemoveAsync(DomainId key,
+        CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/RemoveAsync"))
         {

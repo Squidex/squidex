@@ -21,11 +21,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
 {
     private readonly MongoCountCollection countCollection;
+    private readonly string shardKey;
 
-    public MongoAssetRepository(IMongoDatabase database, ILogger<MongoAssetRepository> log)
+    public MongoAssetRepository(IMongoDatabase database, ILogger<MongoAssetRepository> log, string shardKey)
         : base(database)
     {
         countCollection = new MongoCountCollection(database, log, CollectionName());
+        this.shardKey = shardKey;
     }
 
     public IMongoCollection<MongoAssetEntity> GetInternalCollection()
@@ -35,7 +37,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
 
     protected override string CollectionName()
     {
-        return "States_Assets2";
+        return $"States_Assets2{shardKey}";
     }
 
     protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection,

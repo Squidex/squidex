@@ -122,7 +122,7 @@ public class ContentSchedulerProcessTests : GivenContext
 
         await sut.PublishAsync(CancellationToken);
 
-        A.CallTo(() => contentRepository.ResetScheduledAsync(content1.UniqueId, SearchScope.All, default))
+        A.CallTo(() => contentRepository.ResetScheduledAsync(content1.AppId.Id, content1.Id, SearchScope.All, default))
             .MustHaveHappened();
     }
 }

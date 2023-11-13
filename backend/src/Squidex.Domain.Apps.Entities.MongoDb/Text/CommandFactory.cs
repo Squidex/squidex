@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure.MongoDb;
@@ -45,10 +46,10 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                     Filter.Exists(x => x.GeoField, false),
                     Filter.Exists(x => x.GeoObject, false)),
                 Update
-                    .Set(x => x.ServeAll, upsert.ServeAll)
+                    .Set(x => x.ServeAlways, upsert.ServeAlways)
                     .Set(x => x.ServePublished, upsert.ServePublished)
                     .Set(x => x.Texts, BuildTexts(upsert))
-                    .SetOnInsert(x => x.Id, Guid.NewGuid().ToString())
+                    .SetOnInsert(x => x.Id, ObjectId.GenerateNewId())
                     .SetOnInsert(x => x.DocId, upsert.DocId)
                     .SetOnInsert(x => x.AppId, upsert.AppId.Id)
                     .SetOnInsert(x => x.ContentId, upsert.ContentId)
@@ -75,15 +76,14 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                     new InsertOneModel<MongoTextIndexEntity<T>>(
                         new MongoTextIndexEntity<T>
                         {
-                            Id = Guid.NewGuid().ToString(),
-                            AppId = upsert.AppId.Id,
                             DocId = upsert.DocId,
                             ContentId = upsert.ContentId,
                             GeoField = field,
                             GeoObject = geoObject,
                             SchemaId = upsert.SchemaId.Id,
-                            ServeAll = upsert.ServeAll,
-                            ServePublished = upsert.ServePublished
+                            ServeAlways = upsert.ServeAlways,
+                            ServePublished = upsert.ServePublished,
+                            AppId = upsert.AppId.Id
                         }));
             }
         }
@@ -100,7 +100,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
             new UpdateOneModel<MongoTextIndexEntity<T>>(
                 Filter.Eq(x => x.DocId, update.DocId),
                 Update
-                    .Set(x => x.ServeAll, update.ServeAll)
+                    .Set(x => x.ServeAlways, update.ServeAll)
                     .Set(x => x.ServePublished, update.ServePublished)));
     }
 

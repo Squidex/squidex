@@ -41,7 +41,7 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         BsonStringSerializer<Status>.Register();
     }
 
-    public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider,
+    public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, string shardKey,
         IOptions<ContentOptions> options, ILogger<MongoContentRepository> log)
     {
         this.appProvider = appProvider;
@@ -49,11 +49,11 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         this.options = options.Value;
 
         collectionComplete =
-            new MongoContentCollection("States_Contents_All3", database, log,
+            new MongoContentCollection($"States_Contents_All3{shardKey}", database, log,
                 ReadPreference.Primary, options.Value.OptimizeForSelfHosting);
 
         collectionPublished =
-            new MongoContentCollection("States_Contents_Published3", database, log,
+            new MongoContentCollection($"States_Contents_Published3{shardKey}", database, log,
                 ReadPreference.Secondary, options.Value.OptimizeForSelfHosting);
     }
 
@@ -123,10 +123,10 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         return GetCollection(scope).QueryIdsAsync(appId, schemaId, filterNode, ct);
     }
 
-    public Task ResetScheduledAsync(DomainId documentId, SearchScope scope,
+    public Task ResetScheduledAsync(DomainId appId, DomainId contentId, SearchScope scope,
         CancellationToken ct = default)
     {
-        return GetCollection(SearchScope.All).ResetScheduledAsync(documentId, ct);
+        return GetCollection(SearchScope.All).ResetScheduledAsync(appId, contentId, ct);
     }
 
     private MongoContentCollection GetCollection(SearchScope scope)

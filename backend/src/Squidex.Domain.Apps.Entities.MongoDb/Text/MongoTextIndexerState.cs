@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -23,7 +24,7 @@ public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState
             cm.MapIdField(x => x.UniqueContentId);
 
             cm.MapProperty(x => x.AppId)
-                .SetElementName("a");
+                .SetElementName("a").SetSerializer(new BsonDomainIdSerializer(BsonType.Binary));
 
             cm.MapProperty(x => x.DocIdCurrent)
                 .SetElementName("c");

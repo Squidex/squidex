@@ -11,8 +11,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
 public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntityText>>
 {
-    public MongoTextIndex(IMongoDatabase database)
-        : base(database)
+    public MongoTextIndex(IMongoDatabase database, string shardKey)
+        : base(database, shardKey)
     {
     }
 
@@ -26,7 +26,7 @@ public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntit
                 Index
                     .Text("t.t")
                     .Ascending(x => x.AppId)
-                    .Ascending(x => x.ServeAll)
+                    .Ascending(x => x.ServeAlways)
                     .Ascending(x => x.ServePublished)
                     .Ascending(x => x.SchemaId)),
             cancellationToken: ct);
