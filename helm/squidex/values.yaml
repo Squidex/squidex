@@ -47,6 +47,7 @@ affinity: { }
 clusterSuffix: cluster.local
 
 ## @param runAsNonRoot
+## Set to true to run Squidex as nonroot. Defaults to false for backwards compatibility.
 runAsNonRoot: false
 
 ## @param podSecurityContext - object - optional
