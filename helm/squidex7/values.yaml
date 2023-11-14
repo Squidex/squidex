@@ -46,6 +46,36 @@ affinity: { }
 ## @skip clusterSuffix
 clusterSuffix: cluster.local
 
+## @param runAsNonRoot
+## Set to true to run Squidex as nonroot. Defaults to false for backwards compatibility.
+runAsNonRoot: false
+
+## @param podSecurityContext - object - optional
+## You can modify the security context used to run PODS in the cluster
+## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+## An example that follows the Restricted profile is described below:
+#
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  runAsNonRoot: true
+  runAsUser: 10000
+  runAsGroup: 10000
+  fsGroup: 10000
+
+## @param containerSecurityContext - object - optional
+## You can modify the security context used to run CONTAINERS in the cluster
+## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+## An example that follows the Restricted profile is described below:
+#
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+
 ## @skip auth
 auth:
   ## 
@@ -213,7 +243,10 @@ env:
   URLS__BASEURL: https://squidex.local/ # 
 
   ## @param env.URLS__ENFORCEHTTPS Set it to true to redirect the user from http to https permanently
-  URLS__ENFORCEHTTPS: false 
+  URLS__ENFORCEHTTPS: false
+
+  ## @param env.ASPNETCORE_URLS: an override to ensure that kestrel starts on a non-privileged port
+  ASPNETCORE_URLS: http://+:80
 
 ## @section MongoDB parameters
 mongodb-replicaset:
