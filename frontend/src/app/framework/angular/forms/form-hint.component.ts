@@ -8,11 +8,11 @@
 import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
 
 @Component({
+    standalone: true,
     selector: 'sqx-form-hint',
     styleUrls: ['./form-hint.component.scss'],
     templateUrl: './form-hint.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
 })
 export class FormHintComponent {
     @Input()

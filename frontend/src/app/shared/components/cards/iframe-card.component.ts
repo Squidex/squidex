@@ -10,11 +10,11 @@ import { ApiUrlConfig, Types } from '@app/framework';
 import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-iframe-card',
     styleUrls: ['./iframe-card.component.scss'],
     templateUrl: './iframe-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
 })
 export class IFrameCardComponent implements AfterViewInit {
     private readonly context: any;

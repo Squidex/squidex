@@ -13,27 +13,27 @@ import { WorkflowAddFormComponent } from './workflow-add-form.component';
 import { WorkflowComponent } from './workflow.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-workflows-page',
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html',
-    standalone: true,
     imports: [
-        TitleComponent,
+        AsyncPipe,
         LayoutComponent,
-        TooltipDirective,
-        ShortcutDirective,
         ListViewComponent,
-        NgIf,
         NgFor,
-        WorkflowComponent,
-        WorkflowAddFormComponent,
-        SidebarMenuDirective,
+        NgIf,
         RouterLink,
         RouterLinkActive,
-        TourStepDirective,
         RouterOutlet,
-        AsyncPipe,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
         TranslatePipe,
+        WorkflowAddFormComponent,
+        WorkflowComponent,
     ],
 })
 export class WorkflowsPageComponent implements OnInit {

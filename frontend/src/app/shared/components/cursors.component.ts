@@ -14,14 +14,14 @@ import { CollaborationService, Profile } from '@app/shared/internal';
 type CursorState = { user: Profile; cursor: { x: number; y: number } };
 
 @Component({
+    standalone: true,
     selector: 'sqx-cursors',
     styleUrls: ['./cursors.component.scss'],
     templateUrl: './cursors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgFor,
         AsyncPipe,
+        NgFor,
         StringColorPipe,
     ],
 })

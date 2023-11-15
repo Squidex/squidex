@@ -12,21 +12,21 @@ import { IndeterminateValueDirective, StarsComponent, ToggleComponent, Transform
 import { FieldDto, MathHelper } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-value-editor',
     styleUrls: ['./content-value-editor.component.scss'],
     templateUrl: './content-value-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         FormsModule,
-        ReactiveFormsModule,
+        IndeterminateValueDirective,
+        NgFor,
         NgSwitch,
         NgSwitchCase,
+        ReactiveFormsModule,
         StarsComponent,
-        NgFor,
-        TransformInputDirective,
         ToggleComponent,
-        IndeterminateValueDirective,
+        TransformInputDirective,
     ],
 })
 export class ContentValueEditorComponent {

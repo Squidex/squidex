@@ -8,11 +8,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
+    standalone: true,
     selector: 'sqx-random-cat-card',
     styleUrls: ['./random-cat-card.component.scss'],
     templateUrl: './random-cat-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
 })
 export class RandomCatCardComponent {
     public get random() {

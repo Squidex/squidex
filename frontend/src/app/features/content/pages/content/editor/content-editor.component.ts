@@ -9,7 +9,7 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, FieldForm, FieldSection, FormErrorComponent, ListViewComponent, MarkdownInlinePipe, RootFieldDto, SafeHtmlPipe, SchemaDto, TranslatePipe, Version } from '@app/shared';
-import { ContentSectionComponent } from './content-section.component';
+import { ContentSectionComponent } from '../../../shared/forms/content-section.component';
 
 @Component({
     standalone: true,

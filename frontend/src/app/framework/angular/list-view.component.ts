@@ -18,17 +18,17 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-list-view',
     styleUrls: ['./list-view.component.scss'],
     templateUrl: './list-view.component.html',
     changeDetection: ChangeDetectionStrategy.Default,
-    standalone: true,
     imports: [
-        NgTemplateOutlet,
-        NgIf,
         CompensateScrollbarDirective,
-        SyncScollingDirective,
         LoaderComponent,
+        NgIf,
+        NgTemplateOutlet,
+        SyncScollingDirective,
     ],
 })
 export class ListViewComponent extends StatefulComponent<State> implements AfterViewInit {

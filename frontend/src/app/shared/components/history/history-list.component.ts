@@ -13,17 +13,17 @@ import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { HistoryMessagePipe } from './pipes';
 
 @Component({
+    standalone: true,
     selector: 'sqx-history-list',
     styleUrls: ['./history-list.component.scss'],
     templateUrl: './history-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        NgFor,
-        TooltipDirective,
         FromNowPipe,
         HistoryMessagePipe,
+        NgFor,
+        NgIf,
+        TooltipDirective,
         UserNameRefPipe,
         UserPictureRefPipe,
     ],

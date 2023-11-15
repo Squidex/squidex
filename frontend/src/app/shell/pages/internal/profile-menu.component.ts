@@ -28,21 +28,21 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-profile-menu',
     styleUrls: ['./profile-menu.component.scss'],
     templateUrl: './profile-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        ModalDirective,
+        AsyncPipe,
         DropdownMenuComponent,
-        ModalPlacementDirective,
         ExternalLinkDirective,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
         NgIf,
         RouterLink,
         StopClickDirective,
-        NgFor,
-        AsyncPipe,
         TranslatePipe,
         UserIdPicturePipe,
     ],

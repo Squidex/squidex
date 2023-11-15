@@ -25,19 +25,19 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-chat-dialog',
     styleUrls: ['./chat-dialog.component.scss'],
     templateUrl: './chat-dialog.component.html',
-    standalone: true,
     imports: [
-        ModalDialogComponent,
-        TooltipDirective,
-        ResizedDirective,
-        NgIf,
-        NgFor,
-        ScrollActiveDirective,
-        FormsModule,
         FocusOnInitDirective,
+        FormsModule,
+        ModalDialogComponent,
+        NgFor,
+        NgIf,
+        ResizedDirective,
+        ScrollActiveDirective,
+        TooltipDirective,
         TranslatePipe,
         UserIdPicturePipe,
     ],

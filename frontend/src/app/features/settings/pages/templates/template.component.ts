@@ -11,17 +11,17 @@ import { map, Observable, shareReplay } from 'rxjs';
 import { AppsState, ClientsState, FormHintComponent, LoaderComponent, MarkdownPipe, SafeHtmlPipe, TemplateDetailsDto, TemplateDto, TemplatesService, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-template',
     styleUrls: ['./template.component.scss'],
     templateUrl: './template.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        FormHintComponent,
-        NgIf,
-        LoaderComponent,
         AsyncPipe,
+        FormHintComponent,
+        LoaderComponent,
         MarkdownPipe,
+        NgIf,
         SafeHtmlPipe,
         TranslatePipe,
     ],

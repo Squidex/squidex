@@ -11,14 +11,14 @@ import { StopClickDirective, TranslatePipe } from '@app/framework';
 import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-query-list',
     styleUrls: ['./query-list.component.scss'],
     templateUrl: './query-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
         NgFor,
+        NgIf,
         StopClickDirective,
         TranslatePipe,
     ],

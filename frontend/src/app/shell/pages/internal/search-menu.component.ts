@@ -33,6 +33,7 @@ export class SearchSource implements AutocompleteSource {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-search-menu',
     styleUrls: ['./search-menu.component.scss'],
     templateUrl: './search-menu.component.html',
@@ -40,15 +41,14 @@ export class SearchSource implements AutocompleteSource {
         SearchSource,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
+        AsyncPipe,
         AutocompleteComponent_1,
+        FormsModule,
+        NgIf,
+        ShortcutComponent,
         ShortcutDirective,
         TooltipDirective,
-        FormsModule,
-        ShortcutComponent,
-        AsyncPipe,
         TranslatePipe,
     ],
 })

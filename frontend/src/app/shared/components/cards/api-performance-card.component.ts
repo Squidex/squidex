@@ -12,11 +12,11 @@ import { TranslatePipe } from '@app/framework';
 import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-api-performance-card',
     styleUrls: ['./api-performance-card.component.scss'],
     templateUrl: './api-performance-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         FormsModule,
         NgChartsModule,

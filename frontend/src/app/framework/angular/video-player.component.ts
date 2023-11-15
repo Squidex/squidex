@@ -11,11 +11,11 @@ import { ResourceLoaderService } from '@app/framework/internal';
 declare const videojs: any;
 
 @Component({
+    standalone: true,
     selector: 'sqx-video-player',
     styleUrls: ['./video-player.component.scss'],
     templateUrl: './video-player.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
 })
 export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
     private player: any;

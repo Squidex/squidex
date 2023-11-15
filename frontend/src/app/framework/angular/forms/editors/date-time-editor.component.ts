@@ -29,6 +29,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
     templateUrl: './date-time-editor.component.html',
@@ -36,12 +37,11 @@ interface State {
         SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        ResizedDirective,
-        NgIf,
         FormsModule,
+        NgIf,
         ReactiveFormsModule,
+        ResizedDirective,
         TooltipDirective,
         TranslatePipe,
     ],

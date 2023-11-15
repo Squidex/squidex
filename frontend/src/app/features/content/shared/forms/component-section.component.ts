@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSection, FormHintComponent, MarkdownDirective } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
 
@@ -18,11 +18,11 @@ import { FieldEditorComponent } from './field-editor.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
-        FieldEditorComponent,
         FormHintComponent,
         MarkdownDirective,
         NgFor,
         NgIf,
+        forwardRef(() => FieldEditorComponent),
     ],
 })
 export class ComponentSectionComponent {

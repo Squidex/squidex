@@ -6,7 +6,7 @@
  */
 
 import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
-import { booleanAttribute, Component, ElementRef, EventEmitter, forwardRef, Input, numberAttribute, Output, ViewChild } from '@angular/core';
+import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AbstractContentForm, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldDto, FormHintComponent, GeolocationEditorComponent, hasNoValue$, IndeterminateValueDirective, MarkdownDirective, MathHelper, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
@@ -26,12 +26,14 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',
     imports: [
+        ArrayEditorComponent,
         AssetsEditorComponent,
         AsyncPipe,
         ChatDialogComponent,
         CheckboxGroupComponent,
         CodeEditorComponent,
         ColorPickerComponent,
+        ComponentComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
         DateTimeEditorComponent,
@@ -60,8 +62,6 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         ToggleComponent,
         TooltipDirective,
         TransformInputDirective,
-        forwardRef(() => ArrayEditorComponent),
-        forwardRef(() => ComponentComponent),
     ],
 })
 export class FieldEditorComponent {

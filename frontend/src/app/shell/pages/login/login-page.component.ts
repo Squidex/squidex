@@ -10,9 +10,9 @@ import { Router } from '@angular/router';
 import { AuthService } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-login',
     template: '',
-    standalone: true,
 })
 export class LoginPageComponent implements OnInit {
     constructor(

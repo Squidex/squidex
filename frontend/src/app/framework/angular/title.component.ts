@@ -10,10 +10,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TitleService, Types } from '@app/framework/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-title',
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
 })
 export class TitleComponent implements OnDestroy {
     private previousIndex: undefined | number;

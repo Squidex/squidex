@@ -18,18 +18,18 @@ export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-folder-dropdown',
     styleUrls: ['./asset-folder-dropdown.component.scss'],
     templateUrl: './asset-folder-dropdown.component.html',
     providers: [
         SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR,
     ],
-    standalone: true,
     imports: [
-        NgIf,
+        AssetFolderDropdownItemComponent,
         ModalDirective,
         ModalPlacementDirective,
-        AssetFolderDropdownItemComponent,
+        NgIf,
         TranslatePipe,
     ],
 })

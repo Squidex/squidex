@@ -13,22 +13,22 @@ import { WorkflowDiagramComponent } from './workflow-diagram.component';
 import { WorkflowStepComponent } from './workflow-step.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-workflow',
     styleUrls: ['./workflow.component.scss'],
     templateUrl: './workflow.component.html',
-    standalone: true,
     imports: [
-        TagEditorComponent,
-        FormsModule,
+        AsyncPipe,
         ConfirmClickDirective,
-        NgIf,
         FormErrorComponent,
         FormHintComponent,
+        FormsModule,
         NgFor,
-        WorkflowStepComponent,
-        WorkflowDiagramComponent,
-        AsyncPipe,
+        NgIf,
+        TagEditorComponent,
         TranslatePipe,
+        WorkflowDiagramComponent,
+        WorkflowStepComponent,
     ],
 })
 export class WorkflowComponent {

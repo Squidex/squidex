@@ -19,22 +19,22 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-assets-list',
     styleUrls: ['./assets-list.component.scss'],
     templateUrl: './assets-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
+        AssetComponent,
+        AssetFolderComponent,
+        AsyncPipe,
+        CdkDrag,
+        CdkDropList,
+        CdkDropListGroup,
+        FileDropDirective,
+        NgFor,
         NgIf,
         TourStepDirective,
-        FileDropDirective,
-        CdkDropListGroup,
-        CdkDropList,
-        AssetFolderComponent,
-        NgFor,
-        CdkDrag,
-        AssetComponent,
-        AsyncPipe,
         TranslatePipe,
     ],
 })

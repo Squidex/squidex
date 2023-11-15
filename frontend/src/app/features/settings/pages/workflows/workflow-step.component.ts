@@ -12,20 +12,20 @@ import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEdi
 import { WorkflowTransitionComponent } from './workflow-transition.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-workflow-step',
     styleUrls: ['./workflow-step.component.scss'],
     templateUrl: './workflow-step.component.html',
-    standalone: true,
     imports: [
-        NgIf,
         ColorPickerComponent,
-        FormsModule,
-        EditableTitleComponent,
-        NgFor,
-        WorkflowTransitionComponent,
         DropdownComponent,
+        EditableTitleComponent,
+        FormsModule,
+        NgFor,
+        NgIf,
         TagEditorComponent,
         TranslatePipe,
+        WorkflowTransitionComponent,
     ],
 })
 export class WorkflowStepComponent {

@@ -12,6 +12,7 @@ import { map, switchMap, tap } from 'rxjs/operators';
 import { AuthService, CollaborationService, Comment, CommentComponent, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, SharedArray, Subscriptions, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-notification-dropdown',
     styleUrls: ['./notification-dropdown.component.scss'],
     templateUrl: './notification-dropdown.component.html',
@@ -19,15 +20,14 @@ import { AuthService, CollaborationService, Comment, CommentComponent, DropdownM
     providers: [
         CollaborationService,
     ],
-    standalone: true,
     imports: [
-        NgIf,
-        ModalDirective,
+        AsyncPipe,
+        CommentComponent,
         DropdownMenuComponent,
+        ModalDirective,
         ModalPlacementDirective,
         NgFor,
-        CommentComponent,
-        AsyncPipe,
+        NgIf,
         TranslatePipe,
     ],
 })

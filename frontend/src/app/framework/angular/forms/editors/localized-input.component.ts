@@ -26,6 +26,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-localized-input',
     styleUrls: ['./localized-input.component.scss'],
     templateUrl: './localized-input.component.html',
@@ -33,15 +34,14 @@ interface State {
         SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
+        DateTimeEditorComponent,
+        FormsModule,
+        IndeterminateValueDirective,
         LanguageSelectorComponent,
         NgSwitch,
         NgSwitchCase,
-        FormsModule,
         TagEditorComponent,
-        DateTimeEditorComponent,
-        IndeterminateValueDirective,
     ],
 })
 export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {

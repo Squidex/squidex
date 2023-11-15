@@ -11,14 +11,14 @@ import { TranslatePipe } from '@app/framework';
 import { CallsUsageDto, FileSizePipe } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-api-traffic-summary-card',
     styleUrls: ['./api-traffic-summary-card.component.scss'],
     templateUrl: './api-traffic-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
         FileSizePipe,
+        NgIf,
         TranslatePipe,
     ],
 })

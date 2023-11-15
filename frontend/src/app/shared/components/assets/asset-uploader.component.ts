@@ -11,22 +11,22 @@ import { DropdownMenuComponent, FileDropDirective, ModalDirective, ProgressBarCo
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-uploader',
     styleUrls: ['./asset-uploader.component.scss'],
     templateUrl: './asset-uploader.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
+        AsyncPipe,
+        DropdownMenuComponent,
         FileDropDirective,
         ModalDirective,
-        DropdownMenuComponent,
         NgFor,
+        NgIf,
         NgSwitch,
         NgSwitchCase,
         NgSwitchDefault,
         ProgressBarComponent,
-        AsyncPipe,
         TranslatePipe,
     ],
 })

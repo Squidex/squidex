@@ -38,6 +38,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-dropdown',
     styleUrls: ['./dropdown.component.scss'],
     templateUrl: './dropdown.component.html',
@@ -45,19 +46,18 @@ interface State {
         SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        TemplateWrapperDirective,
-        ModalDirective,
         DropdownMenuComponent,
-        ModalPlacementDirective,
-        FormsModule,
         FocusOnInitDirective,
-        ReactiveFormsModule,
-        NgFor,
-        ScrollActiveDirective,
+        FormsModule,
         LoaderComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        ScrollActiveDirective,
+        TemplateWrapperDirective,
         TranslatePipe,
     ],
 })

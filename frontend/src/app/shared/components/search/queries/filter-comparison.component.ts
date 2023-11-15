@@ -16,25 +16,25 @@ import { QueryPathComponent } from './query-path.component';
 import { FilterOperatorPipe } from './query.pipes';
 
 @Component({
+    standalone: true,
     selector: 'sqx-filter-comparison',
     styleUrls: ['./filter-comparison.component.scss'],
     templateUrl: './filter-comparison.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        QueryPathComponent,
+        AsyncPipe,
+        DateTimeEditorComponent,
+        DropdownComponent,
+        FilterOperatorPipe,
         FormsModule,
+        HighlightPipe,
         NgFor,
+        NgIf,
         NgSwitch,
         NgSwitchCase,
-        DateTimeEditorComponent,
+        QueryPathComponent,
         ReferenceInputComponent,
-        DropdownComponent,
-        AsyncPipe,
-        HighlightPipe,
         TranslatePipe,
-        FilterOperatorPipe,
         UserDtoPicture,
     ],
 })

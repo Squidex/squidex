@@ -31,6 +31,7 @@ interface State {
 type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
 
 @Component({
+    standalone: true,
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
     templateUrl: './geolocation-editor.component.html',
@@ -38,13 +39,12 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
         SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        ResizedDirective,
-        FormsModule,
-        ReactiveFormsModule,
-        NgIf,
         ControlErrorsComponent,
+        FormsModule,
+        NgIf,
+        ReactiveFormsModule,
+        ResizedDirective,
         TooltipDirective,
         TranslatePipe,
     ],

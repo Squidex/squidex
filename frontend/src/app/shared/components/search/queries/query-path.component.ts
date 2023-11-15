@@ -11,15 +11,15 @@ import { DropdownComponent, FormHintComponent } from '@app/framework';
 import { FilterableField, QueryModel } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-query-path',
     styleUrls: ['./query-path.component.scss'],
     templateUrl: './query-path.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         DropdownComponent,
-        FormsModule,
         FormHintComponent,
+        FormsModule,
     ],
 })
 export class QueryPathComponent {

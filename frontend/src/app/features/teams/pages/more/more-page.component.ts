@@ -12,24 +12,24 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ControlErrorsComponent, defined, FormErrorComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamDto, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
-    standalone: true,
     imports: [
+        AsyncPipe,
+        ControlErrorsComponent,
+        FormErrorComponent,
+        FormsModule,
         LayoutComponent,
         ListViewComponent,
-        FormsModule,
         ReactiveFormsModule,
-        FormErrorComponent,
-        ControlErrorsComponent,
-        SidebarMenuDirective,
         RouterLink,
         RouterLinkActive,
+        RouterOutlet,
+        SidebarMenuDirective,
         TooltipDirective,
         TourStepDirective,
-        RouterOutlet,
-        AsyncPipe,
         TranslatePipe,
     ],
 })

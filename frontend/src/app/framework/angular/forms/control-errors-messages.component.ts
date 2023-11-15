@@ -19,8 +19,8 @@ import { fadeAnimation } from '@app/framework/internal';
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgIf,
         NgFor,
+        NgIf,
     ],
 })
 export class ControlErrorsMessagesComponent {

@@ -12,17 +12,17 @@ import { AppsState, defined, LayoutContainerDirective, TitleComponent } from '@a
 import { LeftMenuComponent } from './left-menu.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-app-area',
     styleUrls: ['./app-area.component.scss'],
     templateUrl: './app-area.component.html',
-    standalone: true,
     imports: [
-        NgIf,
-        TitleComponent,
-        LeftMenuComponent,
-        LayoutContainerDirective,
-        RouterOutlet,
         AsyncPipe,
+        LayoutContainerDirective,
+        LeftMenuComponent,
+        NgIf,
+        RouterOutlet,
+        TitleComponent,
     ],
 })
 export class AppAreaComponent {

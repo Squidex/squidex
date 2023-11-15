@@ -10,16 +10,16 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { TooltipDirective } from './modals/tooltip.directive';
 
 @Component({
+    standalone: true,
     selector: 'sqx-status-icon',
     styleUrls: ['./status-icon.component.scss'],
     templateUrl: './status-icon.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         NgSwitch,
         NgSwitchCase,
-        TooltipDirective,
         NgSwitchDefault,
+        TooltipDirective,
     ],
 })
 export class StatusIconComponent {

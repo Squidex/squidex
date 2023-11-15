@@ -16,6 +16,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-tour-guide',
     styleUrls: ['./tour-guide.component.scss'],
     templateUrl: './tour-guide.component.html',
@@ -23,12 +24,11 @@ interface State {
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        NgFor,
-        ScrollActiveDirective,
         AsyncPipe,
+        NgFor,
+        NgIf,
+        ScrollActiveDirective,
         TranslatePipe,
     ],
 })

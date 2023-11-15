@@ -12,13 +12,13 @@ import { StringColorPipe } from '@app/framework';
 import { CollaborationService, Subscriptions } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-focus-marker',
     styleUrls: ['./focus-marker.component.scss'],
     templateUrl: './focus-marker.component.html',
-    standalone: true,
     imports: [
-        NgIf,
         AsyncPipe,
+        NgIf,
         StringColorPipe,
     ],
 })

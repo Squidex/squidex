@@ -6,10 +6,10 @@
  */
 
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
-import { ContentSectionComponent } from '../../pages/content/editor/content-section.component';
+import { ContentSectionComponent } from '../forms/content-section.component';
 
 @Component({
     standalone: true,
@@ -23,7 +23,6 @@ import { ContentSectionComponent } from '../../pages/content/editor/content-sect
     ],
     imports: [
         AsyncPipe,
-        ContentSectionComponent,
         FormErrorComponent,
         FormsModule,
         LanguageSelectorComponent,
@@ -33,6 +32,7 @@ import { ContentSectionComponent } from '../../pages/content/editor/content-sect
         ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
+        forwardRef(() => ContentSectionComponent),
     ],
 })
 export class ContentCreatorComponent implements OnInit {

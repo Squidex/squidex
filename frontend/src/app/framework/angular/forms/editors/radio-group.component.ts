@@ -21,6 +21,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-radio-group',
     styleUrls: ['./radio-group.component.scss'],
     templateUrl: './radio-group.component.html',
@@ -28,11 +29,10 @@ interface State {
         SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        ResizedDirective,
-        NgFor,
         FormsModule,
+        NgFor,
+        ResizedDirective,
     ],
 })
 export class RadioGroupComponent extends StatefulControlComponent<State, string> implements AfterViewInit, AfterViewChecked {

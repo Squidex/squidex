@@ -16,19 +16,19 @@ import { AuthService, CollaborationService, Comment, ContributorsState, SharedAr
 import { CommentComponent } from './comment.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
-    standalone: true,
     imports: [
-        NgIf,
-        ResizedDirective,
-        NgFor,
+        AsyncPipe,
         CommentComponent,
         FormsModule,
-        ReactiveFormsModule,
         MentionModule,
-        AsyncPipe,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        ResizedDirective,
         TranslatePipe,
     ],
 })

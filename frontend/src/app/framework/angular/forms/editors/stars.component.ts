@@ -27,6 +27,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-stars',
     styleUrls: ['./stars.component.scss'],
     templateUrl: './stars.component.html',
@@ -34,10 +35,9 @@ interface State {
         SQX_STARS_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
         NgFor,
+        NgIf,
         TranslatePipe,
     ],
 })

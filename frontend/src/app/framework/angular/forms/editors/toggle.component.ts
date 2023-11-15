@@ -19,13 +19,13 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-toggle',
     styleUrls: ['./toggle.component.scss'],
     templateUrl: './toggle.component.html',
     providers: [
         SQX_TOGGLE_CONTROL_VALUE_ACCESSOR,
     ],
-    standalone: true,
 })
 export class ToggleComponent extends StatefulControlComponent<State, boolean | null> {
     @Input({ transform: booleanAttribute })

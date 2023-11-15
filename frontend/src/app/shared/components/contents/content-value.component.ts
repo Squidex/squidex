@@ -15,18 +15,18 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-value',
     styleUrls: ['./content-value.component.scss'],
     templateUrl: './content-value.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        TooltipDirective,
-        StopClickDirective,
         LongHoverDirective,
         ModalDirective,
         ModalPlacementDirective,
+        NgIf,
+        StopClickDirective,
+        TooltipDirective,
     ],
 })
 export class ContentValueComponent extends StatefulComponent<State> {

@@ -18,22 +18,22 @@ import { ProfileMenuComponent } from './profile-menu.component';
 import { SearchMenuComponent } from './search-menu.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-internal-area',
     styleUrls: ['./internal-area.component.scss'],
     templateUrl: './internal-area.component.html',
-    standalone: true,
     imports: [
-        NgIf,
-        RouterLink,
-        LogoComponent,
         AppsMenuComponent,
-        SearchMenuComponent,
         AssetUploaderComponent,
+        AsyncPipe,
         FeedbackMenuComponent,
+        LogoComponent,
+        NgIf,
         NotificationsMenuComponent,
         ProfileMenuComponent,
+        RouterLink,
         RouterOutlet,
-        AsyncPipe,
+        SearchMenuComponent,
     ],
 })
 export class InternalAreaComponent implements OnInit {

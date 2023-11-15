@@ -12,18 +12,18 @@ import { CollaborationService, Profile } from '@app/shared/internal';
 import { UserPicturePipe } from './pipes';
 
 @Component({
+    standalone: true,
     selector: 'sqx-watching-users',
     styleUrls: ['./watching-users.component.scss'],
     templateUrl: './watching-users.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        NgFor,
-        TooltipDirective,
         AsyncPipe,
+        NgFor,
+        NgIf,
         SlicePipe,
         StringColorPipe,
+        TooltipDirective,
         UserPicturePipe,
     ],
 })

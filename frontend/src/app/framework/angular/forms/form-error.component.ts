@@ -13,14 +13,14 @@ import { TranslatePipe } from '../pipes/translate.pipe';
 import { SafeHtmlPipe } from '../safe-html.pipe';
 
 @Component({
+    standalone: true,
     selector: 'sqx-form-error',
     styleUrls: ['./form-error.component.scss'],
     templateUrl: './form-error.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
         MarkdownPipe,
+        NgIf,
         SafeHtmlPipe,
         TranslatePipe,
     ],

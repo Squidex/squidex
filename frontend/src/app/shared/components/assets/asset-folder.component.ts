@@ -12,19 +12,19 @@ import { AssetFolderDto, AssetPathItem, DialogModel, ModalModel, Types } from '@
 import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-folder',
     styleUrls: ['./asset-folder.component.scss'],
     templateUrl: './asset-folder.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        TooltipDirective,
-        NgIf,
-        ModalDirective,
-        DropdownMenuComponent,
-        ModalPlacementDirective,
-        ConfirmClickDirective,
         AssetFolderDialogComponent,
+        ConfirmClickDirective,
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgIf,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

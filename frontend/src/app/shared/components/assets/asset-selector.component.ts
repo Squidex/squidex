@@ -25,6 +25,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-selector',
     styleUrls: ['./asset-selector.component.scss'],
     templateUrl: './asset-selector.component.html',
@@ -32,17 +33,16 @@ interface State {
         ComponentAssetsState,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        ModalDialogComponent,
-        TooltipDirective,
-        TagEditorComponent,
-        FormsModule,
-        SearchFormComponent,
-        ListViewComponent,
         AssetsListComponent,
-        PagerComponent,
         AsyncPipe,
+        FormsModule,
+        ListViewComponent,
+        ModalDialogComponent,
+        PagerComponent,
+        SearchFormComponent,
+        TagEditorComponent,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

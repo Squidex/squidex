@@ -12,15 +12,15 @@ import { FileSizePipe, TranslatePipe } from '@app/framework';
 import { CallsUsageDto, ChartHelpers, ChartOptions, TypedSimpleChanges } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-api-traffic-card',
     styleUrls: ['./api-traffic-card.component.scss'],
     templateUrl: './api-traffic-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
+        FileSizePipe,
         FormsModule,
         NgChartsModule,
-        FileSizePipe,
         TranslatePipe,
     ],
 })

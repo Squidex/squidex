@@ -12,15 +12,15 @@ import { FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '
 import { FilterNodeComponent } from './filter-node.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-filter-logical',
     styleUrls: ['./filter-logical.component.scss'],
     templateUrl: './filter-logical.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        NgFor,
         FilterNodeComponent,
+        NgFor,
+        NgIf,
         TranslatePipe,
     ],
 })

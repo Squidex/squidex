@@ -18,20 +18,20 @@ import { AssetUrlPipe } from './pipes';
 interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean }
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-history',
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
-    standalone: true,
     imports: [
-        NgFor,
-        TooltipDirective,
-        NgIf,
-        ExternalLinkDirective,
-        AsyncPipe,
-        FromNowPipe,
-        TranslatePipe,
         AssetUrlPipe,
+        AsyncPipe,
+        ExternalLinkDirective,
+        FromNowPipe,
         HistoryMessagePipe,
+        NgFor,
+        NgIf,
+        TooltipDirective,
+        TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
     ],

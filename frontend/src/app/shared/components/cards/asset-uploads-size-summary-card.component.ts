@@ -11,14 +11,14 @@ import { FileSizePipe, TranslatePipe } from '@app/framework';
 import { CurrentStorageDto } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-uploads-size-summary-card',
     styleUrls: ['./asset-uploads-size-summary-card.component.scss'],
     templateUrl: './asset-uploads-size-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
         FileSizePipe,
+        NgIf,
         TranslatePipe,
     ],
 })

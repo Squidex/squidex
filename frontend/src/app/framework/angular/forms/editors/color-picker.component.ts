@@ -27,6 +27,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-color-picker',
     styleUrls: ['./color-picker.component.scss'],
     templateUrl: './color-picker.component.html',
@@ -34,13 +35,12 @@ interface State {
         SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
+        ColorPickerModule,
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
-        ColorPickerModule,
+        NgIf,
     ],
 })
 export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {

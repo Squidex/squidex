@@ -9,11 +9,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MathHelper } from '../internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-code',
     styleUrls: ['./code.component.scss'],
     templateUrl: './code.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
 })
 export class CodeComponent {
     public readonly id = MathHelper.guid();

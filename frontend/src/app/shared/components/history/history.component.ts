@@ -15,15 +15,15 @@ import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistorySe
 import { HistoryListComponent } from './history-list.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-history',
     styleUrls: ['./history.component.scss'],
     templateUrl: './history.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        LayoutComponent,
-        HistoryListComponent,
         AsyncPipe,
+        HistoryListComponent,
+        LayoutComponent,
     ],
 })
 export class HistoryComponent {

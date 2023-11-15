@@ -31,6 +31,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
     templateUrl: './dialog-renderer.component.html',
@@ -38,18 +39,17 @@ interface State {
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        ModalDirective,
-        NgIf,
-        ModalDialogComponent,
-        TooltipDirective,
-        FormsModule,
         FocusOnInitDirective,
-        NgFor,
-        ModalPlacementDirective,
+        FormsModule,
         MarkdownPipe,
+        ModalDialogComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
         SafeHtmlPipe,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

@@ -19,22 +19,22 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-comment',
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        TooltipDirective,
-        NgIf,
-        RouterLink,
         ConfirmClickDirective,
-        FormsModule,
         FocusOnInitDirective,
-        MentionModule,
+        FormsModule,
         FromNowPipe,
         MarkdownPipe,
+        MentionModule,
+        NgIf,
+        RouterLink,
         SafeHtmlPipe,
+        TooltipDirective,
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,

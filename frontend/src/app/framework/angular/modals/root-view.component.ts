@@ -8,11 +8,11 @@
 import { ChangeDetectionStrategy, Component, ViewChild, ViewContainerRef } from '@angular/core';
 
 @Component({
+    standalone: true,
     selector: 'sqx-root-view',
     styleUrls: ['./root-view.component.scss'],
     templateUrl: './root-view.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
 })
 export class RootViewComponent {
     @ViewChild('element', { read: ViewContainerRef, static: false })

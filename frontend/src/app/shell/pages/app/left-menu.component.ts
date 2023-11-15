@@ -11,16 +11,16 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AppDto, Settings, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        TourStepDirective,
+        NgIf,
         RouterLink,
         RouterLinkActive,
-        NgIf,
+        TourStepDirective,
         TranslatePipe,
     ],
 })

@@ -38,6 +38,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
@@ -45,19 +46,18 @@ interface State {
         SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgFor,
-        FormsModule,
-        ReactiveFormsModule,
-        NgIf,
-        StopClickDirective,
-        ModalDirective,
         DropdownMenuComponent,
-        ModalPlacementDirective,
-        ScrollActiveDirective,
-        TooltipDirective,
+        FormsModule,
         LoaderComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        ScrollActiveDirective,
+        StopClickDirective,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

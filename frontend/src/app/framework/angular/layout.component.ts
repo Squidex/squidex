@@ -15,17 +15,17 @@ import { StopClickDirective } from './stop-click.directive';
 import { SidebarMenuDirective } from './template.directive';
 
 @Component({
+    standalone: true,
     selector: 'sqx-layout',
     styleUrls: ['./layout.component.scss'],
     templateUrl: './layout.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
+        AsyncPipe,
         NgIf,
         NgTemplateOutlet,
         RouterLink,
         StopClickDirective,
-        AsyncPipe,
         TranslatePipe,
     ],
 })

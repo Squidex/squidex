@@ -12,14 +12,14 @@ import { TranslatePipe } from '@app/framework';
 import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-api-calls-card',
     styleUrls: ['./api-calls-card.component.scss'],
     templateUrl: './api-calls-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
         NgChartsModule,
+        NgIf,
         TranslatePipe,
     ],
 })

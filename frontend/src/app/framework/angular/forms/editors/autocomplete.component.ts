@@ -45,6 +45,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
+    standalone: true,
     selector: 'sqx-autocomplete',
     styleUrls: ['./autocomplete.component.scss'],
     templateUrl: './autocomplete.component.html',
@@ -52,19 +53,18 @@ const NO_EMIT = { emitEvent: false };
         SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        FormsModule,
-        FocusOnInitDirective,
-        ReactiveFormsModule,
-        NgIf,
-        LoaderComponent,
-        StopClickDirective,
-        ModalDirective,
         DropdownMenuComponent,
+        FocusOnInitDirective,
+        FormsModule,
+        LoaderComponent,
+        ModalDirective,
         ModalPlacementDirective,
         NgFor,
+        NgIf,
+        ReactiveFormsModule,
         ScrollActiveDirective,
+        StopClickDirective,
         TemplateWrapperDirective,
     ],
 })

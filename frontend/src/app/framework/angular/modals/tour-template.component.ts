@@ -16,6 +16,7 @@ import { ModalDirective } from './modal.directive';
 import { StepDefinition, TourService } from './tour.service';
 
 @Component({
+    standalone: true,
     selector: 'sqx-tour-template',
     styleUrls: ['./tour-template.component.scss'],
     templateUrl: './tour-template.component.html',
@@ -23,13 +24,12 @@ import { StepDefinition, TourService } from './tour.service';
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
+        MarkdownInlinePipe,
+        MarkdownPipe,
         ModalDirective,
         ModalPlacementDirective,
         NgIf,
-        MarkdownInlinePipe,
-        MarkdownPipe,
         SafeHtmlPipe,
         TranslatePipe,
     ],

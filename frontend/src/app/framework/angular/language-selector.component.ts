@@ -16,18 +16,18 @@ import { TooltipDirective } from './modals/tooltip.directive';
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
 
 @Component({
+    standalone: true,
     selector: 'sqx-language-selector',
     styleUrls: ['./language-selector.component.scss'],
     templateUrl: './language-selector.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        TooltipDirective,
-        ModalDirective,
         DropdownMenuComponent,
+        ModalDirective,
         ModalPlacementDirective,
         NgFor,
+        NgIf,
+        TooltipDirective,
     ],
 })
 export class LanguageSelectorComponent implements  OnInit {

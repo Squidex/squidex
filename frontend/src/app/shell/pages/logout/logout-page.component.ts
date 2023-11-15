@@ -10,9 +10,9 @@ import { Router } from '@angular/router';
 import { AuthService } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-logout',
     template: '',
-    standalone: true,
 })
 export class LogoutPageComponent implements OnInit {
     constructor(

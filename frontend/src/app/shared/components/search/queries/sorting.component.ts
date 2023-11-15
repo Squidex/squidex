@@ -12,15 +12,15 @@ import { QueryModel, QuerySorting, SORT_MODES } from '@app/shared/internal';
 import { QueryPathComponent } from './query-path.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-sorting',
     styleUrls: ['./sorting.component.scss'],
     templateUrl: './sorting.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        QueryPathComponent,
         FormsModule,
         NgFor,
+        QueryPathComponent,
     ],
 })
 export class SortingComponent {

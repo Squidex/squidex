@@ -13,22 +13,22 @@ import { map } from 'rxjs/operators';
 import { AppDto, AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TeamDto, TeamFormComponent, TeamsState, Title, TitleService, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-apps-menu',
     styleUrls: ['./apps-menu.component.scss'],
     templateUrl: './apps-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        ModalDirective,
-        DropdownMenuComponent,
-        ModalPlacementDirective,
-        RouterLink,
-        NgFor,
-        RouterLinkActive,
         AppFormComponent,
-        TeamFormComponent,
         AsyncPipe,
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        RouterLink,
+        RouterLinkActive,
+        TeamFormComponent,
         TranslatePipe,
     ],
 })

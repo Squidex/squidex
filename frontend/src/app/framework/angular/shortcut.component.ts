@@ -9,9 +9,9 @@ import { booleanAttribute, ChangeDetectorRef, Component, EventEmitter, Input, On
 import { ShortcutService } from '@app/framework/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-shortcut',
     template: '',
-    standalone: true,
 })
 export class ShortcutComponent implements OnDestroy, OnInit {
     private subscription?: Function;
