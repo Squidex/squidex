@@ -5,14 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
+import { CodeEditorComponent, KeysPipe, LayoutComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { AppsState, AssetScriptsState, AssetsService, EditAssetScriptsForm, ScriptCompletions } from '@app/shared';
+import { ScriptNamePipe } from '@app/shared/components/pipes';
 
 @Component({
     selector: 'sqx-asset-scripts-page',
     styleUrls: ['./asset-scripts-page.component.scss'],
     templateUrl: './asset-scripts-page.component.html',
+    standalone: true,
+    imports: [
+        TitleComponent,
+        LayoutComponent,
+        TooltipDirective,
+        ShortcutDirective,
+        FormsModule,
+        ReactiveFormsModule,
+        NgFor,
+        NgIf,
+        CodeEditorComponent,
+        SidebarMenuDirective,
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        RouterOutlet,
+        AsyncPipe,
+        KeysPipe,
+        TranslatePipe,
+        ScriptNamePipe,
+    ],
 })
 export class AssetScriptsPageComponent implements OnInit {
     public assetScript = 'query';

@@ -6,12 +6,21 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { TriggerForm } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ControlErrorsComponent, FormHintComponent, TranslatePipe, TriggerForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-usage-trigger',
     styleUrls: ['./usage-trigger.component.scss'],
     templateUrl: './usage-trigger.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ControlErrorsComponent,
+        FormHintComponent,
+        TranslatePipe,
+    ],
 })
 export class UsageTriggerComponent {
     @Input({ required: true })

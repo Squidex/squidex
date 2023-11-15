@@ -7,12 +7,15 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { LanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shared/internal';
+import { TableHeaderComponent } from '../table-header.component';
 
 @Component({
     selector: 'sqx-content-list-header',
     styleUrls: ['./content-list-header.component.scss'],
     templateUrl: './content-list-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [TableHeaderComponent],
 })
 export class ContentListHeaderComponent {
     public readonly metaFields = META_FIELDS;

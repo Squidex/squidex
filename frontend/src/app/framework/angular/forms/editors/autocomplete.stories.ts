@@ -8,7 +8,7 @@
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { map, Observable, timer } from 'rxjs';
-import { AutocompleteComponent, LocalizerService, SqxFrameworkModule } from '@app/framework';
+import { AutocompleteComponent, LocalizerService, SqxFrameworkModule } from '@app/framework/internal';
 import { AutocompleteSource } from './autocomplete.component';
 
 const TRANSLATIONS = {

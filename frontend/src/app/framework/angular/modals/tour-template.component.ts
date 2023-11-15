@@ -5,10 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { AfterContentInit, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { fadeAnimation, StatefulComponent } from '@app/framework/internal';
-import { StepDefinition } from './tour.service';
+import { MarkdownInlinePipe, MarkdownPipe } from '../pipes/markdown.pipe';
+import { TranslatePipe } from '../pipes/translate.pipe';
+import { SafeHtmlPipe } from '../safe-html.pipe';
+import { ModalPlacementDirective } from './modal-placement.directive';
+import { ModalDirective } from './modal.directive';
 import { TourService } from './tour.service';
+import { StepDefinition } from './tour.service';
 
 @Component({
     selector: 'sqx-tour-template',
@@ -18,6 +24,16 @@ import { TourService } from './tour.service';
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        ModalDirective,
+        ModalPlacementDirective,
+        NgIf,
+        MarkdownInlinePipe,
+        MarkdownPipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class TourTemplateComponent extends StatefulComponent implements AfterContentInit {
     private delayedDestory: any;

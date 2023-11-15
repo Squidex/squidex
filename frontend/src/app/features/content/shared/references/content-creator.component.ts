@@ -5,8 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResolveAssets, ResolveContents, SchemaDto, SchemasState } from '@app/shared';
+import { TranslatePipe } from '@app/shared';
+import { FormErrorComponent } from '@app/shared';
+import { LanguageSelectorComponent } from '@app/shared';
+import { TooltipDirective } from '@app/shared';
+import { ModalDialogComponent } from '@app/shared';
+import { ContentSectionComponent } from '../../pages/content/editor/content-section.component';
 
 @Component({
     selector: 'sqx-content-creator',
@@ -16,6 +24,20 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, Re
         ResolveAssets,
         ResolveContents,
         ComponentContentsState,
+    ],
+    standalone: true,
+    imports: [
+        ModalDialogComponent,
+        TooltipDirective,
+        NgIf,
+        FormsModule,
+        NgFor,
+        LanguageSelectorComponent,
+        FormErrorComponent,
+        ReactiveFormsModule,
+        ContentSectionComponent,
+        AsyncPipe,
+        TranslatePipe,
     ],
 })
 export class ContentCreatorComponent implements OnInit {

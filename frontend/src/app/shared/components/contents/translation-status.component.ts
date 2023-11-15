@@ -13,6 +13,7 @@ import { contentTranslationStatus, LanguageDto, SchemaDto } from '@app/shared/in
     styleUrls: ['./translation-status.component.scss'],
     templateUrl: './translation-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class TranslationStatusComponent {
     @Input({ required: true })

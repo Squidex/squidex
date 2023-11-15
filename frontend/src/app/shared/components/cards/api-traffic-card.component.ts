@@ -6,6 +6,10 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { NgChartsModule } from 'ng2-charts';
+import { TranslatePipe } from '@app/framework';
+import { FileSizePipe } from '@app/framework';
 import { CallsUsageDto, ChartHelpers, ChartOptions, TypedSimpleChanges } from '@app/shared/internal';
 
 @Component({
@@ -13,6 +17,13 @@ import { CallsUsageDto, ChartHelpers, ChartOptions, TypedSimpleChanges } from '@
     styleUrls: ['./api-traffic-card.component.scss'],
     templateUrl: './api-traffic-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        FormsModule,
+        NgChartsModule,
+        FileSizePipe,
+        TranslatePipe,
+    ],
 })
 export class ApiTrafficCardComponent {
     @Input({ required: true })

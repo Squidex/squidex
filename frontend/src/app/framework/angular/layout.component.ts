@@ -5,10 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf, NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, Input, numberAttribute, OnDestroy, OnInit, Optional, Renderer2, ViewChild } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router, RouterLink } from '@angular/router';
 import { concat, defer, filter, map, of } from 'rxjs';
 import { LayoutContainerDirective } from './layout-container.directive';
+import { TranslatePipe } from './pipes/translate.pipe';
+import { StopClickDirective } from './stop-click.directive';
 import { SidebarMenuDirective } from './template.directive';
 
 @Component({
@@ -16,6 +19,15 @@ import { SidebarMenuDirective } from './template.directive';
     styleUrls: ['./layout.component.scss'],
     templateUrl: './layout.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        NgTemplateOutlet,
+        RouterLink,
+        StopClickDirective,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     private widthPrevious?: string;

@@ -6,13 +6,23 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, MarkdownInlinePipe, SafeHtmlPipe, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-ui',
     styleUrls: ['assets-ui.component.scss'],
     templateUrl: 'assets-ui.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        FormHintComponent,
+        AssetFolderDropdownComponent,
+        MarkdownInlinePipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class AssetsUIComponent {
     @Input({ required: true })

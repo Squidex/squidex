@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Types } from './../utils/types';
+import { Types } from '../utils/types';
 import { LocalizerService } from './localizer.service';
 
 export class TitlesConfig {

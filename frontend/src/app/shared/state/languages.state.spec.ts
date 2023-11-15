@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { AppLanguagesPayload, AppLanguagesService, DialogService, LanguageDto, LanguagesService, LanguagesState, versioned } from '@app/shared/internal';
-import { createLanguages } from './../services/app-languages.service.spec';
+import { createLanguages } from '../services/app-languages.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('LanguagesState', () => {

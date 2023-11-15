@@ -5,14 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, LanguageDto, TagsFieldPropertiesDto } from '@app/shared';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, TagEditorComponent, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-tags-validation',
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        NgIf,
+        LocalizedInputComponent,
+        FormHintComponent,
+        TranslatePipe,
+    ],
 })
 export class TagsValidationComponent {
     @Input({ required: true })

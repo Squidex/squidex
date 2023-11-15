@@ -6,7 +6,8 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, Input } from '@angular/core';
-import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { CheckboxGroupComponent } from '@app/shared';
 import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
@@ -29,6 +30,12 @@ const NO_EMIT = { emitEvent: false };
         SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        CheckboxGroupComponent,
+        FormsModule,
+        ReactiveFormsModule,
+    ],
 })
 export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     private readonly subscriptions = new Subscriptions();

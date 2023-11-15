@@ -9,8 +9,8 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { UsersState } from '@app/features/administration/internal';
-import { allParams } from '@app/framework';
+import { allParams } from '@app/shared';
+import { UsersState } from '../internal';
 
 @Injectable()
 export class UserMustExistGuard  {

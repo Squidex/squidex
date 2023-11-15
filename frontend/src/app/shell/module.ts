@@ -13,15 +13,6 @@ import { AppAreaComponent, AppsMenuComponent, FeedbackMenuComponent, ForbiddenPa
     imports: [
         SqxFrameworkModule,
         SqxSharedModule,
-    ],
-    exports: [
-        AppAreaComponent,
-        HomePageComponent,
-        ForbiddenPageComponent,
-        InternalAreaComponent,
-        NotFoundPageComponent,
-    ],
-    declarations: [
         AppAreaComponent,
         AppsMenuComponent,
         FeedbackMenuComponent,
@@ -38,6 +29,13 @@ import { AppAreaComponent, AppsMenuComponent, FeedbackMenuComponent, ForbiddenPa
         ProfileMenuComponent,
         SearchMenuComponent,
         TeamsAreaComponent,
+    ],
+    exports: [
+        AppAreaComponent,
+        HomePageComponent,
+        ForbiddenPageComponent,
+        InternalAreaComponent,
+        NotFoundPageComponent,
     ],
 })
 export class SqxShellModule { }

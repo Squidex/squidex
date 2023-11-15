@@ -5,11 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import * as Pikaday from 'pikaday/pikaday';
 import { DateHelper, DateTime, StatefulControlComponent, Subscriptions, UIOptions } from '@app/framework/internal';
-import { FocusComponent } from './../forms-helper';
+import { TooltipDirective } from '../../modals/tooltip.directive';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { ResizedDirective } from '../../resized.directive';
+import { FocusComponent } from '../forms-helper';
 
 declare module 'pikaday/pikaday';
 
@@ -32,6 +36,15 @@ interface State {
         SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        ResizedDirective,
+        NgIf,
+        FormsModule,
+        ReactiveFormsModule,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements OnInit, AfterViewInit, FocusComponent {
     private readonly subscriptions = new Subscriptions();

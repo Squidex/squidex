@@ -10,7 +10,7 @@ import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { allParams } from '@app/framework';
-import { ContentsState } from './../state/contents.state';
+import { ContentsState } from '@app/shared/internal';
 
 @Injectable()
 export class ContentMustExistGuard  {

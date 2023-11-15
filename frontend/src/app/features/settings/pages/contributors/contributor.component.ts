@@ -7,14 +7,25 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
+import { NgFor } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ContributorDto, ContributorsState, RoleDto } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, UserPicturePipe } from '@app/shared';
 
 @Component({
     selector: '[sqxContributor][roles]',
     styleUrls: ['./contributor.component.scss'],
     templateUrl: './contributor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        TooltipDirective,
+        FormsModule,
+        NgFor,
+        ConfirmClickDirective,
+        HighlightPipe,
+        UserPicturePipe,
+    ],
 })
 export class ContributorComponent {
     @Input()

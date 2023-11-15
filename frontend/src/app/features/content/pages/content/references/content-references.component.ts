@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State, ToolbarService, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, ListViewComponent, PagerComponent, QuerySynchronizer, ReferenceItemComponent, Router2State, ToolbarService, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-references',
@@ -15,6 +16,17 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, 
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         Router2State, ComponentContentsState,
+    ],
+    standalone: true,
+    imports: [
+        ListViewComponent,
+        NgIf,
+        NgFor,
+        ReferenceItemComponent,
+        PagerComponent,
+        AsyncPipe,
+        TranslatePipe,
+        ContentsColumnsPipe,
     ],
 })
 export class ContentReferencesComponent implements OnInit, OnDestroy {

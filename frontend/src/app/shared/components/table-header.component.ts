@@ -5,7 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslatePipe } from '@app/framework';
 import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
@@ -13,6 +15,8 @@ import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
     styleUrls: ['./table-header.component.scss'],
     templateUrl: './table-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgIf, TranslatePipe],
 })
 export class TableHeaderComponent {
     @Output()

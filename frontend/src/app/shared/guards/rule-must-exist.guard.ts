@@ -10,7 +10,7 @@ import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { allParams } from '@app/framework';
-import { RulesState } from './../state/rules.state';
+import { RulesState } from '../state/rules.state';
 
 @Injectable()
 export class RuleMustExistGuard  {

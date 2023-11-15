@@ -7,14 +7,26 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { RuleEventDto } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { CodeEditorComponent, ConfirmClickDirective, FromNowPipe, RuleClassPipe, RuleEventDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: '[sqxRuleEvent]',
     styleUrls: ['./rule-event.component.scss'],
     templateUrl: './rule-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        ConfirmClickDirective,
+        CodeEditorComponent,
+        FormsModule,
+        FromNowPipe,
+        TranslatePipe,
+        RuleClassPipe,
+    ],
 })
 export class RuleEventComponent {
     @Input('sqxRuleEvent')

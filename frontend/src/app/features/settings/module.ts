@@ -230,8 +230,6 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
         SqxSharedModule,
-    ],
-    declarations: [
         AssetScriptsPageComponent,
         BackupComponent,
         BackupsPageComponent,

@@ -5,14 +5,29 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
+import { NgFor, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { AppLanguageDto, EditLanguageForm, LanguageDto, LanguagesState, sorted } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintComponent, LanguageDto, LanguagesState, sorted, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-language',
     styleUrls: ['./language.component.scss'],
     templateUrl: './language.component.html',
+    standalone: true,
+    imports: [
+        NgIf,
+        ConfirmClickDirective,
+        FormsModule,
+        ReactiveFormsModule,
+        CdkDropList,
+        NgFor,
+        CdkDrag,
+        CdkDragHandle,
+        FormHintComponent,
+        TranslatePipe,
+    ],
 })
 export class LanguageComponent {
     @Input({ required: true })

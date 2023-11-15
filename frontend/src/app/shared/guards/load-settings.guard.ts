@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UIState } from './../state/ui.state';
+import { UIState } from '../state/ui.state';
 
 @Injectable()
 export class LoadSettingsGuard  {

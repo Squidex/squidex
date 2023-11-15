@@ -11,6 +11,7 @@ import { escapeHTML, Types } from '@app/framework/internal';
 @Pipe({
     name: 'sqxHighlight',
     pure: false,
+    standalone: true,
 })
 export class HighlightPipe implements PipeTransform {
     public transform(text: string, highlight: string | RegExp | undefined | null): string {

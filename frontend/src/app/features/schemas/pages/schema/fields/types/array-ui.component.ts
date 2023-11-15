@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { ArrayFieldPropertiesDto, FieldDto } from '@app/shared';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { ArrayFieldPropertiesDto, FieldDto, TranslatePipe } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
@@ -15,6 +16,13 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
     selector: 'sqx-array-ui',
     styleUrls: ['array-ui.component.scss'],
     templateUrl: 'array-ui.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgFor,
+        TranslatePipe,
+    ],
 })
 export class ArrayUIComponent {
     @Input({ required: true })

@@ -5,7 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
 
 @Component({
@@ -13,6 +16,21 @@ import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
     styleUrls: ['./team-form.component.scss'],
     templateUrl: './team-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ModalDialogComponent,
+        TooltipDirective,
+        FormErrorComponent,
+        ControlErrorsComponent,
+        TransformInputDirective,
+        FocusOnInitDirective,
+        FormHintComponent,
+        FormAlertComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class TeamFormComponent {
     @Output()

@@ -5,7 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ConfirmClickDirective, ControlErrorsComponent, FormAlertComponent, FormHintComponent, TranslatePipe } from '@app/shared';
 import { AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, SchemaDto, Settings, TypedSimpleChanges } from '@app/shared';
 
 const DESCRIPTIONS = {
@@ -36,6 +39,20 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
     styleUrls: ['./role.component.scss'],
     templateUrl: './role.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        ConfirmClickDirective,
+        NgIf,
+        FormsModule,
+        FormHintComponent,
+        NgFor,
+        ControlErrorsComponent,
+        AutocompleteComponent_1,
+        ReactiveFormsModule,
+        FormAlertComponent,
+        SlicePipe,
+        TranslatePipe,
+    ],
 })
 export class RoleComponent {
     @Input({ required: true })

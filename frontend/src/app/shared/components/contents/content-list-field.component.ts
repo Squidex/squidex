@@ -5,9 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
+import { FromNowPipe, ShortDatePipe, TooltipDirective, TranslatePipe } from '@app/framework';
 import { ContentDto, FieldValue, getContentValue, LanguageDto, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
+import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
+import { ContentStatusComponent } from './content-status.component';
+import { ContentValueEditorComponent } from './content-value-editor.component';
+import { ContentValueComponent } from './content-value.component';
+import { TranslationStatusComponent } from './translation-status.component';
 
 interface State {
     // The formatted value.
@@ -19,6 +26,23 @@ interface State {
     styleUrls: ['./content-list-field.component.scss'],
     templateUrl: './content-list-field.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgSwitch,
+        NgSwitchCase,
+        TooltipDirective,
+        TranslationStatusComponent,
+        NgIf,
+        ContentStatusComponent,
+        NgSwitchDefault,
+        ContentValueEditorComponent,
+        ContentValueComponent,
+        FromNowPipe,
+        ShortDatePipe,
+        TranslatePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class ContentListFieldComponent extends StatefulComponent<State> {
     public readonly metaFields = META_FIELDS;

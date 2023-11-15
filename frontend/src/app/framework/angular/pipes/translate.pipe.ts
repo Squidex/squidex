@@ -11,6 +11,7 @@ import { LocalizerService, Types } from '@app/framework/internal';
 @Pipe({
     name: 'sqxTranslate',
     pure: true,
+    standalone: true,
 })
 export class TranslatePipe implements PipeTransform {
     constructor(

@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy,  Component, Input } from '@angular/core';
-import { ModalModel, StatefulComponent, Subscriptions, TypedSimpleChanges } from '@app/framework';
+import { NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { LongHoverDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, TooltipDirective, TypedSimpleChanges } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
 
 interface State {
@@ -18,6 +19,15 @@ interface State {
     styleUrls: ['./content-value.component.scss'],
     templateUrl: './content-value.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        TooltipDirective,
+        StopClickDirective,
+        LongHoverDirective,
+        ModalDirective,
+        ModalPlacementDirective,
+    ],
 })
 export class ContentValueComponent extends StatefulComponent<State> {
     private readonly subscriptions = new Subscriptions();

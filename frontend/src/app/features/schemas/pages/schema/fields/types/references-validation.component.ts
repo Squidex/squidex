@@ -5,14 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, LanguageDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/shared';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-validation',
     styleUrls: ['references-validation.component.scss'],
     templateUrl: 'references-validation.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        NgIf,
+        LocalizedInputComponent,
+        FormHintComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class ReferencesValidationComponent {
     @Input({ required: true })

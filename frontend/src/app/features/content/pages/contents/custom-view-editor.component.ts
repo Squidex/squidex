@@ -5,15 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { TableField } from '@app/shared';
+import { TableField, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-custom-view-editor',
     styleUrls: ['./custom-view-editor.component.scss'],
     templateUrl: './custom-view-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        CdkDropList,
+        NgFor,
+        CdkDrag,
+        NgIf,
+        TranslatePipe,
+    ],
 })
 export class CustomViewEditorComponent {
     @Output()

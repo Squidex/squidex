@@ -5,9 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { MentionConfig } from 'angular-mentions';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { MentionConfig, MentionModule } from 'angular-mentions';
+import { ConfirmClickDirective, FocusOnInitDirective, FromNowPipe, MarkdownPipe, SafeHtmlPipe, TooltipDirective, TranslatePipe } from '@app/framework';
 import { Comment, ContributorDto, DialogService, Keys, SharedArray, StatefulComponent } from '@app/shared/internal';
+import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 
 interface State {
     isEditing: boolean;
@@ -18,6 +23,22 @@ interface State {
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        TooltipDirective,
+        NgIf,
+        RouterLink,
+        ConfirmClickDirective,
+        FormsModule,
+        FocusOnInitDirective,
+        MentionModule,
+        FromNowPipe,
+        MarkdownPipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class CommentComponent extends StatefulComponent<State> {
     @Input({ transform: booleanAttribute })

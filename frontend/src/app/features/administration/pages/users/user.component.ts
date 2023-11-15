@@ -7,14 +7,27 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { UserDto, UsersState } from '@app/features/administration/internal';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { ConfirmClickDirective, StopClickDirective, TooltipDirective, UserDtoPicture } from '@app/shared';
+import { UserDto, UsersState } from '../../internal';
 
 @Component({
     selector: '[sqxUser]',
     styleUrls: ['./user.component.scss'],
     templateUrl: './user.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        RouterLinkActive,
+        RouterLink,
+        TooltipDirective,
+        NgIf,
+        StopClickDirective,
+        ConfirmClickDirective,
+        UserDtoPicture,
+    ],
 })
 export class UserComponent {
     @Input('sqxUser')

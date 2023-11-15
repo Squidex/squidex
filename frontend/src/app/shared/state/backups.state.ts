@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
-import { BackupDto, BackupsService } from './../services/backups.service';
+import { BackupDto, BackupsService } from '../services/backups.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {

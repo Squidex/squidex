@@ -5,15 +5,37 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, LowerCasePipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { ActionForm, RulesService, ScriptCompletions, TypedSimpleChanges } from '@app/shared';
+import { ActionForm, CodeEditorComponent, ControlErrorsComponent, ExternalLinkDirective, FormHintComponent, MarkdownDirective, RulesService, ScriptCompletions, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { FormattableInputComponent } from './formattable-input.component';
 
 @Component({
     selector: 'sqx-generic-action',
     styleUrls: ['./generic-action.component.scss'],
     templateUrl: './generic-action.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        NgFor,
+        NgIf,
+        ControlErrorsComponent,
+        NgSwitch,
+        NgSwitchCase,
+        FormattableInputComponent,
+        CodeEditorComponent,
+        NgSwitchDefault,
+        FormHintComponent,
+        MarkdownDirective,
+        ExternalLinkDirective,
+        AsyncPipe,
+        LowerCasePipe,
+        TranslatePipe,
+    ],
 })
 export class GenericActionComponent {
     @Input({ required: true })

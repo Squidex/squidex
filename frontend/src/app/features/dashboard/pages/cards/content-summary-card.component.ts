@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { AppDto, ContentsService, StatefulComponent, Types } from '@app/shared';
+import { AppDto, ContentsService, StatefulComponent, TranslatePipe, Types } from '@app/shared';
 
 interface State {
     // The number of items.
@@ -18,6 +18,8 @@ interface State {
     styleUrls: ['./content-summary-card.component.scss'],
     templateUrl: './content-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [TranslatePipe],
 })
 export class ContentSummaryCardComponent extends StatefulComponent<State> implements OnInit {
     @Input({ required: true })

@@ -5,14 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { SimulatedRuleEventDto, TypedSimpleChanges } from '@app/shared';
+import { SimulatedRuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-transition',
     styleUrls: ['./rule-transition.component.scss'],
     templateUrl: './rule-transition.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        NgFor,
+        TranslatePipe,
+    ],
 })
 export class RuleTransitionComponent {
     @Input()

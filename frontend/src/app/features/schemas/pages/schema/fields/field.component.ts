@@ -5,13 +5,34 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
-import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, FieldDto, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, TypedSimpleChanges } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, LanguageDto, ModalDirective, ModalModel, ModalPlacementDirective, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { FieldWizardComponent } from './field-wizard.component';
+import { FieldFormComponent } from './forms/field-form.component';
+import { SortableFieldListComponent } from './sortable-field-list.component';
 
 @Component({
     selector: 'sqx-field',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
+    standalone: true,
+    imports: [
+        TourStepDirective,
+        NgIf,
+        TooltipDirective,
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        ConfirmClickDirective,
+        FormsModule,
+        ReactiveFormsModule,
+        FieldFormComponent,
+        SortableFieldListComponent,
+        FieldWizardComponent,
+        TranslatePipe,
+    ],
 })
 export class FieldComponent {
     @Input({ required: true })

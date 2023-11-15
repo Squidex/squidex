@@ -8,7 +8,7 @@
 /* eslint-disable no-template-curly-in-string */
 
 import { Version } from '@app/framework';
-import { AppSettingsDto } from './../services/apps.service';
+import { AppSettingsDto } from '../services/apps.service';
 import { computeEditorUrl } from './editor-utils';
 
 describe('EditorUtils', () => {

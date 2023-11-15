@@ -7,7 +7,7 @@
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { LayoutComponent, LocalizerService, SqxFrameworkModule } from '@app/framework';
+import { LayoutComponent, LocalizerService, SqxFrameworkModule } from '@app/framework/internal';
 
 export default {
     title: 'Framework/Layout',

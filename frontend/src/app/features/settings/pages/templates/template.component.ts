@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { map, Observable, shareReplay } from 'rxjs';
+import { FormHintComponent, LoaderComponent, MarkdownPipe, SafeHtmlPipe, TranslatePipe } from '@app/shared';
 import { AppsState, ClientsState, TemplateDetailsDto, TemplateDto, TemplatesService } from '@app/shared';
 
 @Component({
@@ -14,6 +16,16 @@ import { AppsState, ClientsState, TemplateDetailsDto, TemplateDto, TemplatesServ
     styleUrls: ['./template.component.scss'],
     templateUrl: './template.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        FormHintComponent,
+        NgIf,
+        LoaderComponent,
+        AsyncPipe,
+        MarkdownPipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class TemplateComponent {
     @Input({ required: true })

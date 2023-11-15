@@ -5,13 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { LanguagesState, SnapshotLanguage } from '@app/shared';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { LanguagesState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, SnapshotLanguage, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { LanguageAddFormComponent } from './language-add-form.component';
+import { LanguageComponent } from './language.component';
 
 @Component({
     selector: 'sqx-languages-page',
     styleUrls: ['./languages-page.component.scss'],
     templateUrl: './languages-page.component.html',
+    standalone: true,
+    imports: [
+        TitleComponent,
+        LayoutComponent,
+        TooltipDirective,
+        ShortcutDirective,
+        ListViewComponent,
+        NgIf,
+        LanguageAddFormComponent,
+        NgFor,
+        LanguageComponent,
+        SidebarMenuDirective,
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        RouterOutlet,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class LanguagesPageComponent implements OnInit {
     constructor(

@@ -21,8 +21,6 @@ import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterc
         FormsModule,
         ReactiveFormsModule,
         RouterModule,
-    ],
-    declarations: [
         AutocompleteComponent,
         AvatarComponent,
         CheckboxGroupComponent,

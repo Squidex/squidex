@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Types } from './../utils/types';
+import { Types } from '../utils/types';
 
 @Injectable()
 export class LocalStoreService {

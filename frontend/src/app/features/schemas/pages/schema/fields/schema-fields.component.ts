@@ -5,13 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, SchemaDto, SchemasState } from '@app/shared';
+import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, ModalDirective, SchemaDto, SchemasState, TourStepDirective, TranslatePipe } from '@app/shared';
+import { FieldWizardComponent } from './field-wizard.component';
+import { SortableFieldListComponent } from './sortable-field-list.component';
 
 @Component({
     selector: 'sqx-schema-fields',
     styleUrls: ['./schema-fields.component.scss'],
     templateUrl: './schema-fields.component.html',
+    standalone: true,
+    imports: [
+        NgIf,
+        TourStepDirective,
+        SortableFieldListComponent,
+        ModalDirective,
+        FieldWizardComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class SchemaFieldsComponent implements OnInit {
     @Input({ required: true })

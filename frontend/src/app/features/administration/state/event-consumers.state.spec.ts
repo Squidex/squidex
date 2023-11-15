@@ -7,9 +7,9 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { EventConsumersService } from '@app/features/administration/internal';
-import { DialogService } from '@app/framework';
-import { createEventConsumer } from './../services/event-consumers.service.spec';
+import { DialogService } from '@app/shared';
+import { EventConsumersService } from '../internal';
+import { createEventConsumer } from '../services/event-consumers.service.spec';
 import { EventConsumersState } from './event-consumers.state';
 
 describe('EventConsumersState', () => {

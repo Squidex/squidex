@@ -7,14 +7,27 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
+import { NgFor } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { StopClickDirective } from '@app/framework';
 import { ContentDto, LanguageDto, META_FIELDS, SchemaDto } from '@app/shared/internal';
+import { ContentListCellDirective } from '../contents/content-list-cell.directive';
+import { ContentListFieldComponent } from '../contents/content-list-field.component';
 
 @Component({
     selector: '[sqxContentSelectorItem][language][languages][schema]',
     styleUrls: ['./content-selector-item.component.scss'],
     templateUrl: './content-selector-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        StopClickDirective,
+        FormsModule,
+        ContentListCellDirective,
+        ContentListFieldComponent,
+        NgFor,
+    ],
 })
 export class ContentSelectorItemComponent {
     public readonly metaFields = META_FIELDS;

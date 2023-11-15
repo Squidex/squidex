@@ -9,7 +9,7 @@ import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, El
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
 import { ResourceLoaderService, ScriptCompletions, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
-import { FocusComponent } from './../forms-helper';
+import { FocusComponent } from '../forms-helper';
 
 declare const ace: any;
 
@@ -25,6 +25,7 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class CodeEditorComponent extends StatefulControlComponent<{}, any> implements AfterViewInit, FocusComponent {
     private aceEditor: any;

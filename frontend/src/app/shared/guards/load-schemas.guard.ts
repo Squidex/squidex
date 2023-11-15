@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { SchemasState } from './../state/schemas.state';
+import { SchemasState } from '@app/shared/internal';
 
 @Injectable()
 export class LoadSchemasGuard  {

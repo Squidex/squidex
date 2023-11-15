@@ -9,8 +9,8 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { UIOptions } from '@app/framework';
-import { ContentsService } from './../services/contents.service';
-import { createContent } from './../services/contents.service.spec';
+import { ContentsService } from '../services/contents.service';
+import { createContent } from '../services/contents.service.spec';
 import { TestValues } from './_test-helpers';
 import { ResolveContents } from './resolvers';
 

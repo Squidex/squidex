@@ -8,7 +8,7 @@
 import { ChangeDetectorRef, Directive, inject, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { skip, Subscription } from 'rxjs';
-import { State } from './../state';
+import { State } from '../state';
 
 @Directive()
 export abstract class StatefulComponent<T extends {} = object> extends State<T> implements OnDestroy {

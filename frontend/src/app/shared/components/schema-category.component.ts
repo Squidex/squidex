@@ -5,8 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragStart, CdkDropList } from '@angular/cdk/drag-drop';
+import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { EditableTitleComponent, StopDragDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
 import { LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app/shared/internal';
 
 const ITEM_HEIGHT = 2.5;
@@ -16,6 +19,21 @@ const ITEM_HEIGHT = 2.5;
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        CdkDropList,
+        EditableTitleComponent,
+        NgIf,
+        NgFor,
+        TourStepDirective,
+        CdkDrag,
+        RouterLinkActive,
+        StopDragDirective,
+        RouterLink,
+        TooltipDirective,
+        CdkDragHandle,
+        TranslatePipe,
+    ],
 })
 export class SchemaCategoryComponent {
     @Output()

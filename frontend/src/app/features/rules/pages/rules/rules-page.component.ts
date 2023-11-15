@@ -5,13 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ALL_TRIGGERS, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState } from '@app/shared';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ALL_TRIGGERS, LayoutComponent, ListViewComponent, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { RuleComponent } from './rule.component';
 
 @Component({
     selector: 'sqx-rules-page',
     styleUrls: ['./rules-page.component.scss'],
     templateUrl: './rules-page.component.html',
+    standalone: true,
+    imports: [
+        TitleComponent,
+        LayoutComponent,
+        TooltipDirective,
+        ShortcutDirective,
+        NgIf,
+        RouterLink,
+        ListViewComponent,
+        NgFor,
+        RuleComponent,
+        SidebarMenuDirective,
+        RouterLinkActive,
+        TourStepDirective,
+        TourHintDirective,
+        RouterOutlet,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class RulesPageComponent implements OnInit {
     public supportedActions?: { [name: string]: RuleElementDto };

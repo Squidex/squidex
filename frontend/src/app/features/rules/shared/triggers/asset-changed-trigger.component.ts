@@ -6,12 +6,22 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { TriggerForm } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CodeComponent, ControlErrorsComponent, FormHintComponent, TranslatePipe, TriggerForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-changed-trigger',
     styleUrls: ['./asset-changed-trigger.component.scss'],
     templateUrl: './asset-changed-trigger.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ControlErrorsComponent,
+        FormHintComponent,
+        CodeComponent,
+        TranslatePipe,
+    ],
 })
 export class AssetChangedTriggerComponent {
     @Input({ required: true })

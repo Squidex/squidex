@@ -7,11 +7,14 @@
 
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
+import { TitleComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-forbidden-page',
     styleUrls: ['./forbidden-page.component.scss'],
     templateUrl: './forbidden-page.component.html',
+    standalone: true,
+    imports: [TitleComponent, TranslatePipe],
 })
 export class ForbiddenPageComponent {
     constructor(

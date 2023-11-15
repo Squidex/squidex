@@ -5,15 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { LayoutComponent } from '@app/framework';
 import { HelpService } from '@app/shared/internal';
+import { HelpMarkdownPipe } from './help-markdown.pipe';
 
 @Component({
     selector: 'sqx-help',
     styleUrls: ['./help.component.scss'],
     templateUrl: './help.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        LayoutComponent,
+        AsyncPipe,
+        HelpMarkdownPipe,
+    ],
 })
 export class HelpComponent {
     public helpMarkdown = this.helpService.getHelp(this.route.snapshot.data.helpPage);

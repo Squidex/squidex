@@ -5,13 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { EditSchemaForm, SchemaDto, SchemasState } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ControlErrorsComponent, EditSchemaForm, FormAlertComponent, FormHintComponent, SchemaDto, SchemasState, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-edit-form',
     styleUrls: ['./schema-edit-form.component.scss'],
     templateUrl: './schema-edit-form.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ControlErrorsComponent,
+        FormHintComponent,
+        TagEditorComponent,
+        FormAlertComponent,
+        NgIf,
+        TranslatePipe,
+    ],
 })
 export class SchemaEditFormComponent {
     @Input({ required: true })

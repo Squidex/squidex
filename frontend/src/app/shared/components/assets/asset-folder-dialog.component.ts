@@ -5,13 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-folder-dialog',
     styleUrls: ['./asset-folder-dialog.component.scss'],
     templateUrl: './asset-folder-dialog.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ModalDialogComponent,
+        TooltipDirective,
+        NgIf,
+        FormErrorComponent,
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        FormAlertComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class AssetFolderDialogComponent implements OnInit {
     @Output()

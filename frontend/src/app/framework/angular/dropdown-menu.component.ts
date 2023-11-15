@@ -21,6 +21,7 @@ import { fadeAnimation } from './animations';
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class DropdownMenuComponent {
     @HostBinding('@fade')

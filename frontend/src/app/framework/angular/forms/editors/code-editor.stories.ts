@@ -7,7 +7,7 @@
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { CodeEditorComponent, ScriptCompletions, SqxFrameworkModule } from '@app/framework';
+import { CodeEditorComponent, ScriptCompletions, SqxFrameworkModule } from '@app/framework/internal';
 
 export default {
     title: 'Framework/CodeEditor',

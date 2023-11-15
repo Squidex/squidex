@@ -10,7 +10,7 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/ro
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { defined } from '@app/framework';
-import { SchemasState } from './../state/schemas.state';
+import { SchemasState } from '../state/schemas.state';
 
 @Injectable()
 export class SchemaMustNotBeSingletonGuard  {

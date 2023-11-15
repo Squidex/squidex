@@ -5,10 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { AfterContentInit, booleanAttribute, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
-import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Subscriptions, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { DropdownMenuComponent } from '../../dropdown-menu.component';
+import { LoaderComponent } from '../../loader.component';
+import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
+import { ModalDirective } from '../../modals/modal.directive';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { ScrollActiveDirective } from '../../scroll-active.directive';
+import { TemplateWrapperDirective } from '../../template-wrapper.directive';
+import { FocusOnInitDirective } from '../focus-on-init.directive';
 
 export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
@@ -36,6 +45,21 @@ interface State {
         SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        TemplateWrapperDirective,
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        FormsModule,
+        FocusOnInitDirective,
+        ReactiveFormsModule,
+        NgFor,
+        ScrollActiveDirective,
+        LoaderComponent,
+        TranslatePipe,
+    ],
 })
 export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnInit {
     private readonly subscriptions = new Subscriptions();

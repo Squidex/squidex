@@ -12,6 +12,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     styleUrls: ['./random-dog-card.component.scss'],
     templateUrl: './random-dog-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class RandomDogCardComponent {
     public get random() {

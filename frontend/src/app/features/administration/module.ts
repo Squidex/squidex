@@ -73,8 +73,6 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
         SqxSharedModule,
-    ],
-    declarations: [
         AdministrationAreaComponent,
         EventConsumerComponent,
         EventConsumersPageComponent,

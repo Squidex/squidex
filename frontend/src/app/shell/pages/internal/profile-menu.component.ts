@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { ApiUrlConfig, AuthService, Cookies, ModalModel, StatefulComponent, Subscriptions, UILanguages, UIOptions, UIState } from '@app/shared';
+import { RouterLink } from '@angular/router';
+import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, TranslatePipe, UILanguages, UIOptions, UIState, UserIdPicturePipe } from '@app/shared';
 
 interface State {
     // The display name of the user.
@@ -30,6 +32,20 @@ interface State {
     styleUrls: ['./profile-menu.component.scss'],
     templateUrl: './profile-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        ExternalLinkDirective,
+        NgIf,
+        RouterLink,
+        StopClickDirective,
+        NgFor,
+        AsyncPipe,
+        TranslatePipe,
+        UserIdPicturePipe,
+    ],
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

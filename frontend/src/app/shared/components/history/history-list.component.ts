@@ -5,14 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { FromNowPipe, TooltipDirective } from '@app/framework';
 import { HistoryEventDto } from '@app/shared/internal';
+import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
+import { HistoryMessagePipe } from './pipes';
 
 @Component({
     selector: 'sqx-history-list',
     styleUrls: ['./history-list.component.scss'],
     templateUrl: './history-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        NgFor,
+        TooltipDirective,
+        FromNowPipe,
+        HistoryMessagePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class HistoryListComponent {
     @Input({ required: true })

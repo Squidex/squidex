@@ -12,6 +12,7 @@ import { AuthService } from '@app/shared';
 @Component({
     selector: 'sqx-logout',
     template: '',
+    standalone: true,
 })
 export class LogoutPageComponent implements OnInit {
     constructor(

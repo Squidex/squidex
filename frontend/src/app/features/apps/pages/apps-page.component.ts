@@ -5,11 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, TeamDto, TeamsState, TemplateDto, TemplatesState, TourState, UIOptions, UIState } from '@app/shared';
-import { Settings } from '@app/shared/state/settings';
+import { AppDto, AppFormComponent, AppsState, AuthService, DialogModel, FeatureDto, FormHintComponent, LocalStoreService, ModalDirective, NewsService, Settings, TeamDto, TeamsState, TemplateDto, TemplatesState, TitleComponent, TourState, TourStepDirective, TranslatePipe, UIOptions, UIState } from '@app/shared';
+import { AppComponent } from './app.component';
+import { NewsDialogComponent } from './news-dialog.component';
+import { OnboardingDialogComponent } from './onboarding-dialog.component';
+import { TeamComponent } from './team.component';
 
 type GroupedApps = { team?: TeamDto; apps: AppDto[] };
 
@@ -17,6 +21,22 @@ type GroupedApps = { team?: TeamDto; apps: AppDto[] };
     selector: 'sqx-apps-page',
     styleUrls: ['./apps-page.component.scss'],
     templateUrl: './apps-page.component.html',
+    standalone: true,
+    imports: [
+        TitleComponent,
+        NgIf,
+        TourStepDirective,
+        NgFor,
+        TeamComponent,
+        AppComponent,
+        FormHintComponent,
+        ModalDirective,
+        AppFormComponent,
+        OnboardingDialogComponent,
+        NewsDialogComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class AppsPageComponent implements OnInit {
     public addAppDialog = new DialogModel();

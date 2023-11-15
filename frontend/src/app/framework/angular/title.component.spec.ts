@@ -7,7 +7,7 @@
 
 import { Router } from '@angular/router';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { TitleService } from './../internal';
+import { TitleService } from '../internal';
 import { TitleComponent } from './title.component';
 
 describe('TitleComponent', () => {

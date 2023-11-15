@@ -13,6 +13,7 @@ import { TitleService, Types } from '@app/framework/internal';
     selector: 'sqx-title',
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class TitleComponent implements OnDestroy {
     private previousIndex: undefined | number;

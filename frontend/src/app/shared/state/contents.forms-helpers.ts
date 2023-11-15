@@ -11,10 +11,10 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { isValidValue, Language } from './../internal';
-import { AppLanguageDto } from './../services/app-languages.service';
-import { FieldDto, RootFieldDto, SchemaDto } from './../services/schemas.service';
-import { fieldInvariant } from './../services/schemas.types';
+import { isValidValue, Language } from '../internal';
+import { AppLanguageDto } from '../services/app-languages.service';
+import { FieldDto, RootFieldDto, SchemaDto } from '../services/schemas.service';
+import { fieldInvariant } from '../services/schemas.types';
 import { CompiledRules, RuleContext, RulesProvider } from './contents.form-rules';
 
 export type TranslationStatus = { [language: string]: number };

@@ -9,7 +9,7 @@
 /* eslint-disable no-useless-return */
 
 import { Types } from '@app/framework';
-import { FieldRule, SchemaDto } from './../services/schemas.service';
+import { FieldRule, SchemaDto } from '../services/schemas.service';
 
 export type RuleContext = { data: any; user?: any };
 export type RuleForm = { fieldPath: string };

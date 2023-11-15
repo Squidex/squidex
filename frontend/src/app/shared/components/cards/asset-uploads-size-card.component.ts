@@ -6,6 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { NgChartsModule } from 'ng2-charts';
+import { TranslatePipe } from '@app/framework';
 import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/internal';
 
 @Component({
@@ -13,6 +15,8 @@ import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/
     styleUrls: ['./asset-uploads-size-card.component.scss'],
     templateUrl: './asset-uploads-size-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgChartsModule, TranslatePipe],
 })
 export class AssetUploadsSizeCardComponent {
     @Input({ required: true })

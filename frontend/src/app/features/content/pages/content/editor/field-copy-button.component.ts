@@ -5,13 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { AppLanguageDto, FieldForm, ModalModel, TypedSimpleChanges } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldForm, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-copy-button',
     styleUrls: ['./field-copy-button.component.scss'],
     templateUrl: './field-copy-button.component.html',
+    standalone: true,
+    imports: [
+        NgIf,
+        TooltipDirective,
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        FormsModule,
+        NgFor,
+        CheckboxGroupComponent,
+        TranslatePipe,
+    ],
 })
 export class FieldCopyButtonComponent {
     @Input({ required: true })

@@ -8,14 +8,21 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { TeamContributorsState } from '@app/features/teams/internal';
-import { ContributorDto } from '@app/shared';
+import { ConfirmClickDirective, ContributorDto, HighlightPipe, TooltipDirective, UserPicturePipe } from '@app/shared';
+import { TeamContributorsState } from '../../internal;
 
 @Component({
     selector: '[sqxContributor]',
     styleUrls: ['./contributor.component.scss'],
     templateUrl: './contributor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        TooltipDirective,
+        ConfirmClickDirective,
+        HighlightPipe,
+        UserPicturePipe,
+    ],
 })
 export class ContributorComponent {
     @Input()

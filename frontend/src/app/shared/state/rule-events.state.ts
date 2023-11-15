@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, getPagingInfo, ListState, Resource, shareSubscribed, State } from '@app/framework';
-import { RuleEventDto, RulesService } from './../services/rules.service';
+import { RuleEventDto, RulesService } from '../services/rules.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends ListState {

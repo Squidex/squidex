@@ -5,13 +5,33 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { defined, Subscriptions, TeamDto, TeamsState, UpdateTeamForm } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ControlErrorsComponent, defined, FormErrorComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamDto, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
+    standalone: true,
+    imports: [
+        LayoutComponent,
+        ListViewComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        FormErrorComponent,
+        ControlErrorsComponent,
+        SidebarMenuDirective,
+        RouterLink,
+        RouterLinkActive,
+        TooltipDirective,
+        TourStepDirective,
+        RouterOutlet,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class MorePageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

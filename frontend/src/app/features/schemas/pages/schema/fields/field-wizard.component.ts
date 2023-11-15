@@ -5,8 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddFieldForm, AppSettingsDto, createProperties, EditFieldForm, FieldDto, fieldTypes, LanguagesState, RootFieldDto, SchemaDto, SchemasState, Types } from '@app/shared';
+import { FieldFormComponent } from './forms/field-form.component';
+import { ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared'';
 
 const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
 
@@ -14,6 +18,23 @@ const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createP
     selector: 'sqx-field-wizard',
     styleUrls: ['./field-wizard.component.scss'],
     templateUrl: './field-wizard.component.html',
+    standalone: true,
+    imports: [
+        ModalDialogComponent,
+        TooltipDirective,
+        NgIf,
+        FormsModule,
+        ReactiveFormsModule,
+        FieldFormComponent,
+        FormErrorComponent,
+        NgFor,
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        FormHintComponent,
+        FormAlertComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class FieldWizardComponent implements OnInit {
     @ViewChild('nameInput', { static: false })

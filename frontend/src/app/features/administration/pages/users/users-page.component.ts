@@ -5,10 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
-import { UserDto, UsersState } from '@app/features/administration/internal';
-import { Router2State, Subscriptions } from '@app/framework';
+import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { LayoutComponent, ListViewComponent, PagerComponent, Router2State, ShortcutDirective, SidebarMenuDirective, Subscriptions, SyncWidthDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { UserDto, UsersState } from '../../internal';
+import { UserComponent } from './user.component';
 
 @Component({
     selector: 'sqx-users-page',
@@ -16,6 +19,28 @@ import { Router2State, Subscriptions } from '@app/framework';
     templateUrl: './users-page.component.html',
     providers: [
         Router2State,
+    ],
+    standalone: true,
+    imports: [
+        TitleComponent,
+        LayoutComponent,
+        TooltipDirective,
+        ShortcutDirective,
+        FormsModule,
+        ReactiveFormsModule,
+        NgIf,
+        RouterLink,
+        ListViewComponent,
+        SyncWidthDirective,
+        NgFor,
+        UserComponent,
+        PagerComponent,
+        SidebarMenuDirective,
+        RouterLinkActive,
+        TourStepDirective,
+        RouterOutlet,
+        AsyncPipe,
+        TranslatePipe,
     ],
 })
 export class UsersPageComponent implements OnInit {

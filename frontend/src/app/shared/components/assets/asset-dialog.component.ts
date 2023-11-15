@@ -5,20 +5,60 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, MoveAssetForm, switchMapCached, Types, UploadCanceled } from '@app/shared/internal';
-import { AssetsService, MoveAssetItemDto } from '@app/shared/services/assets.service';
-import { AssetPathItem, ROOT_ITEM } from '@app/shared/state/assets.state';
+import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormHintComponent, ModalDialogComponent, ProgressBarComponent, switchMapCached, TagEditorComponent, TooltipDirective, TransformInputDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
+import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetPathItem, AssetsService, AssetsState, AssetUploaderState, AuthService, MoveAssetForm, MoveAssetItemDto, ROOT_ITEM, UploadCanceled } from '@app/shared/internal';
+import { AssetFolderDropdownComponent } from './asset-folder-dropdown.component';
+import { AssetHistoryComponent } from './asset-history.component';
+import { AssetPathComponent } from './asset-path.component';
 import { AssetTextEditorComponent } from './asset-text-editor.component';
 import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
+import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
 
 @Component({
     selector: 'sqx-asset-dialog',
     styleUrls: ['./asset-dialog.component.scss'],
     templateUrl: './asset-dialog.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ModalDialogComponent,
+        TooltipDirective,
+        NgIf,
+        NgSwitch,
+        NgSwitchCase,
+        FormErrorComponent,
+        AssetFolderDropdownComponent,
+        AssetPathComponent,
+        CopyDirective,
+        ControlErrorsComponent,
+        TransformInputDirective,
+        TagEditorComponent,
+        NgFor,
+        ConfirmClickDirective,
+        FormHintComponent,
+        RouterLink,
+        ImageCropperComponent,
+        ProgressBarComponent,
+        ImageFocusPointComponent,
+        AssetTextEditorComponent,
+        NgxDocViewerModule,
+        VideoPlayerComponent,
+        AssetHistoryComponent,
+        AsyncPipe,
+        TranslatePipe,
+        AssetPreviewUrlPipe,
+        AssetUrlPipe,
+        PreviewableType,
+    ],
 })
 export class AssetDialogComponent implements OnInit {
     @Output()

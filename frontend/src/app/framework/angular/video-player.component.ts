@@ -15,6 +15,7 @@ declare const videojs: any;
     styleUrls: ['./video-player.component.scss'],
     templateUrl: './video-player.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
     private player: any;

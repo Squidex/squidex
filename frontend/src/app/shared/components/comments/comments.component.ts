@@ -5,10 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, ElementRef, Input, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MentionConfig } from 'angular-mentions';
+import { MentionConfig, MentionModule } from 'angular-mentions';
 import { Observable } from 'rxjs';
+import { ResizedDirective, TranslatePipe } from '@app/framework';
 import { AuthService, CollaborationService, Comment, ContributorsState, SharedArray, UpsertCommentForm } from '@app/shared/internal';
 import { CommentComponent } from './comment.component';
 
@@ -16,6 +19,18 @@ import { CommentComponent } from './comment.component';
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
+    standalone: true,
+    imports: [
+        NgIf,
+        ResizedDirective,
+        NgFor,
+        CommentComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        MentionModule,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class CommentsComponent {
     @ViewChild('scrollContainer', { static: false })

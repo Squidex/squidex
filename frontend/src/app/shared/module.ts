@@ -23,8 +23,6 @@ import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCard
         NgxDocViewerModule,
         RouterModule,
         SqxFrameworkModule,
-    ],
-    declarations: [
         ApiCallsCardComponent,
         ApiCallsSummaryCardComponent,
         ApiPerformanceCardComponent,

@@ -6,6 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DropdownComponent, FormHintComponent } from '@app/framework';
 import { FilterableField, QueryModel } from '@app/shared/internal';
 
 @Component({
@@ -13,6 +15,12 @@ import { FilterableField, QueryModel } from '@app/shared/internal';
     styleUrls: ['./query-path.component.scss'],
     templateUrl: './query-path.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        DropdownComponent,
+        FormsModule,
+        FormHintComponent,
+    ],
 })
 export class QueryPathComponent {
     @Output()

@@ -5,14 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, Input, Optional, Renderer2 } from '@angular/core';
 import { map } from 'rxjs';
+import { StringColorPipe } from '@app/framework';
 import { CollaborationService, Subscriptions } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-focus-marker',
     styleUrls: ['./focus-marker.component.scss'],
     templateUrl: './focus-marker.component.html',
+    standalone: true,
+    imports: [
+        NgIf,
+        AsyncPipe,
+        StringColorPipe,
+    ],
 })
 export class FocusMarkerComponent {
     private readonly subscriptions = new Subscriptions();

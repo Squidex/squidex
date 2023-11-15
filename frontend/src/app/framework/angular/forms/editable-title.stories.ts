@@ -8,7 +8,7 @@
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { EditableTitleComponent, LocalizerService, SqxFrameworkModule } from '@app/framework';
+import { EditableTitleComponent, LocalizerService, SqxFrameworkModule } from '@app/framework/internal';
 
 export default {
     title: 'Framework/EditableTitle',

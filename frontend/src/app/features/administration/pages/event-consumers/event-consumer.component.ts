@@ -7,14 +7,18 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { EventConsumerDto, EventConsumersState } from '@app/features/administration/internal';
+import { TooltipDirective } from '@app/shared';
+import { EventConsumerDto, EventConsumersState } from '../../internal';
 
 @Component({
     selector: '[sqxEventConsumer]',
     styleUrls: ['./event-consumer.component.scss'],
     templateUrl: './event-consumer.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgIf, TooltipDirective],
 })
 export class EventConsumerComponent {
     @Output()

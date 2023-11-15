@@ -12,6 +12,7 @@ import { AuthService } from '@app/shared';
 @Component({
     selector: 'sqx-login',
     template: '',
+    standalone: true,
 })
 export class LoginPageComponent implements OnInit {
     constructor(

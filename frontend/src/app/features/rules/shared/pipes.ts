@@ -11,6 +11,7 @@ import { SimulatedRuleEventDto } from '@app/shared';
 @Pipe({
     name: 'sqxRuleClass',
     pure: true,
+    standalone: true,
 })
 export class RuleClassPipe implements PipeTransform {
     public transform(value: string) {
@@ -29,6 +30,7 @@ export class RuleClassPipe implements PipeTransform {
 @Pipe({
     name: 'sqxSimulatedRuleEventStatus',
     pure: true,
+    standalone: true,
 })
 export class SimulatedRuleEventStatusPipe implements PipeTransform {
     public transform(value: SimulatedRuleEventDto) {

@@ -12,6 +12,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttr
     styleUrls: ['./form-alert.component.scss'],
     templateUrl: './form-alert.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class FormAlertComponent {
     @Input()

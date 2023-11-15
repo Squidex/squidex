@@ -6,10 +6,9 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
-import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { ContentsDto } from '@app/shared';
-import { ContentDto, getContentValue, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared/internal';
+import { ContentDto, ContentsDto, DropdownComponent, getContentValue, HighlightPipe, LanguageDto, LocalizerService, ResolveContents, SafeHtmlPipe, StatefulControlComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared';
 
 export const SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceDropdownComponent), multi: true,
@@ -38,6 +37,14 @@ const NO_EMIT = { emitEvent: false };
         SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        DropdownComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        HighlightPipe,
+        SafeHtmlPipe,
+    ],
 })
 export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
     private readonly subscriptions = new Subscriptions();

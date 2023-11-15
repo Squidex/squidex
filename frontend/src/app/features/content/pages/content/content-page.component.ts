@@ -5,11 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, ContentDto, ContentsState, defined, DialogService, EditContentForm, LanguagesState, LocalStoreService, ModalModel, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, Subscriptions, TempService, ToolbarService, Types, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, ConfirmClickDirective, ContentDto, ContentExtensionComponent, ContentsState, defined, DialogService, DropdownMenuComponent, EditContentForm, LanguageSelectorComponent, LanguagesState, LayoutComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PreviewButtonComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, TempService, TitleComponent, ToolbarComponent, ToolbarService, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types, Version, WatchingUsersComponent } from '@app/shared';
+import { ContentEditorComponent } from './editor/content-editor.component';
+import { ContentInspectionComponent } from './inspecting/content-inspection.component';
+import { ContentReferencesComponent } from './references/content-references.component';
 
 @Component({
     selector: 'sqx-content-page',
@@ -20,6 +25,39 @@ import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, Auto
         ResolveAssets,
         ResolveContents,
         ToolbarService,
+    ],
+    standalone: true,
+    imports: [
+        TitleComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        LayoutComponent,
+        TooltipDirective,
+        NgIf,
+        RouterLink,
+        WatchingUsersComponent,
+        NotifoComponent,
+        LanguageSelectorComponent,
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        ConfirmClickDirective,
+        ToolbarComponent,
+        PreviewButtonComponent,
+        ShortcutDirective,
+        TourStepDirective,
+        NgSwitch,
+        NgSwitchCase,
+        ContentReferencesComponent,
+        ContentInspectionComponent,
+        ContentExtensionComponent,
+        ContentEditorComponent,
+        SidebarMenuDirective,
+        RouterLinkActive,
+        TourHintDirective,
+        RouterOutlet,
+        AsyncPipe,
+        TranslatePipe,
     ],
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnInit {

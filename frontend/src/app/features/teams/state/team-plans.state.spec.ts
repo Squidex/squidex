@@ -6,10 +6,10 @@
  */
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
+import { TestValues } from 'src/app/shared/state/_test-helpers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { TeamPlansService, TeamPlansState } from '@app/features/teams/internal';
 import { DialogService, PlanDto, PlanLockedReason, versioned } from '@app/shared';
-import { TestValues } from '@app/shared/state/_test-helpers';
+import { TeamPlansService, TeamPlansState } from '../internal';
 
 describe('TeamPlansState', () => {
     const {

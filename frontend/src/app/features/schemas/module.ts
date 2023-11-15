@@ -47,11 +47,6 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
         SqxSharedModule,
-    ],
-    providers: [
-        SchemaMustExistGuard,
-    ],
-    declarations: [
         ArrayUIComponent,
         ArrayValidationComponent,
         AssetsUIComponent,
@@ -96,6 +91,9 @@ const routes: Routes = [
         StringValidationComponent,
         TagsUIComponent,
         TagsValidationComponent,
+    ],
+    providers: [
+        SchemaMustExistGuard,
     ],
 })
 export class SqxFeatureSchemasModule {}

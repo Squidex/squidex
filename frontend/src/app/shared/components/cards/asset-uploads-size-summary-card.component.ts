@@ -5,7 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { FileSizePipe, TranslatePipe } from '@app/framework';
 import { CurrentStorageDto } from '@app/shared/internal';
 
 @Component({
@@ -13,6 +15,12 @@ import { CurrentStorageDto } from '@app/shared/internal';
     styleUrls: ['./asset-uploads-size-summary-card.component.scss'],
     templateUrl: './asset-uploads-size-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        FileSizePipe,
+        TranslatePipe,
+    ],
 })
 export class AssetUploadsSizeSummaryCardComponent {
     @Input({ required: true })

@@ -9,6 +9,7 @@ import { AfterViewInit, Directive, ElementRef, Input, Renderer2 } from '@angular
 
 @Directive({
     selector: '[sqxExternalLink]',
+    standalone: true,
 })
 export class ExternalLinkDirective implements AfterViewInit {
     @Input('sqxExternalLink')

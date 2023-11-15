@@ -7,14 +7,25 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { DialogModel, TagItem, TagsSelected } from '@app/shared';
+import { DialogModel, ModalDirective, StopClickDirective, TagItem, TagsSelected, TranslatePipe } from '@app/shared';
+import { AssetTagDialogComponent } from './asset-tag-dialog.component';
 
 @Component({
     selector: 'sqx-asset-tags',
     styleUrls: ['./asset-tags.component.scss'],
     templateUrl: './asset-tags.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgFor,
+        NgIf,
+        StopClickDirective,
+        ModalDirective,
+        AssetTagDialogComponent,
+        TranslatePipe,
+    ],
 })
 export class AssetTagsComponent {
     @Output()

@@ -8,7 +8,7 @@
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { action } from '@storybook/addon-actions';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { CodeEditorComponent, LongHoverDirective, SqxFrameworkModule } from '@app/framework';
+import { CodeEditorComponent, LongHoverDirective, SqxFrameworkModule } from '@app/framework/internal';
 
 export default {
     title: 'Framework/LongHover',

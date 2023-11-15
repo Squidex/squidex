@@ -5,14 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Output } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, disabled$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { AppLanguageDto, AppsState, changed$, disabled$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TooltipDirective, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { FocusMarkerComponent } from '@app/shared/components/focus-marker.component';
+import { FieldEditorComponent } from '../../../shared/forms/field-editor.component';
+import { FieldCopyButtonComponent } from './field-copy-button.component';
+import { FieldLanguagesComponent } from './field-languages.component';
 
 @Component({
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html',
+    standalone: true,
+    imports: [
+        FocusMarkerComponent,
+        NgIf,
+        FieldLanguagesComponent,
+        FieldCopyButtonComponent,
+        TooltipDirective,
+        NgFor,
+        FieldEditorComponent,
+        AsyncPipe,
+    ],
 })
 export class ContentFieldComponent {
     @Output()

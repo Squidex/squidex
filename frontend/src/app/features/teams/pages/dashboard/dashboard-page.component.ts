@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { GridsterComponent, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
-import { AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, LocalStoreService, Settings, StorageUsagePerDateDto, Subscriptions, switchSafe, TeamsState, UsagesService } from '@app/shared';
+import { GridsterComponent, GridsterConfig, GridsterItem, GridsterItemComponent, GridType } from 'angular-gridster2';
+import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, IFrameCardComponent, LocalStoreService, MarkdownPipe, RandomCatCardComponent, RandomDogCardComponent, SafeHtmlPipe, Settings, StorageUsagePerDateDto, Subscriptions, SupportCardComponent, switchSafe, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
+import { AppsCardComponent } from './cards/apps-card.component';
 
 @Component({
     selector: 'sqx-dashboard-page',
@@ -15,6 +17,33 @@ import { AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeA
     templateUrl: './dashboard-page.component.html',
     animations: [
         fadeAnimation,
+    ],
+    standalone: true,
+    imports: [
+        TitleComponent,
+        NgIf,
+        GridsterComponent,
+        NgFor,
+        GridsterItemComponent,
+        NgSwitch,
+        NgSwitchCase,
+        AppsCardComponent,
+        ApiCallsCardComponent,
+        ApiTrafficSummaryCardComponent,
+        ApiCallsSummaryCardComponent,
+        AssetUploadsCountCardComponent,
+        AssetUploadsSizeSummaryCardComponent,
+        AssetUploadsSizeCardComponent,
+        ApiTrafficCardComponent,
+        ApiPerformanceCardComponent,
+        RandomDogCardComponent,
+        RandomCatCardComponent,
+        SupportCardComponent,
+        IFrameCardComponent,
+        AsyncPipe,
+        MarkdownPipe,
+        SafeHtmlPipe,
+        TranslatePipe,
     ],
 })
 export class DashboardPageComponent implements AfterViewInit, OnInit {

@@ -97,8 +97,6 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
         SqxSharedModule,
-    ],
-    declarations: [
         AppsCardComponent,
         DashboardPageComponent,
         ContributorAddFormComponent,

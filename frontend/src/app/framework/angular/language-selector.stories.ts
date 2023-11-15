@@ -7,7 +7,7 @@
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { LanguageSelectorComponent, SqxFrameworkModule } from '@app/framework';
+import { LanguageSelectorComponent, SqxFrameworkModule } from '@app/framework/internal';
 
 export default {
     title: 'Framework/Language-Selector',

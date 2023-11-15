@@ -14,6 +14,7 @@ import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@ang
     styleUrls: ['./loader.component.scss'],
     templateUrl: './loader.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class LoaderComponent {
     @Input({ transform: numberAttribute })

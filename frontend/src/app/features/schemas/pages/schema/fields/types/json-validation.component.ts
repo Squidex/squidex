@@ -13,6 +13,7 @@ import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
     selector: 'sqx-json-validation',
     styleUrls: ['json-validation.component.scss'],
     templateUrl: 'json-validation.component.html',
+    standalone: true,
 })
 export class JsonValidationComponent {
     @Input({ required: true })

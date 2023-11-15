@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, forwardRef, Input, ViewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CodeEditorComponent, ScriptCompletions, Types } from '@app/framework';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { CodeEditorComponent, ScriptCompletions, Types } from '@app/shared';
+import { CodeEditorComponent as CodeEditorComponent_1 } from '../../../../framework/angular/forms/editors/code-editor.component';
 
 type TemplateMode = 'Text' | 'Script' | 'Liquid';
 
@@ -25,6 +27,13 @@ export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
         SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        CodeEditorComponent_1,
+        FormsModule,
+        NgFor,
+    ],
 })
 export class FormattableInputComponent implements ControlValueAccessor, AfterViewInit {
     private fnChanged = (_: any) => { /* NOOP */ };

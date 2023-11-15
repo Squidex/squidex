@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
-import { WorkflowDto, WorkflowsPayload, WorkflowsService } from './../services/workflows.service';
+import { WorkflowDto, WorkflowsPayload, WorkflowsService } from '../services/workflows.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {

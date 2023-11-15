@@ -7,11 +7,14 @@
 
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
+import { TitleComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-not-found-page',
     styleUrls: ['./not-found-page.component.scss'],
     templateUrl: './not-found-page.component.html',
+    standalone: true,
+    imports: [TitleComponent, TranslatePipe],
 })
 export class NotFoundPageComponent {
     constructor(

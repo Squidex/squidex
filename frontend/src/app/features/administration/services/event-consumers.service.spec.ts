@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, Resource, ResourceLinks } from '@app/framework';
+import { ApiUrlConfig, Resource, ResourceLinks } from '@app/shared';
 import { EventConsumerDto, EventConsumersDto, EventConsumersService } from './event-consumers.service';
 
 describe('EventConsumersService', () => {

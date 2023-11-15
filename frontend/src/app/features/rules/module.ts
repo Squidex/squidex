@@ -64,8 +64,6 @@ const routes: Routes = [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
         SqxSharedModule,
-    ],
-    declarations: [
         AssetChangedTriggerComponent,
         CommentTriggerComponent,
         ContentChangedSchemaComponent,

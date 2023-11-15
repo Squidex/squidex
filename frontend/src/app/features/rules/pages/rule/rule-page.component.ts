@@ -5,17 +5,56 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { AbstractControl, FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { debounceTime, Subscription } from 'rxjs';
-import { ActionForm, ALL_TRIGGERS, MessageBus, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, Subscriptions, TriggerForm, TriggerType, value$ } from '@app/shared';
-import { RuleConfigured } from './../messages';
+import { ActionForm, ALL_TRIGGERS, ConfirmClickDirective, FormAlertComponent, KeysPipe, LayoutComponent, ListViewComponent, MessageBus, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, TriggerForm, TriggerType, value$ } from '@app/shared';
+import { GenericActionComponent } from '../../shared/actions/generic-action.component';
+import { RuleElementComponent } from '../../shared/rule-element.component';
+import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
+import { CommentTriggerComponent } from '../../shared/triggers/comment-trigger.component';
+import { ContentChangedTriggerComponent } from '../../shared/triggers/content-changed-trigger.component';
+import { SchemaChangedTriggerComponent } from '../../shared/triggers/schema-changed-trigger.component';
+import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.component';
+import { RuleConfigured } from '../messages';
 
 @Component({
     selector: 'sqx-rule-page',
     styleUrls: ['./rule-page.component.scss'],
     templateUrl: './rule-page.component.html',
+    standalone: true,
+    imports: [
+        TitleComponent,
+        FormsModule,
+        LayoutComponent,
+        TooltipDirective,
+        NgIf,
+        ToggleComponent,
+        ConfirmClickDirective,
+        ListViewComponent,
+        RuleElementComponent,
+        FormAlertComponent,
+        NgSwitch,
+        NgSwitchCase,
+        AssetChangedTriggerComponent,
+        CommentTriggerComponent,
+        ContentChangedTriggerComponent,
+        SchemaChangedTriggerComponent,
+        UsageTriggerComponent,
+        NgFor,
+        GenericActionComponent,
+        SidebarMenuDirective,
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        TourHintDirective,
+        RouterOutlet,
+        AsyncPipe,
+        KeysPipe,
+        TranslatePipe,
+    ],
 })
 export class RulePageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

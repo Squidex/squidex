@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppSettingsDto, FieldDto, FieldGroup, LanguageDto, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
+import { FieldComponent } from './field.component';
 
 interface State {
     // The when the section is collapsed.
@@ -18,6 +20,15 @@ interface State {
     selector: 'sqx-field-group',
     styleUrls: ['./field-group.component.scss'],
     templateUrl: './field-group.component.html',
+    standalone: true,
+    imports: [
+        NgIf,
+        FieldComponent,
+        CdkDropList,
+        NgFor,
+        CdkDrag,
+        CdkDragHandle,
+    ],
 })
 export class FieldGroupComponent extends StatefulComponent<State> {
     @Output()

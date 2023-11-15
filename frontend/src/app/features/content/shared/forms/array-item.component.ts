@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output, QueryList, ViewChildren } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, FormHintComponent, IfOnceDirective, invalid$, ObjectFormBase, RootFieldDto, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -16,6 +17,17 @@ import { ComponentSectionComponent } from './component-section.component';
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        TooltipDirective,
+        IfOnceDirective,
+        NgFor,
+        ComponentSectionComponent,
+        NgIf,
+        FormHintComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class ArrayItemComponent {
     @Output()

@@ -6,13 +6,21 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { CodeEditorComponent, FieldDto, FormHintComponent, JsonFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-json-more',
     styleUrls: ['json-more.component.scss'],
     templateUrl: 'json-more.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        CodeEditorComponent,
+        FormHintComponent,
+        TranslatePipe,
+    ],
 })
 export class JsonMoreComponent {
     @Input({ required: true })

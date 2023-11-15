@@ -5,10 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor } from '@angular/common';
 import { Component, Injectable, Input } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
-import { AssignContributorForm, AutocompleteSource, ContributorsState, DialogModel, DialogService, RoleDto, UsersService } from '@app/shared';
+import { AssignContributorForm, AutocompleteComponent, AutocompleteSource, ContributorsState, DialogModel, DialogService, FormHintComponent, ModalDirective, RoleDto, TranslatePipe, UserDtoPicture, UsersService } from '@app/shared';
+import { ImportContributorsDialogComponent } from './import-contributors-dialog.component';
 
 @Injectable()
 export class UsersDataSource implements AutocompleteSource {
@@ -43,6 +46,19 @@ export class UsersDataSource implements AutocompleteSource {
     templateUrl: './contributor-add-form.component.html',
     providers: [
         UsersDataSource,
+    ],
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        AutocompleteComponent,
+        NgFor,
+        FormHintComponent,
+        ModalDirective,
+        ImportContributorsDialogComponent,
+        AsyncPipe,
+        TranslatePipe,
+        UserDtoPicture,
     ],
 })
 export class ContributorAddFormComponent {

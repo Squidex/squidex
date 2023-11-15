@@ -5,14 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AppDto, AppsState, defined, DialogService, Subscriptions, TeamsState, TransferAppForm, Types, UpdateAppForm } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AppDto, AppsState, AvatarComponent, ConfirmClickDirective, ControlErrorsComponent, defined, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, Subscriptions, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',
+    standalone: true,
+    imports: [
+        LayoutComponent,
+        ListViewComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        FormErrorComponent,
+        ControlErrorsComponent,
+        FileDropDirective,
+        NgIf,
+        ProgressBarComponent,
+        AvatarComponent,
+        TooltipDirective,
+        FormHintComponent,
+        NgFor,
+        ConfirmClickDirective,
+        SidebarMenuDirective,
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        RouterOutlet,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class MorePageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

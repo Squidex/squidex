@@ -5,12 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
-import { VirtualScrollerComponent } from '@iharbeck/ngx-virtual-scroller';
+import { VirtualScrollerComponent, VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, TypedSimpleChanges, Types } from '@app/shared';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, disabled$, DropdownMenuComponent, EditContentForm, FieldArrayForm, FormHintComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, ObjectFormBase, SchemaDto, Settings, sorted, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
@@ -18,6 +19,24 @@ import { ArrayItemComponent } from './array-item.component';
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        CdkDropList,
+        NgFor,
+        CdkDrag,
+        ArrayItemComponent,
+        CdkDragHandle,
+        VirtualScrollerModule,
+        FormHintComponent,
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        ConfirmClickDirective,
+        TooltipDirective,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class ArrayEditorComponent {
     @Input({ required: true })

@@ -6,7 +6,7 @@
  */
 
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { LoaderComponent, SqxFrameworkModule } from '@app/framework';
+import { LoaderComponent, SqxFrameworkModule } from '@app/framework/internal';
 
 export default {
     title: 'Framework/Loader',

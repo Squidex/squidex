@@ -10,6 +10,7 @@ import { Subscriptions } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxImageUrl]',
+    standalone: true,
 })
 export class ImageUrlDirective implements  OnInit {
     private readonly subscriptions = new Subscriptions();

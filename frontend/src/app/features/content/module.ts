@@ -91,8 +91,6 @@ const routes: Routes = [
         SqxFrameworkModule,
         SqxSharedModule,
         VirtualScrollerModule,
-    ],
-    declarations: [
         ArrayEditorComponent,
         ArrayItemComponent,
         AssetsEditorComponent,

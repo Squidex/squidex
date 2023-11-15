@@ -5,14 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AddClientForm, ClientsState } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TransformInputDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-add-form',
     styleUrls: ['./client-add-form.component.scss'],
     templateUrl: './client-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ControlErrorsComponent,
+        TransformInputDirective,
+        FormHintComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class ClientAddFormComponent {
     public addClientForm = new AddClientForm();

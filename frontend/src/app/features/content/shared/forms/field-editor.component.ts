@@ -5,15 +5,64 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AbstractContentForm, AppLanguageDto, DialogModel, EditContentForm, FieldDto, hasNoValue$, MathHelper, TypedSimpleChanges, Types } from '@app/shared';
+import { AbstractContentForm, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldDto, FormHintComponent, GeolocationEditorComponent, hasNoValue$, IndeterminateValueDirective, MarkdownDirective, MathHelper, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
+import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
+import { ReferencesEditorComponent } from '../references/references-editor.component';
+import { ReferencesTagsComponent } from '../references/references-tags.component';
+import { ArrayEditorComponent } from './array-editor.component';
+import { AssetsEditorComponent } from './assets-editor.component';
+import { ComponentComponent } from './component.component';
+import { IFrameEditorComponent } from './iframe-editor.component';
+import { StockPhotoEditorComponent } from './stock-photo-editor.component';
 
 @Component({
     selector: 'sqx-field-editor',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',
+    standalone: true,
+    imports: [
+        NgIf,
+        TooltipDirective,
+        ConfirmClickDirective,
+        ControlErrorsComponent,
+        IFrameEditorComponent,
+        NgSwitch,
+        NgSwitchCase,
+        ArrayEditorComponent,
+        AssetsEditorComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        ToggleComponent,
+        IndeterminateValueDirective,
+        ComponentComponent,
+        DateTimeEditorComponent,
+        GeolocationEditorComponent,
+        CodeEditorComponent,
+        StarsComponent,
+        RadioGroupComponent,
+        NgFor,
+        ReferencesEditorComponent,
+        ReferenceDropdownComponent,
+        ReferenceInputComponent,
+        ReferencesTagsComponent,
+        ReferencesCheckboxesComponent,
+        TransformInputDirective,
+        RichEditorComponent,
+        StockPhotoEditorComponent,
+        ColorPickerComponent,
+        TagEditorComponent,
+        CheckboxGroupComponent,
+        FormHintComponent,
+        MarkdownDirective,
+        ModalDirective,
+        ChatDialogComponent,
+        AsyncPipe,
+    ],
 })
 export class FieldEditorComponent {
     public readonly uniqueId = MathHelper.guid();

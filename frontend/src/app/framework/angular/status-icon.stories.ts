@@ -6,7 +6,7 @@
  */
 
 import { Meta, StoryObj } from '@storybook/angular';
-import { StatusIconComponent } from '@app/framework';
+import { StatusIconComponent } from '@app/framework/internal';
 
 export default {
     title: 'Framework/StatusIcon',

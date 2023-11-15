@@ -6,10 +6,9 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
-import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { Subscriptions, TypedSimpleChanges, Types } from '@app/framework';
-import { ContentDto, ContentsDto, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent } from '@app/shared/internal';
+import { ContentDto, ContentsDto, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
@@ -34,6 +33,13 @@ const NO_EMIT = { emitEvent: false };
         SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        TagEditorComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     private readonly subscriptions = new Subscriptions();

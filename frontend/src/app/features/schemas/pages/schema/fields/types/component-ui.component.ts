@@ -13,6 +13,7 @@ import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
     selector: 'sqx-component-ui',
     styleUrls: ['component-ui.component.scss'],
     templateUrl: 'component-ui.component.html',
+    standalone: true,
 })
 export class ComponentUIComponent {
     @Input({ required: true })

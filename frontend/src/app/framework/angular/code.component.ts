@@ -13,6 +13,7 @@ import { MathHelper } from '../internal';
     styleUrls: ['./code.component.scss'],
     templateUrl: './code.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class CodeComponent {
     public readonly id = MathHelper.guid();

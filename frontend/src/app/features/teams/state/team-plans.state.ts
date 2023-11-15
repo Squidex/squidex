@@ -8,8 +8,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { TeamPlansService } from '@app/features/teams/internal';
 import { debug, DialogService, LoadingState, PlanDto, PlanLockedReason, ReferralDto, shareSubscribed, State, TeamsState, Version } from '@app/shared';
+import { TeamPlansService } from '../internal';
 
 export interface PlanInfo {
     // The plan.

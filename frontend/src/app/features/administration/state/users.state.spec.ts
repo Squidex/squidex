@@ -7,9 +7,9 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { UpsertUserDto, UsersService } from '@app/features/administration/internal';
 import { DialogService } from '@app/shared';
-import { createUser } from './../services/users.service.spec';
+import { UpsertUserDto, UsersService } from '../internal';
+import { createUser } from '../services/users.service.spec';
 import { UsersState } from './users.state';
 
 describe('UsersState', () => {

@@ -7,7 +7,7 @@
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { DateTimeEditorComponent, LocalizerService, SqxFrameworkModule, UIOptions } from '@app/framework';
+import { DateTimeEditorComponent, LocalizerService, SqxFrameworkModule, UIOptions } from '@app/framework/internal';
 
 const translations = {
     'common.date': 'Date',

@@ -5,10 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
-import { ContributorsState, ErrorDto, ImportContributorsForm, RoleDto } from '@app/shared';
+import { ContributorsState, ErrorDto, FormHintComponent, ImportContributorsForm, ModalDialogComponent, RoleDto, StatusIconComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 
 type ImportStatus = {
     email: string;
@@ -21,6 +23,21 @@ type ImportStatus = {
     selector: 'sqx-import-contributors-dialog',
     styleUrls: ['./import-contributors-dialog.component.scss'],
     templateUrl: './import-contributors-dialog.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ModalDialogComponent,
+        TooltipDirective,
+        NgSwitch,
+        NgSwitchCase,
+        FormHintComponent,
+        NgIf,
+        NgFor,
+        StatusIconComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class ImportContributorsDialogComponent {
     @Output()

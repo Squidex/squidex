@@ -6,13 +6,24 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ModalModel, TeamDto } from '@app/shared';
+import { RouterLink } from '@angular/router';
+import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TeamDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-team',
     styleUrls: ['./team.component.scss'],
     templateUrl: './team.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        StopClickDirective,
+        RouterLink,
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        ConfirmClickDirective,
+        TranslatePipe,
+    ],
 })
 export class TeamComponent {
     @Input({ required: true })

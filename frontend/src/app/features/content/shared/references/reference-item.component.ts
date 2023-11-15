@@ -7,14 +7,28 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
-import { ContentDto, getContentValue, LanguageDto, META_FIELDS } from '@app/shared';
+import { RouterLink } from '@angular/router';
+import { ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListFieldComponent, ContentValueComponent, getContentValue, LanguageDto, META_FIELDS, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: '[sqxReferenceItem][language][languages]',
     styleUrls: ['./reference-item.component.scss'],
     templateUrl: './reference-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        ContentListCellDirective,
+        ContentListFieldComponent,
+        NgFor,
+        ContentValueComponent,
+        NgIf,
+        TooltipDirective,
+        ConfirmClickDirective,
+        RouterLink,
+        TranslatePipe,
+    ],
 })
 export class ReferenceItemComponent {
     public readonly metaFields = META_FIELDS;

@@ -6,11 +6,14 @@
  */
 
 import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
     selector: 'sqx-teams-area',
     styleUrls: ['./teams-area.component.scss'],
     templateUrl: './teams-area.component.html',
+    standalone: true,
+    imports: [RouterOutlet],
 })
 export class TeamsAreaComponent {
 }

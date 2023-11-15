@@ -12,6 +12,7 @@ const LAYOUT_CACHE: { [key: string]: { width: number; height: number } } = {};
 
 @Directive({
     selector: '[sqxImageSource]',
+    standalone: true,
 })
 export class ImageSourceDirective implements OnDestroy, OnInit, AfterViewInit {
     private readonly subscriptions = new Subscriptions();

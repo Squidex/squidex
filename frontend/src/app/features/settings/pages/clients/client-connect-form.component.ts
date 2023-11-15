@@ -5,13 +5,33 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, KeyValuePipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, DialogService, HelpService, MessageBus, SDKEntry } from '@app/shared';
+import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MarkdownInlinePipe, MarkdownPipe, MessageBus, ModalDialogComponent, SafeHtmlPipe, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-client-connect-form',
     styleUrls: ['./client-connect-form.component.scss'],
     templateUrl: './client-connect-form.component.html',
+    standalone: true,
+    imports: [
+        ModalDialogComponent,
+        TooltipDirective,
+        NgIf,
+        NgSwitch,
+        NgSwitchCase,
+        FormHintComponent,
+        CodeComponent,
+        NgFor,
+        ExternalLinkDirective,
+        MarkdownDirective,
+        AsyncPipe,
+        KeyValuePipe,
+        MarkdownInlinePipe,
+        MarkdownPipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class ClientConnectFormComponent implements OnInit {
     @Output()

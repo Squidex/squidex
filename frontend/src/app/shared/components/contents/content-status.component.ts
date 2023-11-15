@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { LocalizerService, TypedSimpleChanges } from '@app/framework';
+import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/framework';
 import { ScheduleDto } from '@app/shared/internal';
 
 @Component({
@@ -14,6 +15,13 @@ import { ScheduleDto } from '@app/shared/internal';
     styleUrls: ['./content-status.component.scss'],
     templateUrl: './content-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        TooltipDirective,
+        FullDateTimePipe,
+        TranslatePipe,
+    ],
 })
 export class ContentStatusComponent {
     @Input({ required: true })

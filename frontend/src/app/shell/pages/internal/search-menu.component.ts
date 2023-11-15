@@ -5,10 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Injectable, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, Types } from '@app/shared/internal';
+import { ShortcutComponent, ShortcutDirective, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, Types } from '@app/shared';
+import { AutocompleteComponent as AutocompleteComponent_1 } from '../../../framework/angular/forms/editors/autocomplete.component';
 
 @Injectable()
 export class SearchSource implements AutocompleteSource {
@@ -37,6 +41,17 @@ export class SearchSource implements AutocompleteSource {
         SearchSource,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        AutocompleteComponent_1,
+        ShortcutDirective,
+        TooltipDirective,
+        FormsModule,
+        ShortcutComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class SearchMenuComponent {
     @ViewChild(AutocompleteComponent, { static: false })

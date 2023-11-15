@@ -7,14 +7,15 @@
 
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiUrlConfig, Types } from '@app/framework/internal';
-import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto, TypedSimpleChanges } from '@app/shared';
+import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-extension',
     styleUrls: ['./content-extension.component.scss'],
     templateUrl: './content-extension.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [SafeResourceUrlPipe],
 })
 export class ContentExtensionComponent {
     private readonly context: any;

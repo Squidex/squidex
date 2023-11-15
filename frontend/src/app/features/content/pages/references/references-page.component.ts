@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentContentsState, ContentDto, LanguagesState, QuerySynchronizer, Router2State, Subscriptions } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, ReferenceItemComponent, Router2State, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-page',
@@ -17,6 +18,22 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, LanguagesState, Que
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         Router2State, ComponentContentsState,
+    ],
+    standalone: true,
+    imports: [
+        TitleComponent,
+        LayoutComponent,
+        TooltipDirective,
+        ShortcutDirective,
+        NgIf,
+        LanguageSelectorComponent,
+        ListViewComponent,
+        NgFor,
+        ReferenceItemComponent,
+        PagerComponent,
+        AsyncPipe,
+        TranslatePipe,
+        ContentsColumnsPipe,
     ],
 })
 export class ReferencesPageComponent implements OnInit {

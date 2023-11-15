@@ -14,6 +14,7 @@ import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
     styleUrls: ['./iframe-card.component.scss'],
     templateUrl: './iframe-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class IFrameCardComponent implements AfterViewInit {
     private readonly context: any;

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
-import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from './../services/contributors.service';
+import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from '../services/contributors.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends ListState<string> {

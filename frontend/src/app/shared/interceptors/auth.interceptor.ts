@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { EMPTY, from, Observable, throwError } from 'rxjs';
 import { catchError, switchMap, take } from 'rxjs/operators';
 import { ApiUrlConfig, ErrorDto } from '@app/framework';
-import { AuthService, Profile } from './../services/auth.service';
+import { AuthService, Profile } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {

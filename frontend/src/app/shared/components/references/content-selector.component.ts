@@ -5,10 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
+import { LanguageSelectorComponent, ListViewComponent, ModalDialogComponent, PagerComponent, SyncWidthDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState, Subscriptions } from '@app/shared/internal';
+import { ContentListCellDirective, ContentListWidthDirective } from '../contents/content-list-cell.directive';
+import { ContentListHeaderComponent } from '../contents/content-list-header.component';
+import { SearchFormComponent } from '../search/search-form.component';
+import { ContentSelectorItemComponent } from './content-selector-item.component';
 
 @Component({
     selector: 'sqx-content-selector',
@@ -16,6 +23,25 @@ import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDt
     templateUrl: './content-selector.component.html',
     providers: [
         ComponentContentsState,
+    ],
+    standalone: true,
+    imports: [
+        ModalDialogComponent,
+        TooltipDirective,
+        NgIf,
+        FormsModule,
+        NgFor,
+        SearchFormComponent,
+        LanguageSelectorComponent,
+        ListViewComponent,
+        ContentListWidthDirective,
+        ContentListCellDirective,
+        ContentListHeaderComponent,
+        SyncWidthDirective,
+        ContentSelectorItemComponent,
+        PagerComponent,
+        AsyncPipe,
+        TranslatePipe,
     ],
 })
 export class ContentSelectorComponent implements OnInit {

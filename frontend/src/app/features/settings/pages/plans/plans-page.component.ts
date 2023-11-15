@@ -5,14 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ApiUrlConfig, PlanDto, PlansState } from '@app/shared';
+import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ApiUrlConfig, ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownPipe, NotifoComponent, PlanDto, PlansState, SafeHtmlPipe, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UserNamePipe } from '@app/shared';
+import { PlanComponent } from './plan.component';
 
 @Component({
     selector: 'sqx-plans-page',
     styleUrls: ['./plans-page.component.scss'],
     templateUrl: './plans-page.component.html',
+    standalone: true,
+    imports: [
+        TitleComponent,
+        LayoutComponent,
+        NotifoComponent,
+        TooltipDirective,
+        ShortcutDirective,
+        ListViewComponent,
+        NgIf,
+        FormHintComponent,
+        NgFor,
+        PlanComponent,
+        ExternalLinkDirective,
+        SidebarMenuDirective,
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        RouterOutlet,
+        AsyncPipe,
+        MarkdownPipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+        UserNamePipe,
+    ],
 })
 export class PlansPageComponent implements OnInit {
     private overridePlanId?: string;

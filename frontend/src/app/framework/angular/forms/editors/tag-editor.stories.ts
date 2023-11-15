@@ -9,7 +9,7 @@
 import { Component } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { LocalizerService, SqxFrameworkModule, TagEditorComponent } from '@app/framework';
+import { LocalizerService, SqxFrameworkModule, TagEditorComponent } from '@app/framework/internal';
 
 const TRANSLATIONS = {
     'common.tagAdd': ', to add tag',

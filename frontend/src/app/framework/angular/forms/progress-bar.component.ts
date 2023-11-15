@@ -18,6 +18,7 @@ import { TypedSimpleChanges } from '@app/framework/internal';
     ],
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class ProgressBarComponent implements  OnInit {
     private progressBar: any;

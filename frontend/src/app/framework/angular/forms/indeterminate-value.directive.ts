@@ -18,6 +18,7 @@ export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
     providers: [
         SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR,
     ],
+    standalone: true,
 })
 export class IndeterminateValueDirective implements ControlValueAccessor {
     private callChange = (_: any) => { /* NOOP */ };

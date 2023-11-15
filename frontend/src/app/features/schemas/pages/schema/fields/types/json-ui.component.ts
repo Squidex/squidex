@@ -13,6 +13,7 @@ import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
     selector: 'sqx-json-ui',
     styleUrls: ['json-ui.component.scss'],
     templateUrl: 'json-ui.component.html',
+    standalone: true,
 })
 export class JsonUIComponent {
     @Input({ required: true })

@@ -16,10 +16,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, RouteReuseStrategy, RouterModule } from '@angular/router';
 import { NgChartsModule } from 'ng2-charts';
-import { environment } from './../environments/environment';
+import { ApiUrlConfig, DateHelper, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from '@app/shared';
+import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
-import { ApiUrlConfig, DateHelper, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
 
 const options = (window as any)['options'] || {};
@@ -104,8 +104,6 @@ export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
         SqxSharedModule.forRoot(),
         SqxShellModule,
         routing,
-    ],
-    declarations: [
         AppComponent,
     ],
     providers: [

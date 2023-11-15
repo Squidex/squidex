@@ -7,9 +7,13 @@
 
 /* eslint-disable no-return-assign */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { AppsState, AutocompleteSource, RoleDto, RolesService, RolesState, SchemasState } from '@app/shared';
+import { AppsState, AutocompleteSource, FormHintComponent, LayoutComponent, ListViewComponent, RoleDto, RolesService, RolesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { RoleAddFormComponent } from './role-add-form.component';
+import { RoleComponent } from './role.component';
 
 class PermissionsAutocomplete implements AutocompleteSource {
     private permissions: ReadonlyArray<string> = [];
@@ -31,6 +35,26 @@ class PermissionsAutocomplete implements AutocompleteSource {
     selector: 'sqx-roles-page',
     styleUrls: ['./roles-page.component.scss'],
     templateUrl: './roles-page.component.html',
+    standalone: true,
+    imports: [
+        TitleComponent,
+        LayoutComponent,
+        TooltipDirective,
+        ShortcutDirective,
+        ListViewComponent,
+        NgIf,
+        RoleAddFormComponent,
+        FormHintComponent,
+        NgFor,
+        RoleComponent,
+        SidebarMenuDirective,
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        RouterOutlet,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class RolesPageComponent implements OnInit {
     public allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);

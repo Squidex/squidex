@@ -9,6 +9,7 @@ import { booleanAttribute, Directive, Input, TemplateRef, ViewContainerRef } fro
 
 @Directive({
     selector: '[sqxIfOnce]',
+    standalone: true,
 })
 export class IfOnceDirective {
     private hasView = false;

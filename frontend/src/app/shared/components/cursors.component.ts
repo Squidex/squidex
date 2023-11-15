@@ -1,4 +1,3 @@
-
 /*
  * Squidex Headless CMS
  *
@@ -6,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { map } from 'rxjs';
+import { StringColorPipe } from '@app/framework';
 import { CollaborationService, Profile } from '@app/shared/internal';
 
 type CursorState = { user: Profile; cursor: { x: number; y: number } };
@@ -17,6 +18,12 @@ type CursorState = { user: Profile; cursor: { x: number; y: number } };
     styleUrls: ['./cursors.component.scss'],
     templateUrl: './cursors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgFor,
+        AsyncPipe,
+        StringColorPipe,
+    ],
 })
 export class CursorsComponent  {
     public otherCursor =

@@ -5,15 +5,42 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { ControlErrorsComponent, FocusOnInitDirective, MarkdownPipe, ModalDialogComponent, ModalDirective, SafeHtmlPipe, ShortcutComponent, ShortcutDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
 import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, StatusInfo, TypedSimpleChanges, Types } from '@app/shared/internal';
+import { TourHintDirective } from '../tour-hint.directive';
+import { QueryComponent } from './queries/query.component';
+import { SavedQueriesComponent } from './shared-queries.component';
 
 @Component({
     selector: 'sqx-search-form',
     styleUrls: ['./search-form.component.scss'],
     templateUrl: './search-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        ShortcutComponent,
+        FormsModule,
+        TourHintDirective,
+        TourStepDirective,
+        ShortcutDirective,
+        TooltipDirective,
+        ModalDirective,
+        ModalDialogComponent,
+        QueryComponent,
+        SavedQueriesComponent,
+        ReactiveFormsModule,
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        AsyncPipe,
+        MarkdownPipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class SearchFormComponent {
     private previousQuery?: Query | null;

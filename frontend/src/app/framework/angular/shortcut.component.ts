@@ -11,6 +11,7 @@ import { ShortcutService } from '@app/framework/internal';
 @Component({
     selector: 'sqx-shortcut',
     template: '',
+    standalone: true,
 })
 export class ShortcutComponent implements OnDestroy, OnInit {
     private subscription?: Function;

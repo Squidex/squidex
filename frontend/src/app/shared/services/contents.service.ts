@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
-import { StatusInfo } from './../state/contents.state';
+import { StatusInfo } from '../state/contents.state';
 import { Query, sanitize } from './query';
 import { parseField, RootFieldDto } from './schemas.service';
 

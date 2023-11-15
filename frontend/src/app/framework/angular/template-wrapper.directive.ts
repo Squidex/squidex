@@ -10,6 +10,7 @@ import { TypedSimpleChanges } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxTemplateWrapper]',
+    standalone: true,
 })
 export class TemplateWrapperDirective implements OnDestroy, OnInit {
     @Input()

@@ -5,13 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
-import { AssetsState, Queries, Query, UIState } from '@app/shared';
+import { AssetsState, LayoutComponent, Queries, Query, SavedQueriesComponent, TranslatePipe, UIState } from '@app/shared';
+import { AssetTagsComponent } from './asset-tags.component';
 
 @Component({
     selector: 'sqx-assets-filters-page',
     styleUrls: ['./assets-filters-page.component.scss'],
     templateUrl: './assets-filters-page.component.html',
+    standalone: true,
+    imports: [
+        LayoutComponent,
+        AssetTagsComponent,
+        SavedQueriesComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class AssetsFiltersPageComponent {
     public assetsQueries: Queries;

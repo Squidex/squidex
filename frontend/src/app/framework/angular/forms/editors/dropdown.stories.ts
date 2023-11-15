@@ -8,7 +8,7 @@
 import { Component } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { DropdownComponent, LocalizerService, SqxFrameworkModule } from '@app/framework';
+import { DropdownComponent, LocalizerService, SqxFrameworkModule } from '@app/framework/internal';
 
 const TRANSLATIONS = {
     'common.search': 'Search',

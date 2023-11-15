@@ -5,14 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AddRoleForm, RolesState } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-role-add-form',
     styleUrls: ['./role-add-form.component.scss'],
     templateUrl: './role-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ControlErrorsComponent,
+        FormHintComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class RoleAddFormComponent {
     public addRoleForm = new AddRoleForm();

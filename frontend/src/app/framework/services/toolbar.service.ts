@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Types } from './../utils/types';
+import { Types } from '../utils/types';
 
 export type ButtonItem = { owner: any; name: string; method: () => void } & ButtonOptions;
 export type ButtonOptions = { disabled?: boolean; color?: string };

@@ -5,14 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto, TypedSimpleChanges } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormHintComponent, ModalDirective, RoleDto, TourStepDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { ClientConnectFormComponent } from './client-connect-form.component';
 
 @Component({
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        TourStepDirective,
+        EditableTitleComponent,
+        ConfirmClickDirective,
+        CopyDirective,
+        FormsModule,
+        NgFor,
+        FormHintComponent,
+        NgIf,
+        ModalDirective,
+        ClientConnectFormComponent,
+        TranslatePipe,
+    ],
 })
 export class ClientComponent {
     @Input({ required: true })

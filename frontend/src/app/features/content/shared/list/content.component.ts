@@ -8,14 +8,34 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, SchemaDto, TableField, TableSettings, TypedSimpleChanges } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalPlacementDirective, StopClickDirective, TabRouterlinkDirective, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, ModalModel, PatchContentForm, SchemaDto, TableField, TableSettings, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: '[sqxContent][language][languages][tableFields][schema][tableSettings]',
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        TabRouterlinkDirective,
+        StopClickDirective,
+        FormsModule,
+        NgIf,
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        NgFor,
+        ContentStatusComponent,
+        ConfirmClickDirective,
+        ContentListCellDirective,
+        ContentListCellResizeDirective,
+        ContentListFieldComponent_1,
+        TranslatePipe,
+    ],
 })
 export class ContentComponent {
     @Output()

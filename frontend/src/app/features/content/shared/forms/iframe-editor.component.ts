@@ -8,8 +8,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, numberAttribute, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DialogModel, DialogService, disabled$, StatefulComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/framework';
-import { AppLanguageDto, AppsState, AssetDto, computeEditorUrl, ContentDto } from '@app/shared';
+import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, disabled$, ModalDirective, SafeResourceUrlPipe, StatefulComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared';
 
 interface State {
     // True, when the editor is shown as fullscreen.
@@ -21,6 +20,13 @@ interface State {
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        ModalDirective,
+        AssetSelectorComponent,
+        ContentSelectorComponent,
+        SafeResourceUrlPipe,
+    ],
 })
 export class IFrameEditorComponent extends StatefulComponent<State> implements OnDestroy {
     private readonly subscriptions = new Subscriptions();

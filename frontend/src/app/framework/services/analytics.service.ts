@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { Types } from './../internal';
+import { Types } from '../internal';
 
 type TrackEvent = (name: string, properties: any) => void;
 type TrackPage = (url: string) => void;

@@ -5,13 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, RootFieldDto, SchemaDto, Version } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, FieldForm, FieldSection, FormErrorComponent, ListViewComponent, MarkdownInlinePipe, RootFieldDto, SafeHtmlPipe, SchemaDto, TranslatePipe, Version } from '@app/shared';
+import { ContentSectionComponent } from './content-section.component';
 
 @Component({
     selector: 'sqx-content-editor',
     styleUrls: ['./content-editor.component.scss'],
     templateUrl: './content-editor.component.html',
+    standalone: true,
+    imports: [
+        FormErrorComponent,
+        ListViewComponent,
+        NgIf,
+        FormsModule,
+        CursorsDirective,
+        NgFor,
+        ContentSectionComponent,
+        CursorsComponent,
+        AsyncPipe,
+        MarkdownInlinePipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class ContentEditorComponent {
     @Output()

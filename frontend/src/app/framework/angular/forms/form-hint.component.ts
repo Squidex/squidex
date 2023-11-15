@@ -12,6 +12,7 @@ import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@ang
     styleUrls: ['./form-hint.component.scss'],
     templateUrl: './form-hint.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
 })
 export class FormHintComponent {
     @Input()

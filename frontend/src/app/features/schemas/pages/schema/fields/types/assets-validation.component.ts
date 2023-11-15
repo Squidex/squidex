@@ -5,14 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { AssetsFieldPropertiesDto, FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-validation',
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        NgIf,
+        LocalizedInputComponent,
+        FormHintComponent,
+        TranslatePipe,
+    ],
 })
 export class AssetsValidationComponent {
     @Input({ required: true })

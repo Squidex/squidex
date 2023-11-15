@@ -11,7 +11,7 @@ import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { UIOptions } from '@app/framework';
-import { AuthService } from './../services/auth.service';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class MustBeNotAuthenticatedGuard  {

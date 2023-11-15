@@ -5,14 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf, NgSwitch } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ApiUrlConfig, BackupDto, BackupsState, Duration, TypedSimpleChanges } from '@app/shared';
+import { ApiUrlConfig, BackupDto, BackupsState, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, KNumberPipe, StatusIconComponent, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-backup',
     styleUrls: ['./backup.component.scss'],
     templateUrl: './backup.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgSwitch,
+        StatusIconComponent,
+        NgIf,
+        TooltipDirective,
+        ExternalLinkDirective,
+        ConfirmClickDirective,
+        FromNowPipe,
+        KNumberPipe,
+        TranslatePipe,
+    ],
 })
 export class BackupComponent {
     @Input({ required: true })

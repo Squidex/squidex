@@ -5,8 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
 import { fadeAnimation } from '@app/framework/internal';
+import { ShortcutComponent } from '../shortcut.component';
+import { TourStepDirective } from './tour-step.directive';
 
 @Component({
     selector: 'sqx-modal-dialog',
@@ -16,6 +19,12 @@ import { fadeAnimation } from '@app/framework/internal';
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.Default,
+    standalone: true,
+    imports: [
+        TourStepDirective,
+        NgIf,
+        ShortcutComponent,
+    ],
 })
 export class ModalDialogComponent implements AfterViewInit {
     @Output()

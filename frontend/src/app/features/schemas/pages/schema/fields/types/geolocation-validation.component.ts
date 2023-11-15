@@ -13,6 +13,7 @@ import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
     selector: 'sqx-geolocation-validation',
     styleUrls: ['geolocation-validation.component.scss'],
     templateUrl: 'geolocation-validation.component.html',
+    standalone: true,
 })
 export class GeolocationValidationComponent {
     @Input({ required: true })

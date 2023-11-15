@@ -8,8 +8,8 @@
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, RulesService, versioned } from '@app/shared/internal';
-import { RuleDto } from './../services/rules.service';
-import { createRule } from './../services/rules.service.spec';
+import { RuleDto } from '../services/rules.service';
+import { createRule } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { RulesState } from './rules.state';
 

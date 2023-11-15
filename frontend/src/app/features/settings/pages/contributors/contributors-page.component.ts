@@ -5,8 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ContributorDto, ContributorsState, RolesState, Router2State } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ContributorDto, ContributorsState, LayoutComponent, ListViewComponent, NotifoComponent, PagerComponent, RolesState, Router2State, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ContributorAddFormComponent } from './contributor-add-form.component';
+import { ContributorComponent } from './contributor.component';
 
 @Component({
     selector: 'sqx-contributors-page',
@@ -14,6 +19,28 @@ import { ContributorDto, ContributorsState, RolesState, Router2State } from '@ap
     templateUrl: './contributors-page.component.html',
     providers: [
         Router2State,
+    ],
+    standalone: true,
+    imports: [
+        TitleComponent,
+        LayoutComponent,
+        NotifoComponent,
+        TooltipDirective,
+        ShortcutDirective,
+        FormsModule,
+        ListViewComponent,
+        NgIf,
+        ContributorAddFormComponent,
+        NgFor,
+        ContributorComponent,
+        PagerComponent,
+        SidebarMenuDirective,
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        RouterOutlet,
+        AsyncPipe,
+        TranslatePipe,
     ],
 })
 export class ContributorsPageComponent implements OnInit {

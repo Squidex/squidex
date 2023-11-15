@@ -5,15 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UpsertUserDto, UserDto, UserForm, UsersState } from '@app/features/administration/internal';
-import { Subscriptions } from '@app/shared';
+import { ControlErrorsComponent, FormErrorComponent, LayoutComponent, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { UpsertUserDto, UserDto, UserForm, UsersState } from '../../internal';
 
 @Component({
     selector: 'sqx-user-page',
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        LayoutComponent,
+        TooltipDirective,
+        NgIf,
+        TitleComponent,
+        ShortcutDirective,
+        FormErrorComponent,
+        ControlErrorsComponent,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class UserPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

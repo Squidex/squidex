@@ -5,17 +5,37 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppsState, ContentDto, ContentsState, defined, HistoryEventDto, HistoryService, ModalModel, SchemasState, Subscriptions, switchSafe } from '@app/shared';
-import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
+import { AppsState, ConfirmClickDirective, ContentDto, ContentsState, ContentStatusComponent, CopyDirective, defined, DropdownMenuComponent, DueTimeSelectorComponent, FormHintComponent, FromNowPipe, HistoryEventDto, HistoryService, LayoutComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, Subscriptions, switchSafe, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ContentEventComponent } from './content-event.component';
 import { ContentPageComponent } from './content-page.component';
 
 @Component({
     selector: 'sqx-history',
     styleUrls: ['./content-history-page.component.scss'],
     templateUrl: './content-history-page.component.html',
+    standalone: true,
+    imports: [
+        LayoutComponent,
+        CopyDirective,
+        NgIf,
+        TourStepDirective,
+        ContentStatusComponent,
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        NgFor,
+        ConfirmClickDirective,
+        FormHintComponent,
+        ContentEventComponent,
+        DueTimeSelectorComponent,
+        AsyncPipe,
+        FromNowPipe,
+        TranslatePipe,
+    ],
 })
 export class ContentHistoryPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

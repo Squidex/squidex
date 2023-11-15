@@ -5,15 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { TeamPlansState } from '@app/features/teams/internal';
-import { PlanInfo } from '@app/shared';
+import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, TranslatePipe } from '@app/shared';
+import { TeamPlansState } from '../../internal';
 
 @Component({
     selector: 'sqx-plan',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        FormHintComponent,
+        NgIf,
+        ConfirmClickDirective,
+        AsyncPipe,
+        FileSizePipe,
+        KNumberPipe,
+        TranslatePipe,
+    ],
 })
 export class PlanComponent {
     @Input({ required: true })

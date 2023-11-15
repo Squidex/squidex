@@ -6,13 +6,20 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { TeamDto } from '@app/shared';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { TeamDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        RouterLink,
+        RouterLinkActive,
+        TranslatePipe,
+    ],
 })
 export class LeftMenuComponent {
     @Input({ required: true })

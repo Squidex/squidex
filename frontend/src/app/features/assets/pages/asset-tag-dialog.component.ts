@@ -5,13 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ControlErrorsComponent, FocusOnInitDirective, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-tag-dialog',
     styleUrls: ['./asset-tag-dialog.component.scss'],
     templateUrl: './asset-tag-dialog.component.html',
+    standalone: true,
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        ModalDialogComponent,
+        TooltipDirective,
+        FormErrorComponent,
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class AssetTagDialogComponent implements OnInit {
     @Output()

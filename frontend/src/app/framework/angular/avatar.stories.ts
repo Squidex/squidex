@@ -6,7 +6,7 @@
  */
 
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { AvatarComponent, SqxFrameworkModule } from '@app/framework';
+import { AvatarComponent, SqxFrameworkModule } from '@app/framework/internal';
 
 export default {
     title: 'Framework/Avatar',

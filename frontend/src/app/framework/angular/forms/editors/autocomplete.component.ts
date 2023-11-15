@@ -5,11 +5,20 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, ElementRef, forwardRef, Input, numberAttribute, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Subscriptions, Types } from '@app/framework/internal';
+import { DropdownMenuComponent } from '../../dropdown-menu.component';
+import { LoaderComponent } from '../../loader.component';
+import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
+import { ModalDirective } from '../../modals/modal.directive';
+import { ScrollActiveDirective } from '../../scroll-active.directive';
+import { StopClickDirective } from '../../stop-click.directive';
+import { TemplateWrapperDirective } from '../../template-wrapper.directive';
+import { FocusOnInitDirective } from '../focus-on-init.directive';
 
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
@@ -43,6 +52,21 @@ const NO_EMIT = { emitEvent: false };
         SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        FormsModule,
+        FocusOnInitDirective,
+        ReactiveFormsModule,
+        NgIf,
+        LoaderComponent,
+        StopClickDirective,
+        ModalDirective,
+        DropdownMenuComponent,
+        ModalPlacementDirective,
+        NgFor,
+        ScrollActiveDirective,
+        TemplateWrapperDirective,
+    ],
 })
 export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
     private readonly subscriptions = new Subscriptions();

@@ -5,7 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslatePipe } from '@app/framework';
 import { AssetPathItem } from '@app/shared/internal';
 
 @Component({
@@ -13,6 +15,12 @@ import { AssetPathItem } from '@app/shared/internal';
     styleUrls: ['./asset-path.component.scss'],
     templateUrl: './asset-path.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        NgIf,
+        NgFor,
+        TranslatePipe,
+    ],
 })
 export class AssetPathComponent {
     @Output()

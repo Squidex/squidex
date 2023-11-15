@@ -5,13 +5,37 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AppSettingsDto, AppsState, EditAppSettingsForm, Subscriptions } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-settings-page',
     styleUrls: ['./settings-page.component.scss'],
     templateUrl: './settings-page.component.html',
+    standalone: true,
+    imports: [
+        TitleComponent,
+        LayoutComponent,
+        TooltipDirective,
+        ShortcutDirective,
+        ListViewComponent,
+        FormHintComponent,
+        NgIf,
+        NgFor,
+        FormsModule,
+        ReactiveFormsModule,
+        ControlErrorsComponent,
+        ConfirmClickDirective,
+        SidebarMenuDirective,
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        RouterOutlet,
+        TranslatePipe,
+    ],
 })
 export class SettingsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

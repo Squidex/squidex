@@ -5,14 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ContentDto, HistoryEventDto, TypedSimpleChanges } from '@app/shared';
+import { FromNowPipe, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ContentDto, HistoryEventDto, HistoryMessagePipe, TypedSimpleChanges, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-event',
     styleUrls: ['./content-event.component.scss'],
     templateUrl: './content-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        TooltipDirective,
+        NgIf,
+        FromNowPipe,
+        TranslatePipe,
+        HistoryMessagePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class ContentEventComponent {
     @Output()
