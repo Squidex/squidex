@@ -13,21 +13,21 @@ import { ControlErrorsComponent, FormErrorComponent, LayoutComponent, ShortcutDi
 import { UpsertUserDto, UserDto, UserForm, UsersState } from '../../internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-user-page',
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        LayoutComponent,
-        TooltipDirective,
-        NgIf,
-        TitleComponent,
-        ShortcutDirective,
-        FormErrorComponent,
-        ControlErrorsComponent,
         AsyncPipe,
+        ControlErrorsComponent,
+        FormErrorComponent,
+        FormsModule,
+        LayoutComponent,
+        NgIf,
+        ReactiveFormsModule,
+        ShortcutDirective,
+        TitleComponent,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

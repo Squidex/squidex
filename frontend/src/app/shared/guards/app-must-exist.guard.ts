@@ -5,40 +5,33 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { AppsState, UIState } from '@app/shared/internal';
 
-@Injectable()
-export class AppMustExistGuard  {
-    constructor(
-        private readonly appsState: AppsState,
-        private readonly router: Router,
-        private readonly uiState: UIState,
-    ) {
-    }
+export const appMustExistGuard = (route: ActivatedRouteSnapshot) => {
+    const appsState = inject(AppsState);
+    const appName = route.params['appName'];
+    const router = inject(Router);
+    const uiState = inject(UIState);
 
-    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
-        const appName = route.params['appName'];
+    const result =
+        appsState.select(appName).pipe(
+            tap(app => {
+                if (!app) {
+                    router.navigate(['/404']);
+                }
+            }),
+            switchMap(app => {
+                if (app) {
+                    return uiState.loadApp(appName).pipe(map(() => app));
+                } else {
+                    return of(app);
+                }
+            }),
+            map(app => !!app));
 
-        const result =
-            this.appsState.select(appName).pipe(
-                tap(app => {
-                    if (!app) {
-                        this.router.navigate(['/404']);
-                    }
-                }),
-                switchMap(app => {
-                    if (app) {
-                        return this.uiState.loadApp(appName).pipe(map(() => app));
-                    } else {
-                        return of(app);
-                    }
-                }),
-                map(app => !!app));
-
-        return result;
-    }
-}
+    return result;
+};

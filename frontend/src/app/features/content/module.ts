@@ -5,17 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
-import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, LoadSchemasGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { ArrayEditorComponent, ArrayItemComponent, AssetsEditorComponent, CalendarPageComponent, CommentsPageComponent, ComponentComponent, ComponentSectionComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentExtensionComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentInspectionComponent, ContentPageComponent, ContentReferencesComponent, ContentSectionComponent, ContentsFiltersPageComponent, ContentsPageComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldCopyButtonComponent, FieldEditorComponent, FieldLanguagesComponent, IFrameEditorComponent, PreviewButtonComponent, ReferenceDropdownComponent, ReferenceItemComponent, ReferencesCheckboxesComponent, ReferencesEditorComponent, ReferencesPageComponent, ReferencesTagsComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
+import { Routes } from '@angular/router';
+import { canDeactivateGuard, contentMustExistGuard, loadLanguagesGuard, loadSchemasGuard, schemaMustExistPublishedGuard, schemaMustNotBeSingletonGuard } from '@app/shared';
+import { CalendarPageComponent } from './pages/calendar/calendar-page.component';
+import { CommentsPageComponent } from './pages/comments/comments-page.component';
+import { ContentHistoryPageComponent } from './pages/content/content-history-page.component';
+import { ContentPageComponent } from './pages/content/content-page.component';
+import { ContentsFiltersPageComponent } from './pages/contents/contents-filters-page.component';
+import { ContentsPageComponent } from './pages/contents/contents-page.component';
+import { ReferencesPageComponent } from './pages/references/references-page.component';
+import { SchemasPageComponent } from './pages/schemas/schemas-page.component';
+import { SidebarPageComponent } from './pages/sidebar/sidebar-page.component';
 
-const routes: Routes = [
+export const CONTENT_ROUTES: Routes = [
     {
         path: '',
         component: SchemasPageComponent,
-        canActivate: [LoadLanguagesGuard, LoadSchemasGuard],
+        canActivate: [loadLanguagesGuard, loadSchemasGuard],
         children: [
             {
                 path: '__calendar',
@@ -27,13 +33,13 @@ const routes: Routes = [
             },
             {
                 path: ':schemaName',
-                canActivate: [SchemaMustExistPublishedGuard],
+                canActivate: [schemaMustExistPublishedGuard],
                 children: [
                     {
                         path: '',
                         component: ContentsPageComponent,
-                        canActivate: [SchemaMustNotBeSingletonGuard, ContentMustExistGuard],
-                        canDeactivate: [CanDeactivateGuard],
+                        canActivate: [schemaMustNotBeSingletonGuard, contentMustExistGuard],
+                        canDeactivate: [canDeactivateGuard],
                         children: [
                             {
                                 path: 'filters',
@@ -48,8 +54,8 @@ const routes: Routes = [
                     {
                         path: 'new',
                         component: ContentPageComponent,
-                        canActivate: [SchemaMustNotBeSingletonGuard, ContentMustExistGuard],
-                        canDeactivate: [CanDeactivateGuard],
+                        canActivate: [schemaMustNotBeSingletonGuard, contentMustExistGuard],
+                        canDeactivate: [canDeactivateGuard],
                         data: {
                             reuseId: 'contentPage',
                         },
@@ -57,8 +63,8 @@ const routes: Routes = [
                     {
                         path: ':contentId',
                         component: ContentPageComponent,
-                        canActivate: [ContentMustExistGuard],
-                        canDeactivate: [CanDeactivateGuard],
+                        canActivate: [contentMustExistGuard],
+                        canDeactivate: [canDeactivateGuard],
                         data: {
                             reuseId: 'contentPage',
                         },
@@ -84,50 +90,3 @@ const routes: Routes = [
             }],
     },
 ];
-
-@NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        SqxFrameworkModule,
-        SqxSharedModule,
-        VirtualScrollerModule,
-        ArrayEditorComponent,
-        ArrayItemComponent,
-        AssetsEditorComponent,
-        CalendarPageComponent,
-        CommentsPageComponent,
-        ComponentComponent,
-        ComponentSectionComponent,
-        ContentComponent,
-        ContentCreatorComponent,
-        ContentEditorComponent,
-        ContentEventComponent,
-        ContentExtensionComponent,
-        ContentFieldComponent,
-        ContentHistoryPageComponent,
-        ContentInspectionComponent,
-        ContentPageComponent,
-        ContentReferencesComponent,
-        ContentSectionComponent,
-        ContentsFiltersPageComponent,
-        ContentsPageComponent,
-        CustomViewEditorComponent,
-        DueTimeSelectorComponent,
-        FieldCopyButtonComponent,
-        FieldEditorComponent,
-        FieldLanguagesComponent,
-        IFrameEditorComponent,
-        PreviewButtonComponent,
-        ReferenceDropdownComponent,
-        ReferenceItemComponent,
-        ReferencesCheckboxesComponent,
-        ReferencesEditorComponent,
-        ReferencesEditorComponent,
-        ReferencesPageComponent,
-        ReferencesTagsComponent,
-        SchemasPageComponent,
-        SidebarPageComponent,
-        StockPhotoEditorComponent,
-    ],
-})
-export class SqxFeatureContentModule {}

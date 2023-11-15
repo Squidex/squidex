@@ -11,11 +11,13 @@ import { ListViewComponent, ResourceLoaderService, WorkflowDto } from '@app/shar
 declare const vis: any;
 
 @Component({
+    standalone: true,
     selector: 'sqx-workflow-diagram',
     styleUrls: ['./workflow-diagram.component.scss'],
     templateUrl: './workflow-diagram.component.html',
-    standalone: true,
-    imports: [ListViewComponent],
+    imports: [
+        ListViewComponent,
+    ],
 })
 export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
     private network: any;

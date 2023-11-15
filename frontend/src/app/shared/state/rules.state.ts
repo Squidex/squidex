@@ -32,7 +32,9 @@ interface Snapshot extends LoadingState {
     canReadEvents?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class RulesState extends State<Snapshot> {
     public selectedRule =
         this.project(x => x.selectedRule);

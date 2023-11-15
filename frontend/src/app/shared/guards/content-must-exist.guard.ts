@@ -5,39 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { allParams } from '@app/framework';
 import { ContentsState } from '@app/shared/internal';
 
-@Injectable()
-export class ContentMustExistGuard  {
-    constructor(
-        private readonly contentsState: ContentsState,
-        private readonly router: Router,
-    ) {
+export const contentMustExistGuard = (route: ActivatedRouteSnapshot) => {
+    const contentsState = inject(ContentsState);
+    const contentId = allParams(route)['contentId'];
+    const router = inject(Router);
+
+    if (!contentId || contentId === 'new') {
+        return contentsState.select(null).pipe(map(u => u === null));
     }
 
-    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
-        const contentId = allParams(route)['contentId'];
+    const decoded = decodeURIComponent(contentId);
 
-        if (!contentId || contentId === 'new') {
-            return this.contentsState.select(null).pipe(map(u => u === null));
-        }
+    const result =
+        contentsState.select(decoded).pipe(
+            tap(content => {
+                if (!content) {
+                    router.navigate(['/404']);
+                }
+            }),
+            map(content => !!content));
 
-        const decoded = decodeURIComponent(contentId);
-
-        const result =
-            this.contentsState.select(decoded).pipe(
-                tap(content => {
-                    if (!content) {
-                        this.router.navigate(['/404']);
-                    }
-                }),
-                map(content => !!content));
-
-        return result;
-    }
-}
+    return result;
+};

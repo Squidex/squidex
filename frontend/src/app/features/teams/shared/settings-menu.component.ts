@@ -8,8 +8,7 @@
 import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { TranslatePipe } from '@app/shared';
-import { TeamDto } from '@app/shared';
+import { TeamDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-settings-menu',

@@ -449,7 +449,9 @@ function isReferrerError(error?: ErrorDto) {
     return error?.errorCode === 'OBJECT_REFERENCED';
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ContentsState extends ContentsStateBase {
     constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
         private readonly schemasState: SchemasState,

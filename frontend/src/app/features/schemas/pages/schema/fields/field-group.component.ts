@@ -17,17 +17,17 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-field-group',
     styleUrls: ['./field-group.component.scss'],
     templateUrl: './field-group.component.html',
-    standalone: true,
     imports: [
-        NgIf,
-        FieldComponent,
-        CdkDropList,
-        NgFor,
         CdkDrag,
         CdkDragHandle,
+        CdkDropList,
+        FieldComponent,
+        NgFor,
+        NgIf,
     ],
 })
 export class FieldGroupComponent extends StatefulComponent<State> {

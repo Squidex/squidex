@@ -10,10 +10,10 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { ArrayFieldPropertiesDto, FieldDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-array-validation',
     styleUrls: ['array-validation.component.scss'],
     templateUrl: 'array-validation.component.html',
-    standalone: true,
     imports: [
         FormsModule,
         ReactiveFormsModule,

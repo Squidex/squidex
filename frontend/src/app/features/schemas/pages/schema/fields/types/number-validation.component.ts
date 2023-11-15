@@ -11,16 +11,16 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, NumberFieldPropertiesDto, RootFieldDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-number-validation',
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgIf,
-        LocalizedInputComponent,
         FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        NgIf,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

@@ -13,17 +13,17 @@ import { DialogModel, ModalDirective, StopClickDirective, TagItem, TagsSelected,
 import { AssetTagDialogComponent } from './asset-tag-dialog.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-tags',
     styleUrls: ['./asset-tags.component.scss'],
     templateUrl: './asset-tags.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
+        AssetTagDialogComponent,
+        ModalDirective,
         NgFor,
         NgIf,
         StopClickDirective,
-        ModalDirective,
-        AssetTagDialogComponent,
         TranslatePipe,
     ],
 })

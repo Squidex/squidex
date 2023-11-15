@@ -16,17 +16,17 @@ import { ContentListCellDirective } from '../contents/content-list-cell.directiv
 import { ContentListFieldComponent } from '../contents/content-list-field.component';
 
 @Component({
+    standalone: true,
     selector: '[sqxContentSelectorItem][language][languages][schema]',
     styleUrls: ['./content-selector-item.component.scss'],
     templateUrl: './content-selector-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        StopClickDirective,
-        FormsModule,
         ContentListCellDirective,
         ContentListFieldComponent,
+        FormsModule,
         NgFor,
+        StopClickDirective,
     ],
 })
 export class ContentSelectorItemComponent {

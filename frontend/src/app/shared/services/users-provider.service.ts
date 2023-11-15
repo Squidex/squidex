@@ -10,7 +10,9 @@ import { catchError, map, Observable, of, share, shareReplay } from 'rxjs';
 import { AuthService } from './auth.service';
 import { UserDto, UsersService } from './users.service';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class UsersProviderService {
     private readonly caches: { [id: string]: Observable<UserDto> } = {};
 

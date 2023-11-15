@@ -26,6 +26,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
@@ -33,20 +34,19 @@ interface State {
         SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        ResizedDirective,
-        NgIf,
-        CdkDropList,
-        NgFor,
         CdkDrag,
-        ReferenceItemComponent,
         CdkDragHandle,
-        ModalDirective,
-        ContentCreatorComponent,
-        ContentSelectorComponent,
-        TranslatePipe,
+        CdkDropList,
         ContentsColumnsPipe,
+        ContentSelectorComponent,
+        ModalDirective,
+        NgFor,
+        NgIf,
+        ReferenceItemComponent,
+        ResizedDirective,
+        TranslatePipe,
+        forwardRef(() => ContentCreatorComponent),
     ],
 })
 export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {

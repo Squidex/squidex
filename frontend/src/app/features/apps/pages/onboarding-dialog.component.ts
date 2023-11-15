@@ -11,19 +11,19 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { fadeAnimation, MarkdownPipe, ModalDialogComponent, SafeHtmlPipe, slideAnimation, TourState, TranslatePipe, UsersService } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-onboarding-dialog',
     styleUrls: ['./onboarding-dialog.component.scss'],
     templateUrl: './onboarding-dialog.component.html',
     animations: [
         fadeAnimation, slideAnimation,
     ],
-    standalone: true,
     imports: [
+        FormsModule,
+        MarkdownPipe,
         ModalDialogComponent,
         NgIf,
-        FormsModule,
         ReactiveFormsModule,
-        MarkdownPipe,
         SafeHtmlPipe,
         TranslatePipe,
     ],

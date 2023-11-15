@@ -12,22 +12,22 @@ import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirectiv
 import { ClientConnectFormComponent } from './client-connect-form.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        TourStepDirective,
-        EditableTitleComponent,
+        ClientConnectFormComponent,
         ConfirmClickDirective,
         CopyDirective,
-        FormsModule,
-        NgFor,
+        EditableTitleComponent,
         FormHintComponent,
-        NgIf,
+        FormsModule,
         ModalDirective,
-        ClientConnectFormComponent,
+        NgFor,
+        NgIf,
+        TourStepDirective,
         TranslatePipe,
     ],
 })

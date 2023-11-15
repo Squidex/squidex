@@ -11,29 +11,28 @@
 import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalPlacementDirective, StopClickDirective, TabRouterlinkDirective, TranslatePipe } from '@app/shared';
-import { AppLanguageDto, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, ModalModel, PatchContentForm, SchemaDto, TableField, TableSettings, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: '[sqxContent][language][languages][tableFields][schema][tableSettings]',
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        TabRouterlinkDirective,
-        StopClickDirective,
-        FormsModule,
-        NgIf,
-        ModalDirective,
-        DropdownMenuComponent,
-        ModalPlacementDirective,
-        NgFor,
-        ContentStatusComponent,
         ConfirmClickDirective,
         ContentListCellDirective,
         ContentListCellResizeDirective,
-        ContentListFieldComponent_1,
+        ContentListFieldComponent,
+        ContentStatusComponent,
+        DropdownMenuComponent,
+        FormsModule,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        StopClickDirective,
+        TabRouterlinkDirective,
         TranslatePipe,
     ],
 })

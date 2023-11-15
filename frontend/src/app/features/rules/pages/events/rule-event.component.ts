@@ -10,22 +10,23 @@
 import { NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CodeEditorComponent, ConfirmClickDirective, FromNowPipe, RuleClassPipe, RuleEventDto, TranslatePipe } from '@app/shared';
+import { CodeEditorComponent, ConfirmClickDirective, FromNowPipe, RuleEventDto, TranslatePipe } from '@app/shared';
+import { RuleClassPipe } from '../../shared/pipes';
 
 @Component({
+    standalone: true,
     selector: '[sqxRuleEvent]',
     styleUrls: ['./rule-event.component.scss'],
     templateUrl: './rule-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        ConfirmClickDirective,
         CodeEditorComponent,
+        ConfirmClickDirective,
         FormsModule,
         FromNowPipe,
-        TranslatePipe,
+        NgIf,
         RuleClassPipe,
+        TranslatePipe,
     ],
 })
 export class RuleEventComponent {

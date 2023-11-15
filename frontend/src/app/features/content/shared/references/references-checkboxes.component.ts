@@ -23,6 +23,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
+    standalone: true,
     selector: 'sqx-references-checkboxes',
     styleUrls: ['./references-checkboxes.component.scss'],
     templateUrl: './references-checkboxes.component.html',
@@ -30,7 +31,6 @@ const NO_EMIT = { emitEvent: false };
         SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         CheckboxGroupComponent,
         FormsModule,

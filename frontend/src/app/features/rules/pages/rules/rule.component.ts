@@ -13,22 +13,22 @@ import { ActionsDto, ConfirmClickDirective, DropdownMenuComponent, EditableTitle
 import { RuleElementComponent } from '../../shared/rule-element.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-rule',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        EditableTitleComponent,
-        ModalDirective,
+        ConfirmClickDirective,
         DropdownMenuComponent,
+        EditableTitleComponent,
+        FormsModule,
+        ModalDirective,
         ModalPlacementDirective,
         NgIf,
         RouterLink,
-        ConfirmClickDirective,
         RuleElementComponent,
         ToggleComponent,
-        FormsModule,
         TranslatePipe,
     ],
 })

@@ -6,8 +6,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import './array-extensions';
 import { FloatConverter, getTagValues, IntConverter, StringConverter, TagValue } from './tag-values';
+import './array-extensions';
 
 describe('TagValue', () => {
     it('should create with value and search string', () => {

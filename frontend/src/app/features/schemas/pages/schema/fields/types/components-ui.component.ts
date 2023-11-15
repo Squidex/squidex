@@ -13,14 +13,14 @@ import { FieldDto, ReferencesFieldPropertiesDto, TranslatePipe } from '@app/shar
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
 @Component({
+    standalone: true,
     selector: 'sqx-components-ui',
     styleUrls: ['components-ui.component.scss'],
     templateUrl: 'components-ui.component.html',
-    standalone: true,
     imports: [
         FormsModule,
-        ReactiveFormsModule,
         NgFor,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

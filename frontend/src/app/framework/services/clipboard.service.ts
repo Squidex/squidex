@@ -8,7 +8,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ClipboardService {
     private readonly text$ = new BehaviorSubject<string>('');
 

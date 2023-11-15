@@ -11,12 +11,15 @@ import { picasso, TypedSimpleChanges } from '@app/framework/internal';
 import { SafeUrlPipe } from './safe-html.pipe';
 
 @Component({
+    standalone: true,
     selector: 'sqx-avatar',
     styleUrls: ['./avatar.component.scss'],
     templateUrl: './avatar.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [NgIf, SafeUrlPipe],
+    imports: [
+        NgIf,
+        SafeUrlPipe,
+    ],
 })
 export class AvatarComponent {
     @Input()

@@ -14,19 +14,19 @@ import { DateTimeEditorComponent, DateTimeFieldPropertiesDto, FieldDto, FormHint
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
 @Component({
+    standalone: true,
     selector: 'sqx-date-time-validation',
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        DateTimeEditorComponent,
-        NgIf,
-        NgFor,
-        LocalizedInputComponent,
-        FormHintComponent,
         AsyncPipe,
+        DateTimeEditorComponent,
+        FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

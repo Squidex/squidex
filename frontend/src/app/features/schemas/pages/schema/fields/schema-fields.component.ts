@@ -6,24 +6,24 @@
  */
 
 import { AsyncPipe, NgIf } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, ModalDirective, SchemaDto, SchemasState, TourStepDirective, TranslatePipe } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-fields',
     styleUrls: ['./schema-fields.component.scss'],
     templateUrl: './schema-fields.component.html',
-    standalone: true,
     imports: [
+        AsyncPipe,
+        FieldWizardComponent,
+        ModalDirective,
         NgIf,
         TourStepDirective,
-        SortableFieldListComponent,
-        ModalDirective,
-        FieldWizardComponent,
-        AsyncPipe,
         TranslatePipe,
+        forwardRef(() => SortableFieldListComponent),
     ],
 })
 export class SchemaFieldsComponent implements OnInit {

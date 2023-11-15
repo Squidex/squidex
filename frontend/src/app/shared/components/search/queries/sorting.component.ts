@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { QueryModel, QuerySorting, SORT_MODES } from '@app/shared/internal';
 import { QueryPathComponent } from './query-path.component';
 
- @Component({
+@Component({
     selector: 'sqx-sorting',
     styleUrls: ['./sorting.component.scss'],
     templateUrl: './sorting.component.html',

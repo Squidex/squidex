@@ -6,26 +6,30 @@
  */
 
 import { NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Injector } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CopyGlobalDirective, DialogRendererComponent, RootViewComponent, TourGuideComponent, TourTemplateComponent, TranslatePipe } from '@app/shared';
+import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootViewComponent, TourGuideComponent, TourTemplateComponent, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-app',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
-    standalone: true,
     imports: [
         CopyGlobalDirective,
+        DialogRendererComponent,
+        NgIf,
         RootViewComponent,
         RouterOutlet,
-        NgIf,
         TourGuideComponent,
         TourTemplateComponent,
-        DialogRendererComponent,
         TranslatePipe,
     ],
 })
 export class AppComponent {
     public isLoaded?: boolean | null;
+
+    constructor(injector: Injector) {
+        injector.get(AnalyticsService);
+    }
 }

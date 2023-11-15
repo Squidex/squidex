@@ -10,16 +10,16 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, MarkdownInlinePipe, SafeHtmlPipe, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-assets-ui',
     styleUrls: ['assets-ui.component.scss'],
     templateUrl: 'assets-ui.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        FormHintComponent,
         AssetFolderDropdownComponent,
+        FormHintComponent,
+        FormsModule,
         MarkdownInlinePipe,
+        ReactiveFormsModule,
         SafeHtmlPipe,
         TranslatePipe,
     ],

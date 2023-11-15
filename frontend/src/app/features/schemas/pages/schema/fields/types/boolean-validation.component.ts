@@ -12,17 +12,17 @@ import { Observable } from 'rxjs';
 import { BooleanFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, IndeterminateValueDirective, LanguageDto, LocalizedInputComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-boolean-validation',
     styleUrls: ['boolean-validation.component.scss'],
     templateUrl: 'boolean-validation.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        IndeterminateValueDirective,
-        NgIf,
-        LocalizedInputComponent,
         FormHintComponent,
+        FormsModule,
+        IndeterminateValueDirective,
+        LocalizedInputComponent,
+        NgIf,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

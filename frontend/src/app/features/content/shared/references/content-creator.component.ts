@@ -8,15 +8,11 @@
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResolveAssets, ResolveContents, SchemaDto, SchemasState } from '@app/shared';
-import { TranslatePipe } from '@app/shared';
-import { FormErrorComponent } from '@app/shared';
-import { LanguageSelectorComponent } from '@app/shared';
-import { TooltipDirective } from '@app/shared';
-import { ModalDialogComponent } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ContentSectionComponent } from '../../pages/content/editor/content-section.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-creator',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
@@ -25,18 +21,17 @@ import { ContentSectionComponent } from '../../pages/content/editor/content-sect
         ResolveContents,
         ComponentContentsState,
     ],
-    standalone: true,
     imports: [
-        ModalDialogComponent,
-        TooltipDirective,
-        NgIf,
-        FormsModule,
-        NgFor,
-        LanguageSelectorComponent,
-        FormErrorComponent,
-        ReactiveFormsModule,
-        ContentSectionComponent,
         AsyncPipe,
+        ContentSectionComponent,
+        FormErrorComponent,
+        FormsModule,
+        LanguageSelectorComponent,
+        ModalDialogComponent,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

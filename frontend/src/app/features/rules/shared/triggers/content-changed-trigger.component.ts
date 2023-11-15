@@ -8,27 +8,26 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CodeComponent, FormHintComponent } from '@app/shared';
-import { SchemaDto, TemplatedFormArray, TranslatePipe, TriggerForm } from '@app/shared';
+import { CodeComponent, FormHintComponent, SchemaDto, TemplatedFormArray, TranslatePipe, TriggerForm } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
 import { ContentChangedSchemaComponent } from './content-changed-schema.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-changed-trigger',
     styleUrls: ['./content-changed-trigger.component.scss'],
     templateUrl: './content-changed-trigger.component.html',
     providers: [
         CompletionsCache,
     ],
-    standalone: true,
     imports: [
-        FormHintComponent,
-        NgIf,
-        NgFor,
-        ContentChangedSchemaComponent,
-        FormsModule,
-        ReactiveFormsModule,
         CodeComponent,
+        ContentChangedSchemaComponent,
+        FormHintComponent,
+        FormsModule,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

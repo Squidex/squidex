@@ -11,15 +11,15 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, FormHintComponent, TagEditorComponent, TAGS_FIELD_EDITORS, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-tags-ui',
     styleUrls: ['tags-ui.component.scss'],
     templateUrl: 'tags-ui.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
         FormHintComponent,
+        FormsModule,
         NgFor,
+        ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],

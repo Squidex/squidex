@@ -9,30 +9,24 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared';
-import { TranslatePipe } from '@app/shared';
-import { LocalizedInputComponent } from '@app/shared';
-import { FormHintComponent } from '@app/shared';
-import { ModalPlacementDirective } from '@app/shared';
-import { DropdownMenuComponent } from '@app/shared';
-import { ModalDirective } from '@app/shared';
+import { AppSettingsDto, DropdownMenuComponent, FieldDto, FormHintComponent, hasNoValue$, hasValue$, LanguageDto, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types, value$ } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-string-validation',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgIf,
-        ModalDirective,
+        AsyncPipe,
         DropdownMenuComponent,
+        FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        ModalDirective,
         ModalPlacementDirective,
         NgFor,
-        FormHintComponent,
-        LocalizedInputComponent,
-        AsyncPipe,
+        NgIf,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

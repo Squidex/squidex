@@ -10,7 +10,9 @@ import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Rout
 import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
 import { Types } from '../utils/types';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class LoadingService implements OnDestroy {
     private readonly routerSubscription: Subscription;
     private readonly loading$ = new BehaviorSubject(0);

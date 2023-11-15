@@ -20,22 +20,22 @@ type ImportStatus = {
 };
 
 @Component({
+    standalone: true,
     selector: 'sqx-import-contributors-dialog',
     styleUrls: ['./import-contributors-dialog.component.scss'],
     templateUrl: './import-contributors-dialog.component.html',
-    standalone: true,
     imports: [
+        AsyncPipe,
+        FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         ModalDialogComponent,
-        TooltipDirective,
+        NgFor,
+        NgIf,
         NgSwitch,
         NgSwitchCase,
-        FormHintComponent,
-        NgIf,
-        NgFor,
+        ReactiveFormsModule,
         StatusIconComponent,
-        AsyncPipe,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

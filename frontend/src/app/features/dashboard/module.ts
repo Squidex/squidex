@@ -5,34 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { GridsterModule } from 'angular-gridster2';
-import { NgChartsModule } from 'ng2-charts';
-import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { ApiCardComponent, ContentSummaryCardComponent, DashboardConfigComponent, DashboardPageComponent, GithubCardComponent, HistoryCardComponent, SchemaCardComponent } from './declarations';
+import { Routes } from '@angular/router';
+import { DashboardPageComponent } from './pages/dashboard-page.component';
 
-const routes: Routes = [
+export const DASHBOARD_ROUTES: Routes = [
     {
         path: '',
         component: DashboardPageComponent,
     },
 ];
-
-@NgModule({
-    imports: [
-        GridsterModule,
-        NgChartsModule,
-        RouterModule.forChild(routes),
-        SqxFrameworkModule,
-        SqxSharedModule,
-        ApiCardComponent,
-        ContentSummaryCardComponent,
-        DashboardConfigComponent,
-        DashboardPageComponent,
-        GithubCardComponent,
-        HistoryCardComponent,
-        SchemaCardComponent,
-    ],
-})
-export class SqxFeatureDashboardModule {}

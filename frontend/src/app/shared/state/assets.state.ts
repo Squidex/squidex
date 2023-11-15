@@ -582,7 +582,9 @@ function getParent(path: ReadonlyArray<AssetPathItem>) {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AssetsState extends AssetsStateBase {
     constructor(
         appsState: AppsState, assetsService: AssetsService, dialogs: DialogService,

@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { ApiAreaComponent, GraphQLPageComponent } from './declarations';
+import { Routes } from '@angular/router';
+import { ApiAreaComponent } from './api-area.component';
+import { GraphQLPageComponent } from './pages/graphql/graphql-page.component';
 
-const routes: Routes = [
+export const API_ROUTES: Routes = [
     {
         path: '',
         component: ApiAreaComponent,
@@ -22,14 +21,3 @@ const routes: Routes = [
         ],
     },
 ];
-
-@NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        SqxFrameworkModule,
-        SqxSharedModule,
-        ApiAreaComponent,
-        GraphQLPageComponent,
-    ],
-})
-export class SqxFeatureApiModule {}

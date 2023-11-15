@@ -10,24 +10,21 @@ import { ChangeDetectorRef, Component, Input, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, combineLatest, of } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto, ToolbarService, TypedSimpleChanges } from '@app/shared';
-import { TranslatePipe } from '@app/shared';
-import { CodeEditorComponent } from '@app/shared';
-import { FormErrorComponent } from '@app/shared';
+import { AppLanguageDto, CodeEditorComponent, ContentDto, ContentsService, ContentsState, ErrorDto, FormErrorComponent, ToolbarService, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 type Mode = 'Content' | 'Data' | 'FlatData';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-inspection',
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',
-    standalone: true,
     imports: [
-        FormErrorComponent,
-        NgIf,
-        CodeEditorComponent,
-        FormsModule,
         AsyncPipe,
+        CodeEditorComponent,
+        FormErrorComponent,
+        FormsModule,
+        NgIf,
         TranslatePipe,
     ],
 })

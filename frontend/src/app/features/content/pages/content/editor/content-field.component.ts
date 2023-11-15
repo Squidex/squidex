@@ -15,19 +15,19 @@ import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldLanguagesComponent } from './field-languages.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html',
-    standalone: true,
     imports: [
-        FocusMarkerComponent,
-        NgIf,
-        FieldLanguagesComponent,
-        FieldCopyButtonComponent,
-        TooltipDirective,
-        NgFor,
-        FieldEditorComponent,
         AsyncPipe,
+        FieldCopyButtonComponent,
+        FieldEditorComponent,
+        FieldLanguagesComponent,
+        FocusMarkerComponent,
+        NgFor,
+        NgIf,
+        TooltipDirective,
     ],
 })
 export class ContentFieldComponent {

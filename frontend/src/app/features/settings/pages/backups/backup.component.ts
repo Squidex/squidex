@@ -10,20 +10,20 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ApiUrlConfig, BackupDto, BackupsState, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, KNumberPipe, StatusIconComponent, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-backup',
     styleUrls: ['./backup.component.scss'],
     templateUrl: './backup.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgSwitch,
-        StatusIconComponent,
-        NgIf,
-        TooltipDirective,
-        ExternalLinkDirective,
         ConfirmClickDirective,
+        ExternalLinkDirective,
         FromNowPipe,
         KNumberPipe,
+        NgIf,
+        NgSwitch,
+        StatusIconComponent,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

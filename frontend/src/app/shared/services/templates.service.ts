@@ -39,7 +39,9 @@ export type TemplatesDto = Readonly<{
     items: ReadonlyArray<TemplateDto>;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TemplatesService {
     constructor(
         private readonly http: HttpClient,

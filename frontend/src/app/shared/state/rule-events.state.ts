@@ -26,7 +26,9 @@ interface Snapshot extends ListState {
     resource: Resource;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class RuleEventsState extends State<Snapshot> {
     public ruleEvents =
         this.project(x => x.ruleEvents);

@@ -28,7 +28,9 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SchemasState extends State<Snapshot> {
     public selectedSchema =
         this.project(x => x.selectedSchema);

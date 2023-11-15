@@ -27,7 +27,9 @@ export interface SDKEntry {
     logo: string;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class HelpService {
     constructor(
         private readonly http: HttpClient,

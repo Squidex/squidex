@@ -5,20 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { AppsState } from '../state/apps.state';
 
-@Injectable()
-export class UnsetAppGuard  {
-    constructor(
-        private readonly appsState: AppsState,
-    ) {
-    }
+export const unsetAppGuard = () => {
+    const appsState = inject(AppsState);
 
-    public canActivate(): Observable<boolean> {
-        return this.appsState.select(null).pipe(map(a => a === null));
-    }
-}
+    return appsState.select(null).pipe(map(a => a === null));
+};

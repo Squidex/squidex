@@ -9,31 +9,33 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, ReferenceItemComponent, Router2State, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ReferenceItemComponent } from '../../shared/references/reference-item.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-references-page',
     styleUrls: ['./references-page.component.scss'],
     templateUrl: './references-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
-        Router2State, ComponentContentsState,
+        ComponentContentsState,
+        Router2State,
     ],
-    standalone: true,
     imports: [
-        TitleComponent,
-        LayoutComponent,
-        TooltipDirective,
-        ShortcutDirective,
-        NgIf,
+        AsyncPipe,
+        ContentsColumnsPipe,
         LanguageSelectorComponent,
+        LayoutComponent,
         ListViewComponent,
         NgFor,
-        ReferenceItemComponent,
+        NgIf,
         PagerComponent,
-        AsyncPipe,
+        ReferenceItemComponent,
+        ShortcutDirective,
+        TitleComponent,
+        TooltipDirective,
         TranslatePipe,
-        ContentsColumnsPipe,
     ],
 })
 export class ReferencesPageComponent implements OnInit {

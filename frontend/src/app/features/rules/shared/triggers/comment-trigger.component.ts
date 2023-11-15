@@ -10,16 +10,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodeComponent, ControlErrorsComponent, FormHintComponent, TranslatePipe, TriggerForm } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-comment-trigger',
     styleUrls: ['./comment-trigger.component.scss'],
     templateUrl: './comment-trigger.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
+        CodeComponent,
         ControlErrorsComponent,
         FormHintComponent,
-        CodeComponent,
+        FormsModule,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

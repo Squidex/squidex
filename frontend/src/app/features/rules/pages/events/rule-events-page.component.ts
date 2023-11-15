@@ -12,25 +12,25 @@ import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerCompone
 import { RuleEventComponent } from './rule-event.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-rule-events-page',
     styleUrls: ['./rule-events-page.component.scss'],
     templateUrl: './rule-events-page.component.html',
     providers: [
         Router2State,
     ],
-    standalone: true,
     imports: [
-        TitleComponent,
-        LayoutComponent,
-        TooltipDirective,
-        ShortcutDirective,
-        NgIf,
+        AsyncPipe,
         ConfirmClickDirective,
+        LayoutComponent,
         ListViewComponent,
         NgFor,
-        RuleEventComponent,
+        NgIf,
         PagerComponent,
-        AsyncPipe,
+        RuleEventComponent,
+        ShortcutDirective,
+        TitleComponent,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

@@ -10,9 +10,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Version, Versioned } from '@app/framework';
 import { ChangePlanDto, parsePlans, PlanChangedDto, PlansDto } from './shared';
+
 export * from './shared';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class PlansService {
     constructor(
         private readonly http: HttpClient,

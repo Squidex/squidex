@@ -14,12 +14,14 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-summary-card',
     styleUrls: ['./content-summary-card.component.scss'],
     templateUrl: './content-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [TranslatePipe],
+    imports: [
+        TranslatePipe,
+    ],
 })
 export class ContentSummaryCardComponent extends StatefulComponent<State> implements OnInit {
     @Input({ required: true })

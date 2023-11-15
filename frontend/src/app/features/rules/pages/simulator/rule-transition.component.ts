@@ -10,14 +10,14 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { SimulatedRuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-rule-transition',
     styleUrls: ['./rule-transition.component.scss'],
     templateUrl: './rule-transition.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
         NgFor,
+        NgIf,
         TranslatePipe,
     ],
 })

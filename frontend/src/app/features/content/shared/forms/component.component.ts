@@ -12,20 +12,20 @@ import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, 
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-component',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        FormHintComponent,
-        NgFor,
-        ComponentSectionComponent,
-        ModalDirective,
-        DropdownMenuComponent,
-        ModalPlacementDirective,
         AsyncPipe,
+        ComponentSectionComponent,
+        DropdownMenuComponent,
+        FormHintComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
         TranslatePipe,
     ],
 })

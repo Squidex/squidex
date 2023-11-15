@@ -14,22 +14,22 @@ import { map } from 'rxjs/operators';
 import { AppsState, getCategoryTree, LayoutComponent, SchemaCategory, SchemaCategoryComponent, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions, value$ } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
-    standalone: true,
     imports: [
-        TitleComponent,
-        NgIf,
-        LayoutComponent,
+        AsyncPipe,
         FormsModule,
+        LayoutComponent,
+        NgFor,
+        NgIf,
         ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
-        NgFor,
-        SchemaCategoryComponent,
         RouterOutlet,
-        AsyncPipe,
+        SchemaCategoryComponent,
+        TitleComponent,
         TranslatePipe,
     ],
 })

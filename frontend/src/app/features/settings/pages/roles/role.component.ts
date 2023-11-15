@@ -8,8 +8,7 @@
 import { NgFor, NgIf, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ConfirmClickDirective, ControlErrorsComponent, FormAlertComponent, FormHintComponent, TranslatePipe } from '@app/shared';
-import { AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, SchemaDto, Settings, TypedSimpleChanges } from '@app/shared';
+import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, ControlErrorsComponent, EditRoleForm, FormAlertComponent, FormHintComponent, RoleDto, RolesState, SchemaDto, Settings, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 const DESCRIPTIONS = {
     Developer: 'i18n:roles.defaults.developer',
@@ -35,21 +34,21 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
 }];
 
 @Component({
+    standalone: true,
     selector: 'sqx-role',
     styleUrls: ['./role.component.scss'],
     templateUrl: './role.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
+        AutocompleteComponent,
         ConfirmClickDirective,
-        NgIf,
-        FormsModule,
-        FormHintComponent,
-        NgFor,
         ControlErrorsComponent,
-        AutocompleteComponent_1,
-        ReactiveFormsModule,
         FormAlertComponent,
+        FormHintComponent,
+        FormsModule,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
         SlicePipe,
         TranslatePipe,
     ],

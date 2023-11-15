@@ -19,7 +19,9 @@ interface Snapshot {
     selectedTeam?: TeamDto | null;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TeamsState extends State<Snapshot> {
     public teams =
         this.project(x => x.teams);

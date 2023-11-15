@@ -5,20 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { AppsState } from '../state/apps.state';
 
-@Injectable()
-export class LoadAppsGuard  {
-    constructor(
-        private readonly appsState: AppsState,
-    ) {
-    }
+export const loadAppsGuard = () => {
+    const appsState = inject(AppsState);
 
-    public canActivate(): Observable<boolean> {
-        return this.appsState.load().pipe(map(() => true));
-    }
-}
+    return appsState.load().pipe(map(() => true));
+};

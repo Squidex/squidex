@@ -13,20 +13,20 @@ import { RouterLink } from '@angular/router';
 import { ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListFieldComponent, ContentValueComponent, getContentValue, LanguageDto, META_FIELDS, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: '[sqxReferenceItem][language][languages]',
     styleUrls: ['./reference-item.component.scss'],
     templateUrl: './reference-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
+        ConfirmClickDirective,
         ContentListCellDirective,
         ContentListFieldComponent,
-        NgFor,
         ContentValueComponent,
+        NgFor,
         NgIf,
-        TooltipDirective,
-        ConfirmClickDirective,
         RouterLink,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

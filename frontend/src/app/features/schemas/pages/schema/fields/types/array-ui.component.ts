@@ -13,14 +13,14 @@ import { ArrayFieldPropertiesDto, FieldDto, TranslatePipe } from '@app/shared';
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
 @Component({
+    standalone: true,
     selector: 'sqx-array-ui',
     styleUrls: ['array-ui.component.scss'],
     templateUrl: 'array-ui.component.html',
-    standalone: true,
     imports: [
         FormsModule,
-        ReactiveFormsModule,
         NgFor,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

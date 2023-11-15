@@ -9,28 +9,23 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { ConfigurePreviewUrlsForm, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
-import { TranslatePipe } from '@app/shared';
-import { ConfirmClickDirective } from '@app/shared';
-import { CodeEditorComponent } from '@app/shared';
-import { ControlErrorsComponent } from '@app/shared';
-import { FormAlertComponent } from '@app/shared';
+import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, ControlErrorsComponent, FormAlertComponent, SchemaDto, SchemasService, SchemasState, ScriptCompletions, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-preview-urls-form',
     styleUrls: ['./schema-preview-urls-form.component.scss'],
     templateUrl: './schema-preview-urls-form.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        FormAlertComponent,
-        NgIf,
-        NgFor,
-        ReactiveFormsModule,
-        ControlErrorsComponent,
+        AsyncPipe,
         CodeEditorComponent,
         ConfirmClickDirective,
-        AsyncPipe,
+        ControlErrorsComponent,
+        FormAlertComponent,
+        FormsModule,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

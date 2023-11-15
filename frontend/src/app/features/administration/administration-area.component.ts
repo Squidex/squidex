@@ -11,18 +11,18 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutContainerDirective, TitleComponent, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-administration-area',
     styleUrls: ['./administration-area.component.scss'],
     templateUrl: './administration-area.component.html',
-    standalone: true,
     imports: [
-        TitleComponent,
+        AsyncPipe,
+        LayoutContainerDirective,
         NgIf,
         RouterLink,
         RouterLinkActive,
-        LayoutContainerDirective,
         RouterOutlet,
-        AsyncPipe,
+        TitleComponent,
         TranslatePipe,
     ],
 })

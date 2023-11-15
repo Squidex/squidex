@@ -13,17 +13,17 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, UserPicturePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: '[sqxContributor][roles]',
     styleUrls: ['./contributor.component.scss'],
     templateUrl: './contributor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        TooltipDirective,
-        FormsModule,
-        NgFor,
         ConfirmClickDirective,
+        FormsModule,
         HighlightPipe,
+        NgFor,
+        TooltipDirective,
         UserPicturePipe,
     ],
 })

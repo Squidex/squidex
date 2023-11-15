@@ -10,8 +10,7 @@ import { ChangeDetectionStrategy, Component, Injectable, ViewChild } from '@angu
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { ShortcutComponent, ShortcutDirective, TooltipDirective, TranslatePipe } from '@app/shared';
-import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, Types } from '@app/shared';
+import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, ShortcutComponent, ShortcutDirective, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { AutocompleteComponent as AutocompleteComponent_1 } from '../../../framework/angular/forms/editors/autocomplete.component';
 
 @Injectable()

@@ -20,7 +20,9 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class BackupsState extends State<Snapshot> {
     public backups =
         this.project(x => x.backups);

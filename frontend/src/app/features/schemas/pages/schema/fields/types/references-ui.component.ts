@@ -11,16 +11,16 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, FormHintComponent, REFERENCES_FIELD_EDITORS, ReferencesFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-references-ui',
     styleUrls: ['references-ui.component.scss'],
     templateUrl: 'references-ui.component.html',
-    standalone: true,
     imports: [
+        FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         NgFor,
         NgIf,
-        FormHintComponent,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

@@ -11,17 +11,17 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, TagEditorComponent, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-tags-validation',
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html',
-    standalone: true,
     imports: [
+        FormHintComponent,
         FormsModule,
+        LocalizedInputComponent,
+        NgIf,
         ReactiveFormsModule,
         TagEditorComponent,
-        NgIf,
-        LocalizedInputComponent,
-        FormHintComponent,
         TranslatePipe,
     ],
 })

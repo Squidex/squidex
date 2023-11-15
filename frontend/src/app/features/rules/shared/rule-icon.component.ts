@@ -10,12 +10,15 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RuleElementMetadataDto, SafeHtmlPipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-rule-icon',
     styleUrls: ['./rule-icon.component.scss'],
     templateUrl: './rule-icon.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [NgIf, SafeHtmlPipe],
+    imports: [
+        NgIf,
+        SafeHtmlPipe,
+    ],
 })
 export class RuleIconComponent {
     @Input({ required: true })

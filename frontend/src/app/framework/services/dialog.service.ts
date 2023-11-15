@@ -87,7 +87,9 @@ export class Notification {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class DialogService {
     private readonly requestStream$ = new Subject<DialogRequest>();
     private readonly notificationsStream$ = new Subject<Notification>();

@@ -10,12 +10,14 @@ import { Router } from '@angular/router';
 import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-extension',
     styleUrls: ['./content-extension.component.scss'],
     templateUrl: './content-extension.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [SafeResourceUrlPipe],
+    imports: [
+        SafeResourceUrlPipe,
+    ],
 })
 export class ContentExtensionComponent {
     private readonly context: any;

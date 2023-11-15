@@ -10,8 +10,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
-import { FormHintComponent, ModalDialogComponent, StatusIconComponent, TooltipDirective, TranslatePipe } from '@app/shared';
-import { ErrorDto, ImportContributorsForm } from '@app/shared';
+import { ErrorDto, FormHintComponent, ImportContributorsForm, ModalDialogComponent, StatusIconComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { TeamContributorsState } from '../../internal';
 
 type ImportStatus = {
@@ -22,22 +21,22 @@ type ImportStatus = {
 };
 
 @Component({
+    standalone: true,
     selector: 'sqx-import-contributors-dialog',
     styleUrls: ['./import-contributors-dialog.component.scss'],
     templateUrl: './import-contributors-dialog.component.html',
-    standalone: true,
     imports: [
+        AsyncPipe,
+        FormHintComponent,
         FormsModule,
-        ReactiveFormsModule,
         ModalDialogComponent,
-        TooltipDirective,
+        NgFor,
+        NgIf,
         NgSwitch,
         NgSwitchCase,
-        FormHintComponent,
-        NgIf,
-        NgFor,
+        ReactiveFormsModule,
         StatusIconComponent,
-        AsyncPipe,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

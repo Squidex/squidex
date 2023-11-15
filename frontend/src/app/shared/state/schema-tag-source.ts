@@ -46,7 +46,9 @@ class SchemaConverter implements TagConverter {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SchemaTagSource {
     public converter =
         this.schemasState.schemas.pipe(

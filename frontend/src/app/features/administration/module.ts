@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { HelpComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AdministrationAreaComponent, EventConsumerComponent, EventConsumersPageComponent, EventConsumersService, EventConsumersState, RestorePageComponent, UserComponent, UserMustExistGuard, UserPageComponent, UsersPageComponent, UsersService, UsersState } from './declarations';
+import { Routes } from '@angular/router';
+import { HelpComponent } from '@app/shared';
+import { AdministrationAreaComponent, EventConsumersPageComponent, EventConsumersService, EventConsumersState, RestorePageComponent, UserPageComponent, UsersPageComponent, UsersService, UsersState, userMustExistGuard } from './declarations';
 
-const routes: Routes = [
+export const ADMINISTRATION_ROUTES: Routes = [
     {
         path: '',
         component: AdministrationAreaComponent,
@@ -23,6 +22,10 @@ const routes: Routes = [
             {
                 path: 'event-consumers',
                 component: EventConsumersPageComponent,
+                providers: [
+                    EventConsumersService,
+                    EventConsumersState,
+                ],
                 children: [
                     {
                         path: 'help',
@@ -49,6 +52,10 @@ const routes: Routes = [
             {
                 path: 'users',
                 component: UsersPageComponent,
+                providers: [
+                    UsersService,
+                    UsersState,
+                ],
                 children: [
                     {
                         path: 'help',
@@ -60,33 +67,10 @@ const routes: Routes = [
                     {
                         path: ':userId',
                         component: UserPageComponent,
-                        canActivate: [UserMustExistGuard],
+                        canActivate: [userMustExistGuard],
                     },
                 ],
             },
         ],
     },
 ];
-
-@NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        SqxFrameworkModule,
-        SqxSharedModule,
-        AdministrationAreaComponent,
-        EventConsumerComponent,
-        EventConsumersPageComponent,
-        RestorePageComponent,
-        UserComponent,
-        UserPageComponent,
-        UsersPageComponent,
-    ],
-    providers: [
-        EventConsumersService,
-        EventConsumersState,
-        UserMustExistGuard,
-        UsersService,
-        UsersState,
-    ],
-})
-export class SqxFeatureAdministrationModule {}

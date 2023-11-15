@@ -11,18 +11,18 @@ import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSe
 import { FieldEditorComponent } from './field-editor.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-component-section',
     styleUrls: ['./component-section.component.scss'],
     templateUrl: './component-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
+        AsyncPipe,
+        FieldEditorComponent,
         FormHintComponent,
         MarkdownDirective,
         NgFor,
-        FieldEditorComponent,
-        AsyncPipe,
+        NgIf,
     ],
 })
 export class ComponentSectionComponent {

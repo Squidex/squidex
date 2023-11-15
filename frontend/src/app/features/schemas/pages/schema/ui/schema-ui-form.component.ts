@@ -11,13 +11,13 @@ import { SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 import { FieldListComponent } from './field-list.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-ui-form',
     styleUrls: ['./schema-ui-form.component.scss'],
     templateUrl: './schema-ui-form.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
         FieldListComponent,
+        FormsModule,
         TranslatePipe,
     ],
 })

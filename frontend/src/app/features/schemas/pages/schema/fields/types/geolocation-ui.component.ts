@@ -10,10 +10,10 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, GeolocationFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-geolocation-ui',
     styleUrls: ['geolocation-ui.component.scss'],
     templateUrl: 'geolocation-ui.component.html',
-    standalone: true,
     imports: [
         FormsModule,
         ReactiveFormsModule,

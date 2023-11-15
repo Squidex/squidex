@@ -11,18 +11,18 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ControlErrorsComponent, EditSchemaForm, FormAlertComponent, FormHintComponent, SchemaDto, SchemasState, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-edit-form',
     styleUrls: ['./schema-edit-form.component.scss'],
     templateUrl: './schema-edit-form.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
         ControlErrorsComponent,
-        FormHintComponent,
-        TagEditorComponent,
         FormAlertComponent,
+        FormHintComponent,
+        FormsModule,
         NgIf,
+        ReactiveFormsModule,
+        TagEditorComponent,
         TranslatePipe,
     ],
 })

@@ -5,37 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { map, tap } from 'rxjs/operators';
 import { allParams } from '@app/shared';
 import { UsersState } from '../internal';
 
-@Injectable()
-export class UserMustExistGuard  {
-    constructor(
-        private readonly usersState: UsersState,
-        private readonly router: Router,
-    ) {
+export const userMustExistGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+    const usersState = inject(UsersState);
+
+    const userId = allParams(route)['userId'];
+
+    if (!userId || userId === 'new') {
+        return usersState.select(null).pipe(map(u => u === null));
     }
 
-    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
-        const userId = allParams(route)['userId'];
+    const router = inject(Router);
+    const result =
+        usersState.select(userId).pipe(
+            tap(dto => {
+                if (!dto) {
+                    router.navigate(['/404']);
+                }
+            }),
+            map(u => !!u));
 
-        if (!userId || userId === 'new') {
-            return this.usersState.select(null).pipe(map(u => u === null));
-        }
-
-        const result =
-            this.usersState.select(userId).pipe(
-                tap(dto => {
-                    if (!dto) {
-                        this.router.navigate(['/404']);
-                    }
-                }),
-                map(u => !!u));
-
-        return result;
-    }
-}
+    return result;
+};

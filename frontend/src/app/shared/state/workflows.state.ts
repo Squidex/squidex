@@ -26,7 +26,9 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class WorkflowsState extends State<Snapshot> {
     public workflows =
         this.project(x => x.workflows);

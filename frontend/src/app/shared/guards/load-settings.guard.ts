@@ -5,20 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { UIState } from '../state/ui.state';
 
-@Injectable()
-export class LoadSettingsGuard  {
-    constructor(
-        private readonly uiState: UIState,
-    ) {
-    }
+export const loadSettingsGuard = () => {
+    const uiState = inject(UIState);
 
-    public canActivate(): Observable<boolean> {
-        return this.uiState.load().pipe(map(() => true));
-    }
-}
+    return uiState.load().pipe(map(() => true));
+};

@@ -27,18 +27,9 @@
       "dom"
     ],
     "paths": {
-      "@app/shared/internal": [
-        "src/app/shared/internal"
+      "@app*": [
+        "src/app*"
       ],
-      "@app/shared": [
-        "src/app/shared"
-      ],
-      "@app/framework": [
-        "src/app/framework"
-      ],
-      "@app/framework/internal": [
-        "src/app/framework/internal"
-      ]
     },
     "useDefineForClassFields": false
   },

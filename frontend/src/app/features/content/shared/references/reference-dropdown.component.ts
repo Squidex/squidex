@@ -30,6 +30,7 @@ type ContentName = { name: string; id?: string };
 const NO_EMIT = { emitEvent: false };
 
 @Component({
+    standalone: true,
     selector: 'sqx-reference-dropdown',
     styleUrls: ['./reference-dropdown.component.scss'],
     templateUrl: './reference-dropdown.component.html',
@@ -37,12 +38,11 @@ const NO_EMIT = { emitEvent: false };
         SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         DropdownComponent,
         FormsModule,
-        ReactiveFormsModule,
         HighlightPipe,
+        ReactiveFormsModule,
         SafeHtmlPipe,
     ],
 })

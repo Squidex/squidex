@@ -40,16 +40,16 @@ class LanguageSource implements AutocompleteSource {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-language-add-form',
     styleUrls: ['./language-add-form.component.scss'],
     templateUrl: './language-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
         AutocompleteComponent,
         FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

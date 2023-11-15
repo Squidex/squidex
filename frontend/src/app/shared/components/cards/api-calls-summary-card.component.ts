@@ -7,17 +7,18 @@
 
 import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CallsUsageDto, KNumberPipe, TranslatePipe } from '@app/framework';
+import { KNumberPipe, TranslatePipe } from '@app/framework';
+import { CallsUsageDto } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-api-calls-summary-card',
     styleUrls: ['./api-calls-summary-card.component.scss'],
     templateUrl: './api-calls-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
         KNumberPipe,
+        NgIf,
         TranslatePipe,
     ],
 })

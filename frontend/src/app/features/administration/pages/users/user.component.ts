@@ -14,18 +14,18 @@ import { ConfirmClickDirective, StopClickDirective, TooltipDirective, UserDtoPic
 import { UserDto, UsersState } from '../../internal';
 
 @Component({
+    standalone: true,
     selector: '[sqxUser]',
     styleUrls: ['./user.component.scss'],
     templateUrl: './user.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        RouterLinkActive,
-        RouterLink,
-        TooltipDirective,
-        NgIf,
-        StopClickDirective,
         ConfirmClickDirective,
+        NgIf,
+        RouterLink,
+        RouterLinkActive,
+        StopClickDirective,
+        TooltipDirective,
         UserDtoPicture,
     ],
 })

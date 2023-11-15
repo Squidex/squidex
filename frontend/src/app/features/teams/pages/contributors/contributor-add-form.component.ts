@@ -11,7 +11,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
 import { AutocompleteComponent, AutocompleteSource, DialogModel, DialogService, FormHintComponent, ModalDirective, TranslatePipe, UsersService } from '@app/shared';
-import { UserDtoPicture } from '@app/shared/components/pipes';
+import { UserDtoPicture } from '@app/shared';
+import { AssignTeamContributorForm } from '../../internal';
 import { TeamContributorsState } from '../../state/team-contributors.state';
 import { ImportContributorsDialogComponent } from './import-contributors-dialog.component';
 
@@ -43,21 +44,21 @@ export class UsersDataSource implements AutocompleteSource {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-contributor-add-form',
     styleUrls: ['./contributor-add-form.component.scss'],
     templateUrl: './contributor-add-form.component.html',
     providers: [
         UsersDataSource,
     ],
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
+        AsyncPipe,
         AutocompleteComponent,
         FormHintComponent,
-        ModalDirective,
+        FormsModule,
         ImportContributorsDialogComponent,
-        AsyncPipe,
+        ModalDirective,
+        ReactiveFormsModule,
         TranslatePipe,
         UserDtoPicture,
     ],

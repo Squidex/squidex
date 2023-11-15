@@ -9,41 +9,30 @@ import { NgIf } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { TranslatePipe } from '@app/shared';
-import { FullDateTimePipe } from '@app/shared';
-import { ConfirmClickDirective } from '@app/shared';
-import { CopyDirective } from '@app/shared';
-import { TooltipDirective } from '@app/shared';
-import { ModalDialogComponent } from '@app/shared';
-import { ModalDirective } from '@app/shared';
-import { LayoutComponent } from '@app/shared';
-import { TitleComponent } from '@app/shared';
-import { ContentStatusComponent } from '@app/shared';
-import { UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
-import { AppsState, ContentDto, ContentsService, DateTime, DialogModel, getContentValue, LanguageDto, LanguagesState, LocalizerService, ResourceLoaderService } from '@app/shared';
+import { AppsState, ConfirmClickDirective, ContentDto, ContentsService, ContentStatusComponent, CopyDirective, DateTime, DialogModel, FullDateTimePipe, getContentValue, LanguageDto, LanguagesState, LayoutComponent, LocalizerService, ModalDialogComponent, ModalDirective, ResourceLoaderService, TitleComponent, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 declare const tui: any;
 
 type ViewMode = 'day' | 'week' | 'month';
 
 @Component({
+    standalone: true,
     selector: 'sqx-calendar-page',
     styleUrls: ['./calendar-page.component.scss'],
     templateUrl: './calendar-page.component.html',
-    standalone: true,
     imports: [
-        TitleComponent,
-        LayoutComponent,
-        FormsModule,
-        ModalDirective,
-        ModalDialogComponent,
-        TooltipDirective,
-        NgIf,
-        CopyDirective,
-        RouterLink,
-        ContentStatusComponent,
         ConfirmClickDirective,
+        ContentStatusComponent,
+        CopyDirective,
+        FormsModule,
         FullDateTimePipe,
+        LayoutComponent,
+        ModalDialogComponent,
+        ModalDirective,
+        NgIf,
+        RouterLink,
+        TitleComponent,
+        TooltipDirective,
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,

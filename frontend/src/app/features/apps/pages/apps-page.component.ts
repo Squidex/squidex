@@ -18,23 +18,23 @@ import { TeamComponent } from './team.component';
 type GroupedApps = { team?: TeamDto; apps: AppDto[] };
 
 @Component({
+    standalone: true,
     selector: 'sqx-apps-page',
     styleUrls: ['./apps-page.component.scss'],
     templateUrl: './apps-page.component.html',
-    standalone: true,
     imports: [
-        TitleComponent,
-        NgIf,
-        TourStepDirective,
-        NgFor,
-        TeamComponent,
         AppComponent,
+        AppFormComponent,
+        AsyncPipe,
         FormHintComponent,
         ModalDirective,
-        AppFormComponent,
-        OnboardingDialogComponent,
         NewsDialogComponent,
-        AsyncPipe,
+        NgFor,
+        NgIf,
+        OnboardingDialogComponent,
+        TeamComponent,
+        TitleComponent,
+        TourStepDirective,
         TranslatePipe,
     ],
 })

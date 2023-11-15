@@ -21,7 +21,9 @@ export class TitlesConfig {
 
 export type Title = { route?: any; localized: string; value: string };
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TitleService {
     private readonly path$ = new BehaviorSubject<ReadonlyArray<Title>>([]);
 

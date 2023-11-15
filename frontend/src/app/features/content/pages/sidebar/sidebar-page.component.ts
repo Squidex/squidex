@@ -9,21 +9,19 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { LayoutComponent } from '@app/shared';
-import { defined } from '@app/shared';
-import { ContentsState, SchemasState } from '@app/shared';
+import { ContentsState, defined, LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-sidebar-page',
     styleUrls: ['./sidebar-page.component.scss'],
     templateUrl: './sidebar-page.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        LayoutComponent,
-        ContentExtensionComponent,
         AsyncPipe,
+        ContentExtensionComponent,
+        LayoutComponent,
     ],
 })
 export class SidebarPageComponent {

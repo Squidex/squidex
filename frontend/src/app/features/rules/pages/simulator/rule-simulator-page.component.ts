@@ -13,18 +13,18 @@ import { RuleConfigured } from '../messages';
 import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-simulator-events-page',
     styleUrls: ['./rule-simulator-page.component.scss'],
     templateUrl: './rule-simulator-page.component.html',
-    standalone: true,
     imports: [
-        TitleComponent,
+        AsyncPipe,
         LayoutComponent,
-        TooltipDirective,
         ListViewComponent,
         NgFor,
         SimulatedRuleEventComponent,
-        AsyncPipe,
+        TitleComponent,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

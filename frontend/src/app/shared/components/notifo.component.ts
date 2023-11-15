@@ -11,12 +11,14 @@ import { AuthService } from '@app/shared/internal';
 import { TourHintDirective } from './tour-hint.directive';
 
 @Component({
+    standalone: true,
     selector: 'sqx-notifo',
     styleUrls: ['./notifo.component.scss'],
     templateUrl: './notifo.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [TourHintDirective],
+    imports: [
+        TourHintDirective,
+    ],
 })
 export class NotifoComponent implements AfterViewInit, OnDestroy {
     private readonly notifoApiUrl: string = inject(UIOptions).value.notifoApi;

@@ -213,7 +213,9 @@ export type AssetsByQuery = Readonly<{
     parentId?: string;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AssetsService {
     constructor(
         private readonly http: HttpClient,

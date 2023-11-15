@@ -8,8 +8,7 @@
 import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { map, Observable, shareReplay } from 'rxjs';
-import { FormHintComponent, LoaderComponent, MarkdownPipe, SafeHtmlPipe, TranslatePipe } from '@app/shared';
-import { AppsState, ClientsState, TemplateDetailsDto, TemplateDto, TemplatesService } from '@app/shared';
+import { AppsState, ClientsState, FormHintComponent, LoaderComponent, MarkdownPipe, SafeHtmlPipe, TemplateDetailsDto, TemplateDto, TemplatesService, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-template',

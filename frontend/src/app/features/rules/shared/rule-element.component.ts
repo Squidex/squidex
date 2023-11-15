@@ -11,18 +11,18 @@ import { DarkenPipe, ExternalLinkDirective, HoverBackgroundDirective, RuleElemen
 import { RuleIconComponent } from './rule-icon.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-rule-element',
     styleUrls: ['./rule-element.component.scss'],
     templateUrl: './rule-element.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
+        DarkenPipe,
+        ExternalLinkDirective,
         HoverBackgroundDirective,
+        NgIf,
         RuleIconComponent,
         StopClickDirective,
-        ExternalLinkDirective,
-        DarkenPipe,
         TranslatePipe,
     ],
 })

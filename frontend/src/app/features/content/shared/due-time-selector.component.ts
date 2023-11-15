@@ -13,17 +13,17 @@ import { DateTimeEditorComponent, DialogModel, FocusOnInitDirective, ModalDialog
 const OPTION_IMMEDIATELY = 'Immediately';
 
 @Component({
+    standalone: true,
     selector: 'sqx-due-time-selector',
     styleUrls: ['./due-time-selector.component.scss'],
     templateUrl: './due-time-selector.component.html',
-    standalone: true,
     imports: [
-        ModalDirective,
-        ModalDialogComponent,
-        TooltipDirective,
-        FormsModule,
         DateTimeEditorComponent,
         FocusOnInitDirective,
+        FormsModule,
+        ModalDialogComponent,
+        ModalDirective,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

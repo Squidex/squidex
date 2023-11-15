@@ -12,17 +12,17 @@ import { AppsState, defined, LayoutComponent, TitleComponent } from '@app/shared
 import { SettingsMenuComponent } from './settings-menu.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-settings-area',
     styleUrls: ['./settings-area.component.scss'],
     templateUrl: './settings-area.component.html',
-    standalone: true,
     imports: [
-        TitleComponent,
+        AsyncPipe,
         LayoutComponent,
         NgIf,
-        SettingsMenuComponent,
         RouterOutlet,
-        AsyncPipe,
+        SettingsMenuComponent,
+        TitleComponent,
     ],
 })
 export class SettingsAreaComponent {

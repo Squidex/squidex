@@ -11,18 +11,18 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-references-validation',
     styleUrls: ['references-validation.component.scss'],
     templateUrl: 'references-validation.component.html',
-    standalone: true,
     imports: [
+        AsyncPipe,
+        FormHintComponent,
         FormsModule,
+        LocalizedInputComponent,
+        NgIf,
         ReactiveFormsModule,
         TagEditorComponent,
-        NgIf,
-        LocalizedInputComponent,
-        FormHintComponent,
-        AsyncPipe,
         TranslatePipe,
     ],
 })

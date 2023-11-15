@@ -67,7 +67,9 @@ export type StartRestoreDto = Readonly<{
     newAppName?: string;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class BackupsService {
     constructor(
         private readonly http: HttpClient,

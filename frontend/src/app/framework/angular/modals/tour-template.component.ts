@@ -13,8 +13,7 @@ import { TranslatePipe } from '../pipes/translate.pipe';
 import { SafeHtmlPipe } from '../safe-html.pipe';
 import { ModalPlacementDirective } from './modal-placement.directive';
 import { ModalDirective } from './modal.directive';
-import { TourService } from './tour.service';
-import { StepDefinition } from './tour.service';
+import { StepDefinition, TourService } from './tour.service';
 
 @Component({
     selector: 'sqx-tour-template',

@@ -5,76 +5,75 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ModuleWithProviders } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { AppMustExistGuard, LoadAppsGuard, LoadSettingsGuard, LoadTeamsGuard, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, TeamMustExistGuard, UnsetAppGuard, UnsetTeamGuard } from './shared';
+import { Routes } from '@angular/router';
+import { appMustExistGuard, loadAppsGuard, loadSettingsGuard, LoadTeamsGuard, mustBeAuthenticatedGuard, mustBeNotAuthenticatedGuard, TeamMustExistGuard, unsetAppGuard, unsetTeamGuard } from './shared';
 import { AppAreaComponent, ForbiddenPageComponent, HomePageComponent, InternalAreaComponent, LoginPageComponent, LogoutPageComponent, NotFoundPageComponent, TeamsAreaComponent } from './shell';
 
-const routes: Routes = [
+export const APP_ROUTES: Routes = [
     {
         path: '',
         component: HomePageComponent,
-        canActivate: [MustBeNotAuthenticatedGuard],
+        canActivate: [mustBeNotAuthenticatedGuard],
     },
     {
         path: 'app',
         component: InternalAreaComponent,
-        canActivate: [MustBeAuthenticatedGuard, LoadAppsGuard, LoadTeamsGuard, LoadSettingsGuard],
+        canActivate: [mustBeAuthenticatedGuard, loadAppsGuard, LoadTeamsGuard, loadSettingsGuard],
         children: [
             {
                 path: '',
-                loadChildren: () => import('./features/apps/module').then(m => m.SqxFeatureAppsModule),
-                canActivate: [UnsetAppGuard, UnsetTeamGuard],
+                loadChildren: () => import('./features/apps/module').then(m => m.APPS_ROUTES),
+                canActivate: [unsetAppGuard, unsetTeamGuard],
             },
             {
                 path: 'administration',
-                loadChildren: () => import('./features/administration/module').then(m => m.SqxFeatureAdministrationModule),
-                canActivate: [UnsetAppGuard, UnsetTeamGuard],
+                loadChildren: () => import('./features/administration/module').then(m => m.ADMINISTRATION_ROUTES),
+                canActivate: [unsetAppGuard, unsetTeamGuard],
             },
             {
                 path: 'teams',
                 component: TeamsAreaComponent,
-                canActivate: [UnsetAppGuard, UnsetTeamGuard],
+                canActivate: [unsetAppGuard, unsetTeamGuard],
                 children: [
                     {
                         path: ':teamName',
                         canActivate: [TeamMustExistGuard],
-                        loadChildren: () => import('./features/teams/module').then(m => m.SqxFeatureTeamsModule),
+                        loadChildren: () => import('./features/teams/module').then(m => m.TEAM_ROUTES),
                     },
                 ],
             },
             {
                 path: ':appName',
                 component: AppAreaComponent,
-                canActivate: [AppMustExistGuard],
+                canActivate: [appMustExistGuard],
                 children: [
                     {
                         path: '',
-                        loadChildren: () => import('./features/dashboard/module').then(m => m.SqxFeatureDashboardModule),
+                        loadChildren: () => import('./features/dashboard/module').then(m => m.DASHBOARD_ROUTES),
                     },
                     {
                         path: 'content',
-                        loadChildren: () => import('./features/content/module').then(m => m.SqxFeatureContentModule),
+                        loadChildren: () => import('./features/content/module').then(m => m.CONTENT_ROUTES),
                     },
                     {
                         path: 'schemas',
-                        loadChildren: () => import('./features/schemas/module').then(m => m.SqxFeatureSchemasModule),
+                        loadChildren: () => import('./features/schemas/module').then(m => m.SCHEMAS_ROUTES),
                     },
                     {
                         path: 'assets',
-                        loadChildren: () => import('./features/assets/module').then(m => m.SqxFeatureAssetsModule),
+                        loadChildren: () => import('./features/assets/module').then(m => m.ASSETS_ROUTES),
                     },
                     {
                         path: 'rules',
-                        loadChildren: () => import('./features/rules/module').then(m => m.SqxFeatureRulesModule),
+                        loadChildren: () => import('./features/rules/module').then(m => m.RULES_ROUTES),
                     },
                     {
                         path: 'settings',
-                        loadChildren: () => import('./features/settings/module').then(m => m.SqxFeatureSettingsModule),
+                        loadChildren: () => import('./features/settings/module').then(m => m.SETTINGS_ROUTES),
                     },
                     {
                         path: 'api',
-                        loadChildren: () => import('./features/api/module').then(m => m.SqxFeatureApiModule),
+                        loadChildren: () => import('./features/api/module').then(m => m.API_ROUTES),
                     },
                 ],
             },
@@ -97,5 +96,3 @@ const routes: Routes = [
         component: NotFoundPageComponent,
     },
 ];
-
-export const routing: ModuleWithProviders<RouterModule> = RouterModule.forRoot(routes, { useHash: false });

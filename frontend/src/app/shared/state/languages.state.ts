@@ -37,11 +37,13 @@ interface Snapshot extends LoadingState {
     // The app version.
     version: Version;
 
-    // Inedicates if the user can add a language.
+    // Indicates if the user can add a language.
     canCreate?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class LanguagesState extends State<Snapshot> {
     private cachedLanguage$?: Observable<ReadonlyArray<LanguageDto>>;
 

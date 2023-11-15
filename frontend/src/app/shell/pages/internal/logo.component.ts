@@ -9,12 +9,14 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@an
 import { LoaderComponent } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-logo',
     styleUrls: ['./logo.component.scss'],
     templateUrl: './logo.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [LoaderComponent],
+    imports: [
+        LoaderComponent,
+    ],
 })
 export class LogoComponent {
     @Input({ transform: booleanAttribute })

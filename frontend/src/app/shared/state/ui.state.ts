@@ -40,7 +40,9 @@ interface Snapshot {
     appName?: string;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class UIState extends State<Snapshot> {
     public settings =
         this.project(mergeSettings);

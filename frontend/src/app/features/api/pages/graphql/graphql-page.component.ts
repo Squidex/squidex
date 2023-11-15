@@ -15,22 +15,22 @@ import * as ReactDOM from 'react-dom';
 import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-graphql-page',
     styleUrls: ['./graphql-page.component.scss'],
     templateUrl: './graphql-page.component.html',
-    standalone: true,
     imports: [
-        TitleComponent,
-        LayoutComponent,
-        TourStepDirective,
-        NgIf,
-        ModalDirective,
-        ModalDialogComponent,
-        TooltipDirective,
+        AsyncPipe,
         FormHintComponent,
         FormsModule,
+        LayoutComponent,
+        ModalDialogComponent,
+        ModalDirective,
         NgFor,
-        AsyncPipe,
+        NgIf,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
         TranslatePipe,
     ],
 })

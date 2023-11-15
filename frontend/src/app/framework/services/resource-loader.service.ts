@@ -7,7 +7,9 @@
 
 import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ResourceLoaderService {
     private readonly cache: { [path: string]: Promise<any> } = {};
     private readonly renderer: Renderer2;

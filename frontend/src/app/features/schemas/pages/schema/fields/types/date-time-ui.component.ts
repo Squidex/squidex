@@ -11,16 +11,16 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { DATETIME_FIELD_EDITORS, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormHintComponent, MarkdownInlinePipe, SafeHtmlPipe, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-date-time-ui',
     styleUrls: ['date-time-ui.component.scss'],
     templateUrl: 'date-time-ui.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
         FormHintComponent,
-        NgFor,
+        FormsModule,
         MarkdownInlinePipe,
+        NgFor,
+        ReactiveFormsModule,
         SafeHtmlPipe,
         TranslatePipe,
     ],

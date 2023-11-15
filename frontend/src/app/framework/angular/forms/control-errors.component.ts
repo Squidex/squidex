@@ -20,12 +20,15 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-control-errors',
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [NgIf, ControlErrorsMessagesComponent],
+    imports: [
+        ControlErrorsMessagesComponent,
+        NgIf,
+    ],
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements  OnDestroy {
     private readonly subscriptions = new Subscriptions();

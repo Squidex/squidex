@@ -11,18 +11,18 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TransformInputDirective, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-client-add-form',
     styleUrls: ['./client-add-form.component.scss'],
     templateUrl: './client-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
+        AsyncPipe,
+        ControlErrorsComponent,
+        FormHintComponent,
         FormsModule,
         ReactiveFormsModule,
-        ControlErrorsComponent,
         TransformInputDirective,
-        FormHintComponent,
-        AsyncPipe,
         TranslatePipe,
     ],
 })

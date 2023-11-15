@@ -41,6 +41,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
@@ -48,18 +49,17 @@ interface State {
         SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        FileDropDirective,
-        ResizedDirective,
-        NgIf,
-        NgFor,
         AssetComponent,
-        CdkDropList,
-        CdkDrag,
-        ModalDirective,
-        AssetSelectorComponent,
         AssetDialogComponent,
+        AssetSelectorComponent,
+        CdkDrag,
+        CdkDropList,
+        FileDropDirective,
+        ModalDirective,
+        NgFor,
+        NgIf,
+        ResizedDirective,
         TranslatePipe,
     ],
 })

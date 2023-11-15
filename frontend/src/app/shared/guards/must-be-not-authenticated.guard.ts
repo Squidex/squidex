@@ -6,38 +6,30 @@
  */
 
 import { Location } from '@angular/common';
-import { inject, Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { UIOptions } from '@app/framework';
 import { AuthService } from '../services/auth.service';
 
-@Injectable()
-export class MustBeNotAuthenticatedGuard  {
-    private readonly options = inject(UIOptions);
+export const mustBeNotAuthenticatedGuard = (route: ActivatedRouteSnapshot) => {
+    const authService = inject(AuthService);
+    const location = inject(Location);
+    const options = inject(UIOptions);
+    const router = inject(Router);
 
-    constructor(
-        private readonly authService: AuthService,
-        private readonly location: Location,
-        private readonly router: Router,
-    ) {
-    }
+    const redirect = options.value.redirectToLogin && !route.queryParams.logout;
 
-    public canActivate(snapshot: ActivatedRouteSnapshot): Observable<boolean> {
-        const redirect = this.options.value.redirectToLogin && !snapshot.queryParams.logout;
+    return authService.userChanges.pipe(
+        take(1),
+        tap(user => {
+            const redirectPath = location.path(true);
 
-        return this.authService.userChanges.pipe(
-            take(1),
-            tap(user => {
-                const redirectPath = this.location.path(true);
-
-                if (!user && redirect) {
-                    this.authService.loginRedirect(redirectPath);
-                } else if (user) {
-                    this.router.navigate(['app'], { queryParams: { redirectPath } });
-                }
-            }),
-            map(user => !user && !redirect));
-    }
-}
+            if (!user && redirect) {
+                authService.loginRedirect(redirectPath);
+            } else if (user) {
+                router.navigate(['app'], { queryParams: { redirectPath } });
+            }
+        }),
+        map(user => !user && !redirect));
+};

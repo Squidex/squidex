@@ -74,7 +74,9 @@ export class Profile {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AuthService {
     private readonly userManager!: UserManager;
     private readonly user$ = new ReplaySubject<Profile | null>(1);

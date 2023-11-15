@@ -21,6 +21,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
+    standalone: true,
     selector: 'sqx-rich-editor',
     styleUrls: ['./rich-editor.component.scss'],
     templateUrl: './rich-editor.component.html',
@@ -28,14 +29,13 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        ModalDirective,
-        AssetSelectorComponent,
         AssetDialogComponent,
-        ContentSelectorComponent,
-        ChatDialogComponent,
+        AssetSelectorComponent,
         AsyncPipe,
+        ChatDialogComponent,
+        ContentSelectorComponent,
+        ModalDirective,
     ],
 })
 export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {

@@ -10,6 +10,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { fadeAnimation } from '@app/framework/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-errors-messages',
     styleUrls: ['./control-errors-messages.component.scss'],
     templateUrl: './control-errors-messages.component.html',
@@ -17,8 +18,10 @@ import { fadeAnimation } from '@app/framework/internal';
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [NgIf, NgFor],
+    imports: [
+        NgIf,
+        NgFor,
+    ],
 })
 export class ControlErrorsMessagesComponent {
     @Input()

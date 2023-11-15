@@ -9,24 +9,23 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { TranslatePipe } from '@app/';
-import { CodeEditorComponent, ConfirmClickDirective, ControlErrorsComponent } from '@app/shared';
-import { ConfigureFieldRulesForm, FIELD_RULE_ACTIONS, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
+import { TranslatePipe } from '@app/framework';
+import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-field-rules-form',
     styleUrls: ['./schema-field-rules-form.component.scss'],
     templateUrl: './schema-field-rules-form.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        NgIf,
-        NgFor,
-        ReactiveFormsModule,
-        ControlErrorsComponent,
+        AsyncPipe,
         CodeEditorComponent,
         ConfirmClickDirective,
-        AsyncPipe,
+        ControlErrorsComponent,
+        FormsModule,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })

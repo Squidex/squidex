@@ -13,19 +13,19 @@ import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatte
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-array-item',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        TooltipDirective,
+        AsyncPipe,
+        ComponentSectionComponent,
+        FormHintComponent,
         IfOnceDirective,
         NgFor,
-        ComponentSectionComponent,
         NgIf,
-        FormHintComponent,
-        AsyncPipe,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

@@ -5,28 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AppComponent, AppsPageComponent, NewsDialogComponent, OnboardingDialogComponent, TeamComponent } from './declarations';
+import { Routes } from '@angular/router';
+import { AppsPageComponent } from './pages/apps-page.component';
 
-const routes: Routes = [
+export const APPS_ROUTES: Routes = [
     {
         path: '',
         component: AppsPageComponent,
     },
 ];
-
-@NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        SqxFrameworkModule,
-        SqxSharedModule,
-        AppComponent,
-        AppsPageComponent,
-        NewsDialogComponent,
-        OnboardingDialogComponent,
-        TeamComponent,
-    ],
-})
-export class SqxFeatureAppsModule {}

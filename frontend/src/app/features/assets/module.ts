@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AssetsFiltersPageComponent, AssetsPageComponent, AssetTagDialogComponent, AssetTagsComponent } from './declarations';
+import { Routes } from '@angular/router';
+import { AssetsFiltersPageComponent } from './pages/assets-filters-page.component';
+import { AssetsPageComponent } from './pages/assets-page.component';
 
-const routes: Routes = [
+export const ASSETS_ROUTES: Routes = [
     {
         path: '',
         component: AssetsPageComponent,
@@ -22,16 +21,3 @@ const routes: Routes = [
         ],
     },
 ];
-
-@NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        SqxFrameworkModule,
-        SqxSharedModule,
-        AssetsFiltersPageComponent,
-        AssetsPageComponent,
-        AssetTagDialogComponent,
-        AssetTagsComponent,
-    ],
-})
-export class SqxFeatureAssetsModule {}

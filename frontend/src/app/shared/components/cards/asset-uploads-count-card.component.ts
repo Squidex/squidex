@@ -11,12 +11,15 @@ import { TranslatePipe } from '@app/framework';
 import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-uploads-count-card',
     styleUrls: ['./asset-uploads-count-card.component.scss'],
     templateUrl: './asset-uploads-count-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [NgChartsModule, TranslatePipe],
+    imports: [
+        NgChartsModule,
+        TranslatePipe,
+    ],
 })
 export class AssetUploadsCountCardComponent {
     @Input({ required: true })

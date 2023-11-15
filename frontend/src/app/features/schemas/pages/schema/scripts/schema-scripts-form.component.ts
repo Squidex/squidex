@@ -12,20 +12,20 @@ import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, SchemaDto, SchemasService, SchemasState, ScriptCompletions, ScriptNamePipe, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-scripts-form',
     styleUrls: ['./schema-scripts-form.component.scss'],
     templateUrl: './schema-scripts-form.component.html',
-    standalone: true,
     imports: [
+        AsyncPipe,
+        CodeEditorComponent,
         FormsModule,
-        ReactiveFormsModule,
+        KeysPipe,
         NgFor,
         NgIf,
-        CodeEditorComponent,
-        AsyncPipe,
-        KeysPipe,
-        TranslatePipe,
+        ReactiveFormsModule,
         ScriptNamePipe,
+        TranslatePipe,
     ],
 })
 export class SchemaScriptsFormComponent {

@@ -41,22 +41,22 @@ export class UsersDataSource implements AutocompleteSource {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-contributor-add-form',
     styleUrls: ['./contributor-add-form.component.scss'],
     templateUrl: './contributor-add-form.component.html',
     providers: [
         UsersDataSource,
     ],
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        AutocompleteComponent,
-        NgFor,
-        FormHintComponent,
-        ModalDirective,
-        ImportContributorsDialogComponent,
         AsyncPipe,
+        AutocompleteComponent,
+        FormHintComponent,
+        FormsModule,
+        ImportContributorsDialogComponent,
+        ModalDirective,
+        NgFor,
+        ReactiveFormsModule,
         TranslatePipe,
         UserDtoPicture,
     ],

@@ -10,10 +10,10 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-geolocation-validation',
     styleUrls: ['geolocation-validation.component.scss'],
     templateUrl: 'geolocation-validation.component.html',
-    standalone: true,
 })
 export class GeolocationValidationComponent {
     @Input({ required: true })

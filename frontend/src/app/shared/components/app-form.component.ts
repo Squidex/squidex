@@ -8,7 +8,8 @@
 import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ApiUrlConfig, AppsState, ControlErrorsComponent, CreateAppForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, TemplateDto, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
+import { ApiUrlConfig, ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
+import { AppsState, CreateAppForm, TemplateDto } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-app-form',

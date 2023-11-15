@@ -35,7 +35,9 @@ export type TranslateDto = Readonly<{
     prompt: string;
  }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TranslationsService {
     constructor(
         private readonly http: HttpClient,

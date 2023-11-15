@@ -35,7 +35,9 @@ interface Snapshot {
 
 export class UploadCanceled {}
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AssetUploaderState extends State<Snapshot> {
     public uploads =
         this.project(x => x.uploads);

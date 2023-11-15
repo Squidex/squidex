@@ -11,14 +11,14 @@ import { Observable } from 'rxjs';
 import { AppDto, HistoryEventDto, HistoryListComponent, HistoryService, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-history-card',
     styleUrls: ['./history-card.component.scss'],
     templateUrl: './history-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        HistoryListComponent,
         AsyncPipe,
+        HistoryListComponent,
         TranslatePipe,
     ],
 })

@@ -22,7 +22,9 @@ interface Snapshot {
     selectedSettings: AppSettingsDto | null;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AppsState extends State<Snapshot> {
     public apps =
         this.project(x => x.apps);

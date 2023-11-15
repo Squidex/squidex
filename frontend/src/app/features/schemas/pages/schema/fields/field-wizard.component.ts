@@ -8,31 +8,30 @@
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AddFieldForm, AppSettingsDto, createProperties, EditFieldForm, FieldDto, fieldTypes, LanguagesState, RootFieldDto, SchemaDto, SchemasState, Types } from '@app/shared';
+import { AddFieldForm, AppSettingsDto, ControlErrorsComponent, createProperties, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, LanguagesState, ModalDialogComponent, RootFieldDto, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
-import { ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared'';
 
 const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
 
 @Component({
+    standalone: true,
     selector: 'sqx-field-wizard',
     styleUrls: ['./field-wizard.component.scss'],
     templateUrl: './field-wizard.component.html',
-    standalone: true,
     imports: [
-        ModalDialogComponent,
-        TooltipDirective,
-        NgIf,
-        FormsModule,
-        ReactiveFormsModule,
-        FieldFormComponent,
-        FormErrorComponent,
-        NgFor,
-        ControlErrorsComponent,
-        FocusOnInitDirective,
-        FormHintComponent,
-        FormAlertComponent,
         AsyncPipe,
+        ControlErrorsComponent,
+        FieldFormComponent,
+        FocusOnInitDirective,
+        FormAlertComponent,
+        FormErrorComponent,
+        FormHintComponent,
+        FormsModule,
+        ModalDialogComponent,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        TooltipDirective,
         TranslatePipe,
     ],
 })

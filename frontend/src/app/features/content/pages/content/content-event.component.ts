@@ -7,21 +7,20 @@
 
 import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FromNowPipe, TooltipDirective, TranslatePipe } from '@app/shared';
-import { ContentDto, HistoryEventDto, HistoryMessagePipe, TypedSimpleChanges, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
+import { ContentDto, FromNowPipe, HistoryEventDto, HistoryMessagePipe, TooltipDirective, TranslatePipe, TypedSimpleChanges, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-event',
     styleUrls: ['./content-event.component.scss'],
     templateUrl: './content-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        TooltipDirective,
-        NgIf,
         FromNowPipe,
-        TranslatePipe,
         HistoryMessagePipe,
+        NgIf,
+        TooltipDirective,
+        TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
     ],

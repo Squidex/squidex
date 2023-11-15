@@ -15,27 +15,27 @@ import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, di
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-array-editor',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgIf,
-        CdkDropList,
-        NgFor,
-        CdkDrag,
         ArrayItemComponent,
+        AsyncPipe,
+        CdkDrag,
         CdkDragHandle,
-        VirtualScrollerModule,
+        CdkDropList,
+        ConfirmClickDirective,
+        DropdownMenuComponent,
         FormHintComponent,
         ModalDirective,
-        DropdownMenuComponent,
         ModalPlacementDirective,
-        ConfirmClickDirective,
+        NgFor,
+        NgIf,
         TooltipDirective,
-        AsyncPipe,
         TranslatePipe,
+        VirtualScrollerModule,
     ],
 })
 export class ArrayEditorComponent {

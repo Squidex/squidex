@@ -26,7 +26,9 @@ interface Snapshot extends LoadingState {
     resource: Resource;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AssetScriptsState extends State<Snapshot> {
     public scripts =
         this.project(x => x.scripts);

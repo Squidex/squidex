@@ -47,7 +47,9 @@ export type UpdateTeamDto = Readonly<{
     name?: string;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TeamsService {
     constructor(
         private readonly http: HttpClient,

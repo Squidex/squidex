@@ -8,7 +8,8 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgChartsModule } from 'ng2-charts';
-import { CallsUsageDto, ChartHelpers, ChartOptions, TranslatePipe } from '@app/framework';
+import { TranslatePipe } from '@app/framework';
+import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-api-performance-card',

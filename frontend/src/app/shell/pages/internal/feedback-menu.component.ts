@@ -11,12 +11,14 @@ import markerSDK, { MarkerSdk } from '@marker.io/browser';
 import { UIOptions } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-feedback-menu',
     styleUrls: ['./feedback-menu.component.scss'],
     templateUrl: './feedback-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [NgIf],
+    imports: [
+        NgIf,
+    ],
 })
 export class FeedbackMenuComponent implements OnInit, OnDestroy {
     private widget?: MarkerSdk;

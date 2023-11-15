@@ -15,16 +15,16 @@ import { FieldFormUIComponent } from './field-form-ui.component';
 import { FieldFormValidationComponent } from './field-form-validation.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-field-form',
     styleUrls: ['./field-form.component.scss'],
     templateUrl: './field-form.component.html',
-    standalone: true,
     imports: [
-        NgIf,
         FieldFormCommonComponent,
-        FieldFormValidationComponent,
         FieldFormUIComponent,
+        FieldFormValidationComponent,
         JsonMoreComponent,
+        NgIf,
         TranslatePipe,
     ],
 })

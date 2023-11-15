@@ -11,16 +11,16 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { ControlErrorsComponent, FieldDto, FormHintComponent, SchemaDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-field-form-common',
     styleUrls: ['./field-form-common.component.scss'],
     templateUrl: './field-form-common.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        FormHintComponent,
         ControlErrorsComponent,
+        FormHintComponent,
+        FormsModule,
         NgIf,
+        ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],

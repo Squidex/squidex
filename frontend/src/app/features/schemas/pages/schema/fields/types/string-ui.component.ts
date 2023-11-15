@@ -12,18 +12,18 @@ import { Observable } from 'rxjs';
 import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-string-ui',
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        FormHintComponent,
-        NgFor,
-        TagEditorComponent,
         AssetFolderDropdownComponent,
         AsyncPipe,
+        FormHintComponent,
+        FormsModule,
+        NgFor,
+        ReactiveFormsModule,
+        TagEditorComponent,
         TranslatePipe,
     ],
 })

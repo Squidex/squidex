@@ -16,15 +16,15 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-iframe-editor',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        ModalDirective,
         AssetSelectorComponent,
         ContentSelectorComponent,
+        ModalDirective,
         SafeResourceUrlPipe,
     ],
 })

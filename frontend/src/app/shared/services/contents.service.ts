@@ -204,7 +204,9 @@ export type ContentsByQuery = Readonly<{
 
 type FullQuery = ContentsByIds | ContentsBySchedule | ContentsByReferences | ContentsByReferencing;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ContentsService {
     constructor(
         private readonly http: HttpClient,

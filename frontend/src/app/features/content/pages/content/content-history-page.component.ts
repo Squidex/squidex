@@ -9,31 +9,32 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppsState, ConfirmClickDirective, ContentDto, ContentsState, ContentStatusComponent, CopyDirective, defined, DropdownMenuComponent, DueTimeSelectorComponent, FormHintComponent, FromNowPipe, HistoryEventDto, HistoryService, LayoutComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, Subscriptions, switchSafe, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppsState, ConfirmClickDirective, ContentDto, ContentsState, ContentStatusComponent, CopyDirective, defined, DropdownMenuComponent, FormHintComponent, FromNowPipe, HistoryEventDto, HistoryService, LayoutComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, Subscriptions, switchSafe, TourStepDirective, TranslatePipe } from '@app/shared';
+import { DueTimeSelectorComponent } from '../../shared/due-time-selector.component';
 import { ContentEventComponent } from './content-event.component';
 import { ContentPageComponent } from './content-page.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-history',
     styleUrls: ['./content-history-page.component.scss'],
     templateUrl: './content-history-page.component.html',
-    standalone: true,
     imports: [
-        LayoutComponent,
-        CopyDirective,
-        NgIf,
-        TourStepDirective,
+        AsyncPipe,
+        ConfirmClickDirective,
+        ContentEventComponent,
         ContentStatusComponent,
-        ModalDirective,
+        CopyDirective,
         DropdownMenuComponent,
+        DueTimeSelectorComponent,
+        FormHintComponent,
+        FromNowPipe,
+        LayoutComponent,
+        ModalDirective,
         ModalPlacementDirective,
         NgFor,
-        ConfirmClickDirective,
-        FormHintComponent,
-        ContentEventComponent,
-        DueTimeSelectorComponent,
-        AsyncPipe,
-        FromNowPipe,
+        NgIf,
+        TourStepDirective,
         TranslatePipe,
     ],
 })

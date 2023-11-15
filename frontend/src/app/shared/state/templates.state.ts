@@ -19,7 +19,9 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TemplatesState extends State<Snapshot> {
     public templates =
         this.project(x => x.templates);

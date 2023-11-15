@@ -11,21 +11,21 @@ import { RouterLink } from '@angular/router';
 import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-app',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        RouterLink,
-        TourStepDirective,
         AvatarComponent,
-        StopClickDirective,
-        NgIf,
-        ModalDirective,
-        DropdownMenuComponent,
-        ModalPlacementDirective,
         ConfirmClickDirective,
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgIf,
+        RouterLink,
+        StopClickDirective,
+        TourStepDirective,
         TranslatePipe,
     ],
 })

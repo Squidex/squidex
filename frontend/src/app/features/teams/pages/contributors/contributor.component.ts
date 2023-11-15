@@ -9,18 +9,18 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ConfirmClickDirective, ContributorDto, HighlightPipe, TooltipDirective, UserPicturePipe } from '@app/shared';
-import { TeamContributorsState } from '../../internal;
+import { TeamContributorsState } from '../../internal';
 
 @Component({
+    standalone: true,
     selector: '[sqxContributor]',
     styleUrls: ['./contributor.component.scss'],
     templateUrl: './contributor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        TooltipDirective,
         ConfirmClickDirective,
         HighlightPipe,
+        TooltipDirective,
         UserPicturePipe,
     ],
 })

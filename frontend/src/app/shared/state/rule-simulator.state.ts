@@ -26,7 +26,9 @@ interface Snapshot extends ListState {
     action?: any;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class RuleSimulatorState extends State<Snapshot> {
     public simulatedRuleEvents =
         this.project(x => x.simulatedRuleEvents);

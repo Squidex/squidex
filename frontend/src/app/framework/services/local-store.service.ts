@@ -8,7 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Types } from '../utils/types';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class LocalStoreService {
     private readonly fallback: { [key: string]: string } = {};
     private store = localStorage;

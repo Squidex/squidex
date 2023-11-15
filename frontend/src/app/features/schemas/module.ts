@@ -5,22 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { HelpComponent, HistoryComponent, LoadSchemasGuard, SchemaMustExistGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { ArrayValidationComponent, AssetsUIComponent, AssetsValidationComponent, BooleanUIComponent, BooleanValidationComponent, ComponentsUIComponent, ComponentsValidationComponent, ComponentUIComponent, ComponentValidationComponent, DateTimeUIComponent, DateTimeValidationComponent, FieldComponent, FieldFormCommonComponent, FieldFormComponent, FieldFormUIComponent, FieldFormValidationComponent, FieldGroupComponent, FieldListComponent, FieldWizardComponent, GeolocationUIComponent, GeolocationValidationComponent, JsonMoreComponent, JsonUIComponent, JsonValidationComponent, NumberUIComponent, NumberValidationComponent, ReferencesUIComponent, ReferencesValidationComponent, SchemaEditFormComponent, SchemaExportFormComponent, SchemaFieldRulesFormComponent, SchemaFieldsComponent, SchemaFormComponent, SchemaPageComponent, SchemaPreviewUrlsFormComponent, SchemaScriptsFormComponent, SchemasPageComponent, SchemaUIFormComponent, SortableFieldListComponent, StringUIComponent, StringValidationComponent, TagsUIComponent, TagsValidationComponent } from './declarations';
-import { ArrayUIComponent } from './pages/schema/fields/types/array-ui.component';
+import { Routes } from '@angular/router';
+import { HelpComponent, HistoryComponent, loadSchemasGuard, schemaMustExistGuard } from '@app/shared';
+import { SchemaPageComponent } from './pages/schema/schema-page.component';
+import { SchemasPageComponent } from './pages/schemas/schemas-page.component';
 
-const routes: Routes = [
+export const SCHEMAS_ROUTES: Routes = [
     {
         path: '',
         component: SchemasPageComponent,
-        canActivate: [LoadSchemasGuard],
+        canActivate: [loadSchemasGuard],
         children: [
             {
                 path: ':schemaName',
                 component: SchemaPageComponent,
-                canActivate: [SchemaMustExistGuard],
+                canActivate: [schemaMustExistGuard],
                 children: [
                     {
                         path: 'help',
@@ -41,59 +40,3 @@ const routes: Routes = [
         ],
     },
 ];
-
-@NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        SqxFrameworkModule,
-        SqxSharedModule,
-        ArrayUIComponent,
-        ArrayValidationComponent,
-        AssetsUIComponent,
-        AssetsValidationComponent,
-        BooleanUIComponent,
-        BooleanValidationComponent,
-        ComponentUIComponent,
-        ComponentValidationComponent,
-        ComponentsUIComponent,
-        ComponentsValidationComponent,
-        DateTimeUIComponent,
-        DateTimeValidationComponent,
-        FieldComponent,
-        FieldGroupComponent,
-        FieldFormCommonComponent,
-        FieldFormComponent,
-        FieldFormUIComponent,
-        FieldFormValidationComponent,
-        FieldListComponent,
-        FieldWizardComponent,
-        GeolocationUIComponent,
-        GeolocationValidationComponent,
-        JsonMoreComponent,
-        JsonUIComponent,
-        JsonValidationComponent,
-        NumberUIComponent,
-        NumberValidationComponent,
-        ReferencesUIComponent,
-        ReferencesValidationComponent,
-        SchemaEditFormComponent,
-        SchemaExportFormComponent,
-        SchemaFieldRulesFormComponent,
-        SchemaFieldsComponent,
-        SchemaFormComponent,
-        SchemaPageComponent,
-        SchemaPreviewUrlsFormComponent,
-        SchemaScriptsFormComponent,
-        SchemasPageComponent,
-        SchemaUIFormComponent,
-        SortableFieldListComponent,
-        StringUIComponent,
-        StringValidationComponent,
-        TagsUIComponent,
-        TagsValidationComponent,
-    ],
-    providers: [
-        SchemaMustExistGuard,
-    ],
-})
-export class SqxFeatureSchemasModule {}

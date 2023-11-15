@@ -10,15 +10,15 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { CodeEditorComponent, FieldDto, FormHintComponent, JsonFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-json-more',
     styleUrls: ['json-more.component.scss'],
     templateUrl: 'json-more.component.html',
-    standalone: true,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
         CodeEditorComponent,
         FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
         TranslatePipe,
     ],
 })
