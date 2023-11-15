@@ -53,9 +53,9 @@ export function renderMarkdown(input: string | undefined | null, inline: boolean
     }
 
     if (inline) {
-        return marked(input, { renderer: RENDERER_INLINE, mangle: false, headerIds: false });
+        return marked(input, { renderer: RENDERER_INLINE });
     } else {
-        return marked(input, { renderer: RENDERER_DEFAULT, mangle: false, headerIds: false });
+        return marked(input, { renderer: RENDERER_DEFAULT });
     }
 }
 

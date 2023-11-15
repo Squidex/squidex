@@ -51,7 +51,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
     public ngAfterViewInit() {
         Promise.all([
             this.resourceLoader.loadLocalScript('dependencies/videojs/video.min.js'),
-            this.resourceLoader.loadLocalStyle('dependencies/videojs/video-js.min.css'),
+            this.resourceLoader.loadLocalStyle('dependencies/videojs/videojs.min.css'),
         ]).then(() => {
             this.renderer.removeClass(this.video.nativeElement, 'hidden');
 

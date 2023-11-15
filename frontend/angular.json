@@ -18,7 +18,7 @@
       "prefix": "sqx",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "build",
             "index": "src/index.html",
@@ -47,7 +47,42 @@
               "slugify"
             ],
             "assets": [
-              "src/app/assets"
+              "src/app/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/tui-code-snippet/dist/",
+                "output": "./dependencies/tui-calendar/"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/tui-calendar/dist/",
+                "output": "./dependencies/tui-calendar/"
+              },
+              {
+                "glob": "vis-network.min.js",
+                "input": "./node_modules/vis-network/standalone/umd/",
+                "output": "./dependencies/vis-network/"
+              },
+              {
+                "glob": "*.min.*",
+                "input": "/node_modules/video.js/dist/",
+                "output": "./dependencies/videojs/"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/leaflet-control-geocoder/dist/",
+                "output": "./dependencies/leaflet/"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/leaflet/dist/",
+                "output": "./dependencies/leaflet/"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/ace-builds/src-min/",
+                "output": "./dependencies/ace/"
+              }
             ],
             "styles": [
               "src/styles.scss"
@@ -56,9 +91,6 @@
               "includePaths": [
                 "./src/app/theme"
               ]
-            },
-            "customWebpackConfig": {
-              "path": "./src/config/webpack.config.js"
             },
             "scripts": []
           },
@@ -96,13 +128,13 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "squidex:build:production"
+              "buildTarget": "squidex:build:production"
             },
             "development": {
-              "browserTarget": "squidex:build:development"
+              "buildTarget": "squidex:build:development"
             }
           },
           "options": {
@@ -114,7 +146,7 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular-builders/custom-webpack:karma",
+          "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "polyfills": [
               "zone.js",

@@ -144,14 +144,14 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
 
         Promise.all([
             this.resourceLoader.loadLocalScript('dependencies/ace/ace.js'),
-            this.resourceLoader.loadLocalScript('dependencies/ace/ext/modelist.js'),
-            this.resourceLoader.loadLocalScript('dependencies/ace/ext/language_tools.js'),
+            this.resourceLoader.loadLocalScript('dependencies/ace/ext-modelist.js'),
+            this.resourceLoader.loadLocalScript('dependencies/ace/ext-language_tools.js'),
         ]).then(() => {
-            this.modelist = ace.require('ace/ext/modelist');
+            this.modelist = ace.require('ace/ext-modelist');
 
             this.aceEditor = ace.edit(this.editor.nativeElement);
             this.aceEditor.setFontSize(14);
-            this.aceTools = ace.require('ace/ext/language_tools');
+            this.aceTools = ace.require('ace/ext-language_tools');
 
             this.setValue(this.value);
             this.setMode();

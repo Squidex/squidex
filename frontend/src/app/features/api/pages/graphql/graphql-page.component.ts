@@ -76,7 +76,7 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
-            fetch: (input: RequestInfo | URL, init?: RequestInit) => {
+            fetch: (input: any, init?: RequestInit) => {
                 const isIntrospection = Types.isString(init?.body) && init!.body.indexOf('IntrospectionQuery') >= 0;
 
                 if (!isIntrospection) {

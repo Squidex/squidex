@@ -26,7 +26,7 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
 
     public view: ViewMode = 'month';
 
-    public content?: ContentDto;
+    public contentSelected?: ContentDto;
     public contentDialog = new DialogModel();
 
     public title = '';
@@ -68,7 +68,7 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
             });
 
             this.calendar.on('clickSchedule', (event: any) => {
-                this.content = event.schedule.raw;
+                this.contentSelected = event.schedule.raw;
                 this.contentDialog.show();
 
                 this.changeDetector.detectChanges();
@@ -123,12 +123,12 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     public cancelStatus() {
-        this.contentsService.cancelStatus(this.appsState.appName, this.content!, this.content!.version)
+        this.contentsService.cancelStatus(this.appsState.appName, this.contentSelected!, this.contentSelected!.version)
             .subscribe(content => {
                 this.calendar?.deleteSchedule(content.id, '1');
 
                 this.contentDialog.hide();
-                this.content = undefined;
+                this.contentSelected = undefined;
             });
     }
 

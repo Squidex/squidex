@@ -45,7 +45,7 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
 
     private updateNetwork() {
         if (this.chartContainer?.nativeElement && this.workflow) {
-            this.resourceLoader.loadLocalScript('dependencies/vis-network.min.js')
+            this.resourceLoader.loadLocalScript('dependencies/vis-network/vis-network.min.js')
                 .then(() => {
                     this.network?.destroy();
 
