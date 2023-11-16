@@ -2,7 +2,7 @@
 # Stage 1, Build Backend
 #
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 as backend
+FROM mcr.microsoft.com/dotnet/sdk:8.0 as backend
 
 ARG SQUIDEX__BUILD__VERSION=7.0.0
 
@@ -67,7 +67,7 @@ RUN cp -a build /build/
 #
 # Stage 3, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim
 
 ARG SQUIDEX__RUNTIME__VERSION=7.0.0
 
