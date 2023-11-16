@@ -92,6 +92,6 @@ public sealed partial class IgnoreHashFileProvider : IFileProvider
         return $"{path1}/{path2}";
     }
 
-    [GeneratedRegex("^(?<Name>[^.]+)(\\.|-)[0-9a-f]{4,}\\.(?<Extension>.+)$")]
+    [GeneratedRegex("^(?<Name>[^.]+)(\\.|-)[0-9A-Za-z]{4,}\\.(?<Extension>.+)$")]
     private static partial Regex BuildFileWithHashRegex();
 }
