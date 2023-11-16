@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Shared
+namespace Squidex.Shared;
+
+public static class DefaultClients
 {
-    public static class DefaultClients
-    {
-        public const string Frontend = "squidex-frontend";
-    }
+    public const string Frontend = "squidex-frontend";
 }

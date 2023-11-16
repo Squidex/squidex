@@ -7,15 +7,14 @@
 
 using System.Resources;
 
-namespace Squidex.Shared
-{
-    public static class Texts
-    {
-        private static ResourceManager? resourceManager;
+namespace Squidex.Shared;
 
-        public static ResourceManager ResourceManager
-        {
-            get => resourceManager ??= new ResourceManager("Squidex.Shared.Texts", typeof(Texts).Assembly);
-        }
+public static class Texts
+{
+    private static ResourceManager? resourceManager;
+
+    public static ResourceManager ResourceManager
+    {
+        get => resourceManager ??= new ResourceManager("Squidex.Shared.Texts", typeof(Texts).Assembly);
     }
 }

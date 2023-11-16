@@ -3,7 +3,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <LangVersion>11.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <NeutralLanguage>en</NeutralLanguage>
 	<NoWarn>NU1608</NoWarn>
