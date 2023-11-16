@@ -5,14 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
 import { picasso, TypedSimpleChanges } from '@app/framework/internal';
+import { SafeUrlPipe } from './safe-html.pipe';
 
 @Component({
+    standalone: true,
     selector: 'sqx-avatar',
     styleUrls: ['./avatar.component.scss'],
     templateUrl: './avatar.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        NgIf,
+        SafeUrlPipe,
+    ],
 })
 export class AvatarComponent {
     @Input()

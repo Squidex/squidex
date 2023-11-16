@@ -11,6 +11,7 @@ import { StepDefinition, TourService } from './tour.service';
 
 @Directive({
     selector: '[sqxTourStep]',
+    standalone: true,
 })
 export class TourStepDirective implements OnInit, OnDestroy, TourAnchorDirective {
     private isNextOnClick = false;

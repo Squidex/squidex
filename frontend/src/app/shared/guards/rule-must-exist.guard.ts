@@ -5,37 +5,29 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { allParams } from '@app/framework';
-import { RulesState } from './../state/rules.state';
+import { RulesState } from '../state/rules.state';
 
-@Injectable()
-export class RuleMustExistGuard  {
-    constructor(
-        private readonly rulesState: RulesState,
-        private readonly router: Router,
-    ) {
+export const ruleMustExistGuard = (route: ActivatedRouteSnapshot) => {
+    const rulesState = inject(RulesState);
+    const ruleId = allParams(route)['ruleId'];
+    const router = inject(Router);
+
+    if (!ruleId || ruleId === 'new') {
+        return rulesState.select(null).pipe(map(u => u === null));
     }
 
-    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
-        const ruleId = allParams(route)['ruleId'];
+    const result =
+        rulesState.select(ruleId).pipe(
+            tap(rule => {
+                if (!rule) {
+                    router.navigate(['/404']);
+                }
+            }),
+            map(rule => !!rule));
 
-        if (!ruleId || ruleId === 'new') {
-            return this.rulesState.select(null).pipe(map(u => u === null));
-        }
-
-        const result =
-            this.rulesState.select(ruleId).pipe(
-                tap(rule => {
-                    if (!rule) {
-                        this.router.navigate(['/404']);
-                    }
-                }),
-                map(rule => !!rule));
-
-        return result;
-    }
-}
+    return result;
+};

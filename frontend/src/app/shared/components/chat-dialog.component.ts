@@ -5,9 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { delay } from 'rxjs/operators';
+import { FocusOnInitDirective, ModalDialogComponent, ResizedDirective, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppsState, AuthService, StatefulComponent, TranslationsService } from '@app/shared/internal';
+import { UserIdPicturePipe } from './pipes';
 
 interface State {
     // True, when running
@@ -21,9 +25,22 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-chat-dialog',
     styleUrls: ['./chat-dialog.component.scss'],
     templateUrl: './chat-dialog.component.html',
+    imports: [
+        FocusOnInitDirective,
+        FormsModule,
+        ModalDialogComponent,
+        NgFor,
+        NgIf,
+        ResizedDirective,
+        ScrollActiveDirective,
+        TooltipDirective,
+        TranslatePipe,
+        UserIdPicturePipe,
+    ],
 })
 export class ChatDialogComponent extends StatefulComponent<State> {
     @Output()

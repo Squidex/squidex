@@ -6,7 +6,7 @@
  */
 
 import { IMock, It, Mock } from 'typemoq';
-import { LocalizerService } from './../../services/localizer.service';
+import { LocalizerService } from '../../services/localizer.service';
 import { TranslatePipe } from './translate.pipe';
 
 describe('TranslatePipe', () => {

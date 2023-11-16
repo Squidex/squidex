@@ -5,15 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MessageBus, RuleSimulatorState, SimulatedRuleEventDto, Subscriptions } from '@app/shared';
-import { RuleConfigured } from './../messages';
+import { LayoutComponent, ListViewComponent, MessageBus, RuleSimulatorState, SimulatedRuleEventDto, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { RuleConfigured } from '../messages';
+import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-simulator-events-page',
     styleUrls: ['./rule-simulator-page.component.scss'],
     templateUrl: './rule-simulator-page.component.html',
+    imports: [
+        AsyncPipe,
+        LayoutComponent,
+        ListViewComponent,
+        NgFor,
+        SimulatedRuleEventComponent,
+        TitleComponent,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class RuleSimulatorPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -8,7 +8,7 @@
 import { AbstractControl, UntypedFormArray, UntypedFormGroup, ValidatorFn } from '@angular/forms';
 import { combineLatest, Observable } from 'rxjs';
 import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
-import { Types } from './../../utils/types';
+import { Types } from '../../utils/types';
 
 export interface FocusComponent {
     focus(): void;

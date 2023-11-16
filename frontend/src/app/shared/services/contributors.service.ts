@@ -10,9 +10,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, Version } from '@app/framework';
 import { AssignContributorDto, ContributorsDto, parseContributors } from './shared';
+
 export * from './shared';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ContributorsService {
     constructor(
         private readonly http: HttpClient,

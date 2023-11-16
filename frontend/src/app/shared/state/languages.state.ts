@@ -9,8 +9,8 @@ import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
-import { AppLanguageDto, AppLanguagesPayload, AppLanguagesService, UpdateAppLanguageDto } from './../services/app-languages.service';
-import { LanguageDto, LanguagesService } from './../services/languages.service';
+import { AppLanguageDto, AppLanguagesPayload, AppLanguagesService, UpdateAppLanguageDto } from '../services/app-languages.service';
+import { LanguageDto, LanguagesService } from '../services/languages.service';
 import { AppsState } from './apps.state';
 
 export interface SnapshotLanguage {
@@ -37,11 +37,13 @@ interface Snapshot extends LoadingState {
     // The app version.
     version: Version;
 
-    // Inedicates if the user can add a language.
+    // Indicates if the user can add a language.
     canCreate?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class LanguagesState extends State<Snapshot> {
     private cachedLanguage$?: Observable<ReadonlyArray<LanguageDto>>;
 

@@ -5,14 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
+import { TranslatePipe } from '@app/framework';
 import { FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
+import { FilterNodeComponent } from './filter-node.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-filter-logical',
     styleUrls: ['./filter-logical.component.scss'],
     templateUrl: './filter-logical.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        FilterNodeComponent,
+        NgFor,
+        NgIf,
+        TranslatePipe,
+    ],
 })
 export class FilterLogicalComponent {
     private filterValue!: FilterLogical;

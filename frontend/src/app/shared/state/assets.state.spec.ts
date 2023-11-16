@@ -9,7 +9,7 @@ import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ErrorDto } from '@app/framework';
 import { AssetsService, AssetsState, DialogService, MathHelper, versioned } from '@app/shared/internal';
-import { createAsset, createAssetFolder } from './../services/assets.service.spec';
+import { createAsset, createAssetFolder } from '../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('AssetsState', () => {

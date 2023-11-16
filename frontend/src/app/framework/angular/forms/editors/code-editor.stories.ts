@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { CodeEditorComponent, ScriptCompletions, SqxFrameworkModule } from '@app/framework';
+import { CodeEditorComponent, ScriptCompletions } from '@app/framework';
 
 export default {
     title: 'Framework/CodeEditor',
@@ -40,9 +39,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
             ],
         }),
     ],

@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, RolesPayload, RolesService, RolesState, versioned } from '@app/shared/internal';
-import { createRoles } from './../services/roles.service.spec';
+import { createRoles } from '../services/roles.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('RolesState', () => {

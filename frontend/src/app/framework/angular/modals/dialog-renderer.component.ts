@@ -5,9 +5,19 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { timer } from 'rxjs';
 import { DialogModel, DialogRequest, DialogService, fadeAnimation, Notification, StatefulComponent, Subscriptions, Tooltip } from '@app/framework/internal';
+import { FocusOnInitDirective } from '../forms/focus-on-init.directive';
+import { MarkdownPipe } from '../pipes/markdown.pipe';
+import { TranslatePipe } from '../pipes/translate.pipe';
+import { SafeHtmlPipe } from '../safe-html.pipe';
+import { ModalDialogComponent } from './modal-dialog.component';
+import { ModalPlacementDirective } from './modal-placement.directive';
+import { ModalDirective } from './modal.directive';
+import { TooltipDirective } from './tooltip.directive';
 
 interface State {
     // The pending dialog request.
@@ -21,6 +31,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
     templateUrl: './dialog-renderer.component.html',
@@ -28,6 +39,19 @@ interface State {
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        FocusOnInitDirective,
+        FormsModule,
+        MarkdownPipe,
+        ModalDialogComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        SafeHtmlPipe,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

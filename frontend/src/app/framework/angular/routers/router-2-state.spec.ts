@@ -8,7 +8,7 @@
 import { NavigationExtras, Params, Router } from '@angular/router';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { LocalStoreService } from '@app/framework/internal';
-import { State } from './../../state';
+import { State } from '../../state';
 import { PagingSynchronizer, QueryParams, Router2State, StringKeysSynchronizer, StringSynchronizer } from './router-2-state';
 
 describe('Router2State', () => {

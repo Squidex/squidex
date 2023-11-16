@@ -12,6 +12,7 @@ import { LayoutComponent } from './layout.component';
 
 @Directive({
     selector: '[sqxLayoutContainer]',
+    standalone: true,
 })
 export class LayoutContainerDirective implements AfterViewInit {
     private readonly layouts: LayoutComponent[] = [];

@@ -5,17 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnDestroy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, combineLatest, of } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto, ToolbarService, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, CodeEditorComponent, ContentDto, ContentsService, ContentsState, ErrorDto, FormErrorComponent, ToolbarService, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 type Mode = 'Content' | 'Data' | 'FlatData';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-inspection',
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',
+    imports: [
+        AsyncPipe,
+        CodeEditorComponent,
+        FormErrorComponent,
+        FormsModule,
+        NgIf,
+        TranslatePipe,
+    ],
 })
 export class ContentInspectionComponent implements OnDestroy {
     private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);

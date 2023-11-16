@@ -5,14 +5,29 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { ConfigurePreviewUrlsForm, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
+import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, ControlErrorsComponent, FormAlertComponent, SchemaDto, SchemasService, SchemasState, ScriptCompletions, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-preview-urls-form',
     styleUrls: ['./schema-preview-urls-form.component.scss'],
     templateUrl: './schema-preview-urls-form.component.html',
+    imports: [
+        AsyncPipe,
+        CodeEditorComponent,
+        ConfirmClickDirective,
+        ControlErrorsComponent,
+        FormAlertComponent,
+        FormsModule,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class SchemaPreviewUrlsFormComponent implements OnInit {
     @Input()

@@ -13,6 +13,7 @@ import { ApiUrlConfig, UserDto, UsersProviderService } from '@app/shared/interna
 @Pipe({
     name: 'sqxScriptName',
     pure: true,
+    standalone: true,
 })
 export class ScriptNamePipe implements PipeTransform {
     public transform(value: string) {
@@ -75,6 +76,7 @@ class UserAsyncPipe {
 @Pipe({
     name: 'sqxUserName',
     pure: false,
+    standalone: true,
 })
 export class UserNamePipe extends UserAsyncPipe implements OnDestroy, PipeTransform {
     constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef) {
@@ -94,6 +96,7 @@ export class UserNamePipe extends UserAsyncPipe implements OnDestroy, PipeTransf
 @Pipe({
     name: 'sqxUserNameRef',
     pure: false,
+    standalone: true,
 })
 export class UserNameRefPipe extends UserAsyncPipe implements OnDestroy, PipeTransform {
     constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef) {
@@ -122,6 +125,7 @@ export class UserNameRefPipe extends UserAsyncPipe implements OnDestroy, PipeTra
 @Pipe({
     name: 'sqxUserDtoPicture',
     pure: false,
+    standalone: true,
 })
 export class UserDtoPicture implements PipeTransform {
     constructor(
@@ -137,6 +141,7 @@ export class UserDtoPicture implements PipeTransform {
 @Pipe({
     name: 'sqxUserIdPicture',
     pure: false,
+    standalone: true,
 })
 export class UserIdPicturePipe implements PipeTransform {
     constructor(
@@ -152,6 +157,7 @@ export class UserIdPicturePipe implements PipeTransform {
 @Pipe({
     name: 'sqxUserPicture',
     pure: false,
+    standalone: true,
 })
 export class UserPicturePipe extends UserAsyncPipe implements OnDestroy, PipeTransform {
     constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef,
@@ -173,6 +179,7 @@ export class UserPicturePipe extends UserAsyncPipe implements OnDestroy, PipeTra
 @Pipe({
     name: 'sqxUserPictureRef',
     pure: false,
+    standalone: true,
 })
 export class UserPictureRefPipe extends UserAsyncPipe implements OnDestroy, PipeTransform {
     constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { LocalizerService } from './../services/localizer.service';
+import { LocalizerService } from '../services/localizer.service';
 import { StringHelper } from './string-helper';
 import { Types } from './types';
 

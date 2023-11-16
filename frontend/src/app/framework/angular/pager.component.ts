@@ -5,16 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { PagingInfo } from './../state';
+import { FormsModule } from '@angular/forms';
+import { PagingInfo } from '../state';
+import { TooltipDirective } from './modals/tooltip.directive';
+import { TranslatePipe } from './pipes/translate.pipe';
 
 export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
 
 @Component({
+    standalone: true,
     selector: 'sqx-pager',
     styleUrls: ['./pager.component.scss'],
     templateUrl: './pager.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        FormsModule,
+        NgFor,
+        NgIf,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class PagerComponent {
     @Output()

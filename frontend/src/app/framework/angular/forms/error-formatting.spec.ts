@@ -6,7 +6,7 @@
  */
 
 import { UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { LocalizerService } from './../../services/localizer.service';
+import { LocalizerService } from '../../services/localizer.service';
 import { formatError } from './error-formatting';
 import { ValidatorsEx } from './validators';
 

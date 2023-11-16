@@ -5,18 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { AuthService, CollaborationService, Comment, ModalModel, SharedArray, Subscriptions } from '@app/shared';
+import { AuthService, CollaborationService, Comment, CommentComponent, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, SharedArray, Subscriptions, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-notification-dropdown',
     styleUrls: ['./notification-dropdown.component.scss'],
     templateUrl: './notification-dropdown.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         CollaborationService,
+    ],
+    imports: [
+        AsyncPipe,
+        CommentComponent,
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        TranslatePipe,
     ],
 })
 export class NotificationDropdownComponent implements OnInit {

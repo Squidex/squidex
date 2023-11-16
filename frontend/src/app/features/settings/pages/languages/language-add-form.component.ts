@@ -6,8 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { AddLanguageForm, AutocompleteSource, LanguageDto, LanguagesState } from '@app/shared';
+import { AddLanguageForm, AutocompleteComponent, AutocompleteSource, FormHintComponent, LanguageDto, LanguagesState, TranslatePipe } from '@app/shared';
 
 class LanguageSource implements AutocompleteSource {
     constructor(
@@ -39,10 +40,18 @@ class LanguageSource implements AutocompleteSource {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-language-add-form',
     styleUrls: ['./language-add-form.component.scss'],
     templateUrl: './language-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AutocompleteComponent,
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class LanguageAddFormComponent {
     @Input()

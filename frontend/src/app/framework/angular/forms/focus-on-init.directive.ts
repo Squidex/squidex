@@ -10,6 +10,7 @@ import { Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxFocusOnInit]',
+    standalone: true,
 })
 export class FocusOnInitDirective implements AfterViewInit {
     @Input({ transform: booleanAttribute })

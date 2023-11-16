@@ -34,7 +34,9 @@ export function waitForAnchor(anchorId: string) {
     };
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TourService extends BaseTourService<StepDefinition> {
     private condition?: Subscription;
 

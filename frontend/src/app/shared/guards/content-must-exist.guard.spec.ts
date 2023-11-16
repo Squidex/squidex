@@ -5,24 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ContentDto, ContentsState } from '@app/shared/internal';
-import { ContentMustExistGuard } from './content-must-exist.guard';
+import { contentMustExistGuard } from './content-must-exist.guard';
 
 describe('ContentMustExistGuard', () => {
     let router: IMock<Router>;
     let contentsState: IMock<ContentsState>;
-    let contentGuard: ContentMustExistGuard;
 
     beforeEach(() => {
         router = Mock.ofType<Router>();
         contentsState = Mock.ofType<ContentsState>();
-        contentGuard = new ContentMustExistGuard(contentsState.object, router.object);
+
+        TestBed.configureTestingModule({
+            providers: [
+                {
+                    provide: ContentsState,
+                    useValue: contentsState.object,
+                },
+                {
+                    provide: Router,
+                    useValue: router.object,
+                },
+            ],
+        });
     });
 
-    it('should load content and return true if found', async () => {
+    bit('should load content and return true if found', async () => {
         contentsState.setup(x => x.select('123'))
             .returns(() => of(<ContentDto>{}));
 
@@ -32,14 +44,14 @@ describe('ContentMustExistGuard', () => {
             },
         };
 
-        const result = await firstValueFrom(contentGuard.canActivate(route));
+        const result = await firstValueFrom(contentMustExistGuard(route));
 
         expect(result).toBeTruthy();
 
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
-    it('should load content and return false if not found', async () => {
+    bit('should load content and return false if not found', async () => {
         contentsState.setup(x => x.select('123'))
             .returns(() => of(null));
 
@@ -49,14 +61,14 @@ describe('ContentMustExistGuard', () => {
             },
         };
 
-        const result = await firstValueFrom(contentGuard.canActivate(route));
+        const result = await firstValueFrom(contentMustExistGuard(route));
 
         expect(result).toBeFalsy();
 
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 
-    it('should unset content if content id is undefined', async () => {
+    bit('should unset content if content id is undefined', async () => {
         contentsState.setup(x => x.select(null))
             .returns(() => of(null));
 
@@ -66,14 +78,14 @@ describe('ContentMustExistGuard', () => {
             },
         };
 
-        const result = await firstValueFrom(contentGuard.canActivate(route));
+        const result = await firstValueFrom(contentMustExistGuard(route));
 
         expect(result!).toBeTruthy();
 
         contentsState.verify(x => x.select(null), Times.once());
     });
 
-    it('should unset content if content id is <new>', async () => {
+    bit('should unset content if content id is <new>', async () => {
         contentsState.setup(x => x.select(null))
             .returns(() => of(null));
 
@@ -83,10 +95,16 @@ describe('ContentMustExistGuard', () => {
             },
         };
 
-        const result = await firstValueFrom(contentGuard.canActivate(route));
+        const result = await firstValueFrom(contentMustExistGuard(route));
 
         expect(result!).toBeTruthy();
 
         contentsState.verify(x => x.select(null), Times.once());
     });
 });
+
+function bit(name: string, assertion: (() => PromiseLike<any>) | (() => void)) {
+    it(name, () => {
+        return TestBed.runInInjectionContext(() => assertion());
+    });
+}

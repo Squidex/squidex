@@ -8,12 +8,17 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, inject, Input, OnDestroy, Renderer2, ViewChild } from '@angular/core';
 import { ResourceLoaderService, TypedSimpleChanges, UIOptions } from '@app/framework';
 import { AuthService } from '@app/shared/internal';
+import { TourHintDirective } from './tour-hint.directive';
 
 @Component({
+    standalone: true,
     selector: 'sqx-notifo',
     styleUrls: ['./notifo.component.scss'],
     templateUrl: './notifo.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        TourHintDirective,
+    ],
 })
 export class NotifoComponent implements AfterViewInit, OnDestroy {
     private readonly notifoApiUrl: string = inject(UIOptions).value.notifoApi;

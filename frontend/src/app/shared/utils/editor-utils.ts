@@ -6,7 +6,7 @@
  */
 
 import { interpolate } from '@app/framework';
-import { AppSettingsDto } from './../services/apps.service';
+import { AppSettingsDto } from '../services/apps.service';
 
 export function computeEditorUrl(url?: string | null, settings?: AppSettingsDto | null) {
     if (!url) {

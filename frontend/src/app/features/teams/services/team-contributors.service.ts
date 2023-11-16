@@ -10,7 +10,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlConfig, AssignContributorDto, ContributorsDto, HTTP, mapVersioned, parseContributors, pretifyError, Resource, Version } from '@app/shared';
 
-@Injectable()
+@Injectable({
+    providedIn: 'any',
+})
 export class TeamContributorsService {
     constructor(
         private readonly http: HttpClient,

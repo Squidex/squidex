@@ -5,10 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ModalModel, StatefulControlComponent, Types } from '@app/framework';
+import { ModalDirective, ModalModel, ModalPlacementDirective, StatefulControlComponent, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
+import { AssetFolderDropdownItemComponent } from './asset-folder-dropdown-item.component';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
 
 export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
@@ -16,11 +18,19 @@ export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-folder-dropdown',
     styleUrls: ['./asset-folder-dropdown.component.scss'],
     templateUrl: './asset-folder-dropdown.component.html',
     providers: [
         SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR,
+    ],
+    imports: [
+        AssetFolderDropdownItemComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgIf,
+        TranslatePipe,
     ],
 })
 export class AssetFolderDropdownComponent extends StatefulControlComponent<any, string> {

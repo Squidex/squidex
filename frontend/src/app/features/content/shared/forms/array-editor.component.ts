@@ -5,19 +5,38 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
-import { VirtualScrollerComponent } from '@iharbeck/ngx-virtual-scroller';
+import { VirtualScrollerComponent, VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, TypedSimpleChanges, Types } from '@app/shared';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, disabled$, DropdownMenuComponent, EditContentForm, FieldArrayForm, FormHintComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, ObjectFormBase, SchemaDto, Settings, sorted, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-array-editor',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        ArrayItemComponent,
+        AsyncPipe,
+        CdkDrag,
+        CdkDragHandle,
+        CdkDropList,
+        ConfirmClickDirective,
+        DropdownMenuComponent,
+        FormHintComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        TooltipDirective,
+        TranslatePipe,
+        VirtualScrollerModule,
+    ],
 })
 export class ArrayEditorComponent {
     @Input({ required: true })

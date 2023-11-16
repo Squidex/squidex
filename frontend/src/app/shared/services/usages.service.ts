@@ -53,7 +53,9 @@ export class CurrentStorageDto {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class UsagesService {
     constructor(
         private readonly http: HttpClient,

@@ -5,17 +5,43 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { booleanAttribute, Component, EventEmitter, forwardRef, Input, numberAttribute, OnInit, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
+import { LanguageSelectorComponent, ListViewComponent, ModalDialogComponent, PagerComponent, SyncWidthDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState, Subscriptions } from '@app/shared/internal';
+import { ContentListCellDirective, ContentListWidthDirective } from '../contents/content-list-cell.directive';
+import { ContentListHeaderComponent } from '../contents/content-list-header.component';
+import { SearchFormComponent } from '../search/search-form.component';
+import { ContentSelectorItemComponent } from './content-selector-item.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-selector',
     styleUrls: ['./content-selector.component.scss'],
     templateUrl: './content-selector.component.html',
     providers: [
         ComponentContentsState,
+    ],
+    imports: [
+        AsyncPipe,
+        ContentListCellDirective,
+        ContentListHeaderComponent,
+        ContentListWidthDirective,
+        ContentSelectorItemComponent,
+        FormsModule,
+        LanguageSelectorComponent,
+        ListViewComponent,
+        ModalDialogComponent,
+        NgFor,
+        NgIf,
+        PagerComponent,
+        SyncWidthDirective,
+        TooltipDirective,
+        TranslatePipe,
+        forwardRef(() => SearchFormComponent),
     ],
 })
 export class ContentSelectorComponent implements OnInit {

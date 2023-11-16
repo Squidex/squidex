@@ -7,19 +7,59 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsService, ContentsState, contentsTranslationStatus, ContributorsState, defined, getTableConfig, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, Settings, Subscriptions, switchSafe, TableSettings, TempService, TranslationStatus, UIState } from '@app/shared';
-import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
+import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, defined, DropdownMenuComponent, getTableConfig, KeysPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatus, UIState } from '@app/shared';
+import { DueTimeSelectorComponent } from '../../shared/due-time-selector.component';
+import { ContentComponent } from '../../shared/list/content.component';
+import { CustomViewEditorComponent } from './custom-view-editor.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
     templateUrl: './contents-page.component.html',
     providers: [
         Router2State,
+    ],
+    imports: [
+        AsyncPipe,
+        ConfirmClickDirective,
+        ContentComponent,
+        ContentListCellDirective,
+        ContentListCellResizeDirective,
+        ContentListHeaderComponent,
+        ContentListWidthDirective,
+        ContentStatusComponent,
+        CustomViewEditorComponent,
+        DropdownMenuComponent,
+        DueTimeSelectorComponent,
+        FormsModule,
+        KeysPipe,
+        LanguageSelectorComponent,
+        LayoutComponent,
+        ListViewComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        NotifoComponent,
+        PagerComponent,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        SearchFormComponent,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        SyncWidthDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
     ],
 })
 export class ContentsPageComponent implements OnInit {

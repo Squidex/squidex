@@ -5,14 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { GridsterModule } from 'angular-gridster2';
-import { HelpComponent, HistoryComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AppsCardComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, DashboardPageComponent, ImportContributorsDialogComponent, LeftMenuComponent, MorePageComponent, PlanComponent, PlansPageComponent, SettingsAreaComponent, SettingsMenuComponent, TeamAreaComponent } from './declarations';
+import { Routes } from '@angular/router';
+import { HelpComponent, HistoryComponent } from '@app/shared';
 import { TeamContributorsService, TeamContributorsState, TeamPlansService, TeamPlansState } from './internal';
+import { ContributorsPageComponent } from './pages/contributors/contributors-page.component';
+import { DashboardPageComponent } from './pages/dashboard/dashboard-page.component';
+import { MorePageComponent } from './pages/more/more-page.component';
+import { PlansPageComponent } from './pages/plans/plans-page.component';
+import { SettingsAreaComponent } from './shared/settings-area.component';
+import { TeamAreaComponent } from './team-area.component';
 
-const routes: Routes = [
+export const TEAM_ROUTES: Routes = [
     {
         path: '',
         component: TeamAreaComponent,
@@ -28,6 +31,10 @@ const routes: Routes = [
                     {
                         path: 'contributors',
                         component: ContributorsPageComponent,
+                        providers: [
+                            TeamContributorsService,
+                            TeamContributorsState,
+                        ],
                         children: [
                             {
                                 path: 'history',
@@ -48,6 +55,10 @@ const routes: Routes = [
                     {
                         path: 'plans',
                         component: PlansPageComponent,
+                        providers: [
+                            TeamPlansService,
+                            TeamPlansState,
+                        ],
                         children: [
                             {
                                 path: 'history',
@@ -90,34 +101,3 @@ const routes: Routes = [
         ],
     },
 ];
-
-@NgModule({
-    imports: [
-        GridsterModule,
-        RouterModule.forChild(routes),
-        SqxFrameworkModule,
-        SqxSharedModule,
-    ],
-    declarations: [
-        AppsCardComponent,
-        DashboardPageComponent,
-        ContributorAddFormComponent,
-        ContributorComponent,
-        ContributorsPageComponent,
-        ImportContributorsDialogComponent,
-        LeftMenuComponent,
-        MorePageComponent,
-        PlanComponent,
-        PlansPageComponent,
-        SettingsAreaComponent,
-        SettingsMenuComponent,
-        TeamAreaComponent,
-    ],
-    providers: [
-        TeamContributorsService,
-        TeamContributorsState,
-        TeamPlansService,
-        TeamPlansState,
-    ],
-})
-export class SqxFeatureTeamsModule {}

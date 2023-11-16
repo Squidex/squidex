@@ -24,7 +24,9 @@ export type UpdateProfileDto = Readonly<{
     answers: { [question: string]: string };
  }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class UsersService {
     constructor(
         private readonly http: HttpClient,

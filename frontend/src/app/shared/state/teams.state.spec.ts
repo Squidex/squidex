@@ -8,7 +8,7 @@
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { DialogService, TeamsService, TeamsState } from '@app/shared/internal';
-import { createTeam } from './../services/teams.service.spec';
+import { createTeam } from '../services/teams.service.spec';
 
 describe('TeamsState', () => {
     const team1 = createTeam(1);

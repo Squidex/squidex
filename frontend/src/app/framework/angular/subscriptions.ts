@@ -7,7 +7,7 @@
 
 import { ChangeDetectorRef, inject, ViewRef } from '@angular/core';
 import { catchError, EMPTY, Observable, Subscription } from 'rxjs';
-import { Types } from './../utils/types';
+import { Types } from '../utils/types';
 
 export type UnsubscribeFunction = () => void;
 

@@ -5,14 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { action } from '@storybook/addon-actions';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { CodeEditorComponent, LongHoverDirective, SqxFrameworkModule } from '@app/framework';
+import { LongHoverDirective } from '@app/framework';
 
 export default {
     title: 'Framework/LongHover',
-    component: CodeEditorComponent,
+    component: LongHoverDirective,
     argTypes: {
         selector: {
             control: 'text',
@@ -37,9 +36,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
             ],
         }),
     ],

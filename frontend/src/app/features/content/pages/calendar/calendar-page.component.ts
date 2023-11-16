@@ -5,17 +5,38 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AppsState, ContentDto, ContentsService, DateTime, DialogModel, getContentValue, LanguageDto, LanguagesState, LocalizerService, ResourceLoaderService } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { AppsState, ConfirmClickDirective, ContentDto, ContentsService, ContentStatusComponent, CopyDirective, DateTime, DialogModel, FullDateTimePipe, getContentValue, LanguageDto, LanguagesState, LayoutComponent, LocalizerService, ModalDialogComponent, ModalDirective, ResourceLoaderService, TitleComponent, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 declare const tui: any;
 
 type ViewMode = 'day' | 'week' | 'month';
 
 @Component({
+    standalone: true,
     selector: 'sqx-calendar-page',
     styleUrls: ['./calendar-page.component.scss'],
     templateUrl: './calendar-page.component.html',
+    imports: [
+        ConfirmClickDirective,
+        ContentStatusComponent,
+        CopyDirective,
+        FormsModule,
+        FullDateTimePipe,
+        LayoutComponent,
+        ModalDialogComponent,
+        ModalDirective,
+        NgIf,
+        RouterLink,
+        TitleComponent,
+        TooltipDirective,
+        TranslatePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
     private calendar: any;

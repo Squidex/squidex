@@ -5,33 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { allParams } from '@app/framework';
-import { SchemasState } from './../state/schemas.state';
+import { SchemasState } from '../state/schemas.state';
 
-@Injectable()
-export class SchemaMustExistGuard  {
-    constructor(
-        private readonly schemasState: SchemasState,
-        private readonly router: Router,
-    ) {
-    }
+export const schemaMustExistGuard = (route: ActivatedRouteSnapshot) => {
+    const schemasState = inject(SchemasState);
+    const schemaName = allParams(route)['schemaName'];
+    const router = inject(Router);
 
-    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
-        const schemaName = allParams(route)['schemaName'];
+    const result =
+        schemasState.select(schemaName).pipe(
+            tap(schema => {
+                if (!schema) {
+                    router.navigate(['/404']);
+                }
+            }),
+            map(schema => !!schema));
 
-        const result =
-            this.schemasState.select(schemaName).pipe(
-                tap(schema => {
-                    if (!schema) {
-                        this.router.navigate(['/404']);
-                    }
-                }),
-                map(schema => !!schema));
-
-        return result;
-    }
-}
+    return result;
+};

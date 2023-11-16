@@ -8,7 +8,7 @@
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, SchemaDto, SchemasService, UpdateSchemaCategoryDto, versioned } from '@app/shared/internal';
-import { createSchema } from './../services/schemas.service.spec';
+import { createSchema } from '../services/schemas.service.spec';
 import { TestValues } from './_test-helpers';
 import { getCategoryTree, SchemasState } from './schemas.state';
 

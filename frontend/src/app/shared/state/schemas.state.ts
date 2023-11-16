@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
-import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
+import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from '../services/schemas.service';
 import { AppsState } from './apps.state';
 
 type AnyFieldDto = NestedFieldDto | RootFieldDto;
@@ -28,7 +28,9 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SchemasState extends State<Snapshot> {
     public selectedSchema =
         this.project(x => x.selectedSchema);

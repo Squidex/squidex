@@ -5,20 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { SchemasState } from './../state/schemas.state';
+import { SchemasState } from '@app/shared/internal';
 
-@Injectable()
-export class LoadSchemasGuard  {
-    constructor(
-        private readonly schemasState: SchemasState,
-    ) {
-    }
+export const loadSchemasGuard = () => {
+    const schemasState = inject(SchemasState);
 
-    public canActivate(): Observable<boolean> {
-        return this.schemasState.load().pipe(map(_ => true));
-    }
-}
+    return schemasState.load().pipe(map(_ => true));
+};

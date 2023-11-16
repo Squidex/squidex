@@ -5,14 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
-import { FormControl, ValidatorFn, Validators } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Keys } from '@app/framework/internal';
+import { ControlErrorsComponent } from './control-errors.component';
+import { FocusOnInitDirective } from './focus-on-init.directive';
 
 @Component({
+    standalone: true,
     selector: 'sqx-editable-title',
     styleUrls: ['./editable-title.component.scss'],
     templateUrl: './editable-title.component.html',
+    imports: [
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        FormsModule,
+        NgIf,
+        ReactiveFormsModule,
+    ],
 })
 export class EditableTitleComponent {
     @Output()

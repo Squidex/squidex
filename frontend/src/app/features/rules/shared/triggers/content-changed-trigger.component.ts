@@ -5,16 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { SchemaDto, TemplatedFormArray, TriggerForm } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CodeComponent, FormHintComponent, SchemaDto, TemplatedFormArray, TranslatePipe, TriggerForm } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
+import { ContentChangedSchemaComponent } from './content-changed-schema.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-changed-trigger',
     styleUrls: ['./content-changed-trigger.component.scss'],
     templateUrl: './content-changed-trigger.component.html',
     providers: [
         CompletionsCache,
+    ],
+    imports: [
+        CodeComponent,
+        ContentChangedSchemaComponent,
+        FormHintComponent,
+        FormsModule,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        TranslatePipe,
     ],
 })
 export class ContentChangedTriggerComponent {

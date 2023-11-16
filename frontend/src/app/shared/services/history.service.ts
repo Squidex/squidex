@@ -70,7 +70,9 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
     return from(format(message));
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class HistoryService {
     constructor(
         private readonly http: HttpClient,

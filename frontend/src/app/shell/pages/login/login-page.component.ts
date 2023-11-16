@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-login',
     template: '',
 })

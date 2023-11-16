@@ -5,14 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { AppLanguageDto, FieldForm } from '@app/shared';
+import { AppLanguageDto, FieldForm, LanguageSelectorComponent, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-field-languages',
     styleUrls: ['./field-languages.component.scss'],
     templateUrl: './field-languages.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        LanguageSelectorComponent,
+        NgIf,
+        TourHintDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class FieldLanguagesComponent {
     @Output()

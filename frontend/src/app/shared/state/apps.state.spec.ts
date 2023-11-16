@@ -8,7 +8,7 @@
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { AppsService, AppsState, DialogService } from '@app/shared/internal';
-import { createApp, createAppSettings } from './../services/apps.service.spec';
+import { createApp, createAppSettings } from '../services/apps.service.spec';
 
 describe('AppsState', () => {
     const app1 = createApp(1);

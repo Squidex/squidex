@@ -5,13 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
-import { AppsState, defined } from '@app/shared';
+import { RouterOutlet } from '@angular/router';
+import { AppsState, defined, LayoutContainerDirective, TitleComponent } from '@app/shared';
+import { LeftMenuComponent } from './left-menu.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-app-area',
     styleUrls: ['./app-area.component.scss'],
     templateUrl: './app-area.component.html',
+    imports: [
+        AsyncPipe,
+        LayoutContainerDirective,
+        LeftMenuComponent,
+        NgIf,
+        RouterOutlet,
+        TitleComponent,
+    ],
 })
 export class AppAreaComponent {
     public selectedApp = this.appsState.selectedApp.pipe(defined());

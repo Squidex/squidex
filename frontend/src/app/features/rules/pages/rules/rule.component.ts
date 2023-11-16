@@ -5,14 +5,32 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ActionsDto, ModalModel, RuleDto, RulesState, TriggersDto } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { ActionsDto, ConfirmClickDirective, DropdownMenuComponent, EditableTitleComponent, ModalDirective, ModalModel, ModalPlacementDirective, RuleDto, RulesState, ToggleComponent, TranslatePipe, TriggersDto } from '@app/shared';
+import { RuleElementComponent } from '../../shared/rule-element.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-rule',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        ConfirmClickDirective,
+        DropdownMenuComponent,
+        EditableTitleComponent,
+        FormsModule,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgIf,
+        RouterLink,
+        RuleElementComponent,
+        ToggleComponent,
+        TranslatePipe,
+    ],
 })
 export class RuleComponent {
     @Input({ required: true })

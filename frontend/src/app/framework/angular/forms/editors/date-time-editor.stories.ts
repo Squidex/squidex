@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { DateTimeEditorComponent, LocalizerService, SqxFrameworkModule, UIOptions } from '@app/framework';
+import { DateTimeEditorComponent, LocalizerService, UIOptions } from '@app/framework';
 
 const translations = {
     'common.date': 'Date',
@@ -45,13 +44,16 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
             ],
             providers: [
-                { provide: LocalizerService, useFactory: () => new LocalizerService(translations) },
-                { provide: UIOptions, useFactory: () => new UIOptions({}) },
+                {
+                    provide: LocalizerService,
+                    useFactory: () => new LocalizerService(translations),
+                },
+                {
+                    provide: UIOptions,
+                    useFactory: () => new UIOptions({}),
+                },
             ],
         }),
     ],

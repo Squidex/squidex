@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { LayoutComponent, LocalizerService, SqxFrameworkModule } from '@app/framework';
+import { LayoutComponent, LayoutContainerDirective, ListViewComponent, LocalizerService, RootViewComponent } from '@app/framework';
 
 export default {
     title: 'Framework/Layout',
@@ -81,12 +80,15 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
+                LayoutContainerDirective,
+                RootViewComponent,
+                ListViewComponent,
             ],
             providers: [
-                { provide: LocalizerService, useValue: new LocalizerService({}) },
+                {
+                    provide: LocalizerService,
+                    useValue: new LocalizerService({}),
+                },
             ],
         }),
     ],

@@ -11,6 +11,7 @@ import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input, Renderer
 
 @Directive({
     selector: '[sqxScrollActive]',
+    standalone: true,
 })
 export class ScrollActiveDirective implements AfterViewInit {
     @Input({ alias: 'sqxScrollActive', transform: booleanAttribute })

@@ -5,10 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppLanguageDto, ContentDto, DialogModel, ResolveContents, sorted, StatefulControlComponent, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, sorted, StatefulControlComponent, TranslatePipe, Types } from '@app/shared';
+import { ContentCreatorComponent } from './content-creator.component';
+import { ReferenceItemComponent } from './reference-item.component';
 
 export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true,
@@ -23,6 +26,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
@@ -30,6 +34,20 @@ interface State {
         SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        CdkDrag,
+        CdkDragHandle,
+        CdkDropList,
+        ContentSelectorComponent,
+        ContentsColumnsPipe,
+        ModalDirective,
+        NgFor,
+        NgIf,
+        ReferenceItemComponent,
+        ResizedDirective,
+        TranslatePipe,
+        forwardRef(() => ContentCreatorComponent),
+    ],
 })
 export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     @Input({ required: true })

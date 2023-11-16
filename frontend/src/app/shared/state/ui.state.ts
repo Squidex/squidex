@@ -9,8 +9,8 @@ import { Injectable } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
 import { debug, hasAnyLink, shareSubscribed, State, Types } from '@app/framework';
-import { UIService } from './../services/ui.service';
-import { UsersService } from './../services/users.service';
+import { UIService } from '../services/ui.service';
+import { UsersService } from '../services/users.service';
 
 type Settings = { canCreateApps?: boolean; canCreateTeams?: boolean; [key: string]: any };
 
@@ -40,7 +40,9 @@ interface Snapshot {
     appName?: string;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class UIState extends State<Snapshot> {
     public settings =
         this.project(mergeSettings);

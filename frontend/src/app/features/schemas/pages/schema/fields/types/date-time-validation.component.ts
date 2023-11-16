@@ -5,17 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto, TypedSimpleChanges } from '@app/shared';
+import { DateTimeEditorComponent, DateTimeFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, LanguageDto, LocalizedInputComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
 @Component({
+    standalone: true,
     selector: 'sqx-date-time-validation',
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html',
+    imports: [
+        AsyncPipe,
+        DateTimeEditorComponent,
+        FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class DateTimeValidationComponent {
     @Input({ required: true })

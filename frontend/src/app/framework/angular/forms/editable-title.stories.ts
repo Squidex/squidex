@@ -6,9 +6,8 @@
  */
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { EditableTitleComponent, LocalizerService, SqxFrameworkModule } from '@app/framework';
+import { EditableTitleComponent, LocalizerService } from '@app/framework';
 
 export default {
     title: 'Framework/EditableTitle',
@@ -68,14 +67,14 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
                 FormsModule,
                 ReactiveFormsModule,
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
             ],
             providers: [
-                { provide: LocalizerService, useValue: new LocalizerService({}) },
+                {
+                    provide: LocalizerService,
+                    useValue: new LocalizerService({}),
+                },
             ],
         }),
     ],

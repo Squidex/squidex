@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure;
 [TypeConverter(typeof(LanguageTypeConverter))]
 public partial record Language
 {
-    private static readonly Regex CultureRegex = new Regex("^(?<Code>[a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
+    private static readonly Regex RegexCulture = BuildCultureRegex();
 
     public static Language GetLanguage(string iso2Code)
     {
@@ -85,7 +85,7 @@ public partial record Language
 
         if (input.Length != 2)
         {
-            var match = CultureRegex.Match(input);
+            var match = RegexCulture.Match(input);
 
             if (!match.Success)
             {
@@ -107,4 +107,7 @@ public partial record Language
     {
         return EnglishName;
     }
+
+    [GeneratedRegex("^(?<Code>[a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture, "en-US")]
+    private static partial Regex BuildCultureRegex();
 }

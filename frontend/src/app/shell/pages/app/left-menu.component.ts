@@ -5,14 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { AppDto, Settings } from '@app/shared';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AppDto, Settings, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        NgIf,
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class LeftMenuComponent {
     @Input({ required: true })

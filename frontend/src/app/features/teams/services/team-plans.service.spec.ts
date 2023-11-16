@@ -7,8 +7,8 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { TeamPlansService } from '@app/features/teams/internal';
 import { ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, Version } from '@app/shared';
+import { TeamPlansService } from '../internal';
 
 describe('TeamPlansService', () => {
     const version = new Version('1');

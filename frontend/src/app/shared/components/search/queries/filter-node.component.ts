@@ -5,14 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, numberAttribute, Output } from '@angular/core';
 import { FilterComparison, FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
+import { FilterComparisonComponent } from './filter-comparison.component';
+import { FilterLogicalComponent } from './filter-logical.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-filter-node',
     styleUrls: ['./filter-node.component.scss'],
     templateUrl: './filter-node.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        NgIf,
+        forwardRef(() => FilterComparisonComponent),
+        forwardRef(() => FilterLogicalComponent),
+    ],
 })
 export class FilterNodeComponent {
     public comparison?: FilterComparison;

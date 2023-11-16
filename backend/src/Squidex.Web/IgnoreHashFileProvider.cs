@@ -11,7 +11,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Squidex.Web;
 
-public sealed class IgnoreHashFileProvider : IFileProvider
+public sealed partial class IgnoreHashFileProvider : IFileProvider
 {
     private readonly char[] pathSeparators = { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, '\\' };
     private readonly Dictionary<string, string> map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -21,7 +21,7 @@ public sealed class IgnoreHashFileProvider : IFileProvider
     {
         this.inner = inner;
 
-        var regex = new Regex("^(?<Name>[^.]+)\\.[0-9a-f]{4,}\\.(?<Extension>.+)$");
+        var regex = BuildFileWithHashRegex();
 
         void MapDirectory(string path)
         {
@@ -91,4 +91,7 @@ public sealed class IgnoreHashFileProvider : IFileProvider
 
         return $"{path1}/{path2}";
     }
+
+    [GeneratedRegex("^(?<Name>[^.]+)(\\.|-)[0-9A-Za-z]{4,}\\.(?<Extension>.+)$")]
+    private static partial Regex BuildFileWithHashRegex();
 }

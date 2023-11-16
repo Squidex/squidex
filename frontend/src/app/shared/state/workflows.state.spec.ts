@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, versioned, WorkflowsPayload, WorkflowsService, WorkflowsState } from '@app/shared/internal';
-import { createWorkflows } from './../services/workflows.service.spec';
+import { createWorkflows } from '../services/workflows.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('WorkflowsState', () => {

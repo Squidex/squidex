@@ -502,7 +502,9 @@ export type UpdateSchemaDto = Readonly<{
     tags?: ReadonlyArray<string>;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SchemasService {
     constructor(
         private readonly http: HttpClient,

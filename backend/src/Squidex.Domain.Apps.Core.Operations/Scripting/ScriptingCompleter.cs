@@ -23,7 +23,7 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
-public sealed class ScriptingCompleter
+public sealed partial class ScriptingCompleter
 {
     private readonly IEnumerable<IScriptDescriptor> descriptors;
     private static readonly FilterSchema DynamicData = new FilterSchema(FilterSchemaType.Object)
@@ -112,9 +112,9 @@ public sealed class ScriptingCompleter
         return new Process(descriptors).UsageTrigger();
     }
 
-    private sealed class Process
+    private sealed partial class Process
     {
-        private static readonly Regex PropertyRegex = new Regex(@"^(?!\d)[\w$]+$", RegexOptions.Compiled);
+        private static readonly Regex RegexProperty = BuildPropertyRegex();
         private readonly Stack<string> prefixes = new Stack<string>();
         private readonly Dictionary<string, ScriptingValue> result = new Dictionary<string, ScriptingValue>();
         private readonly IEnumerable<IScriptDescriptor> descriptors;
@@ -523,7 +523,7 @@ public sealed class ScriptingCompleter
             {
                 prefixes.Push(name);
             }
-            else if (PropertyRegex.IsMatch(name))
+            else if (RegexProperty.IsMatch(name))
             {
                 prefixes.Push($".{name}");
             }
@@ -532,5 +532,8 @@ public sealed class ScriptingCompleter
                 prefixes.Push($"['{name}']");
             }
         }
+
+        [GeneratedRegex("^(?!\\d)[\\w$]+$", RegexOptions.Compiled)]
+        private static partial Regex BuildPropertyRegex();
     }
 }

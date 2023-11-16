@@ -6,40 +6,32 @@
  */
 
 import { Location } from '@angular/common';
-import { inject, Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { UIOptions } from '@app/framework';
-import { AuthService } from './../services/auth.service';
+import { AuthService } from '../services/auth.service';
 
-@Injectable()
-export class MustBeAuthenticatedGuard  {
-    private readonly uiOptions = inject(UIOptions);
+export const mustBeAuthenticatedGuard = () => {
+    const authService = inject(AuthService);
+    const location = inject(Location);
+    const options = inject(UIOptions);
+    const router = inject(Router);
 
-    constructor(
-        private readonly authService: AuthService,
-        private readonly location: Location,
-        private readonly router: Router,
-    ) {
-    }
+    return authService.userChanges.pipe(
+        take(1),
+        tap(user => {
+            if (user) {
+                return;
+            }
 
-    public canActivate(): Observable<boolean> {
-        return this.authService.userChanges.pipe(
-            take(1),
-            tap(user => {
-                if (user) {
-                    return;
-                }
+            const redirectPath = location.path(true);
 
-                const redirectPath = this.location.path(true);
-
-                if (this.uiOptions.value.redirectToLogin) {
-                    this.authService.loginRedirect(redirectPath);
-                } else {
-                    this.router.navigate([''], { queryParams: { redirectPath } });
-                }
-            }),
-            map(user => !!user));
-    }
-}
+            if (options.value.redirectToLogin) {
+                authService.loginRedirect(redirectPath);
+            } else {
+                router.navigate([''], { queryParams: { redirectPath } });
+            }
+        }),
+        map(user => !!user));
+};

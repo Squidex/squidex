@@ -5,17 +5,29 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output, QueryList, ViewChildren } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, FormHintComponent, IfOnceDirective, invalid$, ObjectFormBase, RootFieldDto, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-array-item',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        ComponentSectionComponent,
+        FormHintComponent,
+        IfOnceDirective,
+        NgFor,
+        NgIf,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class ArrayItemComponent {
     @Output()

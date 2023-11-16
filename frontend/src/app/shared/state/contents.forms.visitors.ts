@@ -7,10 +7,10 @@
 
 import { ValidatorFn, Validators } from '@angular/forms';
 import { DateTime, Types, ValidatorsEx } from '@app/framework';
-import { ContentDto, ContentReferencesValue } from './../services/contents.service';
-import { LanguageDto } from './../services/languages.service';
-import { FieldDto, RootFieldDto } from './../services/schemas.service';
-import { ArrayFieldPropertiesDto, AssetPreviewMode, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from './../services/schemas.types';
+import { ContentDto, ContentReferencesValue } from '../services/contents.service';
+import { LanguageDto } from '../services/languages.service';
+import { FieldDto, RootFieldDto } from '../services/schemas.service';
+import { ArrayFieldPropertiesDto, AssetPreviewMode, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from '../services/schemas.types';
 
 export class HtmlValue {
     constructor(

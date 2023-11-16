@@ -7,8 +7,8 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { TeamContributorsService } from '@app/features/teams/internal';
 import { ApiUrlConfig, ContributorDto, ContributorsDto, ContributorsPayload, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { TeamContributorsService } from '../internal';
 
 describe('TeamContributorsService', () => {
     const version = new Version('1');

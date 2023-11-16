@@ -5,15 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { ApiUrlConfig, BackupDto, BackupsState, Subscriptions } from '@app/shared';
+import { ApiUrlConfig, BackupDto, BackupsState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { BackupComponent } from './backup.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-backups-page',
     styleUrls: ['./backups-page.component.scss'],
     templateUrl: './backups-page.component.html',
+    imports: [
+        AsyncPipe,
+        BackupComponent,
+        LayoutComponent,
+        ListViewComponent,
+        NgFor,
+        NgIf,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class BackupsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

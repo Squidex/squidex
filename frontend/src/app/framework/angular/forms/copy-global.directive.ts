@@ -10,6 +10,7 @@ import { DialogService, Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxCopyGlobal]',
+    standalone: true,
 })
 export class CopyGlobalDirective {
     constructor(

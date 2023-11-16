@@ -6,7 +6,7 @@
  */
 
 import { of } from 'rxjs';
-import { CanDeactivateGuard } from './can-deactivate.guard';
+import { canDeactivateGuard } from './can-deactivate.guard';
 
 describe('CanDeactivateGuard', () => {
     it('should call component', () => {
@@ -20,7 +20,7 @@ describe('CanDeactivateGuard', () => {
             },
         };
 
-        const result = new CanDeactivateGuard().canDeactivate(component);
+        const result = canDeactivateGuard(component);
 
         expect(result).toBeDefined();
         expect(called).toBeTruthy();

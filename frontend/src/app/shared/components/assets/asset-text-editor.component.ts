@@ -7,12 +7,19 @@
 
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CodeEditorComponent } from '@app/framework';
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-text-editor',
     styleUrls: ['./asset-text-editor.component.scss'],
     templateUrl: './asset-text-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        CodeEditorComponent,
+        FormsModule,
+    ],
 })
 export class AssetTextEditorComponent implements OnInit {
     @Input()

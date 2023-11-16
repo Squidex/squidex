@@ -12,46 +12,45 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Shared.Users
+namespace Squidex.Shared.Users;
+
+public sealed class ClientUser : IUser
 {
-    public sealed class ClientUser : IUser
+    private readonly RefToken token;
+    private readonly List<Claim> claims;
+
+    public string Id
     {
-        private readonly RefToken token;
-        private readonly List<Claim> claims;
+        get => token.Identifier;
+    }
 
-        public string Id
+    public string Email
+    {
+        get => token.ToString();
+    }
+
+    public bool IsLocked
+    {
+        get => false;
+    }
+
+    public IReadOnlyList<Claim> Claims
+    {
+        get => claims;
+    }
+
+    public object Identity => throw new NotSupportedException();
+
+    public ClientUser(RefToken token)
+    {
+        Guard.NotNull(token);
+
+        this.token = token;
+
+        claims = new List<Claim>
         {
-            get => token.Identifier;
-        }
-
-        public string Email
-        {
-            get => token.ToString();
-        }
-
-        public bool IsLocked
-        {
-            get => false;
-        }
-
-        public IReadOnlyList<Claim> Claims
-        {
-            get => claims;
-        }
-
-        public object Identity => throw new NotSupportedException();
-
-        public ClientUser(RefToken token)
-        {
-            Guard.NotNull(token);
-
-            this.token = token;
-
-            claims = new List<Claim>
-            {
-                new Claim(OpenIdClaims.ClientId, token.Identifier),
-                new Claim(SquidexClaimTypes.DisplayName, token.Identifier)
-            };
-        }
+            new Claim(OpenIdClaims.ClientId, token.Identifier),
+            new Claim(SquidexClaimTypes.DisplayName, token.Identifier)
+        };
     }
 }

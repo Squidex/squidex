@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor } from '@angular/common';
 import { AfterViewChecked, AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer } from '@app/framework/internal';
+import { ResizedDirective } from '../../resized.directive';
 
 export const SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RadioGroupComponent), multi: true,
@@ -19,6 +21,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-radio-group',
     styleUrls: ['./radio-group.component.scss'],
     templateUrl: './radio-group.component.html',
@@ -26,6 +29,11 @@ interface State {
         SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        FormsModule,
+        NgFor,
+        ResizedDirective,
+    ],
 })
 export class RadioGroupComponent extends StatefulControlComponent<State, string> implements AfterViewInit, AfterViewChecked {
     private readonly textMeasurer: TextMeasurer;

@@ -10,6 +10,7 @@
 import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
 
 @Component({
+    standalone: true,
     selector: 'sqx-loader',
     styleUrls: ['./loader.component.scss'],
     templateUrl: './loader.component.html',

@@ -5,15 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
-import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSection } from '@app/shared';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
+import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSection, FormHintComponent, MarkdownDirective } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-component-section',
     styleUrls: ['./component-section.component.scss'],
     templateUrl: './component-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        FormHintComponent,
+        MarkdownDirective,
+        NgFor,
+        NgIf,
+        forwardRef(() => FieldEditorComponent),
+    ],
 })
 export class ComponentSectionComponent {
     @Input({ required: true })

@@ -6,13 +6,18 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { AppDto } from '@app/shared';
+import { AppDto, ExternalLinkDirective, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-api-card',
     styleUrls: ['./api-card.component.scss'],
     templateUrl: './api-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        ExternalLinkDirective,
+        TranslatePipe,
+    ],
 })
 export class ApiCardComponent {
     @Input({ required: true })

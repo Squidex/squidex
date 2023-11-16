@@ -5,15 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { GridsterItem } from 'angular-gridster2';
 import { take } from 'rxjs/operators';
-import { AppDto, AppsState, AuthService, DialogModel, DialogService, LocalizerService, ModalModel, TypedSimpleChanges, Types, UIState } from '@app/shared';
+import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, UIState } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-dashboard-config',
     styleUrls: ['./dashboard-config.component.scss'],
     templateUrl: './dashboard-config.component.html',
+    imports: [
+        CodeEditorComponent,
+        ConfirmClickDirective,
+        DropdownMenuComponent,
+        FormsModule,
+        ModalDialogComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class DashboardConfigComponent {
     @Input({ required: true })

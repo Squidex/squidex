@@ -6,8 +6,10 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ModalDirective, StopClickDirective } from '@app/framework';
 import { AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/shared/internal';
+import { ContentSelectorComponent } from './content-selector.component';
 
 export const SQX_REFERENCE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceInputComponent), multi: true,
@@ -22,6 +24,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-reference-input',
     styleUrls: ['./reference-input.component.scss'],
     templateUrl: './reference-input.component.html',
@@ -29,6 +32,12 @@ interface State {
         SQX_REFERENCE_INPUT_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        ContentSelectorComponent,
+        FormsModule,
+        ModalDirective,
+        StopClickDirective,
+    ],
 })
 export class ReferenceInputComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
     @Input()

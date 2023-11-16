@@ -6,15 +6,26 @@
  */
 
 import { booleanAttribute, Component, Input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Observable, of, Subject } from 'rxjs';
-import { DialogModel } from '@app/shared';
+import { DateTimeEditorComponent, DialogModel, FocusOnInitDirective, ModalDialogComponent, ModalDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 
 const OPTION_IMMEDIATELY = 'Immediately';
 
 @Component({
+    standalone: true,
     selector: 'sqx-due-time-selector',
     styleUrls: ['./due-time-selector.component.scss'],
     templateUrl: './due-time-selector.component.html',
+    imports: [
+        DateTimeEditorComponent,
+        FocusOnInitDirective,
+        FormsModule,
+        ModalDialogComponent,
+        ModalDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class DueTimeSelectorComponent {
     private dueTimeResult?: Subject<string | null>;

@@ -5,17 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BehaviorSubject, catchError, of, switchMap } from 'rxjs';
-import { ContentDto } from '@app/shared';
-import { ApiUrlConfig, AppsState, AssetDto, AssetsService, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
+import { ModalDirective } from '@app/framework';
+import { ApiUrlConfig, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
+import { AssetDialogComponent } from '../assets/asset-dialog.component';
+import { AssetSelectorComponent } from '../assets/asset-selector.component';
+import { ChatDialogComponent } from '../chat-dialog.component';
+import { ContentSelectorComponent } from '../references/content-selector.component';
 
 export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true,
 };
 
 @Component({
+    standalone: true,
     selector: 'sqx-rich-editor',
     styleUrls: ['./rich-editor.component.scss'],
     templateUrl: './rich-editor.component.html',
@@ -23,6 +29,14 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AssetDialogComponent,
+        AssetSelectorComponent,
+        AsyncPipe,
+        ChatDialogComponent,
+        ContentSelectorComponent,
+        ModalDirective,
+    ],
 })
 export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {
     private readonly assetId = new BehaviorSubject<string | null>(null);

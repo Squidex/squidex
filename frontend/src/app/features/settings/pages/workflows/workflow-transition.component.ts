@@ -6,12 +6,19 @@
  */
 
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { RoleDto, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { RoleDto, TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-workflow-transition',
     styleUrls: ['./workflow-transition.component.scss'],
     templateUrl: './workflow-transition.component.html',
+    imports: [
+        FormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class WorkflowTransitionComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };

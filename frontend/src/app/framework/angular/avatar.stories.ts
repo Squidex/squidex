@@ -6,7 +6,7 @@
  */
 
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { AvatarComponent, SqxFrameworkModule } from '@app/framework';
+import { AvatarComponent } from '@app/framework';
 
 export default {
     title: 'Framework/Avatar',
@@ -25,8 +25,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
             ],
         }),
     ],

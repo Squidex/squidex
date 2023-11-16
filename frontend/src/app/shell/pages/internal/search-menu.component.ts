@@ -5,10 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Injectable, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, Types } from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, ShortcutComponent, ShortcutDirective, TooltipDirective, TranslatePipe, Types } from '@app/shared';
+import { AutocompleteComponent as AutocompleteComponent_1 } from '../../../framework/angular/forms/editors/autocomplete.component';
 
 @Injectable()
 export class SearchSource implements AutocompleteSource {
@@ -30,6 +33,7 @@ export class SearchSource implements AutocompleteSource {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-search-menu',
     styleUrls: ['./search-menu.component.scss'],
     templateUrl: './search-menu.component.html',
@@ -37,6 +41,16 @@ export class SearchSource implements AutocompleteSource {
         SearchSource,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        AutocompleteComponent_1,
+        FormsModule,
+        NgIf,
+        ShortcutComponent,
+        ShortcutDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class SearchMenuComponent {
     @ViewChild(AutocompleteComponent, { static: false })

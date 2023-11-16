@@ -5,18 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkDropListGroup } from '@angular/cdk/drag-drop';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { CreateCategoryForm, DialogModel, getCategoryTree, MessageBus, SchemaCategory, SchemaDto, SchemasState, Subscriptions, value$ } from '@app/shared';
-import { SchemaCloning } from './../messages';
+import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, SchemaCategory, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, value$ } from '@app/shared';
+import { SchemaCloning } from '../messages';
+import { SchemaFormComponent } from './schema-form.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
+    imports: [
+        AsyncPipe,
+        CdkDropListGroup,
+        FormsModule,
+        LayoutComponent,
+        ModalDirective,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        RouterOutlet,
+        SchemaCategoryComponent,
+        SchemaFormComponent,
+        ShortcutDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class SchemasPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

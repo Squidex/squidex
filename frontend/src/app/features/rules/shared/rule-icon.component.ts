@@ -5,14 +5,20 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RuleElementMetadataDto } from '@app/shared';
+import { RuleElementMetadataDto, SafeHtmlPipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-rule-icon',
     styleUrls: ['./rule-icon.component.scss'],
     templateUrl: './rule-icon.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        NgIf,
+        SafeHtmlPipe,
+    ],
 })
 export class RuleIconComponent {
     @Input({ required: true })

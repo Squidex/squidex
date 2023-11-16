@@ -7,8 +7,12 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { SimulatedRuleEventDto } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { CodeEditorComponent, JoinPipe, SimulatedRuleEventDto, TranslatePipe } from '@app/shared';
+import { RuleClassPipe, SimulatedRuleEventStatusPipe } from '../../shared/pipes';
+import { RuleTransitionComponent } from './rule-transition.component';
 
 const ERRORS_AFTER_EVENT = [
     'ConditionPrecheckDoesNotMatch',
@@ -30,10 +34,21 @@ const ERRORS_FAILED = [
 ];
 
 @Component({
+    standalone: true,
     selector: '[sqxSimulatedRuleEvent]',
     styleUrls: ['./simulated-rule-event.component.scss'],
     templateUrl: './simulated-rule-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        CodeEditorComponent,
+        FormsModule,
+        JoinPipe,
+        NgIf,
+        RuleClassPipe,
+        RuleTransitionComponent,
+        SimulatedRuleEventStatusPipe,
+        TranslatePipe,
+    ],
 })
 export class SimulatedRuleEventComponent {
     @Input('sqxSimulatedRuleEvent')

@@ -5,10 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, Subscriptions, TagValue, TextMeasurer, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { DropdownMenuComponent } from '../../dropdown-menu.component';
+import { LoaderComponent } from '../../loader.component';
+import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
+import { ModalDirective } from '../../modals/modal.directive';
+import { TooltipDirective } from '../../modals/tooltip.directive';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { ScrollActiveDirective } from '../../scroll-active.directive';
+import { StopClickDirective } from '../../stop-click.directive';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
@@ -29,6 +38,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
@@ -36,6 +46,20 @@ interface State {
         SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        DropdownMenuComponent,
+        FormsModule,
+        LoaderComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        ScrollActiveDirective,
+        StopClickDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();

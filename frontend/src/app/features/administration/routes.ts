@@ -5,12 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { HelpComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AdministrationAreaComponent, EventConsumerComponent, EventConsumersPageComponent, EventConsumersService, EventConsumersState, RestorePageComponent, UserComponent, UserMustExistGuard, UserPageComponent, UsersPageComponent, UsersService, UsersState } from './declarations';
+import { Routes } from '@angular/router';
+import { HelpComponent, UsersService } from '@app/shared';
+import { AdministrationAreaComponent } from './administration-area.component';
+import { userMustExistGuard } from './guards/user-must-exist.guard';
+import { EventConsumersService, EventConsumersState, UsersState } from './internal';
+import { EventConsumersPageComponent } from './pages/event-consumers/event-consumers-page.component';
+import { RestorePageComponent } from './pages/restore/restore-page.component';
+import { UserPageComponent } from './pages/users/user-page.component';
+import { UsersPageComponent } from './pages/users/users-page.component';
 
-const routes: Routes = [
+export const ADMINISTRATION_ROUTES: Routes = [
     {
         path: '',
         component: AdministrationAreaComponent,
@@ -23,6 +28,10 @@ const routes: Routes = [
             {
                 path: 'event-consumers',
                 component: EventConsumersPageComponent,
+                providers: [
+                    EventConsumersService,
+                    EventConsumersState,
+                ],
                 children: [
                     {
                         path: 'help',
@@ -49,6 +58,10 @@ const routes: Routes = [
             {
                 path: 'users',
                 component: UsersPageComponent,
+                providers: [
+                    UsersService,
+                    UsersState,
+                ],
                 children: [
                     {
                         path: 'help',
@@ -60,35 +73,10 @@ const routes: Routes = [
                     {
                         path: ':userId',
                         component: UserPageComponent,
-                        canActivate: [UserMustExistGuard],
+                        canActivate: [userMustExistGuard],
                     },
                 ],
             },
         ],
     },
 ];
-
-@NgModule({
-    imports: [
-        RouterModule.forChild(routes),
-        SqxFrameworkModule,
-        SqxSharedModule,
-    ],
-    declarations: [
-        AdministrationAreaComponent,
-        EventConsumerComponent,
-        EventConsumersPageComponent,
-        RestorePageComponent,
-        UserComponent,
-        UserPageComponent,
-        UsersPageComponent,
-    ],
-    providers: [
-        EventConsumersService,
-        EventConsumersState,
-        UserMustExistGuard,
-        UsersService,
-        UsersState,
-    ],
-})
-export class SqxFeatureAdministrationModule {}

@@ -54,7 +54,9 @@ export type UpdateRoleDto = Readonly<{
     properties: {};
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class RolesService {
     constructor(
         private readonly http: HttpClient,

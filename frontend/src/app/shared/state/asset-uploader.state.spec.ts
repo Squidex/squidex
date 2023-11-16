@@ -8,7 +8,7 @@
 import { lastValueFrom, NEVER, Observable, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
 import { AssetsService, AssetUploaderState, DialogService } from '@app/shared/internal';
-import { createAsset } from './../services/assets.service.spec';
+import { createAsset } from '../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('AssetUploaderState', () => {

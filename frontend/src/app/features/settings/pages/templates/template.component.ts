@@ -5,15 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { map, Observable, shareReplay } from 'rxjs';
-import { AppsState, ClientsState, TemplateDetailsDto, TemplateDto, TemplatesService } from '@app/shared';
+import { AppsState, ClientsState, FormHintComponent, LoaderComponent, MarkdownPipe, SafeHtmlPipe, TemplateDetailsDto, TemplateDto, TemplatesService, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-template',
     styleUrls: ['./template.component.scss'],
     templateUrl: './template.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        FormHintComponent,
+        LoaderComponent,
+        MarkdownPipe,
+        NgIf,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class TemplateComponent {
     @Input({ required: true })

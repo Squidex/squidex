@@ -86,7 +86,7 @@ WORKDIR /app
 
 # Copy from build stages
 COPY --from=backend /build/ .
-COPY --from=frontend /build/ wwwroot/build/
+COPY --from=frontend /build/browser wwwroot/build/
 
 EXPOSE 80
 EXPOSE 443

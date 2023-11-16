@@ -5,16 +5,33 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppsState, getCategoryTree, SchemaCategory, SchemasState, Settings, UIOptions, value$ } from '@app/shared';
+import { AppsState, getCategoryTree, LayoutComponent, SchemaCategory, SchemaCategoryComponent, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions, value$ } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
+    imports: [
+        AsyncPipe,
+        FormsModule,
+        LayoutComponent,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        SchemaCategoryComponent,
+        TitleComponent,
+        TranslatePipe,
+    ],
 })
 export class SchemasPageComponent {
     public schemasFilter = new UntypedFormControl();

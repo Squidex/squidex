@@ -5,15 +5,38 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FilterableField, FilterComparison, FilterFieldUI, getFilterUI, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
-import { ContributorsState } from '@app/shared/state/contributors.state';
+import { FormsModule } from '@angular/forms';
+import { DateTimeEditorComponent, DropdownComponent, HighlightPipe, TranslatePipe } from '@app/framework';
+import { ContributorsState, FilterableField, FilterComparison, FilterFieldUI, getFilterUI, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
+import { UserDtoPicture } from '../../pipes';
+import { ReferenceInputComponent } from '../../references/reference-input.component';
+import { QueryPathComponent } from './query-path.component';
+import { FilterOperatorPipe } from './query.pipes';
 
 @Component({
+    standalone: true,
     selector: 'sqx-filter-comparison',
     styleUrls: ['./filter-comparison.component.scss'],
     templateUrl: './filter-comparison.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        DateTimeEditorComponent,
+        DropdownComponent,
+        FilterOperatorPipe,
+        FormsModule,
+        HighlightPipe,
+        NgFor,
+        NgIf,
+        NgSwitch,
+        NgSwitchCase,
+        QueryPathComponent,
+        ReferenceInputComponent,
+        TranslatePipe,
+        UserDtoPicture,
+    ],
 })
 export class FilterComparisonComponent {
     @Output()

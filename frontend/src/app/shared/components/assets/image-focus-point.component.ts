@@ -7,14 +7,18 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { FocusedImage, FocusPicker } from 'image-focus';
-import { Types } from '@app/framework';
-import { AnnotateAssetDto, AssetDto } from '@app/shared/services/assets.service';
+import { TranslatePipe, Types } from '@app/framework';
+import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-image-focus-point',
     styleUrls: ['./image-focus-point.component.scss'],
     templateUrl: './image-focus-point.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        TranslatePipe,
+    ],
 })
 export class ImageFocusPointComponent implements AfterViewInit, OnDestroy {
     private readonly previewImages: FocusedImage[] = [];

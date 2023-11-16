@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, RuleEventsState, RulesService } from '@app/shared/internal';
-import { createRuleEvent } from './../services/rules.service.spec';
+import { createRuleEvent } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('RuleEventsState', () => {

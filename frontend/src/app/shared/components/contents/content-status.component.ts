@@ -5,15 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { LocalizerService, TypedSimpleChanges } from '@app/framework';
+import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/framework';
 import { ScheduleDto } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-status',
     styleUrls: ['./content-status.component.scss'],
     templateUrl: './content-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        FullDateTimePipe,
+        NgIf,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class ContentStatusComponent {
     @Input({ required: true })

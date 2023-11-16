@@ -18,11 +18,11 @@
       "prefix": "sqx",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "build",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -30,6 +30,7 @@
             "inlineStyleLanguage": "scss",
             "allowedCommonJsDependencies": [
               "@tweenjs/tween.js",
+              "client-only",
               "copy-to-clipboard",
               "cropperjs",
               "crypto-js",
@@ -37,12 +38,16 @@
               "crypto-js/enc-base64.js",
               "crypto-js/enc-utf8.js",
               "crypto-js/sha256.js",
-              "mousetrap",
+              "graphql-ws",
+              "markdown-it",
               "mersenne-twister",
+              "mousetrap",
               "nullthrows",
               "pikaday",
               "pikaday/pikaday",
               "progressbar.js",
+              "react-dom",
+              "react",
               "set-value",
               "slugify"
             ],
@@ -117,12 +122,10 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "extractLicenses": false,
               "namedChunks": true,
               "optimization": false,
-              "sourceMap": true,
-              "vendorChunk": true
+              "sourceMap": true
             }
           },
           "defaultConfiguration": "production"

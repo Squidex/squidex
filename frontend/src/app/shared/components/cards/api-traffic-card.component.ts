@@ -6,13 +6,23 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { NgChartsModule } from 'ng2-charts';
+import { FileSizePipe, TranslatePipe } from '@app/framework';
 import { CallsUsageDto, ChartHelpers, ChartOptions, TypedSimpleChanges } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-api-traffic-card',
     styleUrls: ['./api-traffic-card.component.scss'],
     templateUrl: './api-traffic-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        FileSizePipe,
+        FormsModule,
+        NgChartsModule,
+        TranslatePipe,
+    ],
 })
 export class ApiTrafficCardComponent {
     @Input({ required: true })

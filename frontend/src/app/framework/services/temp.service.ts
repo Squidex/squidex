@@ -7,7 +7,9 @@
 
 import { Injectable } from '@angular/core';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TempService {
     private value: any = null;
 

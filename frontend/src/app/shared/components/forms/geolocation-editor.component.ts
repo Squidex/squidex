@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, inject, Input, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { ControlErrorsComponent, ResizedDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { ExtendedFormGroup, LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
 declare const L: any;
@@ -29,6 +31,7 @@ interface State {
 type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
 
 @Component({
+    standalone: true,
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
     templateUrl: './geolocation-editor.component.html',
@@ -36,6 +39,15 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
         SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        ControlErrorsComponent,
+        FormsModule,
+        NgIf,
+        ReactiveFormsModule,
+        ResizedDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class GeolocationEditorComponent extends StatefulControlComponent<State, Geolocation> implements AfterViewInit {
     private readonly googleMapsKey = inject(UIOptions).value.map.googleMaps.key;

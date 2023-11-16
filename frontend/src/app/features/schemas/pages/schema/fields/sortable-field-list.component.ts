@@ -5,14 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, CdkDropListGroup, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { NgFor } from '@angular/common';
+import { booleanAttribute, Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
 import { AppSettingsDto, FieldDto, FieldGroup, groupFields, LanguageDto, RootFieldDto, SchemaDto } from '@app/shared';
+import { FieldGroupComponent } from './field-group.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-sortable-field-list',
     styleUrls: ['./sortable-field-list.component.scss'],
     templateUrl: './sortable-field-list.component.html',
+    imports: [
+        CdkDrag,
+        CdkDragHandle,
+        CdkDropList,
+        CdkDropListGroup,
+        NgFor,
+        forwardRef(() => FieldGroupComponent),
+    ],
 })
 export class SortableFieldListComponent {
     @Output()

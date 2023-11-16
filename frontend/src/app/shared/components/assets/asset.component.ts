@@ -5,8 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
+import { ConfirmClickDirective, ExternalLinkDirective, FileDropDirective, FromNowPipe, ImageSourceDirective, ProgressBarComponent, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetUploaderState, DialogService, StatefulComponent, Types, UploadCanceled } from '@app/shared/internal';
+import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
+import { AssetPreviewUrlPipe, AssetUrlPipe, FileIconPipe } from './pipes';
 
 interface State {
     // The download progress.
@@ -14,10 +18,29 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AssetPreviewUrlPipe,
+        AssetUrlPipe,
+        ConfirmClickDirective,
+        ExternalLinkDirective,
+        FileDropDirective,
+        FileIconPipe,
+        FromNowPipe,
+        ImageSourceDirective,
+        NgFor,
+        NgIf,
+        ProgressBarComponent,
+        StopClickDirective,
+        TooltipDirective,
+        TranslatePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Output()

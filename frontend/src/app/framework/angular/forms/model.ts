@@ -7,7 +7,7 @@
 
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { ErrorDto, Types } from '@app/framework/internal';
-import { State } from './../../state';
+import { State } from '../../state';
 import { ErrorValidator } from './error-validator';
 import { addValidator, hasNonCustomError, updateAll } from './forms-helper';
 

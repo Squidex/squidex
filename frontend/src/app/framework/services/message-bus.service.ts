@@ -16,7 +16,9 @@ interface Message {
     data: any;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class MessageBus {
     private message$ = new Subject<Message>();
 

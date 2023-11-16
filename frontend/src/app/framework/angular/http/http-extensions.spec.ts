@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ErrorDto } from './../../utils/error';
+import { ErrorDto } from '../../utils/error';
 import { parseError } from './http-extensions';
 
 describe('ErrorParsing', () => {

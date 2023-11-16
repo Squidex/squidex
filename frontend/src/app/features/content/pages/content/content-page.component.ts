@@ -5,13 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, ContentDto, ContentsState, defined, DialogService, EditContentForm, LanguagesState, LocalStoreService, ModalModel, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, Subscriptions, TempService, ToolbarService, Types, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, ConfirmClickDirective, ContentDto, ContentsState, defined, DialogService, DropdownMenuComponent, EditContentForm, LanguageSelectorComponent, LanguagesState, LayoutComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, TempService, TitleComponent, ToolbarComponent, ToolbarService, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types, Version, WatchingUsersComponent } from '@app/shared';
+import { ContentExtensionComponent } from '../../shared/content-extension.component';
+import { PreviewButtonComponent } from '../../shared/preview-button.component';
+import { ContentEditorComponent } from './editor/content-editor.component';
+import { ContentInspectionComponent } from './inspecting/content-inspection.component';
+import { ContentReferencesComponent } from './references/content-references.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
     templateUrl: './content-page.component.html',
@@ -20,6 +28,38 @@ import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, Auto
         ResolveAssets,
         ResolveContents,
         ToolbarService,
+    ],
+    imports: [
+        AsyncPipe,
+        ConfirmClickDirective,
+        ContentEditorComponent,
+        ContentExtensionComponent,
+        ContentInspectionComponent,
+        ContentReferencesComponent,
+        DropdownMenuComponent,
+        FormsModule,
+        LanguageSelectorComponent,
+        LayoutComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgIf,
+        NgSwitch,
+        NgSwitchCase,
+        NotifoComponent,
+        PreviewButtonComponent,
+        ReactiveFormsModule,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        TitleComponent,
+        ToolbarComponent,
+        TooltipDirective,
+        TourHintDirective,
+        TourStepDirective,
+        TranslatePipe,
+        WatchingUsersComponent,
     ],
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnInit {

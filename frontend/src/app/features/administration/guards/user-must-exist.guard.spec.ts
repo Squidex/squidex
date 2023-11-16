@@ -5,24 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-import { UserDto, UsersState } from '@app/features/administration/internal';
-import { UserMustExistGuard } from './user-must-exist.guard';
+import { UserDto, UsersState } from '../internal';
+import { userMustExistGuard } from './user-must-exist.guard';
 
 describe('UserMustExistGuard', () => {
-    let usersState: IMock<UsersState>;
     let router: IMock<Router>;
-    let userGuard: UserMustExistGuard;
+    let usersState: IMock<UsersState>;
 
     beforeEach(() => {
         router = Mock.ofType<Router>();
         usersState = Mock.ofType<UsersState>();
-        userGuard = new UserMustExistGuard(usersState.object, router.object);
+
+        TestBed.configureTestingModule({
+            providers: [
+                {
+                    provide: Router,
+                    useValue: router.object,
+                },
+                {
+                    provide: UsersState,
+                    useValue: usersState.object,
+                },
+            ],
+        });
     });
 
-    it('should load user and return true if found', async () => {
+    bit('should load user and return true if found', async () => {
         usersState.setup(x => x.select('123'))
             .returns(() => of(<UserDto>{}));
 
@@ -32,14 +44,14 @@ describe('UserMustExistGuard', () => {
             },
         };
 
-        const result = await firstValueFrom(userGuard.canActivate(route));
+        const result = await firstValueFrom(userMustExistGuard(route));
 
         expect(result).toBeTruthy();
 
         usersState.verify(x => x.select('123'), Times.once());
     });
 
-    it('should load user and return false if not found', async () => {
+    bit('should load user and return false if not found', async () => {
         usersState.setup(x => x.select('123'))
             .returns(() => of(null));
 
@@ -49,14 +61,14 @@ describe('UserMustExistGuard', () => {
             },
         };
 
-        const result = await firstValueFrom(userGuard.canActivate(route));
+        const result = await firstValueFrom(userMustExistGuard(route));
 
         expect(result).toBeFalsy();
 
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 
-    it('should unset user if user id is undefined', async () => {
+    bit('should unset user if user id is undefined', async () => {
         usersState.setup(x => x.select(null))
             .returns(() => of(null));
 
@@ -66,14 +78,14 @@ describe('UserMustExistGuard', () => {
             },
         };
 
-        const result = await firstValueFrom(userGuard.canActivate(route));
+        const result = await firstValueFrom(userMustExistGuard(route));
 
         expect(result).toBeTruthy();
 
         usersState.verify(x => x.select(null), Times.once());
     });
 
-    it('should unset user if user id is <new>', async () => {
+    bit('should unset user if user id is <new>', async () => {
         usersState.setup(x => x.select(null))
             .returns(() => of(null));
 
@@ -83,10 +95,16 @@ describe('UserMustExistGuard', () => {
             },
         };
 
-        const result = await firstValueFrom(userGuard.canActivate(route));
+        const result = await firstValueFrom(userMustExistGuard(route));
 
         expect(result).toBeTruthy();
 
         usersState.verify(x => x.select(null), Times.once());
     });
 });
+
+function bit(name: string, assertion: (() => PromiseLike<any>) | (() => void)) {
+    it(name, () => {
+        return TestBed.runInInjectionContext(() => assertion());
+    });
+}

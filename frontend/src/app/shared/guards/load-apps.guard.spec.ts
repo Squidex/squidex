@@ -5,28 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { AppsState } from '@app/shared/internal';
-import { LoadAppsGuard } from './load-apps.guard';
+import { loadAppsGuard } from './load-apps.guard';
 
 describe('LoadAppsGuard', () => {
     let appsState: IMock<AppsState>;
-    let appGuard: LoadAppsGuard;
 
     beforeEach(() => {
         appsState = Mock.ofType<AppsState>();
-        appGuard = new LoadAppsGuard(appsState.object);
+
+        TestBed.configureTestingModule({ providers: [{ provide: AppsState, useValue: appsState.object }] });
     });
 
-    it('should load apps', async () => {
+    bit('should load apps', async () => {
         appsState.setup(x => x.load())
             .returns(() => of(null));
 
-        const result = await firstValueFrom(appGuard.canActivate());
+        const result = await firstValueFrom(loadAppsGuard());
 
         expect(result).toBeTruthy();
 
         appsState.verify(x => x.load(), Times.once());
     });
 });
+
+function bit(name: string, assertion: (() => PromiseLike<any>) | (() => void)) {
+    it(name, () => {
+        return TestBed.runInInjectionContext(() => assertion());
+    });
+}

@@ -56,7 +56,9 @@ export type UpdateAppLanguageDto = Readonly<{
     falback?: ReadonlyArray<string>;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AppLanguagesService {
     constructor(
         private readonly http: HttpClient,

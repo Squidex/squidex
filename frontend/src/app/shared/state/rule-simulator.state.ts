@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, ListState, shareSubscribed, State } from '@app/framework';
-import { RulesService, SimulatedRuleEventDto } from './../services/rules.service';
+import { RulesService, SimulatedRuleEventDto } from '../services/rules.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends ListState {
@@ -26,7 +26,9 @@ interface Snapshot extends ListState {
     action?: any;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class RuleSimulatorState extends State<Snapshot> {
     public simulatedRuleEvents =
         this.project(x => x.simulatedRuleEvents);

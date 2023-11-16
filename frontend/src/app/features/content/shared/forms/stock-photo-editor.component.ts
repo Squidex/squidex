@@ -5,11 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, UntypedFormControl } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
-import { DialogModel, StatefulControlComponent, StockPhotoDto, StockPhotoService, Subscriptions, thumbnail, Types, value$, valueProjection$ } from '@app/shared';
+import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, LoaderComponent, ModalDialogComponent, ModalDirective, StatefulControlComponent, StockPhotoDto, StockPhotoService, StopClickDirective, Subscriptions, thumbnail, TooltipDirective, TranslatePipe, Types, value$, valueProjection$ } from '@app/shared';
 
 export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true,
@@ -32,6 +33,7 @@ interface State {
 type Request = { search?: string; page: number };
 
 @Component({
+    standalone: true,
     selector: 'sqx-stock-photo-editor',
     styleUrls: ['./stock-photo-editor.component.scss'],
     templateUrl: './stock-photo-editor.component.html',
@@ -39,6 +41,21 @@ type Request = { search?: string; page: number };
         SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        ExternalLinkDirective,
+        FocusOnInitDirective,
+        FormsModule,
+        LoaderComponent,
+        ModalDialogComponent,
+        ModalDirective,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        StopClickDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
     private readonly subscriptions = new Subscriptions();

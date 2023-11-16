@@ -9,7 +9,7 @@ import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, El
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
 import { ResourceLoaderService, ScriptCompletions, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
-import { FocusComponent } from './../forms-helper';
+import { FocusComponent } from '../forms-helper';
 
 declare const ace: any;
 
@@ -18,6 +18,7 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
+    standalone: true,
     selector: 'sqx-code-editor',
     styleUrls: ['./code-editor.component.scss'],
     templateUrl: './code-editor.component.html',

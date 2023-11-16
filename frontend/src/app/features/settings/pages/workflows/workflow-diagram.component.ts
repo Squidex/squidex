@@ -6,14 +6,18 @@
  */
 
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { ResourceLoaderService, WorkflowDto } from '@app/shared';
+import { ListViewComponent, ResourceLoaderService, WorkflowDto } from '@app/shared';
 
 declare const vis: any;
 
 @Component({
+    standalone: true,
     selector: 'sqx-workflow-diagram',
     styleUrls: ['./workflow-diagram.component.scss'],
     templateUrl: './workflow-diagram.component.html',
+    imports: [
+        ListViewComponent,
+    ],
 })
 export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
     private network: any;

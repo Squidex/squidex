@@ -6,7 +6,7 @@
  */
 
 import { createProperties, META_FIELDS, SchemaPropertiesDto } from '@app/shared/internal';
-import { TestValues } from './../state/_test-helpers';
+import { TestValues } from '../state/_test-helpers';
 
 const {
     createField,

@@ -11,6 +11,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, HostBinding } from '@an
 import { fadeAnimation } from './animations';
 
 @Component({
+    standalone: true,
     selector: 'sqx-dropdown-menu',
     styleUrls: ['./dropdown-menu.component.scss'],
     templateUrl: './dropdown-menu.component.html',

@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, numberAttribute, Output } from '@angular/core';
+import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, RootFieldDto, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
+import { ContentFieldComponent } from './content-field.component';
 
 interface State {
     // The when the section is collapsed.
@@ -14,10 +16,19 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-section',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        FormHintComponent,
+        MarkdownDirective,
+        NgFor,
+        NgIf,
+        forwardRef(() => ContentFieldComponent),
+    ],
 })
 export class ContentSectionComponent extends StatefulComponent<State> {
     @Output()

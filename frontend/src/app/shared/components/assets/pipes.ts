@@ -12,6 +12,7 @@ import { ApiUrlConfig, AssetDto, AuthService, MathHelper, StringHelper, Types } 
 @Pipe({
     name: 'sqxAssetUrl',
     pure: true,
+    standalone: true,
 })
 export class AssetUrlPipe implements PipeTransform {
     constructor(
@@ -39,6 +40,7 @@ export class AssetUrlPipe implements PipeTransform {
 @Pipe({
     name: 'sqxAssetPreviewUrl',
     pure: true,
+    standalone: true,
 })
 export class AssetPreviewUrlPipe implements PipeTransform {
     constructor(
@@ -59,6 +61,7 @@ export class AssetPreviewUrlPipe implements PipeTransform {
 @Pipe({
     name: 'sqxFileIcon',
     pure: true,
+    standalone: true,
 })
 export class FileIconPipe implements PipeTransform {
     public transform(asset: { mimeType: string; fileType: string }): string {
@@ -79,6 +82,7 @@ export class FileIconPipe implements PipeTransform {
 @Pipe({
     name: 'sqxPreviewable',
     pure: true,
+    standalone: true,
 })
 export class PreviewableType implements PipeTransform {
     public transform(asset: { fileSize: number; fileType: string }): boolean {

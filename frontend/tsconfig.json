@@ -29,7 +29,7 @@
     "paths": {
       "@app*": [
         "src/app*"
-      ]
+      ],
     },
     "useDefineForClassFields": false
   },

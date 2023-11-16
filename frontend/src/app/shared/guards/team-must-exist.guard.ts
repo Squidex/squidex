@@ -5,32 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { TeamsState } from './../state/teams.state';
+import { TeamsState } from '../state/teams.state';
 
-@Injectable()
-export class TeamMustExistGuard  {
-    constructor(
-        private readonly teamsState: TeamsState,
-        private readonly router: Router,
-    ) {
-    }
+export const teamMustExistGuard = (route: ActivatedRouteSnapshot) => {
+    const teamsState = inject(TeamsState);
+    const teamName = route.params['teamName'];
+    const router = inject(Router);
 
-    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
-        const teamName = route.params['teamName'];
+    const result =
+        teamsState.select(teamName).pipe(
+            tap(team => {
+                if (!team) {
+                    router.navigate(['/404']);
+                }
+            }),
+            map(team => !!team));
 
-        const result =
-            this.teamsState.select(teamName).pipe(
-                tap(team => {
-                    if (!team) {
-                        this.router.navigate(['/404']);
-                    }
-                }),
-                map(team => !!team));
-
-        return result;
-    }
-}
+    return result;
+};

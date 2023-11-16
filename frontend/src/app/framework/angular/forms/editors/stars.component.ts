@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, numberAttribute } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarsComponent), multi: true,
@@ -25,6 +27,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-stars',
     styleUrls: ['./stars.component.scss'],
     templateUrl: './stars.component.html',
@@ -32,6 +35,11 @@ interface State {
         SQX_STARS_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        NgFor,
+        NgIf,
+        TranslatePipe,
+    ],
 })
 export class StarsComponent extends StatefulControlComponent<State, number | null> {
     private maximumStarsValue = 5;

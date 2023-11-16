@@ -259,7 +259,9 @@ export type RuleTrigger = Readonly<{
     [key: string]: any;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class RulesService {
     constructor(
         private readonly http: HttpClient,
