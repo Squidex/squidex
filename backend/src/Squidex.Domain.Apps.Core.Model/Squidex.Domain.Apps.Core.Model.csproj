@@ -4,7 +4,7 @@
     <RootNamespace>Squidex.Domain.Apps.Core</RootNamespace>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
-	<NeutralLanguage>en</NeutralLanguage>
+    <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

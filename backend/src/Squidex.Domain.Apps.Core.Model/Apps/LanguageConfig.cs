@@ -16,7 +16,7 @@ public sealed record LanguageConfig(bool IsOptional = false, ReadonlyList<Langua
 {
     public static readonly LanguageConfig Default = new LanguageConfig();
 
-    public ReadonlyList<Language> Fallbacks { get; } = Fallbacks ?? ReadonlyList.Empty<Language>();
+    public ReadonlyList<Language> Fallbacks { get; } = Fallbacks ?? [];
 
     internal LanguageConfig Cleanup(string self, IReadOnlyDictionary<string, LanguageConfig> allowed)
     {

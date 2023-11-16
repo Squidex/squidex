@@ -230,7 +230,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     {
         var contents = new[]
         {
-            CreateContent([DomainId.NewGuid()], Array.Empty<DomainId>())
+            CreateContent([DomainId.NewGuid()], [])
         };
 
         await sut.EnrichAsync(ApiContext, contents, schemaProvider, CancellationToken);
@@ -246,7 +246,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     {
         var contents = new[]
         {
-            CreateContent([DomainId.NewGuid()], Array.Empty<DomainId>())
+            CreateContent([DomainId.NewGuid()], [])
         };
 
         await sut.EnrichAsync(FrontendContext.Clone(b => b.WithNoEnrichment(true)), contents, schemaProvider, CancellationToken);
@@ -262,7 +262,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     {
         var contents = new[]
         {
-            CreateContent(Array.Empty<DomainId>(), Array.Empty<DomainId>())
+            CreateContent([], [])
         };
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);

@@ -31,7 +31,7 @@ public sealed class FieldSurrogate : IFieldSettings
 
         if (Properties is ArrayFieldProperties arrayProperties)
         {
-            var nested = Children?.Select(n => n.ToNestedField()).ToArray() ?? Array.Empty<NestedField>();
+            var nested = Children?.Select(n => n.ToNestedField()).ToArray() ?? [];
 
             return new ArrayField(Id, Name, partitioning, nested, arrayProperties, this);
         }

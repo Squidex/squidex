@@ -197,7 +197,7 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
 
         property.ExtensionData = new Dictionary<string, object>
         {
-            ["schemaIds"] = field.Properties.SchemaIds ?? ReadonlyList.Empty<DomainId>()
+            ["schemaIds"] = field.Properties.SchemaIds ?? []
         };
 
         property.UniqueItems = !field.Properties.AllowDuplicates;

@@ -90,7 +90,7 @@ public sealed class DefaultContentWorkflow : IContentWorkflow
 
     public ValueTask<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
     {
-        var result = Flow.TryGetValue(status, out var step) ? step.Transitions : Array.Empty<StatusInfo>();
+        var result = Flow.TryGetValue(status, out var step) ? step.Transitions : [];
 
         return ValueTask.FromResult(result);
     }

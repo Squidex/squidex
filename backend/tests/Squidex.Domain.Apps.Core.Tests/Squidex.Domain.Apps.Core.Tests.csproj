@@ -24,7 +24,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
-	<PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
+    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit" Version="2.6.1" />
@@ -34,9 +34,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-	<Using Include="FakeItEasy" />
-	<Using Include="FluentAssertions" />
-	<Using Include="Xunit" />
+    <Using Include="FakeItEasy" />
+    <Using Include="FluentAssertions" />
+    <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />

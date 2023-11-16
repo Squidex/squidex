@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -39,8 +39,8 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-	<PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.1.0" />
-	<PackageReference Include="Squidex.YDotNet.Native" Version="0.2.9" />
+    <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.1.0" />
+    <PackageReference Include="Squidex.YDotNet.Native" Version="0.2.9" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Reactive.Linq" Version="6.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
@@ -51,9 +51,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-	<Using Include="FakeItEasy" />
-	<Using Include="FluentAssertions" />
-	<Using Include="Xunit" />
+    <Using Include="FakeItEasy" />
+    <Using Include="FluentAssertions" />
+    <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />

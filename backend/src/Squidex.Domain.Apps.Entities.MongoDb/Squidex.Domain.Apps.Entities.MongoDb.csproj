@@ -18,7 +18,7 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
   </ItemGroup>
   <ItemGroup>
-	<PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />	  
+    <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />
     <PackageReference Include="Meziantou.Analyzer" Version="2.0.110">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

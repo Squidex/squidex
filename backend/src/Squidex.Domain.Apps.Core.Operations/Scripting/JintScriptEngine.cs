@@ -37,7 +37,7 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
         timeoutScript = options.Value.TimeoutScript;
         timeoutExecution = options.Value.TimeoutExecution;
 
-        this.extensions = extensions?.ToArray() ?? Array.Empty<IJintExtension>();
+        this.extensions = extensions?.ToArray() ?? [];
     }
 
     public async Task<JsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
@@ -152,6 +152,7 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
         var engine = new Engine(engineOptions =>
         {
+            engineOptions.SetTypeConverter(engine => new CustomClrConverter(engine));
             engineOptions.AddObjectConverter(JintObjectConverter.Instance);
             engineOptions.SetReferencesResolver(NullPropagation.Instance);
             engineOptions.Strict();

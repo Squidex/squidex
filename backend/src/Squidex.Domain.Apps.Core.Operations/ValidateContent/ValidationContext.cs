@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent;
 
 public sealed record ValidationContext(RootContext Root)
 {
-    public ImmutableQueue<string> Path { get; init; } = ImmutableQueue<string>.Empty;
+    public ImmutableQueue<string> Path { get; init; } = [];
 
     public bool IsOptional { get; init; }
 

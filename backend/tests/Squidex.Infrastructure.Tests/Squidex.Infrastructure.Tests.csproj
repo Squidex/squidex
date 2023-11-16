@@ -35,9 +35,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-	<Using Include="FakeItEasy" />
-	<Using Include="FluentAssertions" />
-	<Using Include="Xunit" />
+    <Using Include="FakeItEasy" />
+    <Using Include="FluentAssertions" />
+    <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />

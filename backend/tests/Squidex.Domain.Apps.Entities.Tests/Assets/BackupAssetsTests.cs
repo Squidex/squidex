@@ -55,8 +55,8 @@ public class BackupAssetsTests : GivenContext
         A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Tags, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias!, A<CancellationToken>._))
-            .MustNotHaveHappened();
+        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias, A<CancellationToken>._))
+            .MustHaveHappened();
     }
 
     [Fact]

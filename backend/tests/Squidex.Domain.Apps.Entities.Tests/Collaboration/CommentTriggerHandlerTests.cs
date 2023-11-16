@@ -127,7 +127,7 @@ public class CommentTriggerHandlerTests
     {
         var ctx = Context().ToRulesContext();
 
-        var @event = new CommentCreated { Mentions = Array.Empty<string>() };
+        var @event = new CommentCreated { Mentions = [] };
         var envelope = Envelope.Create<AppEvent>(@event);
 
         var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, default).ToListAsync();

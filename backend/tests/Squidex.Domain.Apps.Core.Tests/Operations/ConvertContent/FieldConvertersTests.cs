@@ -582,7 +582,7 @@ public class FieldConvertersTests
         var source = new ContentFieldData();
 
         var actual =
-            new ResolveLanguages(languages, Array.Empty<Language>()) { ResolveFallback = true }
+            new ResolveLanguages(languages, []) { ResolveFallback = true }
                 .ConvertFieldAfter(field, source);
 
         Assert.Same(source, actual);

@@ -55,7 +55,7 @@ public sealed class EnrichWithWorkflows : IContentEnricherStep
             }
             else
             {
-                content.NextStatuses = Array.Empty<StatusInfo>();
+                content.NextStatuses = [];
             }
         }
         else

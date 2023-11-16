@@ -72,7 +72,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     {
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Empty<SchemaCondition>()
+            Schemas = []
         };
 
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);

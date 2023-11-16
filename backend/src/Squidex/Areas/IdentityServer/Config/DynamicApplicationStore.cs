@@ -35,12 +35,7 @@ public class DynamicApplicationStore : InMemoryApplicationStore
     {
         var application = await base.FindByIdAsync(identifier, cancellationToken);
 
-        if (application == null)
-        {
-            application = await GetDynamicAsync(identifier);
-        }
-
-        return application;
+        return application ?? await GetDynamicAsync(identifier);
     }
 
     public override async ValueTask<ImmutableApplication?> FindByClientIdAsync(string identifier,

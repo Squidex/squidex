@@ -68,7 +68,7 @@ public sealed class FieldCollection<T> where T : IField
 
     private FieldCollection()
     {
-        fieldsOrdered = Array.Empty<T>();
+        fieldsOrdered = [];
     }
 
     public FieldCollection(T[] fields)

@@ -49,7 +49,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Trigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadonlyList.Empty<SchemaCondition>()
+                Schemas = []
             },
             Action = null!
         });
@@ -65,7 +65,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Trigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadonlyList.Empty<SchemaCondition>()
+                Schemas = []
             },
             Action = new TestAction
             {
@@ -99,7 +99,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Trigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadonlyList.Empty<SchemaCondition>()
+                Schemas = []
             },
             Action = new TestAction
             {

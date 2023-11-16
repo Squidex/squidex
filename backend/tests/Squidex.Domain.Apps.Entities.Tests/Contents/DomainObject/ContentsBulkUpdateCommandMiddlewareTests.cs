@@ -45,7 +45,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_do_nothing_if_jobs_is_empty()
     {
-        var command = new BulkUpdateContents { Jobs = Array.Empty<BulkUpdateJob>() };
+        var command = new BulkUpdateContents { Jobs = [] };
 
         var actual = await PublishAsync(command);
 

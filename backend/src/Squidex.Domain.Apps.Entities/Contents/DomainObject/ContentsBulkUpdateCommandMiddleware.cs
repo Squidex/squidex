@@ -267,6 +267,6 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
             return [DomainId.NewGuid()];
         }
 
-        return Array.Empty<DomainId>();
+        return [];
     }
 }

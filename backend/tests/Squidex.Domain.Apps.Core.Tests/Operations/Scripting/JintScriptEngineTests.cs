@@ -509,7 +509,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return value;
+                value;
             ";
 
         var actual = sut.Execute(vars, script);
@@ -526,7 +526,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return value;
+                value;
             ";
 
         var actual = sut.Execute(vars, script);
@@ -561,7 +561,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
             ";
 
         const string script2 = @"
-                return ctx.shared + 2;
+                ctx.shared + 2;
             ";
 
         sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
@@ -584,7 +584,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
             ";
 
         const string script2 = @"
-                return ctx.obj.number + 2;
+                ctx.obj.number + 2;
             ";
 
         sut.Execute(vars, script1, new ScriptOptions { AsContext = true });

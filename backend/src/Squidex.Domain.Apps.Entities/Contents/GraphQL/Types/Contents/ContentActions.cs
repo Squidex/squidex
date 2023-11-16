@@ -30,7 +30,7 @@ internal static class ContentActions
                 Name = "path",
                 Description = FieldDescriptions.JsonPath,
                 DefaultValue = null
-            }
+            },
         ];
 
         public static readonly ValueResolver<object> Resolver = (value, fieldContext, context) =>
@@ -55,7 +55,7 @@ internal static class ContentActions
             Name = "path",
             Description = FieldDescriptions.JsonPath,
             DefaultValue = null
-        }
+        },
     ];
 
     public static class Find
@@ -73,7 +73,7 @@ internal static class ContentActions
                 Name = "version",
                 Description = FieldDescriptions.QueryVersion,
                 DefaultValue = null
-            }
+            },
         ];
 
         public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
@@ -105,7 +105,7 @@ internal static class ContentActions
                 Name = "version",
                 Description = FieldDescriptions.QueryVersion,
                 DefaultValue = null
-            }
+            },
         ];
 
         public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
@@ -135,7 +135,7 @@ internal static class ContentActions
                 Name = "ids",
                 Description = FieldDescriptions.EntityIds,
                 DefaultValue = null,
-            }
+            },
         ];
 
         public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
@@ -181,7 +181,7 @@ internal static class ContentActions
                 Name = "search",
                 Description = FieldDescriptions.QuerySearch,
                 DefaultValue = null
-            }
+            },
         ];
 
         public static readonly IFieldResolver Query = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
@@ -293,7 +293,7 @@ internal static class ContentActions
                     Name = "id",
                     Description = FieldDescriptions.ContentRequestOptionalId,
                     DefaultValue = null
-                }
+                },
             ];
         }
 
@@ -361,7 +361,7 @@ internal static class ContentActions
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
                     DefaultValue = EtagVersion.Any
-                }
+                },
             ];
         }
 
@@ -414,7 +414,7 @@ internal static class ContentActions
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
                     DefaultValue = EtagVersion.Any
-                }
+                },
             ];
         }
 
@@ -451,7 +451,7 @@ internal static class ContentActions
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
                     DefaultValue = EtagVersion.Any
-                }
+                },
             ];
         }
 
@@ -492,7 +492,7 @@ internal static class ContentActions
                 Name = "expectedVersion",
                 Description = FieldDescriptions.EntityExpectedVersion,
                 DefaultValue = EtagVersion.Any
-            }
+            },
         ];
 
         public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsChangeStatusOwn, c =>
@@ -523,7 +523,7 @@ internal static class ContentActions
                 Name = "expectedVersion",
                 Description = FieldDescriptions.EntityExpectedVersion,
                 DefaultValue = EtagVersion.Any
-            }
+            },
         ];
 
         public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsDeleteOwn, c =>
@@ -547,7 +547,7 @@ internal static class ContentActions
                 Name = "schemaName",
                 Description = FieldDescriptions.ContentSchemaName,
                 DefaultValue = null
-            }
+            },
         ];
 
         public static readonly ISourceStreamResolver Resolver = Resolvers.Stream(PermissionIds.AppContentsRead, c =>

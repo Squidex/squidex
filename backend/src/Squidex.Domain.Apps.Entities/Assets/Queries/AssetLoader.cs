@@ -29,10 +29,7 @@ public sealed class AssetLoader : IAssetLoader
 
         var asset = await GetCachedAsync(uniqueId, version, ct);
 
-        if (asset == null)
-        {
-            asset = await GetAsync(uniqueId, version, ct);
-        }
+        asset ??= await GetAsync(uniqueId, version, ct);
 
         if (asset is not { Version: > EtagVersion.Empty } || (version > EtagVersion.Any && asset.Version != version))
         {

@@ -28,7 +28,7 @@ internal static class AssetActions
                 Name = "path",
                 Description = FieldDescriptions.JsonPath,
                 DefaultValue = null
-            }
+            },
         ];
 
         public static readonly IFieldResolver Resolver = Resolvers.Sync<IEnrichedAssetEntity, object?>((source, fieldContext, _) =>
@@ -54,7 +54,7 @@ internal static class AssetActions
                 Name = "id",
                 Description = "The ID of the asset (usually GUID).",
                 DefaultValue = null
-            }
+            },
         ];
 
         public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
@@ -93,7 +93,7 @@ internal static class AssetActions
                 Name = "orderby",
                 Description = FieldDescriptions.QueryOrderBy,
                 DefaultValue = null
-            }
+            },
         ];
 
         public static readonly IFieldResolver Resolver = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
@@ -126,7 +126,7 @@ internal static class AssetActions
                 Name = "type",
                 Description = FieldDescriptions.EventType,
                 DefaultValue = null
-            }
+            },
         ];
 
         public static readonly ISourceStreamResolver Resolver = Resolvers.Stream(PermissionIds.AppAssetsRead, c =>
