@@ -141,6 +141,6 @@ public class DefaultAppLogStoreTests : GivenContext
 
     private static Request CreateRecord()
     {
-        return new Request { Properties = new Dictionary<string, string>() };
+        return new Request { Properties = [] };
     }
 }

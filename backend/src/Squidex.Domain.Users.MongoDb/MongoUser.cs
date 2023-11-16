@@ -18,19 +18,19 @@ public sealed class MongoUser : IdentityUser
 {
     [BsonRequired]
     [BsonElement]
-    public List<Claim> Claims { get; set; } = new List<Claim>();
+    public List<Claim> Claims { get; set; } = [];
 
     [BsonRequired]
     [BsonElement]
-    public List<UserTokenInfo> Tokens { get; set; } = new List<UserTokenInfo>();
+    public List<UserTokenInfo> Tokens { get; set; } = [];
 
     [BsonRequired]
     [BsonElement]
-    public List<UserLogin> Logins { get; set; } = new List<UserLogin>();
+    public List<UserLogin> Logins { get; set; } = [];
 
     [BsonRequired]
     [BsonElement]
-    public HashSet<string> Roles { get; set; } = new HashSet<string>();
+    public HashSet<string> Roles { get; set; } = [];
 
     internal string? GetToken(string provider, string name)
     {

@@ -125,7 +125,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         roles = roles.Add(roleName);
 
-        var command = new UpdateRole { Name = null!, Permissions = new[] { "P1" } };
+        var command = new UpdateRole { Name = null!, Permissions = ["P1"] };
 
         ValidationAssert.Throws(() => GuardAppRoles.CanUpdate(command, App),
             new ValidationError("Name is required.", "Name"));
@@ -147,7 +147,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         roles = roles.Add(Role.Developer);
 
-        var command = new UpdateRole { Name = Role.Developer, Permissions = new[] { "P1" } };
+        var command = new UpdateRole { Name = Role.Developer, Permissions = ["P1"] };
 
         ValidationAssert.Throws(() => GuardAppRoles.CanUpdate(command, App),
             new ValidationError("Cannot update a default role."));
@@ -156,7 +156,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanUpdate_should_throw_exception_if_role_does_not_exists()
     {
-        var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" } };
+        var command = new UpdateRole { Name = roleName, Permissions = ["P1"] };
 
         Assert.Throws<DomainObjectNotFoundException>(() => GuardAppRoles.CanUpdate(command, App));
     }
@@ -166,7 +166,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         roles = roles.Add(roleName);
 
-        var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" } };
+        var command = new UpdateRole { Name = roleName, Permissions = ["P1"] };
 
         GuardAppRoles.CanUpdate(command, App);
     }
@@ -176,7 +176,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         roles = roles.Add(roleName);
 
-        var command = new UpdateRole { Name = roleName, Permissions = new[] { "P1" } };
+        var command = new UpdateRole { Name = roleName, Permissions = ["P1"] };
 
         GuardAppRoles.CanUpdate(command, App);
     }

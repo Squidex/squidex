@@ -18,11 +18,11 @@ public sealed class DefaultContentWorkflow : IContentWorkflow
     private static readonly StatusInfo InfoPublished = new StatusInfo(Status.Published, StatusColors.Published);
 
     private static readonly StatusInfo[] All =
-    {
+    [
         InfoArchived,
         InfoDraft,
         InfoPublished
-    };
+    ];
 
     private static readonly Dictionary<Status, (StatusInfo Info, StatusInfo[] Transitions)> Flow =
         new Dictionary<Status, (StatusInfo Info, StatusInfo[] Transitions)>

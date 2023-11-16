@@ -20,7 +20,7 @@ public sealed class ConfigPlansProvider : IBillingPlans
     };
 
     private readonly Dictionary<string, Plan> plansById = new Dictionary<string, Plan>(StringComparer.OrdinalIgnoreCase);
-    private readonly List<Plan> plans = new List<Plan>();
+    private readonly List<Plan> plans = [];
     private readonly Plan freePlan;
 
     public ConfigPlansProvider(IEnumerable<Plan> config)

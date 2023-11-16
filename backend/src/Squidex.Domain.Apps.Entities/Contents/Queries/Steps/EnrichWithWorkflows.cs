@@ -48,10 +48,10 @@ public sealed class EnrichWithWorkflows : IContentEnricherStep
         {
             if (editingStatus == Status.Draft)
             {
-                content.NextStatuses = new[]
-                {
+                content.NextStatuses =
+                [
                     new StatusInfo(Status.Published, StatusColors.Published)
-                };
+                ];
             }
             else
             {

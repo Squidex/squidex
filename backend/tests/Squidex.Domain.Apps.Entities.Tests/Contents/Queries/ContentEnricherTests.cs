@@ -99,7 +99,7 @@ public class ContentEnricherTests : GivenContext
     [Fact]
     public async Task Should_clone_data_if_requested()
     {
-        var source = CreateContent(new ContentData());
+        var source = CreateContent([]);
 
         var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), AppProvider);
 
@@ -111,7 +111,7 @@ public class ContentEnricherTests : GivenContext
     [Fact]
     public async Task Should_not_clone_data_if_not_requested()
     {
-        var source = CreateContent(new ContentData());
+        var source = CreateContent([]);
 
         var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), AppProvider);
 

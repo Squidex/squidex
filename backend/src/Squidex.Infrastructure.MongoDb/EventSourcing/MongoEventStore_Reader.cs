@@ -18,7 +18,7 @@ public delegate bool EventPredicate(MongoEvent data);
 
 public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
 {
-    private static readonly List<StoredEvent> EmptyEvents = new List<StoredEvent>();
+    private static readonly List<StoredEvent> EmptyEvents = [];
 
     public IEventSubscription CreateSubscription(IEventSubscriber<StoredEvent> subscriber, StreamFilter filter, string? position = null)
     {

@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.Assets;
 
 public sealed class AssetMetadata : Dictionary<string, JsonValue>
 {
-    private static readonly char[] PathSeparators = { '.', '[', ']' };
+    private static readonly char[] PathSeparators = ['.', '[', ']'];
 
     public const string FocusX = "focusX";
     public const string FocusY = "focusY";

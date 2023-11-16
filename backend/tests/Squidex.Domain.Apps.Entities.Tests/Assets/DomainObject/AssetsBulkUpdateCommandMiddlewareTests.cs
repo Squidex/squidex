@@ -167,15 +167,15 @@ public class AssetsBulkUpdateCommandMiddlewareTests : GivenContext
         return new BulkUpdateAssets
         {
             AppId = AppId,
-            Jobs = new[]
-            {
+            Jobs =
+            [
                 new BulkUpdateJob
                 {
                     Type = type,
                     Id = id,
                     FileName = fileName
-                }
-            }
+                },
+            ]
         };
     }
 

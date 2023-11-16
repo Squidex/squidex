@@ -200,11 +200,11 @@ public class ArrayfieldTests
         var parent_1 = parent_0.AddField(field1);
         var parent_2 = parent_1.AddField(field2);
         var parent_3 = parent_2.AddField(field3);
-        var parent_4 = parent_3.ReorderFields(new List<long> { 3, 2, 1 });
-        var parent_5 = parent_4.ReorderFields(new List<long> { 3, 2, 1 });
+        var parent_4 = parent_3.ReorderFields([3, 2, 1]);
+        var parent_5 = parent_4.ReorderFields([3, 2, 1]);
 
-        Assert.Equal(new List<NestedField> { field3, field2, field1 }, parent_4.Fields.ToList());
-        Assert.Equal(new List<NestedField> { field3, field2, field1 }, parent_5.Fields.ToList());
+        Assert.Equal([field3, field2, field1], parent_4.Fields.ToList());
+        Assert.Equal([field3, field2, field1], parent_5.Fields.ToList());
         Assert.Same(parent_4, parent_5);
     }
 
@@ -217,7 +217,7 @@ public class ArrayfieldTests
         var parent_1 = parent_0.AddField(field1);
         var parent_2 = parent_1.AddField(field2);
 
-        Assert.Throws<ArgumentException>(() => parent_2.ReorderFields(new List<long> { 1 }));
+        Assert.Throws<ArgumentException>(() => parent_2.ReorderFields([1]));
     }
 
     [Fact]
@@ -229,7 +229,7 @@ public class ArrayfieldTests
         var parent_1 = parent_0.AddField(field1);
         var parent_2 = parent_1.AddField(field2);
 
-        Assert.Throws<ArgumentException>(() => parent_2.ReorderFields(new List<long> { 1, 4 }));
+        Assert.Throws<ArgumentException>(() => parent_2.ReorderFields([1, 4]));
     }
 
     private static NestedField<NumberFieldProperties> CreateField(int id)

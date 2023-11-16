@@ -126,10 +126,10 @@ public abstract class ContentsQueryTestsBase
     {
         var query = new ClrQuery
         {
-            Sort = new List<SortNode>
-            {
+            Sort =
+            [
                 new SortNode("data.value.iv", SortOrder.Ascending)
-            }
+            ]
         };
 
         var contents = await QueryAsync(_.ContentRepository, query, 1000, 9000);
@@ -202,7 +202,7 @@ public abstract class ContentsQueryTestsBase
     {
         clrQuery.Take = top;
         clrQuery.Skip = skip;
-        clrQuery.Sort ??= new List<SortNode>();
+        clrQuery.Sort ??= [];
 
         if (clrQuery.Sort.Count == 0)
         {

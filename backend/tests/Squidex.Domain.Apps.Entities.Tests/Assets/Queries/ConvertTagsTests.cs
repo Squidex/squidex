@@ -48,11 +48,11 @@ public class ConvertTagsTests : GivenContext
     {
         var asset = new AssetEntity
         {
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "id1",
                 "id2"
-            },
+            ],
             AppId = AppId
         };
 
@@ -65,7 +65,7 @@ public class ConvertTagsTests : GivenContext
 
         await sut.EnrichAsync(ApiContext, Enumerable.Repeat(asset, 1), CancellationToken);
 
-        Assert.Equal(new HashSet<string> { "name1", "name2" }, asset.TagNames);
+        Assert.Equal(["name1", "name2"], asset.TagNames);
     }
 
     [Fact]
@@ -73,21 +73,21 @@ public class ConvertTagsTests : GivenContext
     {
         var asset1 = new AssetEntity
         {
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "id1",
                 "id2"
-            },
+            ],
             AppId = AppId
         };
 
         var asset2 = new AssetEntity
         {
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "id2",
                 "id3"
-            },
+            ],
             AppId = AppId
         };
 
@@ -101,7 +101,7 @@ public class ConvertTagsTests : GivenContext
 
         await sut.EnrichAsync(ApiContext, new[] { asset1, asset2 }, CancellationToken);
 
-        Assert.Equal(new HashSet<string> { "name1", "name2" }, asset1.TagNames);
-        Assert.Equal(new HashSet<string> { "name2", "name3" }, asset2.TagNames);
+        Assert.Equal(["name1", "name2"], asset1.TagNames);
+        Assert.Equal(["name2", "name3"], asset2.TagNames);
     }
 }

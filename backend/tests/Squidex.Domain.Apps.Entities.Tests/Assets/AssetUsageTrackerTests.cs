@@ -98,11 +98,11 @@ public class AssetUsageTrackerTests : GivenContext
         var @event = new AssetCreated
         {
             AppId = AppId,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag1",
                 "tag2"
-            },
+            ],
             AssetId = assetId
         };
 
@@ -130,22 +130,22 @@ public class AssetUsageTrackerTests : GivenContext
         var @event1 = new AssetCreated
         {
             AppId = AppId,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag1",
                 "tag2"
-            },
+            ],
             AssetId = assetId
         };
 
         var @event2 = new AssetCreated
         {
             AppId = AppId,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag2",
                 "tag3"
-            },
+            ],
             AssetId = assetId
         };
 
@@ -181,22 +181,22 @@ public class AssetUsageTrackerTests : GivenContext
         var @event1 = new AssetCreated
         {
             AppId = AppId,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag1",
                 "tag2"
-            },
+            ],
             AssetId = assetId
         };
 
         var @event2 = new AssetAnnotated
         {
             AppId = AppId,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag2",
                 "tag3"
-            },
+            ],
             AssetId = assetId
         };
 
@@ -229,22 +229,22 @@ public class AssetUsageTrackerTests : GivenContext
         var @event1 = new AssetCreated
         {
             AppId = AppId,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag1",
                 "tag2"
-            },
+            ],
             AssetId = assetId
         };
 
         var @event2 = new AssetAnnotated
         {
             AppId = AppId,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag2",
                 "tag3"
-            },
+            ],
             AssetId = assetId
         };
 
@@ -278,11 +278,11 @@ public class AssetUsageTrackerTests : GivenContext
         var @event1 = new AssetCreated
         {
             AppId = AppId,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag1",
                 "tag2"
-            },
+            ],
             AssetId = assetId
         };
 
@@ -315,11 +315,11 @@ public class AssetUsageTrackerTests : GivenContext
     {
         var state = new AssetUsageTracker.State
         {
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag1",
                 "tag2"
-            }
+            ]
         };
 
         A.CallTo(() => store.ReadAsync(assetKey, default))
@@ -350,11 +350,11 @@ public class AssetUsageTrackerTests : GivenContext
     {
         IAssetEntity asset = new AssetEntity
         {
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "tag1",
                 "tag2"
-            }
+            ]
         };
 
         A.CallTo(() => assetLoader.GetAsync(AppId.Id, assetId, 41, default))

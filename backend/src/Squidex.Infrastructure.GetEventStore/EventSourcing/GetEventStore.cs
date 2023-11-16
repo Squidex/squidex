@@ -17,7 +17,6 @@ namespace Squidex.Infrastructure.EventSourcing;
 public sealed class GetEventStore : IEventStore, IInitializable
 {
     private const string StreamPrefix = "squidex";
-    private static readonly IReadOnlyList<StoredEvent> EmptyEvents = new List<StoredEvent>();
     private readonly EventStoreClient client;
     private readonly EventStoreProjectionClient projectionClient;
     private readonly IJsonSerializer serializer;

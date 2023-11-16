@@ -73,7 +73,7 @@ public sealed class ResolveReferences : IContentEnricherStep
         {
             foreach (var content in contents)
             {
-                content.ReferenceData ??= new ContentData();
+                content.ReferenceData ??= [];
 
                 var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData())!;
 
@@ -83,7 +83,7 @@ public sealed class ResolveReferences : IContentEnricherStep
                     {
                         foreach (var (partition, partitionValue) in fieldData)
                         {
-                            fieldIds ??= new HashSet<DomainId>();
+                            fieldIds ??= [];
                             fieldIds.Clear();
 
                             partitionValue.AddReferencedIds(field, fieldIds, components);

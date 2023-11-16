@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
-
 namespace Squidex.Infrastructure;
 
 [Serializable]
@@ -20,18 +18,5 @@ public class DomainObjectException : DomainException
         Guard.NotNullOrEmpty(id);
 
         Id = id;
-    }
-
-    public DomainObjectException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-        Id = info.GetString(nameof(Id))!;
-    }
-
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        info.AddValue(nameof(Id), Id);
-
-        base.GetObjectData(info, context);
     }
 }

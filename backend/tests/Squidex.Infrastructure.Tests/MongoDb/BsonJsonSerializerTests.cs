@@ -88,7 +88,7 @@ public class BsonJsonSerializerTests
             {
                 Bool = true,
                 Byte = 0x2,
-                Bytes = new byte[] { 0x10, 0x12, 0x13 },
+                Bytes = [0x10, 0x12, 0x13],
                 DateTimeOffset = new DateTimeOffset(2022, 12, 11, 10, 9, 8, TimeSpan.Zero),
                 DateTime = new DateTime(2022, 12, 11),
                 Float32 = 32.5f,
@@ -98,7 +98,7 @@ public class BsonJsonSerializerTests
                 Int32 = 32,
                 Int16 = 16,
                 String = "squidex",
-                Strings = new[] { "hello", "squidex " },
+                Strings = ["hello", "squidex "],
                 TimeSpan = TimeSpan.FromSeconds(123),
                 UInt64 = 164,
                 UInt32 = 132,

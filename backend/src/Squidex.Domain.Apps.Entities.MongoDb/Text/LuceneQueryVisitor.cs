@@ -204,15 +204,15 @@ public sealed class LuceneQueryVisitor
             switch (clause.Occur)
             {
                 case Occur.MUST:
-                    musts ??= new BsonArray();
+                    musts ??= [];
                     musts.Add(converted);
                     break;
                 case Occur.SHOULD:
-                    shoulds ??= new BsonArray();
+                    shoulds ??= [];
                     shoulds.Add(converted);
                     break;
                 case Occur.MUST_NOT:
-                    mustNots ??= new BsonArray();
+                    mustNots ??= [];
                     mustNots.Add(converted);
                     break;
             }

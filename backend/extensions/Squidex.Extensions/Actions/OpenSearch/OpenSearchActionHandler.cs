@@ -149,7 +149,7 @@ public sealed class OpenSearchContent
     public string ContentId { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, object> More { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> More { get; set; } = [];
 }
 
 public sealed class OpenSearchJob

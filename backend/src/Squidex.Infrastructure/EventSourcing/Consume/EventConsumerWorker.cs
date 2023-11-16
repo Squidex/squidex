@@ -17,7 +17,7 @@ public sealed class EventConsumerWorker :
     IMessageHandler<EventConsumerReset>,
     IBackgroundProcess
 {
-    private readonly Dictionary<string, EventConsumerProcessor> processors = new Dictionary<string, EventConsumerProcessor>();
+    private readonly Dictionary<string, EventConsumerProcessor> processors = [];
     private CompletionTimer? timer;
 
     public EventConsumerWorker(IEnumerable<IEventConsumer> eventConsumers,

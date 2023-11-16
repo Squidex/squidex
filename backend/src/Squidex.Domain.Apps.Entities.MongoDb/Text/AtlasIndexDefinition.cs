@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
 public static class AtlasIndexDefinition
 {
-    private static readonly Dictionary<string, string> FieldPaths = new Dictionary<string, string>();
+    private static readonly Dictionary<string, string> FieldPaths = [];
     private static readonly Dictionary<string, string> FieldAnalyzers = new Dictionary<string, string>
     {
         ["iv"] = "lucene.standard",

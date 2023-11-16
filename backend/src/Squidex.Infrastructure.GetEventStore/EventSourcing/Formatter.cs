@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.EventSourcing;
 
 public static class Formatter
 {
-    private static readonly HashSet<string> PrivateHeaders = new HashSet<string> { "$v", "$p", "$c", "$causedBy" };
+    private static readonly HashSet<string> PrivateHeaders = ["$v", "$p", "$c", "$causedBy"];
 
     public static StoredEvent Read(ResolvedEvent resolvedEvent, string? prefix, IJsonSerializer serializer)
     {

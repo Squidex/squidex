@@ -30,12 +30,12 @@ public class ContentsSearchSourceTests : GivenContext
     public ContentsSearchSourceTests()
     {
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity>
-            {
+            .Returns(
+            [
                 Mocks.Schema(AppId, schemaId1),
                 Mocks.Schema(AppId, schemaId2),
                 Mocks.Schema(AppId, schemaId3)
-            });
+            ]);
 
         sut = new ContentsSearchSource(AppProvider, contentQuery, contentIndex, urlGenerator);
     }
@@ -160,7 +160,7 @@ public class ContentsSearchSourceTests : GivenContext
         var requestContext = ContextWithPermissions(schemaId1, schemaId2);
 
         A.CallTo(() => contentIndex.SearchAsync(App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ApiContext.Scope(), CancellationToken))
-            .Returns(new List<DomainId>());
+            .Returns([]);
 
         var actual = await sut.SearchAsync("query", requestContext, CancellationToken);
 

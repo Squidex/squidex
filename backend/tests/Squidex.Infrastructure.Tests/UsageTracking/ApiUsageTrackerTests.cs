@@ -94,22 +94,22 @@ public class ApiUsageTrackerTests
 
         var counters = new Dictionary<string, List<(DateOnly Date, Counters Counters)>>
         {
-            ["my-category"] = new List<(DateOnly Date, Counters Counters)>
-            {
+            ["my-category"] =
+            [
                 (dateFrom.AddDays(0), Counters(0, 0, 0)),
                 (dateFrom.AddDays(1), Counters(4, 100, 2048)),
                 (dateFrom.AddDays(2), Counters(0, 0, 0)),
                 (dateFrom.AddDays(3), Counters(2, 60, 1024)),
                 (dateFrom.AddDays(4), Counters(3, 30, 512))
-            },
-            ["*"] = new List<(DateOnly Date, Counters Counters)>
-            {
+            ],
+            ["*"] =
+            [
                 (dateFrom.AddDays(0), Counters(1, 20, 128)),
                 (dateFrom.AddDays(1), Counters(0, 0, 0)),
                 (dateFrom.AddDays(2), Counters(5, 90, 16)),
                 (dateFrom.AddDays(3), Counters(0, 0, 0)),
                 (dateFrom.AddDays(4), Counters(0, 0, 0))
-            }
+            ]
         };
 
         var forMonth = new Counters
@@ -128,22 +128,22 @@ public class ApiUsageTrackerTests
 
         stats.Should().BeEquivalentTo(new Dictionary<string, List<ApiStats>>
         {
-            ["my-category"] = new List<ApiStats>
-            {
+            ["my-category"] =
+            [
                 new ApiStats(dateFrom.AddDays(0), 0, 0, 0),
                 new ApiStats(dateFrom.AddDays(1), 4, 25, 2048),
                 new ApiStats(dateFrom.AddDays(2), 0, 0, 0),
                 new ApiStats(dateFrom.AddDays(3), 2, 30, 1024),
                 new ApiStats(dateFrom.AddDays(4), 3, 10, 512)
-            },
-            ["*"] = new List<ApiStats>
-            {
+            ],
+            ["*"] =
+            [
                 new ApiStats(dateFrom.AddDays(0), 1, 20, 128),
                 new ApiStats(dateFrom.AddDays(1), 0, 0, 0),
                 new ApiStats(dateFrom.AddDays(2), 5, 18, 16),
                 new ApiStats(dateFrom.AddDays(3), 0, 0, 0),
                 new ApiStats(dateFrom.AddDays(4), 0, 0, 0)
-            }
+            ]
         });
 
         summary.Should().BeEquivalentTo(new ApiStatsSummary(20, 15, 3728, 120, 400));

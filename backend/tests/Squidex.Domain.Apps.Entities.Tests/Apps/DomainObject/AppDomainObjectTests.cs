@@ -621,7 +621,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     [Fact]
     public async Task UpdateLanguage_should_create_events_and_update_language()
     {
-        var command = new UpdateLanguage { Language = Language.DE, Fallback = new[] { Language.EN } };
+        var command = new UpdateLanguage { Language = Language.DE, Fallback = [Language.EN] };
 
         await ExecuteCreateAsync();
         await ExecuteAddLanguageAsync(Language.DE);
@@ -634,7 +634,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateEvent(new AppLanguageUpdated { Language = Language.DE, Fallback = new[] { Language.EN } })
+                CreateEvent(new AppLanguageUpdated { Language = Language.DE, Fallback = [Language.EN] })
             );
     }
 
@@ -680,7 +680,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     [Fact]
     public async Task UpdateRole_should_create_events_and_update_role()
     {
-        var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" }, Properties = JsonValue.Object() };
+        var command = new UpdateRole { Name = roleName, Permissions = ["clients.read"], Properties = JsonValue.Object() };
 
         await ExecuteCreateAsync();
         await ExecuteAddRoleAsync();

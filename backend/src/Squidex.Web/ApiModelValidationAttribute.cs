@@ -56,7 +56,7 @@ public sealed class ApiModelValidationAttribute : ActionFilterAttribute
 
                     if (!string.IsNullOrWhiteSpace(key))
                     {
-                        properties = new[] { key.ToCamelCase() };
+                        properties = [key.ToCamelCase()];
                     }
 
                     foreach (var error in value.Errors)

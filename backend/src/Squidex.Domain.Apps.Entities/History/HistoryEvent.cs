@@ -26,7 +26,7 @@ public sealed class HistoryEvent
 
     public string EventType { get; set; }
 
-    public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> Parameters { get; set; } = [];
 
     public HistoryEvent()
     {

@@ -44,7 +44,7 @@ public sealed class AssetCreated : AssetEvent, IMigrated<IEvent>
     {
         var result = SimpleMapper.Map(this, new AssetCreatedV2());
 
-        result.Metadata = new AssetMetadata();
+        result.Metadata = [];
 
         if (IsImage && PixelWidth != null && PixelHeight != null)
         {

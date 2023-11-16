@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.History;
 
 public sealed class HistoryService : IHistoryService, IEventConsumer
 {
-    private readonly Dictionary<string, string> texts = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> texts = [];
     private readonly List<IHistoryEventsCreator> creators;
     private readonly IHistoryEventRepository repository;
     private readonly NotifoService notifo;

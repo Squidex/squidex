@@ -18,7 +18,7 @@ public class ComponentsFieldTests : IClassFixture<TranslationsFixture>
 {
     private readonly DomainId schemaId1 = DomainId.NewGuid();
     private readonly DomainId schemaId2 = DomainId.NewGuid();
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> errors = [];
 
     [Fact]
     public void Should_instantiate_field()

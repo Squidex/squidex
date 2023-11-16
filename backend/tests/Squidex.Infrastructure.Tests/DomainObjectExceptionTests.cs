@@ -48,8 +48,8 @@ public class DomainObjectExceptionTests
         var actual = source.SerializeAndDeserializeBinary();
 
         Assert.Equal(actual.Id, source.Id);
-        Assert.Equal(actual.ExpectedVersion, source.ExpectedVersion);
-        Assert.Equal(actual.CurrentVersion, source.CurrentVersion);
+        Assert.Equal(actual.VersionExpected, source.VersionExpected);
+        Assert.Equal(actual.VersionCurrent, source.VersionCurrent);
         Assert.Equal(actual.Message, source.Message);
     }
 }

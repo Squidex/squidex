@@ -207,7 +207,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        operation.MustHaveData(new ContentData());
+        operation.MustHaveData([]);
     }
 
     [Fact]

@@ -177,7 +177,7 @@ public sealed class DefaultUserService : IUserService
 
             if (isFirst)
             {
-                var permissions = values.Permissions?.ToIds().ToList() ?? new List<string>();
+                var permissions = values.Permissions?.ToIds().ToList() ?? [];
 
                 permissions.Add(PermissionIds.Admin);
 

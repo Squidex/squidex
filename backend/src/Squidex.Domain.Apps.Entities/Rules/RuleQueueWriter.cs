@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 
 internal sealed class RuleQueueWriter : IAsyncDisposable
 {
-    private readonly List<RuleEventWrite> writes = new List<RuleEventWrite>();
+    private readonly List<RuleEventWrite> writes = [];
     private readonly IRuleEventRepository ruleEventRepository;
     private readonly IRuleUsageTracker ruleUsageTracker;
     private readonly ILogger? log;

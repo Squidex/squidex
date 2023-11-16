@@ -110,7 +110,7 @@ public class SchemasIndexTests : GivenContext
     public async Task Should_resolve_schemas()
     {
         A.CallTo(() => schemaRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { Schema });
+            .Returns([Schema]);
 
         var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
@@ -124,7 +124,7 @@ public class SchemasIndexTests : GivenContext
             .Returns(EtagVersion.Empty);
 
         A.CallTo(() => schemaRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { Schema });
+            .Returns([Schema]);
 
         var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
@@ -138,7 +138,7 @@ public class SchemasIndexTests : GivenContext
             .Returns(true);
 
         A.CallTo(() => schemaRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { Schema });
+            .Returns([Schema]);
 
         var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 

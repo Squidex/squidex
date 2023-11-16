@@ -12,7 +12,7 @@ public sealed class NameReservationState : SimpleState<NameReservationState.Stat
     [CollectionName("Names")]
     public sealed class State
     {
-        public List<NameReservation> Reservations { get; set; } = new List<NameReservation>();
+        public List<NameReservation> Reservations { get; set; } = [];
 
         public (bool, string?) Reserve(DomainId id, string name)
         {

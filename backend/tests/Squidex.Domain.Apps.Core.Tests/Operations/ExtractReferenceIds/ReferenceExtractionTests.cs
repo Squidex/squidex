@@ -191,7 +191,7 @@ public class ReferenceExtractionTests
 
         var actual =
             new ContentConverter(components, schema)
-                .Add(new ValueReferencesConverter(new HashSet<DomainId> { id2 }))
+                .Add(new ValueReferencesConverter([id2]))
                 .Convert(source);
 
         Assert.Equal(expected, actual);
@@ -273,7 +273,7 @@ public class ReferenceExtractionTests
 
         var actual = field.GetReferencedIds(value, components);
 
-        Assert.Equal(new HashSet<DomainId> { id1, id2 }, actual);
+        Assert.Equal([id1, id2], actual);
     }
 
     [Theory]

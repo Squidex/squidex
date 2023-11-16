@@ -17,8 +17,8 @@ namespace Squidex.Domain.Apps.Core.Apps;
 
 public sealed record Role(string Name, PermissionSet? Permissions = null, JsonObject? Properties = null)
 {
-    private static readonly HashSet<string> ExtraPermissions = new HashSet<string>
-    {
+    private static readonly HashSet<string> ExtraPermissions =
+    [
         PermissionIds.AppComments,
         PermissionIds.AppContributorsRead,
         PermissionIds.AppHistory,
@@ -29,7 +29,7 @@ public sealed record Role(string Name, PermissionSet? Permissions = null, JsonOb
         PermissionIds.AppSearch,
         PermissionIds.AppTranslate,
         PermissionIds.AppUsage
-    };
+    ];
 
     public const string Editor = nameof(Editor);
     public const string Developer = nameof(Developer);

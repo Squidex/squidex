@@ -90,8 +90,8 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
 
         var contents = new[]
         {
-            CreateContent(new[] { ref1_1.Id }, new[] { ref2_1.Id }),
-            CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
+            CreateContent([ref1_1.Id], [ref2_1.Id]),
+            CreateContent([ref1_2.Id], [ref2_2.Id])
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
@@ -129,8 +129,8 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
 
         var contents = new[]
         {
-            CreateContent(new[] { ref1_1.Id }, new[] { ref2_1.Id }),
-            CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
+            CreateContent([ref1_1.Id], [ref2_1.Id]),
+            CreateContent([ref1_2.Id], [ref2_2.Id])
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
@@ -182,8 +182,8 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
 
         var contents = new[]
         {
-            CreateContent(new[] { ref1_1.Id }, new[] { ref2_1.Id, ref2_2.Id }),
-            CreateContent(new[] { ref1_2.Id }, new[] { ref2_1.Id, ref2_2.Id })
+            CreateContent([ref1_1.Id], [ref2_1.Id, ref2_2.Id]),
+            CreateContent([ref1_2.Id], [ref2_1.Id, ref2_2.Id])
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
@@ -230,7 +230,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     {
         var contents = new[]
         {
-            CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
+            CreateContent([DomainId.NewGuid()], Array.Empty<DomainId>())
         };
 
         await sut.EnrichAsync(ApiContext, contents, schemaProvider, CancellationToken);
@@ -246,7 +246,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     {
         var contents = new[]
         {
-            CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
+            CreateContent([DomainId.NewGuid()], Array.Empty<DomainId>())
         };
 
         await sut.EnrichAsync(FrontendContext.Clone(b => b.WithNoEnrichment(true)), contents, schemaProvider, CancellationToken);

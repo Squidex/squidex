@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Json.Objects;
 
 public readonly struct JsonValue : IEquatable<JsonValue>
 {
-    private static readonly char[] PathSeparators = { '.', '[', ']' };
+    private static readonly char[] PathSeparators = ['.', '[', ']'];
 
     public static readonly JsonValue Null;
     public static readonly JsonValue True = new JsonValue(true);
@@ -250,12 +250,12 @@ public readonly struct JsonValue : IEquatable<JsonValue>
 
     public static JsonObject Object()
     {
-        return new JsonObject();
+        return [];
     }
 
     public static JsonArray Array()
     {
-        return new JsonArray();
+        return [];
     }
 
     public static JsonValue Array<T>(IEnumerable<T> values)

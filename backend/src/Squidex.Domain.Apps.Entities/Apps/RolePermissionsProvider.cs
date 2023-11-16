@@ -13,8 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Apps;
 
 public sealed class RolePermissionsProvider
 {
-    private readonly List<string> forAppSchemas = new List<string>();
-    private readonly List<string> forAppWithoutSchemas = new List<string>();
+    private readonly List<string> forAppSchemas = [];
+    private readonly List<string> forAppWithoutSchemas = [];
     private readonly IAppProvider appProvider;
 
     public RolePermissionsProvider(IAppProvider appProvider)

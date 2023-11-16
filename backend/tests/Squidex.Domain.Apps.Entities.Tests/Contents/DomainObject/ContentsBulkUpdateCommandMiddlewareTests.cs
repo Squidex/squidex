@@ -546,10 +546,10 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         return new BulkUpdateContents
         {
             AppId = AppId,
-            Jobs = new[]
-            {
+            Jobs =
+            [
                 job
-            },
+            ],
             SchemaId = schemaId
         };
     }

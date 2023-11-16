@@ -54,7 +54,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
             .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
         A.CallTo(() => tagService.GetTagIdsAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>._, default))
-            .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? new Dictionary<string, string>()));
+            .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? []));
 
         var log = A.Fake<ILogger<AssetDomainObject>>();
 
@@ -102,9 +102,9 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                     FileSize = file.FileSize,
                     FileHash = command.FileHash,
                     FileVersion = 0,
-                    Metadata = new AssetMetadata(),
+                    Metadata = [],
                     MimeType = file.MimeType,
-                    Tags = new HashSet<string>(),
+                    Tags = [],
                     Slug = file.FileName.ToAssetSlug()
                 })
             );
@@ -155,9 +155,9 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                     FileSize = file.FileSize,
                     FileHash = command.FileHash,
                     FileVersion = 0,
-                    Metadata = new AssetMetadata(),
+                    Metadata = [],
                     MimeType = file.MimeType,
-                    Tags = new HashSet<string>(),
+                    Tags = [],
                     Slug = file.FileName.ToAssetSlug()
                 })
             );
@@ -187,7 +187,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                     FileSize = file.FileSize,
                     FileHash = command.FileHash,
                     FileVersion = 1,
-                    Metadata = new AssetMetadata(),
+                    Metadata = [],
                     MimeType = file.MimeType
                 })
             );
@@ -217,7 +217,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
                     FileSize = file.FileSize,
                     FileHash = command.FileHash,
                     FileVersion = 1,
-                    Metadata = new AssetMetadata(),
+                    Metadata = [],
                     MimeType = file.MimeType
                 })
             );
@@ -317,7 +317,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
     [Fact]
     public async Task AnnotateTags_should_create_events_and_update_tags()
     {
-        var command = new AnnotateAsset { Tags = new HashSet<string> { "tag1" } };
+        var command = new AnnotateAsset { Tags = ["tag1"] };
 
         await ExecuteCreateAsync();
 
@@ -327,7 +327,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetAnnotated { Tags = new HashSet<string> { "tag1" } })
+                CreateAssetEvent(new AssetAnnotated { Tags = ["tag1"] })
             );
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), CancellationToken))
@@ -372,7 +372,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetDeleted { DeletedSize = 2048, OldTags = new HashSet<string>() })
+                CreateAssetEvent(new AssetDeleted { DeletedSize = 2048, OldTags = [] })
             );
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))

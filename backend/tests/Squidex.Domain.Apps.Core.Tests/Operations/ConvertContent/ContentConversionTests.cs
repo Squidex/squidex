@@ -89,7 +89,7 @@ public class ContentConversionTests
         var expected =
             new ContentData()
                 .AddField("references",
-                    new ContentFieldData())
+                    [])
                 .AddField("assets1",
                     new ContentFieldData()
                         .AddInvariant(JsonValue.Array(1)))

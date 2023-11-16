@@ -47,11 +47,11 @@ public class EnrichWithMetadataTextTests : GivenContext
         var asset = new AssetEntity
         {
             FileSize = 2 * 1024,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "id1",
                 "id2"
-            },
+            ],
             AppId = AppId
         };
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure;
@@ -15,32 +14,15 @@ public class DomainObjectVersionException : DomainObjectException
 {
     private const string ExposedErrorCode = "OBJECT_VERSION_CONFLICT";
 
-    public long CurrentVersion { get; }
+    public long VersionCurrent { get; }
 
-    public long ExpectedVersion { get; }
+    public long VersionExpected { get; }
 
-    public DomainObjectVersionException(string id, long currentVersion, long expectedVersion, Exception? inner = null)
-        : base(FormatMessage(id, currentVersion, expectedVersion), id, ExposedErrorCode, inner)
+    public DomainObjectVersionException(string id, long versionCurrent, long versionExpected, Exception? inner = null)
+        : base(FormatMessage(id, versionCurrent, versionExpected), id, ExposedErrorCode, inner)
     {
-        CurrentVersion = currentVersion;
-
-        ExpectedVersion = expectedVersion;
-    }
-
-    protected DomainObjectVersionException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-        CurrentVersion = info.GetInt64(nameof(CurrentVersion));
-
-        ExpectedVersion = info.GetInt64(nameof(ExpectedVersion));
-    }
-
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        info.AddValue(nameof(CurrentVersion), CurrentVersion);
-        info.AddValue(nameof(ExpectedVersion), ExpectedVersion);
-
-        base.GetObjectData(info, context);
+        VersionCurrent = versionCurrent;
+        VersionExpected = versionExpected;
     }
 
     private static string FormatMessage(string id, long currentVersion, long expectedVersion)

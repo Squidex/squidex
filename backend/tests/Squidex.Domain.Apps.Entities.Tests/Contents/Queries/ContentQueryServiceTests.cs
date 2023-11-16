@@ -23,7 +23,7 @@ public class ContentQueryServiceTests : GivenContext
     private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
-    private readonly ContentData contentData = new ContentData();
+    private readonly ContentData contentData = [];
     private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
     private readonly ContentQueryService sut;
 
@@ -40,7 +40,7 @@ public class ContentQueryServiceTests : GivenContext
         SetupEnricher();
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { Schema });
+            .Returns([Schema]);
 
         A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<ISchemaEntity?>._, CancellationToken))
             .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));

@@ -30,7 +30,7 @@ public class BackgroundUsageTrackerTests
     {
         sut.Dispose();
 
-        await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync(date, key, "category1", new Counters(), ct));
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync(date, key, "category1", [], ct));
     }
 
     [Fact]
@@ -146,14 +146,14 @@ public class BackgroundUsageTrackerTests
 
         var expected = new Dictionary<string, List<(DateOnly Date, Counters Counters)>>
         {
-            ["*"] = new List<(DateOnly Date, Counters Counters)>
-            {
+            ["*"] =
+            [
                 (dateFrom.AddDays(0), new Counters()),
                 (dateFrom.AddDays(1), new Counters()),
                 (dateFrom.AddDays(2), new Counters()),
                 (dateFrom.AddDays(3), new Counters()),
                 (dateFrom.AddDays(4), new Counters())
-            }
+            ]
         };
 
         actual.Should().BeEquivalentTo(expected);
@@ -181,22 +181,22 @@ public class BackgroundUsageTrackerTests
 
         var expected = new Dictionary<string, List<(DateOnly Date, Counters Counters)>>
         {
-            ["my-category"] = new List<(DateOnly Date, Counters Counters)>
-            {
+            ["my-category"] =
+            [
                 (dateFrom.AddDays(0), Counters()),
                 (dateFrom.AddDays(1), Counters(a: 10, b: 15)),
                 (dateFrom.AddDays(2), Counters()),
                 (dateFrom.AddDays(3), Counters(a: 13, b: 18)),
                 (dateFrom.AddDays(4), Counters(a: 15, b: 20))
-            },
-            ["*"] = new List<(DateOnly Date, Counters Counters)>
-            {
+            ],
+            ["*"] =
+            [
                 (dateFrom.AddDays(0), Counters(a: 17, b: 22)),
                 (dateFrom.AddDays(1), Counters()),
                 (dateFrom.AddDays(2), Counters(a: 11, b: 14)),
                 (dateFrom.AddDays(3), Counters()),
                 (dateFrom.AddDays(4), Counters())
-            }
+            ]
         };
 
         actual.Should().BeEquivalentTo(expected);

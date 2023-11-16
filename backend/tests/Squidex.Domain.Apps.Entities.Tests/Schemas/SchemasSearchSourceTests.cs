@@ -31,7 +31,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
         var schema1 = CreateSchema("schemaA1");
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { schema1 });
+            .Returns([schema1]);
 
         A.CallTo(() => urlGenerator.SchemaUI(AppId, schema1.NamedId()))
         .Returns("schemaA1-url");
@@ -51,7 +51,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
         var schema1 = CreateSchema("schemaA1", SchemaType.Component);
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { schema1 });
+            .Returns([schema1]);
 
         A.CallTo(() => urlGenerator.SchemaUI(AppId, schema1.NamedId()))
             .Returns("schemaA1-url");
@@ -73,7 +73,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
         var schema3 = CreateSchema("schemaB2");
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { schema1, schema2, schema3 });
+            .Returns([schema1, schema2, schema3]);
 
         A.CallTo(() => urlGenerator.SchemaUI(AppId, schema1.NamedId()))
             .Returns("schemaA1-url");
@@ -101,7 +101,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
         var schema1 = CreateSchema("schemaA1", SchemaType.Singleton);
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { schema1 });
+            .Returns([schema1]);
 
         A.CallTo(() => urlGenerator.SchemaUI(AppId, schema1.NamedId()))
             .Returns("schemaA1-url");

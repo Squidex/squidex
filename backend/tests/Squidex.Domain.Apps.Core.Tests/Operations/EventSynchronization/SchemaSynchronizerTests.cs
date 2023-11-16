@@ -573,7 +573,7 @@ public class SchemaSynchronizerTests
         var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
         events.ShouldHaveSameEvents(
-            new SchemaFieldsReordered { FieldIds = new[] { 11L, 10L }, ParentFieldId = arrayId }
+            new SchemaFieldsReordered { FieldIds = [11L, 10L], ParentFieldId = arrayId }
         );
     }
 
@@ -593,7 +593,7 @@ public class SchemaSynchronizerTests
         var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
         events.ShouldHaveSameEvents(
-            new SchemaFieldsReordered { FieldIds = new[] { 11L, 10L } }
+            new SchemaFieldsReordered { FieldIds = [11L, 10L] }
         );
     }
 
@@ -615,7 +615,7 @@ public class SchemaSynchronizerTests
         events.ShouldHaveSameEvents(
             new FieldDeleted { FieldId = NamedId.Of(11L, "f2") },
             new FieldAdded { FieldId = NamedId.Of(50L, "f3"), Name = "f3", Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },
-            new SchemaFieldsReordered { FieldIds = new[] { 50L, 10L } }
+            new SchemaFieldsReordered { FieldIds = [50L, 10L] }
         );
     }
 
@@ -637,7 +637,7 @@ public class SchemaSynchronizerTests
 
         events.ShouldHaveSameEvents(
             new FieldAdded { FieldId = NamedId.Of(50L, "f3"), Name = "f3", Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },
-            new SchemaFieldsReordered { FieldIds = new[] { 10L, 50L, 11L } }
+            new SchemaFieldsReordered { FieldIds = [10L, 50L, 11L] }
         );
     }
 
@@ -659,7 +659,7 @@ public class SchemaSynchronizerTests
         events.ShouldHaveSameEvents(
             new FieldDeleted { FieldId = NamedId.Of(10L, "f1") },
             new FieldAdded { FieldId = NamedId.Of(50L, "f3"), Name = "f3", Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },
-            new SchemaFieldsReordered { FieldIds = new[] { 50L, 11L } }
+            new SchemaFieldsReordered { FieldIds = [50L, 11L] }
         );
     }
 }

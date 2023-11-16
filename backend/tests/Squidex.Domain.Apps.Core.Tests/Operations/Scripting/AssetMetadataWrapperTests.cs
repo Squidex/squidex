@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting;
 
 public class AssetMetadataWrapperTests
 {
-    private readonly AssetMetadata metadata = new AssetMetadata();
+    private readonly AssetMetadata metadata = [];
     private readonly AssetMetadataWrapper sut;
 
     public AssetMetadataWrapperTests()

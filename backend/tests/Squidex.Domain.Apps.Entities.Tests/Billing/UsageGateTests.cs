@@ -345,15 +345,15 @@ public class UsageGateTests : GivenContext
             .Returns(
                 new Dictionary<string, List<(DateOnly, Counters)>>
                 {
-                    [AppId.Id.ToString()] = new List<(DateOnly, Counters)>
-                    {
+                    [AppId.Id.ToString()] =
+                    [
                         (default, new Counters
                         {
                             [UsageGate.RulesKeys.TotalCreated] = 100,
                             [UsageGate.RulesKeys.TotalSucceeded] = 120,
                             [UsageGate.RulesKeys.TotalFailed] = 140
                         })
-                    }
+                    ]
                 });
 
         var total = await ((IRuleUsageTracker)sut).GetTotalByAppAsync(AppId.Id, CancellationToken);
@@ -399,8 +399,8 @@ public class UsageGateTests : GivenContext
         A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(2), CancellationToken))
             .Returns(new Dictionary<string, List<(DateOnly, Counters)>>
             {
-                [usageTracker.FallbackCategory] = new List<(DateOnly, Counters)>
-                {
+                [usageTracker.FallbackCategory] =
+                [
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.RulesKeys.TotalCreated] = 50,
@@ -419,16 +419,16 @@ public class UsageGateTests : GivenContext
                         [UsageGate.RulesKeys.TotalSucceeded] = 320,
                         [UsageGate.RulesKeys.TotalFailed] = 340
                     })
-                },
-                ["Custom"] = new List<(DateOnly, Counters)>
-                {
+                ],
+                ["Custom"] =
+                [
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.RulesKeys.TotalCreated] = 50,
                         [UsageGate.RulesKeys.TotalSucceeded] = 60,
                         [UsageGate.RulesKeys.TotalFailed] = 70
                     })
-                }
+                ]
             });
     }
 
@@ -548,8 +548,8 @@ public class UsageGateTests : GivenContext
         A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(2), CancellationToken))
             .Returns(new Dictionary<string, List<(DateOnly, Counters)>>
             {
-                [usageTracker.FallbackCategory] = new List<(DateOnly, Counters)>
-                {
+                [usageTracker.FallbackCategory] =
+                [
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.AssetsKeys.TotalSize] = 64,
@@ -565,15 +565,15 @@ public class UsageGateTests : GivenContext
                         [UsageGate.AssetsKeys.TotalSize] = 512,
                         [UsageGate.AssetsKeys.TotalAssets] = 4
                     })
-                },
-                ["Custom"] = new List<(DateOnly, Counters)>
-                {
+                ],
+                ["Custom"] =
+                [
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.AssetsKeys.TotalSize] = 64,
                         [UsageGate.AssetsKeys.TotalAssets] = 1
                     })
-                }
+                ]
             });
     }
 }

@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries;
 
 public sealed class RuleQueryService : IRuleQueryService
 {
-    private static readonly List<IEnrichedRuleEntity> EmptyResults = new List<IEnrichedRuleEntity>();
+    private static readonly List<IEnrichedRuleEntity> EmptyResults = [];
     private readonly IRulesIndex rulesIndex;
     private readonly IRuleEnricher ruleEnricher;
 

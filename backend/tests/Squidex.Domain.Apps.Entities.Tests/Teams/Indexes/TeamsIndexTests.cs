@@ -27,7 +27,7 @@ public class TeamsIndexTests : GivenContext
         var team = SetupTeam(0);
 
         A.CallTo(() => teamRepository.QueryAllAsync("user1", CancellationToken))
-            .Returns(new List<ITeamEntity> { team });
+            .Returns([team]);
 
         var actual = await sut.GetTeamsAsync("user1", CancellationToken);
 
@@ -40,7 +40,7 @@ public class TeamsIndexTests : GivenContext
         var team = SetupTeam(-1);
 
         A.CallTo(() => teamRepository.QueryAllAsync("user1", CancellationToken))
-            .Returns(new List<ITeamEntity> { team });
+            .Returns([team]);
 
         var actual = await sut.GetTeamsAsync("user1", CancellationToken);
 

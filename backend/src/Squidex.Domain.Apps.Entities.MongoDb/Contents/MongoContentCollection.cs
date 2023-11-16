@@ -184,17 +184,17 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
             {
                 if (q.Ids is { Count: > 0 })
                 {
-                    return await queryByIds.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
+                    return await queryByIds.QueryAsync(app, [schema], q, ct);
                 }
 
                 if (q.ScheduledFrom != null && q.ScheduledTo != null)
                 {
-                    return await queryScheduled.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
+                    return await queryScheduled.QueryAsync(app, [schema], q, ct);
                 }
 
                 if (q.Referencing != default)
                 {
-                    return await queryReferences.QueryAsync(app, new List<ISchemaEntity> { schema }, q, ct);
+                    return await queryReferences.QueryAsync(app, [schema], q, ct);
                 }
 
                 if (queryInDedicatedCollection != null)

@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators;
 
 public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
 {
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> errors = [];
     private readonly DomainId schemaId1 = DomainId.NewGuid();
     private readonly DomainId schemaId2 = DomainId.NewGuid();
     private readonly DomainId ref1 = DomainId.NewGuid();

@@ -67,11 +67,11 @@ public class BackupRulesTests : GivenContext
 
         await sut.RestoreAsync(context, CancellationToken);
 
-        Assert.Equal(new HashSet<DomainId>
-        {
+        Assert.Equal(
+        [
             DomainId.Combine(AppId, ruleId1),
             DomainId.Combine(AppId, ruleId2)
-        }, rebuildAssets);
+        ], rebuildAssets);
     }
 
     private Envelope<RuleEvent> AppEvent(RuleEvent @event)

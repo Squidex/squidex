@@ -31,7 +31,7 @@ public sealed class ConvertTags : IAssetEnricherStep
 
         foreach (var asset in assets)
         {
-            asset.TagNames = new HashSet<string>();
+            asset.TagNames = [];
 
             if (asset.Tags != null)
             {

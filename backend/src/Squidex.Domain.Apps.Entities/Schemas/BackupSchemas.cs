@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas;
 public sealed class BackupSchemas : IBackupHandler
 {
     private const int BatchSize = 100;
-    private readonly HashSet<DomainId> schemaIds = new HashSet<DomainId>();
+    private readonly HashSet<DomainId> schemaIds = [];
     private readonly Rebuilder rebuilder;
 
     public string Name { get; } = "Schemas";

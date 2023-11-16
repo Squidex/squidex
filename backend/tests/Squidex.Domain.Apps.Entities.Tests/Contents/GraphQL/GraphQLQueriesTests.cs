@@ -1498,7 +1498,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     public async Task Should_not_return_data_if_field_not_part_of_content()
     {
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, data: new ContentData());
+        var content = TestContent.Create(contentId, data: []);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),

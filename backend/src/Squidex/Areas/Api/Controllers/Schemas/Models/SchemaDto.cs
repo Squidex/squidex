@@ -115,13 +115,13 @@ public class SchemaDto : Resource
     /// <summary>
     /// The field rules.
     /// </summary>
-    public List<FieldRuleDto> FieldRules { get; set; } = new List<FieldRuleDto>();
+    public List<FieldRuleDto> FieldRules { get; set; } = [];
 
     /// <summary>
     /// The list of fields.
     /// </summary>
     [LocalizedRequired]
-    public List<FieldDto> Fields { get; set; } = new List<FieldDto>();
+    public List<FieldDto> Fields { get; set; } = [];
 
     public static SchemaDto FromDomain(ISchemaEntity schema, Resources resources)
     {

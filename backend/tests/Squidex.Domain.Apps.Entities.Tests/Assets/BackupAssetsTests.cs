@@ -42,7 +42,7 @@ public class BackupAssetsTests : GivenContext
     {
         var tags = new TagsExport
         {
-            Tags = new Dictionary<string, Tag>()
+            Tags = []
         };
 
         var context = CreateBackupContext();
@@ -68,7 +68,7 @@ public class BackupAssetsTests : GivenContext
             {
                 ["tag1"] = "new-name"
             },
-            Tags = new Dictionary<string, Tag>()
+            Tags = []
         };
 
         var context = CreateBackupContext();
@@ -324,11 +324,11 @@ public class BackupAssetsTests : GivenContext
 
         await sut.RestoreAsync(context, CancellationToken);
 
-        Assert.Equal(new HashSet<DomainId>
-        {
+        Assert.Equal(
+        [
             DomainId.Combine(AppId, assetId1),
             DomainId.Combine(AppId, assetId2)
-        }, rebuildAssets);
+        ], rebuildAssets);
     }
 
     [Fact]
@@ -361,11 +361,11 @@ public class BackupAssetsTests : GivenContext
 
         await sut.RestoreAsync(context, CancellationToken);
 
-        Assert.Equal(new HashSet<DomainId>
-        {
+        Assert.Equal(
+        [
             DomainId.Combine(AppId, assetFolderId1),
             DomainId.Combine(AppId, assetFolderId2)
-        }, rebuildAssetFolders);
+        ], rebuildAssetFolders);
     }
 
     private BackupContext CreateBackupContext()

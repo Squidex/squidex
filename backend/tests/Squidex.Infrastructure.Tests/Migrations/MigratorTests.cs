@@ -16,7 +16,7 @@ public class MigratorTests
     private readonly IMigrationStatus status = A.Fake<IMigrationStatus>();
     private readonly IMigrationPath path = A.Fake<IMigrationPath>();
     private readonly ILogger<Migrator> log = A.Fake<ILogger<Migrator>>();
-    private readonly List<(int From, int To, IMigration Migration)> migrations = new List<(int From, int To, IMigration Migration)>();
+    private readonly List<(int From, int To, IMigration Migration)> migrations = [];
 
     public sealed class InMemoryStatus : IMigrationStatus
     {

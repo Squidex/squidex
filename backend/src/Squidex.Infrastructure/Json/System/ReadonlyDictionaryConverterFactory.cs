@@ -46,12 +46,11 @@ public sealed class ReadonlyDictionaryConverterFactory : JsonConverterFactory
         var typeToCreate = IsReadonlyDictionary(typeToConvert) ? typeToConvert : typeToConvert.BaseType!;
 
         var concreteType = typeof(Converter<,,>).MakeGenericType(
-            new Type[]
-            {
+            [
                 typeToCreate.GetGenericArguments()[0],
                 typeToCreate.GetGenericArguments()[1],
                 typeToConvert
-            });
+            ]);
 
         var converter = (JsonConverter)Activator.CreateInstance(concreteType)!;
 

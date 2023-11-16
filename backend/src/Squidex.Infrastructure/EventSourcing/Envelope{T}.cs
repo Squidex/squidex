@@ -28,7 +28,7 @@ public class Envelope<T> where T : class, IEvent
 
         this.payload = payload;
 
-        this.headers = headers ?? new EnvelopeHeaders();
+        this.headers = headers ?? [];
     }
 
     public Envelope<TOther> To<TOther>() where TOther : class, IEvent

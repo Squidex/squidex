@@ -218,7 +218,7 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
 
         if (field.Properties.AllowedValues != null)
         {
-            var names = property.EnumerationNames ??= new Collection<string>();
+            var names = property.EnumerationNames ??= [];
 
             foreach (var value in field.Properties.AllowedValues)
             {

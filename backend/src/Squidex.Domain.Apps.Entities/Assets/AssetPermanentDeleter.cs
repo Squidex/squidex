@@ -24,10 +24,10 @@ public sealed class AssetPermanentDeleter : IEventConsumer
         this.assetFileStore = assetFileStore;
 
         // Compute the event types names once for performance reasons and use hashset for extensibility.
-        consumingTypes = new HashSet<string>
-        {
+        consumingTypes =
+        [
             typeRegistry.GetName<IEvent, AssetDeleted>()
-        };
+        ];
     }
 
     public bool Handles(StoredEvent @event)

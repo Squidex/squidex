@@ -95,6 +95,7 @@ ENV DIAGNOSTICS__COUNTERSTOOL=/tools/dotnet-counters
 ENV DIAGNOSTICS__DUMPTOOL=/tools/dotnet-dump
 ENV DIAGNOSTICS__GCDUMPTOOL=/tools/dotnet-gcdump
 ENV DIAGNOSTICS__TRACETOOL=/tools/dotnet-trace
+ENV ASPNETCORE_HTTP_PORTS=80
 
 ENTRYPOINT ["dotnet", "Squidex.dll"]
 

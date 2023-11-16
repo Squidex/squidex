@@ -61,7 +61,7 @@ public sealed class ApiCostsFilter : IAsyncActionFilter, IFilterContainer
             }
         }
 
-        context.HttpContext.Response.Headers.Add("X-Costs", FilterDefinition.Costs.ToString(CultureInfo.InvariantCulture));
+        context.HttpContext.Response.Headers["X-Costs"] = FilterDefinition.Costs.ToString(CultureInfo.InvariantCulture);
 
         await next();
     }

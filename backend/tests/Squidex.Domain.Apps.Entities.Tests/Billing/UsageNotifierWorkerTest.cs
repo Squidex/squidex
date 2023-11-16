@@ -59,7 +59,7 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1", "2" }
+            Users = ["1", "2"]
         };
 
         await sut.HandleAsync(message, default);
@@ -80,7 +80,7 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1", "2", "3" }
+            Users = ["1", "2", "3"]
         };
 
         await sut.HandleAsync(message, default);
@@ -105,7 +105,7 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1" }
+            Users = ["1"]
         };
 
         await sut.HandleAsync(message, default);
@@ -125,7 +125,7 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1" }
+            Users = ["1"]
         };
 
         await sut.HandleAsync(message, default);
@@ -153,7 +153,7 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1" }
+            Users = ["1"]
         };
 
         await sut.HandleAsync(message, default);

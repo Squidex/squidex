@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent;
 
 public class ArrayFieldTests : IClassFixture<TranslationsFixture>
 {
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> errors = [];
 
     [Fact]
     public void Should_instantiate_field()

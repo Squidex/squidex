@@ -164,14 +164,7 @@ public partial class RuleEventFormatter
         {
             if (!part.IsText)
             {
-                var result = part.Var.Result;
-
-                result = TransformText(result, part.VarTransform);
-
-                if (result == null)
-                {
-                    result = part.VarFallback;
-                }
+                var result = TransformText(part.Var.Result, part.VarTransform) ?? part.VarFallback;
 
                 if (string.IsNullOrEmpty(result))
                 {

@@ -57,7 +57,7 @@ public sealed class UsageTrackerWorker : IMessageHandler<UsageTrackingMessage>, 
     [CollectionName("UsageTracker")]
     public sealed class State
     {
-        public Dictionary<DomainId, Target> Targets { get; set; } = new Dictionary<DomainId, Target>();
+        public Dictionary<DomainId, Target> Targets { get; set; } = [];
     }
 
     public UsageTrackerWorker(IPersistenceFactory<State> persistenceFactory, IApiUsageTracker usageTracker)

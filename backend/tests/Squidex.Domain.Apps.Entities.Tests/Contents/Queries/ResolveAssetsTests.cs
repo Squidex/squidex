@@ -74,11 +74,11 @@ public class ResolveAssetsTests : GivenContext
         var contents = new[]
         {
             CreateContent(
-                new[] { doc1.Id },
-                new[] { doc1.Id }),
+                [doc1.Id],
+                [doc1.Id]),
             CreateContent(
-                new[] { doc2.Id },
-                new[] { doc2.Id })
+                [doc2.Id],
+                [doc2.Id])
         };
 
         A.CallTo(() => assetQuery.QueryAsync(
@@ -106,11 +106,11 @@ public class ResolveAssetsTests : GivenContext
         var contents = new[]
         {
             CreateContent(
-                new[] { img1.Id },
-                new[] { img2.Id, img1.Id }),
+                [img1.Id],
+                [img2.Id, img1.Id]),
             CreateContent(
-                new[] { doc1.Id },
-                new[] { doc2.Id, doc1.Id })
+                [doc1.Id],
+                [doc2.Id, doc1.Id])
         };
 
         A.CallTo(() => assetQuery.QueryAsync(
@@ -145,7 +145,7 @@ public class ResolveAssetsTests : GivenContext
     {
         var contents = new[]
         {
-            CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
+            CreateContent([DomainId.NewGuid()], Array.Empty<DomainId>())
         };
 
         await sut.EnrichAsync(ApiContext, contents, schemaProvider, CancellationToken);
@@ -161,7 +161,7 @@ public class ResolveAssetsTests : GivenContext
     {
         var contents = new[]
         {
-            CreateContent(new[] { DomainId.NewGuid() }, Array.Empty<DomainId>())
+            CreateContent([DomainId.NewGuid()], Array.Empty<DomainId>())
         };
 
         await sut.EnrichAsync(FrontendContext.Clone(b => b.WithNoEnrichment(true)), contents, schemaProvider, CancellationToken);
@@ -196,7 +196,7 @@ public class ResolveAssetsTests : GivenContext
 
         var contents = new[]
         {
-            CreateContent(new[] { id1, id2 }, Array.Empty<DomainId>())
+            CreateContent([id1, id2], Array.Empty<DomainId>())
         };
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);

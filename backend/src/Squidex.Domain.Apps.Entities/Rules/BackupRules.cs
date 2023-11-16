@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 public sealed class BackupRules : IBackupHandler
 {
     private const int BatchSize = 100;
-    private readonly HashSet<DomainId> ruleIds = new HashSet<DomainId>();
+    private readonly HashSet<DomainId> ruleIds = [];
     private readonly Rebuilder rebuilder;
 
     public string Name { get; } = "Rules";

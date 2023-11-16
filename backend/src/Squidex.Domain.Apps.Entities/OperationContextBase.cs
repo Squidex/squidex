@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities;
 
 public abstract class OperationContextBase<TCommand, TSnapShot> where TCommand : SquidexCommand, IAggregateCommand
 {
-    private readonly List<ValidationError> errors = new List<ValidationError>();
+    private readonly List<ValidationError> errors = [];
     private readonly IServiceProvider serviceProvider;
     private readonly Func<TSnapShot> snapshotProvider;
     private readonly TSnapShot snapshotInitial;
@@ -35,7 +35,7 @@ public abstract class OperationContextBase<TCommand, TSnapShot> where TCommand :
 
     public ClaimsPrincipal? User => Command.User;
 
-    public Dictionary<string, object> Context { get; } = new Dictionary<string, object>();
+    public Dictionary<string, object> Context { get; } = [];
 
     protected OperationContextBase(IServiceProvider serviceProvider, Func<TSnapShot> snapshotProvider)
     {

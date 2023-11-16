@@ -12,13 +12,13 @@ namespace Squidex.Infrastructure;
 public static class FileExtensions
 {
     private static readonly string[] Extensions =
-    {
+    [
         "bytes",
         "kB",
         "MB",
         "GB",
         "TB"
-    };
+    ];
 
     private static readonly Dictionary<string, string> UnifiedExtensions = new Dictionary<string, string>
     {

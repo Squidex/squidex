@@ -47,10 +47,10 @@ internal sealed class OperationsBuilder
 
         var operation = new OpenApiOperation
         {
-            Tags = new List<string>
-            {
+            Tags =
+            [
                 tag
-            }
+            ]
         };
 
         var operations = Parent.OpenApiDocument.Paths.GetOrAddNew($"{Path}{path}");

@@ -16,10 +16,10 @@ namespace Squidex.Domain.Apps.Core.ConvertContent;
 
 public sealed class ContentConverter
 {
-    private readonly List<IContentDataConverter> dataConverters = new List<IContentDataConverter>();
-    private readonly List<IContentItemConverter> itemConverters = new List<IContentItemConverter>();
-    private readonly List<IContentFieldConverter> fieldConverters = new List<IContentFieldConverter>();
-    private readonly List<IContentValueConverter> valueConverters = new List<IContentValueConverter>();
+    private readonly List<IContentDataConverter> dataConverters = [];
+    private readonly List<IContentItemConverter> itemConverters = [];
+    private readonly List<IContentFieldConverter> fieldConverters = [];
+    private readonly List<IContentValueConverter> valueConverters = [];
     private readonly ResolvedComponents components;
     private readonly Schema schema;
 

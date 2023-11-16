@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal sealed class ComponentUnionGraphType : UnionGraphType
 {
-    private readonly Dictionary<string, IObjectGraphType> types = new Dictionary<string, IObjectGraphType>();
+    private readonly Dictionary<string, IObjectGraphType> types = [];
 
     public bool HasType => types.Count > 0;
 

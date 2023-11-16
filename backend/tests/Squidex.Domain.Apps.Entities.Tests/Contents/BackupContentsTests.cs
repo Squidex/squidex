@@ -192,11 +192,11 @@ public class BackupContentsTests : GivenContext
 
         await sut.RestoreAsync(context, CancellationToken);
 
-        Assert.Equal(new HashSet<DomainId>
-        {
+        Assert.Equal(
+        [
             DomainId.Combine(AppId, contentId1),
             DomainId.Combine(AppId, contentId2)
-        }, rebuildContents);
+        ], rebuildContents);
     }
 
     private Envelope<ContentEvent> ContentEvent(ContentEvent @event)
