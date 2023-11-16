@@ -9,7 +9,7 @@ import { inject } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { TeamsState } from '../state/teams.state';
 
-export const LoadTeamsGuard = () => {
+export const loadTeamsGuard = () => {
     const teamsState = inject(TeamsState);
 
     return teamsState.load().pipe(map(() => true));

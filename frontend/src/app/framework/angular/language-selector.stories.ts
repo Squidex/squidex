@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { LanguageSelectorComponent, SqxFrameworkModule } from '@app/framework/internal';
+import { LanguageSelectorComponent, RootViewComponent } from '@app/framework';
 
 export default {
     title: 'Framework/Language-Selector',
@@ -40,9 +39,7 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
+                RootViewComponent,
             ],
         }),
     ],

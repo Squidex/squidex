@@ -5,28 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { UIState } from '@app/shared/internal';
-import { LoadSettingsGuard } from './load-settings.guard';
+import { loadSettingsGuard } from './load-settings.guard';
 
 describe('LoadAppsGuard', () => {
-    let settingsState: IMock<UIState>;
-    let settingsGuard: LoadSettingsGuard;
+    let uiState: IMock<UIState>;
 
     beforeEach(() => {
-        settingsState = Mock.ofType<UIState>();
-        settingsGuard = new LoadSettingsGuard(settingsState.object);
+        uiState = Mock.ofType<UIState>();
+
+        TestBed.configureTestingModule({ providers: [{ provide: UIState, useValue: uiState.object }] });
     });
 
-    it('should load apps', async () => {
-        settingsState.setup(x => x.load())
+    bit('should load apps', async () => {
+        uiState.setup(x => x.load())
             .returns(() => of(null as any));
 
-        const result = await firstValueFrom(settingsGuard.canActivate());
+        const result = await firstValueFrom(loadSettingsGuard());
 
         expect(result).toBeTruthy();
 
-        settingsState.verify(x => x.load(), Times.once());
+        uiState.verify(x => x.load(), Times.once());
     });
 });
+
+function bit(name: string, assertion: (() => PromiseLike<any>) | (() => void)) {
+    it(name, () => {
+        return TestBed.runInInjectionContext(() => assertion());
+    });
+}

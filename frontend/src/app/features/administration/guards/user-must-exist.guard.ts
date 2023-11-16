@@ -6,12 +6,12 @@
  */
 
 import { inject } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { map, tap } from 'rxjs/operators';
 import { allParams } from '@app/shared';
 import { UsersState } from '../internal';
 
-export const userMustExistGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+export const userMustExistGuard = (route: ActivatedRouteSnapshot) => {
     const usersState = inject(UsersState);
 
     const userId = allParams(route)['userId'];

@@ -38,6 +38,7 @@
     "angular-gridster2": "16.0.0",
     "angular-mentions": "1.5.0",
     "bootstrap": "5.2.3",
+    "copy-webpack-plugin": "^11.0.0",
     "core-js": "3.33.2",
     "cropperjs": "2.0.0-alpha.1",
     "date-fns": "2.30.0",

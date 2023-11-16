@@ -6,7 +6,7 @@
  */
 
 import { Routes } from '@angular/router';
-import { appMustExistGuard, loadAppsGuard, loadSettingsGuard, LoadTeamsGuard, mustBeAuthenticatedGuard, mustBeNotAuthenticatedGuard, TeamMustExistGuard, unsetAppGuard, unsetTeamGuard } from './shared';
+import { appMustExistGuard, loadAppsGuard, loadSettingsGuard, loadTeamsGuard, mustBeAuthenticatedGuard, mustBeNotAuthenticatedGuard, teamMustExistGuard, unsetAppGuard, unsetTeamGuard } from './shared';
 import { AppAreaComponent, ForbiddenPageComponent, HomePageComponent, InternalAreaComponent, LoginPageComponent, LogoutPageComponent, NotFoundPageComponent, TeamsAreaComponent } from './shell';
 
 export const APP_ROUTES: Routes = [
@@ -18,16 +18,16 @@ export const APP_ROUTES: Routes = [
     {
         path: 'app',
         component: InternalAreaComponent,
-        canActivate: [mustBeAuthenticatedGuard, loadAppsGuard, LoadTeamsGuard, loadSettingsGuard],
+        canActivate: [mustBeAuthenticatedGuard, loadAppsGuard, loadTeamsGuard, loadSettingsGuard],
         children: [
             {
                 path: '',
-                loadChildren: () => import('./features/apps/module').then(m => m.APPS_ROUTES),
+                loadChildren: () => import('./features/apps/routes').then(m => m.APPS_ROUTES),
                 canActivate: [unsetAppGuard, unsetTeamGuard],
             },
             {
                 path: 'administration',
-                loadChildren: () => import('./features/administration/module').then(m => m.ADMINISTRATION_ROUTES),
+                loadChildren: () => import('./features/administration/routes').then(m => m.ADMINISTRATION_ROUTES),
                 canActivate: [unsetAppGuard, unsetTeamGuard],
             },
             {
@@ -37,8 +37,8 @@ export const APP_ROUTES: Routes = [
                 children: [
                     {
                         path: ':teamName',
-                        canActivate: [TeamMustExistGuard],
-                        loadChildren: () => import('./features/teams/module').then(m => m.TEAM_ROUTES),
+                        canActivate: [teamMustExistGuard],
+                        loadChildren: () => import('./features/teams/routes').then(m => m.TEAM_ROUTES),
                     },
                 ],
             },
@@ -49,31 +49,31 @@ export const APP_ROUTES: Routes = [
                 children: [
                     {
                         path: '',
-                        loadChildren: () => import('./features/dashboard/module').then(m => m.DASHBOARD_ROUTES),
+                        loadChildren: () => import('./features/dashboard/routes').then(m => m.DASHBOARD_ROUTES),
                     },
                     {
                         path: 'content',
-                        loadChildren: () => import('./features/content/module').then(m => m.CONTENT_ROUTES),
+                        loadChildren: () => import('./features/content/routes').then(m => m.CONTENT_ROUTES),
                     },
                     {
                         path: 'schemas',
-                        loadChildren: () => import('./features/schemas/module').then(m => m.SCHEMAS_ROUTES),
+                        loadChildren: () => import('./features/schemas/routes').then(m => m.SCHEMAS_ROUTES),
                     },
                     {
                         path: 'assets',
-                        loadChildren: () => import('./features/assets/module').then(m => m.ASSETS_ROUTES),
+                        loadChildren: () => import('./features/assets/routes').then(m => m.ASSETS_ROUTES),
                     },
                     {
                         path: 'rules',
-                        loadChildren: () => import('./features/rules/module').then(m => m.RULES_ROUTES),
+                        loadChildren: () => import('./features/rules/routes').then(m => m.RULES_ROUTES),
                     },
                     {
                         path: 'settings',
-                        loadChildren: () => import('./features/settings/module').then(m => m.SETTINGS_ROUTES),
+                        loadChildren: () => import('./features/settings/routes').then(m => m.SETTINGS_ROUTES),
                     },
                     {
                         path: 'api',
-                        loadChildren: () => import('./features/api/module').then(m => m.API_ROUTES),
+                        loadChildren: () => import('./features/api/routes').then(m => m.API_ROUTES),
                     },
                 ],
             },

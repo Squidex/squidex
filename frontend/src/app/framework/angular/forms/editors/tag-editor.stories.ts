@@ -6,9 +6,8 @@
  */
 
 import { Component } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { LocalizerService, SqxFrameworkModule, TagEditorComponent } from '@app/framework/internal';
+import { LocalizerService, RootViewComponent, TagEditorComponent } from '@app/framework';
 
 const TRANSLATIONS = {
     'common.tagAdd': ', to add tag',
@@ -77,12 +76,13 @@ export default {
                 TestComponent,
             ],
             imports: [
-                BrowserAnimationsModule,
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
+                RootViewComponent,
             ],
             providers: [
-                { provide: LocalizerService, useFactory: () => new LocalizerService(TRANSLATIONS) },
+                {
+                    provide: LocalizerService,
+                    useFactory: () => new LocalizerService(TRANSLATIONS),
+                },
             ],
         }),
     ],

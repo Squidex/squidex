@@ -8,7 +8,7 @@
 import { NgIf } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import * as Pikaday from 'pikaday/pikaday';
+import Pikaday from 'pikaday/pikaday';
 import { DateHelper, DateTime, StatefulControlComponent, Subscriptions, UIOptions } from '@app/framework/internal';
 import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';

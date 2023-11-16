@@ -10,7 +10,7 @@ import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { map, tap } from 'rxjs/operators';
 import { TeamsState } from '../state/teams.state';
 
-export const TeamMustExistGuard = (route: ActivatedRouteSnapshot) => {
+export const teamMustExistGuard = (route: ActivatedRouteSnapshot) => {
     const teamsState = inject(TeamsState);
     const teamName = route.params['teamName'];
     const router = inject(Router);

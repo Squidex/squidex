@@ -5,11 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { map, Observable, timer } from 'rxjs';
-import { AutocompleteComponent, LocalizerService, SqxFrameworkModule } from '@app/framework/internal';
-import { AutocompleteSource } from './autocomplete.component';
+import { AutocompleteComponent, AutocompleteSource, LocalizerService, RootViewComponent } from '@app/framework';
 
 const TRANSLATIONS = {
     'common.search': 'Search',
@@ -43,12 +41,13 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
+                RootViewComponent,
             ],
             providers: [
-                { provide: LocalizerService, useFactory: () => new LocalizerService(TRANSLATIONS) },
+                {
+                    provide: LocalizerService,
+                    useFactory: () => new LocalizerService(TRANSLATIONS),
+                },
             ],
         }),
     ],

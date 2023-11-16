@@ -8,14 +8,13 @@
 /* eslint-disable deprecation/deprecation */
 
 import { Location } from '@angular/common';
-import { HTTP_INTERCEPTORS, HttpClient, HttpHeaders } from '@angular/common/http';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { inject, TestBed } from '@angular/core/testing';
+import { HttpErrorResponse, HttpEventType, HttpHeaders, HttpRequest } from '@angular/common/http';
+import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of, onErrorResumeNextWith } from 'rxjs';
+import { firstValueFrom, lastValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { ApiUrlConfig, AuthService } from '@app/shared/internal';
-import { AuthInterceptor } from './auth.interceptor';
+import { authInterceptor } from './auth.interceptor';
 
 describe('AuthInterceptor', () => {
     let authService: IMock<AuthService>;
@@ -24,136 +23,185 @@ describe('AuthInterceptor', () => {
 
     beforeEach(() => {
         authService = Mock.ofType<AuthService>();
-
         location = Mock.ofType<Location>();
         location.setup(x => x.path()).returns(() => '/my-path');
-
         router = Mock.ofType<Router>();
 
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-            ],
             providers: [
-                { provide: Router, useFactory: () => router.object },
-                { provide: Location, useFactory: () => location.object },
-                { provide: AuthService, useValue: authService.object },
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 {
-                    provide: HTTP_INTERCEPTORS,
-                    useClass: AuthInterceptor,
-                    multi: true,
+                    provide: AuthService,
+                    useValue: authService.object,
+                },
+                {
+                    provide: ApiUrlConfig,
+                    useValue: new ApiUrlConfig('http://service/p/'),
+                },
+                {
+                    provide: Location,
+                    useValue: location.object,
+                },
+                {
+                    provide: Router,
+                    useValue: router.object,
                 },
             ],
         });
     });
 
-    afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
-        httpMock.verify();
-    }));
+    bit('should append headers to request', async () => {
+        authService.setup(x => x.userChanges)
+            .returns(() => of(<any>{ authorization: 'token1' }));
 
-    it('should append headers to request',
-        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-            authService.setup(x => x.userChanges)
-                .returns(() => of(<any>{ authorization: 'token1' }));
+        const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
+            headers: undefined,
+        });
 
-            http.get('http://service/p/apps').subscribe();
+        const invokedRequest: HttpRequest<any>[] = [];
+        await firstValueFrom(authInterceptor(initialRequest, request => {
+            invokedRequest.push(request);
 
-            const req = httpMock.expectOne('http://service/p/apps');
-
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('Authorization')).toEqual('token1');
-            expect(req.request.headers.get('Accept')).toBeNull();
-            expect(req.request.headers.get('Accept-Language')).toBeNull();
-            expect(req.request.headers.get('Pragma')).toEqual('no-cache');
+            return of({ type: HttpEventType.Sent });
         }));
 
-    it('should not append headers for no auth headers',
-        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-            authService.setup(x => x.userChanges)
-                .returns(() => of(<any>{ authToauthorizationken: 'token1' }));
+        const req = invokedRequest[0];
+        expect(invokedRequest.length).toEqual(1);
+        expect(req.method).toEqual('GET');
+        expect(req.headers.get('Authorization')).toEqual('token1');
+        expect(req.headers.get('Accept')).toBeNull();
+        expect(req.headers.get('Accept-Language')).toBeNull();
+        expect(req.headers.get('Pragma')).toEqual('no-cache');
+    });
 
-            http.get('http://service/p/apps', { headers: new HttpHeaders().set('NoAuth', '') }).subscribe();
+    bit('should not append headers for no auth headers', async () => {
+        authService.setup(x => x.userChanges)
+            .returns(() => of(<any>{ authToauthorizationken: 'token1' }));
 
-            const req = httpMock.expectOne('http://service/p/apps');
+        const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
+            headers: new HttpHeaders().set('NoAuth', '1'),
+        });
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('Authorization')).toBeNull();
-            expect(req.request.headers.get('Accept')).toBeNull();
-            expect(req.request.headers.get('Accept-Language')).toBeNull();
-            expect(req.request.headers.get('Pragma')).toBeNull();
+        const invokedRequest: HttpRequest<any>[] = [];
+        await firstValueFrom(authInterceptor(initialRequest, request => {
+            invokedRequest.push(request);
+
+            return of({ type: HttpEventType.Sent });
         }));
 
-    it('should not append headers for other requests',
-        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-            authService.setup(x => x.userChanges)
-                .returns(() => of(<any>{ authorization: 'token1' }));
+        const req = invokedRequest[0];
+        expect(invokedRequest.length).toEqual(1);
+        expect(req.method).toEqual('GET');
+        expect(req.headers.get('Authorization')).toBeNull();
+        expect(req.headers.get('Accept')).toBeNull();
+        expect(req.headers.get('Accept-Language')).toBeNull();
+        expect(req.headers.get('Pragma')).toBeNull();
+    });
 
-            http.get('http://cloud/p/apps').subscribe();
+    bit('should not append headers for other requests', async () => {
+        authService.setup(x => x.userChanges)
+            .returns(() => of(<any>{ authorization: 'token1' }));
 
-            const req = httpMock.expectOne('http://cloud/p/apps');
+        const initialRequest = new HttpRequest('GET', 'http://cloud/p/apps', {
+            headers: undefined,
+        });
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('Authorization')).toBeNull();
-            expect(req.request.headers.get('Accept')).toBeNull();
-            expect(req.request.headers.get('Accept-Language')).toBeNull();
-            expect(req.request.headers.get('Pragma')).toBeNull();
+        const invokedRequest: HttpRequest<any>[] = [];
+        await firstValueFrom(authInterceptor(initialRequest, request => {
+            invokedRequest.push(request);
+
+            return of({ type: HttpEventType.Sent });
         }));
 
-    it('should logout for 401 status code after retry',
-        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-            authService.setup(x => x.userChanges)
-                .returns(() => of(<any>{ authorization: 'token1' }));
+        const req = invokedRequest[0];
+        expect(invokedRequest.length).toEqual(1);
+        expect(req.method).toEqual('GET');
+        expect(req.headers.get('Authorization')).toBeNull();
+        expect(req.headers.get('Accept')).toBeNull();
+        expect(req.headers.get('Accept-Language')).toBeNull();
+        expect(req.headers.get('Pragma')).toBeNull();
+    });
 
-            authService.setup(x => x.loginSilent())
-                .returns(() => ofPromise(<any>{ authorization: 'token2' }));
+    bit('should logout for 401 status code after retry', async () => {
+        authService.setup(x => x.userChanges)
+            .returns(() => of(<any>{ authorization: 'token1' }));
 
-            http.get('http://service/p/apps').pipe(onErrorResumeNextWith()).subscribe();
+        authService.setup(x => x.loginSilent())
+            .returns(() => ofPromise(<any>{ authorization: 'token2' }));
 
-            httpMock.expectOne('http://service/p/apps').flush({}, { status: 401, statusText: '401' });
-            httpMock.expectOne('http://service/p/apps').flush({}, { status: 401, statusText: '401' });
+        const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
+            headers: undefined,
+        });
 
-            expect().nothing();
+        const invokedRequest: HttpRequest<any>[] = [];
+        await lastValueFrom(authInterceptor(initialRequest, request => {
+            invokedRequest.push(request);
 
-            authService.verify(x => x.logoutRedirect('/my-path'), Times.once());
-        }));
+            return throwError(() => ({ status: 401, statusText: '401' } as HttpErrorResponse));
+        }).pipe(onErrorResumeNextWith()), { defaultValue: null });
+
+        const req1 = invokedRequest[0];
+        const req2 = invokedRequest[1];
+        expect(invokedRequest.length).toEqual(2);
+        expect(req1.headers.get('Authorization')).toEqual('token1');
+        expect(req2.headers.get('Authorization')).toEqual('token2');
+
+        authService.verify(x => x.logoutRedirect('/my-path'), Times.once());
+    });
 
     const AUTH_ERRORS = [403];
 
     AUTH_ERRORS.forEach(status => {
-        it(`should redirect for ${status} status code`,
-            inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-                authService.setup(x => x.userChanges)
-                    .returns(() => of(<any>{ authorization: 'token1' }));
+        bit(`should redirect for ${status} status code`, async () => {
+            authService.setup(x => x.userChanges)
+                .returns(() => of(<any>{ authorization: 'token1' }));
 
-                http.get('http://service/p/apps').pipe(onErrorResumeNextWith()).subscribe();
+            const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
+                headers: undefined,
+            });
 
-                httpMock.expectOne('http://service/p/apps').flush({}, { status, statusText: `${status}` });
+            const invokedRequest: HttpRequest<any>[] = [];
+            await firstValueFrom(authInterceptor(initialRequest, request => {
+                invokedRequest.push(request);
 
-                expect().nothing();
+                return throwError(() => ({ status } as HttpErrorResponse));
+            }), { defaultValue: null });
 
-                router.verify(x => x.navigate(['/forbidden'], { replaceUrl: true }), Times.once());
-            }));
+            expect().nothing();
+
+            router.verify(x => x.navigate(['/forbidden'], { replaceUrl: true }), Times.once());
+        });
     });
 
     const SERVER_ERRORS = [500, 404, 405];
 
     SERVER_ERRORS.forEach(status => {
-        it(`should not logout for ${status} status code`,
-            inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-                authService.setup(x => x.userChanges)
-                    .returns(() => of(<any>{ authorization: 'token1' }));
+        bit(`should not logout for ${status} status code`, async () => {
+            authService.setup(x => x.userChanges)
+                .returns(() => of(<any>{ authorization: 'token1' }));
 
-                http.get('http://service/p/apps').pipe(onErrorResumeNextWith()).subscribe();
+                const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
+                    headers: undefined,
+                });
 
-                httpMock.expectOne('http://service/p/apps').flush({}, { status, statusText: `${status}` });
+                const invokedRequest: HttpRequest<any>[] = [];
+                await firstValueFrom(authInterceptor(initialRequest, request => {
+                    invokedRequest.push(request);
 
-                expect().nothing();
+                    return throwError(() => ({ status } as HttpErrorResponse));
+                }).pipe(onErrorResumeNextWith()), { defaultValue: null });
 
-                authService.verify(x => x.logoutRedirect('/my-path'), Times.never());
-            }));
+            expect().nothing();
+
+            authService.verify(x => x.logoutRedirect('/my-path'), Times.never());
+        });
     });
 });
+
+function bit(name: string, assertion: (() => PromiseLike<any>) | (() => void)) {
+    it(name, () => {
+        return TestBed.runInInjectionContext(() => assertion());
+    });
+}
 
 function ofPromise(value: any): Promise<any> {
     return {

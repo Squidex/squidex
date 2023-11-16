@@ -20,16 +20,20 @@ describe('UnsetTeamGuard', () => {
         TestBed.configureTestingModule({ providers: [{ provide: TeamsState, useValue: teamsState.object }] });
     });
 
-    it('should unselect team', async () => {
+    bit('should unselect team', async () => {
         teamsState.setup(x => x.select(null))
             .returns(() => of(null));
 
-        await TestBed.runInInjectionContext(async () => {
-            const result = await firstValueFrom(unsetTeamGuard());
+        const result = await firstValueFrom(unsetTeamGuard());
 
-            expect(result).toBeTruthy();
+        expect(result).toBeTruthy();
 
-            teamsState.verify(x => x.select(null), Times.once());
-        });
+        teamsState.verify(x => x.select(null), Times.once());
     });
 });
+
+function bit(name: string, assertion: (() => PromiseLike<any>) | (() => void)) {
+    it(name, () => {
+        return TestBed.runInInjectionContext(() => assertion());
+    });
+}

@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { CheckboxGroupComponent, SqxFrameworkModule } from '@app/framework/internal';
+import { CheckboxGroupComponent } from '@app/framework';
 
 export default {
     title: 'Framework/CheckboxGroup',
@@ -38,9 +37,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
-                SqxFrameworkModule,
-                SqxFrameworkModule.forRoot(),
             ],
         }),
     ],
