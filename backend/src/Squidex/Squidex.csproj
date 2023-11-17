@@ -6,9 +6,8 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <NeutralLanguage>en</NeutralLanguage>
-    <NoWarn>NU1608</NoWarn>
     <Nullable>enable</Nullable>
-    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+    <NoWarn>1701;1702;NETSDK1206;NU1608</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
