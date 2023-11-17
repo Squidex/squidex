@@ -107,7 +107,7 @@ public class JintUserTests
         Assert.Equal(isClient, GetValue(identity, "user.isClient"));
     }
 
-    private static object GetValue(ClaimsIdentity identity, string script)
+    private static object? GetValue(ClaimsIdentity identity, string script)
     {
         var engine = new Engine();
 

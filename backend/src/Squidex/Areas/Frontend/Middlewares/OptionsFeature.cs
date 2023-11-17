@@ -9,5 +9,5 @@ namespace Squidex.Areas.Frontend.Middlewares;
 
 public sealed class OptionsFeature
 {
-    public Dictionary<string, object> Options { get; } = new Dictionary<string, object>();
+    public Dictionary<string, object> Options { get; } = [];
 }

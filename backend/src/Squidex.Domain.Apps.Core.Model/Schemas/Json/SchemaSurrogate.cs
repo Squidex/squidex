@@ -86,7 +86,7 @@ public sealed class SchemaSurrogate : ISurrogate<Schema>
 
     public Schema ToSource()
     {
-        var fields = Fields?.Select(f => f.ToField()).ToArray() ?? Array.Empty<RootField>();
+        var fields = Fields?.Select(f => f.ToField()).ToArray() ?? [];
 
         var schema = new Schema(Name, fields, Properties, IsPublished, Type);
 

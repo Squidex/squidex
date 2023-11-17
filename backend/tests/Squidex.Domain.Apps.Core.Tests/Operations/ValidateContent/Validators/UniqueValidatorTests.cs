@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators;
 
 public class UniqueValidatorTests : IClassFixture<TranslationsFixture>
 {
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> errors = [];
 
     [Fact]
     public async Task Should_not_check_uniqueness_if_localized_string()

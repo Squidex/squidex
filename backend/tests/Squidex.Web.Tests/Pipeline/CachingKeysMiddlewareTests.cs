@@ -18,7 +18,7 @@ namespace Squidex.Web.Pipeline;
 
 public class CachingKeysMiddlewareTests
 {
-    private readonly List<(object, Func<object, Task>)> callbacks = new List<(object, Func<object, Task>)>();
+    private readonly List<(object, Func<object, Task>)> callbacks = [];
     private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
     private readonly IHttpResponseBodyFeature httpResponseBodyFeature = A.Fake<IHttpResponseBodyFeature>();
     private readonly IHttpResponseFeature httpResponseFeature = A.Fake<IHttpResponseFeature>();

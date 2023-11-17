@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Backup;
 public sealed class UserMapping : IUserMapping
 {
     private const string UsersFile = "Users.json";
-    private readonly Dictionary<string, RefToken> userMap = new Dictionary<string, RefToken>();
+    private readonly Dictionary<string, RefToken> userMap = [];
     private readonly RefToken initiator;
 
     public RefToken Initiator

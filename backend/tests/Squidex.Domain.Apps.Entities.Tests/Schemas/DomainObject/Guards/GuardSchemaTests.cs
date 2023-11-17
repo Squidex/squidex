@@ -45,15 +45,15 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "invalid name",
                     Properties = new StringFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key
-                }
-            },
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -67,15 +67,15 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "field1",
                     Properties = null!,
                     Partitioning = Partitioning.Invariant.Key
-                }
-            },
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -89,15 +89,15 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "field1",
                     Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 },
                     Partitioning = Partitioning.Invariant.Key
-                }
-            },
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -112,15 +112,15 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "field1",
                     Properties = new StringFieldProperties(),
                     Partitioning = "INVALID"
-                }
-            },
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -134,8 +134,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "field1",
@@ -147,8 +147,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     Name = "field1",
                     Properties = new StringFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key
-                }
-            },
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -162,23 +162,23 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "array",
                     Properties = new ArrayFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key,
-                    Nested = new[]
-                    {
+                    Nested =
+                    [
                         new UpsertSchemaNestedField
                         {
                             Name = "invalid name",
                             Properties = new StringFieldProperties()
-                        }
-                    }
-                }
-            },
+                        },
+                    ]
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -192,23 +192,23 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "array",
                     Properties = new ArrayFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key,
-                    Nested = new[]
-                    {
+                    Nested =
+                    [
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
                             Properties = null!
-                        }
-                    }
-                }
-            },
+                        },
+                    ]
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -222,23 +222,23 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "array",
                     Properties = new ArrayFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key,
-                    Nested = new[]
-                    {
+                    Nested =
+                    [
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
                             Properties = new ArrayFieldProperties()
-                        }
-                    }
-                }
-            },
+                        },
+                    ]
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -252,23 +252,23 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "array",
                     Properties = new ArrayFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key,
-                    Nested = new[]
-                    {
+                    Nested =
+                    [
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
                             Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 }
-                        }
-                    }
-                }
-            },
+                        },
+                    ]
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -283,15 +283,15 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "array",
                     Properties = new ArrayFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key,
-                    Nested = new[]
-                    {
+                    Nested =
+                    [
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
@@ -301,10 +301,10 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                         {
                             Name = "nested1",
                             Properties = new StringFieldProperties()
-                        }
-                    }
-                }
-            },
+                        },
+                    ]
+                },
+            ],
             Name = "new-schema"
         });
 
@@ -318,8 +318,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "field1",
@@ -327,8 +327,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     IsHidden = true,
                     IsDisabled = true,
                     Partitioning = Partitioning.Invariant.Key
-                }
-            },
+                },
+            ],
             FieldsInLists = FieldNames.Create("field1"),
             FieldsInReferences = FieldNames.Create("field1"),
             Name = "new-schema"
@@ -350,8 +350,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "field1",
@@ -363,8 +363,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     Name = "field4",
                     Properties = new UIFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key
-                }
-            },
+                },
+            ],
             FieldsInLists = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4"),
             FieldsInReferences = null,
             Name = "new-schema"
@@ -388,8 +388,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "field1",
@@ -401,8 +401,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     Name = "field4",
                     Properties = new UIFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key
-                }
-            },
+                },
+            ],
             FieldsInLists = null,
             FieldsInReferences = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4"),
             Name = "new-schema"
@@ -441,8 +441,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = CreateCommand(new CreateSchema
         {
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "field1",
@@ -462,8 +462,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     Name = "field3",
                     Properties = new ArrayFieldProperties(),
                     Partitioning = Partitioning.Invariant.Key,
-                    Nested = new[]
-                    {
+                    Nested =
+                    [
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
@@ -473,10 +473,10 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                         {
                             Name = "nested2",
                             Properties = ValidProperties()
-                        }
-                    }
-                }
-            },
+                        },
+                    ]
+                },
+            ],
             FieldsInLists = FieldNames.Create("field1", "meta.id"),
             FieldsInReferences = FieldNames.Create("field1"),
             Name = "new-schema"
@@ -560,11 +560,11 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ConfigureFieldRules
         {
-            FieldRules = new[]
-            {
+            FieldRules =
+            [
                 new FieldRuleCommand { Field = "field", Action = (FieldRuleAction)5 },
                 new FieldRuleCommand()
-            }
+            ]
         };
 
         ValidationAssert.Throws(() => GuardSchema.CanConfigureFieldRules(command),
@@ -579,11 +579,11 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ConfigureFieldRules
         {
-            FieldRules = new[]
-            {
+            FieldRules =
+            [
                 new FieldRuleCommand { Field = "field1", Action = FieldRuleAction.Disable, Condition = "a == b" },
                 new FieldRuleCommand { Field = "field2" }
-            }
+            ]
         };
 
         GuardSchema.CanConfigureFieldRules(command);
@@ -603,7 +603,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     [Fact]
     public void CanReorder_should_throw_exception_if_field_ids_contains_invalid_id()
     {
-        var command = new ReorderFields { FieldIds = new[] { 1L, 3L } };
+        var command = new ReorderFields { FieldIds = [1L, 3L] };
 
         ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
             new ValidationError("Field ids do not cover all fields.", "FieldIds"));
@@ -612,7 +612,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     [Fact]
     public void CanReorder_should_throw_exception_if_field_ids_do_not_covers_all_fields()
     {
-        var command = new ReorderFields { FieldIds = new[] { 1L } };
+        var command = new ReorderFields { FieldIds = [1L] };
 
         ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
             new ValidationError("Field ids do not cover all fields.", "FieldIds"));
@@ -630,7 +630,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     [Fact]
     public void CanReorder_should_throw_exception_if_parent_field_not_found()
     {
-        var command = new ReorderFields { FieldIds = new[] { 1L, 2L }, ParentFieldId = 99 };
+        var command = new ReorderFields { FieldIds = [1L, 2L], ParentFieldId = 99 };
 
         Assert.Throws<DomainObjectNotFoundException>(() => GuardSchema.CanReorder(command, schema_0));
     }
@@ -638,7 +638,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     [Fact]
     public void CanReorder_should_not_throw_exception_if_field_ids_are_valid()
     {
-        var command = new ReorderFields { FieldIds = new[] { 1L, 2L, 4L } };
+        var command = new ReorderFields { FieldIds = [1L, 2L, 4L] };
 
         GuardSchema.CanReorder(command, schema_0);
     }

@@ -21,8 +21,8 @@ public class SchemaCommandsTests
         {
             IsPublished = true,
             Properties = new SchemaProperties { Hints = "MyHints" },
-            Fields = new[]
-            {
+            Fields =
+            [
                 new UpsertSchemaField
                 {
                     Name = "myString",
@@ -34,8 +34,8 @@ public class SchemaCommandsTests
                         IsRequired = true
                     },
                     Partitioning = "language"
-                }
-            },
+                },
+            ],
             FieldsInLists = FieldNames.Create("meta.id", "myString"),
             FieldsInReferences = FieldNames.Create("myString"),
             Scripts = new SchemaScripts

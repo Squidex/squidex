@@ -115,7 +115,7 @@ public sealed class ContentData : Dictionary<string, ContentFieldData?>, IEquata
 
     public static ContentData Merge(params ContentData[] contents)
     {
-        return MergeTo(new ContentData(), contents);
+        return MergeTo([], contents);
     }
 
     public ContentData MergeInto(ContentData target)

@@ -54,7 +54,7 @@ public class CachingTextIndexerStateTests : GivenContext
         var contentIds = HashSet.Of(contentId);
 
         A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds), CancellationToken))
-            .Returns(new Dictionary<DomainId, TextContentState>());
+            .Returns([]);
 
         var found1 = await sut.GetAsync(HashSet.Of(contentId), CancellationToken);
         var found2 = await sut.GetAsync(HashSet.Of(contentId), CancellationToken);
@@ -73,7 +73,7 @@ public class CachingTextIndexerStateTests : GivenContext
 
         var state = new TextContentState { UniqueContentId = contentId };
 
-        await sut.SetAsync(new List<TextContentState> { state }, CancellationToken);
+        await sut.SetAsync([state], CancellationToken);
 
         var found1 = await sut.GetAsync(contentIds, CancellationToken);
         var found2 = await sut.GetAsync(contentIds, CancellationToken);
@@ -95,15 +95,15 @@ public class CachingTextIndexerStateTests : GivenContext
 
         var state = new TextContentState { UniqueContentId = contentId };
 
-        await sut.SetAsync(new List<TextContentState>
-        {
+        await sut.SetAsync(
+        [
             state
-        }, CancellationToken);
+        ], CancellationToken);
 
-        await sut.SetAsync(new List<TextContentState>
-        {
+        await sut.SetAsync(
+        [
             new TextContentState { UniqueContentId = contentId, IsDeleted = true }
-        }, CancellationToken);
+        ], CancellationToken);
 
         var found1 = await sut.GetAsync(contentIds, CancellationToken);
         var found2 = await sut.GetAsync(contentIds, CancellationToken);

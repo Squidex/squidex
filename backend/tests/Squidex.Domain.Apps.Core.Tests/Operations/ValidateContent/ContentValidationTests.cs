@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent;
 public class ContentValidationTests : IClassFixture<TranslationsFixture>
 {
     private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
-    private readonly List<ValidationError> errors = new List<ValidationError>();
+    private readonly List<ValidationError> errors = [];
     private Schema schema = new Schema("my-schema");
 
     [Fact]
@@ -90,7 +90,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         var data =
             new ContentData()
                 .AddField("unknown",
-                    new ContentFieldData());
+                    []);
 
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
@@ -271,7 +271,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         var data =
             new ContentData()
                 .AddField("unknown",
-                    new ContentFieldData());
+                    []);
 
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 

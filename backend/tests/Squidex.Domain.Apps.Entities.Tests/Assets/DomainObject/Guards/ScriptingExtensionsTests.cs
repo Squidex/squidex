@@ -24,7 +24,7 @@ public sealed class ScriptingExtensionsTests : GivenContext
     {
         var script = "ctx.command.tags.add('tag');";
 
-        var command = new AnnotateAsset { Tags = new HashSet<string>() };
+        var command = new AnnotateAsset { Tags = [] };
 
         var operation = Operation(script, CreateAsset(), command);
 
@@ -38,7 +38,7 @@ public sealed class ScriptingExtensionsTests : GivenContext
     {
         var script = "ctx.command.metadata['foo'] = 42;";
 
-        var command = new AnnotateAsset { Metadata = new AssetMetadata() };
+        var command = new AnnotateAsset { Metadata = [] };
 
         var operation = Operation(script, CreateAsset(), command);
 
@@ -108,8 +108,8 @@ public sealed class ScriptingExtensionsTests : GivenContext
             AppId = AppId,
             Created = default,
             CreatedBy = User,
-            Metadata = new AssetMetadata(),
-            Tags = new HashSet<string>()
+            Metadata = [],
+            Tags = []
         };
     }
 }

@@ -281,7 +281,7 @@ public class ContentDataObjectTests
         var original =
             new ContentData()
                 .AddField("number",
-                    new ContentFieldData());
+                    []);
 
         var expected =
             new ContentData()
@@ -310,7 +310,7 @@ public class ContentDataObjectTests
         var expected =
             new ContentData()
                 .AddField("string",
-                    new ContentFieldData());
+                    []);
 
         const string script = @"
                 delete data.string.iv
@@ -406,7 +406,7 @@ public class ContentDataObjectTests
                 data.string.iv = 'hello'
             ";
 
-        ExecuteScript(new ContentData(), script);
+        ExecuteScript([], script);
     }
 
     private static ContentData ExecuteScript(ContentData original, string script)

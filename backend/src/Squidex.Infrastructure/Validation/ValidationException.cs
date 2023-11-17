@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
 using System.Text;
 
 namespace Squidex.Infrastructure.Validation;
@@ -31,19 +30,6 @@ public class ValidationException : DomainException
         : base(FormatMessage(errors), ValidationError, inner)
     {
         Errors = errors;
-    }
-
-    protected ValidationException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-        Errors = (List<ValidationError>)info.GetValue(nameof(Errors), typeof(List<ValidationError>))!;
-    }
-
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        info.AddValue(nameof(Errors), Errors);
-
-        base.GetObjectData(info, context);
     }
 
     private static string FormatMessage(IReadOnlyList<ValidationError> errors)

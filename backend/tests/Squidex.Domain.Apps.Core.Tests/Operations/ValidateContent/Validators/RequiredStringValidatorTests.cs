@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators;
 
 public class RequiredStringValidatorTests : IClassFixture<TranslationsFixture>
 {
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> errors = [];
 
     [Theory]
     [InlineData("MyString")]

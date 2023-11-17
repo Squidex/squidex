@@ -17,7 +17,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float ValidNumber(float target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         if (float.IsNaN(target) || float.IsPositiveInfinity(target) || float.IsNegativeInfinity(target))
         {
@@ -31,7 +31,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static double ValidNumber(double target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         if (double.IsNaN(target) || double.IsPositiveInfinity(target) || double.IsNegativeInfinity(target))
         {
@@ -45,7 +45,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ValidSlug(string? target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         NotNullOrEmpty(target, parameterName);
 
@@ -61,7 +61,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ValidPropertyName(string? target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         NotNullOrEmpty(target, parameterName);
 
@@ -77,7 +77,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static object? HasType<T>(object? target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         if (target != null && target.GetType() != typeof(T))
         {
@@ -91,7 +91,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static object? HasType(object? target, Type? expectedType,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         if (target != null && expectedType != null && target.GetType() != expectedType)
         {
@@ -105,7 +105,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TValue Between<TValue>(TValue target, TValue lower, TValue upper,
-        [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null) where TValue : IComparable
     {
         if (!target.IsBetween(lower, upper))
         {
@@ -119,7 +119,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TEnum Enum<TEnum>(TEnum target,
-        [CallerArgumentExpression("target")] string? parameterName = null) where TEnum : struct
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null) where TEnum : struct
     {
         if (!target.IsEnumValue())
         {
@@ -133,7 +133,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TValue GreaterThan<TValue>(TValue target, TValue lower,
-        [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null) where TValue : IComparable
     {
         if (target.CompareTo(lower) <= 0)
         {
@@ -147,7 +147,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TValue GreaterEquals<TValue>(TValue target, TValue lower,
-        [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null) where TValue : IComparable
     {
         if (target.CompareTo(lower) < 0)
         {
@@ -161,7 +161,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TValue LessThan<TValue>(TValue target, TValue upper,
-        [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null) where TValue : IComparable
     {
         if (target.CompareTo(upper) >= 0)
         {
@@ -175,7 +175,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TValue LessEquals<TValue>(TValue target, TValue upper,
-        [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null) where TValue : IComparable
     {
         if (target.CompareTo(upper) > 0)
         {
@@ -189,7 +189,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IReadOnlyCollection<TType> NotEmpty<TType>(IReadOnlyCollection<TType>? target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         NotNull(target, parameterName);
 
@@ -205,7 +205,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Guid NotEmpty(Guid target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         if (target == Guid.Empty)
         {
@@ -219,7 +219,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static DomainId NotEmpty(DomainId target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         if (target == DomainId.Empty)
         {
@@ -233,7 +233,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TValue NotNull<TValue>(TValue? target,
-        [CallerArgumentExpression("target")] string? parameterName = null) where TValue : class
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null) where TValue : class
     {
         if (target == null)
         {
@@ -247,7 +247,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static object? NotNull(object? target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         if (target == null)
         {
@@ -261,7 +261,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TValue NotDefault<TValue>(TValue target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         if (Equals(target, default(TValue)!))
         {
@@ -275,7 +275,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string NotNullOrEmpty(string? target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         NotNull(target, parameterName);
 
@@ -291,7 +291,7 @@ public static class Guard
     [DebuggerStepThrough]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ValidFileName(string? target,
-        [CallerArgumentExpression("target")] string? parameterName = null)
+        [CallerArgumentExpression(nameof(target))] string? parameterName = null)
     {
         NotNullOrEmpty(target, parameterName);
 

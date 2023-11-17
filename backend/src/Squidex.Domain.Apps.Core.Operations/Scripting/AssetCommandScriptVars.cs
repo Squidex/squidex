@@ -52,7 +52,7 @@ public sealed class AssetCommandScriptVars : ScriptVars
     [FieldDescription(nameof(FieldDescriptions.AssetMetadata))]
     public AssetMetadata? Metadata
     {
-        set => SetInitial(value != null ? new AssetMetadataWrapper(value) : null);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetTags))]

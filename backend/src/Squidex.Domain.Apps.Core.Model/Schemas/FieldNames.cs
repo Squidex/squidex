@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.Schemas;
 
 public sealed class FieldNames : ReadonlyList<string>
 {
-    public static readonly FieldNames Empty = new FieldNames(new List<string>());
+    public static readonly new FieldNames Empty = new FieldNames(new List<string>());
 
     public FieldNames()
     {

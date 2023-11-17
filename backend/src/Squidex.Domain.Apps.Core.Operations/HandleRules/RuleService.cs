@@ -316,7 +316,7 @@ public sealed class RuleService : IRuleService
                 }
             }
 
-            matchingRules ??= new ();
+            matchingRules ??= [];
             matchingRules.GetOrAddNew(triggerHandler).Add(state);
         }
 

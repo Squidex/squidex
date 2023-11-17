@@ -16,11 +16,11 @@ public static class HashSet
 
     public static HashSet<T> Of<T>(T item1)
     {
-        return new HashSet<T> { item1 };
+        return [item1];
     }
 
     public static HashSet<T> Of<T>(T item1, T item2)
     {
-        return new HashSet<T> { item1, item2 };
+        return [item1, item2];
     }
 }

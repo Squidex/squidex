@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Queries;
 public sealed class QueryFromJsonTests
 {
     private static readonly (string Name, string Operator, string Output)[] AllOps =
-    {
+    [
         ("Contains", "contains", "contains($FIELD, $VALUE)"),
         ("Empty", "empty", "empty($FIELD)"),
         ("Exists", "exists", "exists($FIELD)"),
@@ -28,7 +28,7 @@ public sealed class QueryFromJsonTests
         ("LessThan", "lt", "$FIELD < $VALUE"),
         ("NotEquals", "ne", "$FIELD != $VALUE"),
         ("StartsWith", "startswith", "startsWith($FIELD, $VALUE)")
-    };
+    ];
 
     private static readonly QueryModel Model = new QueryModel();
 

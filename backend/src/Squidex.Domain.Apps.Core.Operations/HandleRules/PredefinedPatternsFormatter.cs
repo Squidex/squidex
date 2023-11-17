@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules;
 
 public sealed class PredefinedPatternsFormatter : IRuleEventFormatter
 {
-    private readonly List<(string Pattern, Func<EnrichedEvent, string?> Replacer)> patterns = new List<(string Pattern, Func<EnrichedEvent, string?> Replacer)>();
+    private readonly List<(string Pattern, Func<EnrichedEvent, string?> Replacer)> patterns = [];
     private readonly IUrlGenerator urlGenerator;
 
     public PredefinedPatternsFormatter(IUrlGenerator urlGenerator)

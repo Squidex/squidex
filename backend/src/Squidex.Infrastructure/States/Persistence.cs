@@ -227,7 +227,7 @@ internal sealed class Persistence<T> : IPersistence<T>
         }
         catch (WrongEventVersionException ex)
         {
-            throw new InconsistentStateException(ex.CurrentVersion, ex.ExpectedVersion, ex);
+            throw new InconsistentStateException(ex.VersionCurrent, ex.VersionExpected, ex);
         }
 
         versionEvents += eventData.Length;

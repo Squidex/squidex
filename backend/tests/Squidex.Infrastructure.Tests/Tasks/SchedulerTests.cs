@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Tasks;
 
 public class SchedulerTests
 {
-    private readonly ConcurrentBag<int> actuals = new ConcurrentBag<int>();
+    private readonly ConcurrentBag<int> actuals = [];
     private readonly Scheduler sut = new Scheduler();
 
     [Fact]

@@ -30,7 +30,7 @@ internal static class ReflectionHelper
         var dynamicMethod = new DynamicMethod(
             ConstructorInfo.ConstructorName,
             type,
-            new[] { parameterType },
+            [parameterType],
             typeof(ReflectionHelper).Module,
             true);
 

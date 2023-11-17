@@ -12,7 +12,7 @@ public class FeaturesDto
     /// <summary>
     /// The latest features.
     /// </summary>
-    public List<FeatureDto> Features { get; } = new List<FeatureDto>();
+    public List<FeatureDto> Features { get; } = [];
 
     /// <summary>
     /// The recent version.

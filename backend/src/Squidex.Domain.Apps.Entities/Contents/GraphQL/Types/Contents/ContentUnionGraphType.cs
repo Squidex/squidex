@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal sealed class ContentUnionGraphType : UnionGraphType
 {
-    private readonly Dictionary<DomainId, IObjectGraphType> types = new Dictionary<DomainId, IObjectGraphType>();
+    private readonly Dictionary<DomainId, IObjectGraphType> types = [];
 
     // We need the schema identity at runtime.
     public IReadOnlyDictionary<DomainId, IObjectGraphType> SchemaTypes => types;

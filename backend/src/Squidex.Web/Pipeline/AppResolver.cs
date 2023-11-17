@@ -114,7 +114,7 @@ public sealed class AppResolver : IAsyncActionFilter
 
             context.HttpContext.Features.Set(requestContext);
             context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
-            context.HttpContext.Response.Headers.Add("X-AppId", app.Id.ToString());
+            context.HttpContext.Response.Headers["X-AppId"] = app.Id.ToString();
         }
 
         await next();

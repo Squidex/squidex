@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure;
 [TypeConverter(typeof(RefTokenTypeConverter))]
 public sealed record RefToken
 {
-    private static readonly char[] TrimChars = { ' ', ':' };
+    private static readonly char[] TrimChars = [' ', ':'];
 
     public RefTokenType Type { get; }
 

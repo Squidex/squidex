@@ -85,11 +85,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
                 Name = "field3",
                 Partitioning = Partitioning.Language.Key,
                 Properties = new ArrayFieldProperties(),
-                Nested = new[]
-                {
+                Nested =
+                [
                     new UpsertSchemaNestedField { Name = "nested1", Properties = ValidProperties() },
                     new UpsertSchemaNestedField { Name = "nested2", Properties = ValidProperties() }
-                }
+                ]
             }
         };
 
@@ -157,10 +157,10 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     {
         var command = new ConfigureFieldRules
         {
-            FieldRules = new[]
-            {
+            FieldRules =
+            [
                 new FieldRuleCommand { Field = "field1" }
-            }
+            ]
         };
 
         await ExecuteCreateAsync();
@@ -328,7 +328,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task Reorder_should_create_events_and_reorder_fields()
     {
-        var command = new ReorderFields { FieldIds = new[] { 2L, 1L } };
+        var command = new ReorderFields { FieldIds = [2L, 1L] };
 
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync("field1");
@@ -347,7 +347,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task Reorder_should_create_events_and_reorder_nestedy_fields()
     {
-        var command = new ReorderFields { ParentFieldId = 1, FieldIds = new[] { 3L, 2L } };
+        var command = new ReorderFields { ParentFieldId = 1, FieldIds = [3L, 2L] };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();

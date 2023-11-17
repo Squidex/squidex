@@ -112,7 +112,7 @@ public class AppsIndexTests : GivenContext
     public async Task Should_resolve_all_apps_from_user_permissions()
     {
         A.CallTo(() => appRepository.QueryAllAsync(User.Identifier, A<IEnumerable<string>>.That.Is(AppId.Name), CancellationToken))
-            .Returns(new List<IAppEntity> { App });
+            .Returns([App]);
 
         var actual = await sut.GetAppsForUserAsync(User.Identifier, new PermissionSet($"squidex.apps.{AppId.Name}"), CancellationToken);
 
@@ -123,7 +123,7 @@ public class AppsIndexTests : GivenContext
     public async Task Should_resolve_all_apps_from_user()
     {
         A.CallTo(() => appRepository.QueryAllAsync(User.Identifier, A<IEnumerable<string>>.That.IsEmpty(), CancellationToken))
-            .Returns(new List<IAppEntity> { App });
+            .Returns([App]);
 
         var actual = await sut.GetAppsForUserAsync(User.Identifier, PermissionSet.Empty, CancellationToken);
 
@@ -134,7 +134,7 @@ public class AppsIndexTests : GivenContext
     public async Task Should_resolve_all_apps_from_team()
     {
         A.CallTo(() => appRepository.QueryAllAsync(TeamId, CancellationToken))
-            .Returns(new List<IAppEntity> { App });
+            .Returns([App]);
 
         var actual = await sut.GetAppsForTeamAsync(TeamId, CancellationToken);
 
@@ -148,7 +148,7 @@ public class AppsIndexTests : GivenContext
             .Returns(EtagVersion.Empty);
 
         A.CallTo(() => appRepository.QueryAllAsync(User.Identifier, A<IEnumerable<string>>.That.IsEmpty(), CancellationToken))
-            .Returns(new List<IAppEntity> { App });
+            .Returns([App]);
 
         var actual = await sut.GetAppsForUserAsync(User.Identifier, PermissionSet.Empty, CancellationToken);
 
@@ -162,7 +162,7 @@ public class AppsIndexTests : GivenContext
             .Returns(true);
 
         A.CallTo(() => appRepository.QueryAllAsync(User.Identifier, A<IEnumerable<string>>.That.IsEmpty(), CancellationToken))
-            .Returns(new List<IAppEntity> { App });
+            .Returns([App]);
 
         var actual = await sut.GetAppsForUserAsync(User.Identifier, PermissionSet.Empty, CancellationToken);
 

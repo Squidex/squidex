@@ -47,10 +47,10 @@ public sealed class ClientUser : IUser
 
         this.token = token;
 
-        claims = new List<Claim>
-        {
+        claims =
+        [
             new Claim(OpenIdClaims.ClientId, token.Identifier),
             new Claim(SquidexClaimTypes.DisplayName, token.Identifier)
-        };
+        ];
     }
 }

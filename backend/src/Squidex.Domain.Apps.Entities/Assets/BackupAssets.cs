@@ -22,8 +22,8 @@ public sealed class BackupAssets : IBackupHandler
     private const int BatchSize = 100;
     private const string TagsFile = "AssetTags.json";
     private const string TagsAliasFile = "AssetTagsAlias.json";
-    private readonly HashSet<DomainId> assetIds = new HashSet<DomainId>();
-    private readonly HashSet<DomainId> assetFolderIds = new HashSet<DomainId>();
+    private readonly HashSet<DomainId> assetIds = [];
+    private readonly HashSet<DomainId> assetFolderIds = [];
     private readonly Rebuilder rebuilder;
     private readonly IAssetFileStore assetFileStore;
     private readonly ITagService tagService;

@@ -39,7 +39,7 @@ public class CounterJintExtensionTests : GivenContext
             .Returns(3);
 
         const string script = @"
-                return resetCounter('my', 4);
+                resetCounter('my', 4);
             ";
 
         var vars = new ScriptVars
@@ -69,7 +69,7 @@ public class CounterJintExtensionTests : GivenContext
             ["appId"] = AppId.Id
         };
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal("3", actual);
     }
@@ -81,7 +81,7 @@ public class CounterJintExtensionTests : GivenContext
             .Returns(3);
 
         const string script = @"
-                return incrementCounter('my');
+                incrementCounter('my');
             ";
 
         var vars = new ScriptVars
@@ -111,7 +111,7 @@ public class CounterJintExtensionTests : GivenContext
             ["appId"] = AppId.Id
         };
 
-        var actual = (await sut.ExecuteAsync(vars, script)).ToString();
+        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal("3", actual);
     }

@@ -183,7 +183,7 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
     {
         clrQuery.Top = top;
         clrQuery.Skip = skip;
-        clrQuery.Sort ??= new List<SortNode>();
+        clrQuery.Sort ??= [];
 
         if (clrQuery.Sort.Count == 0)
         {

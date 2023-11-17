@@ -19,7 +19,7 @@ public static class SortBuilder
         {
             while (orderBy != null)
             {
-                result.Sort ??= new List<SortNode>();
+                result.Sort ??= [];
                 result.Sort.Add(OrderBy(orderBy));
 
                 orderBy = orderBy.ThenBy;

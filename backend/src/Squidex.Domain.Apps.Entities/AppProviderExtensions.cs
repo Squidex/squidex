@@ -32,7 +32,7 @@ public static class AppProviderExtensions
             {
                 if (schemaId == schema.Id)
                 {
-                    result ??= new Dictionary<DomainId, Schema>();
+                    result ??= [];
                     result[schemaId] = schema.SchemaDef;
                 }
                 else if (result == null || !result.TryGetValue(schemaId, out _))
@@ -41,7 +41,7 @@ public static class AppProviderExtensions
 
                     if (resolvedEntity != null)
                     {
-                        result ??= new Dictionary<DomainId, Schema>();
+                        result ??= [];
                         result[schemaId] = resolvedEntity.SchemaDef;
 
                         await ResolveSchemaAsync(resolvedEntity);

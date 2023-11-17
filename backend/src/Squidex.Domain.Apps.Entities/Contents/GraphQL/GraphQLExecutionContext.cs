@@ -88,7 +88,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
     public IDataLoaderResult<IEnrichedAssetEntity?> GetAsset(DomainId id,
         TimeSpan cacheDuration)
     {
-        var assets = GetAssets(new List<DomainId> { id }, cacheDuration);
+        var assets = GetAssets([id], cacheDuration);
         var asset = assets.Then(x => x.FirstOrDefault());
 
         return asset;
@@ -97,7 +97,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
     public IDataLoaderResult<IEnrichedContentEntity?> GetContent(DomainId schemaId, DomainId id, HashSet<string>? fields,
         TimeSpan cacheDuration)
     {
-        var contents = GetContents(new List<DomainId> { id }, fields, cacheDuration);
+        var contents = GetContents([id], fields, cacheDuration);
         var content = contents.Then(x => x.FirstOrDefault(x => x.SchemaId.Id == schemaId));
 
         return content;

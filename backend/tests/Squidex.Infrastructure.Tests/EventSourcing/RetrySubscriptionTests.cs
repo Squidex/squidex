@@ -96,7 +96,7 @@ public class RetrySubscriptionTests
     [Fact]
     public async Task Should_forward_event_from_inner_subscription()
     {
-        var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+        var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", [], "Payload"));
 
         await OnNextAsync(eventSubscription, @event);
 
@@ -109,7 +109,7 @@ public class RetrySubscriptionTests
     [Fact]
     public async Task Should_not_forward_event_if_message_is_from_another_subscription()
     {
-        var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+        var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", [], "Payload"));
 
         await OnNextAsync(A.Fake<IEventSubscription>(), @event);
 
@@ -135,7 +135,7 @@ public class RetrySubscriptionTests
     [Fact]
     public async Task Should_be_able_to_unsubscribe_within_event_handler()
     {
-        var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+        var @event = new StoredEvent("Stream", "1", 2, new EventData("Type", [], "Payload"));
 
         A.CallTo(() => eventSubscriber.OnNextAsync(A<IEventSubscription>._, A<StoredEvent>._))
             .Invokes(() => sut.Dispose());

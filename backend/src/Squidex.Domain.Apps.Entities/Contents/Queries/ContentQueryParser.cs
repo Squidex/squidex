@@ -149,7 +149,7 @@ public class ContentQueryParser
 
     private static void WithSorting(ClrQuery query)
     {
-        query.Sort ??= new List<SortNode>();
+        query.Sort ??= [];
 
         if (query.Sort.Count == 0)
         {

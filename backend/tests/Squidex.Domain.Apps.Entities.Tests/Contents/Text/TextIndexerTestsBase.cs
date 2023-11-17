@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public abstract class TextIndexerTestsBase : GivenContext
 {
-    protected readonly List<DomainId> ids1 = new List<DomainId> { DomainId.NewGuid() };
-    protected readonly List<DomainId> ids2 = new List<DomainId> { DomainId.NewGuid() };
+    protected readonly List<DomainId> ids1 = [DomainId.NewGuid()];
+    protected readonly List<DomainId> ids2 = [DomainId.NewGuid()];
     private readonly Lazy<TextIndexingProcess> sut;
 
     protected TextIndexingProcess Sut

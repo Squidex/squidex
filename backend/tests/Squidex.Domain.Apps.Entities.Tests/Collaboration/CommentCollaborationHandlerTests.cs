@@ -179,7 +179,7 @@ public class CommentCollaborationHandlerTests : GivenContext
                 CommentId = default,
                 CommentsId = commentsId,
                 Text = commentItem.Text,
-                Mentions = new string[] { "id1", "id2" }
+                Mentions = ["id1", "id2"]
             }, opts => opts.Excluding(x => x.CommentId));
     }
 
@@ -204,7 +204,7 @@ public class CommentCollaborationHandlerTests : GivenContext
                 CommentId = default,
                 CommentsId = commentsId,
                 Text = commentItem.Text,
-                Mentions = new string[] { "id1", "id2" }
+                Mentions = ["id1", "id2"]
             }, opts => opts.Excluding(x => x.CommentId));
     }
 

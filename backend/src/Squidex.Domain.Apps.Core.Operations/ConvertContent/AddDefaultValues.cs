@@ -43,7 +43,7 @@ public sealed class AddDefaultValues : IContentDataConverter, IContentItemConver
                 continue;
             }
 
-            data[field.Name] = new ContentFieldData();
+            data[field.Name] = [];
         }
     }
 

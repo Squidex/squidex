@@ -165,7 +165,7 @@ public class ScriptContentTests : GivenContext
 
     private ContentEntity CreateContent()
     {
-        return new ContentEntity { Data = new ContentData(), SchemaId = SchemaId };
+        return new ContentEntity { Data = [], SchemaId = SchemaId };
     }
 
     private ProvideSchema SchemaProvider()

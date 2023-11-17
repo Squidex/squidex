@@ -237,7 +237,7 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
 
         if (id != null)
         {
-            return new[] { id.Value };
+            return [id.Value];
         }
 
         if (bulkJob.Query != null)
@@ -256,7 +256,7 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
             // Therefore we create a new ID if we cannot find the ID for the query.
             if (existingResult.Count == 0 && bulkJob.Type == BulkUpdateContentType.Upsert)
             {
-                return new[] { DomainId.NewGuid() };
+                return [DomainId.NewGuid()];
             }
 
             return existingResult.Select(x => x.Id).ToArray();
@@ -264,9 +264,9 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
 
         if (bulkJob.Type is BulkUpdateContentType.Create or BulkUpdateContentType.Upsert)
         {
-            return new[] { DomainId.NewGuid() };
+            return [DomainId.NewGuid()];
         }
 
-        return Array.Empty<DomainId>();
+        return [];
     }
 }

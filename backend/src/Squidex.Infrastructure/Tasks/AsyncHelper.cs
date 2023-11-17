@@ -71,7 +71,7 @@ public static class AsyncHelper
                     await target.Writer.WriteAsync(batch, ct);
 
                     // Create a new batch, because the value is shared and might be processes by another concurrent task.
-                    batch = new List<TIn>();
+                    batch = [];
                 }
             }
 

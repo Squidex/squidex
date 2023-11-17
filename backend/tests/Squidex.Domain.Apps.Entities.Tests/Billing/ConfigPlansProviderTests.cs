@@ -43,7 +43,7 @@ public class ConfigPlansProviderTests
         IsFree = false
     };
 
-    private static readonly Plan[] Plans = { BasicPlan, FreePlan };
+    private static readonly Plan[] Plans = [BasicPlan, FreePlan];
 
     [Fact]
     public void Should_return_plans()

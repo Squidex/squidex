@@ -162,7 +162,7 @@ public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<Domain
         entity.DocumentId = job.Value.UniqueId;
         entity.IndexedAppId = job.Value.AppId.Id;
         entity.IndexedSchemaId = job.Value.SchemaId.Id;
-        entity.ReferencedIds ??= new HashSet<DomainId>();
+        entity.ReferencedIds ??= [];
         entity.Version = job.NewVersion;
 
         var (app, schema) = await appProvider.GetAppWithSchemaAsync(entity.IndexedAppId, entity.IndexedSchemaId, true, ct);

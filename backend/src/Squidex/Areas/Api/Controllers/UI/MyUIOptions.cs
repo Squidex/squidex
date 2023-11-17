@@ -12,7 +12,7 @@ namespace Squidex.Areas.Api.Controllers.UI;
 public sealed record MyUIOptions
 {
     [JsonExtensionData]
-    public Dictionary<string, object> More { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> More { get; set; } = [];
 
     [JsonPropertyName("regexSuggestions")]
     public Dictionary<string, string> RegexSuggestions { get; set; }

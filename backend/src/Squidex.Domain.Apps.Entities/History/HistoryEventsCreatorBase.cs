@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.History;
 
 public abstract class HistoryEventsCreatorBase : IHistoryEventsCreator
 {
-    private readonly Dictionary<string, string> texts = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> texts = [];
     private readonly TypeRegistry typeRegistry;
 
     public IReadOnlyDictionary<string, string> Texts

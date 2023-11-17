@@ -212,7 +212,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveLanguages(languages, new[] { Language.DE }) { ResolveFallback = true })
+                .Add(new ResolveLanguages(languages, [Language.DE]) { ResolveFallback = true })
                 .Convert(source);
 
         var expected =
@@ -290,7 +290,7 @@ public class FieldConvertersTests
         var expected =
             new ContentData()
                 .AddField(field1.Name,
-                    new ContentFieldData());
+                    []);
 
         Assert.Equal(expected, actual);
     }
@@ -325,7 +325,7 @@ public class FieldConvertersTests
         var expected =
             new ContentData()
                 .AddField(field1.Name,
-                    new ContentFieldData());
+                    []);
 
         if (value != false)
         {
@@ -473,7 +473,7 @@ public class FieldConvertersTests
         var source =
             new ContentData()
                 .AddField(field1.Name,
-                    new ContentFieldData());
+                    []);
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
@@ -582,7 +582,7 @@ public class FieldConvertersTests
         var source = new ContentFieldData();
 
         var actual =
-            new ResolveLanguages(languages, Array.Empty<Language>()) { ResolveFallback = true }
+            new ResolveLanguages(languages, []) { ResolveFallback = true }
                 .ConvertFieldAfter(field, source);
 
         Assert.Same(source, actual);

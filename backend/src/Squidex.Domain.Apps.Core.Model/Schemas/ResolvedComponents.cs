@@ -33,7 +33,7 @@ public sealed class ResolvedComponents : ReadonlyDictionary<DomainId, Schema>
             {
                 if (TryGetValue(schemaId, out var schema))
                 {
-                    result ??= new Dictionary<DomainId, Schema>();
+                    result ??= [];
                     result[schemaId] = schema;
                 }
             }

@@ -25,7 +25,7 @@ public static class ResultList
     private static class Empties<T>
     {
 #pragma warning disable SA1401 // Fields should be private
-        public static Impl<T> Instance = new Impl<T>(new List<T>(), 0);
+        public static Impl<T> Instance = new Impl<T>([], 0);
 #pragma warning restore SA1401 // Fields should be private
     }
 

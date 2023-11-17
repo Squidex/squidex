@@ -143,7 +143,7 @@ public class RuleTypeProviderTests
             Description = null,
             Editor = RuleFieldEditor.Dropdown,
             IsRequired = false,
-            Options = new[] { "Yes", "No" }
+            Options = ["Yes", "No"]
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -153,7 +153,7 @@ public class RuleTypeProviderTests
             Description = null,
             Editor = RuleFieldEditor.Dropdown,
             IsRequired = false,
-            Options = new[] { "Yes", "No" }
+            Options = ["Yes", "No"]
         });
 
         expected.Properties.Add(new RuleActionProperty

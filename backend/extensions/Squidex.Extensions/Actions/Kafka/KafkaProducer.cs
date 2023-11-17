@@ -129,7 +129,7 @@ public sealed class KafkaProducer
 
         if (job.Headers?.Count > 0)
         {
-            message.Headers = new Headers();
+            message.Headers = [];
 
             foreach (var header in job.Headers)
             {

@@ -32,8 +32,8 @@ public class EnrichForCachingTests : GivenContext
 
         await sut.EnrichAsync(ApiContext, CancellationToken);
 
-        Assert.Equal(new List<string>
-        {
+        Assert.Equal(
+        [
             "X-Fields",
             "X-Flatten",
             "X-Languages",
@@ -43,7 +43,7 @@ public class EnrichForCachingTests : GivenContext
             "X-ResolveFlow",
             "X-ResolveUrls",
             "X-Unpublished"
-        }, headers);
+        ], headers);
     }
 
     [Fact]

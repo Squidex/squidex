@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -18,8 +18,8 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
   </ItemGroup>
   <ItemGroup>
-	<PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00015" />	  
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.62">
+    <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.110">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

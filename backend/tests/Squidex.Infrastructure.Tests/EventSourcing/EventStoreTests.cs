@@ -16,7 +16,7 @@ public abstract class EventStoreTests<T> where T : IEventStore
 
     public sealed class EventSubscriber : IEventSubscriber<StoredEvent>
     {
-        public List<StoredEvent> LastEvents { get; } = new List<StoredEvent>();
+        public List<StoredEvent> LastEvents { get; } = [];
 
         public string LastPosition { get; set; }
 

@@ -42,5 +42,5 @@ public abstract class MongoBase<TEntity>
         new UpdateOptions { IsUpsert = true };
 
     protected static readonly BsonDocument FindAll =
-        new BsonDocument();
+        [];
 }

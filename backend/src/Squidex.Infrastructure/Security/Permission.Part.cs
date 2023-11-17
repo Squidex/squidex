@@ -31,7 +31,7 @@ public sealed partial class Permission
         {
             if (string.IsNullOrWhiteSpace(path))
             {
-                return Array.Empty<Part>();
+                return [];
             }
 
             var current = path.AsMemory();
@@ -73,7 +73,7 @@ public sealed partial class Permission
 
             if (currentSpan.Length == 0)
             {
-                return new Part(Array.Empty<ReadOnlyMemory<char>>(), false);
+                return new Part([], false);
             }
 
             var isExclusion = false;
@@ -88,7 +88,7 @@ public sealed partial class Permission
 
             if (currentSpan.Length == 0)
             {
-                return new Part(Array.Empty<ReadOnlyMemory<char>>(), isExclusion);
+                return new Part([], isExclusion);
             }
 
             if (current.Length > 1 || currentSpan[0] != CharAny)

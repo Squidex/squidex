@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Reflection;
 
 public sealed class TypeRegistry
 {
-    private readonly Dictionary<Type, TypeConfig> configs = new Dictionary<Type, TypeConfig>();
+    private readonly Dictionary<Type, TypeConfig> configs = [];
 
     public TypeRegistry(IEnumerable<ITypeProvider>? providers = null)
     {

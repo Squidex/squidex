@@ -48,7 +48,7 @@ public class ConvertDataTests : GivenContext
     [Fact]
     public async Task Should_convert_data_and_data_draft_if_frontend_user()
     {
-        var content = CreateContent(new ContentData());
+        var content = CreateContent([]);
 
         await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
 

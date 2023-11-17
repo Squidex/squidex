@@ -13,9 +13,9 @@ public sealed record AppSettings
 {
     public static readonly AppSettings Empty = new AppSettings();
 
-    public ReadonlyList<Pattern> Patterns { get; init; } = ReadonlyList.Empty<Pattern>();
+    public ReadonlyList<Pattern> Patterns { get; init; } = [];
 
-    public ReadonlyList<Editor> Editors { get; init; } = ReadonlyList.Empty<Editor>();
+    public ReadonlyList<Editor> Editors { get; init; } = [];
 
     public bool HideScheduler { get; init; }
 

@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.TestHelpers;
 
 public sealed class TestState<T> where T : class, new()
 {
-    private readonly List<Envelope<IEvent>> events = new List<Envelope<IEvent>>();
+    private readonly List<Envelope<IEvent>> events = [];
     private readonly ISnapshotStore<T> snapshotStore = A.Fake<ISnapshotStore<T>>();
     private HandleSnapshot<T>? handleSnapshot;
     private HandleEvent? handleEvent;

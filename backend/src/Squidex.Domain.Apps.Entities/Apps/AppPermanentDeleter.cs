@@ -28,11 +28,11 @@ public sealed class AppPermanentDeleter : IEventConsumer
         this.factory = factory;
 
         // Compute the event types names once for performance reasons and use hashset for extensibility.
-        consumingTypes = new HashSet<string>
-        {
+        consumingTypes =
+        [
             typeRegistry.GetName<IEvent, AppDeleted>(),
             typeRegistry.GetName<IEvent, AppContributorRemoved>()
-        };
+        ];
     }
 
     public bool Handles(StoredEvent @event)

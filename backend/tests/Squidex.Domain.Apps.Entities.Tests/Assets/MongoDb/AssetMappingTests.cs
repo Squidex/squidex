@@ -41,7 +41,7 @@ public class AssetMappingTests
             MimeType = "image/png",
             ParentId = DomainId.NewGuid(),
             Slug = "my-image",
-            Tags = new HashSet<string> { "image" },
+            Tags = ["image"],
             TotalSize = 1024 * 2,
             Type = AssetType.Image,
             Version = 42

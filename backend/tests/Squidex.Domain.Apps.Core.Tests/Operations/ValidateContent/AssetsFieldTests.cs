@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent;
 
 public class AssetsFieldTests : IClassFixture<TranslationsFixture>
 {
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> errors = [];
     private readonly DomainId asset1 = DomainId.NewGuid();
     private readonly DomainId asset2 = DomainId.NewGuid();
     private readonly IValidatorsFactory factory;

@@ -228,10 +228,7 @@ public sealed class ContentQueryService : IContentQueryService
             schema = await appProvider.GetSchemaAsync(context.App.Id, schemaId, canCache, ct);
         }
 
-        if (schema == null)
-        {
-            schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache, ct);
-        }
+        schema ??= await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache, ct);
 
         if (schema != null && !HasPermission(context, schema, PermissionIds.AppContentsReadOwn))
         {

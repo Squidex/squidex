@@ -13,13 +13,13 @@ namespace Squidex.Infrastructure.States;
 
 public sealed class BatchContext<T> : IBatchContext<T>
 {
-    private static readonly List<Envelope<IEvent>> EmptyStream = new List<Envelope<IEvent>>();
+    private static readonly List<Envelope<IEvent>> EmptyStream = [];
     private readonly Type owner;
     private readonly IEventFormatter eventFormatter;
     private readonly IEventStore eventStore;
     private readonly IEventStreamNames eventStreamNames;
     private readonly ISnapshotStore<T> snapshotStore;
-    private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> events = new Dictionary<DomainId, (long, List<Envelope<IEvent>>)>();
+    private readonly Dictionary<DomainId, (long, List<Envelope<IEvent>>)> events = [];
     private Dictionary<DomainId, SnapshotWriteJob<T>>? snapshots;
 
     public ISnapshotStore<T> Snapshots => snapshotStore;
@@ -40,7 +40,7 @@ public sealed class BatchContext<T> : IBatchContext<T>
 
     internal void Add(DomainId key, T snapshot, long version)
     {
-        snapshots ??= new ();
+        snapshots ??= [];
 
         if (!snapshots.TryGetValue(key, out var existing) || existing.NewVersion < version)
         {

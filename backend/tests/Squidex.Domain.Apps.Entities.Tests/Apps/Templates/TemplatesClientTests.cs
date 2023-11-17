@@ -29,13 +29,13 @@ public class TemplatesClientTests
 
         sut = new TemplatesClient(httpClientFactory, Options.Create(new TemplatesOptions
         {
-            Repositories = new[]
-            {
+            Repositories =
+            [
                 new TemplateRepository
                 {
                     ContentUrl = "https://raw.githubusercontent.com/Squidex/templates/main"
-                }
-            }
+                },
+            ]
         }));
     }
 

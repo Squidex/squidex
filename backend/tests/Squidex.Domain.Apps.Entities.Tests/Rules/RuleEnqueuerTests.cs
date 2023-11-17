@@ -289,7 +289,7 @@ public class RuleEnqueuerTests : GivenContext
         var rule = CreateRule();
 
         A.CallTo(() => AppProvider.GetRulesAsync(AppId.Id, A<CancellationToken>._))
-            .Returns(new List<IRuleEntity> { rule });
+            .Returns([rule]);
 
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
             .Returns(Enumerable.Repeat(new JobResult

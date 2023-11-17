@@ -161,7 +161,7 @@ public class AssetQueryParserTests : GivenContext
     public async Task Should_not_fail_if_tags_not_found()
     {
         A.CallTo(() => tagService.GetTagIdsAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1"), CancellationToken))
-            .Returns(new Dictionary<string, string>());
+            .Returns([]);
 
         var query = Q.Empty.WithODataQuery("$filter=tags eq 'name1'");
 

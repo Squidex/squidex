@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
 public static class JintUser
 {
-    private static readonly char[] ClaimSeparators = { '/', '.', ':' };
+    private static readonly char[] ClaimSeparators = ['/', '.', ':'];
 
     public static JsValue Create(Engine engine, IUser user)
     {

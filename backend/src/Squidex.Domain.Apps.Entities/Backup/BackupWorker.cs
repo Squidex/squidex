@@ -19,13 +19,13 @@ public sealed class BackupWorker :
     IMessageHandler<BackupClear>,
     IInitializable
 {
-    private readonly Dictionary<DomainId, Task<BackupProcessor>> backupProcessors = new Dictionary<DomainId, Task<BackupProcessor>>();
+    private readonly Dictionary<DomainId, Task<BackupProcessor>> backupProcessors = [];
     private readonly Func<DomainId, BackupProcessor> backupFactory;
     private readonly RestoreProcessor restoreProcessor;
 
     public BackupWorker(IServiceProvider serviceProvider)
     {
-        var objectFactory = ActivatorUtilities.CreateFactory(typeof(BackupProcessor), new[] { typeof(DomainId) });
+        var objectFactory = ActivatorUtilities.CreateFactory(typeof(BackupProcessor), [typeof(DomainId)]);
 
         backupFactory = key =>
         {

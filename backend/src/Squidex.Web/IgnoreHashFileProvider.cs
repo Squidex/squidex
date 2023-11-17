@@ -13,7 +13,7 @@ namespace Squidex.Web;
 
 public sealed partial class IgnoreHashFileProvider : IFileProvider
 {
-    private readonly char[] pathSeparators = { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, '\\' };
+    private readonly char[] pathSeparators = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, '\\'];
     private readonly Dictionary<string, string> map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     private readonly IFileProvider inner;
 

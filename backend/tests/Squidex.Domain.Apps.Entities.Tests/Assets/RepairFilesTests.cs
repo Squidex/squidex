@@ -104,7 +104,7 @@ public class RepairFilesTests : GivenContext
     {
         var storedEvent =
             new StoredEvent("stream", "0", -1,
-                new EventData("type", new EnvelopeHeaders(), "payload"));
+                new EventData("type", [], "payload"));
 
         var storedEvents = new List<StoredEvent>
         {

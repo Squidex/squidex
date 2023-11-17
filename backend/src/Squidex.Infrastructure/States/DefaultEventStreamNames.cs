@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.States;
 
 public sealed class DefaultEventStreamNames : IEventStreamNames
 {
-    private static readonly string[] Suffixes = { "Processor", "DomainObject", "State" };
+    private static readonly string[] Suffixes = ["Processor", "DomainObject", "State"];
 
     public string GetStreamName(Type aggregateType, string id)
     {

@@ -471,7 +471,7 @@ public sealed partial class ScriptingCompleter
 
         private void Add(JsonType type, string? name, string? description, string[]? allowedValues = null, string? decprecationReason = null)
         {
-            var parts = name?.Split('.') ?? Array.Empty<string>();
+            var parts = name?.Split('.') ?? [];
 
             foreach (var part in parts)
             {

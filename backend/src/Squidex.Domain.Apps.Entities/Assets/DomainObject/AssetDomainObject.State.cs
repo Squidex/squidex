@@ -155,12 +155,12 @@ public partial class AssetDomainObject
         {
             if (Tags == null)
             {
-                Tags = new HashSet<string>();
+                Tags = [];
             }
 
             if (Metadata == null)
             {
-                Metadata = new AssetMetadata();
+                Metadata = [];
             }
         }
     }

@@ -150,7 +150,7 @@ public sealed class AppProvider : IAppProvider
             return indexForApps.GetAppsForUserAsync(userId, permissions, ct)!;
         });
 
-        return apps?.ToList() ?? new List<IAppEntity>();
+        return apps?.ToList() ?? [];
     }
 
     public async Task<List<IAppEntity>> GetTeamAppsAsync(DomainId teamId,
@@ -161,7 +161,7 @@ public sealed class AppProvider : IAppProvider
             return indexForApps.GetAppsForTeamAsync(teamId, ct)!;
         });
 
-        return apps?.ToList() ?? new List<IAppEntity>();
+        return apps?.ToList() ?? [];
     }
 
     public async Task<List<ITeamEntity>> GetUserTeamsAsync(string userId, CancellationToken ct = default)
@@ -171,7 +171,7 @@ public sealed class AppProvider : IAppProvider
             return indexForTeams.GetTeamsAsync(userId, ct)!;
         });
 
-        return teams?.ToList() ?? new List<ITeamEntity>();
+        return teams?.ToList() ?? [];
     }
 
     public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
@@ -191,7 +191,7 @@ public sealed class AppProvider : IAppProvider
             }
         }
 
-        return schemas?.ToList() ?? new List<ISchemaEntity>();
+        return schemas?.ToList() ?? [];
     }
 
     public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
@@ -202,7 +202,7 @@ public sealed class AppProvider : IAppProvider
             return indexForRules.GetRulesAsync(appId, ct)!;
         });
 
-        return rules?.ToList() ?? new List<IRuleEntity>();
+        return rules?.ToList() ?? [];
     }
 
     public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id,

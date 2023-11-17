@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
-
 namespace Squidex.Infrastructure;
 
 [Serializable]
@@ -23,18 +21,5 @@ public class DomainException : Exception
         : base(message, inner)
     {
         ErrorCode = errorCode;
-    }
-
-    protected DomainException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-        ErrorCode = info.GetString(nameof(ErrorCode));
-    }
-
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-        info.AddValue(nameof(ErrorCode), ErrorCode);
-
-        base.GetObjectData(info, context);
     }
 }

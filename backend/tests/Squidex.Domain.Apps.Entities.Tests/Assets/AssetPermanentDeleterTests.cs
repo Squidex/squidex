@@ -49,7 +49,7 @@ public class AssetPermanentDeleterTests : GivenContext
 
         var storedEvent =
             new StoredEvent("stream", "1", 1,
-                new EventData(eventType, new EnvelopeHeaders(), "payload"));
+                new EventData(eventType, [], "payload"));
 
         Assert.True(sut.Handles(storedEvent));
     }
@@ -61,7 +61,7 @@ public class AssetPermanentDeleterTests : GivenContext
 
         var storedEvent =
             new StoredEvent("stream", "1", 1,
-                new EventData(eventType, new EnvelopeHeaders(), "payload"));
+                new EventData(eventType, [], "payload"));
 
         Assert.False(sut.Handles(storedEvent));
     }

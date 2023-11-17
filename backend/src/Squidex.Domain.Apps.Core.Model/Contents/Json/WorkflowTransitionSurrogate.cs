@@ -30,7 +30,7 @@ public sealed class WorkflowTransitionSurrogate : ISurrogate<WorkflowTransition>
 
         if (!string.IsNullOrEmpty(Role))
         {
-            roles = new[] { Role };
+            roles = [Role];
         }
 
         return WorkflowTransition.When(Expression, roles);

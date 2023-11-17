@@ -307,11 +307,11 @@ public class SchemaTests
         var schema_1 = schema_0.AddField(field1);
         var schema_2 = schema_1.AddField(field2);
         var schema_3 = schema_2.AddField(field3);
-        var schema_4 = schema_3.ReorderFields(new List<long> { 3, 2, 1 });
-        var schema_5 = schema_4.ReorderFields(new List<long> { 3, 2, 1 });
+        var schema_4 = schema_3.ReorderFields([3, 2, 1]);
+        var schema_5 = schema_4.ReorderFields([3, 2, 1]);
 
-        Assert.Equal(new List<RootField> { field3, field2, field1 }, schema_4.Fields.ToList());
-        Assert.Equal(new List<RootField> { field3, field2, field1 }, schema_5.Fields.ToList());
+        Assert.Equal([field3, field2, field1], schema_4.Fields.ToList());
+        Assert.Equal([field3, field2, field1], schema_5.Fields.ToList());
         Assert.Same(schema_4, schema_5);
     }
 
@@ -324,7 +324,7 @@ public class SchemaTests
         var schema_1 = schema_0.AddField(field1);
         var schema_2 = schema_1.AddField(field2);
 
-        Assert.Throws<ArgumentException>(() => schema_2.ReorderFields(new List<long> { 1 }));
+        Assert.Throws<ArgumentException>(() => schema_2.ReorderFields([1]));
     }
 
     [Fact]
@@ -336,7 +336,7 @@ public class SchemaTests
         var schema_1 = schema_0.AddField(field1);
         var schema_2 = schema_1.AddField(field2);
 
-        Assert.Throws<ArgumentException>(() => schema_2.ReorderFields(new List<long> { 1, 4 }));
+        Assert.Throws<ArgumentException>(() => schema_2.ReorderFields([1, 4]));
     }
 
     [Fact]

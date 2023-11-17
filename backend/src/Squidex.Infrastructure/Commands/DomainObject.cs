@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Commands;
 
 public abstract partial class DomainObject<T> : IAggregate where T : class, IDomainState<T>, new()
 {
-    private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
+    private readonly List<Envelope<IEvent>> uncomittedEvents = [];
     private readonly ILogger log;
     private readonly IPersistenceFactory<T> persistenceFactory;
     private readonly IPersistence<T> persistence;

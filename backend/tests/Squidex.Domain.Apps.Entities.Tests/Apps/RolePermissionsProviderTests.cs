@@ -26,11 +26,11 @@ public class RolePermissionsProviderTests : GivenContext
     public async Task Should_provide_all_permissions()
     {
         A.CallTo(() => AppProvider.GetSchemasAsync(A<DomainId>._, default))
-            .Returns(new List<ISchemaEntity>
-            {
+            .Returns(
+            [
                 Mocks.Schema(AppId, NamedId.Of(DomainId.NewGuid(), "schema1")),
                 Mocks.Schema(AppId, NamedId.Of(DomainId.NewGuid(), "schema2"))
-            });
+            ]);
 
         var actual = await sut.GetPermissionsAsync(App);
 

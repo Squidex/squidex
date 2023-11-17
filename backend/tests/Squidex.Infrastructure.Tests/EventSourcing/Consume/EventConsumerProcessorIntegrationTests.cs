@@ -20,7 +20,7 @@ public abstract class EventConsumerProcessorIntegrationTests
 
     public sealed class EventConsumer : IEventConsumer
     {
-        public List<Guid> Events { get; } = new List<Guid>();
+        public List<Guid> Events { get; } = [];
 
         public string Name => "Consumer";
 

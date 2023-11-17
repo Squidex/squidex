@@ -23,7 +23,7 @@ public sealed class AlwaysAddScopeHandler : IOpenIddictServerHandler<ProcessSign
 
         if (!string.IsNullOrWhiteSpace(context.Response.AccessToken))
         {
-            var scopes = context.AccessTokenPrincipal?.GetScopes() ?? ImmutableArray<string>.Empty;
+            var scopes = context.AccessTokenPrincipal?.GetScopes() ?? [];
 
             context.Response.Scope = string.Join(' ', scopes);
         }

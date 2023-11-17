@@ -183,9 +183,9 @@ public static class StoreServices
                     {
                         options.BaseAddress = new Uri("https://cloud.mongodb.com/");
                     })
-                    .ConfigureHttpMessageHandlerBuilder(builder =>
+                    .ConfigurePrimaryHttpMessageHandler(() =>
                     {
-                        builder.PrimaryHandler = new HttpClientHandler
+                        return new HttpClientHandler
                         {
                             Credentials = new NetworkCredential(atlasOptions.PublicKey, atlasOptions.PrivateKey, "cloud.mongodb.com")
                         };

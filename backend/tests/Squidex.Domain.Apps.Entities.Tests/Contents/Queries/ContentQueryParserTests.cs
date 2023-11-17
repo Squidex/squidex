@@ -119,7 +119,7 @@ public class ContentQueryParserTests : GivenContext
     public async Task Should_convert_full_text_query_to_filter_with_other_filter()
     {
         A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), ApiContext.Scope(), CancellationToken))
-            .Returns(new List<DomainId> { DomainId.Create("1"), DomainId.Create("2") });
+            .Returns([DomainId.Create("1"), DomainId.Create("2")]);
 
         var query = Q.Empty.WithODataQuery("$search=Hello&$filter=data/firstName/iv eq 'ABC'");
 
@@ -132,7 +132,7 @@ public class ContentQueryParserTests : GivenContext
     public async Task Should_convert_full_text_query_to_filter()
     {
         A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), ApiContext.Scope(), CancellationToken))
-            .Returns(new List<DomainId> { DomainId.Create("1"), DomainId.Create("2") });
+            .Returns([DomainId.Create("1"), DomainId.Create("2")]);
 
         var query = Q.Empty.WithODataQuery("$search=Hello");
 
@@ -145,7 +145,7 @@ public class ContentQueryParserTests : GivenContext
     public async Task Should_convert_full_text_query_to_filter_if_single_id_found()
     {
         A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), ApiContext.Scope(), CancellationToken))
-            .Returns(new List<DomainId> { DomainId.Create("1") });
+            .Returns([DomainId.Create("1")]);
 
         var query = Q.Empty.WithODataQuery("$search=Hello");
 
@@ -171,7 +171,7 @@ public class ContentQueryParserTests : GivenContext
     public async Task Should_convert_full_text_query_to_filter_if_index_returns_empty()
     {
         A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), ApiContext.Scope(), CancellationToken))
-            .Returns(new List<DomainId>());
+            .Returns([]);
 
         var query = Q.Empty.WithODataQuery("$search=Hello");
 
@@ -184,7 +184,7 @@ public class ContentQueryParserTests : GivenContext
     public async Task Should_convert_geo_query_to_filter()
     {
         A.CallTo(() => textIndex.SearchAsync(ApiContext.App, new GeoQuery(SchemaId.Id, "geo.iv", 10, 20, 30, 1000), ApiContext.Scope(), CancellationToken))
-            .Returns(new List<DomainId> { DomainId.Create("1"), DomainId.Create("2") });
+            .Returns([DomainId.Create("1"), DomainId.Create("2")]);
 
         var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
 
@@ -197,7 +197,7 @@ public class ContentQueryParserTests : GivenContext
     public async Task Should_convert_geo_query_to_filter_if_single_id_found()
     {
         A.CallTo(() => textIndex.SearchAsync(ApiContext.App, new GeoQuery(SchemaId.Id, "geo.iv", 10, 20, 30, 1000), ApiContext.Scope(), CancellationToken))
-            .Returns(new List<DomainId> { DomainId.Create("1") });
+            .Returns([DomainId.Create("1")]);
 
         var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
 
@@ -223,7 +223,7 @@ public class ContentQueryParserTests : GivenContext
     public async Task Should_convert_geo_query_to_filter_if_index_returns_empty()
     {
         A.CallTo(() => textIndex.SearchAsync(ApiContext.App, new GeoQuery(SchemaId.Id, "geo.iv", 10, 20, 30, 1000), ApiContext.Scope(), CancellationToken))
-            .Returns(new List<DomainId>());
+            .Returns([]);
 
         var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
 

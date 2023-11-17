@@ -26,7 +26,7 @@ public class RulesIndexTests : GivenContext
         var rule = SetupRule(0);
 
         A.CallTo(() => ruleRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<IRuleEntity> { rule });
+            .Returns([rule]);
 
         var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
@@ -39,7 +39,7 @@ public class RulesIndexTests : GivenContext
         var rule = SetupRule(-1);
 
         A.CallTo(() => ruleRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<IRuleEntity> { rule });
+            .Returns([rule]);
 
         var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
@@ -52,7 +52,7 @@ public class RulesIndexTests : GivenContext
         var rule = SetupRule(0, true);
 
         A.CallTo(() => ruleRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<IRuleEntity> { rule });
+            .Returns([rule]);
 
         var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 

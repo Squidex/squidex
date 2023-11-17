@@ -11,7 +11,7 @@ public class CustomCommandMiddlewareRunnerTests
 {
     public sealed class Command : ICommand
     {
-        public List<int> Values { get; set; } = new List<int>();
+        public List<int> Values { get; set; } = [];
 
         public long ExpectedVersion { get; set; }
     }

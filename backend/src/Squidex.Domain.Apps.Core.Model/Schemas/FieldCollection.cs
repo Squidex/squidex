@@ -14,8 +14,8 @@ public sealed class FieldCollection<T> where T : IField
 {
     public static readonly FieldCollection<T> Empty = new FieldCollection<T>();
 
-    private static readonly Dictionary<long, T> EmptyById = new Dictionary<long, T>();
-    private static readonly Dictionary<string, T> EmptyByString = new Dictionary<string, T>();
+    private static readonly Dictionary<long, T> EmptyById = [];
+    private static readonly Dictionary<string, T> EmptyByString = [];
 
     private readonly T[] fieldsOrdered;
     private Dictionary<long, T>? fieldsById;
@@ -68,7 +68,7 @@ public sealed class FieldCollection<T> where T : IField
 
     private FieldCollection()
     {
-        fieldsOrdered = Array.Empty<T>();
+        fieldsOrdered = [];
     }
 
     public FieldCollection(T[] fields)

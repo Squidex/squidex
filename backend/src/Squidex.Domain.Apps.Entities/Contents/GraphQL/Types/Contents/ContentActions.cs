@@ -23,15 +23,15 @@ internal static class ContentActions
 {
     public static class Json
     {
-        public static readonly QueryArguments Arguments = new QueryArguments
-        {
+        public static readonly QueryArguments Arguments =
+        [
             new QueryArgument(Scalars.String)
             {
                 Name = "path",
                 Description = FieldDescriptions.JsonPath,
                 DefaultValue = null
-            }
-        };
+            },
+        ];
 
         public static readonly ValueResolver<object> Resolver = (value, fieldContext, context) =>
         {
@@ -48,20 +48,20 @@ internal static class ContentActions
         };
     }
 
-    public static readonly QueryArguments JsonPath = new QueryArguments
-    {
+    public static readonly QueryArguments JsonPath =
+    [
         new QueryArgument(Scalars.String)
         {
             Name = "path",
             Description = FieldDescriptions.JsonPath,
             DefaultValue = null
-        }
-    };
+        },
+    ];
 
     public static class Find
     {
-        public static readonly QueryArguments Arguments = new QueryArguments
-        {
+        public static readonly QueryArguments Arguments =
+        [
             new QueryArgument(Scalars.NonNullString)
             {
                 Name = "id",
@@ -73,8 +73,8 @@ internal static class ContentActions
                 Name = "version",
                 Description = FieldDescriptions.QueryVersion,
                 DefaultValue = null
-            }
-        };
+            },
+        ];
 
         public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
         {
@@ -98,15 +98,15 @@ internal static class ContentActions
 
     public static class FindSingleton
     {
-        public static readonly QueryArguments Arguments = new QueryArguments
-        {
+        public static readonly QueryArguments Arguments =
+        [
             new QueryArgument(Scalars.Int)
             {
                 Name = "version",
                 Description = FieldDescriptions.QueryVersion,
                 DefaultValue = null
-            }
-        };
+            },
+        ];
 
         public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
         {
@@ -128,15 +128,15 @@ internal static class ContentActions
 
     public static class QueryByIds
     {
-        public static readonly QueryArguments Arguments = new QueryArguments
-        {
+        public static readonly QueryArguments Arguments =
+        [
             new QueryArgument(Scalars.NonNullStrings)
             {
                 Name = "ids",
                 Description = FieldDescriptions.EntityIds,
                 DefaultValue = null,
-            }
-        };
+            },
+        ];
 
         public static readonly IFieldResolver Resolver = Resolvers.Sync<object, object?>((_, fieldContext, context) =>
         {
@@ -150,8 +150,8 @@ internal static class ContentActions
 
     public static class QueryOrReferencing
     {
-        public static readonly QueryArguments Arguments = new QueryArguments
-        {
+        public static readonly QueryArguments Arguments =
+        [
             new QueryArgument(Scalars.Int)
             {
                 Name = "top",
@@ -181,8 +181,8 @@ internal static class ContentActions
                 Name = "search",
                 Description = FieldDescriptions.QuerySearch,
                 DefaultValue = null
-            }
-        };
+            },
+        ];
 
         public static readonly IFieldResolver Query = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
         {
@@ -268,8 +268,8 @@ internal static class ContentActions
     {
         public static QueryArguments Arguments(IGraphType inputType)
         {
-            return new QueryArguments
-            {
+            return
+            [
                 new QueryArgument(new NonNullGraphType(inputType))
                 {
                     Name = "data",
@@ -293,8 +293,8 @@ internal static class ContentActions
                     Name = "id",
                     Description = FieldDescriptions.ContentRequestOptionalId,
                     DefaultValue = null
-                }
-            };
+                },
+            ];
         }
 
         public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsCreate, c =>
@@ -324,8 +324,8 @@ internal static class ContentActions
     {
         public static QueryArguments Arguments(IGraphType inputType)
         {
-            return new QueryArguments
-            {
+            return
+            [
                 new QueryArgument(Scalars.NonNullString)
                 {
                     Name = "id",
@@ -361,8 +361,8 @@ internal static class ContentActions
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
                     DefaultValue = EtagVersion.Any
-                }
-            };
+                },
+            ];
         }
 
         public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsUpsert, c =>
@@ -395,8 +395,8 @@ internal static class ContentActions
     {
         public static QueryArguments Arguments(IGraphType inputType)
         {
-            return new QueryArguments
-            {
+            return
+            [
                 new QueryArgument(Scalars.String)
                 {
                     Name = "id",
@@ -414,8 +414,8 @@ internal static class ContentActions
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
                     DefaultValue = EtagVersion.Any
-                }
-            };
+                },
+            ];
         }
 
         public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsUpdateOwn, c =>
@@ -432,8 +432,8 @@ internal static class ContentActions
     {
         public static QueryArguments Arguments(IGraphType inputType)
         {
-            return new QueryArguments
-            {
+            return
+            [
                 new QueryArgument(Scalars.String)
                 {
                     Name = "id",
@@ -451,8 +451,8 @@ internal static class ContentActions
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
                     DefaultValue = EtagVersion.Any
-                }
-            };
+                },
+            ];
         }
 
         public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsUpdateOwn, c =>
@@ -467,8 +467,8 @@ internal static class ContentActions
 
     public static class ChangeStatus
     {
-        public static readonly QueryArguments Arguments = new QueryArguments
-        {
+        public static readonly QueryArguments Arguments =
+        [
             new QueryArgument(Scalars.NonNullString)
             {
                 Name = "id",
@@ -492,8 +492,8 @@ internal static class ContentActions
                 Name = "expectedVersion",
                 Description = FieldDescriptions.EntityExpectedVersion,
                 DefaultValue = EtagVersion.Any
-            }
-        };
+            },
+        ];
 
         public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsChangeStatusOwn, c =>
         {
@@ -510,8 +510,8 @@ internal static class ContentActions
 
     public static class Delete
     {
-        public static readonly QueryArguments Arguments = new QueryArguments
-        {
+        public static readonly QueryArguments Arguments =
+        [
             new QueryArgument(Scalars.NonNullString)
             {
                 Name = "id",
@@ -523,8 +523,8 @@ internal static class ContentActions
                 Name = "expectedVersion",
                 Description = FieldDescriptions.EntityExpectedVersion,
                 DefaultValue = EtagVersion.Any
-            }
-        };
+            },
+        ];
 
         public static readonly IFieldResolver Resolver = ContentCommand(PermissionIds.AppContentsDeleteOwn, c =>
         {
@@ -534,8 +534,8 @@ internal static class ContentActions
 
     public static class Subscription
     {
-        public static readonly QueryArguments Arguments = new QueryArguments
-        {
+        public static readonly QueryArguments Arguments =
+        [
             new QueryArgument(Scalars.EnrichedContentEventType)
             {
                 Name = "type",
@@ -547,8 +547,8 @@ internal static class ContentActions
                 Name = "schemaName",
                 Description = FieldDescriptions.ContentSchemaName,
                 DefaultValue = null
-            }
-        };
+            },
+        ];
 
         public static readonly ISourceStreamResolver Resolver = Resolvers.Stream(PermissionIds.AppContentsRead, c =>
         {

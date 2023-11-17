@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Subscriptions;
 
 public sealed class EventMessageEvaluator : IMessageEvaluator
 {
-    private readonly Dictionary<DomainId, Dictionary<Guid, AppSubscription>> subscriptions = new Dictionary<DomainId, Dictionary<Guid, AppSubscription>>();
+    private readonly Dictionary<DomainId, Dictionary<Guid, AppSubscription>> subscriptions = [];
     private readonly ReaderWriterLockSlim readerWriterLock = new ReaderWriterLockSlim();
 
     public async ValueTask<IEnumerable<Guid>> GetSubscriptionsAsync(object message)
@@ -34,7 +34,7 @@ public sealed class EventMessageEvaluator : IMessageEvaluator
                 {
                     if (await subscription.ShouldHandle(appEvent))
                     {
-                        result ??= new List<Guid>();
+                        result ??= [];
                         result.Add(id);
                     }
                 }

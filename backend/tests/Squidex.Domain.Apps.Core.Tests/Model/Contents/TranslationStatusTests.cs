@@ -21,7 +21,7 @@ public class TranslationStatusTests
     {
         var schema = new Schema("my-schema");
 
-        var actual = TranslationStatus.Create(new ContentData(), schema, languages);
+        var actual = TranslationStatus.Create([], schema, languages);
 
         Assert.Equal(new TranslationStatus
         {
@@ -38,7 +38,7 @@ public class TranslationStatusTests
             new Schema("my-schema")
                 .AddString(1, "field1", Partitioning.Invariant);
 
-        var actual = TranslationStatus.Create(new ContentData(), schema, languages);
+        var actual = TranslationStatus.Create([], schema, languages);
 
         Assert.Equal(new TranslationStatus
         {
@@ -55,7 +55,7 @@ public class TranslationStatusTests
             new Schema("my-schema")
                 .AddString(1, "field1", Partitioning.Language);
 
-        var actual = TranslationStatus.Create(new ContentData(), schema, languages);
+        var actual = TranslationStatus.Create([], schema, languages);
 
         Assert.Equal(new TranslationStatus
         {

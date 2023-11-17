@@ -37,7 +37,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
 
     private sealed class SearchOperation
     {
-        public List<(DomainId Id, double Score)> Results { get; } = new List<(DomainId Id, double Score)>();
+        public List<(DomainId Id, double Score)> Results { get; } = [];
 
         public string SearchTerms { get; set; }
 

@@ -68,11 +68,11 @@ public class BackupSchemasTests : GivenContext
 
         await sut.RestoreAsync(context, CancellationToken);
 
-        Assert.Equal(new HashSet<DomainId>
-        {
+        Assert.Equal(
+        [
             DomainId.Combine(AppId, schemaId1.Id),
             DomainId.Combine(AppId, schemaId2.Id)
-        }, rebuildContents);
+        ], rebuildContents);
     }
 
     private Envelope<SchemaEvent> AppEvent(SchemaEvent @event)

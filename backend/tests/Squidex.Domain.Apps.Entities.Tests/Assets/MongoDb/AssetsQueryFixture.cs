@@ -26,10 +26,10 @@ public sealed class AssetsQueryFixture : IAsyncLifetime
     private readonly int numValues = 250;
 
     private readonly NamedId<DomainId>[] appIds =
-    {
+    [
         NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
         NamedId.Of(DomainId.Create("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1")
-    };
+    ];
 
     public IMongoDatabase Database { get; }
 
@@ -123,10 +123,10 @@ public sealed class AssetsQueryFixture : IAsyncLifetime
                         {
                             ["value"] = JsonValue.Create(tag)
                         },
-                        Tags = new HashSet<string>
-                        {
+                        Tags =
+                        [
                             tag
-                        },
+                        ],
                         Slug = fileName
                     };
 

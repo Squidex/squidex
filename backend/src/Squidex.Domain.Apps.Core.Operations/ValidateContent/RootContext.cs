@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent;
 
 public sealed class RootContext
 {
-    private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
+    private readonly ConcurrentBag<ValidationError> errors = [];
     private readonly Scheduler scheduler = new Scheduler();
 
     public IJsonSerializer Serializer { get; }

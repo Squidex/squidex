@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Queries;
 
 public sealed class PropertyPath : ReadonlyList<string>, IEquatable<string>
 {
-    private static readonly char[] Separators = { '.', '/' };
+    private static readonly char[] Separators = ['.', '/'];
 
     public PropertyPath(IList<string> items)
         : base(items)

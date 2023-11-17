@@ -105,7 +105,7 @@ public sealed class DoubleLinkedContentMiddleware : ICustomCommandMiddleware
     {
         if (data != null && data.TryGetValue("reference", out ContentFieldData? fieldData))
         {
-            return fieldData?.Values.OfType<JsonArray>().SelectMany(x => x).SingleOrDefault().ToString();
+            return fieldData?.Values.Select(x => x.Value).OfType<JsonArray>().SelectMany(x => x).SingleOrDefault().ToString();
         }
 
         return null;
