@@ -36,7 +36,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
 
         var languages_1 = await app.Apps.GetLanguagesAsync();
 
-        Assert.Equal(new string[] { "en", "de", "it" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
+        Assert.Equal(new[] { "en", "de", "it" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
 
         await Verify(languages_1);
     }
@@ -54,7 +54,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
 
         var languages_1 = await app.Apps.GetLanguagesAsync();
 
-        Assert.Equal(new string[] { "en", "abc", "xyz" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
+        Assert.Equal(new[] { "en", "abc", "xyz" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
 
         await Verify(languages_1);
     }
@@ -74,10 +74,10 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
         // STEP 3: Update German language.
         var updateRequest = new UpdateLanguageDto
         {
-            Fallback = new List<string>
-            {
+            Fallback =
+            [
                 "it"
-            },
+            ],
             IsOptional = true
         };
 
@@ -105,10 +105,10 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
         // STEP 2: Update Italian language.
         var updateRequest = new UpdateLanguageDto
         {
-            Fallback = new List<string>
-            {
+            Fallback =
+            [
                 "de"
-            },
+            ],
             IsOptional = true
         };
 
@@ -154,10 +154,10 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
         // STEP 2: Update Italian language.
         var updateRequest = new UpdateLanguageDto
         {
-            Fallback = new List<string>
-            {
+            Fallback =
+            [
                 "de"
-            },
+            ],
             IsOptional = true
         };
 
@@ -170,7 +170,7 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
 
         // Fallback language must be removed.
         Assert.Empty(language_2_IT.Fallback);
-        Assert.Equal(new string[] { "en", "it" }, languages_2.Items.Select(x => x.Iso2Code).ToArray());
+        Assert.Equal(new[] { "en", "it" }, languages_2.Items.Select(x => x.Iso2Code).ToArray());
 
         await Verify(languages_2);
     }

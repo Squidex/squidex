@@ -110,8 +110,8 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items_1 = await _.Contents.GetAsync(q1);
 
-        AssertItems(items_0, 3, new[] { 4, 5, 6 });
-        AssertItems(items_1, 3, new[] { 4, 5, 6 });
+        AssertItems(items_0, 3, [4, 5, 6]);
+        AssertItems(items_1, 3, [4, 5, 6]);
     }
 
     [Fact]
@@ -149,7 +149,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+        AssertItems(items, 10, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     }
 
     [Fact]
@@ -171,7 +171,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+        AssertItems(items, 10, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     }
 
     [Fact]
@@ -207,7 +207,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 6, 7, 8, 9, 10 });
+        AssertItems(items, 10, [6, 7, 8, 9, 10]);
     }
 
     [Fact]
@@ -230,7 +230,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 6, 7, 8, 9, 10 });
+        AssertItems(items, 10, [6, 7, 8, 9, 10]);
     }
 
     [Fact]
@@ -240,7 +240,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 3, 4, 5, 6, 7 });
+        AssertItems(items, 10, [3, 4, 5, 6, 7]);
     }
 
     [Fact]
@@ -264,7 +264,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 3, 4, 5, 6, 7 });
+        AssertItems(items, 10, [3, 4, 5, 6, 7]);
     }
 
     [Fact]
@@ -274,7 +274,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 3, new[] { 4, 5, 6 });
+        AssertItems(items, 3, [4, 5, 6]);
     }
 
     [Fact]
@@ -314,7 +314,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 3, new[] { 4, 5, 6 });
+        AssertItems(items, 3, [4, 5, 6]);
     }
 
     [Fact]
@@ -354,7 +354,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 3, new[] { 4, 5, 6 });
+        AssertItems(items, 3, [4, 5, 6]);
     }
 
     [Fact]
@@ -364,7 +364,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 2 });
+        AssertItems(items, 1, [2]);
     }
 
     [Fact]
@@ -380,7 +380,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 2 });
+        AssertItems(items, 1, [2]);
     }
 
     [Fact]
@@ -390,7 +390,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 3 });
+        AssertItems(items, 1, [3]);
     }
 
     [Fact]
@@ -416,7 +416,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 3 });
+        AssertItems(items, 1, [3]);
     }
 
     [Fact]
@@ -426,7 +426,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 4 });
+        AssertItems(items, 1, [4]);
     }
 
     [Fact]
@@ -501,7 +501,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 4 });
+        AssertItems(items, 1, [4]);
     }
 
     [Fact]
@@ -614,8 +614,8 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var items1 = results.ElementAt(0).Data.Items;
         var items2 = results.ElementAt(1).Data.Items;
 
-        Assert.Equal(items1.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
-        Assert.Equal(items2.Select(x => x.Data.Number).ToArray(), new[] { 5, 6 });
+        Assert.Equal(new[] { 4, 5, 6 }, items1.Select(x => x.Data.Number).ToArray());
+        Assert.Equal(new[] { 5, 6 }, items2.Select(x => x.Data.Number).ToArray());
     }
 
     [Fact]
@@ -643,7 +643,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>(query);
         var items = result.Items;
 
-        Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
+        Assert.Equal(new[] { 4, 5, 6 }, items.Select(x => x.Data.Number).ToArray());
     }
 
     [Fact]
@@ -671,7 +671,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlGetAsync<QueryResult>(query);
         var items = result.Items;
 
-        Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
+        Assert.Equal(new[] { 4, 5, 6 }, items.Select(x => x.Data.Number).ToArray());
     }
 
     [Fact]
@@ -695,7 +695,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
         var items = result["queryMyReadsContents"];
 
-        Assert.Equal(items.Select(x => x["data"]["number"]["iv"].Value<int>()).ToArray(), new[] { 4, 5, 6 });
+        Assert.Equal(new[] { 4, 5, 6 }, items.Select(x => x["data"]["number"]["iv"].Value<int>()).ToArray());
     }
 
     [Fact]

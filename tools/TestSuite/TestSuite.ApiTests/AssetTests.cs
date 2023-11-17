@@ -313,11 +313,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         // STEP 2: Annotate tags.
         var tagsRequest = new AnnotateAssetDto
         {
-            Tags = new List<string>
-            {
+            Tags =
+            [
                 "tag1",
                 "tag2"
-            }
+            ]
         };
 
         var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, tagsRequest);
@@ -345,11 +345,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
                 var randomMetadataRequest = new AnnotateAssetDto
                 {
-                    Tags = new List<string>
-                    {
+                    Tags =
+                    [
                         randomTag1,
                         randomTag2
-                    }
+                    ]
                 };
 
                 await _.Client.Assets.PutAssetAsync(asset_1.Id, randomMetadataRequest, ct);
@@ -367,11 +367,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
         var metadataRequest = new AnnotateAssetDto
         {
-            Tags = new List<string>
-            {
+            Tags =
+            [
                 tag1,
                 tag2
-            }
+            ]
         };
 
         var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, metadataRequest);

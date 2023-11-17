@@ -167,7 +167,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         // STEP 1: Create a content item with a text that caused a bug before.
         var content = await _.Contents.CreateAsync(new TestEntityData
         {
-            Localized = new Dictionary<string, string>()
+            Localized = []
         }, ContentCreateOptions.AsPublish);
 
 
@@ -643,14 +643,14 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
             Name = schemaName,
             IsPublished = true,
             IsSingleton = true,
-            Fields = new List<UpsertSchemaFieldDto>
-            {
+            Fields =
+            [
                 new UpsertSchemaFieldDto
                 {
                     Name = "my-field",
                     Properties = new StringFieldPropertiesDto()
-                }
-            }
+                },
+            ]
         };
 
         await _.Client.Schemas.PostSchemaAsync(createRequest);

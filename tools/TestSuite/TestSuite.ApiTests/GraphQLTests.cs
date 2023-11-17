@@ -102,8 +102,8 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                     {
                         Name = "Leipzig Top Location"
                     },
-                    Locations = new List<LocationData>
-                    {
+                    Locations =
+                    [
                         new LocationData
                         {
                             Name = "Leipzig Location 1"
@@ -111,8 +111,8 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                         new LocationData
                         {
                             Name = "Leipzig Location 2"
-                        }
-                    }
+                        },
+                    ],
                 }
             },
             new City
@@ -124,8 +124,8 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                     {
                         Name = "Munich Top Location"
                     },
-                    Locations = new List<LocationData>
-                    {
+                    Locations =
+                    [
                         new LocationData
                         {
                             Name = "Munich Location 1"
@@ -133,8 +133,8 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                         new LocationData
                         {
                             Name = "Munich Location 2"
-                        }
-                    }
+                        },
+                    ],
                 }
             }
         });
@@ -450,7 +450,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         // Create the request manually to check the headers.
         var response = await httpClient.PostAsJsonAsync($"api/content/{_.AppName}/graphql", query);
 
-        Assert.Equal(new string[]
+        Assert.Equal(new[]
         {
             "Auth-State",
             "X-Fields",

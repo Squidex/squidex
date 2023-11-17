@@ -43,7 +43,7 @@ jobs:
       - name: Test - RUN
         uses: kohlerdominik/docker-run-action@v1.1.0
         with:
-          image: squidex/build:7
+          image: squidex/build:8
           environment: |
             CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
@@ -57,7 +57,7 @@ jobs:
       - name: Test - RUN on path
         uses: kohlerdominik/docker-run-action@v1.1.0
         with:
-          image: squidex/build:7
+          image: squidex/build:8
           environment: |
             CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
@@ -71,7 +71,7 @@ jobs:
       - name: Test - RUN with dedicated collections
         uses: kohlerdominik/docker-run-action@v1.1.0
         with:
-          image: squidex/build:7
+          image: squidex/build:8
           environment: |
             CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60

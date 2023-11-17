@@ -63,7 +63,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         // STEP 2: Update role..
         var updateRequest = new UpdateRoleDto
         {
-            Permissions = new List<string> { "a", "b" }
+            Permissions = ["a", "b"]
         };
 
         var roles_2 = await _.Client.Apps.PutRoleAsync(roleName, updateRequest);

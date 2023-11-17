@@ -133,20 +133,20 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
-                Schemas = new List<SchemaCondition>
-                {
+                Schemas =
+                [
                     new SchemaCondition
                     {
                         SchemaId = parentSchema.Id
                     }
-                },
-                ReferencedSchemas = new List<SchemaCondition>
-                {
+                ],
+                ReferencedSchemas =
+                [
                     new SchemaCondition
                     {
                         SchemaId = referencedSchema.Id
                     }
-                }
+                ]
             }
         };
 

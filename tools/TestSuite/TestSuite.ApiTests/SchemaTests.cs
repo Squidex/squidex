@@ -146,8 +146,8 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
         var createRequest = new CreateSchemaDto
         {
             Name = schemaName,
-            Fields = new List<UpsertSchemaFieldDto>
-            {
+            Fields =
+            [
                 new UpsertSchemaFieldDto
                 {
                     Name = "references",
@@ -164,10 +164,10 @@ public class SchemaTests : IClassFixture<CreatedAppFixture>
                     Properties = new TagsFieldPropertiesDto
                     {
                         Editor = TagsFieldEditor.Checkboxes,
-                        AllowedValues = new List<string> { "value1" }
+                        AllowedValues = ["value1"]
                     }
-                }
-            }
+                },
+            ]
         };
 
         var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);

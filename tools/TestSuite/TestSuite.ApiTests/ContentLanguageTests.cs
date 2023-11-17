@@ -80,7 +80,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
 
 
         // STEP 2: Get content.
-        var (etag1, _) = await GetEtagAsync(content.Id, new Dictionary<string, string>());
+        var (etag1, _) = await GetEtagAsync(content.Id, []);
 
         var (etag2, _) = await GetEtagAsync(content.Id, new Dictionary<string, string>
         {

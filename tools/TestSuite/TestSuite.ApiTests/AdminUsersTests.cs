@@ -113,7 +113,7 @@ public sealed class AdminUsersTests : IClassFixture<ClientFixture>
         {
             Email = email,
             Password = "1q2w3e$R",
-            Permissions = new List<string>(),
+            Permissions = [],
             // The API requests to also set the display name.
             DisplayName = email,
         };

@@ -123,8 +123,8 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         {
             DoNotScript = false,
             DoNotValidate = false,
-            Jobs = new List<BulkUpdateJob>
-            {
+            Jobs =
+            [
                 new BulkUpdateJob
                 {
                     Type = BulkUpdateType.Upsert,
@@ -135,8 +135,8 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
                             iv = 99
                         }
                     }
-                }
-            },
+                },
+            ],
             Publish = true
         });
 
@@ -171,8 +171,8 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         {
             DoNotScript = true,
             DoNotValidate = false,
-            Jobs = new List<BulkUpdateJob>
-            {
+            Jobs =
+            [
                 new BulkUpdateJob
                 {
                     Type = BulkUpdateType.Upsert,
@@ -184,7 +184,7 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
                         }
                     }
                 }
-            },
+            ],
             Publish = true
         });
 
