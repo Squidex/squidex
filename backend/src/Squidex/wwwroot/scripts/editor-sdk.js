@@ -171,6 +171,8 @@ function SquidexSidebar(options) {
     return plugin;
 }
 
+var SquidexPlugin = SquidexSidebar;
+
 
 /**
  * Creates a new plugin for widgets.

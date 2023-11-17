@@ -654,6 +654,7 @@ describe('SchemasService', () => {
             contentsSidebarUrl: `url/to/contents/${key}`,
             contentSidebarUrl: `url/to/content/${key}`,
             contentEditorUrl: `url/to/editor/${key}`,
+            contentsListUrl: `url/to/list/${key}`,
             tags: [
                 `tags${key}`,
             ],
@@ -879,6 +880,7 @@ function createSchemaProperties(id: number, suffix = '') {
         `url/to/contents/${key}`,
         `url/to/content/${key}`,
         `url/to/editor/${key}`,
+        `url/to/list/${key}`,
         id % 2 === 1,
         [
             `tags${key}`,

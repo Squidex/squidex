@@ -13,6 +13,7 @@ import { ContentHistoryPageComponent } from './pages/content/content-history-pag
 import { ContentPageComponent } from './pages/content/content-page.component';
 import { ContentsFiltersPageComponent } from './pages/contents/contents-filters-page.component';
 import { ContentsPageComponent } from './pages/contents/contents-page.component';
+import { ContentsPluginComponent } from './pages/contents-plugin/contents-plugin.component';
 import { ReferencesPageComponent } from './pages/references/references-page.component';
 import { SchemasPageComponent } from './pages/schemas/schemas-page.component';
 import { SidebarPageComponent } from './pages/sidebar/sidebar-page.component';
@@ -38,7 +39,7 @@ export const CONTENT_ROUTES: Routes = [
                     {
                         path: '',
                         component: ContentsPageComponent,
-                        canActivate: [schemaMustNotBeSingletonGuard, contentMustExistGuard],
+                        canActivate: [schemaMustNotBeSingletonGuard(false), contentMustExistGuard],
                         canDeactivate: [canDeactivateGuard],
                         children: [
                             {
@@ -50,6 +51,11 @@ export const CONTENT_ROUTES: Routes = [
                                 component: SidebarPageComponent,
                             },
                         ],
+                    },
+                    {
+                        path: 'extension',
+                        canActivate: [schemaMustNotBeSingletonGuard(true), contentMustExistGuard],
+                        component: ContentsPluginComponent,
                     },
                     {
                         path: 'new',

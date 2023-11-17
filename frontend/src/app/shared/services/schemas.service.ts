@@ -380,6 +380,7 @@ export class SchemaPropertiesDto {
         public readonly contentsSidebarUrl?: string,
         public readonly contentSidebarUrl?: string,
         public readonly contentEditorUrl?: string,
+        public readonly contentsListUrl?: string,
         public readonly validateOnPublish?: boolean,
         public readonly tags?: ReadonlyArray<string>,
     ) {
@@ -494,6 +495,9 @@ export type UpdateSchemaDto = Readonly<{
 
     // The URL to an editor to replace the editor.
     contentEditorUrl?: string;
+
+    // The url to the content list plugin.
+    contentsListUrl?: string;
 
     // True, if the content should be validated on publishing.
     validateOnPublish?: boolean;
@@ -835,6 +839,7 @@ function parseProperties(response: any) {
         response.contentsSidebarUrl,
         response.contentSidebarUrl,
         response.contentEditorUrl,
+        response.contentsListUrl,
         response.validateOnPublish,
         response.tags);
 }

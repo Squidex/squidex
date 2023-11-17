@@ -1,8 +1,9 @@
-<sqx-layout titleText="i18n:common.sidebar" width="20" white="true" padding="true" overflow="true">
+<sqx-layout layout="right" titleText="i18n:common.sidebar" width="20" white="true">
     <sqx-content-extension
-        [url]="url | async"
+        [editorUrl]="url | async"
         [contentItem]="contentsState.selectedContent | async"
-        [contentSchema]="(schemasState.selectedSchema | async)!">
+        [contentSchema]="(schemasState.selectedSchema | async)!"
+        scrollable="true">
     </sqx-content-extension>
 </sqx-layout>
 

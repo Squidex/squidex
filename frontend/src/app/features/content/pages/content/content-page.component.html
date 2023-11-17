@@ -146,9 +146,9 @@
                     </ng-container>
                     <ng-container *ngSwitchCase="'extension'">
                         <sqx-content-extension mode="referencing" *ngIf="schema.properties.contentEditorUrl && content"
+                            [editorUrl]="schema.properties.contentEditorUrl"
                             [contentItem]="content" 
-                            [contentSchema]="schema"
-                            [url]="schema.properties.contentEditorUrl">
+                            [contentSchema]="schema">
                         </sqx-content-extension>
                     </ng-container>
                 </ng-container>

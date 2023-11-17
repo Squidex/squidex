@@ -12,6 +12,15 @@
         body {
             background-color: white;
         }
+
+        div {
+            padding: 20px;
+        }
+
+        textarea {
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
     </style>
 </head>
 
@@ -23,7 +32,9 @@
         }
     </script>
 
-    <textarea class="form-control" oninput="grow(this)" id="editor"></textarea>
+    <div>
+        <textarea class="form-control" oninput="grow(this)" id="editor"></textarea>
+    </div>
 
     <script>
         var element = document.getElementById('editor');

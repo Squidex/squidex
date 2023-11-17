@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
 
@@ -32,8 +32,11 @@ export class ContentExtensionComponent {
     @Input({ required: true })
     public contentSchema!: SchemaDto;
 
+    @Input({ transform: booleanAttribute })
+    public scrollable?: boolean = false;
+
     @Input()
-    public set url(value: string | undefined | null) {
+    public set editorUrl(value: string | undefined | null) {
         this.computedUrl = computeEditorUrl(value, this.appsState.snapshot.selectedSettings);
     }
 
@@ -72,7 +75,7 @@ export class ContentExtensionComponent {
 
                 this.sendInit();
                 this.sendContent();
-            } else if (type === 'resize') {
+            } else if (type === 'resize' && !this.scrollable) {
                 const { height } = event.data;
 
                 this.iframe.nativeElement.height = `${height}px`;

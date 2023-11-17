@@ -1,0 +1,10 @@
+<sqx-layout layout="main" titleText="i18n:common.contents" titleIcon="contents" hideHeader="true" hideSidebar="true" white="true" overflow="true">
+    <ng-container *ngIf="schema | async; let schema">
+        <sqx-content-extension 
+            [editorUrl]="schema.properties.contentsListUrl"
+            [contentItem]="undefined"
+            [contentSchema]="schema"
+            scrollable="true">
+        </sqx-content-extension>
+    </ng-container>
+</sqx-layout>
