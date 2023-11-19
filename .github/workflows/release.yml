@@ -23,7 +23,7 @@ jobs:
         uses: docker/setup-buildx-action@v3.0.0
 
       - name: Build - BUILD
-        uses: docker/build-push-action@v5.0.0
+        uses: docker/build-push-action@v5.1.0
         with:
           load: true
           build-args: "SQUIDEX__BUILD__VERSION=${{ env.GITHUB_REF_SLUG }},SQUIDEX__RUNTIME__VERSION=${{ env.GITHUB_REF_SLUG }}"
