@@ -175,112 +175,111 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         }
     }
 
-    private ngAfterViewInitOSM() {
+    private async ngAfterViewInitOSM() {
         this.searchBoxInput.nativeElement.remove();
 
-        Promise.all([
-            this.resourceLoader.loadLocalStyle('dependencies/leaflet/Control.Geocoder.css'),
+        await Promise.all([
             this.resourceLoader.loadLocalStyle('dependencies/leaflet/leaflet.css'),
             this.resourceLoader.loadLocalScript('dependencies/leaflet/leaflet.js'),
-        ]).then(() => {
-            this.map = L.map(this.editor.nativeElement).fitWorld();
+        ]);
 
-            L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png',
-                {
-                    attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-                }).addTo(this.map);
+        await Promise.all([
+            this.resourceLoader.loadLocalStyle('dependencies/leaflet/Control.Geocoder.css'),
+            this.resourceLoader.loadLocalScript('dependencies/leaflet/Control.Geocoder.min.js'),
+        ]);
 
-            this.resourceLoader.loadLocalScript('dependencies/leaflet/Control.Geocoder.min.js')
-                .then(() => {
-                    L.Control.geocoder({
-                        defaultMarkGeocode: false,
-                    })
-                    .on('markgeocode', (event: any) => {
-                        const center = event.geocode.center;
+        this.map = L.map(this.editor.nativeElement).fitWorld();
 
-                        if (!this.snapshot.isDisabled) {
-                            this.updateValue(center.lat, center.lng);
-                            this.updateMarker({ reset: true, fire: true });
-                        }
-                    })
-                    .addTo(this.map);
-                });
+        L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png',
+        {
+            attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(this.map);
 
-            this.map.on('click', (event: any) => {
-                if (!this.snapshot.isDisabled) {
-                    const latlng = event.latlng.wrap();
+        L.Control.geocoder({
+            defaultMarkGeocode: false,
+        })
+        .on('markgeocode', (event: any) => {
+            const center = event.geocode.center;
 
-                    this.updateValue(latlng.lat, latlng.lng);
-                    this.updateMarker({ fire: true });
-                }
-            });
+            if (!this.snapshot.isDisabled) {
+                this.updateValue(center.lat, center.lng);
+                this.updateMarker({ reset: true, fire: true });
+            }
+        })
+        .addTo(this.map);
 
-            this.updateMarker({ reset: true });
+        this.map.on('click', (event: any) => {
+            if (!this.snapshot.isDisabled) {
+                const latlng = event.latlng.wrap();
 
-            if (this.snapshot.isDisabled) {
-                this.map.zoomControl.disable();
-
-                this.map._handlers.forEach((handler: any) => {
-                    handler.disable();
-                });
+                this.updateValue(latlng.lat, latlng.lng);
+                this.updateMarker({ fire: true });
             }
         });
+
+        this.updateMarker({ reset: true });
+
+        if (this.snapshot.isDisabled) {
+            this.map.zoomControl.disable();
+
+            this.map._handlers.forEach((handler: any) => {
+                handler.disable();
+            });
+        }
     }
 
-    private ngAfterViewInitGoogle(apiKey: string) {
-        this.resourceLoader.loadScript(`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`)
-            .then(() => {
-                this.map = new google.maps.Map(this.editor.nativeElement,
-                    {
-                        zoom: 1,
-                        fullscreenControl: false,
-                        mapTypeControl: false,
-                        mapTypeControlOptions: {},
-                        streetViewControl: false,
-                        center: { lat: 0, lng: 0 },
-                    });
+    private async ngAfterViewInitGoogle(apiKey: string) {
+        await this.resourceLoader.loadScript(`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`);
 
-                const searchBox = new google.maps.places.SearchBox(this.searchBoxInput.nativeElement);
+        this.map = new google.maps.Map(this.editor.nativeElement, {
+            zoom: 1,
+            fullscreenControl: false,
+            mapTypeControl: false,
+            mapTypeControlOptions: {},
+            streetViewControl: false,
+            center: { lat: 0, lng: 0 },
+        });
 
-                this.map.addListener('click', (event: any) => {
-                    if (!this.snapshot.isDisabled) {
-                        const latlng = event.latLng;
+        const searchBox = new google.maps.places.SearchBox(this.searchBoxInput.nativeElement);
 
-                        this.updateValue(latlng.lat(), latlng.lng());
-                        this.updateMarker({ fire: true });
-                    }
-                });
+        this.map.addListener('click', (event: any) => {
+            if (!this.snapshot.isDisabled) {
+                const latlng = event.latLng;
 
-                this.map.addListener('bounds_changed', () => {
-                    searchBox.setBounds(this.map.getBounds());
-                });
+                this.updateValue(latlng.lat(), latlng.lng());
+                this.updateMarker({ fire: true });
+            }
+        });
 
-                searchBox.addListener('places_changed', () => {
-                    const places = searchBox.getPlaces();
+        this.map.addListener('bounds_changed', () => {
+            searchBox.setBounds(this.map.getBounds());
+        });
 
-                    if (places.length === 1) {
-                        const place = places[0];
+        searchBox.addListener('places_changed', () => {
+            const places = searchBox.getPlaces();
 
-                        if (!place.geometry) {
-                            return;
-                        }
+            if (places.length === 1) {
+                const place = places[0];
 
-                        if (!this.snapshot.isDisabled) {
-                            const lat = place.geometry.location.lat();
-                            const lng = place.geometry.location.lng();
-
-                            this.updateValue(lat, lng);
-                            this.updateMarker({ pan: true, fire: true });
-                        }
-                    }
-                });
-
-                this.updateMarker({ reset: true });
-
-                if (this.snapshot.isDisabled) {
-                    this.map.setOptions({ draggable: false, zoomControl: false });
+                if (!place.geometry) {
+                    return;
                 }
-            });
+
+                if (!this.snapshot.isDisabled) {
+                    const lat = place.geometry.location.lat();
+                    const lng = place.geometry.location.lng();
+
+                    this.updateValue(lat, lng);
+                    this.updateMarker({ pan: true, fire: true });
+                }
+            }
+        });
+
+        this.updateMarker({ reset: true });
+
+        if (this.snapshot.isDisabled) {
+            this.map.setOptions({ draggable: false, zoomControl: false });
+        }
     }
 
     public clearValue() {

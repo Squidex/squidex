@@ -72,39 +72,39 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
         this.language = this.languagesState.snapshot.languages.find(x => x.language.isMaster)!.language;
     }
 
-    public ngAfterViewInit() {
-        Promise.all([
+    public async ngAfterViewInit() {
+        await Promise.all([
             this.resourceLoader.loadLocalStyle('dependencies/tui-calendar/tui-calendar.min.css'),
             this.resourceLoader.loadLocalScript('dependencies/tui-calendar/tui-code-snippet.min.js'),
             this.resourceLoader.loadLocalScript('dependencies/tui-calendar/tui-calendar.min.js'),
-        ]).then(() => {
-            const Calendar = tui.Calendar;
+        ]);
 
-            this.calendar = new Calendar(this.calendarContainer.nativeElement, {
-                defaultView: 'month',
-                isReadOnly: true,
-                scheduleView: ['time'],
-                taskView: false,
-                ...getLocalizationSettings(),
-            });
-
-            this.calendar.on('clickSchedule', (event: any) => {
-                this.contentSelected = event.schedule.raw;
-                this.contentDialog.show();
-
-                this.changeDetector.detectChanges();
-            });
-
-            this.calendar.on('clickDayname', (event: any) => {
-                if (this.calendar.getViewName() === 'week') {
-                    this.calendar.setDate(new Date(event.date));
-
-                    this.changeView('day');
-                }
-            });
-
-            this.load();
+        this.calendar?.destroy();
+        this.calendar = new tui.Calendar(this.calendarContainer.nativeElement, {
+            defaultView: 'month',
+            isReadOnly: true,
+            isLoading: false,
+            scheduleView: ['time'],
+            taskView: false,
+            ...getLocalizationSettings(),
         });
+
+        this.calendar.on('clickSchedule', (event: any) => {
+            this.contentSelected = event.schedule.raw;
+            this.contentDialog.show();
+
+            this.changeDetector.detectChanges();
+        });
+
+        this.calendar.on('clickDayname', (event: any) => {
+            if (this.calendar.getViewName() === 'week') {
+                this.calendar.setDate(new Date(event.date));
+
+                this.changeView('day');
+            }
+        });
+
+        this.load();
     }
 
     @HostListener('click', ['$event'])

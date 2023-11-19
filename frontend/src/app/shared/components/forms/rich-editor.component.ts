@@ -110,64 +110,66 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         }
     }
 
-    public ngAfterViewInit() {
-        this.resourceLoader.loadLocalStyle('editor/squidex-editor.css');
-        this.resourceLoader.loadLocalScript('editor/squidex-editor.js').then(() => {
-            this.editorWrapper = new SquidexEditorWrapper(this.editor.nativeElement, {
-                value: this.value || '',
-                isDisabled: this.snapshot.isDisabled,
-                onSelectAIText: async () => {
-                    if (this.snapshot.isDisabled) {
-                        return;
-                    }
+    public async ngAfterViewInit() {
+        await Promise.all([
+            this.resourceLoader.loadLocalStyle('editor/squidex-editor.css'),
+            this.resourceLoader.loadLocalScript('editor/squidex-editor.js'),
+        ]);
 
-                    this.currentChat = new ResolvablePromise<string | undefined | null>();
-                    this.chatDialog.show();
+        this.editorWrapper = new SquidexEditorWrapper(this.editor.nativeElement, {
+            onSelectAIText: async () => {
+                if (this.snapshot.isDisabled) {
+                    return;
+                }
 
-                    return await this.currentChat.promise;
-                },
-                onSelectAssets: async () => {
-                    if (this.snapshot.isDisabled) {
-                        return;
-                    }
+                this.currentChat = new ResolvablePromise<string | undefined | null>();
+                this.chatDialog.show();
 
-                    this.currentAssets = new ResolvablePromise<any>();
-                    this.assetsDialog.show();
+                return await this.currentChat.promise;
+            },
+            onSelectAssets: async () => {
+                if (this.snapshot.isDisabled) {
+                    return;
+                }
 
-                    return await this.currentAssets.promise;
-                },
-                onSelectContents: async () => {
-                    if (this.snapshot.isDisabled) {
-                        return;
-                    }
+                this.currentAssets = new ResolvablePromise<any>();
+                this.assetsDialog.show();
 
-                    this.currentContents = new ResolvablePromise<any>();
-                    this.contentsDialog.show();
+                return await this.currentAssets.promise;
+            },
+            onSelectContents: async () => {
+                if (this.snapshot.isDisabled) {
+                    return;
+                }
 
-                    return await this.currentContents.promise;
-                },
-                onUpload: (requests: UploadRequest[]) => {
-                    return this.uploadFiles(requests);
-                },
-                onChange: (value: string | undefined) => {
-                    this.callChange(value);
-                },
-                onEditContent: (schemaName, id) => {
-                    const url = this.apiUrl.buildUrl(`/app/${this.appsState.appName}/content/${schemaName}/${id}`);
+                this.currentContents = new ResolvablePromise<any>();
+                this.contentsDialog.show();
 
-                    window.open(url, '_blank');
-                },
-                onEditAsset: id => {
-                    this.assetId.next(id);
-                },
-                appName: this.appsState.appName,
-                baseUrl: this.apiUrl.buildUrl(''),
-                canSelectAIText: this.hasChatBot,
-                canSelectAssets: true,
-                canSelectContents: !!this.schemaIds,
-                classNames: this.classNames,
-                mode: this.mode,
-            });
+                return await this.currentContents.promise;
+            },
+            onUpload: (requests: UploadRequest[]) => {
+                return this.uploadFiles(requests);
+            },
+            onChange: (value: string | undefined) => {
+                this.callChange(value);
+            },
+            onEditContent: (schemaName, id) => {
+                const url = this.apiUrl.buildUrl(`/app/${this.appsState.appName}/content/${schemaName}/${id}`);
+
+                window.open(url, '_blank');
+            },
+            onEditAsset: id => {
+                this.assetId.next(id);
+            },
+            mode: this.mode,
+            appName: this.appsState.appName,
+            baseUrl: this.apiUrl.buildUrl(''),
+            canSelectAIText: this.hasChatBot,
+            canSelectAssets: true,
+            canSelectContents: !!this.schemaIds,
+            classNames: this.classNames,
+            isDisabled: this.snapshot.isDisabled,
+            value: this.value || '',
         });
     }
 
