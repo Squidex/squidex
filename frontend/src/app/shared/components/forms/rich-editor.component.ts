@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BehaviorSubject, catchError, of, switchMap } from 'rxjs';
-import { ModalDirective } from '@app/framework';
+import { ModalDirective, TypedSimpleChanges } from '@app/framework';
 import { ApiUrlConfig, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
 import { AssetDialogComponent } from '../assets/asset-dialog.component';
 import { AssetSelectorComponent } from '../assets/asset-selector.component';
@@ -40,7 +40,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {
     private readonly assetId = new BehaviorSubject<string | null>(null);
-    private editorWrapper: any;
+    private editorWrapper?: SquidexEditorWrapper;
     private value?: string;
     private currentContents?: ResolvablePromise<any>;
     private currentAssets?: ResolvablePromise<any>;
@@ -49,8 +49,23 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     @Output()
     public assetPluginClick = new EventEmitter<any>();
 
+    @Output()
+    public annotationsCreate = new EventEmitter<AnnotationSelection>();
+
+    @Output()
+    public annotationsUpdate = new EventEmitter<ReadonlyArray<Annotation>>();
+
+    @Output()
+    public annotationsSelect = new EventEmitter<ReadonlyArray<string>>();
+
     @Input({ required: true })
     public hasChatBot = false;
+
+    @Input()
+    public hasAnnotations = false;
+
+    @Input()
+    public annotations?: ReadonlyArray<Annotation> | null;
 
     @Input()
     public schemaIds?: ReadonlyArray<string>;
@@ -106,7 +121,13 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     public ngOnDestroy() {
         if (this.editorWrapper) {
             this.editorWrapper.destroy?.();
-            this.editorWrapper = null;
+            this.editorWrapper = undefined;
+        }
+    }
+
+    public ngOnChanges(changes: TypedSimpleChanges<RichEditorComponent>) {
+        if (changes.annotations) {
+            this.editorWrapper?.setAnnotations(this.annotations);
         }
     }
 
@@ -153,17 +174,28 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
             onChange: (value: string | undefined) => {
                 this.callChange(value);
             },
+            onEditAsset: id => {
+                this.assetId.next(id);
+            },
+            onAnnotationCreate: event => {
+                this.annotationsCreate.emit(event);
+            },
+            onAnnotationsUpdate: event => {
+                this.annotationsUpdate.emit(event);
+            },
+            onAnnotationsFocus: event => {
+                this.annotationsSelect.emit(event);
+            },
             onEditContent: (schemaName, id) => {
                 const url = this.apiUrl.buildUrl(`/app/${this.appsState.appName}/content/${schemaName}/${id}`);
 
                 window.open(url, '_blank');
             },
-            onEditAsset: id => {
-                this.assetId.next(id);
-            },
             mode: this.mode,
+            annotations: this.annotations,
             appName: this.appsState.appName,
             baseUrl: this.apiUrl.buildUrl(''),
+            canAddAnnotation: this.hasAnnotations,
             canSelectAIText: this.hasChatBot,
             canSelectAssets: true,
             canSelectContents: !!this.schemaIds,

@@ -156,18 +156,19 @@
 
             <ng-container *ngIf="!content || (contentTab | async) === 'editor'">
                 <sqx-content-editor
-                    (loadLatest)="loadLatest()"
-                    [(language)]="language"
+                    [(contentId)]="contentId"
                     [isNew]="!content"
                     [isDeleted]="content?.isDeleted"
                     [contentForm]="contentForm"
                     [contentFormCompare]="contentFormCompare"
                     [contentVersion]="contentVersion"
                     [formContext]="formContext"
+                    [language]="language"
+                    (languageChange)="language = $event"
                     [languages]="languages"
+                    (loadLatest)="loadLatest()"
                     [schema]="schema"
-                    [showIdInput]="showIdInput"
-                    [(contentId)]="contentId">
+                    [showIdInput]="showIdInput">
                 </sqx-content-editor>
             </ng-container>
         </ng-container>

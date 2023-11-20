@@ -106,11 +106,11 @@ export class CollaborationService {
     }
 
     public getArray<T>(name: string) {
-        return this.provider.pipe(map(p => new SharedArray<T>(p?.doc.getArray(name))));
+        return this.provider.pipe(map(p => new SharedArray<T>(p?.doc, p?.doc.getArray(name))));
     }
 
     public getMap<T>(name: string) {
-        return this.provider.pipe(map(p => new SharedMap<T>(p?.doc.getMap(name))));
+        return this.provider.pipe(map(p => new SharedMap<T>(p?.doc, p?.doc.getMap(name))));
     }
 
     public updateAwareness(key: string, value: any) {
@@ -130,7 +130,8 @@ export class SharedMap<T> {
     }
 
     constructor(
-        private readonly source: Y.Map<T> | undefined,
+        public readonly doc: Y.Doc | undefined,
+        public readonly source: Y.Map<T> | undefined,
     ) {
         this.value$ = new BehaviorSubject(source?.toJSON() || {});
 
@@ -160,7 +161,8 @@ export class SharedArray<T> {
     }
 
     constructor(
-        private readonly source: Y.Array<T> | undefined,
+        public readonly doc: Y.Doc | undefined,
+        public readonly source: Y.Array<T> | undefined,
     ) {
         this.items$ = new BehaviorSubject<ReadonlyArray<T>>(source?.toJSON() || []);
 

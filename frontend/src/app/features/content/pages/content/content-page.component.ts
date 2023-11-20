@@ -11,7 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, ConfirmClickDirective, ContentDto, ContentsState, defined, DialogService, DropdownMenuComponent, EditContentForm, LanguageSelectorComponent, LanguagesState, LayoutComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, TempService, TitleComponent, ToolbarComponent, ToolbarService, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types, Version, WatchingUsersComponent } from '@app/shared';
+import { AnnotationCreate, AnnotationCreateAfterNavigate, AnnotationsSelect, AnnotationsSelectAfterNavigate, ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, CommentsState, ConfirmClickDirective, ContentDto, ContentsState, defined, DialogService, DropdownMenuComponent, EditContentForm, LanguageSelectorComponent, LanguagesState, LayoutComponent, LocalStoreService, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, TempService, TitleComponent, ToolbarComponent, ToolbarService, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types, Version, WatchingUsersComponent } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 import { PreviewButtonComponent } from '../../shared/preview-button.component';
 import { ContentEditorComponent } from './editor/content-editor.component';
@@ -25,6 +25,7 @@ import { ContentReferencesComponent } from './references/content-references.comp
     templateUrl: './content-page.component.html',
     providers: [
         CollaborationService,
+        CommentsState,
         ResolveAssets,
         ResolveContents,
         ToolbarService,
@@ -93,6 +94,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
         private readonly autoSaveService: AutoSaveService,
         private readonly collaboration: CollaborationService,
         private readonly dialogs: DialogService,
+        private readonly messageBus: MessageBus,
         private readonly languagesState: LanguagesState,
         private readonly localStore: LocalStoreService,
         private readonly route: ActivatedRoute,
@@ -114,6 +116,30 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
 
     public ngOnInit() {
         this.contentsState.loadIfNotLoaded();
+
+        this.subscriptions.add(
+            this.messageBus.of(AnnotationCreate)
+                .subscribe(async message => {
+                    if (message.annotation) {
+                        await this.router.navigate(['comments'], { relativeTo: this.route });
+                    }
+
+                    setTimeout(() => {
+                        this.messageBus.emit(new AnnotationCreateAfterNavigate(message.editorId, message.annotation));
+                    });
+                }));
+
+        this.subscriptions.add(
+            this.messageBus.of(AnnotationsSelect)
+                .subscribe(async message => {
+                    if (message.annotations.length > 0) {
+                        await this.router.navigate(['comments'], { relativeTo: this.route });
+                    }
+
+                    setTimeout(() => {
+                        this.messageBus.emit(new AnnotationsSelectAfterNavigate(message.annotations));
+                    });
+                }));
 
         this.subscriptions.add(
             this.languagesState.isoMasterLanguage

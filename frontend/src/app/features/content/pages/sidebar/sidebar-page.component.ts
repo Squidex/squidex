@@ -8,7 +8,6 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { ContentsState, defined, LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 
@@ -28,14 +27,14 @@ export class SidebarPageComponent {
     public url = combineLatest([
         this.schemasState.selectedSchema.pipe(defined()),
         this.contentsState.selectedContent,
-    ]).pipe(map(([schema, content]) => {
+    ], (schema, content) => {
         const url =
             content ?
             schema.properties.contentSidebarUrl :
             schema.properties.contentsSidebarUrl;
 
         return url;
-    }));
+    });
 
     constructor(
         public readonly contentsState: ContentsState,

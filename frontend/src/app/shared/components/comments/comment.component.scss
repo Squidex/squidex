@@ -4,7 +4,7 @@
 /* stylelint-disable no-descending-specificity */
 
 .actions {
-    @include absolute(-5px, -15px, auto, auto);
+    @include absolute(0, 0, auto, auto);
     background: $color-white;
     border: 0;
     border-radius: 0;
@@ -34,31 +34,51 @@
 }
 
 .comment {
-    font-size: $font-small;
+    background-color: $color-white;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    font-size: .85rem;
     font-weight: normal;
     line-height: 1.25rem;
-    margin: 0;
-    margin-bottom: .75rem;
+    margin-top: 0;
+    margin-bottom: .25rem;
+    padding: .5rem;
+    padding-top: .375rem;
     position: relative;
 
-    &-message {
-        margin-bottom: .375rem;
+    &.reply {
+        margin-bottom: .75rem;
+        padding: 0;
+        padding-left: 1.5rem;
+    }
+
+    &.selected {
+        border-color: $color-theme-brand;
     }
 
     &-created {
         font-size: $font-small;
     }
 
-    &:hover {
-        .actions {
-            display: block;
+    &-text {
+        &:hover {
+            .actions {
+                display: block;
+            }
         }
     }
 }
 
+.replies {
+    border-top: 1px solid $color-border;
+    margin-bottom: 0;
+    margin-top: .5rem;
+    padding-top: .5rem;
+}
+
 :host {
     &:last-child {
-        .comment {
+        & > .comment {
             margin-bottom: 0;
         }
     }

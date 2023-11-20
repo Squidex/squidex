@@ -50,7 +50,7 @@ export * from './state/backups.forms';
 export * from './state/backups.state';
 export * from './state/clients.forms';
 export * from './state/clients.state';
-export * from './state/comments';
+export * from './state/comments.state';
 export * from './state/comments.form';
 export * from './state/contents.forms-helpers';
 export * from './state/contents.forms.visitors';

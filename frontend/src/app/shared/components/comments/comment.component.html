@@ -1,28 +1,38 @@
-<div class="comment row g-0">
-    <div class="col-auto pe-2">
-        <img class="user-picture" title="{{comment.user | sqxUserNameRef}}" [src]="comment.user | sqxUserPictureRef">
-    </div>
+<div class="comment row g-0" [class.selected]="commentItem.isSelected" [class.reply]="commentItem.comment.replyTo" [@bounce]="commentItem.isSelected"
+    [sqxScrollActive]="true"
+    [sqxScrollOffset]="20"
+    [sqxScrollContainer]="scrollContainer">
+    <div class="comment-text row g-0" sqxSc *ngIf="snapshot.mode !== 'Edit'"
+        [sqxScrollActive]="commentItem.isSelected"
+        [sqxScrollOffset]="-20"
+        [sqxScrollContainer]="scrollContainer">
+        <div class="col-auto pe-2">
+            <img class="user-picture" title="{{commentItem.comment.user | sqxUserNameRef}}" [src]="commentItem.comment.user | sqxUserPictureRef">
+        </div>
 
-    <ng-container *ngIf="!snapshot.isEditing; else editing">
         <div class="col col-text">
             <div class="comment-message">
                 <div class="user-row">
-                    <div class="user-ref" [title]="comment.user | sqxUserNameRef:null">{{comment.user | sqxUserNameRef:null}}</div>
+                    <div class="user-ref" [title]="commentItem.comment.user | sqxUserNameRef:null">{{commentItem.comment.user | sqxUserNameRef:null}}</div>
                 </div>
     
-                <div [innerHTML]="comment.text | sqxMarkdown | sqxSafeHtml"></div>
+                <div [innerHTML]="commentItem.comment.text | sqxMarkdown | sqxSafeHtml"></div>
     
                 <div class="comment-created text-muted">
-                    <ng-container *ngIf="canFollow && comment.url">
-                        <a [routerLink]="comment.url">{{ 'comments.follow' | sqxTranslate }}</a>&nbsp;
+                    <ng-container *ngIf="canFollow && commentItem.comment.url">
+                        <a [routerLink]="commentItem.comment.url">{{ 'comments.follow' | sqxTranslate }}</a>&nbsp;
                     </ng-container>
     
-                    {{comment.time | sqxFromNow}} 
+                    {{commentItem.comment.time | sqxFromNow}} 
                 </div>
             </div>
         </div>
 
         <div class="actions">
+            <button *ngIf="isEditable && canAnswer" type="button" class="btn btn-sm btn-text-secondary" (click)="startReply()">
+                <i class="icon-enter"></i>
+            </button>
+
             <button *ngIf="isEditable && canEdit" type="button" class="btn btn-sm btn-text-secondary" (click)="startEdit()">
                 <i class="icon-pencil"></i>
             </button>
@@ -36,27 +46,65 @@
                 <i class="icon-bin2"></i>
             </button>
         </div>
+    </div>
+
+    <ng-container *ngIf="snapshot.mode === 'Edit'">
+        <form (ngSubmit)="update()">
+            <textarea class="form-control mb-1" name="{{commentItem.comment}}" [(ngModel)]="editingText"
+                sqxFocusOnInit
+                [mention]="$any(mentionUsers)"
+                [mentionConfig]="mentionConfig"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                (keydown)="updateOnEnter($event)">
+            </textarea>
+
+            <div>
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="icon-enter"></i> {{ 'common.save' | sqxTranslate }}
+                </button>
+
+                <button type="button" class="btn btn-sm btn-text-secondary me-1" (click)="cancelEditOrReply()">
+                    {{ 'common.cancel' | sqxTranslate }}
+                </button>
+            </div>
+        </form>
     </ng-container>
 
-    <ng-template #editing>
-        <div class="col">
-            <form (ngSubmit)="update()">
-                <textarea class="form-control mb-1" name="{{commentIndex}}" sqxFocusOnInit [(ngModel)]="editingText" 
+    <div class="replies" *ngIf="commentItem.replies.length > 0 || snapshot.mode === 'Reply'">
+        <sqx-comment *ngFor="let item of commentItem.replies; trackBy: trackByComment;"
+            canEdit="true"
+            canFollow="false"
+            [commentItem]="item"
+            [comments]="comments"
+            [mentionConfig]="mentionConfig"
+            [mentionUsers]="mentionUsers"
+            [userToken]="userToken">
+        </sqx-comment>
+
+        <ng-container *ngIf="snapshot.mode === 'Reply'">
+            <form [formGroup]="replyForm.form" (ngSubmit)="reply()">
+                <textarea class="form-control mb-1" name="text" formControlName="text"
+                    sqxFocusOnInit
                     [mention]="$any(mentionUsers)"
                     [mentionConfig]="mentionConfig"
-                    (keydown)="updateWhenEnter($event)">
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    (keydown)="replayOnEnter($event)">
                 </textarea>
-    
+
                 <div>
-                    <button type="button" class="btn btn-sm btn-text-secondary me-1" (click)="cancelEdit()">
-                        {{ 'common.cancel' | sqxTranslate }}
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="icon-enter"></i> {{ 'common.reply' | sqxTranslate }}
                     </button>
 
-                    <button type="submit" class="btn btn-sm btn-primary">
-                        <i class="icon-enter"></i> {{ 'common.save' | sqxTranslate }}
+                    <button type="button" class="btn btn-sm btn-text-secondary me-1" (click)="cancelEditOrReply()">
+                        {{ 'common.cancel' | sqxTranslate }}
                     </button>
                 </div>
             </form>
-        </div>
-    </ng-template>
+        </ng-container>
+    </div>
 </div>

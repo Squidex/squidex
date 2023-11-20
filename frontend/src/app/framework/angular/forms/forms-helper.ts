@@ -115,8 +115,7 @@ export function changed$(lhs: AbstractControl, rhs: AbstractControl) {
     return combineLatest([
         value$(lhs),
         value$(rhs),
-    ]).pipe(map(([lhs, rhs]) => !Types.equals(lhs, rhs, true)),
-        distinctUntilChanged());
+    ], (lhs, rhs) => !Types.equals(lhs, rhs, true)).pipe(distinctUntilChanged());
 }
 
 export function touchedChange$(form: AbstractControl) {

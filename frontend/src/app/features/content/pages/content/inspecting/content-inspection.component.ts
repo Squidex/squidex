@@ -50,10 +50,9 @@ export class ContentInspectionComponent implements OnDestroy {
 
     public actualData =
         combineLatest([
-            this.languageChanges$,
+            this.languageChanges$.pipe(filter(x => !!x)),
             this.mode,
         ]).pipe(
-            filter(x => !!x[0]),
             switchMap(([language, mode]) => {
                 if (mode === 'Content') {
                     return of(this.content);

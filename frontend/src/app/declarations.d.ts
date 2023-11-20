@@ -17,6 +17,8 @@ declare class SquidexEditorWrapper {
 
     setIsDisabled(isDisabled: boolean): void;
 
+    setAnnotations(annotations?: ReadonlyArray<Annotation> | null): void;
+
     destroy(): void;
 }
 
@@ -124,8 +126,11 @@ interface EditorProps {
     // Indicates whether content items can be selected.
     canSelectContents?: boolean;
 
+    // Indicates whether annotations can be added.
+    canAddAnnotation?: boolean;
+
     // The annotations.
-    annotations?: ReadonlyArray<Annotation>;
+    annotations?: ReadonlyArray<Annotation> | null;
 }
 
 interface AnnotationSelection {

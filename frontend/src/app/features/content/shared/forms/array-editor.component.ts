@@ -10,7 +10,6 @@ import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { VirtualScrollerComponent, VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
 import { combineLatest, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, disabled$, DropdownMenuComponent, EditContentForm, FieldArrayForm, FormHintComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, ObjectFormBase, SchemaDto, Settings, sorted, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
@@ -107,9 +106,9 @@ export class ArrayEditorComponent {
             this.isDisabledOrFull = combineLatest([
                 this.isDisabled,
                 this.formModel.itemChanges,
-            ]).pipe(map(([disabled, items]) => {
+            ], (disabled, items) => {
                 return disabled || items.length >= maxItems;
-            }));
+            });
         }
 
         if (changes.formModel || changes.formLevel) {
