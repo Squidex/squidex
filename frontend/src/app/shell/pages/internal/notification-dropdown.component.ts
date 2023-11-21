@@ -7,8 +7,9 @@
 
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { map, tap } from 'rxjs/operators';
-import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, getGroupedComments, ModalDirective, ModalModel, ModalPlacementDirective, Subscriptions, TranslatePipe } from '@app/shared';
+import { of } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Subscriptions, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -36,17 +37,14 @@ export class NotificationDropdownComponent implements OnInit {
 
     public modalMenu = new ModalModel();
 
-    public userToken: string;
-
-    public commentItems =
-        this.comments.itemsChanges.pipe(
-            map(items => getGroupedComments(items, [])));
+    public commentUser: string;
+    public commentItems = this.commentsState.getGroupedComments(of([]));
 
     constructor(authService: AuthService,
-        public readonly comments: CommentsState,
+        public readonly commentsState: CommentsState,
         public readonly collaboration: CollaborationService,
     ) {
-        this.userToken = authService.user!.token;
+        this.commentUser = authService.user!.token;
     }
 
     public ngOnInit() {
@@ -55,8 +53,8 @@ export class NotificationDropdownComponent implements OnInit {
         this.subscriptions.add(
             this.modalMenu.isOpenChanges.pipe(
                 tap(_ => {
-                    this.comments.prune(100);
-                    this.comments.markRead();
+                    this.commentsState.prune(100);
+                    this.commentsState.markRead();
                 }),
             ));
     }

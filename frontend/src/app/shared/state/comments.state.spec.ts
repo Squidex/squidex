@@ -12,7 +12,7 @@ import { CollaborationService, SharedArray } from '../internal';
 import { Comment, CommentItem, CommentsState } from './comments.state';
 
 describe('CommentsState', () => {
-    let collaboration: IMock<CollaborationService>;
+    let collaborationSevice: IMock<CollaborationService>;
     let commentsState: CommentsState;
     let sharedArray: SharedArray<Comment>;
 
@@ -22,11 +22,11 @@ describe('CommentsState', () => {
 
         sharedArray = new SharedArray<Comment>(yDoc, yArray);
 
-        collaboration = Mock.ofType<CollaborationService>();
-        collaboration.setup(x => x.getArray<Comment>(It.isAnyString()))
+        collaborationSevice = Mock.ofType<CollaborationService>();
+        collaborationSevice.setup(x => x.getArray<Comment>(It.isAnyString()))
             .returns(() => of(sharedArray));
 
-        commentsState = new CommentsState(collaboration.object);
+        commentsState = new CommentsState(collaborationSevice.object);
     });
 
     it('should get total items', () => {

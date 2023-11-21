@@ -56,10 +56,10 @@ export class CommentsState implements OnDestroy {
     }
 
     constructor(
-        collaborations: CollaborationService,
+        collaboration: CollaborationService,
     )  {
         this.subscription =
-            collaborations.getArray<Comment>('stream')
+            collaboration.getArray<Comment>('stream')
                 .subscribe(comments => {
                     this.comments.next(comments);
                 });

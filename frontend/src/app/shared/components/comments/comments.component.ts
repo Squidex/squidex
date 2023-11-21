@@ -43,21 +43,20 @@ export class CommentsComponent implements OnInit {
     @Input()
     public commentsId = '';
 
-    public userToken = '';
-
     public mentionUsers = this.contributorsState.contributors;
     public mentionConfig: MentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
 
     public commentForm = new UpsertCommentForm();
-    public commentsItems = this.comments.getGroupedComments(this.selection);
+    public commentsItems = this.commentsState.getGroupedComments(this.selection);
+    public commentUser: string;
 
     constructor(authService: AuthService,
-        public readonly comments: CommentsState,
+        public readonly commentsState: CommentsState,
         public readonly router: Router,
         private readonly contributorsState: ContributorsState,
         private readonly messageBus: MessageBus,
     ) {
-        this.userToken = authService.user!.token;
+        this.commentUser = authService.user!.token;
     }
 
     public ngOnInit() {
@@ -82,7 +81,7 @@ export class CommentsComponent implements OnInit {
         if (text && text.length > 0) {
             const { from, to } = this.reference?.annotation || {};
 
-            this.comments.create(this.userToken, text, this.router.url, { editorId: this.reference?.editorId, from, to });
+            this.commentsState.create(this.commentUser, text, this.router.url, { editorId: this.reference?.editorId, from, to });
         }
 
         this.commentForm.submitCompleted();

@@ -2,7 +2,7 @@
     <span class="nav-link dropdown-toggle" (click)="modalMenu.show()">
         <i class="icon-comments"></i>
 
-        <span class="badge rounded-pill badge-danger" *ngIf="comments.unreadCountChanges| async; let unread">{{unread}}</span>
+        <span class="badge rounded-pill badge-danger" *ngIf="commentsState.unreadCountChanges| async; let unread">{{unread}}</span>
     </span>
 </li>
 
@@ -18,10 +18,10 @@
             canDelete="true"
             canFollow="true"
             [commentItem]="item"
-            [comments]="comments"
+            [comments]="commentsState"
             [mentionConfig]="{}"
             [mentionUsers]="undefined"
-            [userToken]="userToken">
+            [userToken]="commentUser">
         </sqx-comment>
     </ng-container>
 </sqx-dropdown-menu>

@@ -17,12 +17,12 @@
             canEdit="true"
             canFollow="false"
             [commentItem]="item"
-            [comments]="comments"
+            [comments]="commentsState"
             [currenUrl]="router.url"
             [mentionConfig]="mentionConfig"
             [mentionUsers]="users"
             [scrollContainer]="'.comments-list'"
-            [userToken]="userToken">
+            [userToken]="commentUser">
         </sqx-comment>
     </div>
 </ng-container>
