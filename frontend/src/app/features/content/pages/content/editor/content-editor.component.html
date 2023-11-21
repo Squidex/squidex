@@ -30,12 +30,13 @@
     <ng-container>
         <div class="cursors" sqxCursors>
             <sqx-content-section *ngFor="let section of contentForm.sections; trackBy: trackBySection"
-                [(language)]="language"
                 [form]="contentForm"
                 [formCompare]="contentFormCompare"
                 [formContext]="formContext"
                 [formLevel]="0"
                 [formSection]="section"
+                [language]="language"
+                (languageChange)="languageChange.emit($event)"
                 [languages]="languages"
                 [schema]="schema">
             </sqx-content-section>

@@ -12,44 +12,52 @@ import * as Y from 'yjs';
 import { AuthService, CollaborationProvider, CollaborationService, UIOptions } from '@app/shared/internal';
 
 describe('CollaborationService', () => {
-    let service: CollaborationService;
-    let provider!: CollaborationProvider;
+    let collaborationService: CollaborationService;
+    let collaborationProvider!: CollaborationProvider;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({ providers: [{ provide: UIOptions, useValue: new UIOptions({}) }] });
-        TestBed.runInInjectionContext(() => {
-            service = new CollaborationService(Mock.ofType<AuthService>().object);
+        TestBed.configureTestingModule({
+            providers: [
+                {
+                    provide: UIOptions,
+                    useValue: new UIOptions({}),
+                },
+            ],
         });
 
-        service.providerFactory = (_, doc) => {
-            provider = { awareness: new Awareness(doc), doc, destroy: () => {} };
+        TestBed.runInInjectionContext(() => {
+            collaborationService = new CollaborationService(Mock.ofType<AuthService>().object);
+        });
 
-            return provider;
+        collaborationService.providerFactory = (_, doc) => {
+            collaborationProvider = { awareness: new Awareness(doc), doc, destroy: () => {} };
+
+            return collaborationProvider;
         };
 
-        service.connect('my-room');
+        collaborationService.connect('my-room');
     });
 
     it('should also get map if disconnected', () => {
-        service.connect(null);
+        collaborationService.connect(null);
 
         let map: any = undefined;
-        service.getMap('map').subscribe(v => map = v);
+        collaborationService.getMap('map').subscribe(v => map = v);
 
         expect(map).toBeDefined();
     });
 
     it('should also get array if disconnected', () => {
-        service.connect(null);
+        collaborationService.connect(null);
 
         let array: any = undefined;
-        service.getArray('array').subscribe(v => array = v);
+        collaborationService.getArray('array').subscribe(v => array = v);
 
         expect(array).toBeDefined();
     });
 
     it('should add to map', () => {
-        const map = service.getMap('map');
+        const map = collaborationService.getMap('map');
 
         let values: Record<string, any> = {};
 
@@ -64,7 +72,7 @@ describe('CollaborationService', () => {
     });
 
     it('should remove from map', () => {
-        const map = service.getMap('map');
+        const map = collaborationService.getMap('map');
 
         let values: Record<string, any> = {};
 
@@ -80,7 +88,7 @@ describe('CollaborationService', () => {
     });
 
     it('should add to array', () => {
-        const array = service.getArray('array');
+        const array = collaborationService.getArray('array');
 
         let items: ReadonlyArray<any> = [];
 
@@ -95,7 +103,7 @@ describe('CollaborationService', () => {
     });
 
     it('should replace in array', () => {
-        const array = service.getArray('array');
+        const array = collaborationService.getArray('array');
 
         let items: ReadonlyArray<any> = [];
 
@@ -111,7 +119,7 @@ describe('CollaborationService', () => {
     });
 
     it('should remove from array', () => {
-        const array = service.getArray('array');
+        const array = collaborationService.getArray('array');
 
         let items: ReadonlyArray<any> = [];
 
@@ -128,11 +136,11 @@ describe('CollaborationService', () => {
 
     it('should provide one awareness per user', () => {
         let users: any[] = [];
-        service.userChanges.subscribe(u => users = u);
+        collaborationService.userChanges.subscribe(u => users = u);
 
-        provider.awareness.setLocalStateField('user', { id: '0', displayName: 'User0' });
-        provider.awareness.setLocalStateField('key1', 101);
-        provider.awareness.setLocalStateField('key2', 102);
+        collaborationProvider.awareness.setLocalStateField('user', { id: '0', displayName: 'User0' });
+        collaborationProvider.awareness.setLocalStateField('key1', 101);
+        collaborationProvider.awareness.setLocalStateField('key2', 102);
 
         setOtherAwareness({
             user: { id: '1', displayName: 'User1' },
@@ -172,6 +180,6 @@ describe('CollaborationService', () => {
 
         otherAwarness.setLocalState(state);
 
-        applyAwarenessUpdate(provider.awareness, encodeAwarenessUpdate(otherAwarness, [otherDoc.clientID], otherAwarness.getStates()), otherAwarness);
+        applyAwarenessUpdate(collaborationProvider.awareness, encodeAwarenessUpdate(otherAwarness, [otherDoc.clientID], otherAwarness.getStates()), otherAwarness);
     }
 });

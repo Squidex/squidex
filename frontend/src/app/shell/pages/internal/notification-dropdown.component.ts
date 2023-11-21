@@ -7,9 +7,9 @@
 
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
-import { AuthService, CollaborationService, Comment, CommentComponent, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, SharedArray, Subscriptions, TranslatePipe } from '@app/shared';
+import { of } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Subscriptions, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -19,6 +19,7 @@ import { AuthService, CollaborationService, Comment, CommentComponent, DropdownM
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         CollaborationService,
+        CommentsState,
     ],
     imports: [
         AsyncPipe,
@@ -36,58 +37,26 @@ export class NotificationDropdownComponent implements OnInit {
 
     public modalMenu = new ModalModel();
 
-    public commentsArray?: SharedArray<Comment>;
-    public commentsUnread!: Observable<number>;
-
-    public userToken: string;
+    public commentUser: string;
+    public commentItems = this.commentsState.getGroupedComments(of([]));
 
     constructor(authService: AuthService,
-        private readonly collaborations: CollaborationService,
+        public readonly commentsState: CommentsState,
+        public readonly collaboration: CollaborationService,
     ) {
-        this.userToken = authService.user!.token;
+        this.commentUser = authService.user!.token;
     }
 
     public ngOnInit() {
-        this.collaborations.connect('users/collaboration');
-
-        const comments$ = this.collaborations.getArray<Comment>('stream');
-
-        this.commentsUnread =
-            comments$.pipe(switchMap(x => x.itemsChanges),
-                map(array => {
-                    return array.filter(x => !x.isRead).length;
-                }));
-
-        this.subscriptions.add(
-            comments$
-                .subscribe(array => {
-                    this.commentsArray = array;
-                }));
+        this.collaboration.connect('users/collaboration');
 
         this.subscriptions.add(
             this.modalMenu.isOpenChanges.pipe(
                 tap(_ => {
-                    this.markRead();
+                    this.commentsState.prune(100);
+                    this.commentsState.markRead();
                 }),
             ));
-    }
-
-    public markRead() {
-        if (!this.commentsArray) {
-            return;
-        }
-
-        const toDelete = this.commentsArray.items.length - 100;
-
-        if (toDelete > 0) {
-            this.commentsArray.remove(0, toDelete);
-        }
-
-        this.commentsArray.items.forEach((item, i) => {
-            if (!item.isRead) {
-                this.commentsArray?.set(i, { ...item, isRead: true });
-            }
-        });
     }
 
     public trackByComment(index: number) {

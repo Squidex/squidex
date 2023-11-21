@@ -13,25 +13,25 @@
 
 .comments {
     &-list {
+        background-color: $color-background;
         flex-grow: 1;
         overflow-x: hidden;
         overflow-y: auto;
-        padding: 1rem;
-        padding-left: 1.5rem;
+        padding: .5rem;
     }
 
-    &-footer {
-        border: 0;
-        border-top: 1px solid $color-border;
+    &-header {
         flex-shrink: 0;
     }
 }
 
 .form-control {
-    border: 0;
+    border-color: $color-white;
+    border-bottom-color: $color-border;
     border-radius: 0;
 
     &:focus {
         box-shadow: none;
+        border-color: $color-theme-brand;
     }
 }

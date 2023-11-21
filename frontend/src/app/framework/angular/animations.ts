@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { animate, AnimationTriggerMetadata, state, style, transition, trigger } from '@angular/animations';
+import { animate, AnimationTriggerMetadata, keyframes, state, style, transition, trigger } from '@angular/animations';
 
 export function buildSlideRightAnimation(name = 'slideRight', timing = '150ms'): AnimationTriggerMetadata {
     return trigger(
@@ -76,6 +76,21 @@ export function buildFadeAnimation(name = 'fade', timing = '150ms'): AnimationTr
     );
 }
 
+export function buildBounceAnimation(name = 'bounce', timing = '150ms'): AnimationTriggerMetadata {
+    return trigger(
+        name, [
+            transition('* => true', [
+                animate(timing, keyframes([
+                    style({ transform: 'translateX(0)' }),
+                    style({ transform: 'translateX(-10px)' }),
+                    style({ transform: 'translateX(0)' }),
+                ])),
+            ]),
+        ],
+    );
+}
+
+export const bounceAnimation = buildBounceAnimation();
 export const fadeAnimation = buildFadeAnimation();
 export const slideAnimation = buildSlideAnimation();
 export const slideRightAnimation = buildSlideRightAnimation();

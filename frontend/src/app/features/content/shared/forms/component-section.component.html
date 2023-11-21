@@ -13,6 +13,7 @@
             [class.col-6]="!isComparing && child.field.properties.isHalfWidth">
             <sqx-field-editor *ngIf="!(child.hiddenChanges | async)"
                 [canUnset]="canUnset"
+                [comments]="null"
                 [form]="form"
                 [formContext]="formContext"
                 [formLevel]="formLevel"

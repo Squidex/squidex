@@ -53,12 +53,10 @@ export class SchemasPageComponent {
 
     public categories =
         combineLatest([
-            value$(this.schemasFilter),
             this.schemas,
             this.schemasState.addedCategories,
-        ], (filter, schemas, categories) => {
-            return getCategoryTree(schemas, categories, filter);
-        });
+            value$(this.schemasFilter),
+        ], getCategoryTree);
 
     constructor(
         public readonly schemasState: SchemasState,

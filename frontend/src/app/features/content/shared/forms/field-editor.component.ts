@@ -9,7 +9,7 @@ import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common'
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AbstractContentForm, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldDto, FormHintComponent, GeolocationEditorComponent, hasNoValue$, IndeterminateValueDirective, MarkdownDirective, MathHelper, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldDto, FormHintComponent, GeolocationEditorComponent, hasNoValue$, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -70,6 +70,9 @@ export class FieldEditorComponent {
     @Output()
     public expandedChange = new EventEmitter();
 
+    @Input()
+    public comments?: CommentsState | null;
+
     @Input({ required: true })
     public hasChatBot!: boolean;
 
@@ -111,6 +114,8 @@ export class FieldEditorComponent {
 
     public chatDialog = new DialogModel();
 
+    public annotations?: Observable<ReadonlyArray<Annotation>>;
+
     public get field() {
         return this.formModel.field;
     }
@@ -119,9 +124,18 @@ export class FieldEditorComponent {
         return this.formModel.form;
     }
 
+    constructor(
+        private readonly messageBus: MessageBus,
+    ) {
+    }
+
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.formModel) {
             this.isEmpty = hasNoValue$(this.formModel.form);
+        }
+
+        if (changes.formModel || changes.comments) {
+            this.annotations = this.comments?.getAnnotations(this.formModel.fieldPath);
         }
     }
 
@@ -143,6 +157,18 @@ export class FieldEditorComponent {
 
     public toggleExpanded() {
         this.isExpanded = !this.isExpanded;
+    }
+
+    public annotationCreate(annotation: AnnotationSelection) {
+        this.messageBus.emit(new AnnotationCreate(this.formModel.fieldPath, annotation));
+    }
+
+    public annotationsSelect(annotation: ReadonlyArray<string>) {
+        this.messageBus.emit(new AnnotationsSelect(annotation));
+    }
+
+    public annotationsUpdate(annotations: ReadonlyArray<Annotation>) {
+        this.comments?.updateAnnotations(this.formModel.fieldPath, annotations);
     }
 
     public unset() {
