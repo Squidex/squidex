@@ -10,7 +10,7 @@
     <ProjectReference Include="..\..\src\Squidex.Web\Squidex.Web.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="6.15.0" />
+    <PackageReference Include="Algolia.Search" Version="6.16.0" />
     <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.0.0" />
     <PackageReference Include="Azure.Search.Documents" Version="11.5.0" />
     <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.3.0" />

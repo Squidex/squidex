@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
     <PackageReference Include="Notifo.SDK" Version="1.7.4" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.CLI.Core" Version="11.3.0" />
+    <PackageReference Include="Squidex.CLI.Core" Version="12.1.0" />
     <PackageReference Include="Squidex.YDotNet.Extensions" Version="0.2.9" />
     <PackageReference Include="Squidex.YDotNet.Server" Version="0.2.9" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />

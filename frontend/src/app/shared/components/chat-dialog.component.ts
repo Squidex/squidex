@@ -49,9 +49,6 @@ export class ChatDialogComponent extends StatefulComponent<State> {
     @Input({ required: true, transform: booleanAttribute })
     public showFormatHint = false;
 
-    @ViewChild('scrollContainer', { static: false })
-    public scrollContainer!: ElementRef<HTMLDivElement>;
-
     @ViewChild('input', { static: false })
     public input!: ElementRef<HTMLInputElement>;
 
@@ -67,14 +64,6 @@ export class ChatDialogComponent extends StatefulComponent<State> {
             chatQuestion: '',
             chatTalk: [],
         });
-    }
-
-    public scrollDown() {
-        if (this.scrollContainer && this.scrollContainer.nativeElement) {
-            const height = this.scrollContainer.nativeElement.scrollHeight;
-
-            this.scrollContainer.nativeElement.scrollTop = height;
-        }
     }
 
     public setQuestion(chatQuestion: string) {
