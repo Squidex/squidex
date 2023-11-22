@@ -1,5 +1,5 @@
-import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
+import { defineConfig, devices } from '@playwright/test';
 
 export const TEMPORARY_PATH = path.join(__dirname, 'playwright/.temp');
 
@@ -35,44 +35,44 @@ export default defineConfig({
     projects: [
         {
             name: 'login',
-            testMatch: 'tests/given-login/_setup.ts'
+            testMatch: 'tests/given-login/_setup.ts',
         },
-        
+
         {
             name: 'app',
             testMatch: 'tests/given-app/_setup.ts',
             dependencies: ['login'],
-            use: { 
+            use: {
                 storageState: STORAGE_STATE,
-            }
+            },
         },
 
         {
             name: 'given login',
             testMatch: 'tests/given-login/*.spec.ts',
             dependencies: ['login'],
-            use: { 
+            use: {
                 ...devices['Desktop Chrome'],
                 storageState: STORAGE_STATE,
-            }
+            },
         },
 
         {
             name: 'given app',
             testMatch: 'tests/given-app/*.spec.ts',
             dependencies: ['app'],
-            use: { 
+            use: {
                 ...devices['Desktop Chrome'],
                 storageState: STORAGE_STATE,
-            }
+            },
         },
 
         {
             name: 'logged out',
             testMatch: 'tests/*.spec.ts',
-            use: { 
-                ...devices['Desktop Chrome']
-            }
+            use: {
+                ...devices['Desktop Chrome'],
+            },
         },
     ],
 });
