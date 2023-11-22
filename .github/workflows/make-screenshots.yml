@@ -3,6 +3,9 @@ concurrency: build
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'playwright'
 
 jobs:
   build_test:
