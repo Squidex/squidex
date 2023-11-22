@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('login', async ({ page }, testInfo) => {
-    try {
+test('login', async ({ page }) => {
     await page.goto('/');
 
     // Start waiting for popup before clicking.
@@ -21,12 +20,6 @@ test('login', async ({ page }, testInfo) => {
     await page.waitForURL(/app/);
 
     await expect(page).toHaveTitle(/Apps/);
-    } finally {
-        await testInfo.attach('login.png', {
-            body: await page.screenshot(),
-            contentType: 'image/png',
-        });
-    }
 });
 
 test('visual test', async ({ page }) => {

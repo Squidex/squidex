@@ -30,5 +30,6 @@ async function getPath(name: string) {
     const fullPath = path.join(TEMPORARY_PATH, `${name}.json`);
 
     await fs.mkdir(TEMPORARY_PATH, { recursive: true });
+
     return fullPath;
 }
