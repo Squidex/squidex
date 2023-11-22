@@ -57,9 +57,6 @@ export class ArrayItemComponent {
     @Input({ required: true })
     public formModel!: ObjectFormBase;
 
-    @Input({ transform: booleanAttribute })
-    public canUnset?: boolean | null;
-
     @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 

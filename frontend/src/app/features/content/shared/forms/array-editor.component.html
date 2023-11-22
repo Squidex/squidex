@@ -11,7 +11,6 @@
             [class.first]="isFirst"
             [class.last]="isLast">
             <sqx-array-item
-                [canUnset]="canUnset"
                 (clone)="addCopy(itemForm)"
                 [form]="form"
                 [formContext]="formContext"
@@ -28,7 +27,7 @@
                 [hasChatBot]="hasChatBot"
                 [language]="language"
                 [languages]="languages">
-                <i cdkDragHandle class="icon-drag2" [class.hidden]="isDisabled | async"></i>
+                <i cdkDragHandle class="icon-drag2" [class.disabled]="isDisabled | async"></i>
             </sqx-array-item>
         </div>
     </div>
@@ -39,7 +38,6 @@
                 [class.first]="scroll.viewPortInfo.startIndexWithBuffer + i === 0"
                 [class.last]="scroll.viewPortInfo.startIndexWithBuffer + i === items.length - 1">
                 <sqx-array-item
-                    [canUnset]="canUnset"
                     (clone)="addCopy(itemForm)"
                     [form]="form"
                     [formContext]="formContext"

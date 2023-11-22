@@ -9,7 +9,7 @@ import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common'
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldDto, FormHintComponent, GeolocationEditorComponent, hasNoValue$, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FieldDto, FormHintComponent, GeolocationEditorComponent, hasNoValue$, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -100,9 +100,6 @@ export class FieldEditorComponent {
     @Input({ required: true, transform: booleanAttribute })
     public isComparing = false;
 
-    @Input({ transform: booleanAttribute })
-    public canUnset?: boolean | null;
-
     @Input()
     public displaySuffix = '';
 
@@ -111,6 +108,7 @@ export class FieldEditorComponent {
 
     public isEmpty?: Observable<boolean>;
     public isExpanded = false;
+    public isDisabled?: Observable<boolean>;
 
     public chatDialog = new DialogModel();
 
@@ -132,6 +130,7 @@ export class FieldEditorComponent {
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.formModel) {
             this.isEmpty = hasNoValue$(this.formModel.form);
+            this.isDisabled = disabled$(this.formModel.form);
         }
 
         if (changes.formModel || changes.comments) {

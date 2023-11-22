@@ -59,9 +59,6 @@ export class ArrayEditorComponent {
     @Input({ transform: booleanAttribute })
     public isExpanded = false;
 
-    @Input({ transform: booleanAttribute })
-    public canUnset?: boolean | null;
-
     @Input({ required: true })
     public language!: AppLanguageDto;
 

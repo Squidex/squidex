@@ -6,10 +6,10 @@
  */
 
 import { Routes } from '@angular/router';
-import { HelpComponent, UsersService } from '@app/shared';
+import { HelpComponent } from '@app/shared';
 import { AdministrationAreaComponent } from './administration-area.component';
 import { userMustExistGuard } from './guards/user-must-exist.guard';
-import { EventConsumersService, EventConsumersState, UsersState } from './internal';
+import { EventConsumersService, EventConsumersState, UsersService, UsersState } from './internal';
 import { EventConsumersPageComponent } from './pages/event-consumers/event-consumers-page.component';
 import { RestorePageComponent } from './pages/restore/restore-page.component';
 import { UserPageComponent } from './pages/users/user-page.component';

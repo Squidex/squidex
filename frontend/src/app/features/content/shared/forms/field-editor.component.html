@@ -1,5 +1,5 @@
 <div class="field" [class.expanded]="isExpanded" *ngIf="formModel">
-    <div class="buttons-container" *ngIf="canUnset">
+    <div class="buttons-container" *ngIf="!(isDisabled | async)">
         <div class="buttons">
             <button *ngIf="hasChatBot" type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" tabindex="-1">
                 AI
@@ -48,7 +48,6 @@
 			<ng-container [ngSwitch]="field.properties.fieldType">
                 <ng-container *ngSwitchCase="'Array'">
                     <sqx-array-editor
-                        [canUnset]="canUnset"
                         [form]="form"
                         [formLevel]="formLevel"
                         [formModel]="$any(formModel)"
@@ -78,7 +77,6 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'Component'">
                     <sqx-component
-                        [canUnset]="canUnset"
                         [form]="form"
                         [formContext]="formContext"
                         [formLevel]="formLevel"
@@ -91,7 +89,6 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'Components'">
                     <sqx-array-editor
-                        [canUnset]="canUnset"
                         [form]="form"
                         [formLevel]="formLevel"
                         [formModel]="$any(formModel)"

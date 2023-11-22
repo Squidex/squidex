@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/no-input-rename */
 
 import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input, numberAttribute, Renderer2 } from '@angular/core';
-import { Types } from '../internal';
+import { TypedSimpleChanges, Types } from '../internal';
 
 @Directive({
     selector: '[sqxScrollActive]',
@@ -34,8 +34,10 @@ export class ScrollActiveDirective implements AfterViewInit {
         this.check();
     }
 
-    public ngOnChanges() {
-        this.check();
+    public ngOnChanges(changes: TypedSimpleChanges<ScrollActiveDirective>) {
+        if (changes.isActive) {
+            this.check();
+        }
     }
 
     private check() {

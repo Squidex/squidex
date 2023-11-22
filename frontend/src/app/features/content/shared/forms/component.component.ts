@@ -35,9 +35,6 @@ export class ComponentComponent {
     @Input({ required: true })
     public hasChatBot!: boolean;
 
-    @Input({ transform: booleanAttribute })
-    public canUnset?: boolean | null;
-
     @Input({ required: true })
     public form!: EditContentForm;
 

@@ -53,9 +53,6 @@ export class ComponentSectionComponent {
     @Input({ transform: numberAttribute })
     public index: number | null | undefined;
 
-    @Input({ transform: booleanAttribute })
-    public canUnset?: boolean | null;
-
     @ViewChildren(FieldEditorComponent)
     public editors!: QueryList<FieldEditorComponent>;
 
