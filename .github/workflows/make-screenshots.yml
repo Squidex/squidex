@@ -1,0 +1,57 @@
+name: Screenshot
+concurrency: build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare - Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: Prepare - Setup QEMU
+        uses: docker/setup-qemu-action@v3.0.0
+
+      - name: Prepare - Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3.0.0
+
+      - name: Prepare - Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build - BUILD
+        uses: docker/build-push-action@v5.1.0
+        with:
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: squidex-local
+
+      - name: Test - Start Compose
+        run: docker-compose up -d
+        working-directory: tools/TestSuite
+
+      - name: Test - Install Playwright Dependencies
+        run: npm ci
+        working-directory: './tools/e2e'
+
+      - name: Test - Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: './tools/e2e'
+
+      - name: Test - Run Playwright Tests
+        run: npx playwright test --update-snapshots
+        working-directory: './tools/e2e'
+        env:
+          BASE__URL: http://localhost:8080
+
+      - name: Test - Upload Playwright Artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: snapshots
+          path: tools/e2e/snapshots/
+          retention-days: 30
