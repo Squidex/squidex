@@ -27,8 +27,8 @@ services:
       - STORE__MONGODB__CONTENTDATABASE=squidex1_content
       - STORE__MONGODB__DATABASE=squidex1
       - TEMPLATES__LOCALURL=http://localhost:5000
-      - UI__HIDENEWS=false
-      - UI__HIDEONBOARDING=false
+      - UI__HIDENEWS=true
+      - UI__HIDEONBOARDING=true
       - URLS__BASEURL=http://localhost:8080
     networks:
       - internal
@@ -56,8 +56,8 @@ services:
       - STORE__MONGODB__DATABASE=squidex2
       - STORE__TYPE=MongoDB
       - TEMPLATES__LOCALURL=http://localhost:8081
-      - UI__HIDENEWS=false
-      - UI__HIDEONBOARDING=false
+      - UI__HIDENEWS=true
+      - UI__HIDEONBOARDING=true
       - URLS__BASEURL=http://localhost:8081/squidex/
       - URLS__BASEPATH=squidex/
     networks:
@@ -87,8 +87,8 @@ services:
       - STORE__MONGODB__DATABASE=squidex3
       - STORE__TYPE=MongoDB
       - TEMPLATES__LOCALURL=http://localhost:8082
-      - UI__HIDENEWS=false
-      - UI__HIDEONBOARDING=false
+      - UI__HIDENEWS=true
+      - UI__HIDEONBOARDING=true
       - URLS__BASEURL=http://localhost:8082
     networks:
       - internal
