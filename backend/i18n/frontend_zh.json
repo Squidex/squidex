@@ -350,6 +350,7 @@
   "common.notSupported": "Not Supported",
   "common.noValue": "- 无值 -",
   "common.openAPI": "Open API",
+  "common.options": "Options",
   "common.or": "或",
   "common.pagerInfo": "{itemFirst}-{itemLast} 的 {numberOfItems}",
   "common.pagerInfoNoTotal": "{itemFirst}-{itemLast} of total?",

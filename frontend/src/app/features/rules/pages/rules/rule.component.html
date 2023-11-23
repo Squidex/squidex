@@ -13,6 +13,7 @@
             </div>
             <div class="col-auto" [class.invisible]="!rule.canDelete && !rule.canRun">
                 <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" #buttonOptions>
+                    <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
                     <i class="icon-dots"></i>
                 </button>
         

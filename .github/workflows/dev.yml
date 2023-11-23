@@ -6,7 +6,6 @@ on:
     branches:
       - 'master'
       - 'release/*'
-      - 'playwright'
   pull_request:
     branches:
       - 'master'

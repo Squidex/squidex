@@ -13,6 +13,7 @@
     </td>
     <td class="cell-actions">
         <button type="button" class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" (click)="expandedChange.emit()">
+            <span class="hidden">{{ 'common.settings' | sqxTranslate }}</span>
             <i class="icon-settings"></i>
         </button>
     </td>

@@ -3,9 +3,15 @@ import path from 'path';
 import { TEMPORARY_PATH } from '../playwright.config';
 
 export function getRandomId() {
-    const id = new Date().getTime().toString();
+    const result = new Date().getTime().toString();
 
-    return id;
+    return result;
+}
+
+export function escapeRegex(string: string) {
+    const result = string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+
+    return result;
 }
 
 export async function writeJsonAsync(name: string, json: any) {

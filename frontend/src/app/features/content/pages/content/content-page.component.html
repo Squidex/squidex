@@ -64,6 +64,7 @@
 
                     <ng-container *ngIf="content?.canDelete">
                         <button type="button" class="btn btn-outline-secondary ms-2" (click)="dropdown.toggle()" #buttonOptions>
+                            <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
                             <i class="icon-dots"></i>
                         </button>
 

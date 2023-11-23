@@ -350,6 +350,7 @@
   "common.notSupported": "Not Supported",
   "common.noValue": "- Geen waarde -",
   "common.openAPI": "Open API",
+  "common.options": "Options",
   "common.or": "of",
   "common.pagerInfo": "{itemFirst} - {itemLast} van {numberOfItems}",
   "common.pagerInfoNoTotal": "{itemFirst}-{itemLast} of total?",

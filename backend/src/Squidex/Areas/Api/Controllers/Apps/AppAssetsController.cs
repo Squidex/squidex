@@ -47,7 +47,7 @@ public sealed class AppAssetsController : ApiController
     }
 
     /// <summary>
-    /// Update the app asset scripts.
+    /// Update the asset scripts.
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
     /// <param name="request">The values to update.</param>
