@@ -3,12 +3,9 @@ concurrency: build
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 'playwright'
 
 jobs:
-  build_test:
+  screenshot:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare - Checkout
