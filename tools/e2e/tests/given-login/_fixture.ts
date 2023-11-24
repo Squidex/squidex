@@ -1,4 +1,11 @@
-import { test as base } from '@playwright/test';
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
+import { test as base } from '../_fixture';
 
 type LoginFixture = {
     userEmail: string;

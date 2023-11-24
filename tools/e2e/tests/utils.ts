@@ -1,3 +1,10 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
 import fs from 'fs/promises';
 import path from 'path';
 import { TEMPORARY_PATH } from '../playwright.config';

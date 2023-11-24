@@ -281,14 +281,6 @@ hr {
     display: none !important;
 }
 
-.disabled {
-    pointer-events: none;
-
-    & {
-        opacity: .5;
-    }
-}
-
 // Hidden helper (fast *ngIf replacement)
 .invisible {
     visibility: hidden;

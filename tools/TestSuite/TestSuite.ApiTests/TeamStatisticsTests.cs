@@ -5,37 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Net;
 using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
-#pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
 namespace TestSuite.ApiTests;
 
-public class StatisticsTests : IClassFixture<CreatedAppFixture>
+public class TeamStatisticsTests : IClassFixture<CreatedTeamFixture>
 {
-    public CreatedAppFixture _ { get; }
+    public CreatedTeamFixture _ { get; }
 
-    public StatisticsTests(CreatedAppFixture fixture)
+    public TeamStatisticsTests(CreatedTeamFixture fixture)
     {
         _ = fixture;
-    }
-
-    [Fact]
-    public async Task Should_get_logs()
-    {
-        // STEP 1: Get initial log response.
-        var log = await _.Client.Statistics.GetLogAsync();
-
-
-        // STEP 2: Download log.
-        var httpClient = _.Client.CreateHttpClient();
-
-        var response = await httpClient.GetAsync(log.DownloadUrl);
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal("text/csv", response.Content.Headers.GetValues("Content-Type").First());
     }
 
     [Fact]
@@ -45,7 +27,7 @@ public class StatisticsTests : IClassFixture<CreatedAppFixture>
         var dateFrom = DateTimeOffset.UtcNow.AddDays(-30);
         var dateTo = DateTimeOffset.UtcNow;
 
-        var result = await _.Client.Statistics.GetUsagesAsync(dateFrom, dateTo);
+        var result = await _.Client.Statistics.GetUsagesForTeamAsync(_.TeamId, dateFrom, dateTo);
 
         Assert.NotNull(result);
     }
@@ -57,16 +39,16 @@ public class StatisticsTests : IClassFixture<CreatedAppFixture>
         var dateFrom = DateTimeOffset.UtcNow.AddDays(-30);
         var dateTo = DateTimeOffset.UtcNow;
 
-        var result = await _.Client.Statistics.GetStorageSizesAsync(dateFrom, dateTo);
+        var result = await _.Client.Statistics.GetStorageSizesForTeamAsync(_.TeamId, dateFrom, dateTo);
 
         Assert.NotNull(result);
     }
 
     [Fact]
-    public async Task Should_get_current_storage_size()
+    public async Task Should_get_current_storage_size_for()
     {
         // STEP 1: Get statistics.
-        var result = await _.Client.Statistics.GetCurrentStorageSizeAsync();
+        var result = await _.Client.Statistics.GetTeamCurrentStorageSizeForTeamAsync(_.TeamId);
 
         Assert.NotNull(result);
     }

@@ -1,3 +1,10 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
 import { STORAGE_STATE } from '../../playwright.config';
 import { test as setup } from './_fixture';
 

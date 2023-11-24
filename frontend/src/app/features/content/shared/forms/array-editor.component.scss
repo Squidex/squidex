@@ -19,6 +19,14 @@ virtual-scroller {
     }
 }
 
+.disabled {
+    pointer-events: none;
+
+    & {
+        opacity: .5;
+    }
+}
+
 .static {
     padding-bottom: .375rem;
     padding-top: .375rem;

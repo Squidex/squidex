@@ -9,22 +9,28 @@ using Squidex.ClientLibrary;
 
 namespace TestSuite.Fixtures;
 
-public class CreatedAppFixture : ClientFixture
+public class CreatedTeamFixture : ClientFixture
 {
+    public string TeamName { get; } = $"my-team-{Guid.NewGuid()}";
+
+    public string TeamId => Team.Id;
+
+    public TeamDto Team { get; private set; }
+
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
 
-        async Task CreateLanguageAsync(string name)
+        await Factories.CreateAsync(TeamName, async () =>
         {
             try
             {
-                var createRequest = new AddLanguageDto
+                var request = new CreateTeamDto
                 {
-                    Language = name
+                    Name = TeamName
                 };
 
-                await Client.Apps.PostLanguageAsync(createRequest);
+                Team = await Client.Teams.PostTeamAsync(request);
             }
             catch (SquidexException ex)
             {
@@ -33,29 +39,6 @@ public class CreatedAppFixture : ClientFixture
                     throw;
                 }
             }
-        }
-
-        await Factories.CreateAsync(AppName, async () =>
-        {
-            try
-            {
-                var createRequest = new CreateAppDto
-                {
-                    Name = AppName
-                };
-
-                await Client.Apps.PostAppAsync(createRequest);
-            }
-            catch (SquidexException ex)
-            {
-                if (ex.StatusCode != 400)
-                {
-                    throw;
-                }
-            }
-
-            await CreateLanguageAsync("de");
-            await CreateLanguageAsync("custom");
 
             return true;
         });

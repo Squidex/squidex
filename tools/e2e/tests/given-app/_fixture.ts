@@ -1,3 +1,10 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
 import { readJsonAsync } from '../utils';
 import { test as base } from './../given-login/_fixture';
 export { expect } from '@playwright/test';

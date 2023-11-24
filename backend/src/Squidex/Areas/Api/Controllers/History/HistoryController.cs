@@ -29,7 +29,7 @@ public sealed class HistoryController : ApiController
     }
 
     /// <summary>
-    /// Get historical events.
+    /// Get the app history.
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="channel">The name of the channel.</param>
@@ -50,7 +50,7 @@ public sealed class HistoryController : ApiController
     }
 
     /// <summary>
-    /// Get historical events for a team.
+    /// Get the team history.
     /// </summary>
     /// <param name="team">The ID of the team.</param>
     /// <param name="channel">The name of the channel.</param>
