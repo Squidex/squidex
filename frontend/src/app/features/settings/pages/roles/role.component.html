@@ -16,6 +16,7 @@
         <div class="col-auto">
             <div class="float-end">
                 <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()">
+                    <span class="hidden">{{ 'common.settings' | sqxTranslate }}</span>
                     <i class="icon-settings"></i>
                 </button>
 

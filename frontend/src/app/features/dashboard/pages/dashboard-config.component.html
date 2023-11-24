@@ -1,5 +1,6 @@
 <ng-container *ngIf="config">
     <button type="button" class="btn settings-button" [class.focused]="needsAttention" [class.btn-primary]="needsAttention" (click)="dropdownModal.toggle()" #buttonSettings>
+        <span class="hidden">{{ 'common.settings' | sqxTranslate }}</span>
         <i class="icon-settings"></i>
     </button>
     

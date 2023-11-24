@@ -52,7 +52,7 @@ public sealed class AppLanguagesController : ApiController
     }
 
     /// <summary>
-    /// Attaches an app language.
+    /// Add an app language.
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The language to add to the app.</param>

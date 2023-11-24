@@ -47,7 +47,7 @@ public sealed class AppSettingsController : ApiController
     }
 
     /// <summary>
-    /// Update the app settings.
+    /// Update the settings.
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
     /// <param name="request">The values to update.</param>

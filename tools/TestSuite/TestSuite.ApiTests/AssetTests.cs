@@ -782,4 +782,31 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
         Assert.NotNull(asset_2);
     }
+
+    [Fact]
+    public async Task Should_rename_tag()
+    {
+        // STEP 0: Create app.
+        var (client, _) = await _.PostAppAsync();
+
+
+        // STEP 1: Create asset.
+        await client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+        // STEP 2: Rename tag.
+        var renameRequest = new RenameTagDto
+        {
+            TagName = "pngs"
+        };
+
+        await client.Assets.PutTagAsync("type/png", renameRequest);
+
+
+        // STEP 2: Create asset.
+        var asset2 = await client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+        Assert.Contains("pngs", asset2.Tags);
+        Assert.DoesNotContain("type/png", asset2.Tags);
+    }
 }

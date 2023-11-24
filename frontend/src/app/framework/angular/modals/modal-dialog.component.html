@@ -1,4 +1,4 @@
-<div class="modal" @fade>
+<div class="modal" data-testid="dialog" @fade>
     <div class="modal-dialog modal-{{size}}" [class.modal-fh]="fullHeight">
         <div class="modal-content" [sqxTourStep]="tourId">
             <div class="modal-header" [class.with-tabs]="hasTabs" *ngIf="showHeader">

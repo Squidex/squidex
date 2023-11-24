@@ -5,6 +5,7 @@
         <ng-container title>
             <div class="d-flex align-items-center">
                 <a class="btn btn-text-secondary" (click)="back()" *ngIf="schema.type !== 'Singleton'">
+                    <span class="hidden">{{ 'common.back' | sqxTranslate }}</span>
                     <i class="icon-angle-left"></i>
                 </a>
 
@@ -64,6 +65,7 @@
 
                     <ng-container *ngIf="content?.canDelete">
                         <button type="button" class="btn btn-outline-secondary ms-2" (click)="dropdown.toggle()" #buttonOptions>
+                            <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
                             <i class="icon-dots"></i>
                         </button>
 

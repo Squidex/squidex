@@ -97,6 +97,7 @@ export class AppsPageComponent implements OnInit {
         this.appsState.apps.pipe(take(1))
             .subscribe(apps => {
                 if (apps.length === 0 &&
+                    this.uiOptions.value.hideOnboarding !== true &&
                     this.tourState.snapshot.status !== 'Completed' &&
                     this.tourState.snapshot.status !== 'Started') {
                     this.onboardingDialog.show();
