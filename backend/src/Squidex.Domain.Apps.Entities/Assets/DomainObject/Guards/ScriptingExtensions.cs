@@ -63,7 +63,7 @@ public static class ScriptingExtensions
             FileSize = create.File.FileSize,
             FileVersion = 0,
             IsProtected = false,
-            Metadata = create.Metadata.ToReadonlyDictionary(),
+            Metadata = create.Metadata?.ToReadonlyDictionary(),
             MimeType = create.File.MimeType,
             ParentId = create.ParentId,
             ParentPath = await GetPathAsync(operation, create.ParentId, ct),

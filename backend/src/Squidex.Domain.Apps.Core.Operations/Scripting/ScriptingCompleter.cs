@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
@@ -116,7 +115,7 @@ public sealed partial class ScriptingCompleter
     {
         private static readonly Regex RegexProperty = BuildPropertyRegex();
         private readonly Stack<string> prefixes = new Stack<string>();
-        private readonly Dictionary<string, ScriptingValue> result = new Dictionary<string, ScriptingValue>();
+        private readonly Dictionary<string, ScriptingValue> result = [];
         private readonly IEnumerable<IScriptDescriptor> descriptors;
         private readonly FilterSchema? dataSchema;
 
@@ -280,7 +279,7 @@ public sealed partial class ScriptingCompleter
 
                 if (propertyType.IsEnum)
                 {
-                    var allowedValues = Enum.GetValues(propertyType).OfType<object>().Select(x => x.ToString()!).Order().ToArray();
+                    var allowedValues = Enum.GetNames(propertyType);
 
                     Add(JsonType.String, name, description, allowedValues);
                 }
@@ -303,14 +302,6 @@ public sealed partial class ScriptingCompleter
                 else if (typeof(MulticastDelegate).IsAssignableFrom(propertyType.BaseType))
                 {
                     AddFunction(name, description);
-                }
-                else if (propertyType == typeof(AssetMetadata))
-                {
-                    AddObject(name, description, () =>
-                    {
-                        AddString("my-name",
-                            FieldDescriptions.AssetMetadataValue);
-                    });
                 }
                 else if (propertyType == typeof(NamedId<DomainId>))
                 {
@@ -371,11 +362,29 @@ public sealed partial class ScriptingCompleter
                         AddType(propertyType);
                     });
                 }
-                else if (propertyType.GetInterfaces().Contains(typeof(IEnumerable)))
+                else if (IsDictionary(propertyType))
+                {
+                    AddObject(name, description, () =>
+                    {
+                        AddString("my-name",
+                            FieldDescriptions.ObjectValue);
+                    });
+                }
+                else if (IsCollection(propertyType))
                 {
                     AddArray(name, description);
                 }
             }
+        }
+
+        private static bool IsDictionary(Type propertyType)
+        {
+            return propertyType.GetInterfaces().Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>));
+        }
+
+        private static bool IsCollection(Type propertyType)
+        {
+            return propertyType.GetInterfaces().Contains(typeof(IEnumerable));
         }
 
         private static IEnumerable<(string Name, string Description, Type Type)> GetFields(Type type)

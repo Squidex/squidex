@@ -205,15 +205,6 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The asset metadata with name &apos;name&apos;..
-        /// </summary>
-        public static string AssetMetadataValue {
-            get {
-                return ResourceManager.GetString("AssetMetadataValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The mime type..
         /// </summary>
         public static string AssetMimeType {
@@ -813,6 +804,15 @@ namespace Squidex.Domain.Apps.Core {
         public static string NamedName {
             get {
                 return ResourceManager.GetString("NamedName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value with name &apos;name&apos;..
+        /// </summary>
+        public static string ObjectValue {
+            get {
+                return ResourceManager.GetString("ObjectValue", resourceCulture);
             }
         }
         

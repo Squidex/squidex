@@ -77,11 +77,11 @@ public sealed class ScriptAsset : IAssetEnricherStep
                 FileSlug = asset.Slug,
                 FileVersion = asset.FileVersion,
                 IsProtected = asset.IsProtected,
-                Metadata = asset.Metadata.ToReadonlyDictionary(),
+                Metadata = asset.Metadata?.ToReadonlyDictionary(),
                 MimeType = asset.MimeType,
                 ParentId = asset.ParentId,
                 ParentPath = null,
-                Tags = asset.Tags.ToReadonlyList()
+                Tags = asset.Tags?.ToReadonlyList()
             }
         };
 
