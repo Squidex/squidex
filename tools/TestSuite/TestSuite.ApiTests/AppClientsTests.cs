@@ -70,11 +70,11 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
         var client_2 = clients_2.Items.Find(x => x.Id == client.Id);
 
         // Should update client name.
-        Assert.Equal(updateNameRequest.Name, client_2.Name);
-        Assert.Equal(updateNameRequest.AllowAnonymous, client_2.AllowAnonymous);
-        Assert.Equal(updateNameRequest.ApiCallsLimit, client_2.ApiCallsLimit);
-        Assert.Equal(updateNameRequest.ApiTrafficLimit, client_2.ApiTrafficLimit);
-        Assert.Equal(updateNameRequest.Role, client_2.Role);
+        Assert.Equal(updateNameRequest.Name, client_2?.Name);
+        Assert.Equal(updateNameRequest.AllowAnonymous, client_2?.AllowAnonymous);
+        Assert.Equal(updateNameRequest.ApiCallsLimit, client_2?.ApiCallsLimit);
+        Assert.Equal(updateNameRequest.ApiTrafficLimit, client_2?.ApiTrafficLimit);
+        Assert.Equal(updateNameRequest.Role, client_2?.Role);
 
         await Verify(clients_2)
             .IgnoreMember<ClientDto>(x => x.Secret);
@@ -111,6 +111,6 @@ public sealed class AppClientsTests : IClassFixture<ClientFixture>
         var clients = await app.Apps.PostClientAsync(createRequest);
         var client = clients.Items.Find(x => x.Id == id);
 
-        return client;
+        return client!;
     }
 }

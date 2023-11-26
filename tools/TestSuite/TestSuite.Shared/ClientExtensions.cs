@@ -63,7 +63,7 @@ public static class ClientExtensions
         return false;
     }
 
-    public static async Task<AssetDto> PollAsync(this IAssetsClient client, Func<AssetDto, bool> predicate,
+    public static async Task<AssetDto?> PollAsync(this IAssetsClient client, Func<AssetDto, bool> predicate,
         TimeSpan timeout = default)
     {
         try
@@ -116,7 +116,7 @@ public static class ClientExtensions
         return new ContentsResult<TEntity, TData>();
     }
 
-    public static async Task<SearchResultDto> PollAsync(this ISearchClient client, string query, Func<SearchResultDto, bool> predicate,
+    public static async Task<SearchResultDto?> PollAsync(this ISearchClient client, string query, Func<SearchResultDto, bool> predicate,
         TimeSpan timeout = default)
     {
         try
@@ -143,7 +143,7 @@ public static class ClientExtensions
         return null;
     }
 
-    public static async Task<WebhookRequest> PollAsync(this WebhookCatcherClient client, string sessionId, Func<WebhookRequest, bool> predicate,
+    public static async Task<WebhookRequest?> PollAsync(this WebhookCatcherClient client, string sessionId, Func<WebhookRequest, bool> predicate,
         TimeSpan timeout = default)
     {
         if (timeout == default)
@@ -175,7 +175,7 @@ public static class ClientExtensions
         return null;
     }
 
-    public static async Task<HistoryEventDto> PollAsync(this IHistoryClient client, string channel, Func<HistoryEventDto, bool> predicate,
+    public static async Task<HistoryEventDto?> PollAsync(this IHistoryClient client, string? channel, Func<HistoryEventDto, bool> predicate,
         TimeSpan timeout = default)
     {
         try
@@ -202,7 +202,7 @@ public static class ClientExtensions
         return null;
     }
 
-    public static async Task<BackupJobDto> PollAsync(this IBackupsClient client, Func<BackupJobDto, bool> predicate,
+    public static async Task<BackupJobDto?> PollAsync(this IBackupsClient client, Func<BackupJobDto, bool> predicate,
         TimeSpan timeout = default)
     {
         try
@@ -255,7 +255,7 @@ public static class ClientExtensions
         return await client.GetTagsAsync();
     }
 
-    public static async Task<RestoreJobDto> PollRestoreAsync(this IBackupsClient client, Func<RestoreJobDto, bool> predicate,
+    public static async Task<RestoreJobDto?> PollRestoreAsync(this IBackupsClient client, Func<RestoreJobDto, bool> predicate,
         TimeSpan timeout = default)
     {
         try
@@ -281,7 +281,7 @@ public static class ClientExtensions
         return null;
     }
 
-    public static async Task<MemoryStream> DownloadAsync(this ClientFixture fixture, AssetDto asset, int? version = null)
+    public static async Task<MemoryStream?> DownloadAsync(this ClientFixture fixture, AssetDto asset, int? version = null)
     {
         var temp = new MemoryStream();
 
@@ -310,7 +310,7 @@ public static class ClientExtensions
         return temp;
     }
 
-    public static async Task UploadInChunksAsync(this IAssetsClient client, ProgressHandler progress,  FileParameter fileParameter, string id = null)
+    public static async Task UploadInChunksAsync(this IAssetsClient client, ProgressHandler progress,  FileParameter fileParameter, string? id = null)
     {
         var pausingStream = new PauseStream(fileParameter.Data, 0.25);
         var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType)
@@ -332,7 +332,7 @@ public static class ClientExtensions
         }
     }
 
-    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient client, string path, AssetDto asset, string fileName = null)
+    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient client, string path, AssetDto asset, string? fileName = null)
     {
         var fileInfo = new FileInfo(path);
 
@@ -344,7 +344,7 @@ public static class ClientExtensions
         }
     }
 
-    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient client, string path, string fileType, string fileName = null, string parentId = null, string id = null)
+    public static async Task<AssetDto> UploadFileAsync(this IAssetsClient client, string path, string fileType, string? fileName = null, string? parentId = null, string? id = null)
     {
         var fileInfo = new FileInfo(path);
 
@@ -356,7 +356,7 @@ public static class ClientExtensions
         }
     }
 
-    public static async Task<AssetDto> UpdateFileAsync(this IAssetsClient client, string id, string path, string fileType, string fileName = null)
+    public static async Task<AssetDto> ReplaceFileAsync(this IAssetsClient client, string id, string path, string fileType, string? fileName = null)
     {
         var fileInfo = new FileInfo(path);
 
@@ -368,7 +368,7 @@ public static class ClientExtensions
         }
     }
 
-    public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient client, int size, string parentId = null, string id = null)
+    public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient client, int size, string? parentId = null, string? id = null)
     {
         using (var stream = RandomAsset(size))
         {

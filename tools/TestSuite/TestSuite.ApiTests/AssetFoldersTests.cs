@@ -75,26 +75,25 @@ public class AssetFoldersTests : IClassFixture<CreatedAppFixture>
         Assert.Equal(folder1.Id, folder2_1.ParentId);
     }
 
-    [Fact]
-    public async Task Should_move_asset()
+    [Theory]
+    [InlineData(ContentStrategies.Move.Single)]
+    [InlineData(ContentStrategies.Move.Bulk)]
+    public async Task Should_move_asset(ContentStrategies.Move strategy)
     {
         // STEP 1: Create folder.
         var folder1 = await CreateFolderAsync(Guid.NewGuid().ToString());
 
 
         // STEP 2: Create asset.
-        var asset_0 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
         // STEP 2: Update folder
-        var moveRequest = new MoveAssetDto
-        {
-            ParentId = folder1.Id
-        };
+        await _.Client.Assets.MoveAsync(asset_1, folder1, strategy);
 
-        var asset_1 = await _.Client.Assets.PutAssetParentAsync(asset_0.Id, moveRequest);
+        var asset_2 = await _.Client.Assets.GetAssetAsync(asset_1.Id);
 
-        Assert.Equal(folder1.Id, asset_1.ParentId);
+        Assert.Equal(folder1.Id, asset_2.ParentId);
     }
 
     [Fact]
@@ -157,7 +156,7 @@ public class AssetFoldersTests : IClassFixture<CreatedAppFixture>
         Assert.Contains(folder2.Id, folders3.Items.Select(x => x.Id));
     }
 
-    private async Task<AssetFolderDto> CreateFolderAsync(string name, string parentId = null)
+    private async Task<AssetFolderDto> CreateFolderAsync(string name, string? parentId = null)
     {
         var createRequest = new CreateAssetFolderDto
         {

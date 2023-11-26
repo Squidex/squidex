@@ -120,6 +120,6 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
         var contributors = await app.Apps.PostContributorAsync(createInviteRequest);
         var contributor = contributors.Items.Find(x => x.ContributorName == email);
 
-        return contributor;
+        return contributor!;
     }
 }

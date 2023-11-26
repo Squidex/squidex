@@ -84,8 +84,8 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
         var languages_2 = await app.Apps.PutLanguageAsync("de", updateRequest);
         var language_2_DE = languages_2.Items.Find(x => x.Iso2Code == "de");
 
-        Assert.Equal(updateRequest.Fallback, language_2_DE.Fallback);
-        Assert.Equal(updateRequest.IsOptional, language_2_DE.IsOptional);
+        Assert.Equal(updateRequest.Fallback, language_2_DE?.Fallback);
+        Assert.Equal(updateRequest.IsOptional, language_2_DE?.IsOptional);
 
         await Verify(languages_2);
     }
@@ -125,16 +125,16 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
         var language_4_IT = languages_4.Items.Find(x => x.Iso2Code == "it");
         var language_4_EN = languages_4.Items.Find(x => x.Iso2Code == "en");
 
-        Assert.True(language_4_IT.IsMaster);
+        Assert.True(language_4_IT?.IsMaster);
 
         // Old master language is unset.
-        Assert.False(language_4_EN.IsMaster);
+        Assert.False(language_4_EN?.IsMaster);
 
         // Master language cannot be optional.
-        Assert.False(language_4_IT.IsOptional);
+        Assert.False(language_4_IT?.IsOptional);
 
         // Fallback for new master language must be removed.
-        Assert.Empty(language_4_IT.Fallback);
+        Assert.Empty(language_4_IT?.Fallback!);
 
         await Verify(languages_4);
     }
@@ -169,8 +169,8 @@ public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
         var language_2_IT = languages_2.Items.Find(x => x.Iso2Code == "it");
 
         // Fallback language must be removed.
-        Assert.Empty(language_2_IT.Fallback);
-        Assert.Equal(new[] { "en", "it" }, languages_2.Items.Select(x => x.Iso2Code).ToArray());
+        Assert.Empty(language_2_IT?.Fallback!);
+        Assert.Equal(new[] { "en", "it" }, languages_2?.Items.Select(x => x.Iso2Code).ToArray());
 
         await Verify(languages_2);
     }

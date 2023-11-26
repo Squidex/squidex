@@ -56,7 +56,7 @@ public class ConfigPlansProviderTests
     [Theory]
     [InlineData(null)]
     [InlineData("my-plan")]
-    public void Should_return_infinite_if_nothing_configured(string planId)
+    public void Should_return_infinite_if_nothing_configured(string? planId)
     {
         var sut = new ConfigPlansProvider(Enumerable.Empty<Plan>());
 

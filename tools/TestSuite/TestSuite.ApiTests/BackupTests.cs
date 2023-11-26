@@ -51,7 +51,7 @@ public class BackupTests : IClassFixture<ClientFixture>
 
 
         // STEP 3: Restore backup.
-        var uri = new Uri(new Uri(backupUrl), backup.Links["download"].Href);
+        var uri = new Uri(new Uri(backupUrl), backup?.Links["download"].Href);
 
         var restoreRequest = new RestoreRequestDto
         {
@@ -96,7 +96,7 @@ public class BackupTests : IClassFixture<ClientFixture>
 
 
         // STEP 4: Restore backup.
-        var uri = new Uri(new Uri(backupUrl), backup.Links["download"].Href);
+        var uri = new Uri(new Uri(backupUrl), backup?.Links["download"].Href);
 
         var restoreRequest = new RestoreRequestDto
         {

@@ -4,6 +4,7 @@
 	<TargetFramework>net8.0</TargetFramework>
     <LangVersion>11.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Meziantou.Analyzer" Version="2.0.110">

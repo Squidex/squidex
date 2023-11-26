@@ -127,9 +127,9 @@ public class LanguageTests
     [InlineData("xx")]
     [InlineData("invalid")]
     [InlineData(null)]
-    public void Should_parse_invalid_languages(string input)
+    public void Should_parse_invalid_languages(string? input)
     {
-        var language = Language.ParseOrNull(input);
+        var language = Language.ParseOrNull(input!);
 
         Assert.Null(language);
     }

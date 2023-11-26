@@ -57,7 +57,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                 IsUpsert = true
             });
 
-        if (upsert.GeoObjects?.Any() == true)
+        if (upsert.GeoObjects?.Count > 0)
         {
             if (!upsert.IsNew)
             {

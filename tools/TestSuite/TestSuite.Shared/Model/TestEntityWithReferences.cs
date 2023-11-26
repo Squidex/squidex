@@ -19,8 +19,8 @@ public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesD
         var schema = await schemas.PostSchemaAsync(new CreateSchemaDto
         {
             Name = name,
-            Fields = new List<UpsertSchemaFieldDto>
-            {
+            Fields =
+            [
                 new UpsertSchemaFieldDto
                 {
                     Name = TestEntityWithReferencesData.ReferencesField,
@@ -28,8 +28,8 @@ public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesD
                     {
                         IsRequired = false
                     }
-                }
-            },
+                },
+            ],
             IsPublished = true
         });
 
@@ -42,5 +42,5 @@ public sealed class TestEntityWithReferencesData
     public static readonly string ReferencesField = nameof(References).ToLowerInvariant();
 
     [JsonConverter(typeof(InvariantConverter))]
-    public string[] References { get; set; }
+    public string[]? References { get; set; }
 }

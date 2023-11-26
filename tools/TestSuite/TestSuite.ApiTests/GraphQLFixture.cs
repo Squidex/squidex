@@ -138,7 +138,7 @@ public sealed class GraphQLFixture : ContentFixture
                     {
                         SchemaIds = [citiesId]
                     }
-                }
+                },
             ],
             IsPublished = true
         };

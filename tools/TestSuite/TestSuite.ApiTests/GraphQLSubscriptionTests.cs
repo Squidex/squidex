@@ -130,7 +130,7 @@ public class GraphQLSubscriptionTests : IClassFixture<ContentFixture>
 
         var options = new GraphQLHttpClientOptions
         {
-            EndPoint = new Uri(_.Client.GenerateUrl($"/api/content/{_.AppName}/graphql?access_token={accessToken}"))
+            EndPoint = new Uri(_.Client.GenerateUrl($"/api/content/{_.AppName}/graphql?access_token={accessToken}")!)
         };
 
         var client = new GraphQLHttpClient(options, new NewtonsoftJsonSerializer());

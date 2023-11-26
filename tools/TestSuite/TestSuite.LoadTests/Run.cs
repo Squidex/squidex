@@ -14,7 +14,7 @@ namespace TestSuite.LoadTests;
 
 public static class Run
 {
-    public static async Task Parallel(int numUsers, int numIterationsPerUser, Func<Task> action, int expectedAvg = 100, ITestOutputHelper testOutput = null)
+    public static async Task Parallel(int numUsers, int numIterationsPerUser, Func<Task> action, int expectedAvg = 100, ITestOutputHelper? testOutput = null)
     {
         await action();
 
