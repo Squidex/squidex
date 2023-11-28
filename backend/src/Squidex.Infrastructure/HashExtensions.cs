@@ -202,6 +202,15 @@ public static class HashExtensions
         return ToHexString(buffer);
     }
 
+    public static string GetQuotedHexStringAndReset(this IncrementalHash hash)
+    {
+        Span<byte> buffer = stackalloc byte[hash.HashLengthInBytes];
+
+        hash.GetHashAndReset(buffer);
+
+        return ToQuotedHexString(buffer);
+    }
+
     public static string ToHexString(this ReadOnlySpan<byte> data)
     {
         string result;
@@ -213,7 +222,7 @@ public static class HashExtensions
             var buffer = ArrayPool<char>.Shared.Rent(length);
             try
             {
-                result = ConvertCore(data, buffer);
+                result = ConvertCore(data, buffer, 0);
             }
             finally
             {
@@ -224,29 +233,63 @@ public static class HashExtensions
         {
             Span<char> buffer = stackalloc char[length];
 
-            result = ConvertCore(data, buffer);
+            result = ConvertCore(data, buffer, 0);
         }
 
         return result;
+    }
 
-        static string ConvertCore(ReadOnlySpan<byte> data, Span<char> hexBuffer)
+    public static string ToQuotedHexString(this ReadOnlySpan<byte> data)
+    {
+        string result;
+
+        var length = (data.Length * 2) + 2;
+
+        if (length > MaxStackSize)
         {
-            unchecked
+            var buffer = ArrayPool<char>.Shared.Rent(length);
+            try
             {
-                int n = 0;
-                for (int i = 0; i < data.Length; i++)
-                {
-                    byte b = data[i];
+                buffer[0] = '"';
+                buffer[^1] = '"';
 
-                    byte b1 = (byte)(b >> 4);
-                    byte b2 = (byte)(b & 0xF);
-
-                    hexBuffer[n++] = (b1 < 10) ? (char)('0' + b1) : (char)('A' + (b1 - 10));
-                    hexBuffer[n++] = (b2 < 10) ? (char)('0' + b2) : (char)('A' + (b2 - 10));
-                }
+                result = ConvertCore(data, buffer, 1);
             }
-
-            return new string(hexBuffer);
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
         }
+        else
+        {
+            Span<char> buffer = stackalloc char[length];
+
+            buffer[0] = '"';
+            buffer[^1] = '"';
+
+            result = ConvertCore(data, buffer, 1);
+        }
+
+        return result;
+    }
+
+    private static string ConvertCore(ReadOnlySpan<byte> data, Span<char> hexBuffer, int offset)
+    {
+        unchecked
+        {
+            int n = offset;
+            for (int i = 0; i < data.Length; i++)
+            {
+                byte b = data[i];
+
+                byte b1 = (byte)(b >> 4);
+                byte b2 = (byte)(b & 0xF);
+
+                hexBuffer[n++] = (b1 < 10) ? (char)('0' + b1) : (char)('A' + (b1 - 10));
+                hexBuffer[n++] = (b2 < 10) ? (char)('0' + b2) : (char)('A' + (b2 - 10));
+            }
+        }
+
+        return new string(hexBuffer);
     }
 }

@@ -12,37 +12,37 @@ test.beforeEach(async ({ page }) => {
     await page.goto('/app');
 });
 
-test('should show proper English frontend', async ({ page }) => {
+test('show proper English frontend', async ({ page }) => {
     await changeLanguage(page, 'English');
 
     await expect(page.getByText('Welcome to Squidex')).toBeVisible();
 });
 
-test('should show proper French frontend', async ({ page }) => {
+test('show proper French frontend', async ({ page }) => {
     await changeLanguage(page, 'Français');
 
     await expect(page.getByText('Bienvenue sur Squidex.')).toBeVisible();
 });
 
-test('should show proper Dutch frontend', async ({ page }) => {
+test('show proper Dutch frontend', async ({ page }) => {
     await changeLanguage(page, 'Nederlands');
 
     await expect(page.getByText('Welkom bij Squidex.')).toBeVisible();
 });
 
-test('should show proper Italian frontend', async ({ page }) => {
+test('show proper Italian frontend', async ({ page }) => {
     await changeLanguage(page, 'Italiano');
 
     await expect(page.getByText('Benvenuto su Squidex.')).toBeVisible();
 });
 
-test('should show proper Portugese frontend', async ({ page }) => {
+test('show proper Portugese frontend', async ({ page }) => {
     await changeLanguage(page, 'Portuguese');
 
     await expect(page.getByText('Bem-vindo a Squidex.')).toBeVisible();
 });
 
-test('should show proper Chinese frontend', async ({ page }) => {
+test('show proper Chinese frontend', async ({ page }) => {
     await changeLanguage(page, '简体中文');
 
     await expect(page.getByText('欢迎来到 Squidex。')).toBeVisible();

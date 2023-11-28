@@ -10,21 +10,21 @@ import { escapeRegex, getRandomId } from '../utils';
 import { expect, test } from './_fixture';
 
 test.beforeEach(async ({ page, appName }) => {
-    await page.goto(`/app/${appName}`);
+    await page.goto(`/app/${appName}/schemas`);
 });
 
 test('create schema', async ({ page }) => {
     const schemaName = await createRandomSchema(page);
-    const schemaLink = page.locator('a.nav-link', { hasText: new RegExp(escapeRegex(schemaName)) });
+    const schemaLink = page.locator('a.nav-link', { hasText: escapeRegex(schemaName) });
 
     await expect(schemaLink).toBeVisible();
 });
 
 test('delete schema', async ({ dropdown, page }) => {
     const schemaName = await createRandomSchema(page);
-    const schemaLink = page.locator('a.nav-link', { hasText: new RegExp(escapeRegex(schemaName)) });
+    const schemaLink = page.locator('a.nav-link', { hasText: escapeRegex(schemaName) });
 
-    await page.getByTestId('options').click();
+    await page.getByLabel('Options').click();
     await dropdown.delete();
 
     await expect(schemaLink).not.toBeVisible();
@@ -51,9 +51,9 @@ test('delete field', async ({ dropdown, page }) => {
     await createRandomSchema(page);
 
     const fieldName = await createRandomField(page);
-    const fieldRow = page.locator('div.table-items-row-summary', { hasText: new RegExp(escapeRegex(fieldName)) });
+    const fieldRow = page.locator('div.table-items-row-summary', { hasText: escapeRegex(fieldName) });
 
-    await fieldRow.getByTestId('options').click();
+    await fieldRow.getByLabel('Options').click();
     await dropdown.delete();
 
     await expect(fieldRow).not.toBeVisible();
@@ -64,10 +64,10 @@ async function createRandomField(page: Page) {
 
     await page.locator('button').filter({ hasText: /^Add Field$/ }).click();
 
-    // Setup name.
+    // Define field name.
     await page.getByPlaceholder('Enter field name').fill(fieldName);
 
-    // Save
+    // Save field.
     await page.getByRole('button', { name: 'Create and close' }).click();
 
     return fieldName;
@@ -76,15 +76,13 @@ async function createRandomField(page: Page) {
 async function createRandomSchema(page: Page) {
     const schemaName = `schema-${getRandomId()}`;
 
-    await page.getByTestId('schemas').click();
+    await page.getByLabel('Create Schema').click();
 
-    await page.getByTestId('new-schema').click();
-
-    // Setup name.
+    // Define schema name.
     await page.getByLabel('Name (required)').fill(schemaName);
 
-    // Save
-    await page.getByRole('button', { name: 'Create' }).click();
+    // Save schema.
+    await page.getByRole('button', { name: 'Create', exact: true }).click();
 
     return schemaName;
 }

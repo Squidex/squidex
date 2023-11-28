@@ -49,8 +49,7 @@
                     </div>
                 </div>
 
-                <button class="btn panel2-collapse" data-testid="back" (click)="toggle()" sqxStopClick>
-                    <span class="hidden">{{ 'common.back' | sqxTranslate }}</span>
+                <button class="btn panel2-collapse" attr.aria-label="{{ 'common.collapse' | sqxTranslate }}" (click)="toggle()" sqxStopClick>
                     <i class="icon-angle-left"></i>
                 </button>
 

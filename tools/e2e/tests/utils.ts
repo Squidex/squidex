@@ -7,6 +7,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { Page } from '@playwright/test';
 import { TEMPORARY_PATH } from '../playwright.config';
 
 export function getRandomId() {
@@ -18,7 +19,7 @@ export function getRandomId() {
 export function escapeRegex(string: string) {
     const result = string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
 
-    return result;
+    return new RegExp(result);
 }
 
 export async function writeJsonAsync(name: string, json: any) {
@@ -33,7 +34,7 @@ export async function readJsonAsync<T>(name: string, defaultValue: T) {
     const json = await fs.readFile(fullPath, 'utf8');
 
     if (json) {
-        return JSON.parse(json);
+        return JSON.parse(json) as T;
     } else {
         return defaultValue;
     }
@@ -45,4 +46,11 @@ async function getPath(name: string) {
     await fs.mkdir(TEMPORARY_PATH, { recursive: true });
 
     return fullPath;
+}
+
+export async function waitForRequest(page: Page, regex: RegExp, action: () => Promise<any>) {
+    const networkCall = page.waitForRequest(regex);
+
+    await action();
+    await networkCall;
 }

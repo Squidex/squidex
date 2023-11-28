@@ -5,7 +5,7 @@
         <div class="row g-0">
             <div class="col-auto" *ngIf="schemasState.canCreate | async">    
                 <button type="button" class="btn btn-success me-2" (click)="createSchema()"
-                    data-testid="new-schema"
+                    attr.aria-label="{{ 'schemas.create' | sqxTranslate }}"
                     title="i18n:schemas.createSchemaTooltip"
                     titlePosition="top-start"
                     shortcut="CTRL + U"

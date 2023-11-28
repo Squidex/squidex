@@ -5,8 +5,7 @@
     <sqx-layout layout="main" innerWidth="54">
         <ng-container title>
             <div class="d-flex align-items-center">
-                <a class="btn btn-text-secondary" data-testid="back" (click)="back()">
-                    <span class="hidden">{{ 'common.back' | sqxTranslate }}</span>
+                <a class="btn btn-text-secondary" attr.aria-label="{{ 'common.back' | sqxTranslate }}" (click)="back()">
                     <i class="icon-angle-left"></i>
                 </a>
     

@@ -29,13 +29,13 @@
 <ng-template #simple>
     <span [class.truncate]="truncate">
         <ng-container *ngIf="scheduled; else noSchedule">
-            <span class="content-status pending" [style.color]="scheduled.color" title="{{tooltipText}}">
+            <span class="content-status pending" [style.color]="scheduled.color" attr.aria-label="{{tooltipText}}" title="{{tooltipText}}">
                 <i class="icon-clock" [class.icon-sm]="small"></i>
             </span>
         </ng-container>
         
         <ng-template #noSchedule>
-            <span class="content-status default" [style.color]="statusColor" title="{{tooltipText}}">
+            <span class="content-status default" [style.color]="statusColor" attr.aria-label="{{tooltipText}}" title="{{tooltipText}}">
                 <i class="icon-circle" [class.icon-sm]="small"></i>
             </span>
         </ng-template>

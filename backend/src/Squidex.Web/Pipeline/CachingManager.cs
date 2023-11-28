@@ -117,7 +117,7 @@ public sealed class CachingManager : IRequestCache
                 {
                     using (Telemetry.Activities.StartActivity("CalculateEtag"))
                     {
-                        response.Headers[HeaderNames.ETag] = hasher.GetHexStringAndReset();
+                        response.Headers[HeaderNames.ETag] = new EntityTagHeaderValue(hasher.GetQuotedHexStringAndReset()).ToString();
                     }
                 }
 

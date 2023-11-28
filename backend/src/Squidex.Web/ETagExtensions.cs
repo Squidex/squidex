@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
@@ -60,21 +61,18 @@ public static class ETagExtensions
     {
         version = default;
 
-        if (httpContext.Request.Headers.TryGetString(header, out var etag))
+        if (!httpContext.Request.Headers.TryGetValue(header, out var etagValue))
         {
-            var span = etag.AsSpan();
-
-            if (span.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
-            {
-                span = span[2..];
-            }
-
-            if (long.TryParse(span, NumberStyles.Any, CultureInfo.InvariantCulture, out version))
-            {
-                return true;
-            }
+            return false;
         }
 
-        return false;
+        if (!EntityTagHeaderValue.TryParse(etagValue.ToString(), out var etag))
+        {
+            return false;
+        }
+
+        var tag = etag.Tag.AsSpan().Trim('"');
+
+        return long.TryParse(tag, NumberStyles.Any, CultureInfo.InvariantCulture, out version);
     }
 }

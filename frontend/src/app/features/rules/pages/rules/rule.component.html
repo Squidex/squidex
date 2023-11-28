@@ -12,8 +12,7 @@
                 </sqx-editable-title>
             </div>
             <div class="col-auto" [class.invisible]="!rule.canDelete && !rule.canRun">
-                <button type="button" class="btn btn-text-secondary" data-testid="options" (click)="dropdown.toggle()" #buttonOptions>
-                    <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
+                <button type="button" class="btn btn-text-secondary" attr.aria-label="{{ 'common.options' | sqxTranslate }}" (click)="dropdown.toggle()" #buttonOptions>
                     <i class="icon-dots"></i>
                 </button>
         

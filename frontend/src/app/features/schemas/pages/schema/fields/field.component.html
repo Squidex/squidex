@@ -41,8 +41,7 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-secondary ms-1" (click)="dropdown.toggle()" data-testid="options" [disabled]="!field.properties.isContentField && field.isLocked" #buttonOptions>
-                        <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
+                    <button type="button" class="btn btn-text-secondary ms-1" attr.aria-label="{{ 'common.options' | sqxTranslate }}" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
 

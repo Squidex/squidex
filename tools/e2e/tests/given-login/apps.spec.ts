@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
     await page.goto('/app');
 });
 
-test('should create app', async ({ page }) => {
+test('create app', async ({ page }) => {
     const appName = `my-app-${getRandomId()}`;
 
     await page.getByTestId('new-app').click();

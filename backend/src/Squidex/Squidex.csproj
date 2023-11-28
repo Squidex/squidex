@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
-    <NoWarn>1701;1702;NETSDK1206;NU1608</NoWarn>
+    <NoWarn>1701;1702;CS1591;NETSDK1206;NU1608</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -27,7 +27,12 @@ public sealed class SmtpOptions
     {
         return
             !string.IsNullOrWhiteSpace(Server) &&
-            !string.IsNullOrWhiteSpace(Sender) &&
+            !string.IsNullOrWhiteSpace(Sender);
+    }
+
+    public bool IsAuthenticating()
+    {
+        return
             !string.IsNullOrWhiteSpace(Username) &&
             !string.IsNullOrWhiteSpace(Password);
     }

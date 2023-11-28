@@ -48,6 +48,15 @@ export default defineConfig({
         },
 
         {
+            name: 'schema',
+            testMatch: 'tests/given-schema/_setup.ts',
+            dependencies: ['app'],
+            use: {
+                storageState: STORAGE_STATE,
+            },
+        },
+
+        {
             name: 'given login',
             testMatch: 'tests/given-login/*.spec.ts',
             dependencies: ['login'],
@@ -61,6 +70,16 @@ export default defineConfig({
             name: 'given app',
             testMatch: 'tests/given-app/*.spec.ts',
             dependencies: ['app'],
+            use: {
+                ...devices['Desktop Chrome'],
+                storageState: STORAGE_STATE,
+            },
+        },
+
+        {
+            name: 'given schema',
+            testMatch: 'tests/given-schema/*.spec.ts',
+            dependencies: ['schema'],
             use: {
                 ...devices['Desktop Chrome'],
                 storageState: STORAGE_STATE,

@@ -20,5 +20,3 @@ export const test = base.extend<{}, AppFixture>({
         await use(config.appName);
     }, { scope: 'worker', auto: true }],
 });
-
-

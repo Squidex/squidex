@@ -41,8 +41,7 @@
             </button>
         </div>
 
-        <button type="button" class="btn btn-text-secondary me-2" data-testid="options" (click)="editOptionsDropdown.toggle()" #buttonOptions>
-            <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
+        <button type="button" class="btn btn-text-secondary me-2" attr.aria-label="{{ 'common.options' | sqxTranslate }}" (click)="editOptionsDropdown.toggle()" #buttonOptions>
             <i class="icon-dots"></i>
         </button>
 

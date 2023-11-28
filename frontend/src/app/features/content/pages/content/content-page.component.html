@@ -4,8 +4,8 @@
     <sqx-layout layout="main" [hideSidebar]="!content">
         <ng-container title>
             <div class="d-flex align-items-center">
-                <a class="btn btn-text-secondary" (click)="back()" *ngIf="schema.type !== 'Singleton'">
-                    <span class="hidden">{{ 'common.back' | sqxTranslate }}</span>
+                <a class="btn btn-text-secondary" aria-labelledby="content-back" (click)="back()" *ngIf="schema.type !== 'Singleton'">
+                    <span id="content-back" hidden>{{ 'common.back' | sqxTranslate }}</span>
                     <i class="icon-angle-left"></i>
                 </a>
 

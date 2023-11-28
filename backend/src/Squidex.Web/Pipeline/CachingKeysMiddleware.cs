@@ -37,11 +37,11 @@ public sealed class CachingKeysMiddleware
 
             cachingManager.Finish(httpContext);
 
-            if (httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag))
+            if (httpContext.Response.Headers.TryGetValue(HeaderNames.ETag, out var value) && EntityTagHeaderValue.TryParse(value.ToString(), out var etag))
             {
-                if (!cachingOptions.StrongETag && !ETagUtils.IsWeakEtag(etag))
+                if (!cachingOptions.StrongETag && !etag.IsWeak)
                 {
-                    httpContext.Response.Headers[HeaderNames.ETag] = ETagUtils.ToWeakEtag(etag);
+                    httpContext.Response.Headers[HeaderNames.ETag] = new EntityTagHeaderValue(etag.Tag, true).ToString();
                 }
             }
 

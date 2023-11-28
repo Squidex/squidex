@@ -47,11 +47,8 @@ public sealed class EmailUserNotifications : IUserNotifications
         get => true;
     }
 
-    public EmailUserNotifications(
-        IOptions<EmailUserNotificationOptions> texts,
-        IEmailSender emailSender,
-        IUrlGenerator urlGenerator,
-        ILogger<EmailUserNotifications> log)
+    public EmailUserNotifications(IOptions<EmailUserNotificationOptions> texts, IEmailSender emailSender,
+        IUrlGenerator urlGenerator, ILogger<EmailUserNotifications> log)
     {
         this.texts = texts.Value;
         this.emailSender = emailSender;
