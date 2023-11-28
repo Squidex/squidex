@@ -16,8 +16,6 @@ namespace TestSuite.ApiTests;
 [UsesVerify]
 public class TeamContributorTests : IClassFixture<ClientFixture>
 {
-    private readonly string email = $"{Guid.NewGuid()}@squidex.io";
-
     public ClientFixture _ { get; }
 
     public TeamContributorTests(ClientFixture fixture)
@@ -75,14 +73,18 @@ public class TeamContributorTests : IClassFixture<ClientFixture>
         var team = await _.PostTeamAsync();
 
 
-        // STEP 1: Assign contributor.
-        var contributor = await InviteAsync(team.Id);
+        // STEP 1: Assign first contributor.
+        await InviteAsync(team.Id);
 
 
-        // STEP 1: Remove contributor.
-        var contributors_2 = await _.Client.Teams.DeleteContributorAsync(team.Id, contributor.ContributorId);
+        // STEP 2: Assign other contributor.
+        var contributor2 = await InviteAsync(team.Id);
 
-        Assert.DoesNotContain(contributors_2.Items, x => x.ContributorId == contributor.ContributorId);
+
+        // STEP 2: Remove contributor.
+        var contributors_2 = await _.Client.Teams.DeleteContributorAsync(team.Id, contributor2.ContributorId);
+
+        Assert.DoesNotContain(contributors_2.Items, x => x.ContributorId == contributor2.ContributorId);
 
         await Verify(contributors_2)
             .IgnoreMember<ContributorDto>(x => x.ContributorId)
@@ -90,8 +92,25 @@ public class TeamContributorTests : IClassFixture<ClientFixture>
             .IgnoreMember<ContributorDto>(x => x.ContributorName);
     }
 
+    [Fact]
+    public async Task Should_not_remove_single_owner()
+    {
+        // STEP 0: Create team.
+        var team = await _.PostTeamAsync();
+
+
+        // STEP 1: Get contributors
+        var contributor = await InviteAsync(team.Id);
+
+
+        // STEP 2: Remove contributor.
+        await Assert.ThrowsAnyAsync<SquidexException>(() => _.Client.Teams.DeleteContributorAsync(team.Id, contributor.ContributorId));
+    }
+
     private async Task<ContributorDto> InviteAsync(string teamId)
     {
+        var email = $"{Guid.NewGuid()}@squidex.io";
+
         var createInviteRequest = new AssignContributorDto
         {
             ContributorId = email,

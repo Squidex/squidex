@@ -321,7 +321,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         // Should provide updated file name.
         Assert.Equal(fileNameRequest.FileName, asset_2.FileName);
 
-        await Verify(asset_2);
+        await Verify(asset_2).UseParameters(strategy);
     }
 
     [Theory]
@@ -350,7 +350,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         // Should provide metadata.
         Assert.Equal(metadataRequest.Metadata, asset_2.Metadata);
 
-        await Verify(asset_2);
+        await Verify(asset_2).UseParameters(strategy);
     }
 
     [Theory]
@@ -375,7 +375,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         // Should provide updated slug.
         Assert.Equal(slugRequest.Slug, asset_2.Slug);
 
-        await Verify(asset_2);
+        await Verify(asset_2).UseParameters(strategy);
     }
 
     [Theory]
@@ -404,7 +404,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         // Should provide updated tags.
         Assert.Equal(tagsRequest.Tags, asset_2.Tags);
 
-        await Verify(asset_2);
+        await Verify(asset_2).UseParameters(strategy);
     }
 
     [Theory]
@@ -477,7 +477,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
         }
 
-        await Verify(asset_2);
+        await Verify(asset_2).UseParameters(strategy);
     }
 
     [Fact]

@@ -16,8 +16,6 @@ namespace TestSuite.ApiTests;
 [UsesVerify]
 public sealed class AppContributorsTests : IClassFixture<ClientFixture>
 {
-    private readonly string email = $"{Guid.NewGuid()}@squidex.io";
-
     public ClientFixture _ { get; }
 
     public AppContributorsTests(ClientFixture fixture)
@@ -78,7 +76,7 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
         // STEP 1: Update contributor role.
         var updateRequest = new AssignContributorDto
         {
-            ContributorId = email,
+            ContributorId = contributor.ContributorId,
             // Test update of role.
             Role = "Owner"
         };
@@ -96,14 +94,18 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
         var (app, _) = await _.PostAppAsync();
 
 
-        // STEP 1: Assign contributor.
-        var contributor = await InviteAsync(app);
+        // STEP 1: Assign first contributor.
+        await InviteAsync(app, "Owner");
+
+
+        // STEP 2: Assign other contributor.
+        var contributor2 = await InviteAsync(app, "Owner");
 
 
         // STEP 1: Remove contributor.
-        var contributors_2 = await app.Apps.DeleteContributorAsync(contributor.ContributorId);
+        var contributors_2 = await app.Apps.DeleteContributorAsync(contributor2.ContributorId);
 
-        Assert.DoesNotContain(contributors_2.Items, x => x.ContributorId == contributor.ContributorId);
+        Assert.DoesNotContain(contributors_2.Items, x => x.ContributorId == contributor2.ContributorId);
 
         await Verify(contributors_2)
             .IgnoreMember<ContributorDto>(x => x.ContributorId)
@@ -111,13 +113,32 @@ public sealed class AppContributorsTests : IClassFixture<ClientFixture>
             .IgnoreMember<ContributorDto>(x => x.ContributorName);
     }
 
-    private async Task<ContributorDto> InviteAsync(ISquidexClient app)
+    [Fact]
+    public async Task Should_not_remove_single_owner()
     {
+        // STEP 0: Create app.
+        var (app, _) = await _.PostAppAsync();
+
+
+        // STEP 1: Get contributors
+        var contributor = await InviteAsync(app, "Owner");
+
+
+        // STEP 2: Remove contributor.
+        await Assert.ThrowsAnyAsync<SquidexException>(() => app.Apps.DeleteContributorAsync(contributor.ContributorId));
+    }
+
+    private static async Task<ContributorDto> InviteAsync(ISquidexClient app, string? role = null)
+    {
+        var email = $"{Guid.NewGuid()}@squidex.io";
+
         var createInviteRequest = new AssignContributorDto
         {
             ContributorId = email,
             // Invite must be true, otherwise new users are not created.
-            Invite = true
+            Invite = true,
+            // The initial role or editor otherwise.
+            Role = role
         };
 
         var contributors = await app.Apps.PostContributorAsync(createInviteRequest);
