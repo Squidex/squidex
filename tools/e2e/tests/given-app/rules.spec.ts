@@ -3,7 +3,7 @@ import { escapeRegex, getRandomId } from '../utils';
 import { test } from './_fixture';
 
 test.beforeEach(async ({ page, appName }) => {
-    await page.goto(`/app/${appName}`);
+    await page.goto(`/app/${appName}/rules`);
 });
 
 test('create rule', async ({ page }) => {
@@ -62,7 +62,6 @@ test('edit rule', async ({ dropdown, page }) => {
 async function createRandomRule(page: Page) {
     const ruleName = `rule-${getRandomId()}`;
 
-    await page.getByTestId('rules').click();
     await page.getByRole('link', { name: /New Rule/ }).click();
 
     // Define rule action
@@ -70,6 +69,7 @@ async function createRandomRule(page: Page) {
 
     // Define rule trigger
     await page.getByText('Webhook').click();
+    // This is the only required field, so we have to enter some text.
     await page.locator('sqx-formattable-input').first().getByRole('textbox').fill('https:/squidex.io');
 
     await page.getByRole('button', { name: 'Save' }).click();
@@ -82,7 +82,7 @@ async function createRandomRule(page: Page) {
     // Define rule name.
     await page.locator('div.card', { hasText: /Unnamed Rule/ }).getByRole('heading').first().dblclick();
     await page.locator('form').getByRole('textbox').fill(ruleName);
-    await page.locator('form').getByTestId('save').click();
+    await page.locator('form').getByLabel('Save').click();
 
     return ruleName;
 }

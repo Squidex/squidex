@@ -58,7 +58,7 @@ export class ContentStatusComponent {
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.scheduled) {
+        if (changes.scheduled || changes.status) {
             if (this.scheduled) {
                 const args = { status: this.scheduled.status, time: this.scheduled.dueTime.toStringFormat('PPpp') };
 
