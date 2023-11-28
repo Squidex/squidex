@@ -160,7 +160,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
             this.updateInitialData();
         }
 
-        this.updateValue(value);
+        this.updateValue(this.form.value);
     }
 
     protected disable() {
