@@ -7,7 +7,6 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { Page } from '@playwright/test';
 import { TEMPORARY_PATH } from '../playwright.config';
 
 export function getRandomId() {
@@ -46,11 +45,4 @@ async function getPath(name: string) {
     await fs.mkdir(TEMPORARY_PATH, { recursive: true });
 
     return fullPath;
-}
-
-export async function waitForRequest(page: Page, regex: RegExp, action: () => Promise<any>) {
-    const networkCall = page.waitForRequest(regex);
-
-    await action();
-    await networkCall;
 }

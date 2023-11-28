@@ -37,11 +37,10 @@ test('enable rule', async ({ dropdown, page }) => {
     const ruleName = await createRandomRule(page);
     const ruleCard = page.locator('div.card', { hasText: escapeRegex(ruleName) });
 
-    const disableRequest = page.waitForResponse(/rules/);
-
     await ruleCard.getByLabel('Options').click();
+    await dropdown.action('Disable');
 
-    await disableRequest;
+    await expect(ruleCard.locator('sqx-toggle .toggle-container')).toHaveAttribute('data-state', 'unchecked');
 
     await ruleCard.getByLabel('Options').click();
     await dropdown.action('Enable');

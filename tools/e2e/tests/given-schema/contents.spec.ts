@@ -6,7 +6,7 @@
  */
 
 import { Page } from '@playwright/test';
-import { escapeRegex, getRandomId, waitForRequest } from '../utils';
+import { escapeRegex, getRandomId } from '../utils';
 import { expect, test } from './_fixture';
 
 test.beforeEach(async ({ page, appName, schemaName }) => {
@@ -37,10 +37,12 @@ test('update content', async ({ page }) => {
 
     // Define content value.
     await page.locator('sqx-field-editor').getByRole('textbox').fill(contentUpdate);
+    await saveContent(page, false);
 
-    await waitForRequest(page, /content/, async () => {
-        await page.getByRole('button', { name: 'Save', exact: true }).click();
-    });
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+
+    // Wait for update of the version
+    await page.getByText('VersioN: 1').waitFor({ state: 'visible' });
 
     // Go back
     await page.getByLabel('Back').click();
@@ -52,16 +54,19 @@ test('update content', async ({ page }) => {
 
 const states = [{
     state: 'Archived',
+    currentState: 'Draft',
     initialPublished: false,
 }, {
     state: 'Draft',
+    currentState: 'Published',
     initialPublished: true,
 }, {
     state: 'Published',
+    currentState: 'Draft',
     initialPublished: false,
 }];
 
-states.forEach(({ state, initialPublished }) => {
+states.forEach(({ state, currentState, initialPublished }) => {
     test(`change content to ${state}`, async ({ dropdown, page }) => {
         const contentText = await createRandomContent(page, initialPublished);
         const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
@@ -89,7 +94,7 @@ states.forEach(({ state, initialPublished }) => {
         const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
 
         await contentRow.click();
-        await page.getByRole('button', { name: 'Draft' }).click();
+        await page.getByRole('button', { name: currentState }).click();
         await page.getByText(`Change to ${state}`).click();
         await page.getByRole('button', { name: 'Confirm' }).click();
 
@@ -125,12 +130,7 @@ async function createRandomContent(page: Page, publish = false) {
 
     // Define content value.
     await page.locator('sqx-field-editor').getByRole('textbox').fill(contentText);
-
-    if (publish) {
-        await page.getByRole('button', { name: 'Save and Publish', exact: true }).click();
-    } else {
-        await page.getByRole('button', { name: 'Save', exact: true }).click();
-    }
+    await saveContent(page, publish);
 
     // Wait for the success alert.
     await page.getByLabel('Identity').waitFor({ state: 'visible' });
@@ -139,4 +139,12 @@ async function createRandomContent(page: Page, publish = false) {
     await page.getByLabel('Back').click();
 
     return contentText;
+}
+
+async function saveContent(page: Page, publish: boolean) {
+    if (publish) {
+        await page.getByRole('button', { name: 'Save and Publish', exact: true }).click();
+    } else {
+        await page.getByRole('button', { name: 'Save', exact: true }).click();
+    }
 }
