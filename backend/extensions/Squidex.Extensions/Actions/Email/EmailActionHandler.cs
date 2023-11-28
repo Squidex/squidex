@@ -47,7 +47,11 @@ public sealed class EmailActionHandler : RuleActionHandler<EmailAction, EmailJob
         using (var smtpClient = new SmtpClient())
         {
             await smtpClient.ConnectAsync(job.ServerHost, job.ServerPort, cancellationToken: ct);
-            await smtpClient.AuthenticateAsync(job.ServerUsername, job.ServerPassword, ct);
+
+            if (!string.IsNullOrWhiteSpace(job.ServerUsername) && !string.IsNullOrWhiteSpace(job.ServerPassword))
+            {
+                await smtpClient.AuthenticateAsync(job.ServerUsername, job.ServerPassword, ct);
+            }
 
             var smtpMessage = new MimeMessage();
 
