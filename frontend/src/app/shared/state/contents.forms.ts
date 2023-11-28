@@ -131,9 +131,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
         });
 
         value$(this.form).pipe(debounceTimeSafe(debounce), distinctUntilChanged(Types.equals)).subscribe(value => {
-            this.valueChange$.next(value);
-
-            this.updateState(value);
+            this.updateValue(value);
         });
 
         this.updateInitialData();
@@ -161,6 +159,8 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
         if (isInitial) {
             this.updateInitialData();
         }
+
+        this.updateValue(this.form.value);
     }
 
     protected disable() {
@@ -195,6 +195,12 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
         for (const section of this.sections) {
             section.updateHidden();
         }
+    }
+
+    private updateValue(value: any) {
+        this.valueChange$.next(value);
+
+        this.updateState(value);
     }
 
     private updateInitialData() {

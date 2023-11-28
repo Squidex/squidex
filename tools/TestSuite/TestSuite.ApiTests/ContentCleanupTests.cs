@@ -76,7 +76,7 @@ public class ContentCleanupTests : IClassFixture<CreatedAppFixture>
         // STEP 3: Create a content with a reference.
         var contentB_1 = await contents.CreateAsync(new TestEntityWithReferencesData
         {
-            References = new[] { contentA_1.Id }
+            References = [contentA_1.Id]
         });
 
 
@@ -91,6 +91,6 @@ public class ContentCleanupTests : IClassFixture<CreatedAppFixture>
         });
 
         // Should not return deleted field.
-        Assert.Empty(contentB_2.Data.References);
+        Assert.Empty(contentB_2.Data.References!);
     }
 }

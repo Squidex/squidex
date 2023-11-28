@@ -27,9 +27,9 @@ public class FileExtensionsTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void Should_blob_for_invalid_file_types(string fileName)
+    public void Should_blob_for_invalid_file_types(string? fileName)
     {
-        var actual = fileName.FileType();
+        var actual = fileName!.FileType();
 
         Assert.Equal("blob", actual);
     }

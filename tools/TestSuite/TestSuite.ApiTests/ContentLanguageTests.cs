@@ -28,7 +28,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
         // STEP 1: Create content.
         var content = await _.Contents.CreateAsync(new TestEntityData
         {
-            Localized = new Dictionary<string, string>
+            Localized = new Dictionary<string, string?>
             {
                 ["de"] = "Hallo",
                 ["en"] = "Hello"
@@ -48,7 +48,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
         // STEP 1: Create content.
         var content = await _.Contents.CreateAsync(new TestEntityData
         {
-            Localized = new Dictionary<string, string>
+            Localized = new Dictionary<string, string?>
             {
                 ["de"] = "Hallo",
                 ["en"] = "Hello",
@@ -62,7 +62,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
 
         var contentFlatten = await contents.GetAsync(content.Id, QueryContext.Default.Flatten().WithLanguages(code));
 
-        Assert.Equal(expected, (string)contentFlatten.Data["localized"]);
+        Assert.Equal(expected, (string?)contentFlatten.Data["localized"]);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
         // STEP 1: Create content.
         var content = await _.Contents.CreateAsync(new TestEntityData
         {
-            Localized = new Dictionary<string, string>
+            Localized = new Dictionary<string, string?>
             {
                 ["de"] = "Hallo",
                 ["en"] = "Hello"
@@ -98,7 +98,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
             ["X-Flatten"] = "1"
         });
 
-        static void AssertValue(string value, string not = null)
+        static void AssertValue(string? value, string? not = null)
         {
             Assert.NotNull(value);
             Assert.NotEmpty(value);
@@ -111,7 +111,7 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
         AssertValue(etag4, etag1);
     }
 
-    private async Task<(string, string)> GetEtagAsync(string id, Dictionary<string, string> headers)
+    private async Task<(string?, string)> GetEtagAsync(string id, Dictionary<string, string> headers)
     {
         var url = $"{_.Client.Options.Url}api/content/{_.AppName}/{_.SchemaName}/{id}";
 

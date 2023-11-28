@@ -165,9 +165,6 @@
   <data name="AssetMetadataText" xml:space="preserve">
     <value>The type of the image.</value>
   </data>
-  <data name="AssetMetadataValue" xml:space="preserve">
-    <value>The asset metadata with name 'name'.</value>
-  </data>
   <data name="AssetMimeType" xml:space="preserve">
     <value>The mime type.</value>
   </data>
@@ -368,6 +365,9 @@
   </data>
   <data name="NamedName" xml:space="preserve">
     <value>The name part of this ID.</value>
+  </data>
+  <data name="ObjectValue" xml:space="preserve">
+    <value>The value with name 'name'.</value>
   </data>
   <data name="Operation" xml:space="preserve">
     <value>The current operation.</value>

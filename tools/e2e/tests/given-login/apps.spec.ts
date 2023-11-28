@@ -5,13 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { expect, test } from '@playwright/test';
 import { getRandomId } from '../utils';
+import { expect, test } from './_fixture';
 
-test('should create app', async ({ page }) => {
-    const appName = `my-app-${getRandomId()}`;
-
+test.beforeEach(async ({ page }) => {
     await page.goto('/app');
+});
+
+test('create app', async ({ page }) => {
+    const appName = `my-app-${getRandomId()}`;
 
     await page.getByTestId('new-app').click();
 

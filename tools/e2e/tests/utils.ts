@@ -18,7 +18,7 @@ export function getRandomId() {
 export function escapeRegex(string: string) {
     const result = string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
 
-    return result;
+    return new RegExp(result);
 }
 
 export async function writeJsonAsync(name: string, json: any) {
@@ -33,7 +33,7 @@ export async function readJsonAsync<T>(name: string, defaultValue: T) {
     const json = await fs.readFile(fullPath, 'utf8');
 
     if (json) {
-        return JSON.parse(json);
+        return JSON.parse(json) as T;
     } else {
         return defaultValue;
     }

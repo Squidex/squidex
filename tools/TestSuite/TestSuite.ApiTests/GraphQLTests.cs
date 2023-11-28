@@ -62,8 +62,8 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
-        Assert.Equal(1, result["findMyWritesContent"]["flatData"]["json"]["value"].Value<int>());
-        Assert.Equal(2, result["findMyWritesContent"]["flatData"]["json"]["obj"]["value"].Value<int>());
+        Assert.Equal(1, result?["findMyWritesContent"]?["flatData"]?["json"]?["value"]?.Value<int>());
+        Assert.Equal(2, result?["findMyWritesContent"]?["flatData"]?["json"]?["obj"]?["value"]?.Value<int>());
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
-        var cities = result["cities"].ToObject<List<City>>();
+        var cities = result?["cities"]?.ToObject<List<City>>();
 
         cities.Should().BeEquivalentTo(new List<City>
         {
@@ -168,7 +168,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var cityNames =
-            result["countries"].ToObject<List<Country>>()[0].Data.States
+            result!["countries"]!.ToObject<List<Country>>()![0].Data.States
                 .SelectMany(x => x.Data.Cities)
                 .Select(x => x.Data.Name)
                 .Order();
@@ -204,10 +204,10 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var cityNames =
-            result["countries"]
-                .SelectMany(x => x["data"]["states"])
-                .SelectMany(x => x["cities"])
-                .Select(x => x["data"]["name"].Value<string>())
+            result!["countries"]!
+                .SelectMany(x => x["data"]!["states"]!)
+                .SelectMany(x => x["cities"]!)
+                .Select(x => x["data"]!["name"]!.Value<string>())
                 .Order();
 
         Assert.Equal(new[] { "Leipzig", "Munich" }, cityNames);
@@ -241,10 +241,10 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var cityNames =
-            result["countries"]
-                .SelectMany(x => x["data"]["states"])
-                .SelectMany(x => x["cities"])
-                .Select(x => x["data"]["name"].Value<string>())
+            result["countries"]!
+                .SelectMany(x => x["data"]!["states"]!)
+                .SelectMany(x => x["cities"]!)
+                .Select(x => x["data"]!["name"]!.Value<string>())
                 .Order();
 
         Assert.Equal(new[] { "Leipzig" }, cityNames);
@@ -270,9 +270,9 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var stateNames =
-            result["cities"]
-                .SelectMany(x => x["states"])
-                .Select(x => x["data"]["name"].Value<string>())
+            result["cities"]!
+                .SelectMany(x => x["states"]!)
+                .Select(x => x["data"]!["name"]!.Value<string>())
                 .Order();
 
         Assert.Equal(new[] { "Bavaria", "Saxony" }, stateNames);
@@ -298,9 +298,9 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var stateNames =
-            result["cities"]
-                .SelectMany(x => x["states"])
-                .Select(x => x["data"]["name"].Value<string>())
+            result!["cities"]!
+                .SelectMany(x => x!["states"]!)
+                .Select(x => x!["data"]!["name"]!.Value<string>())
                 .Order();
 
         Assert.Equal(new[] { "Saxony" }, stateNames);
@@ -322,8 +322,8 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var cityNames =
-            result["cities"]
-                .Select(x => x["data__dynamic"]["name"]["iv"].Value<string>())
+            result["cities"]!
+                .Select(x => x["data__dynamic"]!["name"]!["iv"]!.Value<string>())
                 .Order();
 
         Assert.Equal(new[] { "Leipzig", "Munich" }, cityNames);
@@ -347,7 +347,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         // Create the request manually to check the content type.
         var response = await httpClient.PostAsync(_.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent());
 
-        Assert.Equal("application/json", response.Content.Headers.ContentType.MediaType);
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
     }
 
     [Fact]
@@ -387,8 +387,8 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var names =
-            result["queryContentsByIds"]
-                .Select(x => x["data"]["name"].Value<string>())
+            result["queryContentsByIds"]!
+                .Select(x => x["data"]!["name"]!.Value<string>())
                 .Order();
 
         Assert.Equal(new[] { "Bavaria", "Leipzig", "Munich", "Saxony" }, names);
@@ -425,8 +425,8 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
-        var city1Id = result["a"]["id"].ToString();
-        var city2Id = result["b"]["id"].ToString();
+        var city1Id = result!["a"]!["id"]!.ToString();
+        var city2Id = result!["b"]!["id"]!.ToString();
 
         Assert.Equal(allCities.Items[0].Id, city1Id);
         Assert.Equal(allCities.Items[1].Id, city2Id);

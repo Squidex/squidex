@@ -30,7 +30,7 @@ public sealed class WebhookRequest
     public string Content { get; set; }
 
     [JsonIgnore]
-    public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+    public Dictionary<string, string> Headers { get; set; } = [];
 
     [JsonPropertyName("headers")]
     public WebhookHeader[] HeaderValues { get; set; }
@@ -81,17 +81,17 @@ public sealed class WebhookCatcherClient
 
         response.EnsureSuccessStatusCode();
 
-        var responseObj = await response.Content.ReadFromJsonAsync<WebhookSession>(cancellationToken: ct);
+        var responseObj = await response.Content.ReadFromJsonAsync<WebhookSession>(ct);
 
-        return ($"http://{EndpointHost}:{EndpointPort}/{responseObj.Uuid}", responseObj.Uuid);
+        return ($"http://{EndpointHost}:{EndpointPort}/{responseObj!.Uuid}", responseObj!.Uuid);
     }
 
     public async Task<WebhookRequest[]> GetRequestsAsync(string sessionId,
         CancellationToken ct = default)
     {
-        var result = await httpClient.GetFromJsonAsync<WebhookRequest[]>($"/api/session/{sessionId}/requests", ct);
+        var responseObj = await httpClient.GetFromJsonAsync<WebhookRequest[]>($"/api/session/{sessionId}/requests", ct);
 
-        foreach (var request in result)
+        foreach (var request in responseObj!)
         {
             if (request.Content != null)
             {
@@ -107,6 +107,6 @@ public sealed class WebhookCatcherClient
             }
         }
 
-        return result;
+        return responseObj;
     }
 }

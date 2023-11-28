@@ -51,7 +51,7 @@ public class ETagCommandMiddlewareTests
     [Fact]
     public async Task Should_add_expected_version_to_command()
     {
-        httpContext.Request.Headers[HeaderNames.IfMatch] = "13";
+        httpContext.Request.Headers[HeaderNames.IfMatch] = "\"13\"";
 
         var context = await HandleAsync(new CreateContent(), true);
 
@@ -61,7 +61,7 @@ public class ETagCommandMiddlewareTests
     [Fact]
     public async Task Should_add_weak_etag_as_expected_version_to_command()
     {
-        httpContext.Request.Headers[HeaderNames.IfMatch] = "W/13";
+        httpContext.Request.Headers[HeaderNames.IfMatch] = "W/\"13\"";
 
         var context = await HandleAsync(new CreateContent(), true);
 

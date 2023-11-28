@@ -70,7 +70,7 @@ public sealed class ContentDataObject : ObjectInstance
     {
         var propertyName = property.AsString();
 
-        fieldsToDelete ??= new HashSet<string>();
+        fieldsToDelete ??= [];
         fieldsToDelete.Add(propertyName);
 
         fieldProperties?.Remove(propertyName);
@@ -114,7 +114,7 @@ public sealed class ContentDataObject : ObjectInstance
             return PropertyDescriptor.Undefined;
         }
 
-        return fieldProperties.GetOrAdd(propertyName, (k, c) => new ContentDataProperty(c, new ContentFieldObject(c, new ContentFieldData(), false)), this);
+        return fieldProperties.GetOrAdd(propertyName, (k, c) => new ContentDataProperty(c, new ContentFieldObject(c, [], false)), this);
     }
 
     public override IEnumerable<KeyValuePair<JsValue, PropertyDescriptor>> GetOwnProperties()

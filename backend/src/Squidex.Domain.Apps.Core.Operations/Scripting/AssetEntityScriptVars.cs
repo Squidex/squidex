@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
@@ -51,15 +51,15 @@ public sealed class AssetEntityScriptVars : ScriptVars
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetMetadata))]
-    public AssetMetadata? Metadata
+    public ReadonlyDictionary<string, JsonValue>? Metadata
     {
-        set => SetInitial(value != null ? new ReadOnlyDictionary<string, JsonValue>(value) : null);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetTags))]
-    public HashSet<string>? Tags
+    public ReadonlyList<string>? Tags
     {
-        set => SetInitial(value != null ? new ReadOnlyCollection<string>(value.ToList()) : null);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetFileSize))]

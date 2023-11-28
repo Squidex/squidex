@@ -39,7 +39,7 @@ public class ClientFixture : IAsyncLifetime
         VerifierSettings.IgnoreMembersWithType<DateTimeOffset>();
     }
 
-    public Task<(ISquidexClient, AppDto)> PostAppAsync(string name = null)
+    public Task<(ISquidexClient, AppDto)> PostAppAsync(string? name = null)
     {
         name ??= Guid.NewGuid().ToString();
 
@@ -49,6 +49,18 @@ public class ClientFixture : IAsyncLifetime
         };
 
         return PostAppAsync(createRequest);
+    }
+
+    public Task<TeamDto> PostTeamAsync(string? name = null)
+    {
+        name ??= Guid.NewGuid().ToString();
+
+        var request = new CreateTeamDto
+        {
+            Name = name
+        };
+
+        return Client.Teams.PostTeamAsync(request);
     }
 
     public async Task<(ISquidexClient, AppDto)> PostAppAsync(CreateAppDto request)

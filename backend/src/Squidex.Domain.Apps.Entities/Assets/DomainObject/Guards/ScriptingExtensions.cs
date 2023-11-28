@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
@@ -62,11 +63,11 @@ public static class ScriptingExtensions
             FileSize = create.File.FileSize,
             FileVersion = 0,
             IsProtected = false,
-            Metadata = create.Metadata,
+            Metadata = create.Metadata?.ToReadonlyDictionary(),
             MimeType = create.File.MimeType,
             ParentId = create.ParentId,
             ParentPath = await GetPathAsync(operation, create.ParentId, ct),
-            Tags = create.Tags
+            Tags = create.Tags?.ToReadonlyList()
         };
 
         await ExecuteScriptAsync(operation, script, vars, asset, ct);
@@ -194,11 +195,11 @@ public static class ScriptingExtensions
             FileSlug = snapshot.Slug,
             FileVersion = snapshot.FileVersion,
             IsProtected = snapshot.IsProtected,
-            Metadata = snapshot.Metadata,
+            Metadata = snapshot.Metadata?.ToReadonlyDictionary(),
             MimeType = snapshot.MimeType,
             ParentId = snapshot.ParentId,
             ParentPath = await GetPathAsync(operation, snapshot.ParentId, ct),
-            Tags = snapshot.Tags,
+            Tags = snapshot.Tags?.ToReadonlyList(),
         };
 
         vars.AppId = operation.App.Id;

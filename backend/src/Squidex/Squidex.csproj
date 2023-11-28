@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
-    <NoWarn>1701;1702;NETSDK1206;NU1608</NoWarn>
+    <NoWarn>1701;1702;CS1591;NETSDK1206;NU1608</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -136,6 +136,7 @@
     <EmbeddedResource Include="..\..\i18n\frontend_nl.json" Link="Areas\Frontend\Resources\frontend_nl.json" />
     <EmbeddedResource Include="..\..\i18n\frontend_pt.json" Link="Areas\Frontend\Resources\frontend_pt.json" />
     <EmbeddedResource Include="..\..\i18n\frontend_zh.json" Link="Areas\Frontend\Resources\frontend_zh.json" />
+    <EmbeddedResource Include="..\..\i18n\frontend_fr.json" Link="Areas\Frontend\Resources\frontend_fr.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -156,8 +157,4 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
-  <PropertyGroup>
-    <NoWarn>$(NoWarn);CS1591;1591;1573;1572;NU1605;IDE0060</NoWarn>
-  </PropertyGroup>
 </Project>

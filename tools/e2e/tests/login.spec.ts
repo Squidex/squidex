@@ -7,9 +7,11 @@
 
 import { expect, test } from '@playwright/test';
 
-test('login', async ({ page }) => {
+test.beforeEach(async ({ page }) => {
     await page.goto('/');
+});
 
+test('login', async ({ page }) => {
     // Start waiting for popup before clicking.
     const popupPromise = page.waitForEvent('popup');
 
@@ -30,8 +32,6 @@ test('login', async ({ page }) => {
 });
 
 test('visual test', async ({ page }) => {
-    await page.goto('/');
-
     // Start waiting for popup before clicking.
     const popupPromise = page.waitForEvent('popup');
 

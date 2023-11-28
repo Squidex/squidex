@@ -35,7 +35,7 @@ public sealed class ContentDataProperty : CustomProperty
 
                 var obj = value.AsObject();
 
-                contentField = new ContentFieldObject(contentData, new ContentFieldData(), true);
+                contentField = new ContentFieldObject(contentData, [], true);
 
                 foreach (var (key, propertyDescriptor) in obj.GetOwnProperties())
                 {

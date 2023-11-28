@@ -13,15 +13,15 @@ public sealed class ProgressHandler : IAssetProgressHandler
 {
     public string FileId { get; private set; } = Guid.NewGuid().ToString();
 
-    public List<int> Progress { get; } = new List<int>();
+    public List<int> Progress { get; } = [];
 
-    public List<int> Uploads { get; } = new List<int>();
+    public List<int> Uploads { get; } = [];
 
     public Exception Exception { get; private set; }
 
     public AssetDto Asset { get; private set; }
 
-    public AssetUploadOptions AsOptions(string id = null)
+    public AssetUploadOptions AsOptions(string? id = null)
     {
         var options = default(AssetUploadOptions);
         options.ProgressHandler = this;

@@ -7,9 +7,11 @@
 
 using Squidex.ClientLibrary;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace TestSuite;
 
-public static class Strategies
+public static partial class ContentStrategies
 {
     public enum Deletion
     {
@@ -35,28 +37,28 @@ public static class Strategies
             case Deletion.BulkSoft:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Type = BulkUpdateType.Delete,
                             Id = content.Id,
                             Permanent = false,
-                        }
-                    }
+                        },
+                    ]
                 });
             case Deletion.BulkPermanent:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Type = BulkUpdateType.Delete,
                             Id = content.Id,
                             Permanent = true,
-                        }
-                    }
+                        },
+                    ]
                 });
             default:
                 return Task.CompletedTask;
@@ -89,56 +91,56 @@ public static class Strategies
             case Update.UpsertBulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Id = content.Id,
                             Data = data,
                             Type = BulkUpdateType.Upsert
-                        }
-                    }
+                        },
+                    ]
                 });
             case Update.Bulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Id = content.Id,
                             Data = data,
                             Type = BulkUpdateType.Update,
-                        }
-                    }
+                        },
+                    ]
                 });
             case Update.BulkWithSchema:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Id = content.Id,
                             Data = data,
                             Type = BulkUpdateType.Update,
                             Schema = content.SchemaName
-                        }
-                    }
+                        },
+                    ]
                 });
             case Update.BulkShared:
                 return client.SharedContents<MyContent, object>().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Id = content.Id,
                             Data = data,
                             Type = BulkUpdateType.Update,
                             Schema = content.SchemaName
-                        }
-                    }
+                        },
+                    ]
                 });
             default:
                 return Task.CompletedTask;
@@ -171,56 +173,56 @@ public static class Strategies
             case Patch.UpsertBulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Id = content.Id,
                             Data = data,
                             Patch = true,
-                        }
-                    }
+                        },
+                    ]
                 });
             case Patch.Bulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Id = content.Id,
                             Data = data,
                             Type = BulkUpdateType.Patch
-                        }
-                    }
+                        },
+                    ]
                 });
             case Patch.BulkWithSchema:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Id = content.Id,
                             Data = data,
                             Type = BulkUpdateType.Patch,
                             Schema = content.SchemaName
-                        }
-                    }
+                        },
+                    ]
                 });
             case Patch.BulkShared:
                 return client.SharedContents<MyContent, object>().BulkUpdateAsync(new BulkUpdate
                 {
-                    Jobs = new List<BulkUpdateJob>
-                    {
+                    Jobs =
+                    [
                         new BulkUpdateJob
                         {
                             Id = content.Id,
                             Data = data,
                             Type = BulkUpdateType.Patch,
                             Schema = content.SchemaName
-                        }
-                    }
+                        },
+                    ]
                 });
             default:
                 return Task.CompletedTask;

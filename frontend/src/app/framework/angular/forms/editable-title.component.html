@@ -8,14 +8,12 @@
             </div>
         </div>
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary btn-{{size}}" data-testid="save" [disabled]="!renameForm.valid || !renameForm.dirty">
-                <span class="hidden">{{ 'common.save' | sqxTranslate }}</span>
+            <button type="submit" class="btn btn-primary btn-{{size}}" attr.aria-label="{{ 'common.save' | sqxTranslate }}" [disabled]="!renameForm.valid || !renameForm.dirty">
                 <i class="icon-checkmark"></i>
             </button>
         </div>
         <div class="col-auto" *ngIf="closeButton">
-            <button type="button" class="btn btn-text-secondary btn-{{size}} btn-cancel" data-testid="cancel" (click)="toggleRename()">
-                <span class="hidden">{{ 'common.cancel' | sqxTranslate }}</span>
+            <button type="button" class="btn btn-text-secondary btn-{{size}} btn-cancel" attr.aria-label="{{ 'common.cancel' | sqxTranslate }}" (click)="toggleRename()">
                 <i class="icon-close"></i>
             </button>
         </div>

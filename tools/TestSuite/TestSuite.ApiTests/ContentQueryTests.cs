@@ -432,7 +432,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     [Fact]
     public async Task Should_query_json_with_dot()
     {
-        TestEntity content = null;
+        TestEntity? content = null;
         try
         {
             // STEP 1: Create a content item with a text that caused a bug before.
@@ -467,7 +467,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
             var queried = await _.Contents.GetAsync(q);
 
-            Assert.Equal(42, (int)queried.Items[0].Data.Json["search.field.with.dot"]);
+            Assert.Equal(42, (int)queried.Items[0].Data.Json!["search.field.with.dot"]!);
         }
         finally
         {
@@ -528,7 +528,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
 
-        var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
+        var value = result?["createMyReadsContent"]?["data"]?["number"]?["iv"]?.Value<int>();
 
         Assert.Equal(555, value);
     }
@@ -563,7 +563,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
 
-        var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
+        var value = result?["createMyReadsContent"]?["data"]?["number"]?["iv"]?.Value<int>();
 
         Assert.Equal(998, value);
     }
@@ -695,7 +695,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
         var items = result["queryMyReadsContents"];
 
-        Assert.Equal(new[] { 4, 5, 6 }, items.Select(x => x["data"]["number"]["iv"].Value<int>()).ToArray());
+        Assert.Equal(new[] { 4, 5, 6 }, items?.Select(x => x["data"]?["number"]?["iv"]?.Value<int>() ?? -1).ToArray());
     }
 
     [Fact]

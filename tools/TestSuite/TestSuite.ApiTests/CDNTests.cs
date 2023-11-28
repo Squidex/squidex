@@ -39,7 +39,7 @@ public class CDNTests : IClassFixture<ClientCloudFixture>
 
         var url = _.CDNClient.GenerateImageUrl(id);
 
-        await DownloadAsync(url);
+        await DownloadAsync(url!);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class CDNTests : IClassFixture<ClientCloudFixture>
 
         var url = _.CloudClient.GenerateImageUrl(id);
 
-        await DownloadAsync(url);
+        await DownloadAsync(url!);
     }
 
     [Fact]

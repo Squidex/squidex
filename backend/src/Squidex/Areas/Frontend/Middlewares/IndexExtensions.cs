@@ -63,7 +63,7 @@ public static class IndexExtensions
 
     private static string GetText(string culture)
     {
-        if (!Texts.TryGetValue(culture, out var result))
+        return Texts.GetOrAdd(culture, culture =>
         {
             var assembly = typeof(IndexExtensions).Assembly;
 
@@ -74,17 +74,15 @@ public static class IndexExtensions
             {
                 using (var reader = new StreamReader(resourceStream))
                 {
-                    result = reader.ReadToEnd();
+                    var result = reader.ReadToEnd();
 
-                    Texts[culture] = result;
+                    return result;
                 }
             }
             else
             {
                 return GetText("en");
             }
-        }
-
-        return result;
+        });
     }
 }

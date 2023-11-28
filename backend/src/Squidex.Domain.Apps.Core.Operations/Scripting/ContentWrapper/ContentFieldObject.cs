@@ -85,7 +85,7 @@ public sealed class ContentFieldObject : ObjectInstance
     {
         var propertyName = property.AsString();
 
-        valuesToDelete ??= new HashSet<string>();
+        valuesToDelete ??= [];
         valuesToDelete.Add(propertyName);
 
         valueProperties?.Remove(propertyName);

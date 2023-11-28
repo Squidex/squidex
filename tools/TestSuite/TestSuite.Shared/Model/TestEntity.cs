@@ -18,13 +18,13 @@ public sealed class TestEntity : Content<TestEntityData>
 {
     public const int ScriptTrigger = -99;
 
-    public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string name, SchemaScriptsDto scripts = null)
+    public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string name, SchemaScriptsDto? scripts = null)
     {
         var schema = await schemas.PostSchemaAsync(new CreateSchemaDto
         {
             Name = name,
-            Fields = new List<UpsertSchemaFieldDto>
-            {
+            Fields =
+            [
                 new UpsertSchemaFieldDto
                 {
                     Name = TestEntityData.NumberField,
@@ -73,8 +73,8 @@ public sealed class TestEntity : Content<TestEntityData>
                     {
                         IsRequired = false
                     }
-                }
-            },
+                },
+            ],
             Scripts = scripts,
             IsPublished = true
         });
@@ -133,20 +133,20 @@ public sealed class TestEntityData
 
     public static readonly string IdField = nameof(Id).ToLowerInvariant();
 
-    public Dictionary<string, string> Localized { get; set; }
+    public Dictionary<string, string?> Localized { get; set; }
 
     [JsonConverter(typeof(InvariantConverter))]
     public int Number { get; set; }
 
     [JsonConverter(typeof(InvariantConverter))]
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     [JsonConverter(typeof(InvariantConverter))]
-    public string String { get; set; }
+    public string? String { get; set; }
 
     [JsonConverter(typeof(InvariantConverter))]
-    public JToken Json { get; set; }
+    public JToken? Json { get; set; }
 
     [JsonConverter(typeof(InvariantConverter))]
-    public object Geo { get; set; }
+    public object? Geo { get; set; }
 }

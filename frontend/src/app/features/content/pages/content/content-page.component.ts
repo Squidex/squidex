@@ -267,6 +267,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
                     .subscribe({
                         next: content => {
                             this.contentForm.submitCompleted({ noReset: true });
+                            this.contentForm.load(content.data, true);
 
                             this.router.navigate([content.id, 'history'], { relativeTo: this.route.parent! });
                         },

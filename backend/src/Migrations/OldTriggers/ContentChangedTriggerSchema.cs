@@ -35,17 +35,17 @@ public sealed class ContentChangedTriggerSchema
 
         if (SendCreate)
         {
-            conditions.Add($"event.type == '{EnrichedContentEventType.Created}'");
+            conditions.Add($"event.type == '{nameof(EnrichedContentEventType.Created)}'");
         }
 
         if (SendUpdate)
         {
-            conditions.Add($"event.type == '{EnrichedContentEventType.Updated}'");
+            conditions.Add($"event.type == '{nameof(EnrichedContentEventType.Updated)}'");
         }
 
         if (SendPublish)
         {
-            conditions.Add($"event.type == '{EnrichedContentEventType.Published}'");
+            conditions.Add($"event.type == '{nameof(EnrichedContentEventType.Published)}'");
         }
 
         if (SendArchived)
@@ -55,7 +55,7 @@ public sealed class ContentChangedTriggerSchema
 
         if (SendDelete)
         {
-            conditions.Add($"event.type == '{EnrichedAssetEventType.Deleted}'");
+            conditions.Add($"event.type == '{nameof(EnrichedAssetEventType.Deleted)}'");
         }
 
         var condition = string.Empty;

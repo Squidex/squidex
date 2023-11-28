@@ -38,26 +38,32 @@ public sealed class CachingFilter : IAsyncActionFilter
         cachingManager.Finish(context.HttpContext);
 
         if (context.HttpContext.Response.HasStarted == false &&
-            context.HttpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag) &&
+            context.HttpContext.Response.Headers.TryGetValue(HeaderNames.ETag, out var etagValue) &&
+            EntityTagHeaderValue.TryParse(etagValue.ToString(), out var etag) &&
             IsCacheable(context.HttpContext, etag))
         {
             resultContext.Result = new StatusCodeResult(304);
         }
     }
 
-    private static bool IsCacheable(HttpContext httpContext, string etag)
+    private static bool IsCacheable(HttpContext httpContext, EntityTagHeaderValue etag)
     {
         if (!HttpMethods.IsGet(httpContext.Request.Method) || httpContext.Response.StatusCode != 200)
         {
             return false;
         }
 
-        if (!httpContext.Request.Headers.TryGetString(HeaderNames.IfNoneMatch, out var noneMatchValue))
+        if (!httpContext.Request.Headers.TryGetValue(HeaderNames.IfNoneMatch, out var noneMatchValue))
         {
             return false;
         }
 
-        return ETagUtils.IsSameEtag(noneMatchValue, etag);
+        if (!EntityTagHeaderValue.TryParse(noneMatchValue.ToString(), out var noneMatch))
+        {
+            return false;
+        }
+
+        return etag.Compare(noneMatch, false);
     }
 
     private static bool IgnoreFilter(ActionExecutingContext context)

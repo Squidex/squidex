@@ -72,7 +72,7 @@ public sealed class SmtpEmailSender : IEmailSender
             await smtpClient.ConnectAsync(options.Server, options.Port, cancellationToken: ct);
         }
 
-        if (!smtpClient.IsAuthenticated)
+        if (!smtpClient.IsAuthenticated && options.IsAuthenticating())
         {
             await smtpClient.AuthenticateAsync(options.Username, options.Password, ct);
         }

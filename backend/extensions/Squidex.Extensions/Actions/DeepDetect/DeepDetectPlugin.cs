@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Actions.DeepDetect;
 
-internal class DeepDetectPlugin : IPlugin
+internal sealed class DeepDetectPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {

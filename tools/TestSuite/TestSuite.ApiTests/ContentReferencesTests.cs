@@ -42,7 +42,7 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         // STEP 3: Query new item.
         var contentB_2 = await _.Contents.GetAsync(contentB_1.Id);
 
-        Assert.Empty(contentB_2.Data.References);
+        Assert.Empty(contentB_2.Data.References!);
 
 
         // STEP 4: Publish reference.

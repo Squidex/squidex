@@ -30,9 +30,9 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
 
         // Should parse image metadata.
         Assert.True(asset.IsImage);
-        Assert.Equal(600L, (long)asset.PixelWidth);
+        Assert.Equal(600L, (long)asset.PixelWidth!);
         Assert.Equal(600L, asset.Metadata["pixelWidth"]);
-        Assert.Equal(400L, (long)asset.PixelHeight);
+        Assert.Equal(400L, (long)asset.PixelHeight!);
         Assert.Equal(400L, asset.Metadata["pixelHeight"]);
         Assert.Equal(AssetType.Image, asset.Type);
 
@@ -119,9 +119,9 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
 
         // Should parse image metadata.
         Assert.True(asset.IsImage);
-        Assert.Equal(600L, (long)asset.PixelWidth);
+        Assert.Equal(600L, (long)asset.PixelWidth!);
         Assert.Equal(600L, asset.Metadata["pixelWidth"]);
-        Assert.Equal(400L, (long)asset.PixelHeight);
+        Assert.Equal(400L, (long)asset.PixelHeight!);
         Assert.Equal(400L, asset.Metadata["pixelHeight"]);
         Assert.Equal(AssetType.Image, asset.Type);
 
@@ -137,9 +137,9 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
 
         // Should parse image metadata and fix orientation.
         Assert.True(asset.IsImage);
-        Assert.Equal(600L, (long)asset.PixelWidth);
+        Assert.Equal(600L, (long)asset.PixelWidth!);
         Assert.Equal(600L, asset.Metadata["pixelWidth"]);
-        Assert.Equal(135L, (long)asset.PixelHeight);
+        Assert.Equal(135L, (long)asset.PixelHeight!);
         Assert.Equal(135L, asset.Metadata["pixelHeight"]);
         Assert.Equal(79L, asset.Metadata["imageQuality"]);
         Assert.Equal(AssetType.Image, asset.Type);
@@ -232,7 +232,7 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
         }
     }
 
-    private async Task<(long, string)> GetReformattedLength(string imageId, string format)
+    private async Task<(long, string?)> GetReformattedLength(string imageId, string format)
     {
         var url = $"{_.Client.GenerateImageUrl(imageId)}?format={format}";
 
@@ -246,7 +246,7 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
 
             await stream.CopyToAsync(buffer);
 
-            return (buffer.Length, response.Content.Headers.ContentType.ToString());
+            return (buffer.Length, response.Content.Headers.ContentType?.ToString());
         }
     }
 }
