@@ -329,8 +329,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     Partitioning = Partitioning.Invariant.Key
                 },
             ],
-            FieldsInLists = FieldNames.Create("field1"),
-            FieldsInReferences = FieldNames.Create("field1"),
+            FieldsInLists = FieldNames.Create("data.field1"),
+            FieldsInReferences = FieldNames.Create("data.field1"),
             Name = "new-schema"
         });
 
@@ -365,7 +365,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     Partitioning = Partitioning.Invariant.Key
                 },
             ],
-            FieldsInLists = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4"),
+            FieldsInLists = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4"),
             FieldsInReferences = null,
             Name = "new-schema"
         });
@@ -404,7 +404,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 },
             ],
             FieldsInLists = null,
-            FieldsInReferences = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4"),
+            FieldsInReferences = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4"),
             Name = "new-schema"
         });
 
@@ -427,7 +427,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = CreateCommand(new CreateSchema
         {
             FieldsInLists = null,
-            FieldsInReferences = FieldNames.Create("meta.id"),
+            FieldsInReferences = FieldNames.Create("id"),
             Name = "new-schema"
         });
 
@@ -477,8 +477,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     ]
                 },
             ],
-            FieldsInLists = FieldNames.Create("field1", "meta.id"),
-            FieldsInReferences = FieldNames.Create("field1"),
+            FieldsInLists = FieldNames.Create("data.field1", "id"),
+            FieldsInReferences = FieldNames.Create("data.field1"),
             Name = "new-schema"
         });
 
@@ -490,7 +490,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ConfigureUIFields
         {
-            FieldsInLists = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4"),
+            FieldsInLists = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4"),
             FieldsInReferences = null
         };
 
@@ -513,7 +513,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new ConfigureUIFields
         {
             FieldsInLists = null,
-            FieldsInReferences = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4")
+            FieldsInReferences = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4")
         };
 
         ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
@@ -548,8 +548,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ConfigureUIFields
         {
-            FieldsInLists = FieldNames.Create("field1", "meta.id"),
-            FieldsInReferences = FieldNames.Create("field2")
+            FieldsInLists = FieldNames.Create("data.field1", "id"),
+            FieldsInReferences = FieldNames.Create("data.field2")
         };
 
         GuardSchema.CanConfigureUIFields(command, schema_0);

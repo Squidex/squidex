@@ -54,12 +54,14 @@ export class ContentInspectionComponent implements OnDestroy {
             this.mode,
         ]).pipe(
             switchMap(([language, mode]) => {
-                if (mode === 'Content') {
-                    return of(this.content);
-                } else if (mode === 'Data') {
+                if (mode === 'Data') {
                     return of(this.content.data);
+                } else if (mode === 'Content') {
+                    return this.contentsService.getRawContent(this.appName,
+                        this.content.schemaName,
+                        this.content.id);
                 } else {
-                    return this.contentsService.getContent(this.appName,
+                    return this.contentsService.getRawContent(this.appName,
                         this.content.schemaName,
                         this.content.id,
                         language?.iso2Code).pipe(

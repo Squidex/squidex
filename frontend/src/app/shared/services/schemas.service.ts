@@ -25,67 +25,67 @@ export const META_FIELDS = {
         title: '',
     },
     id: {
-        name: 'meta.id',
+        name: 'id',
         label: 'i18n:schemas.tableHeaders.id',
         title: 'i18n:schemas.tableHeaders.id_title',
     },
     created: {
-        name: 'meta.created',
+        name: 'created',
         label: 'i18n:schemas.tableHeaders.created',
         title: 'i18n:schemas.tableHeaders.created_title',
     },
     createdByAvatar: {
-        name: 'meta.createdBy.avatar',
+        name: 'createdBy.avatar',
         label: 'i18n:schemas.tableHeaders.createdByShort',
         title: 'i18n:schemas.tableHeaders.createdByShort_title',
     },
     createdByName: {
-        name: 'meta.createdBy.name',
+        name: 'createdBy.name',
         label: 'i18n:schemas.tableHeaders.createdBy',
         title: 'i18n:schemas.tableHeaders.createdBy_title',
     },
     lastModified: {
-        name: 'meta.lastModified',
+        name: 'lastModified',
         label: 'i18n:schemas.tableHeaders.lastModified',
         title: 'i18n:schemas.tableHeaders.lastModified_title',
     },
     lastModifiedByAvatar: {
-        name: 'meta.lastModifiedBy.avatar',
+        name: 'lastModifiedBy.avatar',
         label: 'i18n:schemas.tableHeaders.lastModifiedByShort',
         title: 'i18n:schemas.tableHeaders.lastModifiedByShort_title',
     },
     lastModifiedByName: {
-        name: 'meta.lastModifiedBy.name',
+        name: 'lastModifiedBy.name',
         label: 'i18n:schemas.tableHeaders.lastModifiedBy',
         title: 'i18n:schemas.tableHeaders.lastModifiedBy_title',
     },
     status: {
-        name: 'meta.status',
+        name: 'status',
         label: 'i18n:schemas.tableHeaders.status',
         title: 'i18n:schemas.tableHeaders.status_title',
     },
     statusColor: {
-        name: 'meta.status.color',
+        name: 'status.color',
         label: 'i18n:schemas.tableHeaders.status',
         title: 'i18n:schemas.tableHeaders.status_title',
     },
     statusNext: {
-        name: 'meta.status.next',
+        name: 'status.next',
         label: 'i18n:schemas.tableHeaders.nextStatus',
         title: 'i18n:schemas.tableHeaders.nextStatus_title',
     },
     version: {
-        name: 'meta.version',
+        name: 'version',
         label: 'i18n:schemas.tableHeaders.version',
         title: 'i18n:schemas.tableHeaders.version_title',
     },
     translationStatus: {
-        name: 'meta.translationStatus',
+        name: 'translationStatus',
         label: 'i18n:schemas.tableHeaders.translationStatus',
         title: 'i18n:schemas.tableHeaders.translationStatus_title',
     },
     translationStatusAverage: {
-        name: 'meta.translationStatusAverage',
+        name: 'translationStatusAverage',
         label: 'i18n:schemas.tableHeaders.translationStatusAverage',
         title: 'i18n:schemas.tableHeaders.translationStatusAverage_title',
     },
@@ -95,7 +95,7 @@ export function getTableFields(fields: ReadonlyArray<TableField>) {
     const result: string[] = [];
 
     for (const field of fields) {
-        if (field.name && field.name.indexOf('meta') < 0) {
+        if (field.name?.startsWith('data.')) {
             result.push(field.name);
         }
     }
@@ -181,7 +181,7 @@ export class SchemaDto {
         function tableField(rootField: RootFieldDto) {
             const label = rootField.displayName;
 
-            return { name: rootField.name, label, rootField };
+            return { name: `data.${rootField.name}`, label, rootField };
         }
 
         if (fields) {

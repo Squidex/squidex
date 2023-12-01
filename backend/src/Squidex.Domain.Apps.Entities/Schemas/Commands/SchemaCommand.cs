@@ -7,9 +7,14 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities;
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
 
-public interface IEntityWithLastModifiedBy
+public abstract class SchemaCommand : SchemaCommandBase, ISchemaCommand
 {
-    RefToken LastModifiedBy { get; }
+    public NamedId<DomainId> SchemaId { get; set; }
+
+    public override DomainId AggregateId
+    {
+        get => DomainId.Combine(AppId, SchemaId.Id);
+    }
 }

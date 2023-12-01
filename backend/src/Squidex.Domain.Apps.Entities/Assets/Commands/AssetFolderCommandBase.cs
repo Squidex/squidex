@@ -6,10 +6,13 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities;
+namespace Squidex.Domain.Apps.Entities.Assets.Commands;
 
-public interface IEntityWithLastModifiedBy
+public abstract class AssetFolderCommandBase : SquidexCommand, IAppCommand, IAggregateCommand
 {
-    RefToken LastModifiedBy { get; }
+    public NamedId<DomainId> AppId { get; set; }
+
+    public abstract DomainId AggregateId { get; }
 }

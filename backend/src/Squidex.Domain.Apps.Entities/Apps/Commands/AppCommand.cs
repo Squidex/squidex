@@ -7,9 +7,16 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities;
+#pragma warning disable MA0048 // File name must match type name
 
-public interface IEntityWithLastModifiedBy
+namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+
+public abstract class AppCommand : AppCommandBase, IAppCommand
 {
-    RefToken LastModifiedBy { get; }
+    public NamedId<DomainId> AppId { get; set; }
+
+    public override DomainId AggregateId
+    {
+        get => AppId.Id;
+    }
 }

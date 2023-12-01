@@ -67,12 +67,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             var apps = await appRepository.QueryAllAsync(userId, permissions.ToAppNames(), ct);
 
-            foreach (var app in apps.Where(IsValid))
-            {
-                await CacheItAsync(app);
-            }
-
-            return apps.Where(IsValid).ToList();
+            return await apps.Where(IsValid).SelectAsync(PrepareAsync);
         }
     }
 
@@ -85,12 +80,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             var apps = await appRepository.QueryAllAsync(teamId, ct);
 
-            foreach (var app in apps.Where(IsValid))
-            {
-                await CacheItAsync(app);
-            }
-
-            return apps.Where(IsValid).ToList();
+            return await apps.Where(IsValid).SelectAsync(PrepareAsync);
         }
     }
 
@@ -111,17 +101,12 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             var app = await appRepository.FindAsync(name, ct);
 
-            if (!IsValid(app))
+            if (app == null || !IsValid(app))
             {
-                app = null;
+                return null;
             }
 
-            if (app != null)
-            {
-                await CacheItAsync(app);
-            }
-
-            return app;
+            return await PrepareAsync(app);
         }
     }
 
@@ -142,17 +127,12 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             var app = await appRepository.FindAsync(appId, ct);
 
-            if (!IsValid(app))
+            if (app == null || !IsValid(app))
             {
-                app = null;
+                return null;
             }
 
-            if (app != null)
-            {
-                await CacheItAsync(app);
-            }
-
-            return app;
+            return await PrepareAsync(app);
         }
     }
 
@@ -239,6 +219,18 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         return app is { Version: > EtagVersion.Empty, IsDeleted: false };
     }
 
+    private async Task<IAppEntity> PrepareAsync(IAppEntity app)
+    {
+        // Do not use cancellation here as we already so far.
+        await appCache.AddAsync(new[]
+        {
+            new KeyValuePair<string, object?>(GetCacheKey(app.Id), app),
+            new KeyValuePair<string, object?>(GetCacheKey(app.Name), app),
+        }, CacheDuration);
+
+        return app;
+    }
+
     private Task InvalidateItAsync(DomainId id, string name)
     {
         // Do not use cancellation here as we already so far.
@@ -247,15 +239,5 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
             GetCacheKey(id),
             GetCacheKey(name)
         });
-    }
-
-    private Task CacheItAsync(IAppEntity app)
-    {
-        // Do not use cancellation here as we already so far.
-        return appCache.AddAsync(new[]
-        {
-            new KeyValuePair<string, object?>(GetCacheKey(app.Id), app),
-            new KeyValuePair<string, object?>(GetCacheKey(app.Name), app),
-        }, CacheDuration);
     }
 }
