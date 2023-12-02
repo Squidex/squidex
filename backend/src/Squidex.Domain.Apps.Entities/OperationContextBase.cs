@@ -7,7 +7,7 @@
 
 using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
@@ -23,7 +23,7 @@ public abstract class OperationContextBase<TCommand, TSnapShot> where TCommand :
 
     public RefToken Actor => Command.Actor;
 
-    public IAppEntity App { get; init; }
+    public App App { get; init; }
 
     public DomainId CommandId { get; init; }
 

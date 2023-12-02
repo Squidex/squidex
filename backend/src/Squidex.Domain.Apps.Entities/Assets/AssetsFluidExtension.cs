@@ -11,6 +11,7 @@ using Fluid.Ast;
 using Fluid.Values;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Infrastructure;
@@ -127,7 +128,7 @@ public sealed class AssetsFluidExtension : IFluidExtension
 
         switch (objectValue.ToObjectValue())
         {
-            case IAssetEntity asset:
+            case Asset asset:
                 assetRef = asset.ToRef();
                 return true;
 
@@ -139,7 +140,7 @@ public sealed class AssetsFluidExtension : IFluidExtension
         return true;
     }
 
-    private static async Task<IAssetEntity?> ResolveAssetAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)
+    private static async Task<Asset?> ResolveAssetAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)
     {
         var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
 

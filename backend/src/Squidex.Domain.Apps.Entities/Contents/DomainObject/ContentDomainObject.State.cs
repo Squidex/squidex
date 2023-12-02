@@ -5,155 +5,127 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
 public partial class ContentDomainObject
 {
-    public sealed class State : DomainObjectState<State>, IContentEntity
+    protected override WriteContent Apply(WriteContent snapshot, Envelope<IEvent> @event)
     {
-        public NamedId<DomainId> AppId { get; set; }
+        var newSnapshot = snapshot;
 
-        public NamedId<DomainId> SchemaId { get; set; }
-
-        public ContentVersion? NewVersion { get; set; }
-
-        public ContentVersion CurrentVersion { get; set; }
-
-        public ScheduleJob? ScheduleJob { get; set; }
-
-        public bool IsDeleted { get; set; }
-
-        [JsonIgnore]
-        public DomainId UniqueId
+        ContentData Data()
         {
-            get => DomainId.Combine(AppId, Id);
+            return snapshot.NewVersion.Data ?? snapshot.CurrentVersion.Data;
         }
 
-        [JsonIgnore]
-        public ContentData Data
+        ContentData CurrentData()
         {
-            get => NewVersion?.Data ?? CurrentData;
+            return snapshot.CurrentVersion.Data;
         }
 
-        [JsonIgnore]
-        public ContentData CurrentData
+        switch (@event.Payload)
         {
-            get => CurrentVersion.Data;
+            case ContentCreated e:
+                newSnapshot = snapshot with
+                {
+                    Id = e.ContentId,
+                    AppId = e.AppId,
+                    ScheduleJob = null,
+                    SchemaId = e.SchemaId,
+                    CurrentVersion = new ContentVersion(e.Status, e.Data)
+                };
+
+                break;
+
+            case ContentDraftCreated e:
+                newSnapshot = snapshot with
+                {
+                    NewVersion = new ContentVersion(e.Status, e.MigratedData?.UseSameFields(CurrentData()) ?? CurrentData()),
+                    // Implictely cancels any pending update jobs.
+                    ScheduleJob = null,
+                };
+
+                break;
+
+            case ContentDraftDeleted:
+                newSnapshot = snapshot with
+                {
+                    NewVersion = null,
+                    // Implictely cancels any pending update jobs.
+                    ScheduleJob = null,
+                };
+
+                break;
+
+            case ContentStatusChanged e when snapshot.NewVersion != null && e.Status == Status.Published:
+                newSnapshot = snapshot with
+                {
+                    CurrentVersion = new ContentVersion(e.Status, snapshot.NewVersion.Data.UseSameFields(CurrentData())),
+                    // Discards the draft version.
+                    NewVersion = null,
+                    // Implictely cancels any pending update jobs.
+                    ScheduleJob = null,
+                };
+
+                break;
+
+            case ContentStatusChanged e when snapshot.NewVersion != null:
+                newSnapshot = snapshot with
+                {
+                    NewVersion = snapshot.NewVersion with { Status = e.Status },
+                    // Implictely cancels any pending update jobs.
+                    ScheduleJob = null,
+                };
+
+                break;
+
+            case ContentStatusChanged e:
+                newSnapshot = snapshot with
+                {
+                    CurrentVersion = snapshot.CurrentVersion with { Status = e.Status },
+                    // Implictely cancels any pending update jobs.
+                    ScheduleJob = null,
+                };
+
+                break;
+
+            case ContentUpdated e when snapshot.NewVersion != null:
+                newSnapshot = snapshot with
+                {
+                    NewVersion = snapshot.NewVersion with { Data = e.Data.UseSameFields(Data()) }
+                };
+                break;
+
+            case ContentUpdated e:
+                newSnapshot = snapshot with
+                {
+                    CurrentVersion = snapshot.CurrentVersion with { Data = e.Data.UseSameFields(CurrentData()) }
+                };
+                break;
+
+            case ContentSchedulingCancelled:
+                newSnapshot = snapshot with { ScheduleJob = null };
+                break;
+
+            case ContentStatusScheduled e:
+                newSnapshot = snapshot with { ScheduleJob = ScheduleJob.Build(e.Status, e.Actor, e.DueTime) };
+                break;
+
+            case ContentDeleted:
+                newSnapshot = snapshot with { IsDeleted = true };
+                break;
         }
 
-        [JsonIgnore]
-        public Status? NewStatus
+        if (ReferenceEquals(newSnapshot, snapshot))
         {
-            get => NewVersion?.Status;
+            return snapshot;
         }
 
-        [JsonIgnore]
-        public Status Status
-        {
-            get => CurrentVersion?.Status ?? default;
-        }
-
-        public override bool ApplyEvent(IEvent @event, EnvelopeHeaders headers)
-        {
-            switch (@event)
-            {
-                case ContentCreated e:
-                    {
-                        Id = e.ContentId;
-
-                        SimpleMapper.Map(e, this);
-
-                        CurrentVersion = new ContentVersion(e.Status, e.Data);
-
-                        break;
-                    }
-
-                case ContentDraftCreated e:
-                    {
-                        var newData = e.MigratedData?.UseSameFields(CurrentData) ?? CurrentData;
-
-                        NewVersion = new ContentVersion(e.Status, newData);
-
-                        // Implictely cancels any pending update jobs.
-                        ScheduleJob = null;
-                        break;
-                    }
-
-                case ContentDraftDeleted:
-                    {
-                        NewVersion = null;
-
-                        // Implictely cancels any pending update jobs.
-                        ScheduleJob = null;
-                        break;
-                    }
-
-                case ContentStatusChanged e:
-                    {
-                        ScheduleJob = null;
-
-                        if (NewVersion != null)
-                        {
-                            if (e.Status == Status.Published)
-                            {
-                                CurrentVersion = new ContentVersion(e.Status, NewVersion.Data.UseSameFields(CurrentData));
-
-                                NewVersion = null;
-                            }
-                            else
-                            {
-                                NewVersion = NewVersion.WithStatus(e.Status);
-                            }
-                        }
-                        else
-                        {
-                            CurrentVersion = CurrentVersion.WithStatus(e.Status);
-                        }
-
-                        break;
-                    }
-
-                case ContentSchedulingCancelled:
-                    {
-                        ScheduleJob = null;
-                        break;
-                    }
-
-                case ContentStatusScheduled e:
-                    {
-                        ScheduleJob = ScheduleJob.Build(e.Status, e.Actor, e.DueTime);
-                        break;
-                    }
-
-                case ContentUpdated e:
-                    {
-                        if (NewVersion != null)
-                        {
-                            NewVersion = NewVersion.WithData(e.Data.UseSameFields(Data));
-                        }
-                        else
-                        {
-                            CurrentVersion = CurrentVersion.WithData(e.Data.UseSameFields(CurrentData));
-                        }
-
-                        break;
-                    }
-
-                case ContentDeleted:
-                    {
-                        IsDeleted = true;
-                        break;
-                    }
-            }
-
-            return true;
-        }
+        return newSnapshot.Apply(@event.To<SquidexEvent>());
     }
 }

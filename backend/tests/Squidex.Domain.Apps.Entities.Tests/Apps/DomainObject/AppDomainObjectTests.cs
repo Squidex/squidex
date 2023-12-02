@@ -22,7 +22,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
-public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
+public class AppDomainObjectTests : HandlerTestBase<App>
 {
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly IBillingManager billingManager = A.Fake<IBillingManager>();
@@ -48,22 +48,24 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     {
         user = UserMocks.User(contributorId);
 
-        A.CallTo(() => Team.Contributors)
-            .Returns(Contributors.Empty.Assign(User.Identifier, Role.Owner));
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Owner)
+        };
 
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, CancellationToken))
             .Returns(user);
 
-        A.CallTo(() => usageGate.GetPlanForAppAsync(A<IAppEntity>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdFree), false, CancellationToken))
+        A.CallTo(() => usageGate.GetPlanForAppAsync(A<App>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdFree), false, CancellationToken))
             .Returns((new Plan { Id = planIdFree, MaxContributors = 10 }, planIdFree, null));
 
-        A.CallTo(() => usageGate.GetPlanForAppAsync(A<IAppEntity>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdPaid), false, CancellationToken))
+        A.CallTo(() => usageGate.GetPlanForAppAsync(A<App>.That.Matches(x => x.Plan != null && x.Plan.PlanId == planIdPaid), false, CancellationToken))
             .Returns((new Plan { Id = planIdPaid, MaxContributors = 30 }, planIdPaid, null));
 
         A.CallTo(() => billingPlans.GetFreePlan())
             .Returns(new Plan { Id = planIdFree, MaxContributors = 10 });
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, A<string>._, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, A<string>._, CancellationToken))
             .Returns(Task.FromResult<Uri?>(null));
 
         // Create a non-empty setting, otherwise the event is not raised as it does not change the domain object.
@@ -161,12 +163,13 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     [Fact]
     public async Task UpdateSettings_should_create_event_and_update_settings()
     {
-        var settings = new AppSettings
+        var command = new UpdateAppSettings
         {
-            HideDateTimeModeButton = true
+            Settings = new AppSettings
+            {
+                HideDateTimeModeButton = true
+            }
         };
-
-        var command = new UpdateAppSettings { Settings = settings };
 
         await ExecuteCreateAsync();
 
@@ -174,11 +177,11 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(settings, sut.Snapshot.Settings);
+        Assert.Equal(command.Settings, sut.Snapshot.Settings);
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateEvent(new AppSettingsUpdated { Settings = settings })
+                CreateEvent(new AppSettingsUpdated { Settings = command.Settings })
             );
     }
 
@@ -226,7 +229,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     {
         var command = new ChangePlan { PlanId = planIdPaid };
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, default))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, planIdPaid, default))
             .Returns(Task.FromResult<Uri?>(null));
 
         await ExecuteCreateAsync();
@@ -242,10 +245,10 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
                 CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, planIdPaid, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<IAppEntity>._, planIdPaid, default))
+        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<App>._, planIdPaid, default))
             .MustHaveHappened();
     }
 
@@ -267,10 +270,10 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
                 CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<IAppEntity>._, A<string?>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<App>._, A<string?>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(A<string>._, A<IAppEntity>._, A<string?>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.SubscribeAsync(A<string>._, A<App>._, A<string?>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -293,10 +296,10 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
                 CreateEvent(new AppPlanReset())
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._,  A<IAppEntity>._, A<string?>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._,  A<App>._, A<string?>._, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._,  A<IAppEntity>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._,  A<App>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -319,10 +322,10 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
                 CreateEvent(new AppPlanReset())
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, planIdPaid, CancellationToken))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._,  A<IAppEntity>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._,  A<App>._, A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -331,7 +334,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
     {
         var command = new ChangePlan { PlanId = planIdPaid };
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, planIdPaid, CancellationToken))
             .Returns(new Uri("http://squidex.io"));
 
         await ExecuteCreateAsync();
@@ -356,10 +359,10 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
 
         Assert.Equal(planIdPaid, sut.Snapshot.Plan?.PlanId);
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<IAppEntity>._, planIdPaid, A<CancellationToken>._))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, planIdPaid, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<IAppEntity>._, planIdPaid, A<CancellationToken>._))
+        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<App>._, planIdPaid, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -713,7 +716,7 @@ public class AppDomainObjectTests : HandlerTestBase<AppDomainObject.State>
                 CreateEvent(new AppDeleted())
             );
 
-        A.CallTo(() => billingManager.UnsubscribeAsync(command.Actor.Identifier, A<IAppEntity>._, default))
+        A.CallTo(() => billingManager.UnsubscribeAsync(command.Actor.Identifier, A<App>._, default))
             .MustHaveHappened();
     }
 

@@ -6,45 +6,13 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json;
 
-public sealed class SchemaSurrogate : ISurrogate<Schema>
+public sealed record SchemaSurrogate : Schema, ISurrogate<Schema>
 {
-    public string Name { get; set; }
-
-    public string Category { get; set; }
-
-    public bool IsPublished { get; set; }
-
-    public SchemaType Type { get; set; }
-
-    public SchemaProperties Properties { get; set; }
-
-    public SchemaScripts? Scripts { get; set; }
-
-    public FieldNames? FieldsInLists { get; set; }
-
-    public FieldNames? FieldsInReferences { get; set; }
-
-    public FieldRules? FieldRules { get; set; }
-
-    public FieldSurrogate[] Fields { get; set; }
-
-    public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
-
-    public bool IsSingleton
-    {
-        set
-        {
-            if (value)
-            {
-                Type = SchemaType.Singleton;
-            }
-        }
-    }
+    public new FieldSurrogate[] Fields { get; set; }
 
     public void FromSource(Schema source)
     {
@@ -86,38 +54,14 @@ public sealed class SchemaSurrogate : ISurrogate<Schema>
 
     public Schema ToSource()
     {
-        var fields = Fields?.Select(f => f.ToField()).ToArray() ?? [];
+        var schema = SimpleMapper.Map(this, new Schema());
 
-        var schema = new Schema(Name, fields, Properties, IsPublished, Type);
-
-        if (!string.IsNullOrWhiteSpace(Category))
+        if (Fields != null)
         {
-            schema = schema.ChangeCategory(Category);
-        }
-
-        if (Scripts != null)
-        {
-            schema = schema.SetScripts(Scripts);
-        }
-
-        if (FieldsInLists?.Count > 0)
-        {
-            schema = schema.SetFieldsInLists(FieldsInLists);
-        }
-
-        if (FieldsInReferences?.Count > 0)
-        {
-            schema = schema.SetFieldsInReferences(FieldsInReferences);
-        }
-
-        if (FieldRules?.Count > 0)
-        {
-            schema = schema.SetFieldRules(FieldRules);
-        }
-
-        if (PreviewUrls?.Count > 0)
-        {
-            schema = schema.SetPreviewUrls(PreviewUrls);
+            schema = schema with
+            {
+                FieldCollection = new FieldCollection<RootField>(Fields.Select(x => x.ToField()).ToArray())
+            };
         }
 
         return schema;

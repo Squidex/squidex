@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -29,11 +29,11 @@ public abstract class ApiController : Controller
 
     protected ICommandBus CommandBus { get; }
 
-    protected IAppEntity App
+    protected App App
     {
         get
         {
-            var app = HttpContext.Features.Get<IAppFeature>()?.App;
+            var app = HttpContext.Features.Get<App>();
 
             if (app == null)
             {
@@ -45,11 +45,11 @@ public abstract class ApiController : Controller
         }
     }
 
-    protected ITeamEntity Team
+    protected Team Team
     {
         get
         {
-            var team = HttpContext.Features.Get<ITeamFeature>()?.Team;
+            var team = HttpContext.Features.Get<Team>();
 
             if (team == null)
             {
@@ -61,11 +61,11 @@ public abstract class ApiController : Controller
         }
     }
 
-    protected ISchemaEntity Schema
+    protected Schema Schema
     {
         get
         {
-            var schema = HttpContext.Features.Get<ISchemaFeature>()?.Schema;
+            var schema = HttpContext.Features.Get<Schema>();
 
             if (schema == null)
             {

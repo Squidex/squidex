@@ -8,6 +8,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
@@ -18,7 +19,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
 
-public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
+public class TeamDomainObjectTests : HandlerTestBase<Team>
 {
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly IBillingManager billingManager = A.Fake<IBillingManager>();
@@ -51,7 +52,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
         A.CallTo(() => billingPlans.GetPlan(planPaid.Id))
             .Returns(planPaid);
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, A<string>._, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, A<string>._, CancellationToken))
             .Returns(Task.FromResult<Uri?>(null));
 
         var serviceProvider =
@@ -127,7 +128,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
     {
         var command = new ChangePlan { PlanId = planPaid.Id };
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, planPaid.Id, CancellationToken))
             .Returns(Task.FromResult<Uri?>(null));
 
         await ExecuteCreateAsync();
@@ -143,10 +144,10 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
                 CreateEvent(new TeamPlanChanged { PlanId = planPaid.Id })
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, planPaid.Id, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, default))
+        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<Team>._, planPaid.Id, default))
             .MustHaveHappened();
     }
 
@@ -168,10 +169,10 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
                 CreateEvent(new TeamPlanChanged { PlanId = planPaid.Id })
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<ITeamEntity>._, A<string?>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<Team>._, A<string?>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(A<string>._, A<ITeamEntity>._, A<string?>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.SubscribeAsync(A<string>._, A<Team>._, A<string?>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -194,10 +195,10 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
                 CreateEvent(new TeamPlanReset())
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<ITeamEntity>._, A<string?>._, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<Team>._, A<string?>._, CancellationToken))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<ITeamEntity>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<Team>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -220,10 +221,10 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
                 CreateEvent(new TeamPlanReset())
             );
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, planPaid.Id, CancellationToken))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<ITeamEntity>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<Team>._, A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -232,7 +233,7 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
     {
         var command = new ChangePlan { PlanId = planPaid.Id };
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, CancellationToken))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, planPaid.Id, CancellationToken))
             .Returns(new Uri("http://squidex.io"));
 
         await ExecuteCreateAsync();
@@ -257,10 +258,10 @@ public class TeamDomainObjectTests : HandlerTestBase<TeamDomainObject.State>
 
         Assert.Equal(planPaid.Id, sut.Snapshot.Plan?.PlanId);
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, A<CancellationToken>._))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, planPaid.Id, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<ITeamEntity>._, planPaid.Id, A<CancellationToken>._))
+        A.CallTo(() => billingManager.SubscribeAsync(User.Identifier, A<Team>._, planPaid.Id, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 

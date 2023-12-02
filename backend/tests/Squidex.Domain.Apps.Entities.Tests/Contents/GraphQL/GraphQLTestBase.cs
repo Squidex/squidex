@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
@@ -108,7 +109,7 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
         return actual;
     }
 
-    protected CachingGraphQLResolver CreateSut(params ISchemaEntity[] schemas)
+    protected CachingGraphQLResolver CreateSut(params Schema[] schemas)
     {
         var appProvider = A.Fake<IAppProvider>();
 

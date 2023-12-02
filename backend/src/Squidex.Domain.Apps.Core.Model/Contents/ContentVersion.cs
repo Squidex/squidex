@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
-
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Web.Pipeline;
+namespace Squidex.Domain.Apps.Core.Contents;
 
-public sealed record AppFeature(IAppEntity App) : IAppFeature;
+public sealed record ContentVersion(Status Status, ContentData Data)
+{
+}

@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class FileTypeAssetMetadataSourceTests
+public class FileTypeAssetMetadataSourceTests : GivenContext
 {
     private readonly FileTypeAssetMetadataSource sut = new FileTypeAssetMetadataSource();
 
@@ -53,7 +53,7 @@ public class FileTypeAssetMetadataSourceTests
     [Fact]
     public void Should_always_format_to_empty()
     {
-        var source = new AssetEntity();
+        var source = CreateAsset();
 
         var formatted = sut.Format(source);
 

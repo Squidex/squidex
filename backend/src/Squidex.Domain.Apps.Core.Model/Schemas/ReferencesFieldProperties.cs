@@ -61,13 +61,13 @@ public sealed record ReferencesFieldProperties : FieldProperties
         return visitor.Visit((IField<ReferencesFieldProperties>)field, args);
     }
 
-    public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
+    public override RootField CreateRootField(long id, string name, Partitioning partitioning)
     {
-        return Fields.References(id, name, partitioning, this, settings);
+        return Fields.References(id, name, partitioning, this);
     }
 
-    public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
+    public override NestedField CreateNestedField(long id, string name)
     {
-        return Fields.References(id, name, this, settings);
+        return Fields.References(id, name, this);
     }
 }

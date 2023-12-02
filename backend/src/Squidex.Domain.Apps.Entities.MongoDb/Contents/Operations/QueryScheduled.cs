@@ -7,9 +7,9 @@
 
 using MongoDB.Driver;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
@@ -28,7 +28,7 @@ internal sealed class QueryScheduled : OperationBase
             .Ascending(x => x.IndexedSchemaId));
     }
 
-    public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
+    public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,
         CancellationToken ct)
     {
         var filter = CreateFilter(app.Id, schemas.Select(x => x.Id), q.ScheduledFrom!.Value, q.ScheduledTo!.Value);
@@ -39,10 +39,10 @@ internal sealed class QueryScheduled : OperationBase
         return ResultList.Create(contentTotal, contentEntities);
     }
 
-    public IAsyncEnumerable<IContentEntity> QueryAsync(Instant now,
+    public IAsyncEnumerable<Content> QueryAsync(Instant now,
         CancellationToken ct)
     {
-        var find = Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true).Not(x => x.Data, x => x.DraftData);
+        var find = Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true).Not(x => x.Data, x => x.NewData);
 
         return find.ToAsyncEnumerable(ct);
     }

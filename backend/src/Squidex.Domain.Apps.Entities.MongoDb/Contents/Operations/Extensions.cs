@@ -35,7 +35,7 @@ public static class Extensions
         get => propertyMap ??=
             BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).AllMemberMaps
                 .Where(x =>
-                    x.MemberName != nameof(MongoContentEntity.DraftData) &&
+                    x.MemberName != nameof(MongoContentEntity.NewData) &&
                     x.MemberName != nameof(MongoContentEntity.Data))
                 .ToDictionary(
                     x => x.MemberName,
@@ -193,7 +193,7 @@ public static class Extensions
         }
         else
         {
-            projections.Add(projector.Exclude(Field.Of<MongoContentEntity>(x => nameof(x.DraftData))));
+            projections.Add(projector.Exclude(Field.Of<MongoContentEntity>(x => nameof(x.NewData))));
         }
 
         return projector.Combine(projections);

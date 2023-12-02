@@ -115,9 +115,9 @@ public class ReferencesFluidExtensionTests : GivenContext
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
 
-    private static IEnrichedContentEntity CreateReference(DomainId referenceId, int index)
+    private EnrichedContent CreateReference(DomainId referenceId, int index)
     {
-        return new ContentEntity
+        return CreateContent() with
         {
             Data =
                 new ContentData()

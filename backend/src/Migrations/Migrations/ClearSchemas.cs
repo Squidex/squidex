@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 
@@ -13,9 +13,9 @@ namespace Migrations.Migrations;
 
 public sealed class ClearSchemas : IMigration
 {
-    private readonly IStore<SchemaDomainObject.State> store;
+    private readonly IStore<Schema> store;
 
-    public ClearSchemas(IStore<SchemaDomainObject.State> store)
+    public ClearSchemas(IStore<Schema> store)
     {
         this.store = store;
     }

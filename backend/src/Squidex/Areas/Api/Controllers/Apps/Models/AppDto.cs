@@ -12,6 +12,7 @@ using Squidex.Areas.Api.Controllers.Ping;
 using Squidex.Areas.Api.Controllers.Plans;
 using Squidex.Areas.Api.Controllers.Rules;
 using Squidex.Areas.Api.Controllers.Schemas;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -95,7 +96,7 @@ public sealed class AppDto : Resource
     /// </summary>
     public JsonObject RoleProperties { get; set; }
 
-    public static AppDto FromDomain(IAppEntity app, string userId, bool isFrontend, Resources resources)
+    public static AppDto FromDomain(App app, string userId, bool isFrontend, Resources resources)
     {
         var result = SimpleMapper.Map(app, new AppDto());
 
@@ -139,7 +140,7 @@ public sealed class AppDto : Resource
         return result.CreateLinks(app, resources, permissions, isContributor);
     }
 
-    private AppDto CreateLinks(IAppEntity app, Resources resources, PermissionSet permissions, bool isContributor)
+    private AppDto CreateLinks(App app, Resources resources, PermissionSet permissions, bool isContributor)
     {
         var values = new { app = Name };
 

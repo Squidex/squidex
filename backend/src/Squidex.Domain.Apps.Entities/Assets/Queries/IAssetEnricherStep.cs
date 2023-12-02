@@ -9,7 +9,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
 public interface IAssetEnricherStep
 {
-    Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
+    Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct);
 
     Task EnrichAsync(Context context,

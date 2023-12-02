@@ -6,29 +6,14 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents;
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-public sealed class ScheduleJob
+namespace Squidex.Domain.Apps.Core.Contents;
+
+public sealed record ScheduleJob(DomainId Id, Status Status, RefToken ScheduledBy, Instant DueTime)
 {
-    public DomainId Id { get; }
-
-    public Instant DueTime { get; }
-
-    public Status Status { get; }
-
-    public RefToken ScheduledBy { get; }
-
-    public ScheduleJob(DomainId id, Status status, RefToken scheduledBy, Instant dueTime)
-    {
-        Id = id;
-        ScheduledBy = scheduledBy;
-        Status = status;
-        DueTime = dueTime;
-    }
-
     public static ScheduleJob Build(Status status, RefToken scheduledBy, Instant dueTime)
     {
         return new ScheduleJob(DomainId.NewGuid(), status, scheduledBy, dueTime);

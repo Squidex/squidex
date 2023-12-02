@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text.Json.Serialization;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Json;
 
@@ -23,7 +24,7 @@ public class SchemaStateTests
     {
         var json = File.ReadAllText("Schemas/DomainObject/SchemaState.json");
 
-        var deserialized = serializer.Deserialize<SchemaDomainObject.State>(json);
+        var deserialized = serializer.Deserialize<Schema>(json);
 
         Assert.NotNull(deserialized);
     }
@@ -33,7 +34,7 @@ public class SchemaStateTests
     {
         var json = File.ReadAllText("Schemas/DomainObject/SchemaState.json").CleanJson();
 
-        var serialized = serializer.Serialize(serializer.Deserialize<SchemaDomainObject.State>(json), true);
+        var serialized = serializer.Serialize(serializer.Deserialize<Schema>(json), true);
 
         Assert.Equal(json, serialized);
     }

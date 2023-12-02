@@ -21,7 +21,7 @@ public sealed class EnrichWithWorkflows : IContentEnricherStep
         this.contentWorkflow = contentWorkflow;
     }
 
-    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
         var cache = new Dictionary<(DomainId, Status), StatusInfo>();
@@ -30,7 +30,7 @@ public sealed class EnrichWithWorkflows : IContentEnricherStep
         {
             ct.ThrowIfCancellationRequested();
 
-            await EnrichColorAsync(content, content, cache);
+            await EnrichColorAsync(content, cache);
 
             if (ShouldEnrichWithStatuses(context))
             {
@@ -40,7 +40,7 @@ public sealed class EnrichWithWorkflows : IContentEnricherStep
         }
     }
 
-    private async Task EnrichNextsAsync(ContentEntity content, Context context)
+    private async Task EnrichNextsAsync(EnrichedContent content, Context context)
     {
         var editingStatus = content.NewStatus ?? content.Status;
 
@@ -64,29 +64,27 @@ public sealed class EnrichWithWorkflows : IContentEnricherStep
         }
     }
 
-    private async Task EnrichCanUpdateAsync(ContentEntity content, Context context)
+    private async Task EnrichCanUpdateAsync(EnrichedContent content, Context context)
     {
-        var editingStatus = content.NewStatus ?? content.Status;
-
-        content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, editingStatus, context.UserPrincipal);
+        content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, content.Status, context.UserPrincipal);
     }
 
-    private async Task EnrichColorAsync(ContentEntity content, ContentEntity result, Dictionary<(DomainId, Status), StatusInfo> cache)
+    private async Task EnrichColorAsync(EnrichedContent content, Dictionary<(DomainId, Status), StatusInfo> cache)
     {
-        result.StatusColor = await GetColorAsync(content, content.Status, cache);
+        content.StatusColor = await GetColorAsync(content, content.Status, cache);
 
         if (content.NewStatus != null)
         {
-            result.NewStatusColor = await GetColorAsync(content, content.NewStatus.Value, cache);
+            content.NewStatusColor = await GetColorAsync(content, content.NewStatus.Value, cache);
         }
 
         if (content.ScheduleJob != null)
         {
-            result.ScheduledStatusColor = await GetColorAsync(content, content.ScheduleJob.Status, cache);
+            content.ScheduledStatusColor = await GetColorAsync(content, content.ScheduleJob.Status, cache);
         }
     }
 
-    private async Task<string> GetColorAsync(IContentEntity content, Status status, Dictionary<(DomainId, Status), StatusInfo> cache)
+    private async Task<string> GetColorAsync(Content content, Status status, Dictionary<(DomainId, Status), StatusInfo> cache)
     {
         if (!cache.TryGetValue((content.SchemaId.Id, status), out var info))
         {

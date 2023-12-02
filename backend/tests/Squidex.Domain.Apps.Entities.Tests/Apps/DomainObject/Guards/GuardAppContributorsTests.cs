@@ -25,16 +25,9 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     private readonly IUserResolver users = A.Fake<IUserResolver>();
     private readonly Plan planWithoutLimit = new Plan { MaxContributors = -1 };
     private readonly Plan planWithLimit = new Plan { MaxContributors = 2 };
-    private Contributors contributors = Contributors.Empty;
 
     public GuardAppContributorsTests()
     {
-        A.CallTo(() => App.Roles)
-            .Returns(Roles.Empty);
-
-        A.CallTo(() => App.Contributors)
-            .ReturnsLazily(() => contributors);
-
         A.CallTo(() => user1.Id)
             .Returns("1");
 
@@ -80,7 +73,10 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     {
         var command = new AssignContributor { ContributorId = "1", Role = Role.Owner };
 
-        contributors = contributors.Assign("1", Role.Owner);
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+        };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
     }
@@ -90,7 +86,10 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     {
         var command = new AssignContributor { ContributorId = "1", Role = Role.Owner, IgnoreActor = true };
 
-        contributors = contributors.Assign("1", Role.Owner);
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+        };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
     }
@@ -116,7 +115,10 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     {
         var command = new AssignContributor { ContributorId = "3" };
 
-        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Editor);
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor)
+        };
 
         await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App, users, planWithLimit),
             new ValidationError("You have reached the maximum number of contributors for your plan."));
@@ -127,7 +129,10 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     {
         var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
 
-        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Editor);
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor)
+        };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithLimit);
     }
@@ -145,7 +150,10 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        contributors = contributors.Assign("1", Role.Developer);
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Developer)
+        };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
     }
@@ -155,7 +163,10 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        contributors = contributors.Assign("1", Role.Developer).Assign("2", Role.Developer);
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Developer).Assign("2", Role.Developer)
+        };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithLimit);
     }
@@ -165,7 +176,10 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     {
         var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
 
-        contributors = contributors.Assign("1", Role.Editor).Assign("2", Role.Editor);
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Editor).Assign("2", Role.Editor)
+        };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
     }
@@ -192,7 +206,10 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Editor);
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor)
+        };
 
         ValidationAssert.Throws(() => GuardAppContributors.CanRemove(command, App),
             new ValidationError("Cannot remove the only owner."));
@@ -203,7 +220,10 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Owner);
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Owner)
+        };
 
         GuardAppContributors.CanRemove(command, App);
     }

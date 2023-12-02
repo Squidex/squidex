@@ -5,15 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Teams.Repositories;
 
 public interface ITeamRepository
 {
-    Task<List<ITeamEntity>> QueryAllAsync(string contributorId,
+    Task<List<Team>> QueryAllAsync(string contributorId,
         CancellationToken ct = default);
 
-    Task<ITeamEntity?> FindAsync(DomainId id,
+    Task<Team?> FindAsync(DomainId id,
         CancellationToken ct = default);
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.States;
@@ -118,7 +119,7 @@ public sealed class AppUISettings : IAppUISettings, IDeleter
         await ClearAsync(appId, contributorId, ct);
     }
 
-    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         await ClearAsync(app.Id, null, ct);

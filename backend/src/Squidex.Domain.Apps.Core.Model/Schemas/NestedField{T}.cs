@@ -10,19 +10,13 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas;
 
-public class NestedField<T> : NestedField, IField<T> where T : FieldProperties, new()
+public record NestedField<T> : NestedField, IField<T> where T : FieldProperties, new()
 {
-    public T Properties { get; private set; }
+    public T Properties { get; init; }
 
     public override FieldProperties RawProperties
     {
         get => Properties;
-    }
-
-    public NestedField(long id, string name, T? properties = null, IFieldSettings? settings = null)
-        : base(id, name, settings)
-    {
-        Properties = properties ?? new T();
     }
 
     [Pure]
@@ -35,10 +29,7 @@ public class NestedField<T> : NestedField, IField<T> where T : FieldProperties, 
             return this;
         }
 
-        return Clone(clone =>
-        {
-            ((NestedField<T>)clone).Properties = typedProperties;
-        });
+        return this with { Properties = typedProperties };
     }
 
     private static T ValidateProperties(FieldProperties newProperties)

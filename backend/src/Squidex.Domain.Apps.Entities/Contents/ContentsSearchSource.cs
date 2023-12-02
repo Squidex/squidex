@@ -84,7 +84,7 @@ public sealed class ContentsSearchSource : ISearchSource
     {
         var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
-        return schemas.Where(x => HasPermission(context, x.SchemaDef.Name)).Select(x => x.Id).ToList();
+        return schemas.Where(x => HasPermission(context, x.Name)).Select(x => x.Id).ToList();
     }
 
     private static bool HasPermission(Context context, string schemaName)
@@ -92,7 +92,7 @@ public sealed class ContentsSearchSource : ISearchSource
         return context.UserPermissions.Allows(PermissionIds.AppContentsReadOwn, context.App.Name, schemaName);
     }
 
-    private static string FormatName(IEnrichedContentEntity content, string masterLanguage)
+    private static string FormatName(EnrichedContent content, string masterLanguage)
     {
         var sb = new StringBuilder();
 

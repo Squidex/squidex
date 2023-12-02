@@ -483,7 +483,7 @@ public sealed class RulesController : ApiController
 
         var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id, HttpContext.RequestAborted);
 
-        var result = context.Result<IEnrichedRuleEntity>();
+        var result = context.Result<EnrichedRule>();
         var response = RuleDto.FromDomain(result, runningRuleId == null, ruleRunnerService, Resources);
 
         return response;

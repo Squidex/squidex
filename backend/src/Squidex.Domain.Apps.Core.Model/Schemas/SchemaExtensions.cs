@@ -49,11 +49,6 @@ public static class SchemaExtensions
 
     public static string DisplayName(this Schema schema)
     {
-        return schema.Properties.Label.Or(schema.TypeName());
-    }
-
-    public static string DisplayNameUnchanged(this Schema schema)
-    {
         return schema.Properties.Label.Or(schema.Name);
     }
 

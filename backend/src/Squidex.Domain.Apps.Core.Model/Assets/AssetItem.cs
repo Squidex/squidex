@@ -5,9 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
-public interface IEntityWithVersion
+namespace Squidex.Domain.Apps.Core.Assets;
+
+public record AssetItem : Entity
 {
-    long Version { get; }
+    public NamedId<DomainId> AppId { get; init; }
+
+    public DomainId ParentId { get; init; }
+
+    public bool IsDeleted { get; init; }
 }

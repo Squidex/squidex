@@ -14,7 +14,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands;
 
-public abstract partial class DomainObject<T> : IAggregate where T : class, IDomainState<T>, new()
+public abstract partial class DomainObject<T> : IAggregate where T : Entity, new()
 {
     private readonly List<Envelope<IEvent>> uncomittedEvents = [];
     private readonly ILogger log;
@@ -75,9 +75,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         persistence = persistenceFactory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
             new HandleSnapshot<T>((newSnapshot, version) =>
             {
-                newSnapshot.Version = version;
-
-                snapshot = newSnapshot;
+                snapshot = newSnapshot with { Version = version };
             }),
             @event =>
             {
@@ -381,7 +379,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         // If we are loading events at the moment, we will always update the version.
         if (isChanged)
         {
-            newSnapshot.Version = newVersion;
+            newSnapshot = newSnapshot with { Version = newVersion };
         }
 
         if (update)
@@ -417,10 +415,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         await persistence.WriteSnapshotAsync(Snapshot, ct);
     }
 
-    protected virtual T Apply(T snapshot, Envelope<IEvent> @event)
-    {
-        return snapshot.Apply(@event);
-    }
+    protected abstract T Apply(T snapshot, Envelope<IEvent> @event);
 
     public abstract Task<CommandResult> ExecuteAsync(IAggregateCommand command,
         CancellationToken ct);

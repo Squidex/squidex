@@ -23,7 +23,7 @@ public class ScriptingCompleterTests
     public ScriptingCompleterTests()
     {
         var schema =
-            new Schema("simple")
+            new Schema { Name = "my-schema" }
                 .AddString(1, "my-field", Partitioning.Invariant);
 
         dataSchema = schema.BuildDataSchema(LanguagesConfig.English.ToResolver(), ResolvedComponents.Empty);

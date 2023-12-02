@@ -22,14 +22,14 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 
-public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject.State>
+public sealed partial class SchemaDomainObject : DomainObject<Schema>
 {
-    public SchemaDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<SchemaDomainObject> log)
+    public SchemaDomainObject(DomainId id, IPersistenceFactory<Schema> persistence, ILogger<SchemaDomainObject> log)
         : base(id, persistence, log)
     {
     }
 
-    protected override bool IsDeleted(State snapshot)
+    protected override bool IsDeleted(Schema snapshot)
     {
         return snapshot.IsDeleted;
     }
@@ -62,7 +62,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case AddField addField:
                 return ApplyReturn(addField, c =>
                 {
-                    GuardSchemaField.CanAdd(c, Snapshot.SchemaDef);
+                    GuardSchemaField.CanAdd(c, Snapshot);
 
                     AddField(c);
 
@@ -92,7 +92,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case DeleteField deleteField:
                 return ApplyReturn(deleteField, c =>
                 {
-                    GuardSchemaField.CanDelete(deleteField, Snapshot.SchemaDef);
+                    GuardSchemaField.CanDelete(deleteField, Snapshot);
 
                     DeleteField(c);
 
@@ -102,7 +102,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case LockField lockField:
                 return ApplyReturn(lockField, c =>
                 {
-                    GuardSchemaField.CanLock(lockField, Snapshot.SchemaDef);
+                    GuardSchemaField.CanLock(lockField, Snapshot);
 
                     LockField(c);
 
@@ -112,7 +112,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case HideField hideField:
                 return ApplyReturn(hideField, c =>
                 {
-                    GuardSchemaField.CanHide(c, Snapshot.SchemaDef);
+                    GuardSchemaField.CanHide(c, Snapshot);
 
                     HideField(c);
 
@@ -122,7 +122,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case ShowField showField:
                 return ApplyReturn(showField, c =>
                 {
-                    GuardSchemaField.CanShow(c, Snapshot.SchemaDef);
+                    GuardSchemaField.CanShow(c, Snapshot);
 
                     ShowField(c);
 
@@ -132,7 +132,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case DisableField disableField:
                 return ApplyReturn(disableField, c =>
                 {
-                    GuardSchemaField.CanDisable(c, Snapshot.SchemaDef);
+                    GuardSchemaField.CanDisable(c, Snapshot);
 
                     DisableField(c);
 
@@ -142,7 +142,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case EnableField enableField:
                 return ApplyReturn(enableField, c =>
                 {
-                    GuardSchemaField.CanEnable(c, Snapshot.SchemaDef);
+                    GuardSchemaField.CanEnable(c, Snapshot);
 
                     EnableField(c);
 
@@ -152,7 +152,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case UpdateField updateField:
                 return ApplyReturn(updateField, c =>
                 {
-                    GuardSchemaField.CanUpdate(c, Snapshot.SchemaDef);
+                    GuardSchemaField.CanUpdate(c, Snapshot);
 
                     UpdateField(c);
 
@@ -162,7 +162,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case ReorderFields reorderFields:
                 return ApplyReturn(reorderFields, c =>
                 {
-                    GuardSchema.CanReorder(c, Snapshot.SchemaDef);
+                    GuardSchema.CanReorder(c, Snapshot);
 
                     Reorder(c);
 
@@ -192,7 +192,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             case ConfigureUIFields configureUIFields:
                 return ApplyReturn(configureUIFields, c =>
                 {
-                    GuardSchema.CanConfigureUIFields(c, Snapshot.SchemaDef);
+                    GuardSchema.CanConfigureUIFields(c, Snapshot);
 
                     ConfigureUIFields(c);
 
@@ -256,10 +256,10 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
             NoFieldRecreation = command.NoFieldRecreation
         };
 
-        var schemaSource = Snapshot.SchemaDef;
+        var schemaSource = Snapshot;
         var schemaTarget = command.BuildSchema(schemaSource.Name, schemaSource.Type);
 
-        var events = schemaSource.Synchronize(schemaTarget, () => Snapshot.SchemaFieldsTotal + 1, options);
+        var events = schemaSource.Synchronize(schemaTarget, () => Snapshot.TotalFields + 1, options);
 
         foreach (var @event in events)
         {
@@ -368,7 +368,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
 
         NamedId<long>? GetFieldId(long? id)
         {
-            if (id != null && Snapshot.SchemaDef.FieldsById.TryGetValue(id.Value, out var field))
+            if (id != null && Snapshot.FieldsById.TryGetValue(id.Value, out var field))
             {
                 return field.NamedId();
             }
@@ -380,7 +380,7 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
         {
             if (parentField.ParentFieldId != null)
             {
-                if (Snapshot.SchemaDef.FieldsById.TryGetValue(parentField.ParentFieldId.Value, out var field))
+                if (Snapshot.FieldsById.TryGetValue(parentField.ParentFieldId.Value, out var field))
                 {
                     parentFieldEvent.ParentFieldId = field.NamedId();
 
@@ -409,11 +409,6 @@ public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject
 
     private NamedId<long> CreateFieldId(AddField command)
     {
-        return NamedId.Of(Snapshot.SchemaFieldsTotal + 1, command.Name);
-    }
-
-    public Task<ISchemaEntity> GetStateAsync()
-    {
-        return Task.FromResult<ISchemaEntity>(Snapshot);
+        return NamedId.Of(Snapshot.TotalFields + 1, command.Name);
     }
 }

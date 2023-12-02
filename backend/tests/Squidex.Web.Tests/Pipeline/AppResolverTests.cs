@@ -79,7 +79,7 @@ public class AppResolverTests : GivenContext
         SetupUser();
 
         A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, false, httpContext.RequestAborted))
-            .Returns(Task.FromResult<IAppEntity?>(null));
+            .Returns(Task.FromResult<App?>(null));
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 

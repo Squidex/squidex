@@ -7,6 +7,7 @@
 
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Plans;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
@@ -49,7 +50,7 @@ public sealed class TeamDto : Resource
     /// </summary>
     public string? RoleName { get; set; }
 
-    public static TeamDto FromDomain(ITeamEntity team, string userId, Resources resources)
+    public static TeamDto FromDomain(Team team, string userId, Resources resources)
     {
         var result = SimpleMapper.Map(team, new TeamDto());
 
@@ -63,7 +64,7 @@ public sealed class TeamDto : Resource
         return result.CreateLinks(team, resources, permissions, true);
     }
 
-    private TeamDto CreateLinks(ITeamEntity team, Resources resources, PermissionSet permissions, bool isContributor)
+    private TeamDto CreateLinks(Team team, Resources resources, PermissionSet permissions, bool isContributor)
     {
         var values = new { team = Id.ToString() };
 

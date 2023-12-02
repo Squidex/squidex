@@ -13,12 +13,15 @@ using Migrations.Migrations.MongoDb;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
-using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
-using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
@@ -31,12 +34,9 @@ using Squidex.Domain.Apps.Entities.MongoDb.Rules;
 using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 using Squidex.Domain.Apps.Entities.MongoDb.Teams;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
-using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
-using Squidex.Domain.Apps.Entities.Teams.DomainObject;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
@@ -100,7 +100,7 @@ public static class StoreServices
                     .As<IMigration>();
 
                 services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
-                    .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>().As<IDeleter>();
+                    .As<IContentRepository>().As<ISnapshotStore<WriteContent>>().As<IDeleter>();
 
                 services.AddTransientAs<ConvertRuleEventsJson>()
                     .As<IMigration>();
@@ -139,22 +139,22 @@ public static class StoreServices
                     .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
                 services.AddSingletonAs<MongoAssetRepository>()
-                    .As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State>>().As<IDeleter>();
+                    .As<IAssetRepository>().As<ISnapshotStore<Asset>>().As<IDeleter>();
 
                 services.AddSingletonAs<MongoAssetFolderRepository>()
-                    .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State>>().As<IDeleter>();
+                    .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolder>>().As<IDeleter>();
 
                 services.AddSingletonAs<MongoAppRepository>()
-                    .As<IAppRepository>().As<ISnapshotStore<AppDomainObject.State>>().As<IDeleter>();
+                    .As<IAppRepository>().As<ISnapshotStore<App>>().As<IDeleter>();
 
                 services.AddSingletonAs<MongoTeamRepository>()
-                    .As<ITeamRepository>().As<ISnapshotStore<TeamDomainObject.State>>();
+                    .As<ITeamRepository>().As<ISnapshotStore<Team>>();
 
                 services.AddSingletonAs<MongoRuleRepository>()
-                    .As<IRuleRepository>().As<ISnapshotStore<RuleDomainObject.State>>().As<IDeleter>();
+                    .As<IRuleRepository>().As<ISnapshotStore<Rule>>().As<IDeleter>();
 
                 services.AddSingletonAs<MongoSchemaRepository>()
-                    .As<ISchemaRepository>().As<ISnapshotStore<SchemaDomainObject.State>>().As<IDeleter>();
+                    .As<ISchemaRepository>().As<ISnapshotStore<Schema>>().As<IDeleter>();
 
                 services.AddSingletonAs<MongoSchemasHash>()
                     .AsOptional<ISchemasHash>().As<IEventConsumer>().As<IDeleter>();

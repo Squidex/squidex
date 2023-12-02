@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -14,7 +15,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
-public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
+public class AppCommandMiddlewareTests : HandlerTestBase<App>
 {
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
@@ -38,7 +39,7 @@ public class AppCommandMiddlewareTests : HandlerTestBase<AppDomainObject.State>
     [Fact]
     public async Task Should_replace_context_app_with_domain_object_actual()
     {
-        var replaced = A.Fake<IAppEntity>();
+        var replaced = new App();
 
         await HandleAsync(new UpdateApp(), replaced);
 

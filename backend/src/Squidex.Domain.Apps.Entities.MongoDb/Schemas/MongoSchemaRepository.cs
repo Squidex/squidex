@@ -6,16 +6,15 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 
-public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<SchemaDomainObject.State, MongoSchemaEntity>, ISchemaRepository, IDeleter
+public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<Schema, MongoSchemaEntity>, ISchemaRepository, IDeleter
 {
     public MongoSchemaRepository(IMongoDatabase database)
         : base(database)
@@ -34,13 +33,13 @@ public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<SchemaDomainO
         }, ct);
     }
 
-    Task IDeleter.DeleteAppAsync(IAppEntity app,
+    Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
     }
 
-    public async Task<List<ISchemaEntity>> QueryAllAsync(DomainId appId, CancellationToken ct = default)
+    public async Task<List<Schema>> QueryAllAsync(DomainId appId, CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoSchemaRepository/QueryAllAsync"))
         {
@@ -48,11 +47,11 @@ public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<SchemaDomainO
                 await Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted)
                     .ToListAsync(ct);
 
-            return entities.Select(x => (ISchemaEntity)x.Document).ToList();
+            return entities.Select(x => (Schema)x.Document).ToList();
         }
     }
 
-    public async Task<ISchemaEntity?> FindAsync(DomainId appId, DomainId id,
+    public async Task<Schema?> FindAsync(DomainId appId, DomainId id,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoSchemaRepository/FindAsync"))
@@ -65,7 +64,7 @@ public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<SchemaDomainO
         }
     }
 
-    public async Task<ISchemaEntity?> FindAsync(DomainId appId, string name,
+    public async Task<Schema?> FindAsync(DomainId appId, string name,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoSchemaRepository/FindAsyncByName"))

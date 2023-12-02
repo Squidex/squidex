@@ -1,10 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -28,7 +29,7 @@ public static class GuardAppWorkflows
         });
     }
 
-    public static void CanUpdate(UpdateWorkflow command, IAppEntity app)
+    public static void CanUpdate(UpdateWorkflow command, App app)
     {
         Guard.NotNull(command);
 
@@ -92,7 +93,7 @@ public static class GuardAppWorkflows
         });
     }
 
-    public static void CanDelete(DeleteWorkflow command, IAppEntity app)
+    public static void CanDelete(DeleteWorkflow command, App app)
     {
         Guard.NotNull(command);
 

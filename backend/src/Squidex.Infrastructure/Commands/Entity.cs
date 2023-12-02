@@ -5,13 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using NodaTime;
 
 namespace Squidex.Infrastructure.Commands;
 
-public interface IDomainState<out T>
+public record Entity
 {
-    long Version { get; set; }
+    public DomainId UniqueId { get; init; }
 
-    T Apply(Envelope<IEvent> @event);
+    public DomainId Id { get; init; }
+
+    public RefToken CreatedBy { get; init; }
+
+    public RefToken LastModifiedBy { get; init; }
+
+    public Instant Created { get; init; }
+
+    public Instant LastModified { get; init; }
+
+    public long Version { get; init; }
 }

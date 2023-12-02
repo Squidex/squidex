@@ -18,14 +18,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly DomainId workflowId = DomainId.NewGuid();
-    private readonly Workflows workflows;
 
     public GuardAppWorkflowTests()
     {
-        workflows = Workflows.Empty.Add(workflowId, "name");
-
-        A.CallTo(() => App.Workflows)
-            .Returns(workflows);
+        App = App with
+        {
+            Workflows = Workflows.Empty.Add(workflowId, "name")
+        };
     }
 
     [Fact]

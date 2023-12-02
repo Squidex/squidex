@@ -9,6 +9,6 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 
 public interface IRuleQueryService
 {
-    Task<IReadOnlyList<IEnrichedRuleEntity>> QueryAsync(Context context,
+    Task<IReadOnlyList<EnrichedRule>> QueryAsync(Context context,
         CancellationToken ct = default);
 }

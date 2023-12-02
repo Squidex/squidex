@@ -209,7 +209,7 @@ internal static class ContentActions
                 fieldContext.CancellationToken);
         });
 
-        public static readonly IFieldResolver Referencing = Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
+        public static readonly IFieldResolver Referencing = Resolvers.Async<Content, object?>(async (source, fieldContext, context) =>
         {
             var query = fieldContext.BuildODataQuery();
 
@@ -223,7 +223,7 @@ internal static class ContentActions
                 fieldContext.CancellationToken);
         });
 
-        public static readonly IFieldResolver ReferencingWithTotal = Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
+        public static readonly IFieldResolver ReferencingWithTotal = Resolvers.Async<Content, object?>(async (source, fieldContext, context) =>
         {
             var query = fieldContext.BuildODataQuery();
 
@@ -236,7 +236,7 @@ internal static class ContentActions
                 fieldContext.CancellationToken);
         });
 
-        public static readonly IFieldResolver References = Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
+        public static readonly IFieldResolver References = Resolvers.Async<Content, object?>(async (source, fieldContext, context) =>
         {
             var query = fieldContext.BuildODataQuery();
 
@@ -250,7 +250,7 @@ internal static class ContentActions
                 fieldContext.CancellationToken);
         });
 
-        public static readonly IFieldResolver ReferencesWithTotal = Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
+        public static readonly IFieldResolver ReferencesWithTotal = Resolvers.Async<Content, object?>(async (source, fieldContext, context) =>
         {
             var query = fieldContext.BuildODataQuery();
 

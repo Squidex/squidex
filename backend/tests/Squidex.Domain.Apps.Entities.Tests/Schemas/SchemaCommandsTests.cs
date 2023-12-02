@@ -49,26 +49,25 @@ public class SchemaCommandsTests
             Category = "myCategory"
         };
 
-        var expected =
-            new Schema("my-schema")
-                .Update(new SchemaProperties { Hints = "MyHints" })
-                .AddString(1, "myString", Partitioning.Language, new StringFieldProperties
-                {
-                    IsRequired = true
-                })
-                .HideField(1).DisableField(1).LockField(1)
-                .ChangeCategory("myCategory")
-                .SetFieldsInLists(FieldNames.Create("meta.id", "myString"))
-                .SetFieldsInReferences(FieldNames.Create("myString"))
-                .SetScripts(new SchemaScripts
-                {
-                    Change = "change-script"
-                })
-                .SetPreviewUrls(new Dictionary<string, string>
-                {
-                    ["mobile"] = "http://mobile"
-                }.ToReadonlyDictionary())
-                .Publish();
+        var expected = new Schema { Name = "my-schema" }
+            .Update(new SchemaProperties { Hints = "MyHints" })
+            .AddString(1, "myString", Partitioning.Language, new StringFieldProperties
+            {
+                IsRequired = true
+            })
+            .HideField(1).DisableField(1).LockField(1)
+            .ChangeCategory("myCategory")
+            .SetFieldsInLists(FieldNames.Create("meta.id", "myString"))
+            .SetFieldsInReferences(FieldNames.Create("myString"))
+            .SetScripts(new SchemaScripts
+            {
+                Change = "change-script"
+            })
+            .SetPreviewUrls(new Dictionary<string, string>
+            {
+                ["mobile"] = "http://mobile"
+            }.ToReadonlyDictionary())
+            .Publish();
 
         var actual = command.BuildSchema("my-schema", SchemaType.Default);
 

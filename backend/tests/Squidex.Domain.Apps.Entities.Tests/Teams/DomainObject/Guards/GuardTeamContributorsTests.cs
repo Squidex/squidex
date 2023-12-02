@@ -22,13 +22,9 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
     private readonly IUser user2 = UserMocks.User("2");
     private readonly IUser user3 = UserMocks.User("3");
     private readonly IUserResolver users = A.Fake<IUserResolver>();
-    private Contributors contributors = Contributors.Empty;
 
     public GuardTeamContributorsTests()
     {
-        A.CallTo(() => Team.Contributors)
-            .ReturnsLazily(() => contributors);
-
         A.CallTo(() => user1.Id)
             .Returns("1");
 
@@ -74,7 +70,10 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
     {
         var command = new AssignContributor { ContributorId = "1", Role = Role.Owner };
 
-        contributors = contributors.Assign("1", Role.Owner);
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+        };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
     }
@@ -84,7 +83,10 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
     {
         var command = new AssignContributor { ContributorId = "1", Role = Role.Owner, IgnoreActor = true };
 
-        contributors = contributors.Assign("1", Role.Owner);
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+        };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
     }
@@ -118,7 +120,10 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        contributors = contributors.Assign("1", Role.Owner);
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+        };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
     }
@@ -128,7 +133,10 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
     {
         var command = new AssignContributor { ContributorId = "1" };
 
-        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Owner);
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Owner)
+        };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
     }
@@ -138,7 +146,10 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
     {
         var command = new AssignContributor { ContributorId = "3", IgnorePlans = true };
 
-        contributors = contributors.Assign("1", Role.Editor).Assign("2", Role.Editor);
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Editor).Assign("2", Role.Editor)
+        };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
     }
@@ -165,7 +176,10 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Editor);
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor)
+        };
 
         ValidationAssert.Throws(() => GuardTeamContributors.CanRemove(command, Team),
             new ValidationError("Cannot remove the only owner."));
@@ -176,7 +190,10 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
     {
         var command = new RemoveContributor { ContributorId = "1" };
 
-        contributors = contributors.Assign("1", Role.Owner).Assign("2", Role.Owner);
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Owner)
+        };
 
         GuardTeamContributors.CanRemove(command, Team);
     }

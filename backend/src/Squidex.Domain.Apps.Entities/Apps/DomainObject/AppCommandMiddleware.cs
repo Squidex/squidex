@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
@@ -42,7 +43,7 @@ public sealed class AppCommandMiddleware : AggregateCommandMiddleware<AppCommand
     protected override Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
         CancellationToken ct)
     {
-        if (result.Payload is IAppEntity app)
+        if (result.Payload is App app)
         {
             contextProvider.Context.App = app;
         }

@@ -22,7 +22,7 @@ public class ReferenceExtractionTests
     public ReferenceExtractionTests()
     {
         schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddComponent(1, "component", Partitioning.Invariant)
                 .AddComponents(2, "components", Partitioning.Invariant)
                 .AddAssets(3, "assets1", Partitioning.Invariant)
@@ -214,7 +214,7 @@ public class ReferenceExtractionTests
         var id1 = DomainId.NewGuid();
         var id2 = DomainId.NewGuid();
 
-        var arrayField = Fields.Array(1, "myArray", Partitioning.Invariant, null, null, field);
+        var arrayField = Fields.Array(1, "myArray", Partitioning.Invariant, null, field);
 
         var value =
             JsonValue.Array(

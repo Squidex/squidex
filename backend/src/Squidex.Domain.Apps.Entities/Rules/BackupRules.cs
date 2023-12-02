@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Events.Rules;
@@ -48,7 +49,7 @@ public sealed class BackupRules : IBackupHandler
     {
         if (ruleIds.Count > 0)
         {
-            await rebuilder.InsertManyAsync<RuleDomainObject, RuleDomainObject.State>(ruleIds, BatchSize, ct);
+            await rebuilder.InsertManyAsync<RuleDomainObject, Rule>(ruleIds, BatchSize, ct);
         }
     }
 }

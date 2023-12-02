@@ -19,13 +19,13 @@ public static class TestSchema
         var componentId2 = DomainId.NewGuid();
         var componentIds = ReadonlyList.Create(componentId1, componentId2);
 
-        var component1 = new Schema("component1")
+        var component1 = new Schema { Name = "component1" }
             .Publish()
             .AddString(1, "unique1", Partitioning.Invariant)
             .AddString(2, "shared1", Partitioning.Invariant)
             .AddBoolean(3, "shared2", Partitioning.Invariant);
 
-        var component2 = new Schema("component2")
+        var component2 = new Schema { Name = "component2" }
             .Publish()
             .AddNumber(1, "unique1", Partitioning.Invariant)
             .AddNumber(2, "shared1", Partitioning.Invariant)
@@ -37,7 +37,7 @@ public static class TestSchema
             [componentId2] = component2
         });
 
-        var schema = new Schema("user", type: type)
+        var schema = new Schema { Name = "user", Type = type }
             .Publish()
             .AddArray(101, "root-array", Partitioning.Language, f => f
                 .AddAssets(201, "nested-assets",

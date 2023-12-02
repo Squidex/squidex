@@ -19,8 +19,8 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
 {
     private const int MaxBatchSize = 5000;
     private const int MinBatchSize = 1;
-    private static readonly EmptyDataLoaderResult<IEnrichedAssetEntity> EmptyAssets = new EmptyDataLoaderResult<IEnrichedAssetEntity>();
-    private static readonly EmptyDataLoaderResult<IEnrichedContentEntity> EmptyContents = new EmptyDataLoaderResult<IEnrichedContentEntity>();
+    private static readonly EmptyDataLoaderResult<EnrichedAsset> EmptyAssets = new EmptyDataLoaderResult<EnrichedAsset>();
+    private static readonly EmptyDataLoaderResult<EnrichedContent> EmptyContents = new EmptyDataLoaderResult<EnrichedContent>();
     private readonly IDataLoaderContextAccessor dataLoaders;
     private readonly GraphQLOptions options;
     private readonly int batchSize;
@@ -75,7 +75,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         }
     }
 
-    public IDataLoaderResult<IEnrichedContentEntity?> GetContent(DomainId schemaId, DomainId id, long version)
+    public IDataLoaderResult<EnrichedContent?> GetContent(DomainId schemaId, DomainId id, long version)
     {
         var cacheKey = $"{nameof(GetContent)}_{schemaId}_{id}_{version}";
 
@@ -85,7 +85,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         }).LoadAsync();
     }
 
-    public IDataLoaderResult<IEnrichedAssetEntity?> GetAsset(DomainId id,
+    public IDataLoaderResult<EnrichedAsset?> GetAsset(DomainId id,
         TimeSpan cacheDuration)
     {
         var assets = GetAssets([id], cacheDuration);
@@ -94,7 +94,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return asset;
     }
 
-    public IDataLoaderResult<IEnrichedContentEntity?> GetContent(DomainId schemaId, DomainId id, HashSet<string>? fields,
+    public IDataLoaderResult<EnrichedContent?> GetContent(DomainId schemaId, DomainId id, HashSet<string>? fields,
         TimeSpan cacheDuration)
     {
         var contents = GetContents([id], fields, cacheDuration);
@@ -103,7 +103,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return content;
     }
 
-    public IDataLoaderResult<IEnrichedAssetEntity[]> GetAssets(List<DomainId>? ids,
+    public IDataLoaderResult<EnrichedAsset[]> GetAssets(List<DomainId>? ids,
         TimeSpan cacheDuration)
     {
         if (ids == null || ids.Count == 0)
@@ -114,7 +114,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return GetAssetsLoader().LoadAsync(BuildKeys(ids, cacheDuration)).Then(x => x.NotNull().ToArray());
     }
 
-    public IDataLoaderResult<IEnrichedContentEntity[]> GetContents(List<DomainId>? ids, HashSet<string>? fields,
+    public IDataLoaderResult<EnrichedContent[]> GetContents(List<DomainId>? ids, HashSet<string>? fields,
         TimeSpan cacheDuration)
     {
         if (ids == null || ids.Count == 0)
@@ -130,7 +130,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return GetContentsLoaderWithFields().LoadAsync(BuildKeys(ids, fields)).Then(x => x.NotNull().ToArray());
     }
 
-    private IDataLoader<CacheableId<DomainId>, IEnrichedAssetEntity> GetAssetsLoader()
+    private IDataLoader<CacheableId<DomainId>, EnrichedAsset> GetAssetsLoader()
     {
         return dataLoaders.Context!.GetOrAddCachingLoader(AssetCache, nameof(GetAssetsLoader),
             async (batch, ct) =>
@@ -141,7 +141,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
             }, maxBatchSize: batchSize);
     }
 
-    private IDataLoader<CacheableId<DomainId>, IEnrichedContentEntity> GetContentsLoader()
+    private IDataLoader<CacheableId<DomainId>, EnrichedContent> GetContentsLoader()
     {
         return dataLoaders.Context!.GetOrAddCachingLoader(ContentCache, nameof(GetContentsLoader),
             async (batch, ct) =>
@@ -152,9 +152,9 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
             }, maxBatchSize: batchSize);
     }
 
-    private IDataLoader<(DomainId Id, HashSet<string> Fields), IEnrichedContentEntity> GetContentsLoaderWithFields()
+    private IDataLoader<(DomainId Id, HashSet<string> Fields), EnrichedContent> GetContentsLoaderWithFields()
     {
-        return dataLoaders.Context!.GetOrAddNonCachingBatchLoader<(DomainId Id, HashSet<string> Fields), IEnrichedContentEntity>(nameof(GetContentsLoaderWithFields),
+        return dataLoaders.Context!.GetOrAddNonCachingBatchLoader<(DomainId Id, HashSet<string> Fields), EnrichedContent>(nameof(GetContentsLoaderWithFields),
             async (batch, ct) =>
             {
                 var fields = batch.SelectMany(x => x.Fields).ToHashSet();

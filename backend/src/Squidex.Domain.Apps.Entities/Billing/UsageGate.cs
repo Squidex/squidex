@@ -8,8 +8,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Messaging;
@@ -40,7 +39,7 @@ public sealed partial class UsageGate : IUsageGate
         this.usageTracker = usageTracker;
     }
 
-    public async Task TrackRequestAsync(IAppEntity app, string? clientId, DateOnly date, double costs, long elapsedMs, long bytes,
+    public async Task TrackRequestAsync(App app, string? clientId, DateOnly date, double costs, long elapsedMs, long bytes,
        CancellationToken ct = default)
     {
         var appId = app.Id.ToString();
@@ -53,7 +52,7 @@ public sealed partial class UsageGate : IUsageGate
         await apiUsageTracker.TrackAsync(date, appId, clientId, costs, elapsedMs, bytes, ct);
     }
 
-    public async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateOnly date,
+    public async Task<bool> IsBlockedAsync(App app, string? clientId, DateOnly date,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -111,7 +110,7 @@ public sealed partial class UsageGate : IUsageGate
         return memoryCache.Set(appId, true, TimeSpan.FromHours(1));
     }
 
-    private static string[] GetUsers(IAppEntity app)
+    private static string[] GetUsers(App app)
     {
         return app.Contributors.Where(x => x.Value == Role.Owner).Select(x => x.Key).ToArray();
     }
@@ -130,7 +129,7 @@ public sealed partial class UsageGate : IUsageGate
         return forecasted > limit;
     }
 
-    public Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(IAppEntity app, bool canCache,
+    public Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanForAppAsync(App app, bool canCache,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -179,7 +178,7 @@ public sealed partial class UsageGate : IUsageGate
         return await GetPlanCoreAsync(app, ct);
     }
 
-    private async Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanCoreAsync(IAppEntity app,
+    private async Task<(Plan Plan, string PlanId, DomainId? TeamId)> GetPlanCoreAsync(App app,
         CancellationToken ct)
     {
         if (app.TeamId != null)
@@ -198,7 +197,7 @@ public sealed partial class UsageGate : IUsageGate
         }
     }
 
-    public Task<(Plan Plan, string PlanId)> GetPlanForTeamAsync(ITeamEntity team,
+    public Task<(Plan Plan, string PlanId)> GetPlanForTeamAsync(Team team,
         CancellationToken ct = default)
     {
         var (plan, planId) = billingPlans.GetActualPlan(team?.Plan?.PlanId);

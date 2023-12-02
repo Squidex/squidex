@@ -24,7 +24,7 @@ public class ComponentValidatorTests : IClassFixture<TranslationsFixture>
         var validator = A.Fake<IValidator>();
 
         var componentData = JsonValue.Object();
-        var componentObject = new Component("type", componentData, new Schema("my-schema"));
+        var componentObject = new Component("type", componentData, new Schema { Name = "my-schema" });
 
         var isFactoryCalled = false;
 

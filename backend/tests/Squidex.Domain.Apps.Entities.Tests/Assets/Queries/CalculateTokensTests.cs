@@ -58,9 +58,4 @@ public class CalculateTokensTests : GivenContext
         A.CallTo(() => urlGenerator.Root())
             .MustHaveHappened();
     }
-
-    private AssetEntity CreateAsset()
-    {
-        return new AssetEntity { AppId = AppId };
-    }
 }

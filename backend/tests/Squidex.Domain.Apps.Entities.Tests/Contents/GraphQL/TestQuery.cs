@@ -73,7 +73,7 @@ public sealed class TestQuery
                 return new Context(Mocks.FrontendUser(), TestApp.Default);
             }
 
-            var permission = PermissionIds.ForApp(permissionId, TestApp.Default.Name, TestSchemas.Default.SchemaDef.Name).Id;
+            var permission = PermissionIds.ForApp(permissionId, TestApp.Default.Name, TestSchemas.Default.Name).Id;
 
             return new Context(Mocks.FrontendUser(permission: permission), TestApp.Default);
         }

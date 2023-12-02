@@ -5,25 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
 
-public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<DomainId>
+public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 {
-    [BsonId]
-    [BsonElement("_id")]
-    public DomainId DocumentId { get; set; }
-
     [BsonRequired]
     [BsonElement("_ai")]
     public DomainId IndexedAppId { get; set; }
@@ -33,154 +27,196 @@ public sealed class MongoContentEntity : IContentEntity, IVersionedEntity<Domain
     public DomainId IndexedSchemaId { get; set; }
 
     [BsonRequired]
-    [BsonElement("ai")]
-    public NamedId<DomainId> AppId { get; set; }
-
-    [BsonRequired]
-    [BsonElement("si")]
-    public NamedId<DomainId> SchemaId { get; set; }
-
-    [BsonRequired]
     [BsonElement("rf")]
     public HashSet<DomainId>? ReferencedIds { get; set; }
 
-    [BsonRequired]
-    [BsonElement("id")]
-    public DomainId Id { get; set; }
-
-    [BsonRequired]
-    [BsonElement("ss")]
-    public Status Status { get; set; }
-
-    [BsonIgnoreIfNull]
-    [BsonElement("ns")]
-    public Status? NewStatus { get; set; }
-
-    [BsonIgnoreIfNull]
-    [BsonElement("do")]
-    public ContentData Data { get; set; }
-
     [BsonIgnoreIfNull]
     [BsonElement("dd")]
-    public ContentData? DraftData { get; set; }
+    public ContentData? NewData { get; set; }
 
     [BsonIgnoreIfNull]
     [BsonElement("sa")]
     public Instant? ScheduledAt { get; set; }
 
-    [BsonRequired]
-    [BsonElement("ct")]
-    public Instant Created { get; set; }
-
-    [BsonRequired]
-    [BsonElement("mt")]
-    public Instant LastModified { get; set; }
-
-    [BsonRequired]
-    [BsonElement("vs")]
-    public long Version { get; set; }
-
-    [BsonIgnoreIfDefault]
-    [BsonElement("dl")]
-    public bool IsDeleted { get; set; }
-
     [BsonIgnoreIfDefault]
     [BsonElement("is")]
     public bool IsSnapshot { get; set; }
-
-    [BsonIgnoreIfDefault]
-    [BsonElement("sj")]
-    public ScheduleJob? ScheduleJob { get; set; }
-
-    [BsonRequired]
-    [BsonElement("cb")]
-    public RefToken CreatedBy { get; set; }
-
-    [BsonRequired]
-    [BsonElement("mb")]
-    public RefToken LastModifiedBy { get; set; }
 
     [BsonIgnoreIfNull]
     [BsonElement("ts")]
     public TranslationStatus? TranslationStatus { get; set; }
 
-    public DomainId UniqueId
+    public static void RegisterClassMap()
     {
-        get => DocumentId;
+        EntityClassMap.Register();
+
+        BsonClassMap.TryRegisterClassMap<Content>(cm =>
+        {
+            cm.AutoMap();
+
+            cm.MapProperty(x => x.Id)
+                .SetElementName("id")
+                .SetIgnoreIfDefault(true);
+
+            cm.MapProperty(x => x.AppId)
+                .SetElementName("ai")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.SchemaId)
+                .SetElementName("si")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.IsDeleted)
+                .SetElementName("dl")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.Data)
+                .SetElementName("do")
+                .SetIgnoreIfNull(true);
+
+            cm.MapProperty(x => x.NewStatus)
+                .SetElementName("ns")
+                .SetIgnoreIfNull(true);
+
+            cm.MapProperty(x => x.Status)
+                .SetElementName("st")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.ScheduleJob)
+                .SetElementName("sj")
+                .SetIgnoreIfDefault(true);
+        });
     }
 
-    public ContentDomainObject.State ToState()
+    public WriteContent ToState()
     {
-        var state = SimpleMapper.Map(this, new ContentDomainObject.State());
-
-        if (DraftData != null && NewStatus.HasValue)
+        if (NewData != null && NewStatus.HasValue)
         {
-            state.NewVersion = new ContentVersion(NewStatus.Value, Data);
-            state.CurrentVersion = new ContentVersion(Status, DraftData);
+            return new WriteContent
+            {
+                UniqueId = UniqueId,
+                AppId = AppId,
+                Created = Created,
+                CreatedBy = CreatedBy,
+                CurrentVersion = new ContentVersion(Status, NewData),
+                Id = Id,
+                IsDeleted = IsDeleted,
+                LastModified = LastModified,
+                LastModifiedBy = LastModifiedBy,
+                NewVersion = new ContentVersion(NewStatus.Value, Data),
+                ScheduleJob = ScheduleJob,
+                SchemaId = SchemaId,
+                Version = Version
+            };
         }
         else
         {
-            state.NewVersion = null;
-            state.CurrentVersion = new ContentVersion(Status, Data);
+            return new WriteContent
+            {
+                UniqueId = UniqueId,
+                AppId = AppId,
+                Created = Created,
+                CreatedBy = CreatedBy,
+                CurrentVersion = new ContentVersion(Status, Data),
+                Id = Id,
+                IsDeleted = IsDeleted,
+                LastModified = LastModified,
+                LastModifiedBy = LastModifiedBy,
+                NewVersion = null,
+                ScheduleJob = ScheduleJob,
+                SchemaId = SchemaId,
+                Version = Version
+            };
         }
-
-        return state;
     }
 
-    public static async Task<MongoContentEntity> CreatePublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider,
+    public static async Task<MongoContentEntity> CreatePublishedAsync(SnapshotWriteJob<WriteContent> job, IAppProvider appProvider,
         CancellationToken ct)
     {
-        var entity = await CreateContentAsync(job.Value.CurrentVersion.Data, job, appProvider, ct);
+        var source = job.Value;
 
-        entity.ScheduledAt = null;
-        entity.ScheduleJob = null;
-        entity.NewStatus = null;
+        var (referencedIds, translationStatus) = await CreateExtendedValuesAsync(source, source.CurrentVersion.Data, appProvider, ct);
 
-        return entity;
+        return new MongoContentEntity
+        {
+            UniqueId = source.UniqueId,
+            IndexedAppId = source.AppId.Id,
+            IndexedSchemaId = source.SchemaId.Id,
+            AppId = source.AppId,
+            Created = source.Created,
+            CreatedBy = source.CreatedBy,
+            Data = source.EditingData,
+            Id = source.Id,
+            IsDeleted = source.IsDeleted,
+            IsSnapshot = false,
+            LastModified = source.LastModified,
+            LastModifiedBy = source.LastModifiedBy,
+            NewData = null,
+            NewStatus = null,
+            ReferencedIds = referencedIds,
+            ScheduledAt = null,
+            ScheduleJob = null,
+            SchemaId = source.SchemaId,
+            Status = source.CurrentVersion.Status,
+            TranslationStatus = translationStatus,
+            Version = source.Version,
+        };
     }
 
-    public static async Task<MongoContentEntity> CreateCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider,
+    public static async Task<MongoContentEntity> CreateCompleteAsync(SnapshotWriteJob<WriteContent> job, IAppProvider appProvider,
         CancellationToken ct)
     {
-        var entity = await CreateContentAsync(job.Value.Data, job, appProvider, ct);
+        var source = job.Value;
 
-        entity.ScheduledAt = job.Value.ScheduleJob?.DueTime;
-        entity.ScheduleJob = job.Value.ScheduleJob;
-        entity.NewStatus = job.Value.NewStatus;
-        entity.DraftData = job.Value.NewVersion != null ? job.Value.CurrentVersion.Data : null;
-        entity.IsSnapshot = true;
+        var (referencedIds, translationStatus) = await CreateExtendedValuesAsync(source, source.EditingData, appProvider, ct);
 
-        return entity;
+        return new MongoContentEntity
+        {
+            UniqueId = source.UniqueId,
+            IndexedAppId = source.AppId.Id,
+            IndexedSchemaId = source.SchemaId.Id,
+            AppId = source.AppId,
+            Created = source.Created,
+            CreatedBy = source.CreatedBy,
+            Data = source.EditingData,
+            Id = source.Id,
+            IsDeleted = source.IsDeleted,
+            IsSnapshot = false,
+            LastModified = source.LastModified,
+            LastModifiedBy = source.LastModifiedBy,
+            NewData = source.NewVersion != null ? source.CurrentVersion.Data : null,
+            NewStatus = source.NewVersion?.Status,
+            ReferencedIds = referencedIds,
+            ScheduledAt = source.ScheduleJob?.DueTime,
+            ScheduleJob = source.ScheduleJob,
+            SchemaId = source.SchemaId,
+            Status = source.CurrentVersion.Status,
+            TranslationStatus = translationStatus,
+            Version = source.Version,
+        };
     }
 
-    private static async Task<MongoContentEntity> CreateContentAsync(ContentData data, SnapshotWriteJob<ContentDomainObject.State> job, IAppProvider appProvider,
+    private static async Task<(HashSet<DomainId>, TranslationStatus?)> CreateExtendedValuesAsync(WriteContent content, ContentData data, IAppProvider appProvider,
         CancellationToken ct)
     {
-        var entity = SimpleMapper.Map(job.Value, new MongoContentEntity());
+        var referencedIds = new HashSet<DomainId>();
 
-        entity.Data = data;
-        entity.DocumentId = job.Value.UniqueId;
-        entity.IndexedAppId = job.Value.AppId.Id;
-        entity.IndexedSchemaId = job.Value.SchemaId.Id;
-        entity.ReferencedIds ??= [];
-        entity.Version = job.NewVersion;
-
-        var (app, schema) = await appProvider.GetAppWithSchemaAsync(entity.IndexedAppId, entity.IndexedSchemaId, true, ct);
+        var (app, schema) = await appProvider.GetAppWithSchemaAsync(content.AppId.Id, content.SchemaId.Id, true, ct);
 
         if (app == null || schema == null)
         {
-            return entity;
+            return (referencedIds, null);
         }
 
         if (data.CanHaveReference())
         {
             var components = await appProvider.GetComponentsAsync(schema, ct: ct);
 
-            entity.Data.AddReferencedIds(schema.SchemaDef, entity.ReferencedIds, components);
+            data.AddReferencedIds(schema, referencedIds, components);
         }
 
-        entity.TranslationStatus = TranslationStatus.Create(data, schema.SchemaDef, app.Languages);
+        var translationStatus = TranslationStatus.Create(data, schema, app.Languages);
 
-        return entity;
+        return (referencedIds, translationStatus);
     }
 }

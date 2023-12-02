@@ -15,7 +15,7 @@ public class MongoState<T> : IVersionedEntity<DomainId>
 {
     [BsonId]
     [BsonElement("_id")]
-    public DomainId DocumentId { get; set; }
+    public DomainId UniqueId { get; set; }
 
     [BsonRequired]
     [BsonElement("Doc")]

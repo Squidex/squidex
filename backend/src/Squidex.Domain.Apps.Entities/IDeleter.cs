@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities;
@@ -14,7 +14,7 @@ public interface IDeleter
 {
     int Order => 0;
 
-    Task DeleteAppAsync(IAppEntity app,
+    Task DeleteAppAsync(App app,
         CancellationToken ct);
 
     Task DeleteContributorAsync(DomainId appId, string contributorId,

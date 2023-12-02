@@ -8,6 +8,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -53,7 +54,7 @@ public class UsageMiddlewareTests : GivenContext
 
         var date = instant.ToDateOnly();
 
-        A.CallTo(() => usageGate.TrackRequestAsync(A<IAppEntity>._, A<string>._, A<DateOnly>._, A<double>._, A<long>._, A<long>._, default))
+        A.CallTo(() => usageGate.TrackRequestAsync(A<App>._, A<string>._, A<DateOnly>._, A<double>._, A<long>._, A<long>._, default))
             .MustNotHaveHappened();
     }
 

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -19,7 +18,7 @@ namespace Migrations.OldEvents;
 
 [EventType(nameof(AppPatternAdded))]
 [Obsolete("New Event introduced")]
-public sealed class AppPatternAdded : AppEvent, IMigratedStateEvent<AppDomainObject.State>
+public sealed class AppPatternAdded : AppEvent, IMigratedStateEvent<App>
 {
     public DomainId PatternId { get; set; }
 
@@ -29,7 +28,7 @@ public sealed class AppPatternAdded : AppEvent, IMigratedStateEvent<AppDomainObj
 
     public string? Message { get; set; }
 
-    public IEvent Migrate(AppDomainObject.State state)
+    public IEvent Migrate(App state)
     {
         var newSettings = state.Settings with
         {

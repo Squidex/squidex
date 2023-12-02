@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -16,7 +17,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
@@ -77,10 +77,10 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         var ctx = Context();
 
         A.CallTo(() => assetRepository.StreamAll(AppId.Id, CancellationToken))
-            .Returns(new List<AssetEntity>
+            .Returns(new List<Asset>
             {
-                new AssetEntity(),
-                new AssetEntity()
+                CreateAsset(),
+                CreateAsset()
             }.ToAsyncEnumerable());
 
         var actual = await sut.CreateSnapshotEventsAsync(ctx, CancellationToken).ToListAsync(CancellationToken);
@@ -100,7 +100,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
         A.CallTo(() => assetLoader.GetAsync(AppId.Id, @event.AssetId, 12, CancellationToken))
-            .Returns(new AssetEntity());
+            .Returns(CreateAsset());
 
         var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
 
@@ -179,8 +179,9 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         return new RuleContext
         {
             AppId = AppId,
-            Rule = new Rule(trigger, A.Fake<RuleAction>()),
-            RuleId = DomainId.NewGuid()
+            IncludeSkipped = false,
+            IncludeStale = false,
+            Rule = CreateRule() with { Trigger = trigger }
         };
     }
 }

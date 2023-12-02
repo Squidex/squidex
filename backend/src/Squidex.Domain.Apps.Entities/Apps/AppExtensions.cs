@@ -13,31 +13,31 @@ namespace Squidex.Domain.Apps.Entities.Apps;
 
 public static class AppExtensions
 {
-    public static NamedId<DomainId> NamedId(this IAppEntity app)
+    public static NamedId<DomainId> NamedId(this App app)
     {
         return new NamedId<DomainId>(app.Id, app.Name);
     }
 
-    public static string DisplayName(this IAppEntity app)
+    public static string DisplayName(this App app)
     {
         return app.Label.Or(app.Name);
     }
 
-    public static bool TryGetContributorRole(this IAppEntity app, string id, bool isFrontend, [MaybeNullWhen(false)] out Role role)
+    public static bool TryGetContributorRole(this App app, string id, bool isFrontend, [MaybeNullWhen(false)] out Role role)
     {
         role = null;
 
         return app.Contributors.TryGetValue(id, out var roleName) && app.TryGetRole(roleName, isFrontend, out role);
     }
 
-    public static bool TryGetClientRole(this IAppEntity app, string id, bool isFrontend, [MaybeNullWhen(false)] out Role role)
+    public static bool TryGetClientRole(this App app, string id, bool isFrontend, [MaybeNullWhen(false)] out Role role)
     {
         role = null;
 
         return app.Clients.TryGetValue(id, out var client) && app.TryGetRole(client.Role, isFrontend, out role);
     }
 
-    public static bool TryGetRole(this IAppEntity app, string roleName, bool isFrontend, [MaybeNullWhen(false)] out Role role)
+    public static bool TryGetRole(this App app, string roleName, bool isFrontend, [MaybeNullWhen(false)] out Role role)
     {
         return app.Roles.TryGet(app.Name, roleName, isFrontend, out role);
     }

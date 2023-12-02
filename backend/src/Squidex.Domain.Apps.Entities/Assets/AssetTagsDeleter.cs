@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Apps;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
@@ -19,7 +19,7 @@ public sealed class AssetTagsDeleter : IDeleter
         this.tagService = tagService;
     }
 
-    public Task DeleteAppAsync(IAppEntity app,
+    public Task DeleteAppAsync(App app,
         CancellationToken ct)
     {
         return tagService.ClearAsync(app.Id, TagGroups.Assets, ct);

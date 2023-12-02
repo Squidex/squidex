@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas;
 
 public class SchemaTests
 {
-    private readonly Schema schema_0 = new Schema("my-schema");
+    private readonly Schema schema_0 = new Schema { Name = "my-schema" };
 
     public static IEnumerable<object[]> FieldProperyTypes()
     {
@@ -36,12 +36,6 @@ public class SchemaTests
     public void Should_instantiate_schema()
     {
         Assert.Equal("my-schema", schema_0.Name);
-    }
-
-    [Fact]
-    public void Should_throw_exception_if_creating_schema_with_invalid_name()
-    {
-        Assert.Throws<ArgumentException>(() => new Schema(string.Empty));
     }
 
     [Fact]
@@ -255,8 +249,8 @@ public class SchemaTests
 
         var schema_1 = schema_0
             .AddField(field)
-            .SetFieldsInLists(field.Name)
-            .SetFieldsInReferences(field.Name);
+            .SetFieldsInLists(FieldNames.Create(field.Name))
+            .SetFieldsInReferences(FieldNames.Create(field.Name));
         var schema_2 = schema_1.DeleteField(1);
 
         Assert.Empty(schema_2.FieldsById);
@@ -353,8 +347,8 @@ public class SchemaTests
     [Fact]
     public void Should_set_list_fields()
     {
-        var schema_1 = schema_0.SetFieldsInLists("2");
-        var schema_2 = schema_1.SetFieldsInLists("2");
+        var schema_1 = schema_0.SetFieldsInLists(FieldNames.Create("2"));
+        var schema_2 = schema_1.SetFieldsInLists(FieldNames.Create("2"));
 
         Assert.Equal(new[] { "2" }, schema_1.FieldsInLists);
         Assert.Equal(new[] { "2" }, schema_2.FieldsInLists);
@@ -364,8 +358,8 @@ public class SchemaTests
     [Fact]
     public void Should_also_set_list_fields_if_reordered()
     {
-        var schema_1 = schema_0.SetFieldsInLists("2", "1");
-        var schema_2 = schema_1.SetFieldsInLists("1", "2");
+        var schema_1 = schema_0.SetFieldsInLists(FieldNames.Create("2", "1"));
+        var schema_2 = schema_1.SetFieldsInLists(FieldNames.Create("1", "2"));
 
         Assert.Equal(new[] { "2", "1" }, schema_1.FieldsInLists);
         Assert.Equal(new[] { "1", "2" }, schema_2.FieldsInLists);
@@ -375,8 +369,8 @@ public class SchemaTests
     [Fact]
     public void Should_set_reference_fields()
     {
-        var schema_1 = schema_0.SetFieldsInReferences("2");
-        var schema_2 = schema_1.SetFieldsInReferences("2");
+        var schema_1 = schema_0.SetFieldsInReferences(FieldNames.Create("2"));
+        var schema_2 = schema_1.SetFieldsInReferences(FieldNames.Create("2"));
 
         Assert.Equal(new[] { "2" }, schema_1.FieldsInReferences);
         Assert.Equal(new[] { "2" }, schema_2.FieldsInReferences);
@@ -386,8 +380,8 @@ public class SchemaTests
     [Fact]
     public void Should_also_set_reference_fields_if_reordered()
     {
-        var schema_1 = schema_0.SetFieldsInReferences("2", "1");
-        var schema_2 = schema_1.SetFieldsInReferences("1", "2");
+        var schema_1 = schema_0.SetFieldsInReferences(FieldNames.Create("2", "1"));
+        var schema_2 = schema_1.SetFieldsInReferences(FieldNames.Create("1", "2"));
 
         Assert.Equal(new[] { "2", "1" }, schema_1.FieldsInReferences);
         Assert.Equal(new[] { "1", "2" }, schema_2.FieldsInReferences);
@@ -397,8 +391,8 @@ public class SchemaTests
     [Fact]
     public void Should_set_field_rules()
     {
-        var schema_1 = schema_0.SetFieldRules(FieldRule.Hide("2"));
-        var schema_2 = schema_1.SetFieldRules(FieldRule.Hide("2"));
+        var schema_1 = schema_0.SetFieldRules(FieldRules.Create(FieldRule.Hide("2")));
+        var schema_2 = schema_1.SetFieldRules(FieldRules.Create(FieldRule.Hide("2")));
 
         Assert.NotEmpty(schema_1.FieldRules);
         Assert.NotEmpty(schema_2.FieldRules);
@@ -454,9 +448,9 @@ public class SchemaTests
         var schemaSource =
             TestSchema.MixedSchema(SchemaType.Singleton).Schema
                 .ChangeCategory("Category")
-                .SetFieldRules(FieldRule.Hide("2"))
-                .SetFieldsInLists("field2")
-                .SetFieldsInReferences("field1")
+                .SetFieldRules(FieldRules.Create(FieldRule.Hide("2")))
+                .SetFieldsInLists(FieldNames.Create("field2"))
+                .SetFieldsInReferences(FieldNames.Create("field1"))
                 .SetScripts(new SchemaScripts
                 {
                     Create = "<create-script>"
@@ -469,25 +463,6 @@ public class SchemaTests
         var schemaTarget = schemaSource.SerializeAndDeserialize();
 
         schemaTarget.Should().BeEquivalentTo(schemaSource);
-    }
-
-    [Fact]
-    public void Should_deserialize_obsolete_isSingleton_property()
-    {
-        var schemaSource = new
-        {
-            name = "my-schema",
-            isPublished = true,
-            isSingleton = true
-        };
-
-        var expected =
-            new Schema("my-schema", type: SchemaType.Singleton)
-                .Publish();
-
-        var schemaTarget = schemaSource.SerializeAndDeserialize<Schema, object>();
-
-        schemaTarget.Should().BeEquivalentTo(expected);
     }
 
     private static RootField<NumberFieldProperties> CreateField(int id)

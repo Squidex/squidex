@@ -20,15 +20,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards;
 
 public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
 {
-    private readonly Schema schema_0;
-
     public GuardSchemaTests()
     {
-        schema_0 =
-            new Schema("my-schema")
-                .AddString(1, "field1", Partitioning.Invariant)
-                .AddString(2, "field2", Partitioning.Invariant)
-                .AddUI(4, "field4", Partitioning.Invariant);
+        Schema = Schema
+            .AddString(1, "field1", Partitioning.Invariant)
+            .AddString(2, "field2", Partitioning.Invariant)
+            .AddUI(4, "field4", Partitioning.Invariant);
     }
 
     [Fact]
@@ -379,7 +376,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 "FieldsInLists[2]"),
             new ValidationError("Field cannot be an UI field.",
                 "FieldsInLists[5]"),
-            new ValidationError("Field 'field1' has been added twice.",
+            new ValidationError("Field 'data.field1' has been added twice.",
                 "FieldsInLists"));
     }
 
@@ -417,7 +414,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 "FieldsInReferences[2]"),
             new ValidationError("Field cannot be an UI field.",
                 "FieldsInReferences[5]"),
-            new ValidationError("Field 'field1' has been added twice.",
+            new ValidationError("Field 'data.field1' has been added twice.",
                 "FieldsInReferences"));
     }
 
@@ -494,7 +491,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
             FieldsInReferences = null
         };
 
-        ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, Schema),
             new ValidationError("Field is required.",
                 "FieldsInLists[0]"),
             new ValidationError("Field is required.",
@@ -503,7 +500,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 "FieldsInLists[2]"),
             new ValidationError("Field cannot be an UI field.",
                 "FieldsInLists[5]"),
-            new ValidationError("Field 'field1' has been added twice.",
+            new ValidationError("Field 'data.field1' has been added twice.",
                 "FieldsInLists"));
     }
 
@@ -516,7 +513,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
             FieldsInReferences = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4")
         };
 
-        ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, Schema),
             new ValidationError("Field is required.",
                 "FieldsInReferences[0]"),
             new ValidationError("Field is required.",
@@ -525,7 +522,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 "FieldsInReferences[2]"),
             new ValidationError("Field cannot be an UI field.",
                 "FieldsInReferences[5]"),
-            new ValidationError("Field 'field1' has been added twice.",
+            new ValidationError("Field 'data.field1' has been added twice.",
                 "FieldsInReferences"));
     }
 
@@ -538,7 +535,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
             FieldsInReferences = FieldNames.Create("meta.id")
         };
 
-        ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, Schema),
             new ValidationError("Field is not part of the schema.",
                 "FieldsInReferences[0]"));
     }
@@ -552,7 +549,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
             FieldsInReferences = FieldNames.Create("data.field2")
         };
 
-        GuardSchema.CanConfigureUIFields(command, schema_0);
+        GuardSchema.CanConfigureUIFields(command, Schema);
     }
 
     [Fact]
@@ -605,7 +602,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ReorderFields { FieldIds = [1L, 3L] };
 
-        ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchema.CanReorder(command, Schema),
             new ValidationError("Field ids do not cover all fields.", "FieldIds"));
     }
 
@@ -614,7 +611,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ReorderFields { FieldIds = [1L] };
 
-        ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchema.CanReorder(command, Schema),
             new ValidationError("Field ids do not cover all fields.", "FieldIds"));
     }
 
@@ -623,7 +620,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ReorderFields { FieldIds = null! };
 
-        ValidationAssert.Throws(() => GuardSchema.CanReorder(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchema.CanReorder(command, Schema),
             new ValidationError("Field IDs is required.", "FieldIds"));
     }
 
@@ -632,7 +629,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ReorderFields { FieldIds = [1L, 2L], ParentFieldId = 99 };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => GuardSchema.CanReorder(command, schema_0));
+        Assert.Throws<DomainObjectNotFoundException>(() => GuardSchema.CanReorder(command, Schema));
     }
 
     [Fact]
@@ -640,7 +637,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ReorderFields { FieldIds = [1L, 2L, 4L] };
 
-        GuardSchema.CanReorder(command, schema_0);
+        GuardSchema.CanReorder(command, Schema);
     }
 
     [Fact]

@@ -24,7 +24,7 @@ public class RuleTests
             .Select(x => new[] { x })
             .ToList()!;
 
-    private readonly Rule rule_0 = new Rule(new ContentChangedTriggerV2(), new TestAction1());
+    private readonly Rule rule_0 = new Rule { Trigger = new ContentChangedTriggerV2(), Action = new TestAction1() };
 
     public sealed record OtherTrigger : RuleTrigger
     {
@@ -57,19 +57,6 @@ public class RuleTests
     public sealed record TestAction2 : RuleAction
     {
         public string Property { get; set; }
-    }
-
-    [Fact]
-    public void Should_create_with_trigger_and_action()
-    {
-        var ruleTrigger = new ContentChangedTriggerV2();
-        var ruleAction = new TestAction1();
-
-        var newRule = new Rule(ruleTrigger, ruleAction);
-
-        Assert.Equal(ruleTrigger, newRule.Trigger);
-        Assert.Equal(ruleAction, newRule.Action);
-        Assert.True(newRule.IsEnabled);
     }
 
     [Fact]
@@ -167,7 +154,7 @@ public class RuleTests
     [Fact]
     public void Should_serialize_and_deserialize_and_migrate_trigger()
     {
-        var rule_X = new Rule(new MigratedTrigger(), new TestAction1());
+        var rule_X = new Rule { Trigger = new MigratedTrigger(), Action = new TestAction1() };
 
         var serialized = rule_X.SerializeAndDeserialize();
 

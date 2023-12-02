@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Schemas;
@@ -28,7 +27,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
     [Fact]
     public async Task Should_not_add_actual_to_contents_if_user_has_no_permission()
     {
-        var schema1 = CreateSchema("schemaA1");
+        var schema1 = Schema with { Name = "SchemaA1" };
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
             .Returns([schema1]);
@@ -40,7 +39,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
-                .Add("schemaA1 Schema", SearchResultType.Schema, "schemaA1-url"));
+                .Add("SchemaA1 Schema", SearchResultType.Schema, "schemaA1-url"));
     }
 
     [Fact]
@@ -48,7 +47,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
     {
         var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, AppId.Name, "schemaA1");
 
-        var schema1 = CreateSchema("schemaA1", SchemaType.Component);
+        var schema1 = Schema with { Name = "SchemaA1", Type = SchemaType.Component };
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
             .Returns([schema1]);
@@ -60,7 +59,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
-                .Add("schemaA1 Schema", SearchResultType.Schema, "schemaA1-url"));
+                .Add("SchemaA1 Schema", SearchResultType.Schema, "schemaA1-url"));
     }
 
     [Fact]
@@ -68,9 +67,9 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
     {
         var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, AppId.Name, "schemaA2");
 
-        var schema1 = CreateSchema("schemaA1");
-        var schema2 = CreateSchema("schemaA2");
-        var schema3 = CreateSchema("schemaB2");
+        var schema1 = Schema with { Name = "SchemaA1" };
+        var schema2 = Schema with { Name = "SchemaA2" };
+        var schema3 = Schema with { Name = "SchemaB2" };
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
             .Returns([schema1, schema2, schema3]);
@@ -88,9 +87,9 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
-                .Add("schemaA1 Schema", SearchResultType.Schema, "schemaA1-url")
-                .Add("schemaA2 Schema", SearchResultType.Schema, "schemaA2-url")
-                .Add("schemaA2 Contents", SearchResultType.Content, "schemaA2-contents-url", "schemaA2"));
+                .Add("SchemaA1 Schema", SearchResultType.Schema, "schemaA1-url")
+                .Add("SchemaA2 Schema", SearchResultType.Schema, "schemaA2-url")
+                .Add("SchemaA2 Contents", SearchResultType.Content, "schemaA2-contents-url", "SchemaA2"));
     }
 
     [Fact]
@@ -98,7 +97,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
     {
         var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, AppId.Name, "schemaA1");
 
-        var schema1 = CreateSchema("schemaA1", SchemaType.Singleton);
+        var schema1 = Schema with { Name = "SchemaA1", Type = SchemaType.Singleton };
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
             .Returns([schema1]);
@@ -113,12 +112,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
-                .Add("schemaA1 Schema", SearchResultType.Schema, "schemaA1-url")
-                .Add("schemaA1 Content", SearchResultType.Content, "schemaA1-content-url", "schemaA1"));
-    }
-
-    private ISchemaEntity CreateSchema(string name, SchemaType type = SchemaType.Default)
-    {
-        return Mocks.Schema(AppId, DomainId.NewGuid(), new Schema(name, type: type));
+                .Add("SchemaA1 Schema", SearchResultType.Schema, "schemaA1-url")
+                .Add("SchemaA1 Content", SearchResultType.Content, "schemaA1-content-url", "SchemaA1"));
     }
 }

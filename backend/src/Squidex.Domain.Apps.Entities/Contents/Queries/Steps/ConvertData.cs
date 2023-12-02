@@ -37,7 +37,7 @@ public sealed class ConvertData : IContentEnricherStep
         excludeChangedTypes = new ExcludeChangedTypes(serializer);
     }
 
-    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
         var referenceCleaner = await CleanReferencesAsync(context, contents, schemas, ct);
@@ -48,7 +48,7 @@ public sealed class ConvertData : IContentEnricherStep
 
             var (schema, components) = await schemas(group.Key);
 
-            var converter = GenerateConverter(context, components, schema.SchemaDef, referenceCleaner);
+            var converter = GenerateConverter(context, components, schema, referenceCleaner);
 
             foreach (var content in group)
             {
@@ -57,7 +57,7 @@ public sealed class ConvertData : IContentEnricherStep
         }
     }
 
-    private async Task<ValueReferencesConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    private async Task<ValueReferencesConverter?> CleanReferencesAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
         if (context.NoCleanup())
@@ -75,7 +75,7 @@ public sealed class ConvertData : IContentEnricherStep
 
                 foreach (var content in group)
                 {
-                    content.Data.AddReferencedIds(schema.SchemaDef, ids, components);
+                    content.Data.AddReferencedIds(schema, ids, components);
                 }
             }
 
@@ -97,7 +97,7 @@ public sealed class ConvertData : IContentEnricherStep
     private async Task<IEnumerable<DomainId>> QueryContentIdsAsync(Context context, HashSet<DomainId> ids,
         CancellationToken ct)
     {
-        var result = await contentRepository.QueryIdsAsync(context.App.Id, ids, context.Scope(), ct);
+        var result = await contentRepository.QueryIdsAsync(context.App, ids, context.Scope(), ct);
 
         return result.Select(x => x.Id);
     }

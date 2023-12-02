@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -22,7 +23,7 @@ public sealed class ContentLoader : IContentLoader
         this.domainObjectCache = domainObjectCache;
     }
 
-    public async Task<IContentEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any,
+    public async Task<Content?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any,
         CancellationToken ct = default)
     {
         var uniqueId = DomainId.Combine(appId, id);
@@ -39,19 +40,19 @@ public sealed class ContentLoader : IContentLoader
             return null;
         }
 
-        return content;
+        return content?.ToContent();
     }
 
-    private async Task<ContentDomainObject.State?> GetCachedAsync(DomainId uniqueId, long version,
+    private async Task<WriteContent?> GetCachedAsync(DomainId uniqueId, long version,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("ContentLoader/GetCachedAsync"))
         {
-            return await domainObjectCache.GetAsync<ContentDomainObject.State>(uniqueId, version, ct);
+            return await domainObjectCache.GetAsync<WriteContent>(uniqueId, version, ct);
         }
     }
 
-    private async Task<ContentDomainObject.State> GetAsync(DomainId uniqueId, long version,
+    private async Task<WriteContent> GetAsync(DomainId uniqueId, long version,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("ContentLoader/GetAsync"))

@@ -75,7 +75,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
     {
         var requestContext = SetupContext(PermissionIds.AppContentsUpdateOwn);
 
-        var (id, _, query) = CreateTestData(true);
+        var (_, _, query) = CreateTestData(true);
 
         A.CallTo(() => contentQuery.QueryAsync(
                 A<Context>.That.Matches(x =>
@@ -84,7 +84,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
                     x.NoTotal()),
                 schemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
+            .Returns(ResultList.CreateFrom(2, CreateContent(), CreateContent()));
 
         var command = BulkCommand(BulkUpdateContentType.ChangeStatus, new BulkUpdateJob { Query = query });
 
@@ -112,7 +112,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
                 schemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.JsonQuery == query),
                 A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, CreateContent(id)));
+            .Returns(ResultList.CreateFrom(1, CreateContent().WithId(id)));
 
         var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Query = query, Data = data });
 
@@ -131,10 +131,10 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
     {
         var requestContext = SetupContext(PermissionIds.AppContentsUpsert);
 
-        var (_, data, query) = CreateTestData(true);
+        var (id, data, query) = CreateTestData(true);
 
-        var id1 = DomainId.NewGuid();
-        var id2 = DomainId.NewGuid();
+        var content1 = CreateContent();
+        var content2 = CreateContent();
 
         A.CallTo(() => contentQuery.QueryAsync(
                 A<Context>.That.Matches(x =>
@@ -144,9 +144,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
                 schemaId.Id.ToString(),
                 A<Q>.That.Matches(x => x.JsonQuery == query),
                 A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(2,
-                CreateContent(id1),
-                CreateContent(id2)));
+            .Returns(ResultList.CreateFrom(2, content1, content2));
 
         var command = BulkCommand(BulkUpdateContentType.Upsert, new BulkUpdateJob { Query = query, Data = data });
 
@@ -155,15 +153,15 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         var actual = await PublishAsync(command);
 
         Assert.Equal(2, actual.Count);
-        Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id1 && x.Exception == null);
-        Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id2 && x.Exception == null);
+        Assert.Single(actual, x => x.JobIndex == 0 && x.Id == content1.Id && x.Exception == null);
+        Assert.Single(actual, x => x.JobIndex == 0 && x.Id == content2.Id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id1), A<CancellationToken>._))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == content1.Id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id2), A<CancellationToken>._))
+                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == content2.Id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -490,7 +488,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         SetupContext(PermissionIds.AppContentsDeleteOwn);
 
         A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(A<Context>._, schemaCustomId.Name, A<CancellationToken>._))
-            .Returns(Mocks.Schema(AppId, schemaCustomId));
+            .Returns(Schema.WithId(schemaCustomId));
 
         var (id, _, _) = CreateTestData(false);
 
@@ -577,10 +575,5 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
                         .AddInvariant(1));
 
         return (DomainId.NewGuid(), data, query);
-    }
-
-    private static IEnrichedContentEntity CreateContent(DomainId id)
-    {
-        return new ContentEntity { Id = id };
     }
 }

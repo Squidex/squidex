@@ -6,25 +6,14 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent;
+namespace Squidex.Domain.Apps.Entities.Assets;
 
-public interface IAssetInfo
+public record EnrichedAsset : Asset
 {
-    DomainId AssetId { get; }
+    public HashSet<string> TagNames { get; set; }
 
-    long FileSize { get; }
+    public string MetadataText { get; set; }
 
-    string FileName { get; }
-
-    string FileHash { get; }
-
-    string MimeType { get; }
-
-    string Slug { get; }
-
-    AssetMetadata Metadata { get; }
-
-    AssetType Type { get; }
+    public string? EditToken { get; set; }
 }

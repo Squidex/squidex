@@ -128,13 +128,10 @@ public static class MongoExtensions
         var (key, snapshot, newVersion, oldVersion) = job;
         try
         {
-            snapshot.DocumentId = key;
-            snapshot.Version = newVersion;
-
             Expression<Func<T, bool>> filter =
                 oldVersion > EtagVersion.Any ?
-                x => x.DocumentId.Equals(key) && x.Version == oldVersion :
-                x => x.DocumentId.Equals(key);
+                x => x.UniqueId.Equals(key) && x.Version == oldVersion :
+                x => x.UniqueId.Equals(key);
 
             var result = await collection.ReplaceOneAsync(session, filter, job.Value, UpsertReplace, ct);
 
@@ -143,7 +140,7 @@ public static class MongoExtensions
         catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
         {
             var existingVersion =
-                await collection.Find(session, x => x.DocumentId.Equals(key)).Only(x => x.DocumentId, x => x.Version)
+                await collection.Find(session, x => x.UniqueId.Equals(key)).Only(x => x.UniqueId, x => x.Version)
                     .FirstOrDefaultAsync(ct);
 
             if (existingVersion != null)
@@ -168,13 +165,10 @@ public static class MongoExtensions
         var (key, snapshot, newVersion, oldVersion) = job;
         try
         {
-            snapshot.DocumentId = key;
-            snapshot.Version = newVersion;
-
             Expression<Func<T, bool>> filter =
                 oldVersion > EtagVersion.Any ?
-                x => x.DocumentId.Equals(key) && x.Version == oldVersion :
-                x => x.DocumentId.Equals(key);
+                x => x.UniqueId.Equals(key) && x.Version == oldVersion :
+                x => x.UniqueId.Equals(key);
 
             var result = await collection.ReplaceOneAsync(filter, snapshot, UpsertReplace, ct);
 
@@ -183,7 +177,7 @@ public static class MongoExtensions
         catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
         {
             var existingVersion =
-                await collection.Find(x => x.DocumentId.Equals(key)).Only(x => x.DocumentId, x => x.Version)
+                await collection.Find(x => x.UniqueId.Equals(key)).Only(x => x.UniqueId, x => x.Version)
                     .FirstOrDefaultAsync(ct);
 
             if (existingVersion != null)
@@ -245,11 +239,10 @@ public static class MongoExtensions
         }
 
         var idDocuments = await find.Project<BsonDocument>(Builders<T>.Projection.Include("_id")).ToListAsync(ct);
-        var idValues = idDocuments.Select(x => x["_id"]);
+        var idsOrdered = idDocuments.Select(x => x["_id"]);
+        var idsRandom = idsOrdered.TakeRandom(take);
 
-        var randomIds = idValues.TakeRandom(take);
-
-        var documents = await collection.Find(Builders<T>.Filter.In("_id", randomIds)).ToListAsync(ct);
+        var documents = await collection.Find(Builders<T>.Filter.In("_id", idsRandom)).ToListAsync(ct);
 
         return documents.Shuffle().ToList();
     }

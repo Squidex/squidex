@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -107,12 +108,12 @@ public sealed class BackupAssets : IBackupHandler
     {
         if (assetIds.Count > 0)
         {
-            await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds, BatchSize, ct);
+            await rebuilder.InsertManyAsync<AssetDomainObject, Asset>(assetIds, BatchSize, ct);
         }
 
         if (assetFolderIds.Count > 0)
         {
-            await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(assetFolderIds, BatchSize, ct);
+            await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolder>(assetFolderIds, BatchSize, ct);
         }
     }
 

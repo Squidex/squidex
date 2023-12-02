@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
@@ -19,7 +20,7 @@ public sealed class AssetEnricher : IAssetEnricher
         this.steps = steps;
     }
 
-    public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context,
+    public async Task<EnrichedAsset> EnrichAsync(Asset asset, Context context,
         CancellationToken ct)
     {
         Guard.NotNull(asset);
@@ -30,7 +31,7 @@ public sealed class AssetEnricher : IAssetEnricher
         return enriched[0];
     }
 
-    public async Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets, Context context,
+    public async Task<IReadOnlyList<EnrichedAsset>> EnrichAsync(IEnumerable<Asset> assets, Context context,
         CancellationToken ct)
     {
         Guard.NotNull(assets);
@@ -38,7 +39,7 @@ public sealed class AssetEnricher : IAssetEnricher
 
         using (var activity = Telemetry.Activities.StartActivity("AssetEnricher/EnrichAsync"))
         {
-            var results = new List<AssetEntity>();
+            var results = new List<EnrichedAsset>();
 
             if (context.App != null)
             {
@@ -55,7 +56,7 @@ public sealed class AssetEnricher : IAssetEnricher
 
             foreach (var asset in assets)
             {
-                var result = SimpleMapper.Map(asset, new AssetEntity());
+                var result = SimpleMapper.Map(asset, new EnrichedAsset());
 
                 results.Add(result);
             }

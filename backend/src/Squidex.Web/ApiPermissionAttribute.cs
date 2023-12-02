@@ -8,6 +8,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
@@ -41,21 +44,21 @@ public class ApiPermissionAttribute : AuthorizeAttribute, IAsyncActionFilter
             {
                 foreach (var id in permissionIds)
                 {
-                    var app = context.HttpContext.Features.Get<IAppFeature>()?.App.Name;
+                    var app = context.HttpContext.Features.Get<App>()?.Name;
 
                     if (string.IsNullOrWhiteSpace(app))
                     {
                         app = Permission.Any;
                     }
 
-                    var schema = context.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
+                    var schema = context.HttpContext.Features.Get<Schema>()?.Name;
 
                     if (string.IsNullOrWhiteSpace(schema))
                     {
                         schema = Permission.Any;
                     }
 
-                    var team = context.HttpContext.Features.Get<ITeamFeature>()?.Team.Id.ToString();
+                    var team = context.HttpContext.Features.Get<Team>()?.Id.ToString();
 
                     if (string.IsNullOrWhiteSpace(team))
                     {

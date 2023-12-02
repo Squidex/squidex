@@ -1,16 +1,15 @@
 ﻿{
     "appId": "06c68527-a2ca-4d84-91eb-a1707aa5b6fb,hotels",
-    "ruleDef": {
-        "trigger": {
-            "triggerType": "ManualTrigger"
-        },
-        "action": {
-            "actionType": "Webhook",
-            "url": "http://squidex.io"
-        },
-        "isEnabled": true
+    "trigger": {
+        "triggerType": "ManualTrigger"
     },
+    "action": {
+        "actionType": "Webhook",
+        "url": "http://squidex.io"
+    },
+    "isEnabled": true,
     "isDeleted": false,
+    "uniqueId": "06c68527-a2ca-4d84-91eb-a1707aa5b6fb--265aaf1e-5dff-4c40-b1e6-1149f652cd30",
     "id": "265aaf1e-5dff-4c40-b1e6-1149f652cd30",
     "createdBy": "subject:63761585e06d5466c71521b3",
     "lastModifiedBy": "subject:63761585e06d5466c71521b3",

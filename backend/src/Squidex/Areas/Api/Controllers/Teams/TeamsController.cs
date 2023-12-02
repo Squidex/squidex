@@ -8,8 +8,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Teams.Models;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -131,11 +131,11 @@ public sealed class TeamsController : ApiController
         });
     }
 
-    private async Task<T> InvokeCommandAsync<T>(ICommand command, Func<ITeamEntity, T> converter)
+    private async Task<T> InvokeCommandAsync<T>(ICommand command, Func<Team, T> converter)
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        var result = context.Result<ITeamEntity>();
+        var result = context.Result<Team>();
         var response = converter(result);
 
         return response;

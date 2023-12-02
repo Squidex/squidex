@@ -21,7 +21,7 @@ public sealed class CalculateTokens : IAssetEnricherStep
         this.urlGenerator = urlGenerator;
     }
 
-    public Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
+    public Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {
         if (context.NoAssetEnrichment())

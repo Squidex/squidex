@@ -42,8 +42,8 @@ public class AssetsSearchSourceTests : GivenContext
 
         var requestContext = CreateContext(false, permission.Id);
 
-        var asset1 = CreateAsset("logo1.png");
-        var asset2 = CreateAsset("logo2.png");
+        var asset1 = CreateAsset() with { FileName = "logo1.png" };
+        var asset2 = CreateAsset() with { FileName = "logo2.png" };
 
         A.CallTo(() => urlGenerator.AssetsUI(AppId, asset1.Id.ToString()))
             .Returns("assets-url1");
@@ -60,10 +60,5 @@ public class AssetsSearchSourceTests : GivenContext
             new SearchResults()
                 .Add("logo1.png", SearchResultType.Asset, "assets-url1")
                 .Add("logo2.png", SearchResultType.Asset, "assets-url2"));
-    }
-
-    private static IEnrichedAssetEntity CreateAsset(string fileName)
-    {
-        return new AssetEntity { FileName = fileName, Id = DomainId.NewGuid() };
     }
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -119,13 +120,14 @@ public static class ValidationTestExtensions
         ResolvedComponents? components = null,
         DomainId? contentId = null)
     {
+        schema ??= new Schema();
+
         var rootContext = new RootContext(
-            TestUtils.DefaultSerializer,
-            AppId,
-            SchemaId,
-            schema ?? new Schema(SchemaId.Name),
+            new App { Id = AppId.Id, Name = AppId.Name },
+            schema with { Id = SchemaId.Id, Name = SchemaId.Name },
             contentId ?? DomainId.NewGuid(),
-            components ?? ResolvedComponents.Empty);
+            components ?? ResolvedComponents.Empty,
+            TestUtils.DefaultSerializer);
 
         var context =
             new ValidationContext(rootContext)

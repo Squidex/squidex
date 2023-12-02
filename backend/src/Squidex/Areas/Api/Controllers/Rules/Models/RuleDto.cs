@@ -84,22 +84,21 @@ public sealed class RuleDto : Resource
     [Obsolete("Removed when migrated to new rule statistics.")]
     public Instant? LastExecuted { get; set; }
 
-    public static RuleDto FromDomain(IEnrichedRuleEntity rule, bool canRun, IRuleRunnerService ruleRunnerService, Resources resources)
+    public static RuleDto FromDomain(EnrichedRule rule, bool canRun, IRuleRunnerService ruleRunnerService, Resources resources)
     {
         var result = new RuleDto();
 
         SimpleMapper.Map(rule, result);
-        SimpleMapper.Map(rule.RuleDef, result);
 
-        if (rule.RuleDef.Trigger != null)
+        if (rule.Trigger != null)
         {
-            result.Trigger = RuleTriggerDtoFactory.Create(rule.RuleDef.Trigger);
+            result.Trigger = RuleTriggerDtoFactory.Create(rule.Trigger);
         }
 
         return result.CreateLinks(resources, rule, canRun, ruleRunnerService);
     }
 
-    private RuleDto CreateLinks(Resources resources, IEnrichedRuleEntity rule, bool canRun, IRuleRunnerService ruleRunnerService)
+    private RuleDto CreateLinks(Resources resources, EnrichedRule rule, bool canRun, IRuleRunnerService ruleRunnerService)
     {
         var values = new { app = resources.App, id = Id };
 

@@ -7,14 +7,14 @@
 
 using System.Runtime.CompilerServices;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 
 public sealed class QueryAsStream : OperationBase
 {
-    public async IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
+    public async IAsyncEnumerable<Content> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
         [EnumeratorCancellation] CancellationToken ct)
     {
         var filter = CreateFilter(appId, schemaIds);

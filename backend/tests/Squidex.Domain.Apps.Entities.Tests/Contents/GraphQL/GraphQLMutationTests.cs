@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 public class GraphQLMutationTests : GraphQLTestBase
 {
     private readonly DomainId contentId = DomainId.NewGuid();
-    private readonly IEnrichedContentEntity content;
+    private readonly EnrichedContent content;
     private readonly CommandContext commandContext = new CommandContext(new PatchContent(), A.Dummy<ICommandBus>());
 
     public GraphQLMutationTests()

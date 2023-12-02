@@ -30,7 +30,7 @@ internal sealed class ApplicationQueries : ObjectGraphType
                 continue;
             }
 
-            if (schemaInfo.Schema.SchemaDef.Type == SchemaType.Singleton)
+            if (schemaInfo.Schema.Type == SchemaType.Singleton)
             {
                 // Mark the normal queries as deprecated to motivate using the new endpoint.
                 var deprecation = $"Use 'find{schemaInfo.TypeName}Singleton' instead.";

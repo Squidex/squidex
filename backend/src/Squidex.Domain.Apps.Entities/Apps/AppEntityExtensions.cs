@@ -6,12 +6,13 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
 public static class AppEntityExtensions
 {
-    public static PartitionResolver PartitionResolver(this IAppEntity entity)
+    public static PartitionResolver PartitionResolver(this App entity)
     {
         return entity.Languages.ToResolver();
     }

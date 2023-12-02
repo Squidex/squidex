@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -48,7 +49,7 @@ public sealed class BackupSchemas : IBackupHandler
     {
         if (schemaIds.Count > 0)
         {
-            await rebuilder.InsertManyAsync<SchemaDomainObject, SchemaDomainObject.State>(schemaIds, BatchSize, ct);
+            await rebuilder.InsertManyAsync<SchemaDomainObject, Schema>(schemaIds, BatchSize, ct);
         }
     }
 }

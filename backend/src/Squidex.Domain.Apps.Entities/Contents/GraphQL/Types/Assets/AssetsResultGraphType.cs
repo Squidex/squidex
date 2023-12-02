@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets;
 
-internal sealed class AssetsResultGraphType : SharedObjectGraphType<IResultList<IAssetEntity>>
+internal sealed class AssetsResultGraphType : SharedObjectGraphType<IResultList<EnrichedAsset>>
 {
     public AssetsResultGraphType(IGraphType assetsList)
     {
@@ -39,7 +39,7 @@ internal sealed class AssetsResultGraphType : SharedObjectGraphType<IResultList<
         Description = "List of assets and total count of assets.";
     }
 
-    private static IFieldResolver ResolveList<T>(Func<IResultList<IEnrichedAssetEntity>, T> resolver)
+    private static IFieldResolver ResolveList<T>(Func<IResultList<EnrichedAsset>, T> resolver)
     {
         return Resolvers.Sync(resolver);
     }

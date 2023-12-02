@@ -36,7 +36,7 @@ public class RuleStateTests
     {
         var json = File.ReadAllText("Rules/DomainObject/RuleState.json");
 
-        var deserialized = serializer.Deserialize<RuleDomainObject.State>(json);
+        var deserialized = serializer.Deserialize<Rule>(json);
 
         Assert.NotNull(deserialized);
     }
@@ -46,7 +46,7 @@ public class RuleStateTests
     {
         var json = File.ReadAllText("Rules/DomainObject/RuleState_Old.json");
 
-        var deserialized = serializer.Deserialize<RuleDomainObject.State>(json);
+        var deserialized = serializer.Deserialize<Rule>(json);
 
         Assert.NotNull(deserialized);
     }
@@ -56,7 +56,7 @@ public class RuleStateTests
     {
         var json = File.ReadAllText("Rules/DomainObject/RuleState.json").CleanJson();
 
-        var serialized = serializer.Serialize(serializer.Deserialize<RuleDomainObject.State>(json), true);
+        var serialized = serializer.Serialize(serializer.Deserialize<Rule>(json), true);
 
         Assert.Equal(json, serialized);
     }

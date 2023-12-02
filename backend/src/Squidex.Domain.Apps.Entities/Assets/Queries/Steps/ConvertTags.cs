@@ -19,7 +19,7 @@ public sealed class ConvertTags : IAssetEnricherStep
         this.tagService = tagService;
     }
 
-    public async Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
+    public async Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {
         if (context.NoAssetEnrichment())
@@ -46,7 +46,7 @@ public sealed class ConvertTags : IAssetEnricherStep
         }
     }
 
-    private async Task<Dictionary<string, string>> CalculateTagsAsync(DomainId appId, IEnumerable<IAssetEntity> assets,
+    private async Task<Dictionary<string, string>> CalculateTagsAsync(DomainId appId, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {
         var uniqueIds = assets.Where(x => x.Tags != null).SelectMany(x => x.Tags).ToHashSet();

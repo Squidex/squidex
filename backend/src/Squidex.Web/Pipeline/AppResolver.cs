@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Security;
@@ -113,7 +114,7 @@ public sealed class AppResolver : IAsyncActionFilter
             }
 
             context.HttpContext.Features.Set(requestContext);
-            context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
+            context.HttpContext.Features.Set(app);
             context.HttpContext.Response.Headers["X-AppId"] = app.Id.ToString();
         }
 
@@ -130,7 +131,7 @@ public sealed class AppResolver : IAsyncActionFilter
         return context.ActionDescriptor.EndpointMetadata.Any(x => x is AllowAnonymousAttribute);
     }
 
-    private static (string?, string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user, bool isFrontend)
+    private static (string?, string?, PermissionSet?) FindByOpenIdClient(App app, ClaimsPrincipal user, bool isFrontend)
     {
         var (appName, clientId) = user.GetClient();
 
@@ -147,7 +148,7 @@ public sealed class AppResolver : IAsyncActionFilter
         return default;
     }
 
-    private static (string?, string?, PermissionSet?) FindAnonymousClient(IAppEntity app, bool isFrontend)
+    private static (string?, string?, PermissionSet?) FindAnonymousClient(App app, bool isFrontend)
     {
         var client = app.Clients.FirstOrDefault(x => x.Value.AllowAnonymous);
 
@@ -164,7 +165,7 @@ public sealed class AppResolver : IAsyncActionFilter
         return default;
     }
 
-    private static (string?, PermissionSet?) FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user, bool isFrontend)
+    private static (string?, PermissionSet?) FindByOpenIdSubject(App app, ClaimsPrincipal user, bool isFrontend)
     {
         var subjectId = user.OpenIdSubject();
 

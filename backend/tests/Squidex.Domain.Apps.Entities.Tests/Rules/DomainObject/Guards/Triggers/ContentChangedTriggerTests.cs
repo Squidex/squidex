@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -41,7 +41,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     public async Task Should_add_error_if_schemas_ids_are_not_valid()
     {
         A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Id, false, default))
-            .Returns(Task.FromResult<ISchemaEntity?>(null));
+            .Returns(Task.FromResult<Schema?>(null));
 
         var trigger = new ContentChangedTriggerV2
         {

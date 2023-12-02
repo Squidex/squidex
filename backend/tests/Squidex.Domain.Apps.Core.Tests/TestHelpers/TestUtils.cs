@@ -112,12 +112,12 @@ public static class TestUtils
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
         options.Converters.Add(new SurrogateJsonConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>());
+        options.Converters.Add(new SurrogateJsonConverter<FieldCollection<RootField>, FieldsSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<FilterNode<JsonValue>, JsonFilterSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<LanguageConfig, LanguageConfigSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<LanguagesConfig, LanguagesConfigSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<Roles, RolesSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<Rule, RuleSorrgate>());
-        options.Converters.Add(new SurrogateJsonConverter<Schema, SchemaSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowStep, WorkflowStepSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowTransition, WorkflowTransitionSurrogate>());
         options.Converters.Add(new StringConverter<CompareOperator>());

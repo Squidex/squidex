@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
@@ -17,7 +17,7 @@ public sealed class RolesDto : Resource
     /// </summary>
     public RoleDto[] Items { get; set; }
 
-    public static RolesDto FromDomain(IAppEntity app, Resources resources)
+    public static RolesDto FromDomain(App app, Resources resources)
     {
         var result = new RolesDto
         {

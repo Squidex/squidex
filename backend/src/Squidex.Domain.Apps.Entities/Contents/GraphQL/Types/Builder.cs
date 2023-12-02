@@ -8,15 +8,16 @@
 using GraphQL;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using GraphQLSchema = GraphQL.Types.Schema;
+using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
@@ -50,7 +51,7 @@ internal sealed class Builder
 
     public FieldMap FieldMap { get; private set; }
 
-    public Builder(IAppEntity app, GraphQLOptions options)
+    public Builder(App app, GraphQLOptions options)
     {
         partitionResolver = app.PartitionResolver();
 
@@ -60,7 +61,7 @@ internal sealed class Builder
         this.options = options;
     }
 
-    public GraphQLSchema BuildSchema(IEnumerable<ISchemaEntity> schemas)
+    public GraphQLSchema BuildSchema(IEnumerable<Schema> schemas)
     {
         // Do not add schema without fields.
         allSchemas.AddRange(SchemaInfo.Build(schemas, typeNames).Where(x => x.Fields.Count > 0));
@@ -138,7 +139,7 @@ internal sealed class Builder
 
     private static bool IsNormalSchema(SchemaInfo schema)
     {
-        return schema.Schema.SchemaDef.IsPublished && schema.Schema.SchemaDef.Type != SchemaType.Component;
+        return schema.Schema.IsPublished && schema.Schema.Type != SchemaType.Component;
     }
 
     public FieldGraphSchema GetGraphType(FieldInfo fieldInfo)

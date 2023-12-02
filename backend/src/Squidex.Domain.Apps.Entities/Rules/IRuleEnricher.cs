@@ -5,13 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
+
 namespace Squidex.Domain.Apps.Entities.Rules;
 
 public interface IRuleEnricher
 {
-    Task<IEnrichedRuleEntity> EnrichAsync(IRuleEntity rule, Context context,
+    Task<EnrichedRule> EnrichAsync(Rule rule, Context context,
         CancellationToken ct);
 
-    Task<IReadOnlyList<IEnrichedRuleEntity>> EnrichAsync(IEnumerable<IRuleEntity> rules, Context context,
+    Task<IReadOnlyList<EnrichedRule>> EnrichAsync(IEnumerable<Rule> rules, Context context,
         CancellationToken ct);
 }

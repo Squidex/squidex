@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
@@ -20,7 +21,7 @@ public sealed class AppEventDeleter : IDeleter
         this.eventStore = eventStore;
     }
 
-    public Task DeleteAppAsync(IAppEntity app,
+    public Task DeleteAppAsync(App app,
         CancellationToken ct)
     {
         var streamFilter = StreamFilter.Prefix($"([a-zA-Z0-9]+)-{app.Id}");

@@ -20,7 +20,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
 {
     private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
     private readonly List<ValidationError> errors = [];
-    private Schema schema = new Schema("my-schema");
+    private Schema schema = new Schema { Name = "my-schema" };
 
     [Fact]
     public async Task Should_add_error_if_value_validator_throws_exception()

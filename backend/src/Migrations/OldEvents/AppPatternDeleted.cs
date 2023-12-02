@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -17,11 +17,11 @@ namespace Migrations.OldEvents;
 
 [EventType(nameof(AppPatternDeleted))]
 [Obsolete("New Event introduced")]
-public sealed class AppPatternDeleted : AppEvent, IMigratedStateEvent<AppDomainObject.State>
+public sealed class AppPatternDeleted : AppEvent, IMigratedStateEvent<App>
 {
     public DomainId PatternId { get; set; }
 
-    public IEvent Migrate(AppDomainObject.State state)
+    public IEvent Migrate(App state)
     {
         var newEvent = new AppSettingsUpdated
         {

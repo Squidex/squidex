@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 
 public static class GuardAppClients
 {
-    public static void CanAttach(AttachClient command, IAppEntity app)
+    public static void CanAttach(AttachClient command, App app)
     {
         Guard.NotNull(command);
 
@@ -34,7 +34,7 @@ public static class GuardAppClients
         });
     }
 
-    public static void CanRevoke(RevokeClient command, IAppEntity app)
+    public static void CanRevoke(RevokeClient command, App app)
     {
         Guard.NotNull(command);
 
@@ -49,7 +49,7 @@ public static class GuardAppClients
         });
     }
 
-    public static void CanUpdate(UpdateClient command, IAppEntity app)
+    public static void CanUpdate(UpdateClient command, App app)
     {
         Guard.NotNull(command);
 

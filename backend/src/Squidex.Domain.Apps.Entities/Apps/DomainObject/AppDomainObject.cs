@@ -24,18 +24,18 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
-public partial class AppDomainObject : DomainObject<AppDomainObject.State>
+public partial class AppDomainObject : DomainObject<App>
 {
     private readonly IServiceProvider serviceProvider;
 
-    public AppDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
+    public AppDomainObject(DomainId id, IPersistenceFactory<App> persistence, ILogger<AppDomainObject> log,
         IServiceProvider serviceProvider)
         : base(id, persistence, log)
     {
         this.serviceProvider = serviceProvider;
     }
 
-    protected override bool IsDeleted(State snapshot)
+    protected override bool IsDeleted(App snapshot)
     {
         return snapshot.IsDeleted;
     }

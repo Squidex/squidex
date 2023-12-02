@@ -35,8 +35,15 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
         A.CallTo(() => billingPlans.GetPlan("basic"))
             .Returns(new Plan());
 
-        A.CallTo(() => Team.Contributors)
-            .Returns(Contributors.Empty.Assign(User.Identifier, Role.Owner));
+        App = App with
+        {
+            TeamId = default
+        };
+
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Owner)
+        };
     }
 
     [Fact]
@@ -96,8 +103,10 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ChangePlan { PlanId = "basic", Actor = User };
 
-        A.CallTo(() => App.Plan)
-            .Returns(new AssignedPlan(RefToken.User("other"), "premium"));
+        App = App with
+        {
+            Plan = new AssignedPlan(RefToken.User("other"), "premium")
+        };
 
         ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App, billingPlans),
             new ValidationError("Plan can only changed from the user who configured the plan initially."));
@@ -108,8 +117,10 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ChangePlan { PlanId = "basic", Actor = User };
 
-        A.CallTo(() => App.TeamId)
-            .Returns(DomainId.NewGuid());
+        App = App with
+        {
+            TeamId = Team.Id
+        };
 
         ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App, billingPlans),
             new ValidationError("Plan is managed by the team."));
@@ -120,8 +131,10 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ChangePlan { PlanId = "basic", Actor = User };
 
-        A.CallTo(() => App.Plan)
-            .Returns(new AssignedPlan(command.Actor, "premium"));
+        App = App with
+        {
+            Plan = new AssignedPlan(User, "premium")
+        };
 
         GuardApp.CanChangePlan(command, App, billingPlans);
     }
@@ -131,8 +144,10 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ChangePlan { PlanId = "basic", Actor = User };
 
-        A.CallTo(() => App.Plan)
-            .Returns(new AssignedPlan(command.Actor, "premium"));
+        App = App with
+        {
+            Plan = new AssignedPlan(User, "premium")
+        };
 
         GuardApp.CanChangePlan(command, App, billingPlans);
     }
@@ -182,8 +197,10 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new TransferToTeam { TeamId = TeamId, Actor = User };
 
-        A.CallTo(() => App.Plan)
-            .Returns(new AssignedPlan(User, "premium"));
+        App = App with
+        {
+            Plan = new AssignedPlan(RefToken.User("other"), "premium")
+        };
 
         await ValidationAssert.ThrowsAsync(() => GuardApp.CanTransfer(command, App, AppProvider, default),
             new ValidationError("Subscription must be cancelled first before the app can be transfered."));

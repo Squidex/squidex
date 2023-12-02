@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Diagnostics.CodeAnalysis;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas;
@@ -42,9 +43,9 @@ public sealed class FieldNames : ReadonlyList<string>
     {
     }
 
-    public static FieldNames Create(params string[] names)
+    public static FieldNames Create(params string[]? names)
     {
-        return new FieldNames(names.ToList());
+        return names == null || names.Length == 0 ? Empty : new FieldNames(names.ToList());
     }
 
     public FieldNames Add(string field)
@@ -121,5 +122,30 @@ public sealed class FieldNames : ReadonlyList<string>
         }
 
         return new FieldNames(result);
+    }
+
+    public static Schema Migrate(Schema schema)
+    {
+        Guard.NotNull(schema);
+
+        var fieldsInLists = schema.FieldsInLists;
+        var fieldsInRefs = schema.FieldsInReferences;
+
+        var migratedFieldsInLists = fieldsInLists.Migrate();
+        var migratedFieldsInRefs = fieldsInRefs.Migrate();
+
+        var newSchema = schema;
+
+        if (!ReferenceEquals(fieldsInLists, migratedFieldsInLists))
+        {
+            newSchema = newSchema.SetFieldsInLists(migratedFieldsInLists);
+        }
+
+        if (!ReferenceEquals(fieldsInRefs, migratedFieldsInRefs))
+        {
+            newSchema = newSchema.SetFieldsInReferences(migratedFieldsInRefs);
+        }
+
+        return newSchema;
     }
 }

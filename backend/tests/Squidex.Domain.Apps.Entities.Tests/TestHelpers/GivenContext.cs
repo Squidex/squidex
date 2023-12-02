@@ -5,10 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Teams;
+using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Teams;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Extensions.Actions.Webhook;
 using Squidex.Infrastructure;
+using ContentFieldData = Squidex.Domain.Apps.Core.Contents.ContentFieldData;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers;
 
@@ -29,11 +38,11 @@ public abstract class GivenContext
 
     public NamedId<DomainId> SchemaId { get; } = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
-    public ITeamEntity Team { get; set; }
+    public App App { get; set; }
 
-    public IAppEntity App { get; set; }
+    public Team Team { get; set; }
 
-    public ISchemaEntity Schema { get; set; }
+    public Schema Schema { get; set; }
 
     public RefToken User { get; } = RefToken.User("me");
 
@@ -68,13 +77,49 @@ public abstract class GivenContext
 
     protected GivenContext()
     {
-        Team = Mocks.Team(TeamId, TeamName);
+        Team = new Team
+        {
+            Id = TeamId,
+            Name = TeamName,
+            Created = default,
+            CreatedBy = User,
+            LastModified = default,
+            LastModifiedBy = User,
+            UniqueId = TeamId,
+            Version = 1,
+        };
 
-        App = Mocks.App(AppId,
-            Language.EN,
-            Language.DE);
+        App = new App
+        {
+            Id = AppId.Id,
+            Name = AppId.Name,
+            Created = default,
+            CreatedBy = User,
+            Languages = LanguagesConfig.English.Set(Language.DE, false),
+            LastModified = default,
+            LastModifiedBy = User,
+            TeamId = TeamId,
+            UniqueId = AppId.Id,
+            Version = 1,
+        };
 
-        Schema = Mocks.Schema(AppId, SchemaId);
+        Schema = new Schema
+        {
+            Id = SchemaId.Id,
+            Name = SchemaId.Name,
+            AppId = AppId,
+            Created = default,
+            CreatedBy = User,
+            LastModified = default,
+            LastModifiedBy = User,
+            UniqueId = DomainId.Combine(AppId.Id, SchemaId.Id),
+            Version = 1,
+        };
+    }
+
+    public Instant Timestamp()
+    {
+        return SystemClock.Instance.GetCurrentInstant();
     }
 
     public Context CreateContext(params string[] permissions)
@@ -121,5 +166,125 @@ public abstract class GivenContext
             .ReturnsLazily(() => (App, Schema));
 
         return result;
+    }
+
+    public EnrichedAsset CreateAsset()
+    {
+        var id = DomainId.NewGuid();
+
+        return new EnrichedAsset
+        {
+            Id = id,
+            AppId = AppId,
+            Created = Timestamp(),
+            CreatedBy = User,
+            FileName = "My File.png",
+            FileHash = "my-hash-42",
+            FileSize = 1024,
+            FileVersion = 0,
+            TotalSize = 1024 * 2,
+            LastModified = Timestamp(),
+            LastModifiedBy = User,
+            Metadata = [],
+            MetadataText = string.Empty,
+            MimeType = "image/png",
+            Tags = [],
+            TagNames = [],
+            Slug = "my-file",
+            UniqueId = DomainId.Combine(AppId.Id, id),
+            Version = 1,
+        };
+    }
+
+    public AssetFolder CreateAssetFolder()
+    {
+        var id = DomainId.NewGuid();
+
+        return new AssetFolder
+        {
+            Id = id,
+            AppId = AppId,
+            Created = Timestamp(),
+            CreatedBy = User,
+            FolderName = "My Folder",
+            LastModified = Timestamp(),
+            LastModifiedBy = User,
+            UniqueId = DomainId.Combine(AppId.Id, id),
+            Version = 1,
+        };
+    }
+
+    public EnrichedRule CreateRule()
+    {
+        var id = DomainId.NewGuid();
+
+        return new EnrichedRule
+        {
+            Id = id,
+            AppId = AppId,
+            Action = new WebhookAction(),
+            Created = Timestamp(),
+            CreatedBy = User,
+            Name = "My Rule",
+            LastModified = Timestamp(),
+            LastModifiedBy = User,
+            Trigger = new ContentChangedTriggerV2(),
+            UniqueId = DomainId.Combine(AppId.Id, id),
+            Version = 1,
+        };
+    }
+
+    public EnrichedContent CreateContent()
+    {
+        var id = DomainId.NewGuid();
+
+        var data =
+            new ContentData()
+                .AddField("my-field",
+                    new ContentFieldData()
+                        .AddInvariant(42));
+
+        return new EnrichedContent
+        {
+            Id = id,
+            AppId = AppId,
+            Created = Timestamp(),
+            CreatedBy = User,
+            Data = data,
+            LastModified = Timestamp(),
+            LastModifiedBy = User,
+            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, User, Timestamp()),
+            SchemaId = SchemaId,
+            Status = Status.Published,
+            UniqueId = DomainId.Combine(AppId.Id, id),
+            Version = 1,
+        };
+    }
+
+    public WriteContent CreateWriteContent()
+    {
+        var id = DomainId.NewGuid();
+
+        var data =
+            new ContentData()
+                .AddField("my-field",
+                    new ContentFieldData()
+                        .AddInvariant(42));
+
+        return new WriteContent
+        {
+            Id = id,
+            AppId = AppId,
+            Created = Timestamp(),
+            CreatedBy = User,
+            CurrentVersion = new ContentVersion(Status.Published, data),
+            NewVersion = null,
+            LastModified = Timestamp(),
+            LastModifiedBy = User,
+            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, User, Timestamp()),
+            SchemaId = SchemaId,
+            UniqueId = DomainId.Combine(AppId.Id, id),
+            Version = 1,
+        };
     }
 }

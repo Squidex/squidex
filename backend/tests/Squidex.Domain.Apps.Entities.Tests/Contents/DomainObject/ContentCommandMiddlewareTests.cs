@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -13,7 +14,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomainObject.State>
+public sealed class ContentCommandMiddlewareTests : HandlerTestBase<WriteContent>
 {
     private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
@@ -44,31 +45,31 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomai
     {
         await HandleAsync(new CreateContent(), 12);
 
-        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, ApiContext, A<CancellationToken>._))
+        A.CallTo(() => contentEnricher.EnrichAsync(A<EnrichedContent>._, A<bool>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_not_invoke_enricher_if_already_enriched()
     {
-        var actual = new ContentEntity();
+        var actual = CreateContent();
 
         var context =
             await HandleAsync(new CreateContent(),
                 actual);
 
-        Assert.Same(actual, context.Result<IEnrichedContentEntity>());
+        Assert.Same(actual, context.Result<Content>());
 
-        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, ApiContext, A<CancellationToken>._))
+        A.CallTo(() => contentEnricher.EnrichAsync(A<Content>._, A<bool>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_enrich_content_actual()
     {
-        var actual = A.Fake<IContentEntity>();
+        var actual = new Content();
 
-        var enriched = new ContentEntity();
+        var enriched = CreateContent();
 
         A.CallTo(() => contentEnricher.EnrichAsync(actual, true, ApiContext, CancellationToken))
             .Returns(enriched);
@@ -77,7 +78,7 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentDomai
             await HandleAsync(new CreateContent(),
                 actual);
 
-        Assert.Same(enriched, context.Result<IEnrichedContentEntity>());
+        Assert.Same(enriched, context.Result<Content>());
     }
 
     private Task<CommandContext> HandleAsync(ContentCommand command, object actual)

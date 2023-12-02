@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Caching;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -58,14 +58,14 @@ public sealed class CachingGraphQLResolver : IConfigureExecution
         return await next(options);
     }
 
-    public async Task<GraphQLSchema> GetSchemaAsync(IAppEntity app)
+    public async Task<GraphQLSchema> GetSchemaAsync(App app)
     {
         var entry = await GetModelEntryAsync(app);
 
         return entry.Model;
     }
 
-    private Task<CacheEntry> GetModelEntryAsync(IAppEntity app)
+    private Task<CacheEntry> GetModelEntryAsync(App app)
     {
         if (options.CacheDuration <= TimeSpan.Zero)
         {
@@ -86,7 +86,7 @@ public sealed class CachingGraphQLResolver : IConfigureExecution
         });
     }
 
-    private async Task<CacheEntry> CreateModelAsync(IAppEntity app)
+    private async Task<CacheEntry> CreateModelAsync(App app)
     {
         var schemasList = await serviceProvider.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
         var schemasKey = await schemasHash.ComputeHashAsync(app, schemasList);

@@ -11,7 +11,7 @@
 
             ],
             "properties": {
-                "ui_§§_schemas_§§_hide": true
+                "ui_ï¿½ï¿½_schemas_ï¿½ï¿½_hide": true
             }
         }
     },
@@ -29,7 +29,7 @@
         "patterns": [
             {
                 "name": "Email",
-                "regex": "^[a-zA-Z0-9.!#$%&’*+\\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$"
+                "regex": "^[a-zA-Z0-9.!#$%&ï¿½*+\\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$"
             },
             {
                 "name": "Phone",
@@ -125,6 +125,7 @@
         }
     },
     "isDeleted": false,
+    "uniqueId": "7c45937e-e489-453f-81f8-a1432e778ea2",
     "id": "7c45937e-e489-453f-81f8-a1432e778ea2",
     "createdBy": "subject:62cee33bcc71c0d140ad103a",
     "lastModifiedBy": "subject:62cee33bcc71c0d140ad103a",

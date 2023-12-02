@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
 public sealed class EnrichWithSchema : IContentEnricherStep
 {
-    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
         // Group by schema, so we only fetch the schema once.
@@ -21,18 +21,18 @@ public sealed class EnrichWithSchema : IContentEnricherStep
 
             var (schema, _) = await schemas(group.Key);
 
-            var schemaDisplayName = schema.SchemaDef.DisplayNameUnchanged();
+            var schemaDisplayName = schema.DisplayName();
 
             foreach (var content in group)
             {
-                content.IsSingleton = schema.SchemaDef.Type == SchemaType.Singleton;
+                content.IsSingleton = schema.Type == SchemaType.Singleton;
 
                 content.SchemaDisplayName = schemaDisplayName;
             }
 
             if (context.IsFrontendClient)
             {
-                var referenceFields = schema.SchemaDef.ReferenceFields().ToArray();
+                var referenceFields = schema.ReferenceFields().ToArray();
 
                 foreach (var content in group)
                 {

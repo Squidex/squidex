@@ -24,7 +24,7 @@ public class DefaultValuesTests
     public DefaultValuesTests()
     {
         schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddString(1, "myString", Partitioning.Language,
                     new StringFieldProperties { DefaultValue = "en-string", IsRequired = true })
                 .AddNumber(2, "myNumber", Partitioning.Invariant,

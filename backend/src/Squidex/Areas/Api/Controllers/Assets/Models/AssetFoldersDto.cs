@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 using Squidex.Web;
 
@@ -28,7 +28,7 @@ public sealed class AssetFoldersDto : Resource
     /// </summary>
     public AssetFolderDto[] Path { get; set; }
 
-    public static AssetFoldersDto FromDomain(IResultList<IAssetFolderEntity> assetFolders, IEnumerable<IAssetFolderEntity> path, Resources resources)
+    public static AssetFoldersDto FromDomain(IResultList<AssetFolder> assetFolders, IEnumerable<AssetFolder> path, Resources resources)
     {
         var result = new AssetFoldersDto
         {

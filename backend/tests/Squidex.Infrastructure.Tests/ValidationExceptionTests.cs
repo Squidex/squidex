@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.TestHelpers;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure;

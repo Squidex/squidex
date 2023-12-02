@@ -5,20 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Core.Rules;
 
-namespace Squidex.Domain.Apps.Entities.Schemas;
+namespace Squidex.Domain.Apps.Entities.Rules;
 
-public interface ISchemaEntity :
-    IEntity,
-    IEntityWithCreatedBy,
-    IEntityWithLastModifiedBy,
-    IEntityWithVersion
+public sealed record EnrichedRule : Rule
 {
-    NamedId<DomainId> AppId { get; }
+    public long NumSucceeded { get; init; }
 
-    bool IsDeleted { get; }
-
-    Schema SchemaDef { get; }
+    public long NumFailed { get; init; }
 }

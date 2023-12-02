@@ -6,8 +6,7 @@
 // ==========================================================================
 
 using Squidex.Caching;
-using Squidex.ClientLibrary;
-using Squidex.Domain.Apps.Core.ConvertContent;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
@@ -33,7 +32,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         this.persistenceFactory = persistenceFactory;
     }
 
-    public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
+    public async Task<List<Schema>> GetSchemasAsync(DomainId appId,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("SchemasIndex/GetSchemasAsync"))
@@ -46,7 +45,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         }
     }
 
-    public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache,
+    public async Task<Schema?> GetSchemaAsync(DomainId appId, string name, bool canCache,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaByNameAsync"))
@@ -58,7 +57,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
             if (canCache)
             {
-                if (schemaCache.TryGetValue(cacheKey, out var value) && value is ISchemaEntity cachedSchema)
+                if (schemaCache.TryGetValue(cacheKey, out var value) && value is Schema cachedSchema)
                 {
                     return cachedSchema;
                 }
@@ -75,7 +74,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         }
     }
 
-    public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache,
+    public async Task<Schema?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaAsync"))
@@ -87,7 +86,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
             if (canCache)
             {
-                if (schemaCache.TryGetValue(cacheKey, out var v) && v is ISchemaEntity cachedSchema)
+                if (schemaCache.TryGetValue(cacheKey, out var v) && v is Schema cachedSchema)
                 {
                     return cachedSchema;
                 }
@@ -200,21 +199,21 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         return $"{typeof(SchemasIndex)}_Schemas_Id_{appId}_{id}";
     }
 
-    private static bool IsValid(ISchemaEntity? schema)
+    private static bool IsValid(Schema? schema)
     {
         return schema is { Version: > EtagVersion.Empty, IsDeleted: false };
     }
 
-    private async Task<ISchemaEntity> PrepareAsync(ISchemaEntity schema)
+    private async Task<Schema> PrepareAsync(Schema schema)
     {
         // Run some fallback migrations.
-        schema = MigratedSchemaEntity.Migrate(schema);
+        schema = FieldNames.Migrate(schema);
 
         // Do not use cancellation here as we already so far.
         await schemaCache.AddAsync(new[]
         {
             new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Id), schema),
-            new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema),
+            new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Name), schema),
         }, CacheDuration);
 
         return schema;

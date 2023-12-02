@@ -6,33 +6,31 @@
 // ==========================================================================
 
 using System.Diagnostics.Contracts;
+using System.Text.Json.Serialization;
 
 namespace Squidex.Domain.Apps.Core.Schemas;
 
-public sealed class ArrayField : RootField<ArrayFieldProperties>, IArrayField
+public sealed record ArrayField : RootField<ArrayFieldProperties>, IArrayField
 {
+    [JsonIgnore]
     public IReadOnlyList<NestedField> Fields
     {
         get => FieldCollection.Ordered;
     }
 
+    [JsonIgnore]
     public IReadOnlyDictionary<long, NestedField> FieldsById
     {
         get => FieldCollection.ById;
     }
 
+    [JsonIgnore]
     public IReadOnlyDictionary<string, NestedField> FieldsByName
     {
         get => FieldCollection.ByName;
     }
 
-    public FieldCollection<NestedField> FieldCollection { get; private set; } = FieldCollection<NestedField>.Empty;
-
-    public ArrayField(long id, string name, Partitioning partitioning, NestedField[] fields, ArrayFieldProperties? properties = null, IFieldSettings? settings = null)
-        : base(id, name, partitioning, properties, settings)
-    {
-        FieldCollection = new FieldCollection<NestedField>(fields);
-    }
+    public FieldCollection<NestedField> FieldCollection { get; init; } = FieldCollection<NestedField>.Empty;
 
     [Pure]
     public ArrayField DeleteField(long fieldId)
@@ -67,9 +65,6 @@ public sealed class ArrayField : RootField<ArrayFieldProperties>, IArrayField
             return this;
         }
 
-        return (ArrayField)Clone(clone =>
-        {
-            ((ArrayField)clone).FieldCollection = newFields;
-        });
+        return this with { FieldCollection = newFields };
     }
 }

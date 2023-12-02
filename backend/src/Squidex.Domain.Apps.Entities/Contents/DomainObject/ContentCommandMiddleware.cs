@@ -5,13 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public sealed class ContentCommandMiddleware : CachingDomainObjectMiddleware<ContentCommand, ContentDomainObject, ContentDomainObject.State>
+public sealed class ContentCommandMiddleware : CachingDomainObjectMiddleware<ContentCommand, ContentDomainObject, WriteContent>
 {
     private readonly IContentEnricher contentEnricher;
     private readonly IContextProvider contextProvider;
@@ -32,7 +33,7 @@ public sealed class ContentCommandMiddleware : CachingDomainObjectMiddleware<Con
     {
         var payload = await base.EnrichResultAsync(context, result, ct);
 
-        if (payload is IContentEntity content and not IEnrichedContentEntity)
+        if (payload is Content content and not EnrichedContent)
         {
             payload = await contentEnricher.EnrichAsync(content, true, contextProvider.Context, ct);
         }

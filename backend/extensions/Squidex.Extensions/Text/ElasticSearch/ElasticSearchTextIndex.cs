@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Text.RegularExpressions;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Hosting;
@@ -61,7 +61,7 @@ public sealed partial class ElasticSearchTextIndex : ITextIndex, IInitializable
         return elasticClient.BulkAsync(args, ct);
     }
 
-    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(App app, GeoQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -123,7 +123,7 @@ public sealed partial class ElasticSearchTextIndex : ITextIndex, IInitializable
         return await SearchAsync(elasticQuery, ct);
     }
 
-    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);

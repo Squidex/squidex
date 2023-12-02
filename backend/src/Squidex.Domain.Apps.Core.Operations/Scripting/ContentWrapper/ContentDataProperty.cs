@@ -8,7 +8,6 @@
 using Jint;
 using Jint.Native;
 using Jint.Runtime;
-using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 

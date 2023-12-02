@@ -8,12 +8,17 @@
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-public interface IRuleEventEntity : IEntity
+public interface IRuleEventEntity
 {
+    DomainId Id { get; }
+
     RuleJob Job { get; }
+
+    Instant Created { get;  }
 
     Instant? NextAttempt { get; }
 

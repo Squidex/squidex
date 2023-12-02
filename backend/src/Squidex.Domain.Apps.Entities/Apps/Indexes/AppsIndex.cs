@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Caching;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Hosting;
@@ -58,7 +59,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         return await namesState.ReserveAsync(id, name, ct);
     }
 
-    public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
+    public async Task<List<App>> GetAppsForUserAsync(string userId, PermissionSet permissions,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppsForUserAsync"))
@@ -71,7 +72,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         }
     }
 
-    public async Task<List<IAppEntity>> GetAppsForTeamAsync(DomainId teamId,
+    public async Task<List<App>> GetAppsForTeamAsync(DomainId teamId,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppsForTeamAsync"))
@@ -84,7 +85,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         }
     }
 
-    public async Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
+    public async Task<App?> GetAppAsync(string name, bool canCache = false,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppByNameAsync"))
@@ -93,7 +94,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             if (canCache)
             {
-                if (appCache.TryGetValue(GetCacheKey(name), out var v) && v is IAppEntity cacheApp)
+                if (appCache.TryGetValue(GetCacheKey(name), out var v) && v is App cacheApp)
                 {
                     return cacheApp;
                 }
@@ -110,7 +111,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         }
     }
 
-    public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+    public async Task<App?> GetAppAsync(DomainId appId, bool canCache = false,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppAsync"))
@@ -119,7 +120,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             if (canCache)
             {
-                if (appCache.TryGetValue(GetCacheKey(appId), out var cached) && cached is IAppEntity cachedApp)
+                if (appCache.TryGetValue(GetCacheKey(appId), out var cached) && cached is App cachedApp)
                 {
                     return cachedApp;
                 }
@@ -214,12 +215,12 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         return $"{typeof(AppsIndex)}_Apps_Name_{name}";
     }
 
-    private static bool IsValid(IAppEntity? app)
+    private static bool IsValid(App? app)
     {
         return app is { Version: > EtagVersion.Empty, IsDeleted: false };
     }
 
-    private async Task<IAppEntity> PrepareAsync(IAppEntity app)
+    private async Task<App> PrepareAsync(App app)
     {
         // Do not use cancellation here as we already so far.
         await appCache.AddAsync(new[]

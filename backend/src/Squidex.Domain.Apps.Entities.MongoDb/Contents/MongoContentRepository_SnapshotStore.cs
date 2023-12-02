@@ -6,9 +6,8 @@
 // ==========================================================================
 
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
@@ -16,16 +15,16 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
 
-public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State>, IDeleter
+public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDeleter
 {
-    IAsyncEnumerable<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(
+    IAsyncEnumerable<SnapshotResult<WriteContent>> ISnapshotStore<WriteContent>.ReadAllAsync(
         CancellationToken ct)
     {
         return collectionComplete.StreamAll(ct)
-            .Select(x => new SnapshotResult<ContentDomainObject.State>(x.DocumentId, x.ToState(), x.Version, true));
+            .Select(x => new SnapshotResult<WriteContent>(x.UniqueId, x.ToState(), x.Version, true));
     }
 
-    async Task<SnapshotResult<ContentDomainObject.State>> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key,
+    async Task<SnapshotResult<WriteContent>> ISnapshotStore<WriteContent>.ReadAsync(DomainId key,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentRepository/ReadAsync"))
@@ -36,14 +35,14 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
             // Support for all versions, where we do not have full snapshots in the collection.
             if (existing?.IsSnapshot == true)
             {
-                return new SnapshotResult<ContentDomainObject.State>(existing.DocumentId, existing.ToState(), existing.Version);
+                return new SnapshotResult<WriteContent>(existing.UniqueId, existing.ToState(), existing.Version);
             }
 
-            return new SnapshotResult<ContentDomainObject.State>(default, null!, EtagVersion.Empty);
+            return new SnapshotResult<WriteContent>(default, null!, EtagVersion.Empty);
         }
     }
 
-    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentRepository/DeleteAppAsync"))
@@ -53,7 +52,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
         }
     }
 
-    async Task ISnapshotStore<ContentDomainObject.State>.ClearAsync(
+    async Task ISnapshotStore<WriteContent>.ClearAsync(
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentRepository/ClearAsync"))
@@ -63,7 +62,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
         }
     }
 
-    async Task ISnapshotStore<ContentDomainObject.State>.RemoveAsync(DomainId key,
+    async Task ISnapshotStore<WriteContent>.RemoveAsync(DomainId key,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentRepository/RemoveAsync"))
@@ -80,7 +79,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
         }
     }
 
-    async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
+    async Task ISnapshotStore<WriteContent>.WriteAsync(SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
@@ -114,7 +113,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
         }
     }
 
-    async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<SnapshotWriteJob<ContentDomainObject.State>> jobs,
+    async Task ISnapshotStore<WriteContent>.WriteManyAsync(IEnumerable<SnapshotWriteJob<WriteContent>> jobs,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
@@ -158,7 +157,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
         }
     }
 
-    private async Task UpsertPublishedAsync(SnapshotWriteJob<ContentDomainObject.State> job,
+    private async Task UpsertPublishedAsync(SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
         if (ShouldWritePublished(job.Value))
@@ -173,7 +172,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
         }
     }
 
-    private async Task UpsertVersionedPublishedAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
+    private async Task UpsertVersionedPublishedAsync(IClientSessionHandle session, SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
         if (ShouldWritePublished(job.Value))
@@ -188,7 +187,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
         }
     }
 
-    private async Task UpsertCompleteAsync(SnapshotWriteJob<ContentDomainObject.State> job,
+    private async Task UpsertCompleteAsync(SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
         var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct));
@@ -196,7 +195,7 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
         await collectionComplete.UpsertAsync(entityJob, ct);
     }
 
-    private async Task UpsertVersionedCompleteAsync(IClientSessionHandle session, SnapshotWriteJob<ContentDomainObject.State> job,
+    private async Task UpsertVersionedCompleteAsync(IClientSessionHandle session, SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
         var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct));
@@ -204,13 +203,13 @@ public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject
         await collectionComplete.UpsertVersionedAsync(session, entityJob, ct);
     }
 
-    private static bool ShouldWritePublished(ContentDomainObject.State value)
+    private static bool ShouldWritePublished(WriteContent value)
     {
         // Only published content is written to the published collection.
-        return value.Status == Status.Published && !value.IsDeleted;
+        return value.CurrentVersion.Status == Status.Published && !value.IsDeleted;
     }
 
-    private static bool IsValid(ContentDomainObject.State state)
+    private static bool IsValid(WriteContent state)
     {
         // Some data is corrupt and might throw an exception during migration if we do not skip them.
         return
