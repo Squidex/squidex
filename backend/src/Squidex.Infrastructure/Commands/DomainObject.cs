@@ -354,27 +354,27 @@ public abstract partial class DomainObject<T> : IAggregate where T : Entity, new
         return false;
     }
 
-    private (T?, bool Success) ApplyEvent(Envelope<IEvent> @event, T snapshot, long version, bool loading, bool update)
+    private (T?, bool Success) ApplyEvent(Envelope<IEvent> @event, T previousSnapshot, long version, bool loading, bool update)
     {
-        if (IsDeleted(snapshot))
+        if (IsDeleted(previousSnapshot))
         {
             if (!IsRecreation(@event.Payload))
             {
                 return default;
             }
 
-            snapshot = new T
+            previousSnapshot = new T
             {
                 Version = Version
             };
         }
 
-        @event = @event.Migrate(snapshot);
+        @event = @event.Migrate(previousSnapshot);
 
         var newVersion = version + 1;
-        var newSnapshot = Apply(snapshot, @event);
+        var newSnapshot = Apply(previousSnapshot, @event);
 
-        var isChanged = loading || !ReferenceEquals(snapshot, newSnapshot);
+        var isChanged = loading || !ReferenceEquals(previousSnapshot, newSnapshot);
 
         // If we are loading events at the moment, we will always update the version.
         if (isChanged)
@@ -384,7 +384,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : Entity, new
 
         if (update)
         {
-            this.snapshot = newSnapshot;
+            snapshot = newSnapshot;
         }
 
         return (newSnapshot, isChanged);

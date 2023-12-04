@@ -9,7 +9,7 @@ namespace Squidex.Infrastructure.MongoDb;
 
 public interface IVersionedEntity<T>
 {
-    T UniqueId { get; }
+    T DocumentId { get; }
 
     long Version { get; }
 }

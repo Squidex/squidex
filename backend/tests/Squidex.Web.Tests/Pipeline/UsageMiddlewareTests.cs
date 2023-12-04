@@ -61,7 +61,7 @@ public class UsageMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_not_track_if_call_blocked()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        httpContext.Features.Set(App);
         httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
         httpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
@@ -79,7 +79,7 @@ public class UsageMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_track_if_calls_left()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        httpContext.Features.Set(App);
         httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
         await sut.InvokeAsync(httpContext, next);
@@ -95,7 +95,7 @@ public class UsageMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_track_request_bytes()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        httpContext.Features.Set(App);
         httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
         httpContext.Request.ContentLength = 1024;
 
@@ -112,7 +112,7 @@ public class UsageMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_track_response_bytes_with_writer()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        httpContext.Features.Set(App);
         httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
         await sut.InvokeAsync(httpContext, async x =>
@@ -133,7 +133,7 @@ public class UsageMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_track_response_bytes_with_stream()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        httpContext.Features.Set(App);
         httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
         await sut.InvokeAsync(httpContext, async x =>
@@ -154,7 +154,7 @@ public class UsageMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_track_response_bytes_with_file()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        httpContext.Features.Set(App);
         httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
         var tempFileName = Path.GetTempFileName();
@@ -185,7 +185,7 @@ public class UsageMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_not_track_if_costs_are_zero()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        httpContext.Features.Set(App);
         httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
 
         await sut.InvokeAsync(httpContext, next);
@@ -201,7 +201,7 @@ public class UsageMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_log_request_even_if_costs_are_zero()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        httpContext.Features.Set(App);
         httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
 
         httpContext.Request.Method = "GET";

@@ -20,6 +20,11 @@ public sealed class MongoTeamRepository : MongoSnapshotStoreBase<Team, MongoTeam
     {
     }
 
+    protected override string CollectionName()
+    {
+        return "States_Teams";
+    }
+
     protected override Task SetupCollectionAsync(IMongoCollection<MongoTeamEntity> collection,
         CancellationToken ct)
     {
@@ -50,7 +55,7 @@ public sealed class MongoTeamRepository : MongoSnapshotStoreBase<Team, MongoTeam
         using (Telemetry.Activities.StartActivity("MongoTeamRepository/FindAsync"))
         {
             var entity =
-                await Collection.Find(x => x.UniqueId == id)
+                await Collection.Find(x => x.DocumentId == id)
                     .FirstOrDefaultAsync(ct);
 
             return entity?.Document;

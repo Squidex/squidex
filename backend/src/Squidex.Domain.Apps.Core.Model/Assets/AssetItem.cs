@@ -6,15 +6,15 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Core.Assets;
 
-public record AssetItem : Entity
+public record AssetItem : AppEntity
 {
-    public NamedId<DomainId> AppId { get; init; }
-
     public DomainId ParentId { get; init; }
 
-    public bool IsDeleted { get; init; }
+    public override DomainId UniqueId
+    {
+        get => DomainId.Combine(AppId.Id, Id);
+    }
 }

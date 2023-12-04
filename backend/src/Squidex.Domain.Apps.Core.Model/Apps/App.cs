@@ -44,7 +44,7 @@ public record App : Entity
     public bool IsDeleted { get; init; }
 
     [Pure]
-    public App Annotate(string? label, string? description)
+    public App Annotate(string? label = null, string? description = null)
     {
         var result = this;
 

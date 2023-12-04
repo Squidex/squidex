@@ -12,8 +12,6 @@ namespace Squidex.Domain.Apps.Core.Assets;
 
 public record Asset : AssetItem
 {
-    public HashSet<string> Tags { get; set; }
-
     public string FileName { get; set; }
 
     public string FileHash { get; set; }
@@ -30,7 +28,9 @@ public record Asset : AssetItem
 
     public bool IsProtected { get; set; }
 
-    public AssetMetadata Metadata { get; set; }
+    public HashSet<string> Tags { get; set; } = [];
+
+    public AssetMetadata Metadata { get; set; } = [];
 
     public AssetType Type { get; set; }
 
@@ -46,7 +46,8 @@ public record Asset : AssetItem
     }
 
     [Pure]
-    public Asset Annotate(string? fileName, string? slug, bool? isProtected, HashSet<string>? tags, AssetMetadata? metadata)
+    public Asset Annotate(string? fileName = null, string? slug = null, bool? isProtected = null,
+        HashSet<string>? tags = null, AssetMetadata? metadata = null)
     {
         var result = this;
 

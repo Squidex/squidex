@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -17,13 +16,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 
 public record MongoAssetFolderEntity : AssetFolder, IVersionedEntity<DomainId>
 {
-    [BsonRequired]
-    [BsonElement("_ai")]
+    public DomainId DocumentId { get; set; }
+
     public DomainId IndexedAppId { get; set; }
 
     public static void RegisterClassMap()
     {
-        AssetItemClassMap.Register();
+        BsonClassMap.TryRegisterClassMap<MongoAssetEntity>(cm =>
+        {
+            cm.MapProperty(x => x.DocumentId)
+                .SetElementName("_id")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.IndexedAppId)
+                .SetElementName("_ai")
+                .SetIsRequired(true);
+        });
 
         BsonClassMap.TryRegisterClassMap<AssetFolder>(cm =>
         {
@@ -31,6 +39,8 @@ public record MongoAssetFolderEntity : AssetFolder, IVersionedEntity<DomainId>
                 .SetElementName("fn")
                 .SetIsRequired(true);
         });
+
+        AssetItemClassMap.Register();
     }
 
     public AssetFolder ToState()

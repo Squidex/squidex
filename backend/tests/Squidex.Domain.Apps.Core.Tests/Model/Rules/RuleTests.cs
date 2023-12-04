@@ -24,7 +24,7 @@ public class RuleTests
             .Select(x => new[] { x })
             .ToList()!;
 
-    private readonly Rule rule_0 = new Rule { Trigger = new ContentChangedTriggerV2(), Action = new TestAction1() };
+    private readonly Rule rule_0 = new Rule { Action = new TestAction1(), Trigger = new ContentChangedTriggerV2() };
 
     public sealed record OtherTrigger : RuleTrigger
     {
@@ -60,7 +60,7 @@ public class RuleTests
     }
 
     [Fact]
-    public void Should_set_enabled_to_true_if_enabling()
+    public void Should_enable_rule()
     {
         var rule_1 = rule_0.Disable();
         var rule_2 = rule_1.Enable();
@@ -74,7 +74,7 @@ public class RuleTests
     }
 
     [Fact]
-    public void Should_set_enabled_to_false_if_disabling()
+    public void Should_disable_rule()
     {
         var rule_1 = rule_0.Disable();
         var rule_2 = rule_1.Disable();
@@ -86,19 +86,21 @@ public class RuleTests
     }
 
     [Fact]
-    public void Should_replace_name_if_renaming()
+    public void Should_change_category()
     {
-        var rule_1 = rule_0.Rename("MyName");
-        var rule_2 = rule_1.Rename("MyName");
+        var newName = "MyName";
+
+        var rule_1 = rule_0.Rename(newName);
+        var rule_2 = rule_1.Rename(newName);
 
         Assert.NotSame(rule_0, rule_1);
-        Assert.Equal("MyName", rule_1.Name);
-        Assert.Equal("MyName", rule_2.Name);
+        Assert.Equal(newName, rule_1.Name);
+        Assert.Equal(newName, rule_2.Name);
         Assert.Same(rule_1, rule_2);
     }
 
     [Fact]
-    public void Should_replace_trigger_if_updating()
+    public void Should_replace_trigger()
     {
         var newTrigger1 = new ContentChangedTriggerV2 { HandleAll = true };
         var newTrigger2 = new ContentChangedTriggerV2 { HandleAll = true };
@@ -114,13 +116,19 @@ public class RuleTests
     }
 
     [Fact]
+    public void Should_throw_exception_if_new_trigger_is_null()
+    {
+        Assert.Throws<ArgumentNullException>(() => rule_0.Update((RuleTrigger)null!));
+    }
+
+    [Fact]
     public void Should_throw_exception_if_new_trigger_has_other_type()
     {
         Assert.Throws<ArgumentException>(() => rule_0.Update(new OtherTrigger()));
     }
 
     [Fact]
-    public void Should_replace_action_if_updating()
+    public void Should_replace_action()
     {
         var newAction1 = new TestAction1 { Property = "NewValue" };
         var newAction2 = new TestAction1 { Property = "NewValue" };
@@ -136,19 +144,45 @@ public class RuleTests
     }
 
     [Fact]
+    public void Should_throw_exception_if_action_trigger_is_null()
+    {
+        Assert.Throws<ArgumentNullException>(() => rule_0.Update((RuleAction)null!));
+    }
+
+    [Fact]
     public void Should_throw_exception_if_new_action_has_other_type()
     {
         Assert.Throws<ArgumentException>(() => rule_0.Update(new TestAction2()));
     }
 
     [Fact]
-    public void Should_serialize_and_deserialize()
+    public void Should_deserialize_old_state()
     {
-        var rule_1 = rule_0.Disable().Rename("MyName");
+        var original = TestUtils.DefaultSerializer.Deserialize<Rule>(File.ReadAllText("Model/Rules/Rule.json"));
 
-        var serialized = rule_1.SerializeAndDeserialize();
+        var deserialized = TestUtils.DefaultSerializer.Deserialize<Rule>(File.ReadAllText("Model/Rules/Rule_Old.json"));
 
-        serialized.Should().BeEquivalentTo(rule_1);
+        deserialized.Should().BeEquivalentTo(original);
+    }
+
+    [Fact]
+    public void Should_deserialize_state()
+    {
+        var json = File.ReadAllText("Model/Rules/Rule.json");
+
+        var deserialized = TestUtils.DefaultSerializer.Deserialize<Rule>(json);
+
+        Assert.NotNull(deserialized);
+    }
+
+    [Fact]
+    public void Should_serialize_deserialize_state()
+    {
+        var json = File.ReadAllText("Model/Rules/Rule.json").CleanJson();
+
+        var serialized = TestUtils.DefaultSerializer.Serialize(TestUtils.DefaultSerializer.Deserialize<Rule>(json), true);
+
+        Assert.Equal(json, serialized);
     }
 
     [Fact]

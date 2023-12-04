@@ -250,7 +250,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         var documentIds = ids.Select(x => DomainId.Combine(appId, x));
 
         return Filter.And(
-            Filter.In(x => x.UniqueId, documentIds),
+            Filter.In(x => x.DocumentId, documentIds),
             Filter.Ne(x => x.IsDeleted, true));
     }
 
@@ -268,7 +268,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
 
     private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, DomainId id, bool allowDeleted)
     {
-        var filter = Filter.Eq(x => x.UniqueId, DomainId.Combine(appId, id));
+        var filter = Filter.Eq(x => x.DocumentId, DomainId.Combine(appId, id));
 
         if (!allowDeleted)
         {

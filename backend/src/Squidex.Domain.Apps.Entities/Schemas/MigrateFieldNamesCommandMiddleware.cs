@@ -15,10 +15,10 @@ public sealed class MigrateFieldNamesCommandMiddleware : ICommandMiddleware
     public Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {
-        if (context.Command is SynchronizeSchema synchronize)
+        if (context.Command is IUpsertCommand upsert)
         {
-            synchronize.FieldsInLists = synchronize.FieldsInLists?.Migrate();
-            synchronize.FieldsInReferences = synchronize.FieldsInReferences?.Migrate();
+            upsert.FieldsInLists = upsert.FieldsInLists?.Migrate();
+            upsert.FieldsInReferences = upsert.FieldsInReferences?.Migrate();
         }
 
         if (context.Command is ConfigureUIFields configure)

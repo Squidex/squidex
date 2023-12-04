@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Diagnostics.Contracts;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Core.Teams;
@@ -21,6 +22,8 @@ public record Team : Entity
     [Pure]
     public Team Rename(string name)
     {
+        Guard.NotNull(name);
+
         if (string.Equals(Name, name, StringComparison.Ordinal))
         {
             return this;

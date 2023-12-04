@@ -7,6 +7,7 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.Json.System;
@@ -25,6 +26,32 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
 
         discriminatorName = config?.DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
         discriminatorProperty = JsonEncodedText.Encode(discriminatorName);
+    }
+
+    public static Action<JsonTypeInfo> Modifier(TypeRegistry typeRegistry)
+    {
+        return new Action<JsonTypeInfo>(typeInfo =>
+        {
+            var baseType = typeInfo.Type.BaseType;
+
+            while (baseType != null)
+            {
+                if (typeRegistry.TryGetConfig(baseType, out var config) && config.TryGetName(typeInfo.Type, out var typeName))
+                {
+                    var discriminiatorName = config.DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
+                    var discriminatorField = typeInfo.CreateJsonPropertyInfo(typeof(string), discriminiatorName);
+
+                    discriminatorField.Get = x =>
+                    {
+                        return typeName;
+                    };
+
+                    typeInfo.Properties.Insert(0, discriminatorField);
+                }
+
+                baseType = baseType.BaseType;
+            }
+        });
     }
 
     public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -78,17 +105,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
 
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
     {
-        EnsureTypeResolver(options);
-
         JsonSerializer.Serialize<object>(writer, value!, options);
-    }
-
-    private static void EnsureTypeResolver(JsonSerializerOptions options)
-    {
-        if (options.TypeInfoResolver is not PolymorphicTypeResolver)
-        {
-            ThrowHelper.JsonException($"TypeInfoResolver must be of type PolymorphicTypeResolver.");
-        }
     }
 
     private Type GetDiscriminatorType(string name)

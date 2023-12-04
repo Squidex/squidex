@@ -85,7 +85,6 @@ public abstract class GivenContext
             CreatedBy = User,
             LastModified = default,
             LastModifiedBy = User,
-            UniqueId = TeamId,
             Version = 1,
         };
 
@@ -99,7 +98,6 @@ public abstract class GivenContext
             LastModified = default,
             LastModifiedBy = User,
             TeamId = TeamId,
-            UniqueId = AppId.Id,
             Version = 1,
         };
 
@@ -110,9 +108,9 @@ public abstract class GivenContext
             AppId = AppId,
             Created = default,
             CreatedBy = User,
+            IsPublished = true,
             LastModified = default,
             LastModifiedBy = User,
-            UniqueId = DomainId.Combine(AppId.Id, SchemaId.Id),
             Version = 1,
         };
     }
@@ -191,7 +189,6 @@ public abstract class GivenContext
             Tags = [],
             TagNames = [],
             Slug = "my-file",
-            UniqueId = DomainId.Combine(AppId.Id, id),
             Version = 1,
         };
     }
@@ -209,7 +206,6 @@ public abstract class GivenContext
             FolderName = "My Folder",
             LastModified = Timestamp(),
             LastModifiedBy = User,
-            UniqueId = DomainId.Combine(AppId.Id, id),
             Version = 1,
         };
     }
@@ -229,7 +225,6 @@ public abstract class GivenContext
             LastModified = Timestamp(),
             LastModifiedBy = User,
             Trigger = new ContentChangedTriggerV2(),
-            UniqueId = DomainId.Combine(AppId.Id, id),
             Version = 1,
         };
     }
@@ -256,7 +251,6 @@ public abstract class GivenContext
             ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, User, Timestamp()),
             SchemaId = SchemaId,
             Status = Status.Published,
-            UniqueId = DomainId.Combine(AppId.Id, id),
             Version = 1,
         };
     }
@@ -283,7 +277,6 @@ public abstract class GivenContext
             LastModifiedBy = User,
             ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, User, Timestamp()),
             SchemaId = SchemaId,
-            UniqueId = DomainId.Combine(AppId.Id, id),
             Version = 1,
         };
     }

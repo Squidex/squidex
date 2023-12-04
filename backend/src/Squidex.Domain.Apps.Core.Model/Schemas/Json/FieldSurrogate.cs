@@ -53,7 +53,7 @@ public sealed class FieldSurrogate
         };
     }
 
-    public RootField ToField()
+    public RootField ToRootField()
     {
         var partitioning = Core.Partitioning.FromString(Partitioning);
 

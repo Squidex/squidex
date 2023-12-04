@@ -29,7 +29,7 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<Asset>, IDelet
     {
         var documents = Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct);
 
-        return documents.Select(x => new SnapshotResult<Asset>(x.UniqueId, x.ToState(), x.Version));
+        return documents.Select(x => new SnapshotResult<Asset>(x.DocumentId, x.ToState(), x.Version));
     }
 
     async Task<SnapshotResult<Asset>> ISnapshotStore<Asset>.ReadAsync(DomainId key,
@@ -38,12 +38,12 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<Asset>, IDelet
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/ReadAsync"))
         {
             var existing =
-                await Collection.Find(x => x.UniqueId == key)
+                await Collection.Find(x => x.DocumentId == key)
                     .FirstOrDefaultAsync(ct);
 
             if (existing != null)
             {
-                return new SnapshotResult<Asset>(existing.UniqueId, existing.ToState(), existing.Version);
+                return new SnapshotResult<Asset>(existing.DocumentId, existing.ToState(), existing.Version);
             }
 
             return new SnapshotResult<Asset>(default, null!, EtagVersion.Empty);
@@ -88,7 +88,7 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<Asset>, IDelet
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/RemoveAsync"))
         {
-            await Collection.DeleteOneAsync(x => x.UniqueId == key, null, ct);
+            await Collection.DeleteOneAsync(x => x.DocumentId == key, null, ct);
         }
     }
 }

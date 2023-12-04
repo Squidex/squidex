@@ -345,6 +345,12 @@ public class SchemaTests
     }
 
     [Fact]
+    public void Should_throw_exception_if_list_fields_is_null()
+    {
+        Assert.Throws<ArgumentNullException>(() => schema_0.SetFieldsInLists(null!));
+    }
+
+    [Fact]
     public void Should_set_list_fields()
     {
         var schema_1 = schema_0.SetFieldsInLists(FieldNames.Create("2"));
@@ -364,6 +370,12 @@ public class SchemaTests
         Assert.Equal(new[] { "2", "1" }, schema_1.FieldsInLists);
         Assert.Equal(new[] { "1", "2" }, schema_2.FieldsInLists);
         Assert.NotSame(schema_1, schema_2);
+    }
+
+    [Fact]
+    public void Should_throw_exception_if_reference_fields_is_null()
+    {
+        Assert.Throws<ArgumentNullException>(() => schema_0.SetFieldsInReferences(null!));
     }
 
     [Fact]
@@ -389,6 +401,12 @@ public class SchemaTests
     }
 
     [Fact]
+    public void Should_throw_exception_if_field_rules_is_null()
+    {
+        Assert.Throws<ArgumentNullException>(() => schema_0.SetFieldRules(null!));
+    }
+
+    [Fact]
     public void Should_set_field_rules()
     {
         var schema_1 = schema_0.SetFieldRules(FieldRules.Create(FieldRule.Hide("2")));
@@ -397,6 +415,12 @@ public class SchemaTests
         Assert.NotEmpty(schema_1.FieldRules);
         Assert.NotEmpty(schema_2.FieldRules);
         Assert.Same(schema_1, schema_2);
+    }
+
+    [Fact]
+    public void Should_throw_exception_if_scripts_is_null()
+    {
+        Assert.Throws<ArgumentNullException>(() => schema_0.SetScripts(null!));
     }
 
     [Fact]
@@ -422,6 +446,12 @@ public class SchemaTests
     }
 
     [Fact]
+    public void Should_throw_exception_preview_urls_is_null()
+    {
+        Assert.Throws<ArgumentNullException>(() => schema_0.SetPreviewUrls(null!));
+    }
+
+    [Fact]
     public void Should_set_preview_urls()
     {
         var urls1 = new Dictionary<string, string>
@@ -443,26 +473,33 @@ public class SchemaTests
     }
 
     [Fact]
-    public void Should_serialize_and_deserialize_schema()
+    public void Should_deserialize_old_state()
     {
-        var schemaSource =
-            TestSchema.MixedSchema(SchemaType.Singleton).Schema
-                .ChangeCategory("Category")
-                .SetFieldRules(FieldRules.Create(FieldRule.Hide("2")))
-                .SetFieldsInLists(FieldNames.Create("field2"))
-                .SetFieldsInReferences(FieldNames.Create("field1"))
-                .SetScripts(new SchemaScripts
-                {
-                    Create = "<create-script>"
-                })
-                .SetPreviewUrls(new Dictionary<string, string>
-                {
-                    ["web"] = "Url"
-                }.ToReadonlyDictionary());
+        var original = TestUtils.DefaultSerializer.Deserialize<Schema>(File.ReadAllText("Model/Schemas/Schema.json"));
 
-        var schemaTarget = schemaSource.SerializeAndDeserialize();
+        var deserialized = TestUtils.DefaultSerializer.Deserialize<Schema>(File.ReadAllText("Model/Schemas/Schema_Old.json"));
 
-        schemaTarget.Should().BeEquivalentTo(schemaSource);
+        deserialized.Should().BeEquivalentTo(original);
+    }
+
+    [Fact]
+    public void Should_deserialize_state()
+    {
+        var json = File.ReadAllText("Model/Schemas/Schema.json");
+
+        var deserialized = TestUtils.DefaultSerializer.Deserialize<Schema>(json);
+
+        Assert.NotNull(deserialized);
+    }
+
+    [Fact]
+    public void Should_serialize_deserialize_state()
+    {
+        var json = File.ReadAllText("Model/Schemas/Schema.json").CleanJson();
+
+        var serialized = TestUtils.DefaultSerializer.Serialize(TestUtils.DefaultSerializer.Deserialize<Schema>(json), true);
+
+        Assert.Equal(json, serialized);
     }
 
     private static RootField<NumberFieldProperties> CreateField(int id)

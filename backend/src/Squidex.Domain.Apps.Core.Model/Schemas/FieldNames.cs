@@ -34,7 +34,7 @@ public sealed class FieldNames : ReadonlyList<string>
 
     public static readonly new FieldNames Empty = new FieldNames(new List<string>());
 
-    public FieldNames()
+    private FieldNames()
     {
     }
 
@@ -45,16 +45,7 @@ public sealed class FieldNames : ReadonlyList<string>
 
     public static FieldNames Create(params string[]? names)
     {
-        return names == null || names.Length == 0 ? Empty : new FieldNames(names.ToList());
-    }
-
-    public FieldNames Add(string field)
-    {
-        var list = this.ToList();
-
-        list.Add(field);
-
-        return new FieldNames(list);
+        return names?.Length > 0 ? new FieldNames(names.ToList()) : Empty;
     }
 
     public FieldNames Remove(string field)

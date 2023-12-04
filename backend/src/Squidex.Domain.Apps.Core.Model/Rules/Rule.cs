@@ -7,14 +7,11 @@
 
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Core.Rules;
 
-public record Rule : Entity
+public record Rule : AppEntity
 {
-    public NamedId<DomainId> AppId { get; init; }
-
     public string? Name { get; init; }
 
     public RuleTrigger Trigger { get; init; }
@@ -23,10 +20,13 @@ public record Rule : Entity
 
     public bool IsEnabled { get; init; } = true;
 
-    public bool IsDeleted { get; init; }
+    public override DomainId UniqueId
+    {
+        get => DomainId.Combine(AppId.Id, Id);
+    }
 
     [Pure]
-    public Rule Rename(string newName)
+    public Rule Rename(string? newName)
     {
         if (string.Equals(Name, newName, StringComparison.Ordinal))
         {

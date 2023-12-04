@@ -405,10 +405,10 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
             AppId = AppId,
             Created = default,
             CreatedBy = User,
-            CurrentVersion = new ContentVersion(status, new ContentData()),
+            CurrentVersion = new ContentVersion(status, []),
             LastModified = default,
             LastModifiedBy = User,
-            NewVersion = newStatus != null ? new ContentVersion(newStatus.Value, new ContentData()) : null,
+            NewVersion = newStatus != null ? new ContentVersion(newStatus.Value, []) : null,
             SchemaId = SchemaId
         };
     }

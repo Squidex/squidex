@@ -25,7 +25,7 @@ public class AssetsSearchSourceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_return_empty_actuals_if_user_has_no_permission()
+    public async Task Should_return_empty_results_if_user_has_no_permission()
     {
         var actual = await sut.SearchAsync("logo", ApiContext, default);
 
@@ -36,7 +36,7 @@ public class AssetsSearchSourceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_return_assets_actuals_if_found()
+    public async Task Should_return_assets_results_if_found()
     {
         var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, AppId.Name);
 

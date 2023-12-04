@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
@@ -18,46 +17,61 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
 
 public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 {
-    [BsonRequired]
-    [BsonElement("_ai")]
+    public DomainId DocumentId { get; set; }
+
     public DomainId IndexedAppId { get; set; }
 
-    [BsonRequired]
-    [BsonElement("_si")]
     public DomainId IndexedSchemaId { get; set; }
 
-    [BsonRequired]
-    [BsonElement("rf")]
-    public HashSet<DomainId>? ReferencedIds { get; set; }
-
-    [BsonIgnoreIfNull]
-    [BsonElement("dd")]
-    public ContentData? NewData { get; set; }
-
-    [BsonIgnoreIfNull]
-    [BsonElement("sa")]
     public Instant? ScheduledAt { get; set; }
 
-    [BsonIgnoreIfDefault]
-    [BsonElement("is")]
-    public bool IsSnapshot { get; set; }
+    public HashSet<DomainId>? ReferencedIds { get; set; }
 
-    [BsonIgnoreIfNull]
-    [BsonElement("ts")]
+    public ContentData? NewData { get; set; }
+
     public TranslationStatus? TranslationStatus { get; set; }
+
+    public bool IsSnapshot { get; set; }
 
     public static void RegisterClassMap()
     {
-        EntityClassMap.Register();
+        BsonClassMap.TryRegisterClassMap<MongoContentEntity>(cm =>
+        {
+            cm.MapProperty(x => x.DocumentId)
+                .SetElementName("_id")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.IndexedAppId)
+                .SetElementName("_ai")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.IndexedSchemaId)
+                .SetElementName("_si")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.ReferencedIds)
+                .SetElementName("rf")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.ScheduledAt)
+                .SetElementName("sa")
+                .SetIgnoreIfNull(true);
+
+            cm.MapProperty(x => x.NewData)
+                .SetElementName("dd")
+                .SetIgnoreIfNull(true);
+
+            cm.MapProperty(x => x.TranslationStatus)
+                .SetElementName("ts")
+                .SetIgnoreIfNull(true);
+
+            cm.MapProperty(x => x.IsSnapshot)
+                .SetElementName("is")
+                .SetIgnoreIfDefault(true);
+        });
 
         BsonClassMap.TryRegisterClassMap<Content>(cm =>
         {
-            cm.AutoMap();
-
-            cm.MapProperty(x => x.Id)
-                .SetElementName("id")
-                .SetIgnoreIfDefault(true);
-
             cm.MapProperty(x => x.AppId)
                 .SetElementName("ai")
                 .SetIsRequired(true);
@@ -86,6 +100,8 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
                 .SetElementName("sj")
                 .SetIgnoreIfDefault(true);
         });
+
+        EntityClassMap.Register();
     }
 
     public WriteContent ToState()
@@ -94,7 +110,6 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
         {
             return new WriteContent
             {
-                UniqueId = UniqueId,
                 AppId = AppId,
                 Created = Created,
                 CreatedBy = CreatedBy,
@@ -113,7 +128,6 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
         {
             return new WriteContent
             {
-                UniqueId = UniqueId,
                 AppId = AppId,
                 Created = Created,
                 CreatedBy = CreatedBy,
@@ -139,13 +153,13 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 
         return new MongoContentEntity
         {
-            UniqueId = source.UniqueId,
+            DocumentId = source.UniqueId,
             IndexedAppId = source.AppId.Id,
             IndexedSchemaId = source.SchemaId.Id,
             AppId = source.AppId,
             Created = source.Created,
             CreatedBy = source.CreatedBy,
-            Data = source.EditingData,
+            Data = source.CurrentVersion.Data,
             Id = source.Id,
             IsDeleted = source.IsDeleted,
             IsSnapshot = false,
@@ -172,7 +186,7 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 
         return new MongoContentEntity
         {
-            UniqueId = source.UniqueId,
+            DocumentId = source.UniqueId,
             IndexedAppId = source.AppId.Id,
             IndexedSchemaId = source.SchemaId.Id,
             AppId = source.AppId,
@@ -181,7 +195,7 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
             Data = source.EditingData,
             Id = source.Id,
             IsDeleted = source.IsDeleted,
-            IsSnapshot = false,
+            IsSnapshot = true,
             LastModified = source.LastModified,
             LastModifiedBy = source.LastModifiedBy,
             NewData = source.NewVersion != null ? source.CurrentVersion.Data : null,

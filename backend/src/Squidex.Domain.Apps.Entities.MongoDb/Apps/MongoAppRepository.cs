@@ -20,6 +20,11 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEnt
     {
     }
 
+    protected override string CollectionName()
+    {
+        return "States_Apps";
+    }
+
     protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection,
         CancellationToken ct)
     {
@@ -40,7 +45,7 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEnt
     Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
-        return Collection.DeleteManyAsync(Filter.Eq(x => x.UniqueId, app.Id), ct);
+        return Collection.DeleteManyAsync(Filter.Eq(x => x.DocumentId, app.Id), ct);
     }
 
     public async Task<List<App>> QueryAllAsync(string contributorId, IEnumerable<string> names,
@@ -75,7 +80,7 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEnt
         using (Telemetry.Activities.StartActivity("MongoAppRepository/FindAsync"))
         {
             var entity =
-                await Collection.Find(x => x.UniqueId == id && !x.IndexedDeleted)
+                await Collection.Find(x => x.DocumentId == id && !x.IndexedDeleted)
                     .FirstOrDefaultAsync(ct);
 
             return entity?.Document;

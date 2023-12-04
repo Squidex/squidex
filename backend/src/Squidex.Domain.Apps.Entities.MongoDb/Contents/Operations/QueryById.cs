@@ -17,7 +17,7 @@ internal sealed class QueryById : OperationBase
     public async Task<Content?> QueryAsync(Schema schema, DomainId id,
         CancellationToken ct)
     {
-        var filter = Filter.Eq(x => x.UniqueId, DomainId.Combine(schema.AppId, id));
+        var filter = Filter.Eq(x => x.DocumentId, DomainId.Combine(schema.AppId, id));
 
         var contentEntity = await Collection.Find(filter).SelectFields(null).FirstOrDefaultAsync(ct);
 

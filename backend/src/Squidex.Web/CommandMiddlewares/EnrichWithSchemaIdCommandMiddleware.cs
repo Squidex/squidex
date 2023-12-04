@@ -8,7 +8,6 @@
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 

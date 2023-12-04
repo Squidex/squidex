@@ -330,7 +330,7 @@ public class AppDomainObjectTests : HandlerTestBase<App>
     }
 
     [Fact]
-    public async Task ChangePlan_should_not_make_update_for_redirect_actual()
+    public async Task ChangePlan_should_not_make_update_for_redirect()
     {
         var command = new ChangePlan { PlanId = planIdPaid };
 

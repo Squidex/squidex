@@ -21,7 +21,7 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
         CancellationToken ct)
     {
         return collectionComplete.StreamAll(ct)
-            .Select(x => new SnapshotResult<WriteContent>(x.UniqueId, x.ToState(), x.Version, true));
+            .Select(x => new SnapshotResult<WriteContent>(x.DocumentId, x.ToState(), x.Version, true));
     }
 
     async Task<SnapshotResult<WriteContent>> ISnapshotStore<WriteContent>.ReadAsync(DomainId key,
@@ -35,7 +35,7 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
             // Support for all versions, where we do not have full snapshots in the collection.
             if (existing?.IsSnapshot == true)
             {
-                return new SnapshotResult<WriteContent>(existing.UniqueId, existing.ToState(), existing.Version);
+                return new SnapshotResult<WriteContent>(existing.DocumentId, existing.ToState(), existing.Version);
             }
 
             return new SnapshotResult<WriteContent>(default, null!, EtagVersion.Empty);

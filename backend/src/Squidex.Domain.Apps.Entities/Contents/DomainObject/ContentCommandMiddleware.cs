@@ -33,6 +33,11 @@ public sealed class ContentCommandMiddleware : CachingDomainObjectMiddleware<Con
     {
         var payload = await base.EnrichResultAsync(context, result, ct);
 
+        if (payload is WriteContent writeContent)
+        {
+            payload = await contentEnricher.EnrichAsync(writeContent.ToContent(), true, contextProvider.Context, ct);
+        }
+
         if (payload is Content content and not EnrichedContent)
         {
             payload = await contentEnricher.EnrichAsync(content, true, contextProvider.Context, ct);

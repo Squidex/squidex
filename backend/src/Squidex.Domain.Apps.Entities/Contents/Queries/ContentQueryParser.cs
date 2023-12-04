@@ -12,7 +12,6 @@ using Microsoft.OData.Edm;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;

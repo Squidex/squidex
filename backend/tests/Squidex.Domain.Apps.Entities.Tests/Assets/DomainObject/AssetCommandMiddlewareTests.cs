@@ -53,7 +53,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
     }
 
     [Fact]
-    public async Task Should_not_invoke_enricher_for_other_actual()
+    public async Task Should_not_invoke_enricher_for_other_result()
     {
         await HandleAsync(new AnnotateAsset(), 12);
 
@@ -75,7 +75,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
     }
 
     [Fact]
-    public async Task Should_enrich_asset_actual()
+    public async Task Should_enrich_asset_result()
     {
         var actual = new Asset();
 
@@ -117,7 +117,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
     }
 
     [Fact]
-    public async Task Create_should_not_return_duplicate_actual_if_file_with_same_hash_found_but_duplicate_allowed()
+    public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
     {
         var actual = CreateAsset().WithId(assetId);
 
@@ -131,7 +131,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
     }
 
     [Fact]
-    public async Task Create_should_return_duplicate_actual_if_file_with_same_hash_found()
+    public async Task Create_should_return_duplicate_result_if_file_with_same_hash_found()
     {
         SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
 
@@ -175,7 +175,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
     }
 
     [Fact]
-    public async Task Upsert_should_not_return_duplicate_actual_if_file_with_same_hash_found_but_duplicate_allowed()
+    public async Task Upsert_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
     {
         var actual = CreateAsset().WithId(assetId);
 
@@ -189,7 +189,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
     }
 
     [Fact]
-    public async Task Upsert_should_return_duplicate_actual_if_file_with_same_hash_found()
+    public async Task Upsert_should_return_duplicate_result_if_file_with_same_hash_found()
     {
         SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
 

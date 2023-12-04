@@ -19,7 +19,7 @@ public static class EntityExtensions
 {
     public static App WithId(this App app, DomainId id)
     {
-        return app with { Id = id, UniqueId = id };
+        return app with { Id = id };
     }
 
     public static Schema WithId(this Schema schema, NamedId<DomainId> id)
@@ -29,36 +29,36 @@ public static class EntityExtensions
 
     public static Schema WithId(this Schema schema, DomainId id, string name)
     {
-        return schema with { Id = id, Name = name, UniqueId = DomainId.Combine(schema.AppId.Id, id) };
+        return schema with { Id = id, Name = name };
     }
 
     public static Asset WithId<T>(this T asset, DomainId id) where T : Asset
     {
-        return asset with { Id = id, UniqueId = DomainId.Combine(asset.AppId.Id, id) };
+        return asset with { Id = id };
     }
 
     public static EnrichedAsset WithId(this EnrichedAsset content, DomainId id)
     {
-        return content with { Id = id, UniqueId = DomainId.Combine(content.AppId.Id, id) };
+        return content with { Id = id };
     }
 
     public static AssetFolder WithId(this AssetFolder folder, DomainId id)
     {
-        return folder with { Id = id, UniqueId = DomainId.Combine(folder.AppId.Id, id) };
+        return folder with { Id = id };
     }
 
     public static Content WithId(this Content content, DomainId id)
     {
-        return content with { Id = id, UniqueId = DomainId.Combine(content.AppId.Id, id) };
+        return content with { Id = id };
     }
 
     public static EnrichedContent WithId(this EnrichedContent content, DomainId id)
     {
-        return content with { Id = id, UniqueId = DomainId.Combine(content.AppId.Id, id) };
+        return content with { Id = id };
     }
 
     public static WriteContent WithId(this WriteContent content, DomainId id)
     {
-        return content with { Id = id, UniqueId = DomainId.Combine(content.AppId.Id, id) };
+        return content with { Id = id };
     }
 }

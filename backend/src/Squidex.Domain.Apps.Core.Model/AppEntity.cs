@@ -5,21 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using StaticNamedId = Squidex.Infrastructure.NamedId;
+using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Schemas;
+namespace Squidex.Domain.Apps.Core;
 
-public static class SchemaExtensions
+public record AppEntity : Entity
 {
-    public static NamedId<DomainId> NamedId(this Schema schema)
-    {
-        return StaticNamedId.Of(schema.Id, schema.Name);
-    }
+    public NamedId<DomainId> AppId { get; init; }
 
-    public static string EscapePartition(this string value)
+    public bool IsDeleted { get; init; }
+
+    public override DomainId UniqueId
     {
-        return value.Replace('-', '_');
+        get => DomainId.Combine(AppId.Id, Id);
     }
 }

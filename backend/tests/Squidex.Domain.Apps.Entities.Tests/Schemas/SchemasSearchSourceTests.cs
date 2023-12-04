@@ -25,7 +25,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
     }
 
     [Fact]
-    public async Task Should_not_add_actual_to_contents_if_user_has_no_permission()
+    public async Task Should_not_add_result_to_contents_if_user_has_no_permission()
     {
         var schema1 = Schema with { Name = "SchemaA1" };
 
@@ -43,7 +43,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
     }
 
     [Fact]
-    public async Task Should_not_add_actual_to_contents_if_schema_is_component()
+    public async Task Should_not_add_result_to_contents_if_schema_is_component()
     {
         var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, AppId.Name, "schemaA1");
 
@@ -63,7 +63,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
     }
 
     [Fact]
-    public async Task Should_return_actual_to_schema_and_contents_if_matching_and_permission_given()
+    public async Task Should_return_result_to_schema_and_contents_if_matching_and_permission_given()
     {
         var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, AppId.Name, "schemaA2");
 
@@ -93,7 +93,7 @@ public class SchemasSearchSourceTests : GivenContext, IClassFixture<Translations
     }
 
     [Fact]
-    public async Task Should_return_actual_to_schema_and_contents_if_schema_is_singleton()
+    public async Task Should_return_result_to_schema_and_contents_if_schema_is_singleton()
     {
         var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, AppId.Name, "schemaA1");
 

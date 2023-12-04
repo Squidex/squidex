@@ -17,11 +17,11 @@ public sealed record AppClient(string Name, string Secret)
 
     public string Secret { get; } = Guard.NotNullOrEmpty(Secret);
 
-    public string Role { get; init; } = "Editor";
-
     public long ApiCallsLimit { get; init; }
 
     public long ApiTrafficLimit { get; init; }
 
     public bool AllowAnonymous { get; init; }
+
+    public string Role { get; init; } = "Editor";
 }

@@ -21,6 +21,11 @@ public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<Schema, Mongo
     {
     }
 
+    protected override string CollectionName()
+    {
+        return "States_Schemas";
+    }
+
     protected override Task SetupCollectionAsync(IMongoCollection<MongoSchemaEntity> collection,
         CancellationToken ct)
     {

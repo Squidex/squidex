@@ -41,7 +41,7 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<WriteContent
     }
 
     [Fact]
-    public async Task Should_not_invoke_enricher_for_other_actual()
+    public async Task Should_not_invoke_enricher_for_other_result()
     {
         await HandleAsync(new CreateContent(), 12);
 
@@ -65,13 +65,30 @@ public sealed class ContentCommandMiddlewareTests : HandlerTestBase<WriteContent
     }
 
     [Fact]
-    public async Task Should_enrich_content_actual()
+    public async Task Should_enrich_content_result()
     {
         var actual = new Content();
 
         var enriched = CreateContent();
 
         A.CallTo(() => contentEnricher.EnrichAsync(actual, true, ApiContext, CancellationToken))
+            .Returns(enriched);
+
+        var context =
+            await HandleAsync(new CreateContent(),
+                actual);
+
+        Assert.Same(enriched, context.Result<Content>());
+    }
+
+    [Fact]
+    public async Task Should_enrich_write_content_result()
+    {
+        var actual = CreateWriteContent();
+
+        var enriched = CreateContent();
+
+        A.CallTo(() => contentEnricher.EnrichAsync(A<Content>._, true, ApiContext, CancellationToken))
             .Returns(enriched);
 
         var context =

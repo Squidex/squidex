@@ -16,14 +16,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 
 public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
 {
+    public DomainId DocumentId { get; set; }
+
     public DomainId IndexedAppId { get; set; }
 
     public static void RegisterClassMap()
     {
-        AssetItemClassMap.Register();
-
         BsonClassMap.TryRegisterClassMap<MongoAssetEntity>(cm =>
         {
+            cm.MapProperty(x => x.DocumentId)
+                .SetElementName("_id")
+                .SetIsRequired(true);
+
             cm.MapProperty(x => x.IndexedAppId)
                 .SetElementName("_ai")
                 .SetIsRequired(true);
@@ -36,7 +40,7 @@ public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
                 .SetIsRequired(true);
 
             cm.MapProperty(x => x.FileHash)
-                .SetElementName("fn")
+                .SetElementName("fh")
                 .SetIsRequired(true);
 
             cm.MapProperty(x => x.FileSize)
@@ -75,6 +79,8 @@ public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
                 .SetElementName("at")
                 .SetIsRequired(true);
         });
+
+        AssetItemClassMap.Register();
     }
 
     public Asset ToState()

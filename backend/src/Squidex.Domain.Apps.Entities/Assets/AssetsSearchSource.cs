@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.Queries;
 using Squidex.Shared;

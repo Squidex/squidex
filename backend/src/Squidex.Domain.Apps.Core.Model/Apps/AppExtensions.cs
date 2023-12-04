@@ -6,16 +6,20 @@
 // ==========================================================================
 
 using System.Diagnostics.CodeAnalysis;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps;
+namespace Squidex.Domain.Apps.Core.Apps;
 
 public static class AppExtensions
 {
     public static NamedId<DomainId> NamedId(this App app)
     {
         return new NamedId<DomainId>(app.Id, app.Name);
+    }
+
+    public static PartitionResolver PartitionResolver(this App app)
+    {
+        return app.Languages.ToResolver();
     }
 
     public static string DisplayName(this App app)

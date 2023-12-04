@@ -8,7 +8,6 @@
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Plans;
 using Squidex.Domain.Apps.Core.Teams;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;

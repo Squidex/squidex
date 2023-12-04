@@ -13,14 +13,11 @@ public sealed class FieldsSurrogate : List<FieldSurrogate>, ISurrogate<FieldColl
 {
     public void FromSource(FieldCollection<RootField> source)
     {
-        foreach (var field in source.Ordered)
-        {
-            Add(FieldSurrogate.FromSource(field));
-        }
+        AddRange(source.Ordered.Select(FieldSurrogate.FromSource));
     }
 
     public FieldCollection<RootField> ToSource()
     {
-        return new FieldCollection<RootField>(this.Select(x => x.ToField()).ToArray());
+        return new FieldCollection<RootField>(this.Select(x => x.ToRootField()).ToArray());
     }
 }

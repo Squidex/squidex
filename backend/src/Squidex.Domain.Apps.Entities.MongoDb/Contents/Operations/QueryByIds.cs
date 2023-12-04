@@ -92,13 +92,13 @@ internal sealed class QueryByIds : OperationBase
         {
             filters.Add(
                 Filter.Or(
-                    Filter.In(x => x.UniqueId, documentIds)));
+                    Filter.In(x => x.DocumentId, documentIds)));
         }
         else
         {
             filters.Add(
                 Filter.Or(
-                    Filter.Eq(x => x.UniqueId, documentIds[0])));
+                    Filter.Eq(x => x.DocumentId, documentIds[0])));
         }
 
         if (schemaIds != null)

@@ -12,6 +12,11 @@ namespace Squidex.Domain.Apps.Core.Schemas;
 
 public static class SchemaExtensions
 {
+    public static NamedId<DomainId> NamedId(this Schema schema)
+    {
+        return new NamedId<DomainId>(schema.Id, schema.Name);
+    }
+
     public static long MaxId(this Schema schema)
     {
         var id = 0L;

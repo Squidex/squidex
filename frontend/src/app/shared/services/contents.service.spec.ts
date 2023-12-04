@@ -183,7 +183,7 @@ describe('ContentsService', () => {
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
             expect(req.request.headers.get('X-Flatten')).toBeNull();
-            expect(req.request.headers.get('X-Language')).toBeNull();
+            expect(req.request.headers.get('X-Languages')).toBeNull();
 
             req.flush({ id: '1' });
 
@@ -202,8 +202,8 @@ describe('ContentsService', () => {
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.headers.get('X-Flatten')).toBeNull();
-            expect(req.request.headers.get('X-Language')).toEqual('en');
+            expect(req.request.headers.get('X-Flatten')).toEqual('1');
+            expect(req.request.headers.get('X-Languages')).toEqual('en');
 
             req.flush({ id: '1' });
 

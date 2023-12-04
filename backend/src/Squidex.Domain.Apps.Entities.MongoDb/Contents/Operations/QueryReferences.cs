@@ -39,7 +39,7 @@ internal sealed class QueryReferences : OperationBase
     {
         var find =
             Collection
-                .Find(Filter.Eq(x => x.UniqueId, DomainId.Combine(app.Id, q.Referencing)))
+                .Find(Filter.Eq(x => x.DocumentId, DomainId.Combine(app.Id, q.Referencing)))
                 .Project<ReferencedIdsOnly>(Projection.Include(x => x.ReferencedIds));
 
         var contentEntity = await find.FirstOrDefaultAsync(ct);

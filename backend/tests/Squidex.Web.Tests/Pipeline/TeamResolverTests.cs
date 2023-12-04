@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
@@ -79,7 +79,7 @@ public class TeamResolverTests : GivenContext
         SetupUser();
 
         A.CallTo(() => AppProvider.GetTeamAsync(TeamId, httpContext.RequestAborted))
-            .Returns(Task.FromResult<ITeamEntity?>(null));
+            .Returns(Task.FromResult<Team?>(null));
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -116,7 +116,7 @@ public class TeamResolverTests : GivenContext
 
         var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
 
-        Assert.Same(Team, httpContext.Features.Get<ITeamFeature>()!.Team);
+        Assert.Same(Team, httpContext.Features.Get<Team>());
         Assert.True(user.Claims.Any());
         Assert.True(permissions.Count < 3);
         Assert.True(permissions.TrueForAll(x => x.Value.StartsWith($"squidex.teams.{TeamId}", StringComparison.OrdinalIgnoreCase)));
@@ -130,8 +130,10 @@ public class TeamResolverTests : GivenContext
 
         user.AddClaim(new Claim(OpenIdClaims.Subject, User.Identifier));
 
-        A.CallTo(() => Team.Contributors)
-            .Returns(Contributors.Empty.Assign(User.Identifier, Role.Owner));
+        Team = Team with
+        {
+            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Reader)
+        };
 
         A.CallTo(() => AppProvider.GetTeamAsync(TeamId, httpContext.RequestAborted))
             .Returns(Team);
@@ -140,7 +142,7 @@ public class TeamResolverTests : GivenContext
 
         var permissions = user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).ToList();
 
-        Assert.Same(Team, httpContext.Features.Get<ITeamFeature>()!.Team);
+        Assert.Same(Team, httpContext.Features.Get<Team>());
         Assert.True(user.Claims.Count() > 2);
         Assert.True(permissions.Count < 3);
         Assert.True(permissions.TrueForAll(x => x.Value.StartsWith($"squidex.teams.{TeamId}", StringComparison.OrdinalIgnoreCase)));
@@ -162,7 +164,7 @@ public class TeamResolverTests : GivenContext
 
         await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-        Assert.Same(Team, httpContext.Features.Get<ITeamFeature>()!.Team);
+        Assert.Same(Team, httpContext.Features.Get<Team>());
         Assert.Equal(2, user.Claims.Count());
         Assert.True(isNextCalled);
     }

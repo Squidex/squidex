@@ -119,7 +119,7 @@ public sealed class MongoEventStoreSubscription : IEventSubscription
 
                     if (timeToNow <= Duration.FromMinutes(5))
                     {
-                        cts.Cancel();
+                        await cts.CancelAsync();
                     }
                     else
                     {

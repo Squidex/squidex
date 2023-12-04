@@ -15,18 +15,40 @@ public static class TestSchema
 {
     public static (Schema Schema, ResolvedComponents) MixedSchema(SchemaType type = SchemaType.Default)
     {
+        var appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var user = RefToken.User("me");
+
         var componentId1 = DomainId.NewGuid();
         var componentId2 = DomainId.NewGuid();
         var componentIds = ReadonlyList.Create(componentId1, componentId2);
 
-        var component1 = new Schema { Name = "component1" }
-            .Publish()
+        var component1 = new Schema
+        {
+            AppId = appId,
+            Id = DomainId.NewGuid(),
+            Name = "component1",
+            Created = default,
+            CreatedBy = user,
+            LastModified = default,
+            LastModifiedBy = user,
+            Version = 1,
+        }.Publish()
             .AddString(1, "unique1", Partitioning.Invariant)
             .AddString(2, "shared1", Partitioning.Invariant)
             .AddBoolean(3, "shared2", Partitioning.Invariant);
 
-        var component2 = new Schema { Name = "component2" }
-            .Publish()
+        var component2 = new Schema
+        {
+            AppId = appId,
+            Id = DomainId.NewGuid(),
+            Name = "component2",
+            Created = default,
+            CreatedBy = user,
+            LastModified = default,
+            LastModifiedBy = user,
+            Version = 1,
+        }.Publish()
             .AddNumber(1, "unique1", Partitioning.Invariant)
             .AddNumber(2, "shared1", Partitioning.Invariant)
             .AddBoolean(3, "shared2", Partitioning.Invariant);
@@ -37,8 +59,18 @@ public static class TestSchema
             [componentId2] = component2
         });
 
-        var schema = new Schema { Name = "user", Type = type }
-            .Publish()
+        var schema = new Schema
+        {
+            AppId = appId,
+            Id = DomainId.NewGuid(),
+            Name = "user",
+            Created = default,
+            CreatedBy = user,
+            LastModified = default,
+            LastModifiedBy = user,
+            Type = type,
+            Version = 1,
+        }.Publish()
             .AddArray(101, "root-array", Partitioning.Language, f => f
                 .AddAssets(201, "nested-assets",
                     new AssetsFieldProperties())

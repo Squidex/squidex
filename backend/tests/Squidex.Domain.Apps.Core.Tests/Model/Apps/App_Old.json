@@ -1,0 +1,92 @@
+﻿{
+    "name": "My Team",
+    "contributors": {
+        "me": "Owner"
+    },
+    "roles": {
+        "Custom": [
+            "permission1",
+            "permission2"
+        ]
+    },
+    "plan": {
+        "owner": "subject:63761585e06d5466c71521b3",
+        "planId": "Premium"
+    },
+    "clients": {
+        "client1": {
+            "name": "client1",
+            "secret": "MySecret",
+            "apiCallsLimit": 13,
+            "apiTrafficLimit": 42,
+            "allowAnonymous": true,
+            "role": "Admin"
+        }
+    },
+    "image": {
+        "mimeType": "image/png",
+        "etag": "42"
+    },
+    "settings": {
+        "patterns": [
+            {
+                "name": "numbers",
+                "regex": "[0-9]+"
+            }
+        ],
+        "editors": [
+            {
+                "name": "custom",
+                "url": "https://cloud.squidex.io"
+            }
+        ],
+        "hideScheduler": true,
+        "hideDateTimeModeButton": true
+    },
+    "assetScripts": {
+        "query": "Query Script"
+    },
+    "languages": {
+        "languages": {
+            "en": {
+                "fallback": [],
+                "isOptional": false
+            },
+            "de": {
+                "fallback": [],
+                "isOptional": true
+            }
+        },
+        "master": "en"
+    },
+    "workflows": {
+        "265aaf1e-5dff-4c40-b1e6-1149f652cd30": {
+            "initial": "archived",
+            "name": "Unnamed",
+            "steps": {
+                "published": {
+                    "transitions": {
+                        "archived": {}
+                    },
+                    "noUpdate": true,
+                    "validate": false
+                },
+                "archived": {
+                    "transitions": {
+                        "published": {}
+                    },
+                    "noUpdate": true,
+                    "validate": false
+                }
+            },
+            "schemaIds": []
+        }
+    },
+    "isDeleted": false,
+    "id": "265aaf1e-5dff-4c40-b1e6-1149f652cd30",
+    "createdBy": "subject:63761585e06d5466c71521b3",
+    "lastModifiedBy": "subject:63761585e06d5466c71521b3",
+    "created": "2022-12-05T11:00:23Z",
+    "lastModified": "2022-12-05T11:00:23Z",
+    "version": 0
+}

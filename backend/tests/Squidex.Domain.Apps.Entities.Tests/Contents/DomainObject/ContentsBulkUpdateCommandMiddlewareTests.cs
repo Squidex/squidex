@@ -185,7 +185,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_upsert_content_with_random_id_if_query_returns_no_actual()
+    public async Task Should_upsert_content_with_random_id_if_query_returns_no_result()
     {
         SetupContext(PermissionIds.AppContentsUpsert);
 

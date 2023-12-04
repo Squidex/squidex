@@ -187,7 +187,7 @@ export class SchemaDto {
         if (fields) {
             this.contentFields = fields.filter(x => x.properties.isContentField).map(tableField);
 
-            function tableFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>): TableField[] {
+            function tableFields(names: ReadonlyArray<string>, fields: ReadonlyArray<TableField>): TableField[] {
                 const result: TableField[] = [];
 
                 for (const name of names) {
@@ -196,10 +196,10 @@ export class SchemaDto {
                     if (metaField) {
                         result.push(metaField);
                     } else {
-                        const field = fields.find(x => x.name === name && x.properties.isContentField);
+                        const field = fields.find(x => x.name === name);
 
                         if (field) {
-                            result.push(tableField(field));
+                            result.push(field);
                         }
                     }
                 }
@@ -207,7 +207,7 @@ export class SchemaDto {
                 return result;
             }
 
-            const listFields = tableFields(fieldsInLists, fields);
+            const listFields = tableFields(fieldsInLists, this.contentFields);
 
             if (listFields.length === 0) {
                 listFields.push(META_FIELDS.lastModifiedByAvatar);
@@ -224,7 +224,7 @@ export class SchemaDto {
 
             this.defaultListFields = listFields;
 
-            const referenceFields = tableFields(fieldsInReferences, fields);
+            const referenceFields = tableFields(fieldsInReferences, this.contentFields);
 
             if (referenceFields.length === 0) {
                 if (fields.length > 0) {

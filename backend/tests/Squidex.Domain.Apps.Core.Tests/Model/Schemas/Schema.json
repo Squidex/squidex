@@ -1,10 +1,9 @@
 {
-    "appId": "7c45937e-e489-453f-81f8-a1432e778ea2,test",
     "type": "Default",
     "name": "test",
+    "category": "My Category",
     "isPublished": true,
-    "isDeleted": false,
-    "fieldCollection": [
+    "fields": [
         {
             "id": 1,
             "name": "string",
@@ -314,8 +313,9 @@
     "previewUrls": {
         "Web": "URL"
     },
-    "totalFields": 14,
-    "uniqueId": "7c45937e-e489-453f-81f8-a1432e778ea2--62a1d2a8-f08d-4870-8cb9-cb3ba286d56c",
+    "schemaFieldsTotal": 14,
+    "appId": "7c45937e-e489-453f-81f8-a1432e778ea2,test",
+    "isDeleted": true,
     "id": "62a1d2a8-f08d-4870-8cb9-cb3ba286d56c",
     "createdBy": "subject:62cee33bcc71c0d140ad103a",
     "lastModifiedBy": "subject:62cee33bcc71c0d140ad103a",

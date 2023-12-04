@@ -10,6 +10,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
@@ -27,6 +28,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -102,6 +104,7 @@ public static class TestUtils
         // It is also a readonly list, so we have to register it first, so that other converters do not pick this up.
         options.Converters.Add(new StringConverter<PropertyPath>(x => x));
 
+        options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new GeoJsonConverterFactory());
         options.Converters.Add(new PolymorphicConverter<IEvent>(TypeRegistry));
@@ -118,6 +121,7 @@ public static class TestUtils
         options.Converters.Add(new SurrogateJsonConverter<LanguagesConfig, LanguagesConfigSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<Roles, RolesSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<Rule, RuleSorrgate>());
+        options.Converters.Add(new SurrogateJsonConverter<Schema, SchemaSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowStep, WorkflowStepSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowTransition, WorkflowTransitionSurrogate>());
         options.Converters.Add(new StringConverter<CompareOperator>());
@@ -130,7 +134,11 @@ public static class TestUtils
         options.Converters.Add(new StringConverter<RefToken>());
         options.Converters.Add(new StringConverter<Status>());
         options.Converters.Add(new JsonStringEnumConverter());
-        options.TypeInfoResolver = new PolymorphicTypeResolver(TypeRegistry);
+        options.IncludeFields = true;
+        options.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            .WithAddedModifier(PolymorphicConverter<None>.Modifier(TypeRegistry))
+            .WithAddedModifier(JsonIgnoreReadonlyProperties.Modifier<Entity>())
+            .WithAddedModifier(JsonRenameAttribute.Modifier);
         configure?.Invoke(options);
 
         return options;

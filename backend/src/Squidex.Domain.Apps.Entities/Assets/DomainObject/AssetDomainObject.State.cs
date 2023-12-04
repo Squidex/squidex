@@ -32,13 +32,14 @@ public partial class AssetDomainObject
                     Metadata = e.Metadata ?? [],
                     MimeType = e.MimeType,
                     ParentId = e.ParentId,
+                    Slug = e.Slug,
                     Tags = e.Tags ?? [],
                     TotalSize = snapshot.FileSize + e.FileSize,
                     Type = e.Type
                 };
                 break;
 
-            case AssetUpdated e when !string.Equals(e.FileHash, snapshot.FileHash):
+            case AssetUpdated e when !string.Equals(e.FileHash, snapshot.FileHash, StringComparison.Ordinal):
                 newSnapshot = snapshot with
                 {
                     FileHash = e.FileHash,

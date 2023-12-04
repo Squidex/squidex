@@ -37,7 +37,7 @@ public class AppCommandMiddlewareTests : HandlerTestBase<App>
     }
 
     [Fact]
-    public async Task Should_replace_context_app_with_domain_object_actual()
+    public async Task Should_replace_context_app_with_domain_object_result()
     {
         var replaced = new App();
 

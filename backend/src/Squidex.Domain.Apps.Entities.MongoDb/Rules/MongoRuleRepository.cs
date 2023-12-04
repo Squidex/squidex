@@ -21,6 +21,11 @@ public sealed class MongoRuleRepository : MongoSnapshotStoreBase<Rule, MongoRule
     {
     }
 
+    protected override string CollectionName()
+    {
+        return "States_Rules";
+    }
+
     protected override Task SetupCollectionAsync(IMongoCollection<MongoRuleEntity> collection,
         CancellationToken ct)
     {

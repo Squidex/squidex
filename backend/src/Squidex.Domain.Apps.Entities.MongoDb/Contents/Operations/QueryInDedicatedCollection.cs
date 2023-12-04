@@ -115,7 +115,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
     {
         var collection = await GetCollectionAsync(job.Value.AppId.Id, job.Value.SchemaId.Id);
 
-        await collection.ReplaceOneAsync(Filter.Eq(x => x.UniqueId, job.Key), job.Value, UpsertReplace, ct);
+        await collection.ReplaceOneAsync(Filter.Eq(x => x.DocumentId, job.Key), job.Value, UpsertReplace, ct);
     }
 
     public async Task UpsertVersionedAsync(IClientSessionHandle session, SnapshotWriteJob<MongoContentEntity> job,

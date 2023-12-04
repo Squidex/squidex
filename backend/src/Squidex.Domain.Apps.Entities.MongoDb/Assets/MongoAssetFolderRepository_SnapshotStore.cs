@@ -29,7 +29,7 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
     {
         var documents = Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct);
 
-        return documents.Select(x => new SnapshotResult<AssetFolder>(x.UniqueId, x.ToState(), x.Version, true));
+        return documents.Select(x => new SnapshotResult<AssetFolder>(x.DocumentId, x.ToState(), x.Version, true));
     }
 
     async Task<SnapshotResult<AssetFolder>> ISnapshotStore<AssetFolder>.ReadAsync(DomainId key,
@@ -38,12 +38,12 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
         using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/ReadAsync"))
         {
             var existing =
-                await Collection.Find(x => x.UniqueId == key)
+                await Collection.Find(x => x.DocumentId == key)
                     .FirstOrDefaultAsync(ct);
 
             if (existing != null)
             {
-                return new SnapshotResult<AssetFolder>(existing.UniqueId, existing.ToState(), existing.Version);
+                return new SnapshotResult<AssetFolder>(existing.DocumentId, existing.ToState(), existing.Version);
             }
 
             return new SnapshotResult<AssetFolder>(default, null!, EtagVersion.Empty);
@@ -88,7 +88,7 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
     {
         using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/RemoveAsync"))
         {
-            await Collection.DeleteOneAsync(x => x.UniqueId == key, ct);
+            await Collection.DeleteOneAsync(x => x.DocumentId == key, ct);
         }
     }
 }

@@ -9,10 +9,8 @@ using NodaTime;
 
 namespace Squidex.Infrastructure.Commands;
 
-public record Entity
+public abstract record Entity
 {
-    public DomainId UniqueId { get; init; }
-
     public DomainId Id { get; init; }
 
     public RefToken CreatedBy { get; init; }
@@ -23,5 +21,10 @@ public record Entity
 
     public Instant LastModified { get; init; }
 
-    public long Version { get; init; }
+    public long Version { get; init; } = EtagVersion.Empty;
+
+    public virtual DomainId UniqueId
+    {
+        get => Id;
+    }
 }

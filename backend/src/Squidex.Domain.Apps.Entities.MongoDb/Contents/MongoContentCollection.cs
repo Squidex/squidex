@@ -100,7 +100,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         CancellationToken ct)
     {
         return Collection.UpdateOneAsync(
-            x => x.UniqueId == documentId,
+            x => x.DocumentId == documentId,
             Update
                 .Unset(x => x.ScheduleJob)
                 .Unset(x => x.ScheduledAt),
@@ -253,7 +253,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
     public Task<MongoContentEntity> FindAsync(DomainId documentId,
         CancellationToken ct = default)
     {
-        return Collection.Find(x => x.UniqueId == documentId).FirstOrDefaultAsync(ct);
+        return Collection.Find(x => x.DocumentId == documentId).FirstOrDefaultAsync(ct);
     }
 
     public IAsyncEnumerable<MongoContentEntity> StreamAll(
@@ -270,7 +270,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
             await queryInDedicatedCollection.UpsertAsync(job, ct);
         }
 
-        await Collection.ReplaceOneAsync(Filter.Eq(x => x.UniqueId, job.Key), job.Value, UpsertReplace, ct);
+        await Collection.ReplaceOneAsync(Filter.Eq(x => x.DocumentId, job.Key), job.Value, UpsertReplace, ct);
     }
 
     public async Task UpsertVersionedAsync(IClientSessionHandle session, SnapshotWriteJob<MongoContentEntity> job,
@@ -287,7 +287,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
     public async Task RemoveAsync(DomainId key,
         CancellationToken ct = default)
     {
-        var previous = await Collection.FindOneAndDeleteAsync(x => x.UniqueId == key, null, ct);
+        var previous = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key, null, ct);
 
         if (queryInDedicatedCollection != null && previous != null)
         {
@@ -298,7 +298,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
     public async Task RemoveAsync(IClientSessionHandle session, DomainId key,
         CancellationToken ct = default)
     {
-        var previous = await Collection.FindOneAndDeleteAsync(session, x => x.UniqueId == key, null, ct);
+        var previous = await Collection.FindOneAndDeleteAsync(session, x => x.DocumentId == key, null, ct);
 
         if (queryInDedicatedCollection != null && previous != null)
         {

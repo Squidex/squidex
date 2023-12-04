@@ -43,9 +43,6 @@ public abstract class DisposableObjectBase : IDisposable
 
     protected void ThrowIfDisposed()
     {
-        if (isDisposed)
-        {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(isDisposed, this);
     }
 }

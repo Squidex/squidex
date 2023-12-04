@@ -26,7 +26,7 @@ public sealed partial class SchemaDomainObject
                 {
                     Id = e.SchemaId.Id,
                     AppId = e.AppId,
-                    TotalFields = e.Schema.MaxId()
+                    SchemaFieldsTotal = e.Schema.MaxId()
                 };
                 break;
 
@@ -47,7 +47,7 @@ public sealed partial class SchemaDomainObject
                     newSnapshot = newSnapshot.AddField(field);
                 }
 
-                newSnapshot = newSnapshot with { TotalFields = Math.Max(snapshot.TotalFields, e.FieldId.Id) };
+                newSnapshot = newSnapshot with { SchemaFieldsTotal = Math.Max(snapshot.SchemaFieldsTotal, e.FieldId.Id) };
                 break;
 
             case SchemaUIFieldsConfigured e:
@@ -67,16 +67,16 @@ public sealed partial class SchemaDomainObject
                 newSnapshot = newSnapshot.ChangeCategory(e.Name);
                 break;
 
-            case SchemaPreviewUrlsConfigured e:
-                newSnapshot = newSnapshot.SetPreviewUrls(e.PreviewUrls);
+            case SchemaScriptsConfigured e:
+                newSnapshot = newSnapshot.SetScripts(e.Scripts ?? new ());
                 break;
 
-            case SchemaScriptsConfigured e:
-                newSnapshot = newSnapshot.SetScripts(e.Scripts);
+            case SchemaPreviewUrlsConfigured e:
+                newSnapshot = newSnapshot.SetPreviewUrls(e.PreviewUrls ?? new ());
                 break;
 
             case SchemaFieldRulesConfigured e:
-                newSnapshot = newSnapshot.SetFieldRules(e.FieldRules);
+                newSnapshot = newSnapshot.SetFieldRules(e.FieldRules ?? FieldRules.Empty);
                 break;
 
             case SchemaPublished:

@@ -14,17 +14,25 @@ namespace Squidex.Domain.Apps.Core.Contents.Json;
 
 public sealed class WorkflowStepSurrogate : ISurrogate<WorkflowStep>
 {
-    public Dictionary<Status, WorkflowTransitionSurrogate> Transitions { get; set; }
+    [Obsolete("Old serialization format.")]
+    private bool noUpdateFlag;
 
     [JsonPropertyName("noUpdateRules")]
     public NoUpdate? NoUpdate { get; set; }
 
     [JsonPropertyName("noUpdate")]
-    public bool NoUpdateFlag { get; set; }
+    [Obsolete("Old serialization format.")]
+    public bool NoUpdateFlag
+    {
+        // Because this property is old we old want to read it and never to write it.
+        set => noUpdateFlag = value;
+    }
 
     public bool Validate { get; set; }
 
     public string? Color { get; set; }
+
+    public Dictionary<Status, WorkflowTransitionSurrogate> Transitions { get; set; }
 
     public void FromSource(WorkflowStep source)
     {
@@ -44,10 +52,13 @@ public sealed class WorkflowStepSurrogate : ISurrogate<WorkflowStep>
     {
         var noUpdate = NoUpdate;
 
-        if (NoUpdateFlag)
+#pragma warning disable CS0618 // Type or member is obsolete
+        // The flag has been replaced with an object.
+        if (noUpdateFlag)
         {
             noUpdate = NoUpdate.Always;
         }
+#pragma warning restore CS0618 // Type or member is obsolete
 
         var transitions =
             Transitions?.ToReadonlyDictionary(

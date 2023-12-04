@@ -26,13 +26,15 @@ public record AssetFolder : AssetItem
     }
 
     [Pure]
-    public AssetFolder Rename(string name)
+    public AssetFolder Rename(string folderName)
     {
-        if (string.Equals(FolderName, name, StringComparison.Ordinal))
+        Guard.NotNull(folderName);
+
+        if (string.Equals(FolderName, folderName, StringComparison.Ordinal))
         {
             return this;
         }
 
-        return this with { FolderName = name };
+        return this with { FolderName = folderName };
     }
 }

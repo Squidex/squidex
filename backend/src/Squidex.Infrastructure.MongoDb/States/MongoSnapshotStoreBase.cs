@@ -33,7 +33,7 @@ public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TS
         using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/ReadAsync"))
         {
             var existing =
-                await Collection.Find(x => x.UniqueId.Equals(key))
+                await Collection.Find(x => x.DocumentId.Equals(key))
                     .FirstOrDefaultAsync(ct);
 
             if (existing != null)
@@ -43,7 +43,7 @@ public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TS
                     await onRead.OnReadAsync();
                 }
 
-                return new SnapshotResult<T>(existing.UniqueId, existing.Document, existing.Version);
+                return new SnapshotResult<T>(existing.DocumentId, existing.Document, existing.Version);
             }
 
             return new SnapshotResult<T>(default, default!, EtagVersion.Empty);
@@ -57,6 +57,9 @@ public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TS
         {
             var entityJob = job.As(CreateDocument(job.Key, job.Value, job.OldVersion));
 
+            // Also update the version, because the persistence system cannot do it.
+            entityJob.Value.Version = job.NewVersion;
+
             await Collection.UpsertVersionedAsync(entityJob, ct);
         }
     }
@@ -67,7 +70,7 @@ public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TS
         using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/WriteManyAsync"))
         {
             var writes = jobs.Select(x =>
-                new ReplaceOneModel<TState>(Filter.Eq(y => y.UniqueId, x.Key), CreateDocument(x.Key, x.Value, x.NewVersion))
+                new ReplaceOneModel<TState>(Filter.Eq(y => y.DocumentId, x.Key), CreateDocument(x.Key, x.Value, x.NewVersion))
                 {
                     IsUpsert = true
                 }).ToList();
@@ -86,7 +89,7 @@ public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TS
     {
         using (Telemetry.Activities.StartActivity("MongoSnapshotStoreBase/RemoveAsync"))
         {
-            await Collection.DeleteOneAsync(x => x.UniqueId.Equals(key), ct);
+            await Collection.DeleteOneAsync(x => x.DocumentId.Equals(key), ct);
         }
     }
 
@@ -104,7 +107,7 @@ public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TS
                     await onRead.OnReadAsync();
                 }
 
-                yield return new SnapshotResult<T>(document.UniqueId, document.Document, document.Version, true);
+                yield return new SnapshotResult<T>(document.DocumentId, document.Document, document.Version, true);
             }
         }
     }
@@ -114,7 +117,7 @@ public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TS
         var result = new TState
         {
             Document = doc,
-            UniqueId = id,
+            DocumentId = id,
             Version = version
         };
 

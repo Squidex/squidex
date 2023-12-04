@@ -6,17 +6,13 @@
 // ==========================================================================
 
 using System.Diagnostics.Contracts;
-using System.Text.Json.Serialization;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Core.Schemas;
 
-public record Schema : Entity
+public record Schema : AppEntity
 {
-    public NamedId<DomainId> AppId { get; init; }
-
     public SchemaType Type { get; init; }
 
     public string Name { get; init; }
@@ -24,8 +20,6 @@ public record Schema : Entity
     public string? Category { get; init; }
 
     public bool IsPublished { get; init; }
-
-    public bool IsDeleted { get; init; }
 
     public FieldCollection<RootField> FieldCollection { get; init; } = FieldCollection<RootField>.Empty;
 
@@ -41,30 +35,27 @@ public record Schema : Entity
 
     public ReadonlyDictionary<string, string> PreviewUrls { get; init; } = ReadonlyDictionary.Empty<string, string>();
 
-    public long TotalFields { get; init; }
+    public long SchemaFieldsTotal { get; init; }
 
-    [JsonIgnore]
     public IReadOnlyList<RootField> Fields
     {
         get => FieldCollection.Ordered;
     }
 
-    [JsonIgnore]
     public IReadOnlyDictionary<long, RootField> FieldsById
     {
         get => FieldCollection.ById;
     }
 
-    [JsonIgnore]
     public IReadOnlyDictionary<string, RootField> FieldsByName
     {
         get => FieldCollection.ByName;
     }
 
     [Pure]
-    public Schema Update(SchemaProperties? properties)
+    public Schema Update(SchemaProperties properties)
     {
-        properties ??= new SchemaProperties();
+        Guard.NotNull(properties);
 
         if (Properties.Equals(properties))
         {
@@ -75,9 +66,9 @@ public record Schema : Entity
     }
 
     [Pure]
-    public Schema SetScripts(SchemaScripts? scripts)
+    public Schema SetScripts(SchemaScripts scripts)
     {
-        scripts ??= new SchemaScripts();
+        Guard.NotNull(scripts);
 
         if (Scripts.Equals(scripts))
         {
@@ -88,9 +79,9 @@ public record Schema : Entity
     }
 
     [Pure]
-    public Schema SetFieldsInLists(FieldNames? names)
+    public Schema SetFieldsInLists(FieldNames names)
     {
-        names ??= FieldNames.Empty;
+        Guard.NotNull(names);
 
         if (FieldsInLists.SequenceEqual(names))
         {
@@ -101,9 +92,9 @@ public record Schema : Entity
     }
 
     [Pure]
-    public Schema SetFieldsInReferences(FieldNames? names)
+    public Schema SetFieldsInReferences(FieldNames names)
     {
-        names ??= FieldNames.Empty;
+        Guard.NotNull(names);
 
         if (FieldsInReferences.SequenceEqual(names))
         {
@@ -114,9 +105,9 @@ public record Schema : Entity
     }
 
     [Pure]
-    public Schema SetFieldRules(FieldRules? rules)
+    public Schema SetFieldRules(FieldRules rules)
     {
-        rules ??= FieldRules.Empty;
+        Guard.NotNull(rules);
 
         if (FieldRules.Equals(rules))
         {
@@ -160,9 +151,9 @@ public record Schema : Entity
     }
 
     [Pure]
-    public Schema SetPreviewUrls(ReadonlyDictionary<string, string>? previewUrls)
+    public Schema SetPreviewUrls(ReadonlyDictionary<string, string> previewUrls)
     {
-        previewUrls ??= ReadonlyDictionary.Empty<string, string>();
+        Guard.NotNull(previewUrls);
 
         if (PreviewUrls.Equals(previewUrls))
         {

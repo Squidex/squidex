@@ -259,7 +259,7 @@ public sealed partial class SchemaDomainObject : DomainObject<Schema>
         var schemaSource = Snapshot;
         var schemaTarget = command.BuildSchema(schemaSource.Name, schemaSource.Type);
 
-        var events = schemaSource.Synchronize(schemaTarget, () => Snapshot.TotalFields + 1, options);
+        var events = schemaSource.Synchronize(schemaTarget, () => Snapshot.SchemaFieldsTotal + 1, options);
 
         foreach (var @event in events)
         {
@@ -409,6 +409,6 @@ public sealed partial class SchemaDomainObject : DomainObject<Schema>
 
     private NamedId<long> CreateFieldId(AddField command)
     {
-        return NamedId.Of(Snapshot.TotalFields + 1, command.Name);
+        return NamedId.Of(Snapshot.SchemaFieldsTotal + 1, command.Name);
     }
 }

@@ -35,7 +35,7 @@ public sealed class RuleCommandMiddlewareTests : HandlerTestBase<Rule>
     }
 
     [Fact]
-    public async Task Should_not_invoke_enricher_for_other_actual()
+    public async Task Should_not_invoke_enricher_for_other_result()
     {
         await HandleAsync(new EnableRule(), 12);
 

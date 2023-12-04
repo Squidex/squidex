@@ -16,10 +16,6 @@ internal static class EntityClassMap
     {
         BsonClassMap.TryRegisterClassMap<Entity>(cm =>
         {
-            cm.MapProperty(x => x.UniqueId)
-                .SetElementName("_id")
-                .SetIsRequired(true);
-
             cm.MapProperty(x => x.Id)
                 .SetElementName("id")
                 .SetIsRequired(true);

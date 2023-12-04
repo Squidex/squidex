@@ -26,6 +26,8 @@ public class ContentQueryTests : GivenContext
 {
     static ContentQueryTests()
     {
+        MongoContentEntity.RegisterClassMap();
+
         TestUtils.SetupBson();
     }
 

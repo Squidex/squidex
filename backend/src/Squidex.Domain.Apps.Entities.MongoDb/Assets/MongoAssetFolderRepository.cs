@@ -78,7 +78,7 @@ public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<Mon
             var documentId = DomainId.Combine(appId, id);
 
             var assetFolderEntity =
-                await Collection.Find(x => x.UniqueId == documentId && !x.IsDeleted)
+                await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
                     .FirstOrDefaultAsync(ct);
 
             return assetFolderEntity;

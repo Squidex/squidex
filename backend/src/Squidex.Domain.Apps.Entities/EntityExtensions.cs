@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -21,12 +20,6 @@ public static class EntityExtensions
         var timestamp = headers.Timestamp();
         var created = source.Created;
         var createdBy = source.CreatedBy;
-        var uniqueId = source.UniqueId;
-
-        if (uniqueId == DomainId.Empty)
-        {
-            uniqueId = headers.AggregateId();
-        }
 
         if (created == default)
         {
@@ -43,8 +36,7 @@ public static class EntityExtensions
             Created = created,
             CreatedBy = createdBy,
             LastModified = timestamp,
-            LastModifiedBy = @event.Payload.Actor,
-            UniqueId = uniqueId
+            LastModifiedBy = @event.Payload.Actor
         };
     }
 }

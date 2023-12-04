@@ -5,65 +5,53 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json.Serialization;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.System;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json;
 
-public sealed record SchemaSurrogate : Schema, ISurrogate<Schema>
+[JsonRename(nameof(FieldCollection), "fields")]
+public record SchemaSurrogate : Schema, ISurrogate<Schema>
 {
-    public new FieldSurrogate[] Fields { get; set; }
+    [Obsolete("Old serialization format.")]
+    private Schema? schemaDef;
+
+    [JsonPropertyName("schemaDef")]
+    [Obsolete("Old serialization format.")]
+    public Schema? SchemaDef
+    {
+        // Because this property is old we old want to read it and never to write it.
+        set => schemaDef = value;
+    }
 
     public void FromSource(Schema source)
     {
         SimpleMapper.Map(source, this);
-
-        Fields =
-            source.Fields.Select(x =>
-                new FieldSurrogate
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Children = CreateChildren(x),
-                    IsHidden = x.IsHidden,
-                    IsLocked = x.IsLocked,
-                    IsDisabled = x.IsDisabled,
-                    Partitioning = x.Partitioning.Key,
-                    Properties = x.RawProperties
-                }).ToArray();
-    }
-
-    private static FieldSurrogate[]? CreateChildren(IField field)
-    {
-        if (field is ArrayField arrayField)
-        {
-            return arrayField.Fields.Select(x =>
-                new FieldSurrogate
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    IsHidden = x.IsHidden,
-                    IsLocked = x.IsLocked,
-                    IsDisabled = x.IsDisabled,
-                    Properties = x.RawProperties
-                }).ToArray();
-        }
-
-        return null;
     }
 
     public Schema ToSource()
     {
-        var schema = SimpleMapper.Map(this, new Schema());
-
-        if (Fields != null)
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (schemaDef != null)
         {
-            schema = schema with
+            // In previous versions, the actual schema was stored in a nested object.
+            return schemaDef with
             {
-                FieldCollection = new FieldCollection<RootField>(Fields.Select(x => x.ToField()).ToArray())
+                Id = Id,
+                AppId = AppId,
+                Created = Created,
+                CreatedBy = CreatedBy,
+                IsDeleted = IsDeleted,
+                LastModified = LastModified,
+                LastModifiedBy = LastModifiedBy,
+                SchemaFieldsTotal = SchemaFieldsTotal,
+                Version = Version,
             };
         }
+#pragma warning restore CS0618 // Type or member is obsolete
 
-        return schema;
+        return SimpleMapper.Map(this, new Schema());
     }
 }
