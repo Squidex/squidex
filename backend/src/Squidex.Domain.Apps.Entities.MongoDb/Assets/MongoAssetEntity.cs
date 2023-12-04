@@ -90,10 +90,15 @@ public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
 
     public static MongoAssetEntity Create(SnapshotWriteJob<Asset> job)
     {
-        var entity = SimpleMapper.Map(job.Value, new MongoAssetEntity());
+        var entity = new MongoAssetEntity
+        {
+            DocumentId = job.Key,
+            // Both version and ID cannot be changed by the mapper method anymore.
+            Version = job.NewVersion,
+            // Use an app ID without the name to reduce the memory usage of the index.
+            IndexedAppId = job.Value.AppId.Id,
+        };
 
-        entity.IndexedAppId = job.Value.AppId.Id;
-
-        return entity;
+        return SimpleMapper.Map(job.Value, entity);
     }
 }

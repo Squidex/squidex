@@ -18,14 +18,7 @@ public sealed class BsonStringSerializer<T> : SerializerBase<T>
 
     public static void Register()
     {
-        try
-        {
-            BsonSerializer.RegisterSerializer(new BsonStringSerializer<T>());
-        }
-        catch (BsonSerializationException)
-        {
-            return;
-        }
+        BsonSerializer.TryRegisterSerializer(new BsonStringSerializer<T>());
     }
 
     public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)

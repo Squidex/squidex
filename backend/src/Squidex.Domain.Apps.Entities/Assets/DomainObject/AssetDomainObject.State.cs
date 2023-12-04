@@ -9,6 +9,7 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
@@ -21,36 +22,13 @@ public partial class AssetDomainObject
         switch (@event.Payload)
         {
             case AssetCreated e:
-                newSnapshot = snapshot with
-                {
-                    Id = e.AssetId,
-                    AppId = e.AppId,
-                    FileHash = e.FileHash,
-                    FileName = e.FileName,
-                    FileSize = e.FileSize,
-                    FileVersion = 0,
-                    Metadata = e.Metadata ?? [],
-                    MimeType = e.MimeType,
-                    ParentId = e.ParentId,
-                    Slug = e.Slug,
-                    Tags = e.Tags ?? [],
-                    TotalSize = snapshot.FileSize + e.FileSize,
-                    Type = e.Type
-                };
+                newSnapshot = new Asset { Id = e.AssetId, TotalSize = e.FileSize };
+                SimpleMapper.Map(e, newSnapshot);
                 break;
 
             case AssetUpdated e when !string.Equals(e.FileHash, snapshot.FileHash, StringComparison.Ordinal):
-                newSnapshot = snapshot with
-                {
-                    FileHash = e.FileHash,
-                    FileSize = e.FileSize,
-                    FileVersion = e.FileVersion,
-                    Metadata = e.Metadata ?? [],
-                    MimeType = e.MimeType,
-                    Tags = snapshot.Tags ?? [],
-                    TotalSize = snapshot.FileSize + e.FileSize,
-                    Type = e.Type
-                };
+                newSnapshot = snapshot with { TotalSize = snapshot.FileSize + e.FileSize };
+                SimpleMapper.Map(e, newSnapshot);
                 break;
 
             case AssetAnnotated e:
@@ -64,6 +42,16 @@ public partial class AssetDomainObject
             case AssetDeleted:
                 newSnapshot = snapshot with { IsDeleted = true };
                 break;
+        }
+
+        if (newSnapshot.Tags == null)
+        {
+            newSnapshot = newSnapshot with { Tags = [] };
+        }
+
+        if (newSnapshot.Metadata == null)
+        {
+            newSnapshot = newSnapshot with { Metadata = [] };
         }
 
         if (ReferenceEquals(newSnapshot, snapshot))

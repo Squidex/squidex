@@ -15,14 +15,7 @@ public sealed class BsonDomainIdSerializer : SerializerBase<DomainId>, IBsonPoly
 {
     public static void Register()
     {
-        try
-        {
-            BsonSerializer.RegisterSerializer(new BsonDomainIdSerializer());
-        }
-        catch (BsonSerializationException)
-        {
-            return;
-        }
+        BsonSerializer.TryRegisterSerializer(new BsonDomainIdSerializer());
     }
 
     public bool IsDiscriminatorCompatibleWithObjectSerializer

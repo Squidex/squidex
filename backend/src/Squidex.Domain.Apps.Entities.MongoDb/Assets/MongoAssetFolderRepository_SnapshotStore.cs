@@ -68,7 +68,7 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
         {
             var updates = jobs.Select(MongoAssetFolderEntity.Create).Select(x =>
                 new ReplaceOneModel<MongoAssetFolderEntity>(
-                    Filter.Eq(y => y.UniqueId, x.UniqueId),
+                    Filter.Eq(y => y.DocumentId, x.DocumentId),
                     x)
                 {
                     IsUpsert = true

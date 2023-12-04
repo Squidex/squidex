@@ -22,7 +22,7 @@ public partial class TeamDomainObject
         switch (@event.Payload)
         {
             case TeamCreated e:
-                newSnapshot = snapshot with { Id = e.TeamId, Name = e.Name };
+                newSnapshot = new Team { Id = e.TeamId, Name = e.Name };
                 break;
 
             case TeamUpdated e:

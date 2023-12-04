@@ -9,6 +9,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
@@ -21,16 +22,8 @@ public partial class RuleDomainObject
         switch (@event.Payload)
         {
             case RuleCreated e:
-                newSnapshot = snapshot with
-                {
-                    Id = e.RuleId,
-                    AppId = e.AppId,
-                    Action = e.Action,
-                    IsDeleted = false,
-                    IsEnabled = true,
-                    Name = e.Name,
-                    Trigger = e.Trigger,
-                };
+                newSnapshot = new Rule { Id = e.RuleId };
+                SimpleMapper.Map(e, newSnapshot);
                 break;
 
             case RuleUpdated e:

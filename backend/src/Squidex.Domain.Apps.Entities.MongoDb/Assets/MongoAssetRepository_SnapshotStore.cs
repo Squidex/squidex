@@ -68,7 +68,7 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<Asset>, IDelet
         {
             var updates = jobs.Select(MongoAssetEntity.Create).Select(x =>
                 new ReplaceOneModel<MongoAssetEntity>(
-                    Filter.Eq(y => y.UniqueId, x.UniqueId),
+                    Filter.Eq(y => y.DocumentId, x.DocumentId),
                     x)
                 {
                     IsUpsert = true

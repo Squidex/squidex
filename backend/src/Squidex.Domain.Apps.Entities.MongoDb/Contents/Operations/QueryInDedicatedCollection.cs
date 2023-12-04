@@ -131,7 +131,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
     {
         var collection = await GetCollectionAsync(value.AppId.Id, value.SchemaId.Id);
 
-        await collection.DeleteOneAsync(x => x.UniqueId == value.UniqueId, null, ct);
+        await collection.DeleteOneAsync(x => x.DocumentId == value.DocumentId, null, ct);
     }
 
     public async Task RemoveAsync(IClientSessionHandle session, MongoContentEntity value,
@@ -139,7 +139,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
     {
         var collection = await GetCollectionAsync(value.AppId.Id, value.SchemaId.Id);
 
-        await collection.DeleteOneAsync(session, x => x.UniqueId == value.UniqueId, null, ct);
+        await collection.DeleteOneAsync(session, x => x.DocumentId == value.DocumentId, null, ct);
     }
 
     private static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filter)

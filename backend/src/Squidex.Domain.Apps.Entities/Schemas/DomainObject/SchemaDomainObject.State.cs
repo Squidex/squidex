@@ -25,7 +25,9 @@ public sealed partial class SchemaDomainObject
                 newSnapshot = e.Schema with
                 {
                     Id = e.SchemaId.Id,
+                    // The schema usually does not contain any metadata.
                     AppId = e.AppId,
+                    // Just update the total count to be more reliabble.
                     SchemaFieldsTotal = e.Schema.MaxId()
                 };
                 break;
@@ -47,7 +49,7 @@ public sealed partial class SchemaDomainObject
                     newSnapshot = newSnapshot.AddField(field);
                 }
 
-                newSnapshot = newSnapshot with { SchemaFieldsTotal = Math.Max(snapshot.SchemaFieldsTotal, e.FieldId.Id) };
+                newSnapshot = newSnapshot with { SchemaFieldsTotal = newSnapshot.MaxId() };
                 break;
 
             case SchemaUIFieldsConfigured e:

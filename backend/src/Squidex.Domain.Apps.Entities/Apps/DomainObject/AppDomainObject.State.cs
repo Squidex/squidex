@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
@@ -22,7 +23,8 @@ public partial class AppDomainObject
         switch (@event.Payload)
         {
             case AppCreated e:
-                newSnapshot = snapshot with { Id = e.AppId.Id, Name = e.Name };
+                newSnapshot = snapshot with { Id = e.AppId.Id };
+                SimpleMapper.Map(e, newSnapshot);
                 break;
 
             case AppUpdated e:

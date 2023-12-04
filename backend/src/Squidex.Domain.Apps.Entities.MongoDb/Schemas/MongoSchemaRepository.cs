@@ -52,7 +52,7 @@ public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<Schema, Mongo
                 await Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted)
                     .ToListAsync(ct);
 
-            return entities.Select(x => (Schema)x.Document).ToList();
+            return entities.Select(x => x.Document).ToList();
         }
     }
 

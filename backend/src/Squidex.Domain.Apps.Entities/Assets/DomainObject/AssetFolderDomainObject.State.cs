@@ -9,6 +9,7 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
@@ -21,7 +22,8 @@ public sealed partial class AssetFolderDomainObject
         switch (@event.Payload)
         {
             case AssetFolderCreated e:
-                newSnapshot = snapshot with { AppId = e.AppId, Id = e.AssetFolderId, FolderName = e.FolderName };
+                newSnapshot = new AssetFolder { Id = e.AssetFolderId };
+                SimpleMapper.Map(e, newSnapshot);
                 break;
 
             case AssetFolderRenamed e:

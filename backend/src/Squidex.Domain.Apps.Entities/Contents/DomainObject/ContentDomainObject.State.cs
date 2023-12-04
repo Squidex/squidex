@@ -31,7 +31,7 @@ public partial class ContentDomainObject
         switch (@event.Payload)
         {
             case ContentCreated e:
-                newSnapshot = snapshot with
+                newSnapshot = new WriteContent
                 {
                     Id = e.ContentId,
                     AppId = e.AppId,

@@ -17,14 +17,7 @@ public sealed class BsonInstantSerializer : SerializerBase<Instant>, IBsonPolymo
 {
     public static void Register()
     {
-        try
-        {
-            BsonSerializer.RegisterSerializer(new BsonInstantSerializer());
-        }
-        catch (BsonSerializationException)
-        {
-            return;
-        }
+        BsonSerializer.TryRegisterSerializer(new BsonInstantSerializer());
     }
 
     public bool IsDiscriminatorCompatibleWithObjectSerializer

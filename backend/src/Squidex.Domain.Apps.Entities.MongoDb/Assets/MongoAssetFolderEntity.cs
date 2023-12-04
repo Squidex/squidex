@@ -22,7 +22,7 @@ public record MongoAssetFolderEntity : AssetFolder, IVersionedEntity<DomainId>
 
     public static void RegisterClassMap()
     {
-        BsonClassMap.TryRegisterClassMap<MongoAssetEntity>(cm =>
+        BsonClassMap.TryRegisterClassMap<MongoAssetFolderEntity>(cm =>
         {
             cm.MapProperty(x => x.DocumentId)
                 .SetElementName("_id")
@@ -50,10 +50,15 @@ public record MongoAssetFolderEntity : AssetFolder, IVersionedEntity<DomainId>
 
     public static MongoAssetFolderEntity Create(SnapshotWriteJob<AssetFolder> job)
     {
-        var entity = SimpleMapper.Map(job.Value, new MongoAssetFolderEntity());
+        var entity = new MongoAssetFolderEntity
+        {
+            DocumentId = job.Key,
+            // Both version and ID cannot be changed by the mapper method anymore.
+            Version = job.NewVersion,
+            // Use an app ID without the name to reduce the memory usage of the index.
+            IndexedAppId = job.Value.AppId.Id,
+        };
 
-        entity.IndexedAppId = job.Value.AppId.Id;
-
-        return entity;
+        return SimpleMapper.Map(job.Value, entity);
     }
 }

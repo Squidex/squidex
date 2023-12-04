@@ -39,6 +39,7 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         BsonEscapedDictionarySerializer<JsonValue, ContentFieldData>.Register();
         BsonEscapedDictionarySerializer<ContentFieldData, ContentData>.Register();
         BsonStringSerializer<Status>.Register();
+        MongoContentEntity.RegisterClassMap();
     }
 
     public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider,

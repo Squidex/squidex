@@ -30,11 +30,10 @@ public sealed class CompletionTimer
         runTask = RunInternalAsync(delayInMs, initialDelay, callback);
     }
 
-    public Task StopAsync()
+    public async Task StopAsync()
     {
-        stopToken.Cancel();
-
-        return runTask;
+        await stopToken.CancelAsync();
+        await runTask;
     }
 
     public void SkipCurrentDelay()

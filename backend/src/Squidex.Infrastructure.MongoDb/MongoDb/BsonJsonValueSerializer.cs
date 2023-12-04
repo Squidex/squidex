@@ -16,14 +16,7 @@ public sealed class BsonJsonValueSerializer : SerializerBase<JsonValue>
 {
     public static void Register()
     {
-        try
-        {
-            BsonSerializer.RegisterSerializer(new BsonJsonValueSerializer());
-        }
-        catch (BsonSerializationException)
-        {
-            return;
-        }
+        BsonSerializer.TryRegisterSerializer(new BsonJsonValueSerializer());
     }
 
     public override JsonValue Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)

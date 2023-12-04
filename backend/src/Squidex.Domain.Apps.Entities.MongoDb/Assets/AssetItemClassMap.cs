@@ -14,21 +14,13 @@ internal static class AssetItemClassMap
 {
     public static void Register()
     {
-        EntityClassMap.Register();
-
         BsonClassMap.TryRegisterClassMap<AssetItem>(cm =>
         {
             cm.MapProperty(x => x.ParentId)
                 .SetElementName("pi")
                 .SetIgnoreIfDefault(true);
-
-            cm.MapProperty(x => x.AppId)
-                .SetElementName("ai")
-                .SetIsRequired(true);
-
-            cm.MapProperty(x => x.IsDeleted)
-                .SetElementName("dl")
-                .SetIsRequired(true);
         });
+
+        EntityClassMap.Register();
     }
 }

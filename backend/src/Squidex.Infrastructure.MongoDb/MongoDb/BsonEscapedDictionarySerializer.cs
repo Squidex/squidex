@@ -18,7 +18,7 @@ public sealed class BsonEscapedDictionarySerializer<TValue, TInstance> : ClassSe
     {
         try
         {
-            BsonSerializer.RegisterSerializer(new BsonEscapedDictionarySerializer<TValue, TInstance>());
+            BsonSerializer.TryRegisterSerializer(new BsonEscapedDictionarySerializer<TValue, TInstance>());
         }
         catch (BsonSerializationException)
         {

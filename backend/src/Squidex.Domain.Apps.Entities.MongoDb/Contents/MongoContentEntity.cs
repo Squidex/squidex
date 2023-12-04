@@ -72,16 +72,8 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 
         BsonClassMap.TryRegisterClassMap<Content>(cm =>
         {
-            cm.MapProperty(x => x.AppId)
-                .SetElementName("ai")
-                .SetIsRequired(true);
-
             cm.MapProperty(x => x.SchemaId)
                 .SetElementName("si")
-                .SetIsRequired(true);
-
-            cm.MapProperty(x => x.IsDeleted)
-                .SetElementName("dl")
                 .SetIsRequired(true);
 
             cm.MapProperty(x => x.Data)
@@ -110,11 +102,11 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
         {
             return new WriteContent
             {
+                Id = Id,
                 AppId = AppId,
                 Created = Created,
                 CreatedBy = CreatedBy,
                 CurrentVersion = new ContentVersion(Status, NewData),
-                Id = Id,
                 IsDeleted = IsDeleted,
                 LastModified = LastModified,
                 LastModifiedBy = LastModifiedBy,
@@ -128,11 +120,11 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
         {
             return new WriteContent
             {
+                Id = Id,
                 AppId = AppId,
                 Created = Created,
                 CreatedBy = CreatedBy,
                 CurrentVersion = new ContentVersion(Status, Data),
-                Id = Id,
                 IsDeleted = IsDeleted,
                 LastModified = LastModified,
                 LastModifiedBy = LastModifiedBy,
@@ -153,14 +145,14 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 
         return new MongoContentEntity
         {
-            DocumentId = source.UniqueId,
+            Id = source.Id,
+            DocumentId = job.Key,
             IndexedAppId = source.AppId.Id,
             IndexedSchemaId = source.SchemaId.Id,
             AppId = source.AppId,
             Created = source.Created,
             CreatedBy = source.CreatedBy,
             Data = source.CurrentVersion.Data,
-            Id = source.Id,
             IsDeleted = source.IsDeleted,
             IsSnapshot = false,
             LastModified = source.LastModified,
@@ -186,14 +178,14 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 
         return new MongoContentEntity
         {
-            DocumentId = source.UniqueId,
+            Id = source.Id,
+            DocumentId = job.Key,
             IndexedAppId = source.AppId.Id,
             IndexedSchemaId = source.SchemaId.Id,
             AppId = source.AppId,
             Created = source.Created,
             CreatedBy = source.CreatedBy,
             Data = source.EditingData,
-            Id = source.Id,
             IsDeleted = source.IsDeleted,
             IsSnapshot = true,
             LastModified = source.LastModified,
