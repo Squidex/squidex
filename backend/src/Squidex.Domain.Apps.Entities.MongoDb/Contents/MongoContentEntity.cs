@@ -85,7 +85,7 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
                 .SetIgnoreIfNull(true);
 
             cm.MapProperty(x => x.Status)
-                .SetElementName("st")
+                .SetElementName("ss")
                 .SetIsRequired(true);
 
             cm.MapProperty(x => x.ScheduleJob)
