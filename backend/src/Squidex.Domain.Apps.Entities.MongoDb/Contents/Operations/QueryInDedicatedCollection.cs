@@ -123,7 +123,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
     {
         var collection = await GetCollectionAsync(job.Value.AppId.Id, job.Value.SchemaId.Id);
 
-        await collection.UpsertVersionedAsync(session, job, ct);
+        await collection.UpsertVersionedAsync(session, job, Field.Of<MongoContentEntity>(x => nameof(x.Version)), ct);
     }
 
     public async Task RemoveAsync(MongoContentEntity value,

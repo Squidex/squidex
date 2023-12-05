@@ -14,16 +14,15 @@ namespace Squidex.Infrastructure.MongoDb;
 
 public sealed class BsonEscapedDictionarySerializer<TValue, TInstance> : ClassSerializerBase<TInstance> where TInstance : Dictionary<string, TValue?>, new()
 {
+    private static readonly BsonEscapedDictionarySerializer<TValue, TInstance> Instance = new BsonEscapedDictionarySerializer<TValue, TInstance>();
+
     public static void Register()
     {
-        try
-        {
-            BsonSerializer.TryRegisterSerializer(new BsonEscapedDictionarySerializer<TValue, TInstance>());
-        }
-        catch (BsonSerializationException)
-        {
-            return;
-        }
+        BsonSerializer.TryRegisterSerializer(Instance);
+    }
+
+    private BsonEscapedDictionarySerializer()
+    {
     }
 
     protected override TInstance DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)

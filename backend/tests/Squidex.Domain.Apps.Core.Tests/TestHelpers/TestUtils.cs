@@ -104,7 +104,6 @@ public static class TestUtils
         // It is also a readonly list, so we have to register it first, so that other converters do not pick this up.
         options.Converters.Add(new StringConverter<PropertyPath>(x => x));
 
-        options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new GeoJsonConverterFactory());
         options.Converters.Add(new PolymorphicConverter<IEvent>(TypeRegistry));
@@ -199,9 +198,48 @@ public static class TestUtils
         return DefaultSerializer.Deserialize<ObjectHolder<T>>(json).Value1;
     }
 
+    public static string SerializeWithoutNulls<T>(this T value)
+    {
+        var options = DefaultOptions(options =>
+        {
+            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        });
+
+        return new SystemJsonSerializer(options).Serialize(value, true).CleanJson();
+    }
+
     public static string CleanJson(this string json)
     {
-        using var document = JsonDocument.Parse(json);
+        var document = System.Text.Json.Nodes.JsonNode.Parse(json);
+
+        static void Handle(System.Text.Json.Nodes.JsonNode? node)
+        {
+            if (node is System.Text.Json.Nodes.JsonArray array)
+            {
+                foreach (var item in array)
+                {
+                    Handle(item);
+                }
+            }
+            else if (node is System.Text.Json.Nodes.JsonObject obj)
+            {
+                var properties = obj.ToList();
+
+                foreach (var (key, _) in properties)
+                {
+                    obj.Remove(key);
+                }
+
+                foreach (var (key, value) in properties.OrderBy(x => x.Key))
+                {
+                    Handle(value);
+
+                    obj.Add(key, value);
+                }
+            }
+        }
+
+        Handle(document?.Root);
 
         return DefaultSerializer.Serialize(document, true);
     }

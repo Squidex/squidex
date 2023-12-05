@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json;
@@ -13,9 +14,18 @@ public sealed class WorkflowTransitionSurrogate : ISurrogate<WorkflowTransition>
 {
     public string? Expression { get; set; }
 
-    public string? Role { get; set; }
-
     public string[]? Roles { get; set; }
+
+    public string? Role
+    {
+        set
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                Roles = [value];
+            }
+        }
+    }
 
     public void FromSource(WorkflowTransition source)
     {
@@ -27,11 +37,6 @@ public sealed class WorkflowTransitionSurrogate : ISurrogate<WorkflowTransition>
     public WorkflowTransition ToSource()
     {
         var roles = Roles;
-
-        if (!string.IsNullOrEmpty(Role))
-        {
-            roles = [Role];
-        }
 
         return WorkflowTransition.When(Expression, roles);
     }

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
@@ -281,7 +282,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
             await queryInDedicatedCollection.UpsertVersionedAsync(session, job, ct);
         }
 
-        await Collection.UpsertVersionedAsync(session, job, ct);
+        await Collection.UpsertVersionedAsync(session, job, Field.Of<MongoContentEntity>(x => nameof(x.Version)), ct);
     }
 
     public async Task RemoveAsync(DomainId key,

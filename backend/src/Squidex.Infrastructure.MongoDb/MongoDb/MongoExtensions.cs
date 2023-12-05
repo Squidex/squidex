@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Infrastructure.States;
 
@@ -119,19 +120,21 @@ public static class MongoExtensions
         }
     }
 
-    public static async Task<bool> UpsertVersionedAsync<T>(this IMongoCollection<T> collection, IClientSessionHandle session, SnapshotWriteJob<T> job,
+    public static async Task<bool> UpsertVersionedAsync<T>(this IMongoCollection<T> collection, IClientSessionHandle session, SnapshotWriteJob<T> job, string versionField,
         CancellationToken ct = default)
         where T : IVersionedEntity<DomainId>
     {
-        var field2 = Field.Of<T>(x => nameof(x.Version));
+        var filters = Builders<T>.Filter;
 
-        var (key, snapshot, newVersion, oldVersion) = job;
+        var (key, snapshot, _, oldVersion) = job;
         try
         {
-            Expression<Func<T, bool>> filter =
-                oldVersion > EtagVersion.Any ?
-                x => x.DocumentId.Equals(key) && x.Version == oldVersion :
-                x => x.DocumentId.Equals(key);
+            var filter = filters.Eq("_id", key);
+
+            if (oldVersion > EtagVersion.Any)
+            {
+                filter = filters.And(filters.Eq(versionField, oldVersion));
+            }
 
             var result = await collection.ReplaceOneAsync(session, filter, job.Value, UpsertReplace, ct);
 
@@ -140,7 +143,7 @@ public static class MongoExtensions
         catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
         {
             var existingVersion =
-                await collection.Find(session, x => x.DocumentId.Equals(key)).Only(x => x.DocumentId, x => x.Version)
+                await collection.Find(session, filters.Eq("_id", key)).Project<BsonDocument>(Builders<T>.Projection.Include("_id").Include(versionField))
                     .FirstOrDefaultAsync(ct);
 
             if (existingVersion != null)
@@ -156,28 +159,42 @@ public static class MongoExtensions
         }
     }
 
-    public static async Task<bool> UpsertVersionedAsync<T>(this IMongoCollection<T> collection, SnapshotWriteJob<T> job,
+    public static async Task<bool> UpsertVersionedAsync<T>(this IMongoCollection<T> collection, SnapshotWriteJob<T> job, string versionField,
         CancellationToken ct = default)
         where T : IVersionedEntity<DomainId>
     {
-        var field2 = Field.Of<T>(x => nameof(x.Version));
+        var filters = Builders<T>.Filter;
 
-        var (key, snapshot, newVersion, oldVersion) = job;
+        var (key, snapshot, _, oldVersion) = job;
         try
         {
-            Expression<Func<T, bool>> filter =
+
+            Expression<Func<T, bool>> filter2 =
                 oldVersion > EtagVersion.Any ?
                 x => x.DocumentId.Equals(key) && x.Version == oldVersion :
                 x => x.DocumentId.Equals(key);
 
-            var result = await collection.ReplaceOneAsync(filter, snapshot, UpsertReplace, ct);
+            var filter = filters.Eq(x => x.DocumentId, key);
+
+            if (oldVersion > EtagVersion.Any)
+            {
+                filter = filters.And(filter, filters.Eq(versionField, oldVersion));
+            }
+
+            var rendered =
+                filter.Render(
+                    BsonSerializer.SerializerRegistry.GetSerializer<T>(),
+                    BsonSerializer.SerializerRegistry)
+                .ToString();
+
+            var result = await collection.ReplaceOneAsync(filter, job.Value, UpsertReplace, ct);
 
             return result.IsAcknowledged && result.ModifiedCount == 1;
         }
         catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
         {
             var existingVersion =
-                await collection.Find(x => x.DocumentId.Equals(key)).Only(x => x.DocumentId, x => x.Version)
+                await collection.Find(filters.Eq("_id", key)).Project<BsonDocument>(Builders<T>.Projection.Include("_id").Include(versionField))
                     .FirstOrDefaultAsync(ct);
 
             if (existingVersion != null)

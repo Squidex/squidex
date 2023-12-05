@@ -18,6 +18,6 @@ public record AppEntity : Entity
 
     public override DomainId UniqueId
     {
-        get => DomainId.Combine(AppId.Id, Id);
+        get => DomainId.Combine(AppId?.Id ?? default, Id);
     }
 }

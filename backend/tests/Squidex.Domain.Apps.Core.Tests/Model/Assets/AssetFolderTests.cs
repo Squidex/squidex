@@ -66,7 +66,7 @@ public class AssetFolderTests
     {
         var json = File.ReadAllText("Model/Assets/AssetFolder.json").CleanJson();
 
-        var serialized = TestUtils.DefaultSerializer.Serialize(TestUtils.DefaultSerializer.Deserialize<AssetFolder>(json), true);
+        var serialized = TestUtils.SerializeWithoutNulls(TestUtils.DefaultSerializer.Deserialize<AssetFolder>(json));
 
         Assert.Equal(json, serialized);
     }

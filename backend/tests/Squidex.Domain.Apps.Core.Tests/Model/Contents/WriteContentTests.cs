@@ -99,7 +99,7 @@ public class WriteContentTests
     {
         var json = File.ReadAllText("Model/Contents/WriteContent.json").CleanJson();
 
-        var serialized = TestUtils.DefaultSerializer.Serialize(TestUtils.DefaultSerializer.Deserialize<WriteContent>(json), true);
+        var serialized = TestUtils.SerializeWithoutNulls(TestUtils.DefaultSerializer.Deserialize<WriteContent>(json));
 
         Assert.Equal(json, serialized);
     }

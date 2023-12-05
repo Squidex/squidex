@@ -67,9 +67,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Update="Apps\DomainObject\AppState.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Assets\TestFiles\SampleAudio_0.4mb.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

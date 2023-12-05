@@ -230,7 +230,7 @@ public class AppTests
     {
         var json = File.ReadAllText("Model/Apps/App.json").CleanJson();
 
-        var serialized = TestUtils.DefaultSerializer.Serialize(TestUtils.DefaultSerializer.Deserialize<App>(json), true);
+        var serialized = TestUtils.SerializeWithoutNulls(TestUtils.DefaultSerializer.Deserialize<App>(json));
 
         Assert.Equal(json, serialized);
     }

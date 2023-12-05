@@ -56,8 +56,8 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         {
             Name = SchemaId.Name,
             SchemaId = SchemaId.Id,
-            Properties = new SchemaProperties(),
-            Type = SchemaType.Singleton
+            Scripts = null!,
+            Properties = new SchemaProperties()
         };
 
         var actual = await PublishAsync(command);
@@ -65,11 +65,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         actual.ShouldBeEquivalent(sut.Snapshot);
 
         Assert.Equal(AppId, sut.Snapshot.AppId);
-
+        Assert.Equal(SchemaId.Id, sut.Snapshot.Id);
         Assert.Equal(SchemaId.Name, sut.Snapshot.Name);
-        Assert.Equal(SchemaType.Singleton, sut.Snapshot.Type);
+        Assert.Equal(SchemaType.Default, sut.Snapshot.Type);
 
-        var schema = new Schema { Name = command.Name, Properties = command.Properties, Type = SchemaType.Singleton };
+        var schema = new Schema { Name = command.Name, Properties = command.Properties };
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -110,9 +110,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var @event = (SchemaCreated)LastEvents.Single().Payload;
 
         Assert.Equal(AppId, sut.Snapshot.AppId);
+        Assert.Equal(SchemaId.Id, sut.Snapshot.Id);
         Assert.Equal(SchemaId.Name, sut.Snapshot.Name);
         Assert.Equal(SchemaType.Default, sut.Snapshot.Type);
-
         Assert.Equal(3, @event.Schema.Fields.Count);
     }
 

@@ -14,9 +14,15 @@ namespace Squidex.Infrastructure.MongoDb;
 
 public sealed class BsonJsonValueSerializer : SerializerBase<JsonValue>
 {
+    private static readonly BsonJsonValueSerializer Instance = new BsonJsonValueSerializer();
+
     public static void Register()
     {
-        BsonSerializer.TryRegisterSerializer(new BsonJsonValueSerializer());
+        BsonSerializer.TryRegisterSerializer(Instance);
+    }
+
+    private BsonJsonValueSerializer()
+    {
     }
 
     public override JsonValue Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)

@@ -497,7 +497,7 @@ public class SchemaTests
     {
         var json = File.ReadAllText("Model/Schemas/Schema.json").CleanJson();
 
-        var serialized = TestUtils.DefaultSerializer.Serialize(TestUtils.DefaultSerializer.Deserialize<Schema>(json), true);
+        var serialized = TestUtils.SerializeWithoutNulls(TestUtils.DefaultSerializer.Deserialize<Schema>(json));
 
         Assert.Equal(json, serialized);
     }

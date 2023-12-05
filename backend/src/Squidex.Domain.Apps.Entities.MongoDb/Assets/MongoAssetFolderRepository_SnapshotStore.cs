@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Translations;
 
 #pragma warning disable MA0048 // File name must match type name
 
@@ -57,7 +58,7 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
         {
             var entityJob = job.As(MongoAssetFolderEntity.Create(job));
 
-            await Collection.UpsertVersionedAsync(entityJob, ct);
+            await Collection.UpsertVersionedAsync(entityJob, Field.Of<AssetFolder>(x => nameof(x.Version)), ct);
         }
     }
 

@@ -101,7 +101,8 @@ public class PolymorphicConverterTests
                     .Add<Base, A>("A")
                     .Add<Base, B>("B");
 
-            options.TypeInfoResolver?.WithAddedModifier(PolymorphicConverter<None>.Modifier(typeRegistry));
+            options.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+                .WithAddedModifier(PolymorphicConverter<None>.Modifier(typeRegistry));
             options.Converters.Add(new PolymorphicConverter<Base>(typeRegistry));
         });
     }

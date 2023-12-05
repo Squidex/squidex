@@ -27,7 +27,7 @@ public class ContentTests
     {
         var json = File.ReadAllText("Model/Contents/Content.json").CleanJson();
 
-        var serialized = TestUtils.DefaultSerializer.Serialize(TestUtils.DefaultSerializer.Deserialize<Content>(json), true);
+        var serialized = TestUtils.SerializeWithoutNulls(TestUtils.DefaultSerializer.Deserialize<Content>(json));
 
         Assert.Equal(json, serialized);
     }

@@ -180,7 +180,7 @@ public class RuleTests
     {
         var json = File.ReadAllText("Model/Rules/Rule.json").CleanJson();
 
-        var serialized = TestUtils.DefaultSerializer.Serialize(TestUtils.DefaultSerializer.Deserialize<Rule>(json), true);
+        var serialized = TestUtils.SerializeWithoutNulls(TestUtils.DefaultSerializer.Deserialize<Rule>(json));
 
         Assert.Equal(json, serialized);
     }
