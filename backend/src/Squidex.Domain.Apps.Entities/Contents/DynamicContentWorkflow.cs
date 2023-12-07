@@ -7,8 +7,8 @@
 
 using System.Security.Claims;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
@@ -25,35 +25,28 @@ public sealed class DynamicContentWorkflow : IContentWorkflow
         this.appProvider = appProvider;
     }
 
-    public async ValueTask<StatusInfo[]> GetAllAsync(ISchemaEntity schema)
+    public async ValueTask<StatusInfo[]> GetAllAsync(Schema schema)
     {
         var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
         return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
     }
 
-    public async ValueTask<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user)
+    public async ValueTask<bool> CanPublishInitialAsync(Schema schema, ClaimsPrincipal? user)
     {
         var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
         return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, null, user);
     }
 
-    public async ValueTask<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
-    {
-        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-        return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, data, user);
-    }
-
-    public async ValueTask<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user)
+    public async ValueTask<bool> CanMoveToAsync(Content content, Status status, Status next, ClaimsPrincipal? user)
     {
         var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
         return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
     }
 
-    public async ValueTask<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
+    public async ValueTask<bool> CanUpdateAsync(Content content, Status status, ClaimsPrincipal? user)
     {
         var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
@@ -65,7 +58,7 @@ public sealed class DynamicContentWorkflow : IContentWorkflow
         return true;
     }
 
-    public async ValueTask<bool> ShouldValidateAsync(ISchemaEntity schema, Status status)
+    public async ValueTask<bool> ShouldValidateAsync(Schema schema, Status status)
     {
         var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
@@ -74,10 +67,10 @@ public sealed class DynamicContentWorkflow : IContentWorkflow
             return true;
         }
 
-        return status == Status.Published && schema.SchemaDef.Properties.ValidateOnPublish;
+        return status == Status.Published && schema.Properties.ValidateOnPublish;
     }
 
-    public async ValueTask<StatusInfo?> GetInfoAsync(IContentEntity content, Status status)
+    public async ValueTask<StatusInfo?> GetInfoAsync(Content content, Status status)
     {
         var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
@@ -89,7 +82,7 @@ public sealed class DynamicContentWorkflow : IContentWorkflow
         return null;
     }
 
-    public async ValueTask<Status> GetInitialStatusAsync(ISchemaEntity schema)
+    public async ValueTask<Status> GetInitialStatusAsync(Schema schema)
     {
         var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
@@ -98,7 +91,7 @@ public sealed class DynamicContentWorkflow : IContentWorkflow
         return status;
     }
 
-    public async ValueTask<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
+    public async ValueTask<StatusInfo[]> GetNextAsync(Content content, Status status, ClaimsPrincipal? user)
     {
         var result = new List<StatusInfo>();
 

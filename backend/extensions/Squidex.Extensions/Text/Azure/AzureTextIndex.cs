@@ -9,7 +9,7 @@ using Azure;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Models;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Hosting;
@@ -70,7 +70,7 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
         await searchClient.IndexDocumentsAsync(batch, cancellationToken: ct);
     }
 
-    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(App app, GeoQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -83,7 +83,7 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
         return result.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
     }
 
-    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -129,7 +129,7 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
         return SearchAsync(result, text, filter, take, factor, ct);
     }
 
-    private Task SearchByAppAsync(List<(DomainId, double)> result, string text, IAppEntity app, SearchScope scope, int take, double factor,
+    private Task SearchByAppAsync(List<(DomainId, double)> result, string text, App app, SearchScope scope, int take, double factor,
         CancellationToken ct = default)
     {
         var searchField = GetServeField(scope);

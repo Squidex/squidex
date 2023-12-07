@@ -15,7 +15,7 @@ public interface IRuleRunnerService
     Task<List<SimulatedRuleEvent>> SimulateAsync(NamedId<DomainId> appId, DomainId ruleId, Rule rule,
         CancellationToken ct = default);
 
-    Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
+    Task<List<SimulatedRuleEvent>> SimulateAsync(Rule rule,
         CancellationToken ct = default);
 
     Task RunAsync(DomainId appId, DomainId ruleId, bool fromSnapshots = false,
@@ -27,7 +27,7 @@ public interface IRuleRunnerService
     Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,
         CancellationToken ct = default);
 
-    bool CanRunRule(IRuleEntity rule);
+    bool CanRunRule(Rule rule);
 
-    bool CanRunFromSnapshots(IRuleEntity rule);
+    bool CanRunFromSnapshots(Rule rule);
 }

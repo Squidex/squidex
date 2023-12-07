@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
@@ -34,7 +34,7 @@ public sealed class AssetFolderDto : Resource
     /// </summary>
     public long Version { get; set; }
 
-    public static AssetFolderDto FromDomain(IAssetFolderEntity asset, Resources resources)
+    public static AssetFolderDto FromDomain(AssetFolder asset, Resources resources)
     {
         var result = SimpleMapper.Map(asset, new AssetFolderDto());
 

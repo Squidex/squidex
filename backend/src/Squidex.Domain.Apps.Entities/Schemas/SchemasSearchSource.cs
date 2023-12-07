@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
@@ -44,13 +44,13 @@ public sealed class SchemasSearchSource : ISearchSource
         {
             var schemaId = schema.NamedId();
 
-            var name = schema.SchemaDef.DisplayNameUnchanged();
+            var name = schema.DisplayName();
 
             if (name.Contains(query, StringComparison.OrdinalIgnoreCase))
             {
                 AddSchemaUrl(result, appId, schemaId, name);
 
-                if (schema.SchemaDef.Type != SchemaType.Component && HasPermission(context, schemaId))
+                if (schema.Type != SchemaType.Component && HasPermission(context, schemaId))
                 {
                     AddContentsUrl(result, appId, schema, schemaId, name);
                 }
@@ -67,9 +67,9 @@ public sealed class SchemasSearchSource : ISearchSource
         result.Add(T.Get("search.schemaResult", new { name }), SearchResultType.Schema, schemaUrl);
     }
 
-    private void AddContentsUrl(SearchResults result, NamedId<DomainId> appId, ISchemaEntity schema, NamedId<DomainId> schemaId, string name)
+    private void AddContentsUrl(SearchResults result, NamedId<DomainId> appId, Schema schema, NamedId<DomainId> schemaId, string name)
     {
-        if (schema.SchemaDef.Type == SchemaType.Singleton)
+        if (schema.Type == SchemaType.Singleton)
         {
             var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
 

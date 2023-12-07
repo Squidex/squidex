@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
@@ -39,9 +39,9 @@ public sealed class InviteUserCommandMiddleware : ICommandMiddleware
 
             await next(context, ct);
 
-            if (created && context.PlainResult is IAppEntity app)
+            if (created && context.PlainResult is App app)
             {
-                context.Complete(new InvitedResult<IAppEntity> { Entity = app });
+                context.Complete(new InvitedResult<App> { Entity = app });
             }
         }
         else if (context.Command is AssignTeamContributor assignTeamContributor)
@@ -56,9 +56,9 @@ public sealed class InviteUserCommandMiddleware : ICommandMiddleware
 
             await next(context, ct);
 
-            if (created && context.PlainResult is ITeamEntity team)
+            if (created && context.PlainResult is Team team)
             {
-                context.Complete(new InvitedResult<ITeamEntity> { Entity = team });
+                context.Complete(new InvitedResult<Team> { Entity = team });
             }
         }
         else

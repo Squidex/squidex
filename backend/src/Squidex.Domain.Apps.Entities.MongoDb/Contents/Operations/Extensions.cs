@@ -10,6 +10,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
@@ -35,7 +36,7 @@ public static class Extensions
         get => propertyMap ??=
             BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).AllMemberMaps
                 .Where(x =>
-                    x.MemberName != nameof(MongoContentEntity.DraftData) &&
+                    x.MemberName != nameof(MongoContentEntity.NewData) &&
                     x.MemberName != nameof(MongoContentEntity.Data))
                 .ToDictionary(
                     x => x.MemberName,
@@ -179,11 +180,18 @@ public static class Extensions
 
         if (fields?.Any() == true)
         {
-            var dataField = Field.Of<MongoContentEntity>(x => nameof(x.Data));
+            var dataPrefix = Field.Of<MongoContentEntity>(x => nameof(x.Data));
 
             foreach (var field in fields)
             {
-                projections.Add(projector.Include($"{dataField}.{field}"));
+                var dataField = field;
+
+                if (FieldNames.IsDataField(field, out var fieldName))
+                {
+                    dataField = fieldName;
+                }
+
+                projections.Add(projector.Include($"{dataPrefix}.{dataField}"));
             }
 
             foreach (var field in PropertyMap.Values)
@@ -193,7 +201,7 @@ public static class Extensions
         }
         else
         {
-            projections.Add(projector.Exclude(Field.Of<MongoContentEntity>(x => nameof(x.DraftData))));
+            projections.Add(projector.Exclude(Field.Of<MongoContentEntity>(x => nameof(x.NewData))));
         }
 
         return projector.Combine(projections);

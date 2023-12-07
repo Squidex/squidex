@@ -7,7 +7,7 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -211,7 +211,7 @@ public static class TestContent
               }
             }";
 
-    public static IEnrichedContentEntity Create(DomainId id, DomainId refId = default, DomainId assetId = default, ContentData? data = null)
+    public static EnrichedContent Create(DomainId id, DomainId refId = default, DomainId assetId = default, ContentData? data = null)
     {
         var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -261,7 +261,7 @@ public static class TestContent
                         .AddInvariant(
                             JsonValue.Object()
                                 .Add(Component.Discriminator, TestSchemas.Component.Id)
-                                .Add(Component.Descriptor, TestSchemas.Component.SchemaDef.Name)
+                                .Add(Component.Descriptor, TestSchemas.Component.Name)
                                 .Add("component-field", "Component1")))
                 .AddField("my-components",
                     new ContentFieldData()
@@ -269,15 +269,15 @@ public static class TestContent
                             JsonValue.Array(
                                 JsonValue.Object()
                                     .Add(Component.Discriminator, TestSchemas.Reference1.Id)
-                                    .Add(Component.Descriptor, TestSchemas.Reference1.SchemaDef.Name)
+                                    .Add(Component.Descriptor, TestSchemas.Reference1.Name)
                                     .Add("reference1-field", "Component1"),
                                 JsonValue.Object()
                                     .Add(Component.Discriminator, TestSchemas.Reference2.Id)
-                                    .Add(Component.Descriptor, TestSchemas.Reference2.SchemaDef.Name)
+                                    .Add(Component.Descriptor, TestSchemas.Reference2.Name)
                                     .Add("reference2-field", "Component2"),
                                 JsonValue.Object()
                                     .Add(Component.Discriminator, TestSchemas.Component.Id)
-                                    .Add(Component.Descriptor, TestSchemas.Component.SchemaDef.Name)
+                                    .Add(Component.Descriptor, TestSchemas.Component.Name)
                                     .Add("component-field", "Component3"))))
                 .AddField("my-json",
                     new ContentFieldData()
@@ -325,7 +325,7 @@ public static class TestContent
                     .AddInvariant(JsonValue.Create($"assets:{assetId}, contents:{refId}")));
         }
 
-        var content = new ContentEntity
+        var content = new EnrichedContent
         {
             Id = id,
             AppId = TestApp.DefaultId,
@@ -346,7 +346,7 @@ public static class TestContent
         return content;
     }
 
-    public static IEnrichedContentEntity CreateSimple(NamedId<DomainId> schemaId, DomainId id, string field, string value)
+    public static EnrichedContent CreateSimple(NamedId<DomainId> schemaId, DomainId id, string field, string value)
     {
         var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -356,7 +356,7 @@ public static class TestContent
                     new ContentFieldData()
                         .AddInvariant(value));
 
-        var content = new ContentEntity
+        var content = new EnrichedContent
         {
             Id = id,
             AppId = TestApp.DefaultId,
@@ -377,7 +377,7 @@ public static class TestContent
         return content;
     }
 
-    public static object Response(IEnrichedContentEntity content)
+    public static object Response(EnrichedContent content)
     {
         return new
         {
@@ -409,7 +409,7 @@ public static class TestContent
         };
     }
 
-    public static object FlatResponse(IEnrichedContentEntity content)
+    public static object FlatResponse(EnrichedContent content)
     {
         return new
         {
@@ -441,7 +441,7 @@ public static class TestContent
         };
     }
 
-    public static object Input(IContentEntity content, DomainId refId = default, DomainId assetId = default)
+    public static object Input(EnrichedContent content, DomainId refId = default, DomainId assetId = default)
     {
         var actual = new Dictionary<string, object>
         {
@@ -508,7 +508,7 @@ public static class TestContent
                 iv = new Dictionary<string, object>
                 {
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["schemaName"] = TestSchemas.Component.Name,
                     ["componentField"] = "Component1"
                 }
             },
@@ -519,19 +519,19 @@ public static class TestContent
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                        ["schemaName"] = TestSchemas.Reference1.Name,
                         ["reference1Field"] = "Component1"
                     },
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                        ["schemaName"] = TestSchemas.Reference2.Name,
                         ["reference2Field"] = "Component2"
                     },
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                        ["schemaName"] = TestSchemas.Component.Name,
                         ["componentField"] = "Component3"
                     }
                 }
@@ -611,7 +611,7 @@ public static class TestContent
         return actual;
     }
 
-    private static object Data(IContentEntity content)
+    private static object Data(EnrichedContent content)
     {
         var actual = new Dictionary<string, object>
         {
@@ -681,7 +681,7 @@ public static class TestContent
                 iv = new Dictionary<string, object>
                 {
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["schemaName"] = TestSchemas.Component.Name,
                     ["component-field"] = "Component1"
                 }
             },
@@ -690,7 +690,7 @@ public static class TestContent
                 iv = new Dictionary<string, object>
                 {
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["schemaName"] = TestSchemas.Component.Name,
                     ["componentField"] = "Component1"
                 }
             },
@@ -701,19 +701,19 @@ public static class TestContent
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                        ["schemaName"] = TestSchemas.Reference1.Name,
                         ["reference1-field"] = "Component1"
                     },
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                        ["schemaName"] = TestSchemas.Reference2.Name,
                         ["reference2-field"] = "Component2"
                     },
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                        ["schemaName"] = TestSchemas.Component.Name,
                         ["component-field"] = "Component3"
                     }
                 }
@@ -726,21 +726,21 @@ public static class TestContent
                     {
                         ["__typename"] = "MyReference1Component",
                         ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                        ["schemaName"] = TestSchemas.Reference1.Name,
                         ["reference1Field"] = "Component1"
                     },
                     new Dictionary<string, object>
                     {
                         ["__typename"] = "MyReference2Component",
                         ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                        ["schemaName"] = TestSchemas.Reference2.Name,
                         ["reference2Field"] = "Component2"
                     },
                     new Dictionary<string, object>
                     {
                         ["__typename"] = "MyComponentComponent",
                         ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                        ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                        ["schemaName"] = TestSchemas.Component.Name,
                         ["componentField"] = "Component3"
                     }
                 }
@@ -782,7 +782,7 @@ public static class TestContent
         return actual;
     }
 
-    private static object FlatData(IContentEntity content)
+    private static object FlatData(EnrichedContent content)
     {
         var actual = new Dictionary<string, object?>
         {
@@ -823,13 +823,13 @@ public static class TestContent
             ["myComponent__Dynamic"] = new Dictionary<string, object>
             {
                 ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                ["schemaName"] = TestSchemas.Component.Name,
                 ["component-field"] = "Component1"
             },
             ["myComponent"] = new Dictionary<string, object>
             {
                 ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                ["schemaName"] = TestSchemas.Component.Name,
                 ["componentField"] = "Component1"
             },
             ["myComponents__Dynamic"] = new[]
@@ -837,19 +837,19 @@ public static class TestContent
                 new Dictionary<string, object>
                 {
                     ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                    ["schemaName"] = TestSchemas.Reference1.Name,
                     ["reference1-field"] = "Component1"
                 },
                 new Dictionary<string, object>
                 {
                     ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                    ["schemaName"] = TestSchemas.Reference2.Name,
                     ["reference2-field"] = "Component2"
                 },
                 new Dictionary<string, object>
                 {
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["schemaName"] = TestSchemas.Component.Name,
                     ["component-field"] = "Component3"
                 }
             },
@@ -859,21 +859,21 @@ public static class TestContent
                 {
                     ["__typename"] = "MyReference1Component",
                     ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Reference1.SchemaDef.Name,
+                    ["schemaName"] = TestSchemas.Reference1.Name,
                     ["reference1Field"] = "Component1"
                 },
                 new Dictionary<string, object>
                 {
                     ["__typename"] = "MyReference2Component",
                     ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Reference2.SchemaDef.Name,
+                    ["schemaName"] = TestSchemas.Reference2.Name,
                     ["reference2Field"] = "Component2"
                 },
                 new Dictionary<string, object>
                 {
                     ["__typename"] = "MyComponentComponent",
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
-                    ["schemaName"] = TestSchemas.Component.SchemaDef.Name,
+                    ["schemaName"] = TestSchemas.Component.Name,
                     ["componentField"] = "Component3"
                 }
             },

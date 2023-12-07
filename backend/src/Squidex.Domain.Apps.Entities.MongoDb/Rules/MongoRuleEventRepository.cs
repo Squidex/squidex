@@ -7,8 +7,8 @@
 
 using MongoDB.Driver;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
@@ -49,7 +49,7 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
         }, ct);
     }
 
-    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
@@ -86,7 +86,7 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
         CancellationToken ct = default)
     {
         var ruleEvent =
-            await Collection.Find(x => x.JobId == id)
+            await Collection.Find(x => x.Id == id)
                 .FirstOrDefaultAsync(ct);
 
         return ruleEvent;
@@ -95,13 +95,13 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
     public Task EnqueueAsync(DomainId id, Instant nextAttempt,
         CancellationToken ct = default)
     {
-        return Collection.UpdateOneAsync(x => x.JobId == id, Update.Set(x => x.NextAttempt, nextAttempt), cancellationToken: ct);
+        return Collection.UpdateOneAsync(x => x.Id == id, Update.Set(x => x.NextAttempt, nextAttempt), cancellationToken: ct);
     }
 
     public Task CancelByEventAsync(DomainId id,
         CancellationToken ct = default)
     {
-        return Collection.UpdateOneAsync(x => x.JobId == id,
+        return Collection.UpdateOneAsync(x => x.Id == id,
             Update
                 .Set(x => x.NextAttempt, null)
                 .Set(x => x.JobResult, RuleJobResult.Cancelled),
@@ -134,7 +134,7 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
         Guard.NotNull(job);
         Guard.NotNull(update);
 
-        return Collection.UpdateOneAsync(x => x.JobId == job.Id,
+        return Collection.UpdateOneAsync(x => x.Id == job.Id,
             Update
                 .Set(x => x.Result, update.ExecutionResult)
                 .Set(x => x.LastDump, update.ExecutionDump)

@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -15,7 +16,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderDomainObject.State>
+public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolder>
 {
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
@@ -31,7 +32,7 @@ public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderDomainObj
     public AssetFolderDomainObjectTests()
     {
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, A<CancellationToken>._))
-            .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
+            .Returns(new List<AssetFolder> { A.Fake<AssetFolder>() });
 
         var log = A.Fake<ILogger<AssetFolderDomainObject>>();
 

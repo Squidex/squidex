@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 
 public static class GuardAppContributors
 {
-    public static Task CanAssign(AssignContributor command, IAppEntity app, IUserResolver users, Plan plan)
+    public static Task CanAssign(AssignContributor command, App app, IUserResolver users, Plan plan)
     {
         Guard.NotNull(command);
 
@@ -59,7 +59,7 @@ public static class GuardAppContributors
         });
     }
 
-    public static void CanRemove(RemoveContributor command, IAppEntity app)
+    public static void CanRemove(RemoveContributor command, App app)
     {
         Guard.NotNull(command);
 

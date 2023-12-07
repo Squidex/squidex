@@ -38,8 +38,6 @@ public sealed class SynchronizeSchema : SchemaCommand, IUpsertCommand, IAggregat
 
     public Schema BuildSchema(string name, SchemaType type)
     {
-        IUpsertCommand self = this;
-
-        return self.ToSchema(name, type);
+        return ((IUpsertCommand)this).ToSchema(name, type);
     }
 }

@@ -11,29 +11,31 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas;
 
-public sealed class Schema
+public record Schema : AppEntity
 {
-    public SchemaType Type { get; }
+    public SchemaType Type { get; init; }
 
-    public string Name { get; }
+    public string Name { get; init; }
 
-    public string? Category { get; private set; }
+    public string? Category { get; init; }
 
-    public bool IsPublished { get; private set; }
+    public bool IsPublished { get; init; }
 
-    public FieldCollection<RootField> FieldCollection { get; private set; } = FieldCollection<RootField>.Empty;
+    public FieldCollection<RootField> FieldCollection { get; init; } = FieldCollection<RootField>.Empty;
 
-    public FieldRules FieldRules { get; private set; } = FieldRules.Empty;
+    public FieldRules FieldRules { get; init; } = FieldRules.Empty;
 
-    public FieldNames FieldsInLists { get; private set; } = FieldNames.Empty;
+    public FieldNames FieldsInLists { get; init; } = FieldNames.Empty;
 
-    public FieldNames FieldsInReferences { get; private set; } = FieldNames.Empty;
+    public FieldNames FieldsInReferences { get; init; } = FieldNames.Empty;
 
-    public SchemaScripts Scripts { get; private set; } = new SchemaScripts();
+    public SchemaScripts Scripts { get; init; } = new SchemaScripts();
 
-    public SchemaProperties Properties { get; private set; } = new SchemaProperties();
+    public SchemaProperties Properties { get; init; } = new SchemaProperties();
 
-    public ReadonlyDictionary<string, string> PreviewUrls { get; private set; } = ReadonlyDictionary.Empty<string, string>();
+    public ReadonlyDictionary<string, string> PreviewUrls { get; init; } = ReadonlyDictionary.Empty<string, string>();
+
+    public long SchemaFieldsTotal { get; init; }
 
     public IReadOnlyList<RootField> Fields
     {
@@ -50,126 +52,69 @@ public sealed class Schema
         get => FieldCollection.ByName;
     }
 
-    public Schema(string name, SchemaProperties? properties = null, SchemaType type = SchemaType.Default)
-    {
-        Guard.NotNullOrEmpty(name);
-
-        Name = name;
-
-        if (properties != null)
-        {
-            Properties = properties;
-        }
-
-        Type = type;
-    }
-
-    public Schema(string name, RootField[] fields, SchemaProperties? properties, bool isPublished = false, SchemaType type = SchemaType.Default)
-        : this(name, properties, type)
-    {
-        Guard.NotNull(fields);
-
-        FieldCollection = new FieldCollection<RootField>(fields);
-
-        IsPublished = isPublished;
-    }
-
     [Pure]
-    public Schema Update(SchemaProperties? newProperties)
+    public Schema Update(SchemaProperties properties)
     {
-        newProperties ??= new SchemaProperties();
+        Guard.NotNull(properties);
 
-        if (Properties.Equals(newProperties))
+        if (Properties.Equals(properties))
         {
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.Properties = newProperties;
-        });
+        return this with { Properties = properties };
     }
 
     [Pure]
-    public Schema SetScripts(SchemaScripts? newScripts)
+    public Schema SetScripts(SchemaScripts scripts)
     {
-        newScripts ??= new SchemaScripts();
+        Guard.NotNull(scripts);
 
-        if (Scripts.Equals(newScripts))
+        if (Scripts.Equals(scripts))
         {
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.Scripts = newScripts;
-        });
+        return this with { Scripts = scripts };
     }
 
     [Pure]
-    public Schema SetFieldsInLists(FieldNames? names)
+    public Schema SetFieldsInLists(FieldNames names)
     {
-        names ??= FieldNames.Empty;
+        Guard.NotNull(names);
 
         if (FieldsInLists.SequenceEqual(names))
         {
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.FieldsInLists = names;
-        });
+        return this with { FieldsInLists = names };
     }
 
     [Pure]
-    public Schema SetFieldsInLists(params string[] names)
+    public Schema SetFieldsInReferences(FieldNames names)
     {
-        return SetFieldsInLists(new FieldNames(names));
-    }
-
-    [Pure]
-    public Schema SetFieldsInReferences(FieldNames? names)
-    {
-        names ??= FieldNames.Empty;
+        Guard.NotNull(names);
 
         if (FieldsInReferences.SequenceEqual(names))
         {
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.FieldsInReferences = names;
-        });
+        return this with { FieldsInReferences = names };
     }
 
     [Pure]
-    public Schema SetFieldsInReferences(params string[] names)
+    public Schema SetFieldRules(FieldRules rules)
     {
-        return SetFieldsInReferences(new FieldNames(names));
-    }
-
-    [Pure]
-    public Schema SetFieldRules(FieldRules? rules)
-    {
-        rules ??= FieldRules.Empty;
+        Guard.NotNull(rules);
 
         if (FieldRules.Equals(rules))
         {
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.FieldRules = rules;
-        });
-    }
-
-    [Pure]
-    public Schema SetFieldRules(params FieldRule[] rules)
-    {
-        return SetFieldRules(new FieldRules(rules));
+        return this with { FieldRules = rules };
     }
 
     [Pure]
@@ -180,10 +125,7 @@ public sealed class Schema
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsPublished = true;
-        });
+        return this with { IsPublished = true };
     }
 
     [Pure]
@@ -194,10 +136,7 @@ public sealed class Schema
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsPublished = false;
-        });
+        return this with { IsPublished = false };
     }
 
     [Pure]
@@ -208,26 +147,20 @@ public sealed class Schema
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.Category = category;
-        });
+        return this with { Category = category };
     }
 
     [Pure]
-    public Schema SetPreviewUrls(ReadonlyDictionary<string, string>? previewUrls)
+    public Schema SetPreviewUrls(ReadonlyDictionary<string, string> previewUrls)
     {
-        previewUrls ??= ReadonlyDictionary.Empty<string, string>();
+        Guard.NotNull(previewUrls);
 
         if (PreviewUrls.Equals(previewUrls))
         {
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.PreviewUrls = previewUrls;
-        });
+        return this with { PreviewUrls = previewUrls };
     }
 
     [Pure]
@@ -238,12 +171,12 @@ public sealed class Schema
             return this;
         }
 
-        return Clone(clone =>
+        return this with
         {
-            clone.FieldCollection = FieldCollection.Remove(fieldId);
-            clone.FieldsInLists = FieldsInLists.Remove(field.Name);
-            clone.FieldsInReferences = FieldsInReferences.Remove(field.Name);
-        });
+            FieldCollection = FieldCollection.Remove(fieldId),
+            FieldsInLists = FieldsInLists.Remove(field.Name),
+            FieldsInReferences = FieldsInReferences.Remove(field.Name)
+        };
     }
 
     [Pure]
@@ -273,18 +206,6 @@ public sealed class Schema
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.FieldCollection = newFields;
-        });
-    }
-
-    private Schema Clone(Action<Schema> updater)
-    {
-        var clone = (Schema)MemberwiseClone();
-
-        updater(clone);
-
-        return clone;
+        return this with { FieldCollection = newFields };
     }
 }

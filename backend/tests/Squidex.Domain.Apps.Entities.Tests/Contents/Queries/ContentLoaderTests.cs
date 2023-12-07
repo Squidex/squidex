@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -25,8 +26,8 @@ public class ContentLoaderTests : GivenContext
     {
         unqiueId = DomainId.Combine(AppId.Id, id);
 
-        A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(A<DomainId>._, A<long>._, CancellationToken))
-            .Returns(Task.FromResult<ContentDomainObject.State>(null!));
+        A.CallTo(() => domainObjectCache.GetAsync<WriteContent>(A<DomainId>._, A<long>._, CancellationToken))
+            .Returns(Task.FromResult<WriteContent>(null!));
 
         A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(unqiueId))
             .Returns(domainObject);
@@ -37,7 +38,7 @@ public class ContentLoaderTests : GivenContext
     [Fact]
     public async Task Should_return_null_if_no_state_returned()
     {
-        var content = (ContentDomainObject.State)null!;
+        var content = (WriteContent)null!;
 
         A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(content);
@@ -48,7 +49,7 @@ public class ContentLoaderTests : GivenContext
     [Fact]
     public async Task Should_return_null_if_state_empty()
     {
-        var content = new ContentDomainObject.State { Version = EtagVersion.Empty };
+        var content = CreateWriteContent() with { Version = EtagVersion.Empty };
 
         A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(content);
@@ -59,7 +60,7 @@ public class ContentLoaderTests : GivenContext
     [Fact]
     public async Task Should_return_null_if_state_has_other_version()
     {
-        var content = new ContentDomainObject.State { Version = 5 };
+        var content = CreateWriteContent() with { Version = 5 };
 
         A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(content);
@@ -70,40 +71,40 @@ public class ContentLoaderTests : GivenContext
     [Fact]
     public async Task Should_not_return_null_if_state_has_other_version_than_any()
     {
-        var content = new ContentDomainObject.State { Version = 5 };
+        var content = CreateWriteContent() with { Version = 5 };
 
         A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, CancellationToken))
             .Returns(content);
 
         var actual = await sut.GetAsync(AppId.Id, id, EtagVersion.Any, CancellationToken);
 
-        Assert.Same(content, actual);
+        Assert.Equal(content.Version, actual?.Version);
     }
 
     [Fact]
     public async Task Should_return_content_from_state()
     {
-        var content = new ContentDomainObject.State { Version = 10 };
+        var content = CreateWriteContent() with { Version = 10 };
 
         A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(content);
 
         var actual = await sut.GetAsync(AppId.Id, id, 10, CancellationToken);
 
-        Assert.Same(content, actual);
+        Assert.Equal(content.Version, actual?.Version);
     }
 
     [Fact]
     public async Task Should_return_content_from_cache()
     {
-        var content = new ContentDomainObject.State { Version = 10 };
+        var content = CreateWriteContent() with { Version = 10 };
 
-        A.CallTo(() => domainObjectCache.GetAsync<ContentDomainObject.State>(DomainId.Combine(AppId.Id, id), 10, CancellationToken))
+        A.CallTo(() => domainObjectCache.GetAsync<WriteContent>(DomainId.Combine(AppId.Id, id), 10, CancellationToken))
             .Returns(content);
 
         var actual = await sut.GetAsync(AppId.Id, id, 10, CancellationToken);
 
-        Assert.Same(content, actual);
+        Assert.Equal(content.Version, actual?.Version);
 
         A.CallTo(() => domainObjectFactory.Create<ContentDomainObject>(unqiueId))
             .MustNotHaveHappened();

@@ -6,10 +6,9 @@
 // ==========================================================================
 
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.MongoDb;
@@ -20,28 +19,28 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 
 internal sealed class QueryByIds : OperationBase
 {
-    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
+    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, HashSet<DomainId> ids,
         CancellationToken ct)
     {
-        if (ids == null || ids.Count == 0)
+        if (ids is not { Count: > 0 })
         {
             return ReadonlyList.Empty<ContentIdStatus>();
         }
 
         // Create a filter from the Ids and ensure that the content ids match to the app ID.
-        var filter = CreateFilter(appId, null, ids, null);
+        var filter = CreateFilter(app.Id, null, ids, null);
 
         var contentEntities = await Collection.FindStatusAsync(filter, ct);
 
         return contentEntities.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
     }
 
-    public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
+    public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,
         CancellationToken ct)
     {
-        if (q.Ids == null || q.Ids.Count == 0)
+        if (q.Ids is not { Count: > 0 })
         {
-            return ResultList.Empty<IContentEntity>();
+            return ResultList.Empty<Content>();
         }
 
         // We need to translate the query names to the document field names in MongoDB.

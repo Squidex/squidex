@@ -28,24 +28,20 @@ public class ResolveAssetsTests : GivenContext
 
     public ResolveAssetsTests()
     {
-        var schemaDef =
-            new Schema(SchemaId.Name)
-                .AddAssets(1, "asset1", Partitioning.Invariant, new AssetsFieldProperties
-                {
-                    ResolveFirst = true,
-                    MinItems = 2,
-                    MaxItems = 3
-                })
-                .AddAssets(2, "asset2", Partitioning.Language, new AssetsFieldProperties
-                {
-                    ResolveFirst = true,
-                    MinItems = 1,
-                    MaxItems = 1
-                })
-                .SetFieldsInLists("asset1", "asset2");
-
-        A.CallTo(() => Schema.SchemaDef)
-            .Returns(schemaDef);
+        Schema = Schema
+            .AddAssets(1, "asset1", Partitioning.Invariant, new AssetsFieldProperties
+            {
+                ResolveFirst = true,
+                MinItems = 2,
+                MaxItems = 3
+            })
+            .AddAssets(2, "asset2", Partitioning.Language, new AssetsFieldProperties
+            {
+                ResolveFirst = true,
+                MinItems = 1,
+                MaxItems = 1
+            })
+            .SetFieldsInLists(FieldNames.Create("asset1", "asset2"));
 
         A.CallTo(() => urlGenerator.AssetContent(AppId, A<string>._))
             .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<string>(1)}");
@@ -68,8 +64,8 @@ public class ResolveAssetsTests : GivenContext
     [Fact]
     public async Task Should_add_assets_id_and_versions_as_dependency()
     {
-        var doc1 = CreateAsset(DomainId.NewGuid(), 3, AssetType.Unknown, "Document1.docx");
-        var doc2 = CreateAsset(DomainId.NewGuid(), 4, AssetType.Unknown, "Document2.docx");
+        var doc1 = CreateAsset() with { Version = 3, Type = AssetType.Unknown, FileName = "Document1.docx" };
+        var doc2 = CreateAsset() with { Version = 4, Type = AssetType.Unknown, FileName = "Document2.docx" };
 
         var contents = new[]
         {
@@ -97,11 +93,11 @@ public class ResolveAssetsTests : GivenContext
     [Fact]
     public async Task Should_enrich_with_asset_urls()
     {
-        var img1 = CreateAsset(DomainId.NewGuid(), 1, AssetType.Image, "Image1.png");
-        var img2 = CreateAsset(DomainId.NewGuid(), 2, AssetType.Unknown, "Image2.png", "image/svg+xml");
+        var img1 = CreateAsset() with { Version = 1, Type = AssetType.Image, FileName = "Image1.png" };
+        var img2 = CreateAsset() with { Version = 2, Type = AssetType.Unknown, FileName = "Image2.png", MimeType = "image/svg+xml" };
 
-        var doc1 = CreateAsset(DomainId.NewGuid(), 3, AssetType.Unknown, "Document1.png");
-        var doc2 = CreateAsset(DomainId.NewGuid(), 4, AssetType.Unknown, "Document2.png", "image/svg+xml", 20_000);
+        var doc1 = CreateAsset() with { Version = 3, Type = AssetType.Unknown, FileName = "Document1.png" };
+        var doc2 = CreateAsset() with { Version = 4, Type = AssetType.Unknown, FileName = "Document2.png", MimeType = "image/svg+xml", FileSize = 20_000 };
 
         var contents = new[]
         {
@@ -208,9 +204,9 @@ public class ResolveAssetsTests : GivenContext
             .MustHaveHappened();
     }
 
-    private ContentEntity CreateContent(DomainId[] assets1, DomainId[] assets2)
+    private EnrichedContent CreateContent(DomainId[] assets1, DomainId[] assets2)
     {
-        return new ContentEntity
+        return CreateContent() with
         {
             Data =
                 new ContentData()
@@ -219,22 +215,7 @@ public class ResolveAssetsTests : GivenContext
                             .AddLocalized("iv", JsonValue.Array(assets1.Select(x => x.ToString()))))
                     .AddField("asset2",
                         new ContentFieldData()
-                            .AddLocalized("en", JsonValue.Array(assets2.Select(x => x.ToString())))),
-            SchemaId = SchemaId
-        };
-    }
-
-    private AssetEntity CreateAsset(DomainId id, int version, AssetType type, string fileName, string? fileType = null, int fileSize = 100)
-    {
-        return new AssetEntity
-        {
-            AppId = AppId,
-            Id = id,
-            Type = type,
-            FileName = fileName,
-            FileSize = fileSize,
-            MimeType = fileType!,
-            Version = version
+                            .AddLocalized("en", JsonValue.Array(assets2.Select(x => x.ToString()))))
         };
     }
 }

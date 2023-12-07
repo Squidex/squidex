@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Infrastructure;
 
@@ -19,7 +20,7 @@ public sealed class TeamsIndex : ITeamsIndex
         this.teamRepository = teamRepository;
     }
 
-    public async Task<ITeamEntity?> GetTeamAsync(DomainId id,
+    public async Task<Team?> GetTeamAsync(DomainId id,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("TeamsIndex/GetTeamAsync"))
@@ -32,7 +33,7 @@ public sealed class TeamsIndex : ITeamsIndex
         }
     }
 
-    public async Task<List<ITeamEntity>> GetTeamsAsync(string userId,
+    public async Task<List<Team>> GetTeamsAsync(string userId,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("TeamsIndex/GetTeamsAsync"))
@@ -45,7 +46,7 @@ public sealed class TeamsIndex : ITeamsIndex
         }
     }
 
-    private static bool IsValid(ITeamEntity? rule)
+    private static bool IsValid(Team? rule)
     {
         return rule is { Version: > EtagVersion.Empty };
     }

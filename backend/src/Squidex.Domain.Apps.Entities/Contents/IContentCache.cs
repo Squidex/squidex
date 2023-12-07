@@ -10,6 +10,6 @@ using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public interface IContentCache : IQueryCache<DomainId, IEnrichedContentEntity>
+public interface IContentCache : IQueryCache<DomainId, EnrichedContent>
 {
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Infrastructure.Commands;
@@ -29,7 +30,7 @@ public sealed class RuleCommandMiddleware : AggregateCommandMiddleware<RuleComma
     {
         var payload = await base.EnrichResultAsync(context, result, ct);
 
-        if (payload is IRuleEntity rule and not IEnrichedRuleEntity)
+        if (payload is Rule rule and not EnrichedRule)
         {
             payload = await ruleEnricher.EnrichAsync(rule, contextProvider.Context, ct);
         }

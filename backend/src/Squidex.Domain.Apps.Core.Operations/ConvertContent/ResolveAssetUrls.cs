@@ -21,7 +21,7 @@ public sealed class ResolveAssetUrls : IContentValueConverter
     {
         this.appId = appId;
 
-        if (fields == null || fields.Count == 0)
+        if (fields is not { Count: > 0 })
         {
             shouldHandle = (field, parent) => false;
         }

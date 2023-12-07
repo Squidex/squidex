@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization.Attributes;
-using Squidex.Domain.Apps.Entities.Rules.DomainObject;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules;
 
-public sealed class MongoRuleEntity : MongoState<RuleDomainObject.State>
+public sealed class MongoRuleEntity : MongoState<Rule>
 {
     [BsonRequired]
     [BsonElement("_ai")]

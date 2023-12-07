@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Http;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -42,14 +42,14 @@ public sealed class EnrichWithSchemaIdCommandMiddleware : ICommandMiddleware
 
     private NamedId<DomainId> GetSchemaId()
     {
-        var feature = httpContextAccessor.HttpContext?.Features.Get<ISchemaFeature>();
+        var schema = httpContextAccessor.HttpContext?.Features.Get<Schema>();
 
-        if (feature == null)
+        if (schema == null)
         {
             ThrowHelper.InvalidOperationException("Cannot resolve schema.");
             return default!;
         }
 
-        return feature.Schema.NamedId();
+        return schema.NamedId();
     }
 }

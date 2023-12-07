@@ -137,6 +137,11 @@ public sealed class MyDomainObject : DomainObject<MyDomainState>
                 throw new NotSupportedException();
         }
     }
+
+    protected override MyDomainState Apply(MyDomainState snapshot, Envelope<IEvent> @event)
+    {
+        return snapshot.Apply(@event);
+    }
 }
 
 public sealed class Delete : MyCommand

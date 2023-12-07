@@ -40,28 +40,6 @@ jobs:
         run: docker-compose up -d
         working-directory: tools/TestSuite
 
-      - name: Test - Install Playwright Dependencies
-        run: npm ci
-        working-directory: './tools/e2e'
-
-      - name: Test - Install Playwright Browsers
-        run: npx playwright install --with-deps
-        working-directory: './tools/e2e'
-
-      - name: Test - Run Playwright Tests
-        run: npx playwright test
-        working-directory: './tools/e2e'
-        env:
-          BASE__URL: http://localhost:8080
-
-      - name: Test - Upload Playwright Artifacts
-        if: always()
-        uses: actions/upload-artifact@v3.1.3
-        with:
-          name: playwright-report
-          path: tools/e2e/playwright-report/
-          retention-days: 30
-
       - name: Test - RUN
         uses: kohlerdominik/docker-run-action@v1.1.0
         with:
@@ -103,6 +81,28 @@ jobs:
           options: --name test3
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+
+      - name: Test - Install Playwright Dependencies
+        run: npm ci
+        working-directory: './tools/e2e'
+
+      - name: Test - Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: './tools/e2e'
+
+      - name: Test - Run Playwright Tests
+        run: npx playwright test
+        working-directory: './tools/e2e'
+        env:
+          BASE__URL: http://localhost:8080
+
+      - name: Test - Upload Playwright Artifacts
+        if: always()
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: playwright-report
+          path: tools/e2e/playwright-report/
+          retention-days: 30
        
       - name: Test - Dump docker logs on failure
         if: failure()

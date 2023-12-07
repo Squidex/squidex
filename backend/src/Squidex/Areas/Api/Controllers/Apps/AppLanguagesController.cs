@@ -8,7 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -122,13 +122,13 @@ public sealed class AppLanguagesController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        var result = context.Result<IAppEntity>();
+        var result = context.Result<App>();
         var response = GetResponse(result);
 
         return response;
     }
 
-    private AppLanguagesDto GetResponse(IAppEntity result)
+    private AppLanguagesDto GetResponse(App result)
     {
         return AppLanguagesDto.FromDomain(result, Resources);
     }

@@ -62,7 +62,7 @@ public class BackgroundRequestLogStoreTests
     }
 
     [Fact]
-    public async Task Should_provide_actuals_from_repository()
+    public async Task Should_provide_results_from_repository()
     {
         var key = "my-key";
 
@@ -78,7 +78,7 @@ public class BackgroundRequestLogStoreTests
     }
 
     [Fact]
-    public async Task Should_not_provide_actuals_from_repository_if_disabled()
+    public async Task Should_not_provide_results_from_repository_if_disabled()
     {
         options.StoreEnabled = false;
 

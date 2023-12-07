@@ -98,7 +98,7 @@ public sealed class ImageAssetMetadataSource : IAssetMetadataSource
         }
     }
 
-    public IEnumerable<string> Format(IAssetEntity asset)
+    public IEnumerable<string> Format(Asset asset)
     {
         if (asset.Type == AssetType.Image)
         {

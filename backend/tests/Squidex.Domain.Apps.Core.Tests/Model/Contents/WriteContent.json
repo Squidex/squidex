@@ -1,0 +1,33 @@
+﻿{
+    "schemaId": "4827f8cb-ec10-4b38-930a-7c5ac722a12f,destinations",
+    "newVersion": {
+        "status": "Published",
+        "data": {
+            "location": {
+                "iv": "Berlin"
+            }
+        }
+    },
+    "currentVersion": {
+        "status": "Draft",
+        "data": {
+            "location": {
+                "iv": "London"
+            }
+        }
+    },
+    "scheduleJob": {
+        "id": "8edd59a0-a6c2-4177-9502-99ba8aabff44",
+        "status": "Archived",
+        "scheduledBy": "subject:63761585e06d5466c71521b3",
+        "dueTime": "2024-12-02T12:14:33Z"
+    },
+    "appId": "06c68527-a2ca-4d84-91eb-a1707aa5b6fb,hotels",
+    "isDeleted": true,
+    "id": "265aaf1e-5dff-4c40-b1e6-1149f652cd30",
+    "createdBy": "subject:63761585e06d5466c71521b3",
+    "lastModifiedBy": "subject:63761585e06d5466c71521b3",
+    "created": "2022-12-05T11:00:23Z",
+    "lastModified": "2022-12-05T11:00:23Z",
+    "version": 0
+}

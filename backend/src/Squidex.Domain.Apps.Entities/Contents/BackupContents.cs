@@ -194,7 +194,7 @@ public sealed class BackupContents : IBackupHandler
         var ids = contentIdsBySchemaId.Values.SelectMany(x => x);
         if (ids.Any())
         {
-            await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids, BatchSize, ct);
+            await rebuilder.InsertManyAsync<ContentDomainObject, WriteContent>(ids, BatchSize, ct);
         }
     }
 

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
@@ -12,16 +13,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes;
 
 public interface IAppsIndex
 {
-    Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
+    Task<List<App>> GetAppsForUserAsync(string userId, PermissionSet permissions,
         CancellationToken ct = default);
 
-    Task<List<IAppEntity>> GetAppsForTeamAsync(DomainId teamId,
+    Task<List<App>> GetAppsForTeamAsync(DomainId teamId,
         CancellationToken ct = default);
 
-    Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
+    Task<App?> GetAppAsync(string name, bool canCache = false,
         CancellationToken ct = default);
 
-    Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+    Task<App?> GetAppAsync(DomainId appId, bool canCache = false,
         CancellationToken ct = default);
 
     Task<string?> ReserveAsync(DomainId id, string name,

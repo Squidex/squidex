@@ -26,7 +26,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     [Fact]
     public async Task Should_enrich_content_with_next_statuses()
     {
-        var content = new ContentEntity { SchemaId = SchemaId };
+        var content = CreateContent();
 
         var nexts = new[]
         {
@@ -44,7 +44,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     [Fact]
     public async Task Should_enrich_content_with_next_statuses_if_draft_singleton()
     {
-        var content = new ContentEntity { SchemaId = SchemaId, IsSingleton = true, Status = Status.Draft };
+        var content = CreateContent() with { IsSingleton = true, Status = Status.Draft };
 
         await sut.EnrichAsync(FrontendContext, new[] { content }, null!, default);
 
@@ -57,7 +57,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     [Fact]
     public async Task Should_enrich_content_with_next_statuses_if_published_singleton()
     {
-        var content = new ContentEntity { SchemaId = SchemaId, IsSingleton = true, Status = Status.Published };
+        var content = CreateContent() with { IsSingleton = true };
 
         await sut.EnrichAsync(FrontendContext, new[] { content }, null!, CancellationToken);
 
@@ -70,7 +70,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     [Fact]
     public async Task Should_enrich_content_with_status_color()
     {
-        var content = new ContentEntity { SchemaId = SchemaId };
+        var content = CreateContent();
 
         A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
             .Returns(new StatusInfo(Status.Published, StatusColors.Published));
@@ -83,9 +83,9 @@ public class EnrichWithWorkflowsTests : GivenContext
     [Fact]
     public async Task Should_enrich_content_with_new_status_color()
     {
-        var content = new ContentEntity { SchemaId = SchemaId, NewStatus = Status.Archived };
+        var content = CreateContent() with { NewStatus = Status.Archived };
 
-        A.CallTo(() => workflow.GetInfoAsync(content, content.NewStatus.Value))
+        A.CallTo(() => workflow.GetInfoAsync(content, content.NewStatus!.Value))
             .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
 
         await sut.EnrichAsync(FrontendContext, new[] { content }, null!, CancellationToken);
@@ -96,7 +96,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     [Fact]
     public async Task Should_enrich_content_with_scheduled_status_color()
     {
-        var content = new ContentEntity { SchemaId = SchemaId, ScheduleJob = ScheduleJob.Build(Status.Archived, User, default) };
+        var content = CreateContent() with { ScheduleJob = ScheduleJob.Build(Status.Archived, User, Timestamp()) };
 
         A.CallTo(() => workflow.GetInfoAsync(content, content.ScheduleJob.Status))
             .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
@@ -109,7 +109,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     [Fact]
     public async Task Should_enrich_content_with_default_color_if_not_found()
     {
-        var content = new ContentEntity { SchemaId = SchemaId };
+        var content = CreateContent();
 
         A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
             .Returns(ValueTask.FromResult<StatusInfo?>(null!));
@@ -122,7 +122,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     [Fact]
     public async Task Should_enrich_content_with_can_update()
     {
-        var content = new ContentEntity { SchemaId = SchemaId };
+        var content = CreateContent();
 
         A.CallTo(() => workflow.CanUpdateAsync(content, content.Status, FrontendContext.UserPrincipal))
             .Returns(true);
@@ -135,7 +135,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     [Fact]
     public async Task Should_not_enrich_content_with_can_update_if_disabled_in_context()
     {
-        var content = new ContentEntity { SchemaId = SchemaId };
+        var content = CreateContent();
 
         await sut.EnrichAsync(ApiContext.Clone(b => b.WithResolveFlow(false)), new[] { content }, null!, CancellationToken);
 

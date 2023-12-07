@@ -7,6 +7,7 @@
 
 using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -30,7 +31,7 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
         var operation = Operation(CreateAsset());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<IAssetFolderEntity>());
+            .Returns(new List<AssetFolder>());
 
         await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
             new ValidationError("Asset folder does not exist.", "ParentId"));
@@ -44,7 +45,7 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
         var operation = Operation(CreateAsset());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<IAssetFolderEntity> { CreateAssetFolder() });
+            .Returns(new List<AssetFolder> { CreateAssetFolder() });
 
         await operation.MustMoveToValidFolder(parentId, CancellationToken);
     }
@@ -54,7 +55,7 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var parentId = DomainId.NewGuid();
 
-        var operation = Operation(CreateAsset(default, parentId));
+        var operation = Operation(CreateAsset() with { ParentId = parentId });
 
         await operation.MustMoveToValidFolder(parentId, CancellationToken);
 
@@ -67,7 +68,7 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var parentId = DomainId.Empty;
 
-        var operation = Operation(CreateAsset(parentId));
+        var operation = Operation(CreateAsset().WithId(parentId));
 
         await operation.MustMoveToValidFolder(parentId, CancellationToken);
 
@@ -80,7 +81,7 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var operation = Operation(CreateAsset());
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, operation.CommandId, SearchScope.All, CancellationToken))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, operation.CommandId, SearchScope.All, CancellationToken))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync(CancellationToken));
@@ -91,18 +92,18 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var operation = Operation(CreateAsset());
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, operation.CommandId, SearchScope.All, CancellationToken))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, operation.CommandId, SearchScope.All, CancellationToken))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync(CancellationToken));
     }
 
-    private AssetOperation Operation(AssetEntity asset)
+    private AssetOperation Operation(Asset asset)
     {
         return Operation(asset, Mocks.FrontendUser());
     }
 
-    private AssetOperation Operation(AssetEntity asset, ClaimsPrincipal? currentUser)
+    private AssetOperation Operation(Asset asset, ClaimsPrincipal? currentUser)
     {
         var serviceProvider =
             new ServiceCollection()
@@ -116,41 +117,5 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
             CommandId = asset.Id,
             Command = new CreateAsset { User = currentUser, Actor = User }
         };
-    }
-
-    private AssetEntity CreateAsset(DomainId id = default, DomainId parentId = default)
-    {
-        return new AssetEntity
-        {
-            Id = OrNew(id),
-            AppId = AppId,
-            Created = default,
-            CreatedBy = User,
-            ParentId = OrNew(parentId)
-        };
-    }
-
-    private IAssetFolderEntity CreateAssetFolder(DomainId id = default, DomainId parentId = default)
-    {
-        var assetFolder = A.Fake<IAssetFolderEntity>();
-
-        A.CallTo(() => assetFolder.Id)
-            .Returns(OrNew(id));
-        A.CallTo(() => assetFolder.AppId)
-            .Returns(AppId);
-        A.CallTo(() => assetFolder.ParentId)
-            .Returns(OrNew(parentId));
-
-        return assetFolder;
-    }
-
-    private static DomainId OrNew(DomainId parentId)
-    {
-        if (parentId == default)
-        {
-            parentId = DomainId.NewGuid();
-        }
-
-        return parentId;
     }
 }

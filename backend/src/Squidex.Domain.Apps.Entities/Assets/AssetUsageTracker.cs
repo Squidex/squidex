@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.States;
 
 #pragma warning disable CS0649
@@ -40,7 +40,7 @@ public partial class AssetUsageTracker : IDeleter
         ClearCache();
     }
 
-    Task IDeleter.DeleteAppAsync(IAppEntity app,
+    Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         return assetUsageTracker.DeleteUsageAsync(app.Id, ct);

@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Text;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Queries;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
@@ -17,13 +17,13 @@ internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQ
 {
     public static readonly GeoQueryTransformer Instance = new GeoQueryTransformer();
 
-    public record struct Args(Context Context, ISchemaEntity Schema, ITextIndex TextIndex, CancellationToken CancellationToken);
+    public record struct Args(Context Context, Schema Schema, ITextIndex TextIndex, CancellationToken CancellationToken);
 
     private GeoQueryTransformer()
     {
     }
 
-    public static async Task<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> filter, Context context, ISchemaEntity schema, ITextIndex textIndex,
+    public static async Task<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> filter, Context context, Schema schema, ITextIndex textIndex,
         CancellationToken ct)
     {
         var args = new Args(context, schema, textIndex, ct);
@@ -42,7 +42,7 @@ internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQ
 
             var ids = await args.TextIndex.SearchAsync(args.Context.App, searchQuery, searchScope, args.CancellationToken);
 
-            if (ids == null || ids.Count == 0)
+            if (ids is not { Count: > 0 })
             {
                 return ClrFilter.Eq("id", "__notfound__");
             }

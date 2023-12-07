@@ -357,7 +357,7 @@ public class DomainObjectTests
     }
 
     [Fact]
-    public async Task Should_return_custom_actual_on_create()
+    public async Task Should_return_custom_result_on_create()
     {
         var actual = await sut.ExecuteAsync(new CreateCustom(), ct);
 
@@ -379,7 +379,7 @@ public class DomainObjectTests
     }
 
     [Fact]
-    public async Task Should_return_custom_actual_on_update()
+    public async Task Should_return_custom_result_on_update()
     {
         SetupCreated(4);
 

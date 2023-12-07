@@ -37,7 +37,7 @@ public sealed class ContentData : Dictionary<string, ContentFieldData?>, IEquata
 
     public ContentData UseSameFields(ContentData? other)
     {
-        if (other == null || other.Count == 0)
+        if (other is not { Count: > 0 })
         {
             return this;
         }

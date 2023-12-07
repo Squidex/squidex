@@ -8,7 +8,7 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
@@ -21,6 +21,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
 {
     private readonly MongoCountCollection countCollection;
+
+    static MongoAssetRepository()
+    {
+        MongoAssetEntity.RegisterClassMap();
+    }
 
     public MongoAssetRepository(IMongoDatabase database, ILogger<MongoAssetRepository> log)
         : base(database)
@@ -66,7 +71,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         }, ct);
     }
 
-    public async IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId,
+    public async IAsyncEnumerable<Asset> StreamAll(DomainId appId,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         var find = Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
@@ -83,7 +88,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         }
     }
 
-    public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, Q q,
+    public async Task<IResultList<Asset>> QueryAsync(DomainId appId, DomainId? parentId, Q q,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/QueryAsync"))
@@ -117,7 +122,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
                         }
                     }
 
-                    return ResultList.Create(assetTotal, assetEntities.OfType<IAssetEntity>());
+                    return ResultList.Create(assetTotal, assetEntities.OfType<Asset>());
                 }
                 else
                 {
@@ -153,7 +158,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
                         }
                     }
 
-                    return ResultList.Create<IAssetEntity>(assetTotal, assetEntities);
+                    return ResultList.Create<Asset>(assetTotal, assetEntities);
                 }
             }
             catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
@@ -193,7 +198,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         }
     }
 
-    public async Task<IAssetEntity?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize,
+    public async Task<Asset?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetByHashAsync"))
@@ -206,7 +211,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         }
     }
 
-    public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug, bool allowDeleted,
+    public async Task<Asset?> FindAssetBySlugAsync(DomainId appId, string slug, bool allowDeleted,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetBySlugAsync"))
@@ -219,7 +224,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         }
     }
 
-    public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id, bool allowDeleted,
+    public async Task<Asset?> FindAssetAsync(DomainId appId, DomainId id, bool allowDeleted,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetAsync"))
@@ -232,7 +237,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
         }
     }
 
-    public async Task<IAssetEntity?> FindAssetAsync(DomainId id,
+    public async Task<Asset?> FindAssetAsync(DomainId id,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetRepository/FindAssetAsync"))

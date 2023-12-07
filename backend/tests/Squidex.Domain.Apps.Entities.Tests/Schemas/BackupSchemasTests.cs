@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -63,7 +64,7 @@ public class BackupSchemasTests : GivenContext
 
         var rebuildContents = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<SchemaDomainObject, SchemaDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
+        A.CallTo(() => rebuilder.InsertManyAsync<SchemaDomainObject, Schema>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildContents.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
         await sut.RestoreAsync(context, CancellationToken);

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -116,7 +117,7 @@ public sealed class BackupApps : IBackupHandler
     private async Task RestoreAppTemporarilyAsync(RestoreContext context,
         CancellationToken ct)
     {
-        app = await rebuilder.RebuildStateAsync<AppDomainObject, AppDomainObject.State>(context.AppId, ct);
+        app = await rebuilder.RebuildStateAsync<AppDomainObject, App>(context.AppId, ct);
 
         // The app is only available in the context of the restore, so there is nothing to clear.
         appProvider.RegisterAppForLocalContext(context.AppId, app!.Snapshot);

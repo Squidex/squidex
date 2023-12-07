@@ -1,0 +1,112 @@
+﻿{
+    "assetScripts": {
+        "create": "Create Script",
+        "update": "Update Script",
+        "annotate": "Annotate Script",
+        "move": "Move Script",
+        "delete": "Delete Script",
+        "query": "Query Script",
+        "queryPre": "Query Pre Script"
+    },
+    "clients": {
+        "client1": {
+            "name": "client1",
+            "secret": "MySecret",
+            "apiCallsLimit": 13,
+            "apiTrafficLimit": 42,
+            "allowAnonymous": true,
+            "role": "Admin"
+        }
+    },
+    "contributors": {
+        "me": "Owner"
+    },
+    "created": "2022-12-05T11:00:23Z",
+    "createdBy": "subject:63761585e06d5466c71521b3",
+    "description": "My Description",
+    "id": "265aaf1e-5dff-4c40-b1e6-1149f652cd30",
+    "image": {
+        "mimeType": "image/png",
+        "etag": "42"
+    },
+    "isDeleted": true,
+    "label": "My Label",
+    "languages": {
+        "languages": {
+            "en": {
+                "fallback": [],
+                "isOptional": false
+            },
+            "de": {
+                "fallback": [],
+                "isOptional": true
+            }
+        },
+        "master": "en"
+    },
+    "lastModified": "2022-12-05T11:00:23Z",
+    "lastModifiedBy": "subject:63761585e06d5466c71521b3",
+    "name": "My Team",
+    "plan": {
+        "owner": "subject:63761585e06d5466c71521b3",
+        "planId": "Premium"
+    },
+    "roles": {
+        "Custom": {
+            "permissions": [
+                "permission1",
+                "permission2"
+            ],
+            "properties": {}
+        }
+    },
+    "settings": {
+        "patterns": [
+            {
+                "name": "numbers",
+                "regex": "[0-9]+"
+            }
+        ],
+        "editors": [
+            {
+                "name": "custom",
+                "url": "https://cloud.squidex.io"
+            }
+        ],
+        "hideScheduler": true,
+        "hideDateTimeModeButton": true
+    },
+    "teamId": "265aaf1e-5dff-4c40-b1e6-1149f652cd30",
+    "version": 0,
+    "workflows": {
+        "265aaf1e-5dff-4c40-b1e6-1149f652cd30": {
+            "initial": "archived",
+            "name": "Unnamed",
+            "steps": {
+                "published": {
+                    "noUpdateRules": {},
+                    "validate": false,
+                    "transitions": {
+                        "archived": {
+                            "roles": [
+                                "Role1"
+                            ]
+                        }
+                    }
+                },
+                "archived": {
+                    "noUpdateRules": {},
+                    "validate": false,
+                    "transitions": {
+                        "published": {
+                            "roles": [
+                                "Role1"
+                            ]
+                        }
+                    }
+                }
+            },
+            "schemaIds": []
+        }
+    }
+}

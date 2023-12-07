@@ -32,54 +32,58 @@ public sealed class SchemaCreated : SchemaEvent, IMigrated<IEvent>
 
     public IEvent Migrate()
     {
-        var type = Singleton ?
-            SchemaType.Singleton :
-            SchemaType.Default;
-
-        var schema = new Schema(Name, Properties, type);
-
-        if (Publish)
-        {
-            schema = schema.Publish();
-        }
-
-        var totalFields = 0;
+        var fields = new List<RootField>();
 
         if (Fields != null)
         {
+            var totalFields = 0;
+
             foreach (var eventField in Fields)
             {
                 totalFields++;
 
-                var partitioning = Partitioning.FromString(eventField.Partitioning);
-
-                var field =
-                    eventField.Properties.CreateRootField(
-                        totalFields,
-                        eventField.Name, partitioning,
-                        eventField);
+                var field = eventField.Properties.CreateRootField(totalFields, eventField.Name,
+                    Partitioning.FromString(eventField.Partitioning)) with
+                {
+                    IsLocked = eventField.IsLocked,
+                    IsHidden = eventField.IsHidden,
+                    IsDisabled = eventField.IsDisabled
+                };
 
                 if (field is ArrayField arrayField && eventField.Nested?.Length > 0)
                 {
+                    var arrayFields = new List<NestedField>();
+
                     foreach (var nestedEventField in eventField.Nested)
                     {
                         totalFields++;
 
-                        var nestedField =
-                            nestedEventField.Properties.CreateNestedField(
-                                totalFields,
-                                nestedEventField.Name,
-                                nestedEventField);
+                        var nestedField = nestedEventField.Properties.CreateNestedField(totalFields, nestedEventField.Name) with
+                        {
+                            IsLocked = nestedEventField.IsLocked,
+                            IsHidden = nestedEventField.IsHidden,
+                            IsDisabled = nestedEventField.IsDisabled
+                        };
 
-                        arrayField = arrayField.AddField(nestedField);
+                        arrayFields.Add(nestedField);
                     }
 
-                    field = arrayField;
+                    field = arrayField with { FieldCollection = FieldCollection<NestedField>.Create(arrayFields.ToArray()) };
                 }
 
-                schema = schema.AddField(field);
+                fields.Add(field);
             }
         }
+
+        var schema = new Schema
+        {
+            Name = Name,
+            Type = Singleton ?
+                SchemaType.Singleton :
+                SchemaType.Default,
+            IsPublished = Publish,
+            FieldCollection = FieldCollection<RootField>.Create(fields.ToArray())
+        };
 
         return SimpleMapper.Map(this, new SchemaCreatedV2 { Schema = schema });
     }

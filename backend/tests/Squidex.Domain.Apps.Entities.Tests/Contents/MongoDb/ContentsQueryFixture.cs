@@ -10,15 +10,11 @@ using LoremNET;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using NodaTime;
-using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -45,7 +41,7 @@ public sealed class ContentsQueryFixture_Dedicated : ContentsQueryFixture
     }
 }
 
-public abstract class ContentsQueryFixture : IAsyncLifetime
+public abstract class ContentsQueryFixture : GivenContext, IAsyncLifetime
 {
     private readonly int numValues = 10000;
 
@@ -110,18 +106,18 @@ public abstract class ContentsQueryFixture : IAsyncLifetime
             return;
         }
 
-        var batch = new List<SnapshotWriteJob<ContentDomainObject.State>>();
+        var batch = new List<SnapshotWriteJob<WriteContent>>();
 
-        async Task ExecuteBatchAsync(ContentDomainObject.State? state)
+        async Task ExecuteBatchAsync(WriteContent? state)
         {
             if (state != null)
             {
-                batch.Add(new SnapshotWriteJob<ContentDomainObject.State>(state.UniqueId, state, 0));
+                batch.Add(new SnapshotWriteJob<WriteContent>(state.UniqueId, state, 0));
             }
 
             if ((state == null || batch.Count >= 1000) && batch.Count > 0)
             {
-                var store = (ISnapshotStore<ContentDomainObject.State>)ContentRepository;
+                var store = (ISnapshotStore<WriteContent>)ContentRepository;
 
                 await store.WriteManyAsync(batch, ct);
 
@@ -129,34 +125,24 @@ public abstract class ContentsQueryFixture : IAsyncLifetime
             }
         }
 
-        var created = SystemClock.Instance.GetCurrentInstant();
-        var createdBy = RefToken.User("1");
-
         foreach (var appId in AppIds)
         {
             foreach (var schemaId in SchemaIds)
             {
                 for (var i = 0; i < numValues; i++)
                 {
-                    var data =
-                        new ContentData()
-                            .AddField("field1",
-                                new ContentFieldData()
-                                    .AddInvariant(JsonValue.Create(i)))
-                            .AddField("field2",
-                                new ContentFieldData()
-                                    .AddInvariant(JsonValue.Create(Lorem.Paragraph(200, 20))));
-
-                    var content = new ContentDomainObject.State
+                    var content = CreateWriteContent() with
                     {
-                        Id = DomainId.NewGuid(),
                         AppId = appId,
-                        Created = created,
-                        CreatedBy = createdBy,
-                        CurrentVersion = new ContentVersion(Status.Published, data),
-                        IsDeleted = false,
-                        LastModified = created,
-                        LastModifiedBy = createdBy,
+                        CurrentVersion = new ContentVersion(
+                            Status.Published,
+                            new ContentData()
+                                .AddField("field1",
+                                    new ContentFieldData()
+                                        .AddInvariant(JsonValue.Create(i)))
+                                .AddField("field2",
+                                    new ContentFieldData()
+                                        .AddInvariant(JsonValue.Create(Lorem.Paragraph(200, 20))))),
                         SchemaId = schemaId
                     };
 
@@ -168,7 +154,7 @@ public abstract class ContentsQueryFixture : IAsyncLifetime
         await ExecuteBatchAsync(null);
     }
 
-    private static IAppProvider CreateAppProvider()
+    private IAppProvider CreateAppProvider()
     {
         var appProvider = A.Fake<IAppProvider>();
 
@@ -177,7 +163,7 @@ public abstract class ContentsQueryFixture : IAsyncLifetime
             {
                 var appId = x.GetArgument<DomainId>(0)!;
 
-                return Task.FromResult<(IAppEntity?, ISchemaEntity?)>((
+                return Task.FromResult<(App?, Schema?)>((
                     CreateApp(appId),
                     CreateSchema(appId, x.GetArgument<DomainId>(1)!)));
             });
@@ -190,17 +176,17 @@ public abstract class ContentsQueryFixture : IAsyncLifetime
         return AppIds[Random.Shared.Next(AppIds.Length)].Id;
     }
 
-    public IAppEntity RandomApp()
-    {
-        return CreateApp(RandomAppId());
-    }
-
     public DomainId RandomSchemaId()
     {
         return SchemaIds[Random.Shared.Next(SchemaIds.Length)].Id;
     }
 
-    public ISchemaEntity RandomSchema()
+    public App RandomApp()
+    {
+        return CreateApp(RandomAppId());
+    }
+
+    public Schema RandomSchema()
     {
         return CreateSchema(RandomAppId(), RandomSchemaId());
     }
@@ -210,21 +196,13 @@ public abstract class ContentsQueryFixture : IAsyncLifetime
         return Random.Shared.Next(numValues).ToString(CultureInfo.InvariantCulture);
     }
 
-    private static IAppEntity CreateApp(DomainId appId)
+    private App CreateApp(DomainId appId)
     {
-        return Mocks.App(NamedId.Of(appId, "my-app"));
+        return App with { Id = appId };
     }
 
-    private static ISchemaEntity CreateSchema(DomainId appId, DomainId schemaId)
+    private Schema CreateSchema(DomainId appId, DomainId schemaId)
     {
-        var schemaDef =
-            new Schema("my-schema")
-                .AddField(Fields.Number(1, "value", Partitioning.Invariant));
-
-        return
-            Mocks.Schema(
-                NamedId.Of(appId, "my-app"),
-                schemaId,
-                schemaDef);
+        return Schema with { Id = schemaId, AppId = NamedId.Of(appId, "my-app") };
     }
 }

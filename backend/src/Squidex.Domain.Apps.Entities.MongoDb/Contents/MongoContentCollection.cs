@@ -8,11 +8,11 @@
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
@@ -108,19 +108,19 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
             cancellationToken: ct);
     }
 
-    public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
+    public IAsyncEnumerable<Content> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
         CancellationToken ct)
     {
         return queryAsStream.StreamAll(appId, schemaIds, ct);
     }
 
-    public IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference, int take,
+    public IAsyncEnumerable<Content> StreamReferencing(DomainId appId, DomainId reference, int take,
         CancellationToken ct)
     {
         return queryReferrers.StreamReferencing(appId, reference, take, ct);
     }
 
-    public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
+    public IAsyncEnumerable<Content> QueryScheduledWithoutDataAsync(Instant now,
         CancellationToken ct)
     {
         return queryScheduled.QueryAsync(now, ct);
@@ -135,7 +135,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         }
     }
 
-    public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
+    public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
@@ -162,7 +162,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
                     return await queryByQuery.QueryAsync(app, schemas, q, ct);
                 }
 
-                return ResultList.Empty<IContentEntity>();
+                return ResultList.Empty<Content>();
             }
             catch (MongoCommandException ex) when (ex.Code == 96)
             {
@@ -175,7 +175,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         }
     }
 
-    public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q,
+    public async Task<IResultList<Content>> QueryAsync(App app, Schema schema, Q q,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
@@ -215,7 +215,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         }
     }
 
-    public async Task<IContentEntity?> FindContentAsync(ISchemaEntity schema, DomainId id,
+    public async Task<Content?> FindContentAsync(Schema schema, DomainId id,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/FindContentAsync"))
@@ -224,30 +224,30 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         }
     }
 
-    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
+    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, HashSet<DomainId> ids,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
         {
-            return await queryByIds.QueryIdsAsync(appId, ids, ct);
+            return await queryByIds.QueryIdsAsync(app, ids, ct);
         }
     }
 
-    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
+    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, Schema schema, FilterNode<ClrValue> filterNode,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
         {
-            return await queryByQuery.QueryIdsAsync(appId, schemaId, filterNode, ct);
+            return await queryByQuery.QueryIdsAsync(app, schema, filterNode, ct);
         }
     }
 
-    public async Task<bool> HasReferrersAsync(DomainId appId, DomainId reference,
+    public async Task<bool> HasReferrersAsync(App app, DomainId reference,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/HasReferrersAsync"))
         {
-            return await queryReferrers.CheckExistsAsync(appId, reference, ct);
+            return await queryReferrers.CheckExistsAsync(app, reference, ct);
         }
     }
 
@@ -282,7 +282,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
             await queryInDedicatedCollection.UpsertVersionedAsync(session, job, ct);
         }
 
-        await Collection.UpsertVersionedAsync(session, job, ct);
+        await Collection.UpsertVersionedAsync(session, job, Field.Of<MongoContentEntity>(x => nameof(x.Version)), ct);
     }
 
     public async Task RemoveAsync(DomainId key,

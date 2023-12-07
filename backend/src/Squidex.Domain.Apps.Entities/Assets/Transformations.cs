@@ -45,7 +45,7 @@ public static class Transformations
             @event.AssetType);
     }
 
-    public static AssetRef ToRef(this IAssetEntity asset)
+    public static AssetRef ToRef(this Asset asset)
     {
         return new AssetRef(
             asset.AppId,

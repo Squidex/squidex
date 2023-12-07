@@ -131,7 +131,7 @@ internal sealed partial class DeepDetectActionHandler : RuleActionHandler<DeepDe
         var command = new AnnotateAsset
         {
             Tags = asset.TagNames,
-            AssetId = asset.AssetId,
+            AssetId = asset.Id,
             AppId = asset.AppId,
             Actor = job.Actor,
             FromRule = true

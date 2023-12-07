@@ -5,13 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
+
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
 public interface IAssetEnricher
 {
-    Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context,
+    Task<EnrichedAsset> EnrichAsync(Asset asset, Context context,
         CancellationToken ct);
 
-    Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets, Context context,
+    Task<IReadOnlyList<EnrichedAsset>> EnrichAsync(IEnumerable<Asset> assets, Context context,
         CancellationToken ct);
 }

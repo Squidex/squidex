@@ -49,7 +49,7 @@ public static partial class StringExtensions
     {
         Guard.NotNull(separator);
 
-        if (parts == null || parts.Length == 0)
+        if (parts is not { Length: > 0 })
         {
             return string.Empty;
         }

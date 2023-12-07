@@ -88,7 +88,7 @@ public sealed class AzureMetadataSource : IAssetMetadataSource
         }
     }
 
-    public IEnumerable<string> Format(IAssetEntity asset)
+    public IEnumerable<string> Format(Asset asset)
     {
         yield break;
     }

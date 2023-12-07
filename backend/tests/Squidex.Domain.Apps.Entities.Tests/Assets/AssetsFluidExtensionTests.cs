@@ -306,7 +306,7 @@ public class AssetsFluidExtensionTests : GivenContext
             .Invokes(x => x.GetArgument<Stream>(4)?.Write(bytes));
     }
 
-    private (TemplateVars, IAssetEntity) SetupAssetVars(int fileSize = 100, AssetType type = AssetType.Image)
+    private (TemplateVars, Asset) SetupAssetVars(int fileSize = 100, AssetType type = AssetType.Image)
     {
         var assetId = DomainId.NewGuid();
         var asset = CreateAsset(assetId, 1, fileSize, type);
@@ -332,7 +332,7 @@ public class AssetsFluidExtensionTests : GivenContext
         return (vars, asset);
     }
 
-    private (TemplateVars, IAssetEntity[]) SetupAssetsVars(int fileSize = 100, AssetType type = AssetType.Image)
+    private (TemplateVars, Asset[]) SetupAssetsVars(int fileSize = 100, AssetType type = AssetType.Image)
     {
         var assetId1 = DomainId.NewGuid();
         var asset1 = CreateAsset(assetId1, 1, fileSize, type);
@@ -363,9 +363,9 @@ public class AssetsFluidExtensionTests : GivenContext
         return (vars, new[] { asset1, asset2 });
     }
 
-    private IEnrichedAssetEntity CreateAsset(DomainId assetId, int index, int fileSize = 100, AssetType type = AssetType.Unknown)
+    private EnrichedAsset CreateAsset(DomainId assetId, int index, int fileSize = 100, AssetType type = AssetType.Unknown)
     {
-        return new AssetEntity
+        return new EnrichedAsset
         {
             AppId = AppId,
             Id = assetId,

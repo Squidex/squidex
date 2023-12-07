@@ -107,7 +107,7 @@ public class ValueConvertersTests
     [InlineData("*")]
     public void Should_convert_nested_asset_ids_to_urls(string path)
     {
-        var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
+        var field = Fields.Array(1, "parent", Partitioning.Invariant, null, Fields.Assets(11, "assets"));
 
         var source =
             JsonValue.Array(
@@ -133,7 +133,7 @@ public class ValueConvertersTests
     [InlineData("other.assets")]
     public void Should_not_convert_nested_asset_ids_if_field_name_does_not_match(string path)
     {
-        var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
+        var field = Fields.Array(1, "parent", Partitioning.Invariant, null, Fields.Assets(11, "assets"));
 
         var source =
             JsonValue.Array(
@@ -155,7 +155,7 @@ public class ValueConvertersTests
         var field = Fields.Component(1, "component", Partitioning.Invariant);
 
         var componentId = DomainId.NewGuid();
-        var component = new Schema("my-component");
+        var component = new Schema { Name = "my-component" };
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
             [componentId] = component
@@ -183,7 +183,7 @@ public class ValueConvertersTests
         var field = Fields.Component(1, "component", Partitioning.Invariant);
 
         var componentId = DomainId.NewGuid();
-        var component = new Schema("my-component");
+        var component = new Schema { Name = "my-component" };
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
             [componentId] = component
@@ -209,7 +209,7 @@ public class ValueConvertersTests
         var field = Fields.Array(1, "component", Partitioning.Invariant);
 
         var componentId = DomainId.NewGuid();
-        var component = new Schema("my-component");
+        var component = new Schema { Name = "my-component" };
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
             [componentId] = component
@@ -234,7 +234,7 @@ public class ValueConvertersTests
         var field = Fields.Component(1, "component", Partitioning.Invariant);
 
         var componentId = DomainId.NewGuid();
-        var component = new Schema("my-component");
+        var component = new Schema { Name = "my-component" };
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
             [componentId] = component

@@ -7,10 +7,10 @@
 
 using System.Text;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure;
@@ -57,7 +57,7 @@ public sealed class ContentsSearchSource : ISearchSource
 
         var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope(), ct);
 
-        if (ids == null || ids.Count == 0)
+        if (ids is not { Count: > 0 })
         {
             return result;
         }
@@ -84,7 +84,7 @@ public sealed class ContentsSearchSource : ISearchSource
     {
         var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
-        return schemas.Where(x => HasPermission(context, x.SchemaDef.Name)).Select(x => x.Id).ToList();
+        return schemas.Where(x => HasPermission(context, x.Name)).Select(x => x.Id).ToList();
     }
 
     private static bool HasPermission(Context context, string schemaName)
@@ -92,7 +92,7 @@ public sealed class ContentsSearchSource : ISearchSource
         return context.UserPermissions.Allows(PermissionIds.AppContentsReadOwn, context.App.Name, schemaName);
     }
 
-    private static string FormatName(IEnrichedContentEntity content, string masterLanguage)
+    private static string FormatName(EnrichedContent content, string masterLanguage)
     {
         var sb = new StringBuilder();
 

@@ -21,7 +21,7 @@ public sealed class CalculateTokens : IContentEnricherStep
         this.urlGenerator = urlGenerator;
     }
 
-    public Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    public Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
         var url = urlGenerator.Root();

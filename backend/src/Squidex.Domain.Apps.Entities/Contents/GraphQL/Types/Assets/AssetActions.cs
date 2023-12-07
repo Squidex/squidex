@@ -31,7 +31,7 @@ internal static class AssetActions
             },
         ];
 
-        public static readonly IFieldResolver Resolver = Resolvers.Sync<IEnrichedAssetEntity, object?>((source, fieldContext, _) =>
+        public static readonly IFieldResolver Resolver = Resolvers.Sync<EnrichedAsset, object?>((source, fieldContext, _) =>
         {
             if (fieldContext.Arguments != null &&
                 fieldContext.Arguments.TryGetValue("path", out var path))

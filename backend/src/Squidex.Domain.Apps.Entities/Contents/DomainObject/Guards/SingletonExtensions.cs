@@ -16,7 +16,7 @@ public static class SingletonExtensions
 {
     public static void MustNotCreateForUnpublishedSchema(this ContentOperation operation)
     {
-        if (!operation.SchemaDef.IsPublished && operation.SchemaDef.Type != SchemaType.Singleton)
+        if (!operation.Schema.IsPublished && operation.Schema.Type != SchemaType.Singleton)
         {
             throw new DomainException(T.Get("contents.schemaNotPublished"));
         }
@@ -24,7 +24,7 @@ public static class SingletonExtensions
 
     public static void MustNotCreateComponent(this ContentOperation operation)
     {
-        if (operation.SchemaDef.Type == SchemaType.Component)
+        if (operation.Schema.Type == SchemaType.Component)
         {
             throw new DomainException(T.Get("contents.componentNotCreatable"));
         }
@@ -32,7 +32,7 @@ public static class SingletonExtensions
 
     public static void MustNotCreateSingleton(this ContentOperation operation)
     {
-        if (operation.SchemaDef.Type == SchemaType.Singleton && operation.CommandId != operation.Schema.Id)
+        if (operation.Schema.Type == SchemaType.Singleton && operation.CommandId != operation.Schema.Id)
         {
             throw new DomainException(T.Get("contents.singletonNotCreatable"));
         }
@@ -40,7 +40,7 @@ public static class SingletonExtensions
 
     public static void MustNotChangeSingleton(this ContentOperation operation, Status status)
     {
-        if (operation.SchemaDef.Type == SchemaType.Singleton && (operation.Snapshot.NewStatus == null || status != Status.Published))
+        if (operation.Schema.Type == SchemaType.Singleton && (operation.Snapshot.NewVersion == null || status != Status.Published))
         {
             throw new DomainException(T.Get("contents.singletonNotChangeable"));
         }
@@ -48,7 +48,7 @@ public static class SingletonExtensions
 
     public static void MustNotDeleteSingleton(this ContentOperation operation)
     {
-        if (operation.SchemaDef.Type == SchemaType.Singleton)
+        if (operation.Schema.Type == SchemaType.Singleton)
         {
             throw new DomainException(T.Get("contents.singletonNotDeletable"));
         }

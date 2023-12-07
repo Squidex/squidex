@@ -24,13 +24,13 @@ public class ReferenceFormattingTests
         var data = CreateData();
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddString(1, "ref1", Partitioning.Invariant,
                     new StringFieldProperties())
                 .AddString(2, "ref2", Partitioning.Invariant,
                     new StringFieldProperties())
                 .AddString(3, "non-ref", Partitioning.Invariant)
-                .SetFieldsInReferences("ref1", "ref2");
+                .SetFieldsInReferences(FieldNames.Create("ref1", "ref2"));
 
         var formatted = data.FormatReferences(schema, languages);
 
@@ -78,7 +78,7 @@ public class ReferenceFormattingTests
 
     private static Schema CreateNoRefSchema()
     {
-        return new Schema("my-schema")
+        return new Schema { Name = "my-schema" }
             .AddString(1, "ref1", Partitioning.Invariant)
             .AddString(2, "ref2", Partitioning.Invariant)
             .AddString(3, "non-ref", Partitioning.Invariant);

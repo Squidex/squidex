@@ -11,15 +11,15 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Schemas;
 
-public class SchemaChangedTriggerHandlerTests
+public class SchemaChangedTriggerHandlerTests : GivenContext
 {
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
     private readonly IRuleTriggerHandler sut;
@@ -66,7 +66,7 @@ public class SchemaChangedTriggerHandlerTests
     [MemberData(nameof(TestEvents))]
     public async Task Should_create_enriched_events(SchemaEvent @event, EnrichedSchemaEventType type)
     {
-        var ctx = Context(appId: @event.AppId).ToRulesContext();
+        var ctx = Context().ToRulesContext();
 
         var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
@@ -154,15 +154,16 @@ public class SchemaChangedTriggerHandlerTests
         }
     }
 
-    private static RuleContext Context(RuleTrigger? trigger = null, NamedId<DomainId>? appId = null)
+    private RuleContext Context(RuleTrigger? trigger = null)
     {
         trigger ??= new SchemaChangedTrigger();
 
         return new RuleContext
         {
-            AppId = appId ?? NamedId.Of(DomainId.NewGuid(), "my-app"),
-            Rule = new Rule(trigger, A.Fake<RuleAction>()),
-            RuleId = DomainId.NewGuid()
+            AppId = AppId,
+            IncludeSkipped = true,
+            IncludeStale = true,
+            Rule = CreateRule() with { Trigger = trigger }
         };
     }
 }

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 
 public static class GuardAppRoles
 {
-    public static void CanAdd(AddRole command, IAppEntity app)
+    public static void CanAdd(AddRole command, App app)
     {
         Guard.NotNull(command);
 
@@ -34,7 +34,7 @@ public static class GuardAppRoles
         });
     }
 
-    public static void CanDelete(DeleteRole command, IAppEntity app)
+    public static void CanDelete(DeleteRole command, App app)
     {
         Guard.NotNull(command);
 
@@ -65,7 +65,7 @@ public static class GuardAppRoles
         });
     }
 
-    public static void CanUpdate(UpdateRole command, IAppEntity app)
+    public static void CanUpdate(UpdateRole command, App app)
     {
         Guard.NotNull(command);
 

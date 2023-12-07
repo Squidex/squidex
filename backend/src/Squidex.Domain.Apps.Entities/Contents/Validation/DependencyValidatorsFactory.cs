@@ -37,7 +37,7 @@ public sealed class DependencyValidatorsFactory : IValidatorsFactory
         {
             var checkAssets = new CheckAssets(async (ids, ct) =>
             {
-                return await assetRepository.QueryAsync(context.Root.AppId.Id, null, Q.Empty.WithIds(ids), ct);
+                return await assetRepository.QueryAsync(context.Root.App.Id, null, Q.Empty.WithIds(ids), ct);
             });
 
             yield return new AssetsValidator(isRequired, assetsField.Properties, checkAssets);
@@ -47,7 +47,7 @@ public sealed class DependencyValidatorsFactory : IValidatorsFactory
         {
             var checkReferences = new CheckContentsByIds(async (ids, ct) =>
             {
-                return await contentRepository.QueryIdsAsync(context.Root.AppId.Id, ids, SearchScope.All, ct);
+                return await contentRepository.QueryIdsAsync(context.Root.App, ids, SearchScope.All, ct);
             });
 
             yield return new ReferencesValidator(isRequired, referencesField.Properties, checkReferences);
@@ -57,7 +57,7 @@ public sealed class DependencyValidatorsFactory : IValidatorsFactory
         {
             var checkUniqueness = new CheckUniqueness(async (f, ct) =>
             {
-                return await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, f, SearchScope.All, ct);
+                return await contentRepository.QueryIdsAsync(context.Root.App, context.Root.Schema, f, SearchScope.All, ct);
             });
 
             yield return new UniqueValidator(checkUniqueness);
@@ -67,7 +67,7 @@ public sealed class DependencyValidatorsFactory : IValidatorsFactory
         {
             var checkUniqueness = new CheckUniqueness(async (f, ct) =>
             {
-                return await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, f, SearchScope.All, ct);
+                return await contentRepository.QueryIdsAsync(context.Root.App, context.Root.Schema, f, SearchScope.All, ct);
             });
 
             yield return new UniqueValidator(checkUniqueness);

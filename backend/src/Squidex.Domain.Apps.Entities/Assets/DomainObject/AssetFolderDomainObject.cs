@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -20,18 +21,18 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolderDomainObject.State>
+public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolder>
 {
     private readonly IServiceProvider serviceProvider;
 
-    public AssetFolderDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<AssetFolderDomainObject> log,
+    public AssetFolderDomainObject(DomainId id, IPersistenceFactory<AssetFolder> persistence, ILogger<AssetFolderDomainObject> log,
         IServiceProvider serviceProvider)
         : base(id, persistence, log)
     {
         this.serviceProvider = serviceProvider;
     }
 
-    protected override bool IsDeleted(State snapshot)
+    protected override bool IsDeleted(AssetFolder snapshot)
     {
         return Snapshot.IsDeleted;
     }

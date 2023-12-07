@@ -87,7 +87,7 @@ public sealed class BackupReader : DisposableObjectBase, IBackupReader
     {
         var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
 
-        if (attachmentEntry == null || attachmentEntry.Length == 0)
+        if (attachmentEntry is not { Length: > 0 })
         {
             throw new FileNotFoundException("Cannot find attachment.", name);
         }

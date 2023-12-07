@@ -62,7 +62,7 @@ public class UIFieldTests : IClassFixture<TranslationsFixture>
     public async Task Should_add_error_if_field_object_is_defined()
     {
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddUI(1, "myUI1", Partitioning.Invariant)
                 .AddUI(2, "myUI2", Partitioning.Invariant);
 
@@ -88,7 +88,7 @@ public class UIFieldTests : IClassFixture<TranslationsFixture>
     public async Task Should_add_error_if_array_item_field_is_defined()
     {
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddArray(1, "myArray", Partitioning.Invariant, array => array
                     .AddUI(101, "myUI"));
 
@@ -113,6 +113,6 @@ public class UIFieldTests : IClassFixture<TranslationsFixture>
 
     private static NestedField<UIFieldProperties> Field(UIFieldProperties properties)
     {
-        return new NestedField<UIFieldProperties>(1, "myUI", properties);
+        return Fields.UI(1, "myUI", properties);
     }
 }

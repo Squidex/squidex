@@ -12,7 +12,6 @@ using NodaTime;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
@@ -83,7 +82,7 @@ public class RuleEnqueuerTests : GivenContext
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
             .Returns(Enumerable.Repeat(new JobResult(), 1).ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
+        await sut.EnqueueAsync(rule.Id, rule, @event);
 
         A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .MustNotHaveHappened();
@@ -97,14 +96,9 @@ public class RuleEnqueuerTests : GivenContext
         var rule = CreateRule();
 
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(Enumerable.Repeat(new JobResult
-            {
-                Rule = rule.RuleDef,
-                RuleId = rule.Id,
-                SkipReason = SkipReason.WrongEvent
-            }, 1).ToAsyncEnumerable());
+            .Returns(Enumerable.Repeat(new JobResult { Rule = rule, SkipReason = SkipReason.WrongEvent }, 1).ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
+        await sut.EnqueueAsync(rule.Id, rule, @event);
 
         A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .MustNotHaveHappened();
@@ -131,14 +125,9 @@ public class RuleEnqueuerTests : GivenContext
             .Invokes(x => writes = x.GetArgument<List<RuleEventWrite>>(0)?.ToArray());
 
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(Enumerable.Repeat(new JobResult
-            {
-                Job = job,
-                Rule = rule.RuleDef,
-                RuleId = rule.Id
-            }, 1).ToAsyncEnumerable());
+            .Returns(Enumerable.Repeat(new JobResult { Job = job, Rule = rule }, 1).ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
+        await sut.EnqueueAsync(rule.Id, rule, @event);
 
         Assert.Equal(new[] { new RuleEventWrite(job, job.Created) }, writes);
 
@@ -167,15 +156,9 @@ public class RuleEnqueuerTests : GivenContext
             .Invokes(x => writes = x.GetArgument<List<RuleEventWrite>>(0)?.ToArray());
 
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(Enumerable.Repeat(new JobResult
-            {
-                Job = job,
-                Rule = rule.RuleDef,
-                RuleId = rule.Id,
-                SkipReason = SkipReason.Failed
-            }, 1).ToAsyncEnumerable());
+            .Returns(Enumerable.Repeat(new JobResult { Job = job, Rule = rule, SkipReason = SkipReason.Failed }, 1).ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.Id, rule.RuleDef, @event);
+        await sut.EnqueueAsync(rule.Id, rule, @event);
 
         Assert.Equal(new[] { new RuleEventWrite(job) }, writes);
 
@@ -292,27 +275,14 @@ public class RuleEnqueuerTests : GivenContext
             .Returns([rule]);
 
         A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
-            .Returns(Enumerable.Repeat(new JobResult
-            {
-                Job = job,
-                Rule = rule.RuleDef,
-                RuleId = rule.Id,
-                SkipReason = skipReason
-            }, 1).ToAsyncEnumerable());
+            .Returns(Enumerable.Repeat(new JobResult { Job = job, Rule = rule, SkipReason = skipReason }, 1).ToAsyncEnumerable());
     }
 
-    private static RuleEntity CreateRule()
-    {
-        var rule = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
-
-        return new RuleEntity { RuleDef = rule, Id = DomainId.NewGuid() };
-    }
-
-    private static RulesContext MatchingContext(RuleEntity rule)
+    private static RulesContext MatchingContext(Rule rule)
     {
         // These two properties must not be set to true for performance reasons.
         return A<RulesContext>.That.Matches(x =>
-            x.Rules.Values.Contains(rule.RuleDef) &&
+            x.Rules.Values.Contains(rule) &&
            !x.IncludeSkipped &&
            !x.IncludeStale);
     }

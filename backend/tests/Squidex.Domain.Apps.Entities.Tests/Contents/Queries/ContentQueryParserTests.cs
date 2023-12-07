@@ -28,13 +28,9 @@ public class ContentQueryParserTests : GivenContext
     {
         var options = Options.Create(new ContentOptions { DefaultPageSize = 30 });
 
-        var schemaDef =
-            new Schema(SchemaId.Name)
-                .AddString(1, "firstName", Partitioning.Invariant)
-                .AddGeolocation(2, "geo", Partitioning.Invariant);
-
-        A.CallTo(() => Schema.SchemaDef)
-            .Returns(schemaDef);
+        Schema = Schema
+            .AddString(1, "firstName", Partitioning.Invariant)
+            .AddGeolocation(2, "geo", Partitioning.Invariant);
 
         var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 

@@ -25,7 +25,7 @@ public sealed class LanguageConfigSurrogate : ISurrogate<LanguageConfig>
 
     public LanguageConfig ToSource()
     {
-        if (!IsOptional && (Fallback == null || Fallback.Length == 0))
+        if (!IsOptional && Fallback is not { Length: > 0 })
         {
             return LanguageConfig.Default;
         }

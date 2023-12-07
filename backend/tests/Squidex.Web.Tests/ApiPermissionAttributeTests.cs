@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
-using Squidex.Web.Pipeline;
 
 #pragma warning disable IDE0017 // Simplify object initialization
 
@@ -59,7 +58,7 @@ public class ApiPermissionAttributeTests : GivenContext
     [Fact]
     public async Task Should_make_permission_check_with_app_feature()
     {
-        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        actionExecutingContext.HttpContext.Features.Set(App);
 
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
@@ -76,8 +75,8 @@ public class ApiPermissionAttributeTests : GivenContext
     [Fact]
     public async Task Should_make_permission_check_with_schema_feature()
     {
-        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(App));
-        actionExecutingContext.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Schema));
+        actionExecutingContext.HttpContext.Features.Set(App);
+        actionExecutingContext.HttpContext.Features.Set(Schema);
 
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app.schemas.my-schema"));
 
@@ -94,7 +93,7 @@ public class ApiPermissionAttributeTests : GivenContext
     [Fact]
     public async Task Should_return_forbidden_if_user_has_wrong_permission()
     {
-        actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(App));
+        actionExecutingContext.HttpContext.Features.Set(App);
 
         user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 

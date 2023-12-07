@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -70,13 +70,13 @@ public sealed class AppSettingsController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        var result = context.Result<IAppEntity>();
+        var result = context.Result<App>();
         var response = GetResponse(result);
 
         return response;
     }
 
-    private AppSettingsDto GetResponse(IAppEntity result)
+    private AppSettingsDto GetResponse(App result)
     {
         return AppSettingsDto.FromDomain(result, Resources);
     }

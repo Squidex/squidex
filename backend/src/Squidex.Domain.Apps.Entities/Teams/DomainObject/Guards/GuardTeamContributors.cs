@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards;
 
 public static class GuardTeamContributors
 {
-    public static Task CanAssign(AssignContributor command, ITeamEntity team, IUserResolver users)
+    public static Task CanAssign(AssignContributor command, Team team, IUserResolver users)
     {
         Guard.NotNull(command);
 
@@ -50,7 +51,7 @@ public static class GuardTeamContributors
         });
     }
 
-    public static void CanRemove(RemoveContributor command, ITeamEntity team)
+    public static void CanRemove(RemoveContributor command, Team team)
     {
         Guard.NotNull(command);
 

@@ -9,11 +9,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -44,7 +43,7 @@ public class ContentQueryParser
         this.options = options.Value;
     }
 
-    public virtual async Task<Q> ParseAsync(Context context, Q q, ISchemaEntity? schema = null,
+    public virtual async Task<Q> ParseAsync(Context context, Q q, Schema? schema = null,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -75,7 +74,7 @@ public class ContentQueryParser
         }
     }
 
-    private async Task TransformFilterAsync(ClrQuery query, Context context, ISchemaEntity? schema,
+    private async Task TransformFilterAsync(ClrQuery query, Context context, Schema? schema,
         CancellationToken ct)
     {
         if (query.Filter != null && schema != null)
@@ -119,7 +118,7 @@ public class ContentQueryParser
         query.FullText = null;
     }
 
-    private async Task<ClrQuery> ParseClrQueryAsync(Context context, Q q, ISchemaEntity? schema,
+    private async Task<ClrQuery> ParseClrQueryAsync(Context context, Q q, Schema? schema,
         CancellationToken ct)
     {
         var components = ResolvedComponents.Empty;
@@ -181,7 +180,7 @@ public class ContentQueryParser
         }
     }
 
-    private ClrQuery ParseJson(Context context, ISchemaEntity? schema, Query<JsonValue> query,
+    private ClrQuery ParseJson(Context context, Schema? schema, Query<JsonValue> query,
         ResolvedComponents components)
     {
         var queryModel = BuildQueryModel(context, schema, components);
@@ -189,7 +188,7 @@ public class ContentQueryParser
         return queryModel.Convert(query);
     }
 
-    private ClrQuery ParseJson(Context context, ISchemaEntity? schema, string json,
+    private ClrQuery ParseJson(Context context, Schema? schema, string json,
         ResolvedComponents components)
     {
         var queryModel = BuildQueryModel(context, schema, components);
@@ -197,7 +196,7 @@ public class ContentQueryParser
         return queryModel.Parse(json, serializer);
     }
 
-    private ClrQuery ParseOData(Context context, ISchemaEntity? schema, string odata,
+    private ClrQuery ParseOData(Context context, Schema? schema, string odata,
         ResolvedComponents components)
     {
         try
@@ -226,7 +225,7 @@ public class ContentQueryParser
         }
     }
 
-    private QueryModel BuildQueryModel(Context context, ISchemaEntity? schema,
+    private QueryModel BuildQueryModel(Context context, Schema? schema,
         ResolvedComponents components)
     {
         var cacheKey = BuildJsonCacheKey(context.App, schema, context.IsFrontendClient);
@@ -235,13 +234,13 @@ public class ContentQueryParser
         {
             entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
-            return ContentQueryModel.Build(schema?.SchemaDef, context.App.PartitionResolver(), components);
+            return ContentQueryModel.Build(schema, context.App.PartitionResolver(), components);
         })!;
 
         return result;
     }
 
-    private IEdmModel BuildEdmModel(Context context, ISchemaEntity? schema,
+    private IEdmModel BuildEdmModel(Context context, Schema? schema,
         ResolvedComponents components)
     {
         var cacheKey = BuildEmdCacheKey(context.App, schema, context.IsFrontendClient);
@@ -250,13 +249,13 @@ public class ContentQueryParser
         {
             entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
-            return BuildQueryModel(context, schema, components).ConvertToEdm("Contents", schema?.SchemaDef.Name ?? "Generic");
+            return BuildQueryModel(context, schema, components).ConvertToEdm("Contents", schema?.Name ?? "Generic");
         })!;
 
         return result;
     }
 
-    private static string BuildEmdCacheKey(IAppEntity app, ISchemaEntity? schema, bool withHidden)
+    private static string BuildEmdCacheKey(App app, Schema? schema, bool withHidden)
     {
         if (schema == null)
         {
@@ -266,7 +265,7 @@ public class ContentQueryParser
         return $"EDM/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
     }
 
-    private static string BuildJsonCacheKey(IAppEntity app, ISchemaEntity? schema, bool withHidden)
+    private static string BuildJsonCacheKey(App app, Schema? schema, bool withHidden)
     {
         if (schema == null)
         {

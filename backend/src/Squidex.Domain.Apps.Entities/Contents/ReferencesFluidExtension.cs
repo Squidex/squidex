@@ -10,6 +10,7 @@ using Fluid;
 using Fluid.Ast;
 using Fluid.Values;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Infrastructure;
@@ -79,7 +80,7 @@ public sealed class ReferencesFluidExtension : IFluidExtension
         });
     }
 
-    private static async Task<IContentEntity?> ResolveContentAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)
+    private static async Task<Content?> ResolveContentAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)
     {
         var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
 

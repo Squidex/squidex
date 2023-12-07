@@ -134,7 +134,7 @@ public class BackgroundUsageTrackerTests
     }
 
     [Fact]
-    public async Task Should_create_empty_actuals_with_default_category_is_actual_is_empty()
+    public async Task Should_create_empty_results_with_default_category_is_result_is_empty()
     {
         var dateFrom = date;
         var dateTo = dateFrom.AddDays(4);
@@ -160,7 +160,7 @@ public class BackgroundUsageTrackerTests
     }
 
     [Fact]
-    public async Task Should_create_actuals_with_filled_days()
+    public async Task Should_create_results_with_filled_days()
     {
         var dateFrom = date;
         var dateTo = dateFrom.AddDays(4);

@@ -7,13 +7,13 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Apps;
 
-public sealed class MongoAppEntity : MongoState<AppDomainObject.State>
+public sealed class MongoAppEntity : MongoState<App>
 {
     [BsonRequired]
     [BsonElement("_an")]

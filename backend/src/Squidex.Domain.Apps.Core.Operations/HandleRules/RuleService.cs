@@ -38,8 +38,6 @@ public sealed class RuleService : IRuleService
 
         public Rule Rule { get; init; }
 
-        public DomainId RuleId;
-
         public IRuleActionHandler ActionHandler;
     }
 
@@ -115,7 +113,7 @@ public sealed class RuleService : IRuleService
                     continue;
                 }
 
-                job = await CreateJobAsync(enrichedEvent, actionHandler, context.RuleId, context.Rule, now);
+                job = await CreateJobAsync(enrichedEvent, actionHandler, context.Rule, now);
                 job.Offset = offset++;
             }
             catch (Exception ex)
@@ -133,11 +131,7 @@ public sealed class RuleService : IRuleService
         Guard.NotNull(@event);
 
         // Each rule can has its own errors.
-        var states = context.Rules.Select(x => new RuleState
-        {
-            Rule = x.Value,
-            RuleId = x.Key
-        }).ToList();
+        var states = context.Rules.Select(x => new RuleState { Rule = x.Value }).ToList();
 
         var allResults =
             CreateJobs(@event, context, states, ct)
@@ -145,13 +139,7 @@ public sealed class RuleService : IRuleService
                 {
                     log.LogError(ex, "Failed to create rule job.");
 
-                    return states.Select(state =>
-                        new JobResult
-                        {
-                            Rule = state.Rule,
-                            RuleId = state.RuleId,
-                            SkipReason = SkipReason.Failed,
-                        });
+                    return states.Select(state => JobResult.Skipped(state.Rule, SkipReason.Failed));
                 });
 
         return allResults;
@@ -164,12 +152,7 @@ public sealed class RuleService : IRuleService
         {
             foreach (var state in states)
             {
-                yield return new JobResult
-                {
-                    Rule = state.Rule,
-                    RuleId = state.RuleId,
-                    SkipReason = SkipReason.WrongEvent
-                };
+                yield return JobResult.Skipped(state.Rule, SkipReason.WrongEvent);
             }
 
             yield break;
@@ -190,12 +173,7 @@ public sealed class RuleService : IRuleService
             {
                 foreach (var state in states)
                 {
-                    yield return new JobResult
-                    {
-                        Rule = state.Rule,
-                        RuleId = state.RuleId,
-                        SkipReason = SkipReason.FromRule
-                    };
+                    yield return JobResult.Skipped(state.Rule, SkipReason.FromRule);
                 }
 
                 yield break;
@@ -222,12 +200,7 @@ public sealed class RuleService : IRuleService
             {
                 foreach (var state in states)
                 {
-                    yield return new JobResult
-                    {
-                        Rule = state.Rule,
-                        RuleId = state.RuleId,
-                        SkipReason = SkipReason.TooOld
-                    };
+                    yield return JobResult.Skipped(state.Rule, SkipReason.TooOld);
                 }
 
                 yield break;
@@ -248,13 +221,7 @@ public sealed class RuleService : IRuleService
                 }
                 else
                 {
-                    yield return new JobResult
-                    {
-                        Rule = state.Rule,
-                        RuleId = state.RuleId,
-                        SkipReason = SkipReason.Disabled
-                    };
-
+                    yield return JobResult.Skipped(state.Rule, SkipReason.Disabled);
                     continue;
                 }
             }
@@ -263,37 +230,19 @@ public sealed class RuleService : IRuleService
 
             if (!ruleTriggerHandlers.TryGetValue(rule.Trigger.GetType(), out var triggerHandler))
             {
-                yield return new JobResult
-                {
-                    Rule = state.Rule,
-                    RuleId = state.RuleId,
-                    SkipReason = SkipReason.NoTrigger
-                };
-
+                yield return JobResult.Skipped(state.Rule, SkipReason.NoTrigger);
                 continue;
             }
 
             if (!triggerHandler.Handles(typed.Payload))
             {
-                yield return new JobResult
-                {
-                    Rule = state.Rule,
-                    RuleId = state.RuleId,
-                    SkipReason = SkipReason.WrongEventForTrigger
-                };
-
+                yield return JobResult.Skipped(state.Rule, SkipReason.WrongEventForTrigger);
                 continue;
             }
 
             if (!ruleActionHandlers.TryGetValue(actionType, out state.ActionHandler!))
             {
-                yield return new JobResult
-                {
-                    Rule = state.Rule,
-                    RuleId = state.RuleId,
-                    SkipReason = SkipReason.NoAction
-                };
-
+                yield return JobResult.Skipped(state.Rule, SkipReason.NoAction);
                 continue;
             }
 
@@ -305,13 +254,7 @@ public sealed class RuleService : IRuleService
                 }
                 else
                 {
-                    yield return new JobResult
-                    {
-                        Rule = state.Rule,
-                        RuleId = state.RuleId,
-                        SkipReason = SkipReason.ConditionPrecheckDoesNotMatch
-                    };
-
+                    yield return JobResult.Skipped(state.Rule, SkipReason.ConditionPrecheckDoesNotMatch);
                     continue;
                 }
             }
@@ -333,13 +276,7 @@ public sealed class RuleService : IRuleService
                     {
                         log.LogError(ex, "Failed to create rule jobs from trigger.");
 
-                        return states.Select(state =>
-                            new JobResult
-                            {
-                                Rule = state.Rule,
-                                RuleId = state.RuleId,
-                                SkipReason = SkipReason.Failed,
-                            });
+                        return states.Select(state => JobResult.Skipped(state.Rule, SkipReason.Failed));
                     });
 
             await foreach (var result in triggerResults.WithCancellation(ct))
@@ -371,7 +308,6 @@ public sealed class RuleService : IRuleService
                                 EnrichedEvent = enrichedEvent,
                                 EnrichmentError = ex,
                                 Rule = state.Rule,
-                                RuleId = state.RuleId,
                                 SkipReason = SkipReason.Failed,
                             });
                     });
@@ -410,8 +346,8 @@ public sealed class RuleService : IRuleService
                     yield return new JobResult
                     {
                         EnrichedEvent = enrichedEvent,
+                        EnrichmentError = null,
                         Rule = state.Rule,
-                        RuleId = state.RuleId,
                         SkipReason = SkipReason.ConditionDoesNotMatch
                     };
 
@@ -419,7 +355,7 @@ public sealed class RuleService : IRuleService
                 }
             }
 
-            var result = await CreateJobAsync(enrichedEvent, state.ActionHandler, state.RuleId, state.Rule, now);
+            var result = await CreateJobAsync(enrichedEvent, state.ActionHandler, state.Rule, now);
 
             // If the conditions matchs, we can skip creating a new object and save a few allocations.
             if (skipped != SkipReason.None)
@@ -431,7 +367,7 @@ public sealed class RuleService : IRuleService
         }
     }
 
-    private async Task<JobResult> CreateJobAsync(EnrichedEvent enrichedEvent, IRuleActionHandler actionHandler, DomainId ruleId, Rule rule, Instant now)
+    private async Task<JobResult> CreateJobAsync(EnrichedEvent enrichedEvent, IRuleActionHandler actionHandler, Rule rule, Instant now)
     {
         var actionType = rule.Action.GetType();
         var actionName = typeRegistry.GetName<RuleAction>(actionType);
@@ -448,7 +384,7 @@ public sealed class RuleService : IRuleService
             EventName = enrichedEvent.Name,
             ExecutionPartition = enrichedEvent.Partition,
             Expires = expires,
-            RuleId = ruleId
+            RuleId = rule.Id
         };
 
         try
@@ -464,8 +400,8 @@ public sealed class RuleService : IRuleService
             return new JobResult
             {
                 EnrichedEvent = enrichedEvent,
+                EnrichmentError = null,
                 Rule = rule,
-                RuleId = ruleId,
                 Job = job,
             };
         }

@@ -7,6 +7,7 @@
 
 using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -45,7 +46,7 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
         var operation = Operation(CreateAssetFolder());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<IAssetFolderEntity>());
+            .Returns(new List<AssetFolder>());
 
         await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
             new ValidationError("Asset folder does not exist.", "ParentId"));
@@ -59,7 +60,7 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
         var operation = Operation(CreateAssetFolder());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<IAssetFolderEntity> { CreateAssetFolder() });
+            .Returns(new List<AssetFolder> { CreateAssetFolder() });
 
         await operation.MustMoveToValidFolder(parentId, CancellationToken);
     }
@@ -69,7 +70,7 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
     {
         var parentId = DomainId.NewGuid();
 
-        var operation = Operation(CreateAssetFolder(default, parentId));
+        var operation = Operation(CreateAssetFolder() with { ParentId = parentId });
 
         await operation.MustMoveToValidFolder(parentId, CancellationToken);
 
@@ -98,22 +99,22 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
         var operation = Operation(CreateAssetFolder());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<IAssetFolderEntity>
+            .Returns(new List<AssetFolder>
             {
-                CreateAssetFolder(operation.CommandId),
-                CreateAssetFolder(parentId, operation.CommandId)
+                CreateAssetFolder().WithId(operation.CommandId),
+                CreateAssetFolder().WithId(parentId) with { ParentId = operation.CommandId }
             });
 
         await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
             new ValidationError("Cannot add folder to its own child.", "ParentId"));
     }
 
-    private AssetFolderOperation Operation(IAssetFolderEntity assetFolder)
+    private AssetFolderOperation Operation(AssetFolder assetFolder)
     {
         return Operation(assetFolder, Mocks.FrontendUser());
     }
 
-    private AssetFolderOperation Operation(IAssetFolderEntity assetFolder, ClaimsPrincipal? currentUser)
+    private AssetFolderOperation Operation(AssetFolder assetFolder, ClaimsPrincipal? currentUser)
     {
         var serviceProvider =
             new ServiceCollection()
@@ -126,29 +127,5 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
             CommandId = assetFolder.Id,
             Command = new CreateAssetFolder { User = currentUser, Actor = actor }
         };
-    }
-
-    private IAssetFolderEntity CreateAssetFolder(DomainId id = default, DomainId parentId = default)
-    {
-        var assetFolder = A.Fake<IAssetFolderEntity>();
-
-        A.CallTo(() => assetFolder.Id)
-            .Returns(OrNew(id));
-        A.CallTo(() => assetFolder.AppId)
-            .Returns(AppId);
-        A.CallTo(() => assetFolder.ParentId)
-            .Returns(OrNew(parentId));
-
-        return assetFolder;
-    }
-
-    private static DomainId OrNew(DomainId parentId)
-    {
-        if (parentId == default)
-        {
-            parentId = DomainId.NewGuid();
-        }
-
-        return parentId;
     }
 }

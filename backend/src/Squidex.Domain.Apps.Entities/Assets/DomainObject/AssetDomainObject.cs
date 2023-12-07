@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -20,18 +21,18 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
+public partial class AssetDomainObject : DomainObject<Asset>
 {
     private readonly IServiceProvider serviceProvider;
 
-    public AssetDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<AssetDomainObject> log,
+    public AssetDomainObject(DomainId id, IPersistenceFactory<Asset> persistence, ILogger<AssetDomainObject> log,
         IServiceProvider serviceProvider)
         : base(id, persistence, log)
     {
         this.serviceProvider = serviceProvider;
     }
 
-    protected override bool IsDeleted(State snapshot)
+    protected override bool IsDeleted(Asset snapshot)
     {
         return snapshot.IsDeleted;
     }
@@ -80,7 +81,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
                         await CreateCore(c.AsCreate(), operation, ct);
                     }
 
-                    if (Is.OptionalChange(Snapshot.ParentId, c.ParentId))
+                    if (c.ParentId != null && c.ParentId != Snapshot.ParentId)
                     {
                         await MoveCore(c.AsMove(c.ParentId.Value), operation, ct);
                     }
@@ -95,7 +96,7 @@ public partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
 
                     await CreateCore(c, operation, ct);
 
-                    if (Is.Change(Snapshot.ParentId, c.ParentId))
+                    if (c.ParentId != Snapshot.ParentId)
                     {
                         await MoveCore(c.AsMove(), operation, ct);
                     }

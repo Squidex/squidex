@@ -88,7 +88,7 @@ public sealed class BatchContext<T> : IBatchContext<T>
     {
         var current = Interlocked.Exchange(ref snapshots, null!);
 
-        if (current == null || current.Count == 0)
+        if (current is not { Count: > 0 })
         {
             return Task.CompletedTask;
         }

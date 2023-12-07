@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
@@ -24,7 +24,7 @@ public sealed class ContentEnricher : IContentEnricher
         this.appProvider = appProvider;
     }
 
-    public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context,
+    public async Task<EnrichedContent> EnrichAsync(Content content, bool cloneData, Context context,
         CancellationToken ct)
     {
         Guard.NotNull(content);
@@ -34,7 +34,7 @@ public sealed class ContentEnricher : IContentEnricher
         return enriched[0];
     }
 
-    public Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context,
+    public Task<IReadOnlyList<EnrichedContent>> EnrichAsync(IEnumerable<Content> contents, Context context,
         CancellationToken ct)
     {
         Guard.NotNull(contents);
@@ -43,12 +43,12 @@ public sealed class ContentEnricher : IContentEnricher
         return EnrichInternalAsync(contents, false, context, ct);
     }
 
-    private async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichInternalAsync(IEnumerable<IContentEntity> contents, bool cloneData, Context context,
+    private async Task<IReadOnlyList<EnrichedContent>> EnrichInternalAsync(IEnumerable<Content> contents, bool cloneData, Context context,
         CancellationToken ct)
     {
         using (var activity = Telemetry.Activities.StartActivity("ContentEnricher/EnrichInternalAsync"))
         {
-            var results = new List<ContentEntity>();
+            var results = new List<EnrichedContent>();
 
             if (context.App != null)
             {
@@ -65,7 +65,7 @@ public sealed class ContentEnricher : IContentEnricher
 
             foreach (var content in contents)
             {
-                var result = SimpleMapper.Map(content, new ContentEntity());
+                var result = SimpleMapper.Map(content, new EnrichedContent());
 
                 if (cloneData)
                 {
@@ -80,9 +80,9 @@ public sealed class ContentEnricher : IContentEnricher
 
             if (context.App != null)
             {
-                var schemaCache = new Dictionary<DomainId, Task<(ISchemaEntity, ResolvedComponents)>>();
+                var schemaCache = new Dictionary<DomainId, Task<(Schema, ResolvedComponents)>>();
 
-                Task<(ISchemaEntity, ResolvedComponents)> GetSchema(DomainId id)
+                Task<(Schema, ResolvedComponents)> GetSchema(DomainId id)
                 {
                     return schemaCache.GetOrAdd(id, async x =>
                     {

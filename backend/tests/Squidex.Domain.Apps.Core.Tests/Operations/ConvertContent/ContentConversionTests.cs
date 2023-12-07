@@ -21,7 +21,7 @@ public class ContentConversionTests
     public ContentConversionTests()
     {
         schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddComponent(1, "component", Partitioning.Invariant)
                 .AddComponents(2, "components", Partitioning.Invariant)
                 .AddAssets(3, "assets1", Partitioning.Invariant)

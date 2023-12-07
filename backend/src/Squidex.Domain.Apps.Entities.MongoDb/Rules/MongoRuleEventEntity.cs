@@ -22,7 +22,7 @@ public sealed class MongoRuleEventEntity : IRuleEventEntity
 {
     [BsonId]
     [BsonElement("_id")]
-    public DomainId JobId { get; set; }
+    public DomainId Id { get; set; }
 
     [BsonRequired]
     [BsonElement(nameof(AppId))]
@@ -71,26 +71,11 @@ public sealed class MongoRuleEventEntity : IRuleEventEntity
     [BsonElement(nameof(NextAttempt))]
     public Instant? NextAttempt { get; set; }
 
-    DomainId IWithId<DomainId>.Id
-    {
-        get => JobId;
-    }
-
-    DomainId IEntity.UniqueId
-    {
-        get => JobId;
-    }
-
     public static MongoRuleEventEntity FromJob(RuleEventWrite item)
     {
         var (job, nextAttempt, error) = item;
 
-        var entity = new MongoRuleEventEntity
-        {
-            Job = job,
-            JobId = job.Id,
-            NextAttempt = nextAttempt
-        };
+        var entity = new MongoRuleEventEntity { Job = job, Id = job.Id, NextAttempt = nextAttempt };
 
         SimpleMapper.Map(job, entity);
 

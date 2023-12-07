@@ -47,9 +47,9 @@ export class ContentListHeaderComponent {
         } else if (field.rootField?.properties.isSortable !== true) {
             this.sortPath = undefined;
         } else if (field.rootField.isLocalizable && language) {
-            this.sortPath = `data.${field.name}.${language.iso2Code}`;
+            this.sortPath = `${field.name}.${language.iso2Code}`;
         } else {
-            this.sortPath = `data.${field.name}.iv`;
+            this.sortPath = `${field.name}.iv`;
         }
 
         if (field === META_FIELDS.lastModified) {

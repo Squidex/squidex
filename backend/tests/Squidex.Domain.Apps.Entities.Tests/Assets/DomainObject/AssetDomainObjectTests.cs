@@ -20,7 +20,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
+public class AssetDomainObjectTests : HandlerTestBase<Asset>
 {
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
@@ -38,20 +38,20 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
     public AssetDomainObjectTests()
     {
-        var scripts = new AssetScripts
+        App = App with
         {
-            Annotate = "<annotate-script>",
-            Create = "<create-script>",
-            Delete = "<delete-script>",
-            Move = "<move-script>",
-            Update = "<update-script>"
+            AssetScripts = new AssetScripts
+            {
+                Annotate = "<annotate-script>",
+                Create = "<create-script>",
+                Delete = "<delete-script>",
+                Move = "<move-script>",
+                Update = "<update-script>"
+            }
         };
 
-        A.CallTo(() => App.AssetScripts)
-            .Returns(scripts);
-
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, A<CancellationToken>._))
-            .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
+            .Returns(new List<AssetFolder> { A.Fake<AssetFolder>() });
 
         A.CallTo(() => tagService.GetTagIdsAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>._, default))
             .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? []));
@@ -386,7 +386,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
         await ExecuteCreateAsync();
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, Id, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, Id, SearchScope.All, A<CancellationToken>._))
             .Returns(false);
 
         var actual = await PublishAsync(command);
@@ -407,7 +407,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
         await ExecuteCreateAsync();
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, Id, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, Id, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
@@ -423,7 +423,7 @@ public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
 
         await ExecuteCreateAsync();
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, Id, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, Id, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await PublishAsync(command);

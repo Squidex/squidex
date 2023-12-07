@@ -60,7 +60,7 @@ public abstract class HandlerTestBase<TState> : GivenContext
         return context;
     }
 
-    protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : class, IDomainState<T>, new()
+    protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : Entity, new()
     {
         var actual = await domainObject.ExecuteAsync(command, CancellationToken);
 

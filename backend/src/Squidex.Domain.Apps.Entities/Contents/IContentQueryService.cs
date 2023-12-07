@@ -5,28 +5,28 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
 public interface IContentQueryService
 {
-    IAsyncEnumerable<IEnrichedContentEntity> StreamAsync(Context context, string schemaIdOrName, int skip,
+    IAsyncEnumerable<EnrichedContent> StreamAsync(Context context, string schemaIdOrName, int skip,
         CancellationToken ct = default);
 
-    Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, Q q,
+    Task<IResultList<EnrichedContent>> QueryAsync(Context context, Q q,
         CancellationToken ct = default);
 
-    Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query,
+    Task<IResultList<EnrichedContent>> QueryAsync(Context context, string schemaIdOrName, Q query,
         CancellationToken ct = default);
 
-    Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
+    Task<EnrichedContent?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
         CancellationToken ct = default);
 
-    Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName,
+    Task<Schema> GetSchemaOrThrowAsync(Context context, string schemaIdOrName,
         CancellationToken ct = default);
 
-    Task<ISchemaEntity?> GetSchemaAsync(Context context, string schemaIdOrNama,
+    Task<Schema?> GetSchemaAsync(Context context, string schemaIdOrNama,
         CancellationToken ct = default);
 }

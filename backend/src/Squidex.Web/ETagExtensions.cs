@@ -9,14 +9,14 @@ using System.Globalization;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Web;
 
 public static class ETagExtensions
 {
-    public static string ToEtag<T>(this IReadOnlyList<T> items) where T : IEntity, IEntityWithVersion
+    public static string ToEtag<T>(this IReadOnlyList<T> items) where T : Entity
     {
         using (Telemetry.Activities.StartActivity("CalculateEtag"))
         {
@@ -26,7 +26,7 @@ public static class ETagExtensions
         }
     }
 
-    public static string ToEtag<T>(this IResultList<T> entities) where T : IEntity, IEntityWithVersion
+    public static string ToEtag<T>(this IResultList<T> entities) where T : Entity
     {
         using (Telemetry.Activities.StartActivity("CalculateEtag"))
         {
@@ -36,7 +36,7 @@ public static class ETagExtensions
         }
     }
 
-    private static string Create<T>(IReadOnlyList<T> entities, long total) where T : IEntity, IEntityWithVersion
+    private static string Create<T>(IReadOnlyList<T> entities, long total) where T : Entity
     {
         using (var hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
         {
@@ -52,7 +52,7 @@ public static class ETagExtensions
         }
     }
 
-    public static string ToEtag<T>(this T entity) where T : IEntity, IEntityWithVersion
+    public static string ToEtag<T>(this T entity) where T : Entity
     {
         return entity.Version.ToString(CultureInfo.InvariantCulture);
     }

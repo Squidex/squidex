@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 
@@ -36,14 +37,14 @@ public sealed class AssetQueryService : IAssetQueryService
         this.queryParser = queryParser;
     }
 
-    public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId appId, DomainId id,
+    public async Task<IReadOnlyList<AssetFolder>> FindAssetFolderAsync(DomainId appId, DomainId id,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/FindAssetFolderAsync"))
         {
             activity?.SetTag("assetId", id);
 
-            var result = new List<IAssetFolderEntity>();
+            var result = new List<AssetFolder>();
 
             while (id != DomainId.Empty)
             {
@@ -64,7 +65,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId? parentId,
+    public async Task<IResultList<AssetFolder>> QueryAssetFoldersAsync(Context context, DomainId? parentId,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AssetQueryService/QueryAssetFoldersAsync"))
@@ -77,7 +78,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    public async Task<IEnrichedAssetEntity?> FindByHashAsync(Context context, string hash, string fileName, long fileSize,
+    public async Task<EnrichedAsset?> FindByHashAsync(Context context, string hash, string fileName, long fileSize,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -99,7 +100,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    public async Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug, bool allowDeleted = false,
+    public async Task<EnrichedAsset?> FindBySlugAsync(Context context, string slug, bool allowDeleted = false,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -119,7 +120,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    public async Task<IEnrichedAssetEntity?> FindGlobalAsync(Context context, DomainId id,
+    public async Task<EnrichedAsset?> FindGlobalAsync(Context context, DomainId id,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -139,7 +140,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    public async Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, bool allowDeleted = false, long version = EtagVersion.Any,
+    public async Task<EnrichedAsset?> FindAsync(Context context, DomainId id, bool allowDeleted = false, long version = EtagVersion.Any,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -148,7 +149,7 @@ public sealed class AssetQueryService : IAssetQueryService
         {
             activity?.SetTag("assetId", id);
 
-            IAssetEntity? asset;
+            Asset? asset;
 
             if (version > EtagVersion.Empty)
             {
@@ -168,14 +169,14 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q q,
+    public async Task<IResultList<EnrichedAsset>> QueryAsync(Context context, DomainId? parentId, Q q,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
 
         if (q == null)
         {
-            return ResultList.Empty<IEnrichedAssetEntity>();
+            return ResultList.Empty<EnrichedAsset>();
         }
 
         using (Telemetry.Activities.StartActivity("AssetQueryService/QueryAsync"))
@@ -193,7 +194,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IResultList<IEnrichedAssetEntity>> TransformAsync(Context context, IResultList<IAssetEntity> assets,
+    private async Task<IResultList<EnrichedAsset>> TransformAsync(Context context, IResultList<Asset> assets,
         CancellationToken ct)
     {
         var transformed = await TransformCoreAsync(context, assets, ct);
@@ -201,7 +202,7 @@ public sealed class AssetQueryService : IAssetQueryService
         return ResultList.Create(assets.Total, transformed);
     }
 
-    private async Task<IEnrichedAssetEntity> TransformAsync(Context context, IAssetEntity asset,
+    private async Task<EnrichedAsset> TransformAsync(Context context, Asset asset,
         CancellationToken ct)
     {
         var transformed = await TransformCoreAsync(context, Enumerable.Repeat(asset, 1), ct);
@@ -209,7 +210,7 @@ public sealed class AssetQueryService : IAssetQueryService
         return transformed[0];
     }
 
-    private async Task<IReadOnlyList<IEnrichedAssetEntity>> TransformCoreAsync(Context context, IEnumerable<IAssetEntity> assets,
+    private async Task<IReadOnlyList<EnrichedAsset>> TransformCoreAsync(Context context, IEnumerable<Asset> assets,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("AssetQueryService/TransformCoreAsync"))
@@ -230,7 +231,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IResultList<IAssetFolderEntity>> QueryFoldersCoreAsync(Context context, DomainId? parentId,
+    private async Task<IResultList<AssetFolder>> QueryFoldersCoreAsync(Context context, DomainId? parentId,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -242,7 +243,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IResultList<IAssetEntity>> QueryCoreAsync(Context context, DomainId? parentId, Q q,
+    private async Task<IResultList<Asset>> QueryCoreAsync(Context context, DomainId? parentId, Q q,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -254,7 +255,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IAssetFolderEntity?> FindFolderCoreAsync(DomainId appId, DomainId id,
+    private async Task<AssetFolder?> FindFolderCoreAsync(DomainId appId, DomainId id,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -266,7 +267,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IAssetEntity?> FindByHashCoreAsync(Context context, string hash, string fileName, long fileSize,
+    private async Task<Asset?> FindByHashCoreAsync(Context context, string hash, string fileName, long fileSize,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -278,7 +279,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IAssetEntity?> FindBySlugCoreAsync(Context context, string slug, bool allowDeleted,
+    private async Task<Asset?> FindBySlugCoreAsync(Context context, string slug, bool allowDeleted,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -290,7 +291,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IAssetEntity?> FindCoreAsync(DomainId id,
+    private async Task<Asset?> FindCoreAsync(DomainId id,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -302,7 +303,7 @@ public sealed class AssetQueryService : IAssetQueryService
         }
     }
 
-    private async Task<IAssetEntity?> FindCoreAsync(Context context, DomainId id, bool allowDeleted,
+    private async Task<Asset?> FindCoreAsync(Context context, DomainId id, bool allowDeleted,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))

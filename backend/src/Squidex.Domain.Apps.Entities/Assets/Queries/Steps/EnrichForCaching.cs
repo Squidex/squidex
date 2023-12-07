@@ -33,7 +33,7 @@ public sealed class EnrichForCaching : IAssetEnricherStep
         return Task.CompletedTask;
     }
 
-    public Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
+    public Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {
         // Sometimes we just want to skip this for performance reasons.

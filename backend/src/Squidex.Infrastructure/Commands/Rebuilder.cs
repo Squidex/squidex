@@ -38,7 +38,7 @@ public class Rebuilder
 
     public virtual async Task<T> RebuildStateAsync<T, TState>(DomainId id,
         CancellationToken ct = default)
-        where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        where T : DomainObject<TState> where TState : Entity, new()
     {
         var store = serviceProvider.GetRequiredService<IStore<TState>>();
 
@@ -51,14 +51,14 @@ public class Rebuilder
 
     public virtual Task RebuildAsync<T, TState>(StreamFilter filter, int batchSize,
         CancellationToken ct = default)
-        where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        where T : DomainObject<TState> where TState : Entity, new()
     {
         return RebuildAsync<T, TState>(filter, batchSize, 0, ct);
     }
 
     public virtual async Task RebuildAsync<T, TState>(StreamFilter filter, int batchSize, double errorThreshold,
         CancellationToken ct = default)
-        where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        where T : DomainObject<TState> where TState : Entity, new()
     {
         await ClearAsync<TState>();
 
@@ -69,14 +69,14 @@ public class Rebuilder
 
     public virtual Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, int batchSize,
         CancellationToken ct = default)
-        where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        where T : DomainObject<TState> where TState : Entity, new()
     {
         return InsertManyAsync<T, TState>(source, batchSize, 0, ct);
     }
 
     public virtual async Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, int batchSize, double errorThreshold = 0,
         CancellationToken ct = default)
-        where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        where T : DomainObject<TState> where TState : Entity, new()
     {
         Guard.NotNull(source);
 
@@ -87,7 +87,7 @@ public class Rebuilder
 
     private async Task InsertManyAsync<T, TState>(IAsyncEnumerable<DomainId> source, int batchSize, double errorThreshold,
         CancellationToken ct = default)
-        where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        where T : DomainObject<TState> where TState : Entity, new()
     {
         var store = serviceProvider.GetRequiredService<IStore<TState>>();
 
@@ -135,7 +135,7 @@ public class Rebuilder
         }
     }
 
-    private async Task ClearAsync<TState>() where TState : class, IDomainState<TState>, new()
+    private async Task ClearAsync<TState>() where TState : Entity, new()
     {
         var store = serviceProvider.GetRequiredService<IStore<TState>>();
 

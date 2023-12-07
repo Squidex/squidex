@@ -117,7 +117,7 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
                     AllowExtraEvents = maxExtraEvents > 0,
                     IncludeSkipped = false,
                     IncludeStale = false,
-                    Rules = rules.ToDictionary(x => x.Id, x => x.RuleDef).ToReadonlyDictionary(),
+                    Rules = rules.ToReadonlyDictionary(x => x.Id),
                     MaxEvents = maxExtraEvents
                 };
 
@@ -129,7 +129,7 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
         }
     }
 
-    private Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
+    private Task<List<Rule>> GetRulesAsync(DomainId appId)
     {
         if (cacheDuration <= TimeSpan.Zero || cacheDuration == TimeSpan.MaxValue)
         {

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 
@@ -24,14 +25,14 @@ public class RuleQueryServiceTests : GivenContext
     [Fact]
     public async Task Should_get_rules_from_index_and_enrich()
     {
-        var original = new List<IRuleEntity>
+        var original = new List<Rule>
         {
-            new RuleEntity()
+            new Rule()
         };
 
-        var enriched = new List<IEnrichedRuleEntity>
+        var enriched = new List<EnrichedRule>
         {
-            new RuleEntity()
+            CreateRule()
         };
 
         A.CallTo(() => rulesIndex.GetRulesAsync(AppId.Id, CancellationToken))

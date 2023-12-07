@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
@@ -483,7 +483,7 @@ public sealed class RulesController : ApiController
 
         var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id, HttpContext.RequestAborted);
 
-        var result = context.Result<IEnrichedRuleEntity>();
+        var result = context.Result<EnrichedRule>();
         var response = RuleDto.FromDomain(result, runningRuleId == null, ruleRunnerService, Resources);
 
         return response;

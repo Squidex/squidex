@@ -145,7 +145,7 @@ public sealed class FileTagAssetMetadataSource : IAssetMetadataSource
         }
     }
 
-    public IEnumerable<string> Format(IAssetEntity asset)
+    public IEnumerable<string> Format(Asset asset)
     {
         if (asset.Type == AssetType.Video)
         {

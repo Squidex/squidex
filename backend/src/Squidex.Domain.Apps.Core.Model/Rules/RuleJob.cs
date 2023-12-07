@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules;
 
-public sealed class RuleJob
+public sealed record RuleJob
 {
     public DomainId Id { get; set; }
 

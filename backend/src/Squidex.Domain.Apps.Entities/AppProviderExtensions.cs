@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
@@ -14,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities;
 
 public static class AppProviderExtensions
 {
-    public static async Task<ResolvedComponents> GetComponentsAsync(this IAppProvider appProvider, ISchemaEntity schema,
+    public static async Task<ResolvedComponents> GetComponentsAsync(this IAppProvider appProvider, Schema schema,
         CancellationToken ct = default)
     {
         Dictionary<DomainId, Schema>? result = null;
@@ -33,7 +32,7 @@ public static class AppProviderExtensions
                 if (schemaId == schema.Id)
                 {
                     result ??= [];
-                    result[schemaId] = schema.SchemaDef;
+                    result[schemaId] = schema;
                 }
                 else if (result == null || !result.TryGetValue(schemaId, out _))
                 {
@@ -42,7 +41,7 @@ public static class AppProviderExtensions
                     if (resolvedEntity != null)
                     {
                         result ??= [];
-                        result[schemaId] = resolvedEntity.SchemaDef;
+                        result[schemaId] = resolvedEntity;
 
                         await ResolveSchemaAsync(resolvedEntity);
                     }
@@ -76,9 +75,9 @@ public static class AppProviderExtensions
             }
         }
 
-        async Task ResolveSchemaAsync(ISchemaEntity schema)
+        async Task ResolveSchemaAsync(Schema schema)
         {
-            foreach (var field in schema.SchemaDef.Fields)
+            foreach (var field in schema.Fields)
             {
                 await ResolveFieldAsync(field);
             }

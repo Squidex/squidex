@@ -5,8 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -62,7 +63,7 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
             return;
         }
 
-        if (bulkUpdates.Jobs == null || bulkUpdates.Jobs.Length == 0)
+        if (bulkUpdates.Jobs is not { Length: > 0 })
         {
             context.Complete(new BulkUpdateResult());
             return;

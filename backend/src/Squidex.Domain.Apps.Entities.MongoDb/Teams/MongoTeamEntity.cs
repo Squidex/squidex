@@ -7,13 +7,13 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Teams.DomainObject;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Teams;
 
-public sealed class MongoTeamEntity : MongoState<TeamDomainObject.State>
+public sealed class MongoTeamEntity : MongoState<Team>
 {
     [BsonRequired]
     [BsonElement("_ui")]

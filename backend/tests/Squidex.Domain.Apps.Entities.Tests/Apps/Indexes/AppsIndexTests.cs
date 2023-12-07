@@ -8,6 +8,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Caching;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
@@ -144,8 +145,7 @@ public class AppsIndexTests : GivenContext
     [Fact]
     public async Task Should_return_empty_apps_if_app_not_created()
     {
-        A.CallTo(() => App.Version)
-            .Returns(EtagVersion.Empty);
+        App = App with { Version = EtagVersion.Empty };
 
         A.CallTo(() => appRepository.QueryAllAsync(User.Identifier, A<IEnumerable<string>>.That.IsEmpty(), CancellationToken))
             .Returns([App]);
@@ -158,8 +158,7 @@ public class AppsIndexTests : GivenContext
     [Fact]
     public async Task Should_return_empty_apps_if_app_deleted()
     {
-        A.CallTo(() => App.IsDeleted)
-            .Returns(true);
+        App = App with { IsDeleted = true };
 
         A.CallTo(() => appRepository.QueryAllAsync(User.Identifier, A<IEnumerable<string>>.That.IsEmpty(), CancellationToken))
             .Returns([App]);
@@ -173,7 +172,7 @@ public class AppsIndexTests : GivenContext
     public async Task Should_take_and_remove_reservation_if_created()
     {
         A.CallTo(() => appRepository.FindAsync(AppId.Name, CancellationToken))
-            .Returns(Task.FromResult<IAppEntity?>(null));
+            .Returns(Task.FromResult<App?>(null));
 
         var command = Create(AppId.Name);
 
@@ -200,7 +199,7 @@ public class AppsIndexTests : GivenContext
     public async Task Should_clear_reservation_if_app_creation_failed()
     {
         A.CallTo(() => appRepository.FindAsync(AppId.Name, CancellationToken))
-            .Returns(Task.FromResult<IAppEntity?>(null));
+            .Returns(Task.FromResult<App?>(null));
 
         var command = Create(AppId.Name);
 
@@ -229,7 +228,7 @@ public class AppsIndexTests : GivenContext
         state.Snapshot.Reservations.Add(new NameReservation(RandomHash.Simple(), AppId.Name, DomainId.NewGuid()));
 
         A.CallTo(() => appRepository.FindAsync(AppId.Name, CancellationToken))
-            .Returns(Task.FromResult<IAppEntity?>(null));
+            .Returns(Task.FromResult<App?>(null));
 
         var command = Create(AppId.Name);
 

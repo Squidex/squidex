@@ -47,6 +47,7 @@ public sealed class RolesSurrogate : Dictionary<string, JsonValue>, ISurrogate<R
             var properties = JsonValue.Object();
             var permissions = PermissionSet.Empty;
 
+            // Can either be an array of permissions or an object with properties and permissions.
             if (value.Value is JsonArray a)
             {
                 if (a.Count > 0)

@@ -7,11 +7,12 @@
 
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
-internal sealed class ContentResultGraphType : ObjectGraphType<IResultList<IContentEntity>>
+internal sealed class ContentResultGraphType : ObjectGraphType<IResultList<Content>>
 {
     public ContentResultGraphType(ContentGraphType contentType, SchemaInfo schemaInfo)
     {

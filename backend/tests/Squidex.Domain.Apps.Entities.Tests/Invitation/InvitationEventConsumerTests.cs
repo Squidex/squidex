@@ -7,10 +7,10 @@
 
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Collaboration;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Teams;
@@ -276,7 +276,7 @@ public class InvitationEventConsumerTests : GivenContext
         var @event = CreateTeamEvent(true);
 
         A.CallTo(() => AppProvider.GetTeamAsync(A<DomainId>._, default))
-            .Returns(Task.FromResult<ITeamEntity?>(null));
+            .Returns(Task.FromResult<Team?>(null));
 
         await sut.On(@event);
 
@@ -297,10 +297,10 @@ public class InvitationEventConsumerTests : GivenContext
 
     private void MustNotSendEmail()
     {
-        A.CallTo(() => userNotifications.SendInviteAsync(A<IUser>._, A<IUser>._, A<IAppEntity>._, default))
+        A.CallTo(() => userNotifications.SendInviteAsync(A<IUser>._, A<IUser>._, A<App>._, default))
             .MustNotHaveHappened();
 
-        A.CallTo(() => userNotifications.SendInviteAsync(A<IUser>._, A<IUser>._, A<IAppEntity>._, default))
+        A.CallTo(() => userNotifications.SendInviteAsync(A<IUser>._, A<IUser>._, A<App>._, default))
             .MustNotHaveHappened();
     }
 

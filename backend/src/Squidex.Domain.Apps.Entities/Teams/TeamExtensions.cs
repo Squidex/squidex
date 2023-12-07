@@ -6,12 +6,13 @@
 // ==========================================================================
 
 using System.Diagnostics.CodeAnalysis;
+using Squidex.Domain.Apps.Core.Teams;
 
 namespace Squidex.Domain.Apps.Entities.Teams;
 
 public static class TeamExtensions
 {
-    public static bool TryGetContributorRole(this ITeamEntity app, string id, [MaybeNullWhen(false)] out string role)
+    public static bool TryGetContributorRole(this Team app, string id, [MaybeNullWhen(false)] out string role)
     {
         return app.Contributors.TryGetValue(id, out role);
     }

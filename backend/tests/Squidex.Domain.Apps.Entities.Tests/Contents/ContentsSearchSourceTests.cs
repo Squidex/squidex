@@ -9,7 +9,6 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Text;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -32,9 +31,9 @@ public class ContentsSearchSourceTests : GivenContext
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
             .Returns(
             [
-                Mocks.Schema(AppId, schemaId1),
-                Mocks.Schema(AppId, schemaId2),
-                Mocks.Schema(AppId, schemaId3)
+                Schema.WithId(schemaId1),
+                Schema.WithId(schemaId2),
+                Schema.WithId(schemaId3),
             ]);
 
         sut = new ContentsSearchSource(AppProvider, contentQuery, contentIndex, urlGenerator);
@@ -43,7 +42,10 @@ public class ContentsSearchSourceTests : GivenContext
     [Fact]
     public async Task Should_return_content_with_default_name()
     {
-        var content = new ContentEntity { Id = DomainId.NewGuid(), SchemaId = schemaId1 };
+        var content = CreateContent() with
+        {
+            SchemaId = schemaId1
+        };
 
         await TestContentAsync(content, "Content");
     }
@@ -51,9 +53,8 @@ public class ContentsSearchSourceTests : GivenContext
     [Fact]
     public async Task Should_return_content_with_multiple_invariant_reference_fields()
     {
-        var content = new ContentEntity
+        var content = CreateContent() with
         {
-            Id = DomainId.NewGuid(),
             Data =
                 new ContentData()
                     .AddField("field1",
@@ -76,9 +77,8 @@ public class ContentsSearchSourceTests : GivenContext
     [Fact]
     public async Task Should_return_content_with_invariant_reference_field()
     {
-        var content = new ContentEntity
+        var content = CreateContent() with
         {
-            Id = DomainId.NewGuid(),
             Data =
                 new ContentData()
                     .AddField("field",
@@ -97,7 +97,7 @@ public class ContentsSearchSourceTests : GivenContext
     [Fact]
     public async Task Should_return_content_with_localized_reference_field()
     {
-        var content = new ContentEntity
+        var content = CreateContent() with
         {
             Id = DomainId.NewGuid(),
             Data =
@@ -118,9 +118,8 @@ public class ContentsSearchSourceTests : GivenContext
     [Fact]
     public async Task Should_return_content_with_invariant_field_and_reference_data()
     {
-        var content = new ContentEntity
+        var content = CreateContent() with
         {
-            Id = DomainId.NewGuid(),
             Data =
                 new ContentData()
                     .AddField("field",
@@ -170,10 +169,8 @@ public class ContentsSearchSourceTests : GivenContext
             .MustNotHaveHappened();
     }
 
-    private async Task TestContentAsync(ContentEntity content, string expectedName)
+    private async Task TestContentAsync(EnrichedContent content, string expectedName)
     {
-        content.AppId = AppId;
-
         var requestContext = ContextWithPermissions(schemaId1, schemaId2);
 
         var ids = new List<DomainId> { content.Id };
@@ -182,7 +179,7 @@ public class ContentsSearchSourceTests : GivenContext
             .Returns(ids);
 
         A.CallTo(() => contentQuery.QueryAsync(requestContext, A<Q>.That.HasIds(ids), CancellationToken))
-            .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1, content));
+            .Returns(ResultList.CreateFrom<EnrichedContent>(1, content));
 
         A.CallTo(() => urlGenerator.ContentUI(AppId, schemaId1, content.Id))
             .Returns("content-url");
