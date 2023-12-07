@@ -25,6 +25,30 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     }
 
     [Fact]
+    public async Task Should_query_with_old_fields()
+    {
+        var context =
+            QueryContext.Default
+                .WithFields(TestEntityData.StringField);
+
+        var items_0 = await _.Client.DynamicContents(_.SchemaName).GetAsync(context: context);
+
+        Assert.True(items_0.Items.All(x => x.Data.Count == 1));
+    }
+
+    [Fact]
+    public async Task Should_query_with_new_fields()
+    {
+        var context =
+            QueryContext.Default
+                .WithFields($"data.{TestEntityData.StringField}");
+
+        var items_0 = await _.Client.DynamicContents(_.SchemaName).GetAsync(context: context);
+
+        Assert.True(items_0.Items.All(x => x.Data.Count == 1));
+    }
+
+    [Fact]
     public async Task Should_query_newly_created_schema()
     {
         for (var i = 0; i < 20; i++)
@@ -81,11 +105,11 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     [Fact]
     public async Task Should_query_by_ids_filter()
     {
-        var q0 = new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" };
+        var q_0 = new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" };
 
-        var items_0 = await _.Contents.GetAsync(q0);
+        var items_0 = await _.Contents.GetAsync(q_0);
 
-        var q1 = new ContentQuery
+        var q_1 = new ContentQuery
         {
             JsonQuery = new
             {
@@ -108,7 +132,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var items_1 = await _.Contents.GetAsync(q1);
+        var items_1 = await _.Contents.GetAsync(q_1);
 
         AssertItems(items_0, 3, [4, 5, 6]);
         AssertItems(items_1, 3, [4, 5, 6]);

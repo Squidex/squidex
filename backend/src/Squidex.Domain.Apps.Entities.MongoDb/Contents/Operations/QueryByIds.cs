@@ -22,7 +22,7 @@ internal sealed class QueryByIds : OperationBase
     public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, HashSet<DomainId> ids,
         CancellationToken ct)
     {
-        if (ids == null || ids.Count == 0)
+        if (ids is not { Count: > 0 })
         {
             return ReadonlyList.Empty<ContentIdStatus>();
         }
@@ -38,7 +38,7 @@ internal sealed class QueryByIds : OperationBase
     public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,
         CancellationToken ct)
     {
-        if (q.Ids == null || q.Ids.Count == 0)
+        if (q.Ids is not { Count: > 0 })
         {
             return ResultList.Empty<Content>();
         }

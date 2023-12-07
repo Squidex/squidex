@@ -31,7 +31,7 @@ public sealed record FilterSchema(FilterSchemaType Type)
 
     public FilterSchema Flatten(int maxDepth = 7, Predicate<FilterSchema>? predicate = null)
     {
-        if (Fields == null || Fields.Count == 0)
+        if (Fields is not { Count: > 0 })
         {
             return this;
         }

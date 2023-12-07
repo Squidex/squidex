@@ -63,7 +63,7 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
             return;
         }
 
-        if (bulkUpdates.Jobs == null || bulkUpdates.Jobs.Length == 0)
+        if (bulkUpdates.Jobs is not { Length: > 0 })
         {
             context.Complete(new BulkUpdateResult());
             return;

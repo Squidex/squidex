@@ -57,7 +57,7 @@ public sealed class ContentsSearchSource : ISearchSource
 
         var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope(), ct);
 
-        if (ids == null || ids.Count == 0)
+        if (ids is not { Count: > 0 })
         {
             return result;
         }

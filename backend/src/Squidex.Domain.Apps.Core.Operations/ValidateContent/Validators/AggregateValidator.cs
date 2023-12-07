@@ -20,7 +20,7 @@ public sealed class AggregateValidator : IValidator
 
     public void Validate(object? value, ValidationContext context)
     {
-        if (validators == null || validators.Length == 0)
+        if (validators is not { Length: > 0 })
         {
             return;
         }

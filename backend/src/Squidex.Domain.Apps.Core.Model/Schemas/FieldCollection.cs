@@ -80,7 +80,7 @@ public sealed class FieldCollection<T> where T : IField
 
     public static FieldCollection<T> Create(params T[]? fields)
     {
-        return fields == null || fields.Length == 0 ? Empty : new FieldCollection<T>(fields);
+        return fields is not { Length: > 0 } ? Empty : new FieldCollection<T>(fields);
     }
 
     [Pure]

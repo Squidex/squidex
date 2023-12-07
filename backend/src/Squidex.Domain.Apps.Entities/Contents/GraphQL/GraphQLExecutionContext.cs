@@ -106,7 +106,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
     public IDataLoaderResult<EnrichedAsset[]> GetAssets(List<DomainId>? ids,
         TimeSpan cacheDuration)
     {
-        if (ids == null || ids.Count == 0)
+        if (ids is not { Count: > 0 })
         {
             return EmptyAssets;
         }
@@ -117,7 +117,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
     public IDataLoaderResult<EnrichedContent[]> GetContents(List<DomainId>? ids, HashSet<string>? fields,
         TimeSpan cacheDuration)
     {
-        if (ids == null || ids.Count == 0)
+        if (ids is not { Count: > 0 })
         {
             return EmptyContents;
         }

@@ -42,7 +42,7 @@ internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQ
 
             var ids = await args.TextIndex.SearchAsync(args.Context.App, searchQuery, searchScope, args.CancellationToken);
 
-            if (ids == null || ids.Count == 0)
+            if (ids is not { Count: > 0 })
             {
                 return ClrFilter.Eq("id", "__notfound__");
             }

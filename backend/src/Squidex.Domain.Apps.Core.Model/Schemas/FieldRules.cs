@@ -24,6 +24,6 @@ public sealed class FieldRules : ReadonlyList<FieldRule>
 
     public static FieldRules Create(params FieldRule[]? rules)
     {
-        return rules == null || rules.Length == 0 ? Empty : new FieldRules(rules.ToArray());
+        return rules is not { Length: > 0 } ? Empty : new FieldRules(rules.ToArray());
     }
 }

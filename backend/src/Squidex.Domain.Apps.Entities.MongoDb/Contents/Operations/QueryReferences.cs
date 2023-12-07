@@ -49,7 +49,7 @@ internal sealed class QueryReferences : OperationBase
             throw new DomainObjectNotFoundException(q.Referencing.ToString());
         }
 
-        if (contentEntity.ReferencedIds == null || contentEntity.ReferencedIds.Count == 0)
+        if (contentEntity.ReferencedIds is not { Count: > 0 })
         {
             return ResultList.Empty<Content>();
         }
