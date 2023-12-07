@@ -126,6 +126,8 @@ public static class IdentityServerServices
             var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
             options.SuppressXFrameOptionsHeader = identityOptions.SuppressXFrameOptionsHeader;
+
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         });
 
         services.Configure<OpenIddictServerOptions>((c, options) =>
