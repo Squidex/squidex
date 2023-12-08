@@ -18,6 +18,7 @@ using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Hosting;
+using Squidex.Hosting.Web;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 using static OpenIddict.Abstractions.OpenIddictConstants;
@@ -28,7 +29,7 @@ namespace Squidex.Areas.IdentityServer.Config;
 
 public static class IdentityServerServices
 {
-    public static void AddSquidexIdentityServer(this IServiceCollection services)
+    public static void AddSquidexIdentityServer(this IServiceCollection services, IConfiguration config)
     {
         services.Configure<KeyManagementOptions>((c, options) =>
         {
@@ -127,7 +128,13 @@ public static class IdentityServerServices
 
             options.SuppressXFrameOptionsHeader = identityOptions.SuppressXFrameOptionsHeader;
 
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            // Set antiforgery cookie secure policy to always for https
+            var urlsOptions = config.GetSection("urls").Get<UrlOptions>() ?? new ();
+
+            if (urlsOptions.BaseUrl?.StartsWith("https://", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            }
         });
 
         services.Configure<OpenIddictServerOptions>((c, options) =>
