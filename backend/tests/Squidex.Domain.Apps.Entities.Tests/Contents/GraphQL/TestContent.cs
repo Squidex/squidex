@@ -46,18 +46,18 @@ public static class TestContent
               myJson2 {
                 iv {
                   __typename
-                  rootString,
-                  rootInt, 
-                  rootFloat, 
-                  rootBoolean,
-                  rootArray,
+                  rootString
+                  rootInt
+                  rootFloat
+                  rootBoolean
+                  rootArray
                   rootObject {
                     __typename
-                    nestedString,
-                    nestedInt, 
-                    nestedFloat, 
-                    nestedBoolean,
-                    nestedArray,
+                    nestedString
+                    nestedInt
+                    nestedFloat
+                    nestedBoolean
+                    nestedArray
                   }
                 }
               }
@@ -127,6 +127,15 @@ public static class TestContent
                   nestedBoolean
                 }
               }
+              myRichtext {
+                iv {
+                  value
+                  htmlMinimized: html(indentation: 0)
+                  htmlNormal: html
+                  markdown
+                  text
+                }
+              }
             }";
 
     public const string AllFlatFields = @"
@@ -157,18 +166,18 @@ public static class TestContent
               myJsonValue: myJson(path: 'value')
               myJson2 {
                 __typename
-                rootString,
-                rootInt,
-                rootFloat,
-                rootBoolean,
-                rootArray,
+                rootString
+                rootInt
+                rootFloat
+                rootBoolean
+                rootArray
                 rootObject {
                   __typename
-                  nestedString,
-                  nestedInt, 
-                  nestedFloat, 
-                  nestedBoolean,
-                  nestedArray,
+                  nestedString
+                  nestedInt
+                  nestedFloat
+                  nestedBoolean
+                  nestedArray
                 }
               }
               myString
@@ -209,9 +218,16 @@ public static class TestContent
                 nestedNumber
                 nestedBoolean
               }
+              myRichtext {
+                value
+                htmlMinimized: html(indentation: 0)
+                htmlNormal: html
+                markdown
+                text
+              }
             }";
 
-    public static IEnrichedContentEntity Create(DomainId id, DomainId refId = default, DomainId assetId = default, ContentData? data = null)
+    public static IEnrichedContentEntity Create(DomainId id, ContentData? data = null)
     {
         var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -226,30 +242,30 @@ public static class TestContent
                 .AddField("my-string-enum",
                     new ContentFieldData()
                         .AddInvariant("EnumA"))
-                .AddField("my-assets",
-                    new ContentFieldData()
-                        .AddInvariant(JsonValue.Array(assetId.ToString())))
                 .AddField("my-number",
                     new ContentFieldData()
                         .AddInvariant(1.0))
+                .AddField("my-assets",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(TestSchemas.Component.Id)))
                 .AddField("my-boolean",
                     new ContentFieldData()
                         .AddInvariant(true))
                 .AddField("my-datetime",
                     new ContentFieldData()
                         .AddInvariant(now))
+                .AddField("my-references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(TestSchemas.Reference1.Id)))
+                .AddField("my-union",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(TestSchemas.Reference2.Id)))
                 .AddField("my-tags",
                     new ContentFieldData()
                         .AddInvariant(JsonValue.Array("tag1", "tag2")))
                 .AddField("my-tags-enum",
                     new ContentFieldData()
                         .AddInvariant(JsonValue.Array("EnumA", "EnumB")))
-                .AddField("my-references",
-                    new ContentFieldData()
-                        .AddInvariant(JsonValue.Array(refId.ToString())))
-                .AddField("my-union",
-                    new ContentFieldData()
-                        .AddInvariant(JsonValue.Array(refId.ToString())))
                 .AddField("my-geolocation",
                     new ContentFieldData()
                         .AddInvariant(
@@ -316,14 +332,15 @@ public static class TestContent
                                 .Add("nested-boolean", true),
                             JsonValue.Object()
                                 .Add("nested-number", 3.14)
-                                .Add("nested-boolean", false))));
-
-        if (assetId != default || refId != default)
-        {
-            data.AddField("my-embeds",
-                new ContentFieldData()
-                    .AddInvariant(JsonValue.Create($"assets:{assetId}, contents:{refId}")));
-        }
+                                .Add("nested-boolean", false))))
+                .AddField("my-richtext",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Object()
+                            .Add("type", "heading")
+                            .Add("content", JsonValue.Array(
+                                JsonValue.Object()
+                                    .Add("type", "text")
+                                    .Add("text", "Rich Text")))));
 
         var content = new ContentEntity
         {
@@ -441,7 +458,7 @@ public static class TestContent
         };
     }
 
-    public static object Input(IContentEntity content, DomainId refId = default, DomainId assetId = default)
+    public static object Input(IContentEntity content)
     {
         var actual = new Dictionary<string, object>
         {
@@ -487,6 +504,13 @@ public static class TestContent
             {
                 iv = 1.0
             },
+            ["myAssets"] = new
+            {
+                iv = new[]
+                {
+                    TestSchemas.Component.Id
+                }
+            },
             ["myBoolean"] = new
             {
                 iv = true
@@ -494,6 +518,20 @@ public static class TestContent
             ["myDatetime"] = new
             {
                 iv = content.LastModified.ToString()
+            },
+            ["myReferences"] = new
+            {
+                iv = new[]
+                {
+                    TestSchemas.Reference1.Id
+                }
+            },
+            ["myUnion"] = new
+            {
+                iv = new[]
+                {
+                    TestSchemas.Reference2.Id
+                }
             },
             ["myGeolocation"] = new
             {
@@ -567,46 +605,23 @@ public static class TestContent
                         nestedBoolean = false
                     }
                 }
+            },
+            ["myRichtext"] = new
+            {
+                iv = new
+                {
+                    type = "heading",
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = "Rich Text",
+                        }
+                    }
+                }
             }
         };
-
-        if (refId != default)
-        {
-            actual["myReferences"] = new
-            {
-                iv = new[]
-                {
-                    refId
-                }
-            };
-
-            actual["myUnion"] = new
-            {
-                iv = new[]
-                {
-                    refId
-                }
-            };
-        }
-
-        if (assetId != default)
-        {
-            actual["myAssets"] = new
-            {
-                iv = new[]
-                {
-                    assetId
-                }
-            };
-        }
-
-        if (assetId != default || refId != default)
-        {
-            actual["myEmbeds"] = new
-            {
-                iv = $"assets:{assetId}, contents:{refId}"
-            };
-        }
 
         return actual;
     }
@@ -776,6 +791,28 @@ public static class TestContent
                         nestedBoolean = false
                     }
                 }
+            },
+            ["myRichtext"] = new
+            {
+                iv = new
+                {
+                    value = new
+                    {
+                        type = "heading",
+                        content = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                text = "Rich Text",
+                            }
+                        }
+                    },
+                    htmlMinimized = "<h1>Rich Text</h1>",
+                    htmlNormal = "<h1>Rich Text</h1>",
+                    markdown = "# Rich Text",
+                    text = "Rich Text"
+                }
             }
         };
 
@@ -899,6 +936,25 @@ public static class TestContent
                     nestedNumber = 3.14,
                     nestedBoolean = false
                 }
+            },
+            ["myRichtext"] = new
+            {
+                value = new
+                {
+                    type = "heading",
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "text",
+                            text = "Rich Text",
+                        }
+                    }
+                },
+                htmlMinimized = "<h1>Rich Text</h1>",
+                htmlNormal = "<h1>Rich Text</h1>",
+                markdown = "# Rich Text",
+                text = "Rich Text"
             }
         };
 

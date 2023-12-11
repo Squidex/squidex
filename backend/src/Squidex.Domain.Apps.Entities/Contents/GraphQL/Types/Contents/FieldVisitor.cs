@@ -8,6 +8,7 @@
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -92,6 +93,18 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
         {
             case JsonArray a:
                 return a.Select(x => x.ToString()).ToList();
+            default:
+                ThrowHelper.NotSupportedException();
+                return default!;
+        }
+    });
+
+    private static readonly IFieldResolver RichText = CreateValueResolver((value, fieldContext, contex) =>
+    {
+        switch (value.Value)
+        {
+            case JsonObject obj:
+                return RichTextNode.Create(obj);
             default:
                 ThrowHelper.NotSupportedException();
                 return default!;
@@ -248,6 +261,11 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
         }
 
         return new (new ListGraphType(new NonNullGraphType(type)), References, null);
+    }
+
+    public FieldGraphSchema Visit(IField<RichTextFieldProperties> field, FieldInfo args)
+    {
+        return new (builder.GetRichText(args, field.Properties), RichText, null);
     }
 
     public FieldGraphSchema Visit(IField<UIFieldProperties> field, FieldInfo args)

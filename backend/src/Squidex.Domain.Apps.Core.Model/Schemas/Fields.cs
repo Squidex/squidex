@@ -69,6 +69,12 @@ public static class Fields
         return new RootField<ReferencesFieldProperties>(id, name, partitioning, properties, settings);
     }
 
+    public static RootField<RichTextFieldProperties> RichText(long id, string name, Partitioning partitioning,
+        RichTextFieldProperties? properties = null, IFieldSettings? settings = null)
+    {
+        return new RootField<RichTextFieldProperties>(id, name, partitioning, properties, settings);
+    }
+
     public static RootField<StringFieldProperties> String(long id, string name, Partitioning partitioning,
         StringFieldProperties? properties = null, IFieldSettings? settings = null)
     {
@@ -139,6 +145,12 @@ public static class Fields
         ReferencesFieldProperties? properties = null, IFieldSettings? settings = null)
     {
         return new NestedField<ReferencesFieldProperties>(id, name, properties, settings);
+    }
+
+    public static NestedField<RichTextFieldProperties> RichText(long id, string name,
+        RichTextFieldProperties? properties = null, IFieldSettings? settings = null)
+    {
+        return new NestedField<RichTextFieldProperties>(id, name, properties, settings);
     }
 
     public static NestedField<StringFieldProperties> String(long id, string name,
@@ -226,6 +238,12 @@ public static class Fields
         return schema.AddField(References(id, name, partitioning, properties, settings));
     }
 
+    public static Schema AddRichText(this Schema schema, long id, string name, Partitioning partitioning,
+        RichTextFieldProperties? properties = null, IFieldSettings? settings = null)
+    {
+        return schema.AddField(RichText(id, name, partitioning, properties, settings));
+    }
+
     public static Schema AddString(this Schema schema, long id, string name, Partitioning partitioning,
         StringFieldProperties? properties = null, IFieldSettings? settings = null)
     {
@@ -296,6 +314,12 @@ public static class Fields
         ReferencesFieldProperties? properties = null, IFieldSettings? settings = null)
     {
         return field.AddField(References(id, name, properties, settings));
+    }
+
+    public static ArrayField AddRichText(this ArrayField field, long id, string name,
+        RichTextFieldProperties? properties = null, IFieldSettings? settings = null)
+    {
+        return field.AddField(RichText(id, name, properties, settings));
     }
 
     public static ArrayField AddString(this ArrayField field, long id, string name,

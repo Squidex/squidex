@@ -92,6 +92,11 @@ internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor
         return FilterSchema.Number;
     }
 
+    public FilterSchema? Visit(IField<RichTextFieldProperties> field, Args args)
+    {
+        return FilterSchema.Any;
+    }
+
     public FilterSchema? Visit(IField<StringFieldProperties> field, Args args)
     {
         if (field.Properties.AllowedValues?.Count > 0)

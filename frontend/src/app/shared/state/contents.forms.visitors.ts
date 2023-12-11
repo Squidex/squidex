@@ -7,10 +7,10 @@
 
 import { ValidatorFn, Validators } from '@angular/forms';
 import { DateTime, Types, ValidatorsEx } from '@app/framework';
-import { ContentDto, ContentReferencesValue } from '../services/contents.service';
+import { ContentDto, ContentReferences, ContentReferencesValue } from '../services/contents.service';
 import { LanguageDto } from '../services/languages.service';
 import { FieldDto, RootFieldDto } from '../services/schemas.service';
-import { ArrayFieldPropertiesDto, AssetPreviewMode, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from '../services/schemas.types';
+import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from '../services/schemas.types';
 
 export class HtmlValue {
     constructor(
@@ -23,118 +23,106 @@ export class HtmlValue {
 export type FieldValue = string | HtmlValue;
 
 export function getContentValue(content: ContentDto, language: LanguageDto, field: RootFieldDto, allowHtml = true): { value: any; formatted: FieldValue } {
-    if (content.referenceData) {
-        const reference = content.referenceData[field.name];
+    function getValue(source: ContentReferences, language: LanguageDto, field: RootFieldDto, secondLevel = false) {
+        const fieldValue = source[language.iso2Code];
 
-        const isAssets = field.properties.fieldType === 'Assets';
-
-        if (reference && (!isAssets || allowHtml)) {
-            let fieldValue: ContentReferencesValue;
-
-            if (field.isLocalizable) {
-                fieldValue = reference[language.iso2Code];
-            } else {
-                fieldValue = reference[fieldInvariant];
-            }
-
-            let value: string | undefined;
-
-            if (Types.isObject(fieldValue)) {
-                value = (fieldValue as any)[language.iso2Code];
-            } else {
-                value = fieldValue;
-            }
-
-            if (!value) {
-                return { value: '-', formatted: '-' };
-            }
-
-            let formatted: FieldValue = value;
-
-            if (isAssets && Types.isArray(value)) {
-                if (value.length === 2) {
-                    const buildImage = (src: string) => {
-                        let format = (field.properties as any)['previewFormat'] || '';
-
-                        if (format.indexOf('width') < 0 || format.indexOf('height') < 0) {
-                            format = `width=50&height=50&mode=Pad&${format}`;
-                        }
-
-                        return `<img src="${src}?${format}" />`;
-                    };
-
-                    switch ((field.properties as any)['previewMode'] as AssetPreviewMode) {
-                        case 'ImageAndFileName':
-                            formatted = new HtmlValue(`<div class="image">${buildImage(value[0])} <span>${value[1]}</span></div>`, value[0]);
-                            break;
-                        case 'Image':
-                            formatted = new HtmlValue(`<div class="image">${buildImage(value[0])}</div>`, value[0]);
-                            break;
-                        default:
-                            formatted = value[1];
-                    }
-                } else if (value.length === 1) {
-                    formatted = value[0];
-                }
-            }
-
-            return { value, formatted };
+        if (!fieldValue) {
+            return undefined;
         }
-    }
 
-    const contentField = content.data[field.name];
-
-    if (contentField) {
-        let value: any;
+        let partitionValue: ContentReferencesValue;
 
         if (field.isLocalizable) {
-            value = contentField[language.iso2Code];
+            partitionValue = fieldValue[language.iso2Code];
         } else {
-            value = contentField[fieldInvariant];
+            partitionValue = fieldValue[fieldInvariant];
         }
 
-        let formatted: any;
-
-        if (Types.isUndefined(value)) {
-            formatted = value || '';
-        } else {
-            formatted = FieldFormatter.format(field, value, allowHtml);
+        if (secondLevel && Types.isObject(partitionValue)) {
+            partitionValue = (partitionValue as any)[language.iso2Code];
         }
 
-        return { value, formatted };
+        return partitionValue;
     }
 
-    return { value: undefined, formatted: '' };
+    const actualReference = getValue(content.referenceData, language, field, true);
+    const actualValue = getValue(content.data, language, field);
+
+    if (!actualReference || !actualValue) {
+        return { value: actualValue, formatted: '' };
+    }
+
+    const formatted = FieldFormatter.format(field, actualValue, actualReference, allowHtml);
+
+    return { value: actualValue, formatted };
 }
 
 export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     private constructor(
         private readonly value: any,
+        private readonly referenceValue: any,
         private readonly allowHtml: boolean,
     ) {
     }
 
-    public static format(field: FieldDto, value: any, allowHtml = true) {
+    public static format(field: FieldDto, value: any, referenceValue?: any, allowHtml = true) {
         if (value === null || value === undefined) {
             return '';
         }
 
-        return field.properties.accept(new FieldFormatter(value, allowHtml));
+        return field.properties.accept(new FieldFormatter(value, referenceValue, allowHtml));
     }
 
     public visitArray(_: ArrayFieldPropertiesDto): string {
         return this.formatArray('Item', 'Items');
     }
 
-    public visitAssets(_: AssetsFieldPropertiesDto): string {
+    public visitAssets(properties: AssetsFieldPropertiesDto): FieldValue {
+        if (this.allowHtml && this.referenceValue) {
+            const reference = this.referenceValue;
+
+            if (Types.isArray(reference) && reference.length === 2) {
+                const buildImage = (src: string) => {
+                    let format = properties.previewFormat || '';
+
+                    if (format.indexOf('width') < 0 || format.indexOf('height') < 0) {
+                        format = `width=50&height=50&mode=Pad&${format}`;
+                    }
+
+                    return `<img src="${src}?${format}" />`;
+                };
+
+                switch (properties.previewFormat) {
+                    case 'ImageAndFileName':
+                        return new HtmlValue(`<div class="image">${buildImage(reference[0])} <span>${reference[1]}</span></div>`, reference[0]);
+                    case 'Image':
+                        return new HtmlValue(`<div class="image">${buildImage(reference[0])}</div>`, reference[0]);
+                    default:
+                        return reference[1];
+                }
+            }
+
+            if (Types.isArray(reference) && reference.length === 1) {
+                return reference[0];
+            }
+        }
+
         return this.formatArray('Asset', 'Assets');
     }
 
     public visitComponents(_: ComponentsFieldPropertiesDto): string {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         return this.formatArray('Component', 'Components');
     }
 
     public visitReferences(_: ReferencesFieldPropertiesDto): string {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         return this.formatArray('Reference', 'References');
     }
 
@@ -202,6 +190,14 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
 
         return `${this.value.longitude}, ${this.value.latitude}`;
+    }
+
+    public visitRichText(_: RichTextFieldPropertiesDto): string {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
+        return '<Text />';
     }
 
     public visitTags(_: TagsFieldPropertiesDto): string {
@@ -389,6 +385,10 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return [];
     }
 
+    public visitRichText(_: RichTextFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
+
     public visitUI(_: UIFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         return [];
     }
@@ -459,6 +459,10 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 
     public visitReferences(properties: ReferencesFieldPropertiesDto): any {
         return this.getValue(properties.defaultValue, properties.defaultValues);
+    }
+
+    public visitRichText(_: RichTextFieldPropertiesDto): any {
+        return null;
     }
 
     public visitString(properties: StringFieldPropertiesDto): any {

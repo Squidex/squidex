@@ -105,6 +105,8 @@ public static class TestSchemas
                         new NumberFieldProperties()))
                 .AddString(17, "my-embeds", Partitioning.Invariant,
                     new StringFieldProperties { IsEmbeddable = true, SchemaIds = ReadonlyList.Create(Reference1.Id, Reference2.Id) })
+                .AddRichText(18, "my-richtext", Partitioning.Invariant,
+                    new RichTextFieldProperties { SchemaIds = ReadonlyList.Create(Reference1.Id, Reference2.Id) })
                 .SetScripts(new SchemaScripts { Query = "<query-script>" }));
     }
 }

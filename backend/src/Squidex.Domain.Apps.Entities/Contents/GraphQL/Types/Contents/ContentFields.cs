@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
@@ -26,6 +27,23 @@ internal static class ContentFields
     });
 
     public static readonly IFieldResolver ResolveStringFieldContents = Resolvers.Sync<string, object>((value, fieldContext, context) =>
+    {
+        var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedContentIds(value).ToList();
+
+        return context.GetContents(ids,
+            fieldContext.FieldNames(),
+            fieldContext.CacheDuration());
+    });
+
+    public static readonly IFieldResolver ResolveRichTextFieldAssets = Resolvers.Sync<RichTextNode, object>((value, fieldContext, context) =>
+    {
+        var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedAssetIds(value).ToList();
+
+        return context.GetAssets(ids,
+            fieldContext.CacheDuration());
+    });
+
+    public static readonly IFieldResolver ResolveRichTextFieldContents = Resolvers.Sync<RichTextNode, object>((value, fieldContext, context) =>
     {
         var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedContentIds(value).ToList();
 
@@ -218,6 +236,55 @@ internal static class ContentFields
         ResolvedType = new NonNullGraphType(SharedTypes.AssetsList),
         Resolver = ResolveStringFieldAssets,
         Description = FieldDescriptions.StringFieldAssets
+    };
+
+    public static readonly FieldType RichTextFieldValue = new FieldType
+    {
+        Name = "value",
+        ResolvedType = Scalars.JsonNoop,
+        Resolver = Resolvers.Sync<RichTextNode, JsonObject?>(x => x.Root),
+        Description = FieldDescriptions.RichTextFieldValue
+    };
+
+    public static readonly FieldType RichTextFieldAssets = new FieldType
+    {
+        Name = "assets",
+        ResolvedType = new NonNullGraphType(SharedTypes.AssetsList),
+        Resolver = ResolveRichTextFieldAssets,
+        Description = FieldDescriptions.RichTextFieldAssets
+    };
+
+    public static readonly FieldType RichTextFieldMarkdown = new FieldType
+    {
+        Name = "markdown",
+        ResolvedType = Scalars.NonNullString,
+        Resolver = Resolvers.Sync<RichTextNode, string>(x => x.ToMarkdown()),
+        Description = FieldDescriptions.RichTextFieldMarkdown
+    };
+
+    public static readonly FieldType RichTextFieldText = new FieldType
+    {
+        Name = "text",
+        ResolvedType = Scalars.NonNullString,
+        Resolver = Resolvers.Sync<RichTextNode, string>(x => x.ToText()),
+        Description = FieldDescriptions.RichTextFieldMarkdown
+    };
+
+    public static readonly FieldType RichTextFieldHtml = new FieldType
+    {
+        Name = "html",
+        Arguments =
+        [
+            new QueryArgument(Scalars.Int)
+            {
+                Name = "indentation",
+                Description = FieldDescriptions.Indentation,
+                DefaultValue = 4
+            },
+        ],
+        ResolvedType = Scalars.NonNullString,
+        Resolver = Resolvers.Sync<RichTextNode, string>((x, ctx, _) => x.ToHtml(ctx.GetArgument<int>("indentation", 4))),
+        Description = FieldDescriptions.RichTextFieldHtml
     };
 
     private static IFieldResolver Resolve<T>(Func<JsonObject, T> resolver)

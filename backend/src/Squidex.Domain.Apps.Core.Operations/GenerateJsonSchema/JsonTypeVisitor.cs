@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -156,6 +155,11 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
     }
 
     public JsonSchemaProperty? Visit(IField<JsonFieldProperties> field, Args args)
+    {
+        return JsonTypeBuilder.JsonProperty();
+    }
+
+    public JsonSchemaProperty? Visit(IField<RichTextFieldProperties> field, Args args)
     {
         return JsonTypeBuilder.JsonProperty();
     }

@@ -36,11 +36,9 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired || properties.MinItems != null || properties.MaxItems != null)
+        if (IsRequired(properties, args.Context, out var r) || properties.MinItems != null || properties.MaxItems != null)
         {
-            yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
+            yield return new CollectionValidator(r, properties.MinItems, properties.MaxItems);
         }
 
         if (properties.UniqueFields?.Count > 0)
@@ -67,9 +65,7 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired)
+        if (IsRequired(properties, args.Context, out _))
         {
             yield return new RequiredValidator();
         }
@@ -79,9 +75,7 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired)
+        if (IsRequired(properties, args.Context, out _))
         {
             yield return new RequiredValidator();
         }
@@ -93,11 +87,9 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired || properties.MinItems != null || properties.MaxItems != null)
+        if (IsRequired(properties, args.Context, out var r) || properties.MinItems != null || properties.MaxItems != null)
         {
-            yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
+            yield return new CollectionValidator(r, properties.MinItems, properties.MaxItems);
         }
 
         if (properties.UniqueFields?.Count > 0)
@@ -112,9 +104,7 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired)
+        if (IsRequired(properties, args.Context, out _))
         {
             yield return new RequiredValidator();
         }
@@ -129,9 +119,7 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired)
+        if (IsRequired(properties, args.Context, out _))
         {
             yield return new RequiredValidator();
         }
@@ -141,9 +129,7 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired)
+        if (IsRequired(properties, args.Context, out _))
         {
             yield return new RequiredValidator();
         }
@@ -153,9 +139,7 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired)
+        if (IsRequired(properties, args.Context, out _))
         {
             yield return new RequiredValidator();
         }
@@ -176,13 +160,21 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
         yield break;
     }
 
+    public IEnumerable<IValidator> Visit(IField<RichTextFieldProperties> field, Args args)
+    {
+        var properties = field.Properties;
+
+        if (IsRequired(properties, args.Context, out _))
+        {
+            yield return new RequiredValidator();
+        }
+    }
+
     public IEnumerable<IValidator> Visit(IField<StringFieldProperties> field, Args args)
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired)
+        if (IsRequired(properties, args.Context, out _))
         {
             yield return new RequiredStringValidator(true);
         }
@@ -231,11 +223,9 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        var isRequired = IsRequired(properties, args.Context);
-
-        if (isRequired || properties.MinItems != null || properties.MaxItems != null)
+        if (IsRequired(properties, args.Context, out var r) || properties.MinItems != null || properties.MaxItems != null)
         {
-            yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
+            yield return new CollectionValidator(r, properties.MinItems, properties.MaxItems);
         }
 
         if (properties.AllowedValues != null)
@@ -254,7 +244,7 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
         }
     }
 
-    private static bool IsRequired(FieldProperties properties, ValidationContext context)
+    private static bool IsRequired(FieldProperties properties, ValidationContext context, out bool result)
     {
         var isRequired = properties.IsRequired;
 
@@ -262,6 +252,8 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
         {
             isRequired = isRequired || properties.IsRequiredOnPublish;
         }
+
+        result = isRequired;
 
         return isRequired;
     }

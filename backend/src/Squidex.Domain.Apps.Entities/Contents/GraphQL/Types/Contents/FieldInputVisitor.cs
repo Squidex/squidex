@@ -74,6 +74,11 @@ internal sealed class FieldInputVisitor : IFieldVisitor<IGraphType?, FieldInfo>
         return Scalars.Strings;
     }
 
+    public IGraphType? Visit(IField<RichTextFieldProperties> field, FieldInfo args)
+    {
+        return Scalars.Json;
+    }
+
     public IGraphType? Visit(IField<NumberFieldProperties> field, FieldInfo args)
     {
         return Scalars.Float;

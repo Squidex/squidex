@@ -80,6 +80,11 @@ internal sealed class ReferencesCleaner : IFieldPropertiesVisitor<JsonValue, Ref
         return args.Value;
     }
 
+    public JsonValue Visit(RichTextFieldProperties properties, Args args)
+    {
+        return args.Value;
+    }
+
     public JsonValue Visit(StringFieldProperties properties, Args args)
     {
         return args.Value;

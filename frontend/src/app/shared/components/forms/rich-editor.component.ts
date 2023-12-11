@@ -38,7 +38,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         ModalDirective,
     ],
 })
-export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {
+export class RichEditorComponent extends StatefulControlComponent<{}, EditorValue> implements AfterViewInit, OnDestroy {
     private readonly assetId = new BehaviorSubject<string | null>(null);
     private editorWrapper?: SquidexEditorWrapper;
     private value?: string;
@@ -171,7 +171,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
             onUpload: (requests: UploadRequest[]) => {
                 return this.uploadFiles(requests);
             },
-            onChange: (value: string | undefined) => {
+            onChange: (value: EditorValue) => {
                 this.callChange(value);
             },
             onEditAsset: id => {

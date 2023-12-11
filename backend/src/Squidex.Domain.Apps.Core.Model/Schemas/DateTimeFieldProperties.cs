@@ -19,7 +19,7 @@ public sealed record DateTimeFieldProperties : FieldProperties
 
     public Instant? MinValue { get; init; }
 
-    public string? Format { get; set; }
+    public string? Format { get; init; }
 
     public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; init; }
 

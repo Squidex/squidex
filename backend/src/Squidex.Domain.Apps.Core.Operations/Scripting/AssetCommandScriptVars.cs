@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting;

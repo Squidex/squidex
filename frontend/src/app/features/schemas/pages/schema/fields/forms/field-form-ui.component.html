@@ -43,6 +43,9 @@
     <ng-container *ngSwitchCase="'References'">
         <sqx-references-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-references-ui>
     </ng-container>
+    <ng-container *ngSwitchCase="'RichText'">
+        <sqx-rich-text-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-rich-text-ui>
+    </ng-container>
     <ng-container *ngSwitchCase="'String'">
         <sqx-string-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-string-ui>
     </ng-container>

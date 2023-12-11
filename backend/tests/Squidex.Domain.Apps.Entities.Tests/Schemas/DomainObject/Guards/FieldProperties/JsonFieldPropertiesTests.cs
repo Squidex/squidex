@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards.FieldProperti
 public class JsonFieldPropertiesTests : IClassFixture<TranslationsFixture>
 {
     [Fact]
-    public void Should_add_error_if_editor_is_not_valid()
+    public void Should_not_add_error()
     {
         var sut = new JsonFieldProperties();
 

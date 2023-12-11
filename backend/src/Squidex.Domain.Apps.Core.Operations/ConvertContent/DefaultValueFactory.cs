@@ -80,6 +80,11 @@ public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, Def
         return JsonValue.Null;
     }
 
+    public JsonValue Visit(RichTextFieldProperties properties, Args args)
+    {
+        return JsonValue.Null;
+    }
+
     public JsonValue Visit(NumberFieldProperties properties, Args args)
     {
         var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);

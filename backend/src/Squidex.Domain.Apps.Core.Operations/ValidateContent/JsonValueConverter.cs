@@ -91,6 +91,16 @@ public sealed class JsonValueConverter : IFieldPropertiesVisitor<(object? Result
         return (null, new JsonError(T.Get("contents.invalidNumber")));
     }
 
+    public (object? Result, JsonError? Error) Visit(RichTextFieldProperties properties, Args args)
+    {
+        if (args.Value.Type == JsonValueType.Null || RichTextNode.IsValid(args.Value))
+        {
+            return (args.Value, null);
+        }
+
+        return (null, new JsonError(T.Get("contents.invalidRichText")));
+    }
+
     public (object? Result, JsonError? Error) Visit(StringFieldProperties properties, Args args)
     {
         if (args.Value.Value is string s)

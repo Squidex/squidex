@@ -255,6 +255,14 @@ public class DefaultValueFactoryTests
     }
 
     [Fact]
+    public void Should_get_default_value_from_rich_text_field()
+    {
+        var field = Fields.RichText(1, "1", Partitioning.Invariant);
+
+        Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+    }
+
+    [Fact]
     public void Should_get_default_value_from_string_field()
     {
         var field =

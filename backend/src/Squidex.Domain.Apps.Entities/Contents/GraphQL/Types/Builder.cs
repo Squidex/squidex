@@ -25,6 +25,7 @@ internal sealed class Builder
     private readonly Dictionary<FieldInfo, ComponentUnionGraphType> componentUnionTypes = [];
     private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = [];
     private readonly Dictionary<FieldInfo, NestedGraphType> nestedTypes = [];
+    private readonly Dictionary<FieldInfo, RichTextGraphType> richTextTypes = [];
     private readonly Dictionary<SchemaInfo, ComponentGraphType> componentTypes = [];
     private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = [];
     private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = [];
@@ -96,7 +97,7 @@ internal sealed class Builder
 
         FieldMap = new FieldMap(allSchemas);
 
-        if (normalSchemas.Any())
+        if (normalSchemas.Count != 0)
         {
             var mutations = new ApplicationMutations(this, normalSchemas);
 
@@ -203,6 +204,11 @@ internal sealed class Builder
     public EmbeddableStringGraphType GetEmbeddableString(FieldInfo fieldInfo, StringFieldProperties properties)
     {
         return embeddableStringTypes.GetOrAdd(fieldInfo, x => new EmbeddableStringGraphType(this, x, properties));
+    }
+
+    public RichTextGraphType GetRichText(FieldInfo fieldInfo, RichTextFieldProperties properties)
+    {
+        return richTextTypes.GetOrAdd(fieldInfo, x => new RichTextGraphType(this, x, properties));
     }
 
     public ComponentUnionGraphType GetComponentUnion(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)

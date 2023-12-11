@@ -206,6 +206,11 @@ public sealed class FieldPropertiesValidator : IFieldPropertiesVisitor<IEnumerab
         }
     }
 
+    public IEnumerable<ValidationError> Visit(RichTextFieldProperties properties, None args)
+    {
+        yield break;
+    }
+
     public IEnumerable<ValidationError> Visit(StringFieldProperties properties, None args)
     {
         if (!properties.Editor.IsEnumValue())

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -101,6 +102,11 @@ public sealed class StringFormatter : IFieldPropertiesVisitor<string, StringForm
     public string Visit(ReferencesFieldProperties properties, Args args)
     {
         return FormatArray(args.Value, "Reference", "References");
+    }
+
+    public string Visit(RichTextFieldProperties properties, Args args)
+    {
+        return RichTextNode.Create(args.Value).ToText(100);
     }
 
     public string Visit(StringFieldProperties properties, Args args)

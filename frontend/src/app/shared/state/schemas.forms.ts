@@ -331,6 +331,12 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['schemaIds'] = new UntypedFormControl(undefined);
     }
 
+    public visitRichText() {
+        this.config['classNames'] = new UntypedFormControl(undefined);
+        this.config['folderId'] = new UntypedFormControl(undefined);
+        this.config['schemaIds'] = new UntypedFormControl(undefined);
+    }
+
     public visitString() {
         this.config['allowedValues'] = new UntypedFormControl(undefined);
         this.config['classNames'] = new UntypedFormControl(undefined);

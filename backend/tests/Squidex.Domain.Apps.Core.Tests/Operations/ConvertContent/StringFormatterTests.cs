@@ -16,9 +16,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_null_value()
     {
-        var field = Fields.Array(1, "field", Partitioning.Invariant);
+        var fieldValue = JsonValue.Null;
+        var fieldConfig = Fields.Array(1, "field", Partitioning.Invariant);
 
-        var formatted = StringFormatter.Format(field, default);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Empty(formatted);
     }
@@ -26,9 +27,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_null_json_value()
     {
-        var field = Fields.Array(1, "field", Partitioning.Invariant);
+        var fieldValue = JsonValue.Null;
+        var fieldConfig = Fields.Array(1, "field", Partitioning.Invariant);
 
-        var formatted = StringFormatter.Format(field, JsonValue.Null);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Empty(formatted);
     }
@@ -36,11 +38,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_array_field_without_items()
     {
-        var value = new JsonArray();
+        var fieldValue = new JsonArray();
+        var fieldConfig = Fields.Array(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Array(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("0 Items", formatted);
     }
@@ -48,11 +49,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_array_field_with_single_item()
     {
-        var value = JsonValue.Array(JsonValue.Object());
+        var fieldValue = JsonValue.Array(JsonValue.Object());
+        var fieldConfig = Fields.Array(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Array(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("1 Item", formatted);
     }
@@ -60,11 +60,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_array_field_with_multiple_items()
     {
-        var value = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
+        var fieldValue = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
+        var fieldConfig = Fields.Array(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Array(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("2 Items", formatted);
     }
@@ -72,11 +71,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_array_field_with_wrong_type()
     {
-        var value = JsonValue.True;
+        var fieldValue = JsonValue.True;
+        var fieldConfig = Fields.Array(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Array(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("0 Items", formatted);
     }
@@ -84,11 +82,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_assets_field_without_items()
     {
-        var value = new JsonArray();
+        var fieldValue = new JsonArray();
+        var fieldConfig = Fields.Assets(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Assets(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("0 Assets", formatted);
     }
@@ -96,11 +93,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_assets_field_with_single_item()
     {
-        var value = JsonValue.Array(JsonValue.Object());
+        var fieldValue = JsonValue.Array(JsonValue.Object());
+        var fieldConfig = Fields.Assets(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Assets(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("1 Asset", formatted);
     }
@@ -108,11 +104,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_assets_field_with_multiple_items()
     {
-        var value = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
+        var fieldValue = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
+        var fieldConfig = Fields.Assets(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Assets(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("2 Assets", formatted);
     }
@@ -120,11 +115,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_assets_field_with_wrong_type()
     {
-        var value = JsonValue.True;
+        var fieldValue = JsonValue.True;
+        var fieldConfig = Fields.Assets(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Assets(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("0 Assets", formatted);
     }
@@ -132,11 +126,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_boolean_field_with_true()
     {
-        var value = JsonValue.True;
+        var fieldValue = JsonValue.True;
+        var fieldConfig = Fields.Boolean(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Boolean(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("Yes", formatted);
     }
@@ -144,11 +137,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_boolean_field_with_false()
     {
-        var value = JsonValue.False;
+        var fieldValue = JsonValue.False;
+        var fieldConfig = Fields.Boolean(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Boolean(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("No", formatted);
     }
@@ -156,11 +148,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_boolean_field_with_wrong_type()
     {
-        var value = JsonValue.Zero;
+        var fieldValue = JsonValue.Zero;
+        var fieldConfig = Fields.Boolean(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Boolean(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("No", formatted);
     }
@@ -168,11 +159,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_component_field()
     {
-        var value = JsonValue.Object();
+        var fieldValue = JsonValue.Object();
+        var fieldConfig = Fields.Component(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Component(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("{ Component }", formatted);
     }
@@ -180,11 +170,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_components_field_without_items()
     {
-        var value = new JsonArray();
+        var fieldValue = new JsonArray();
+        var fieldConfig = Fields.Components(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Components(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("0 Components", formatted);
     }
@@ -192,11 +181,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_components_field_with_single_item()
     {
-        var value = JsonValue.Array(JsonValue.Object());
+        var fieldValue = JsonValue.Array(JsonValue.Object());
+        var fieldConfig = Fields.Components(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Components(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("1 Component", formatted);
     }
@@ -204,11 +192,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_components_field_with_multiple_items()
     {
-        var value = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
+        var fieldValue = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
+        var fieldConfig = Fields.Components(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Components(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("2 Components", formatted);
     }
@@ -216,11 +203,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_datetime_field()
     {
-        var value = JsonValue.Create("2019-01-19T12:00:00Z");
+        var fieldValue = JsonValue.Create("2019-01-19T12:00:00Z");
+        var fieldConfig = Fields.DateTime(1, "field", Partitioning.Invariant);
 
-        var field = Fields.DateTime(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("2019-01-19T12:00:00Z", formatted);
     }
@@ -228,11 +214,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_geolocation_field_with_correct_data()
     {
-        var value = JsonValue.Object().Add("latitude", 18.9).Add("longitude", 10.9);
+        var fieldValue = JsonValue.Object().Add("latitude", 18.9).Add("longitude", 10.9);
+        var fieldConfig = Fields.Geolocation(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("18.9, 10.9", formatted);
     }
@@ -240,11 +225,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_geolocation_field_with_missing_property()
     {
-        var value = JsonValue.Object().Add("latitude", 18.9);
+        var fieldValue = JsonValue.Object().Add("latitude", 18.9);
+        var fieldConfig = Fields.Geolocation(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Empty(formatted);
     }
@@ -252,11 +236,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_geolocation_field_with_invalid_type()
     {
-        var value = JsonValue.Zero;
+        var fieldValue = JsonValue.Zero;
+        var fieldConfig = Fields.Geolocation(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Geolocation(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Empty(formatted);
     }
@@ -264,11 +247,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_json_field()
     {
-        var value = JsonValue.Object();
+        var fieldValue = JsonValue.Object();
+        var fieldConfig = Fields.Json(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Json(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("<Json />", formatted);
     }
@@ -276,11 +258,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_number_field()
     {
-        var value = JsonValue.Create(123);
+        var fieldValue = JsonValue.Create(123);
+        var fieldConfig = Fields.Number(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Number(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("123", formatted);
     }
@@ -288,11 +269,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_references_field_without_items()
     {
-        var value = new JsonArray();
+        var fieldValue = new JsonArray();
+        var fieldConfig = Fields.References(1, "field", Partitioning.Invariant);
 
-        var field = Fields.References(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("0 References", formatted);
     }
@@ -300,11 +280,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_references_field_with_single_item()
     {
-        var value = JsonValue.Array(JsonValue.Object());
+        var fieldValue = JsonValue.Array(JsonValue.Object());
+        var fieldConfig = Fields.References(1, "field", Partitioning.Invariant);
 
-        var field = Fields.References(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("1 Reference", formatted);
     }
@@ -312,11 +291,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_references_field_with_multiple_items()
     {
-        var value = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
+        var fieldValue = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
+        var fieldConfig = Fields.References(1, "field", Partitioning.Invariant);
 
-        var field = Fields.References(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("2 References", formatted);
     }
@@ -324,11 +302,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_references_field_with_wrong_type()
     {
-        var value = JsonValue.True;
+        var fieldValue = JsonValue.True;
+        var fieldConfig = Fields.References(1, "field", Partitioning.Invariant);
 
-        var field = Fields.References(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("0 References", formatted);
     }
@@ -336,11 +313,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_string_field()
     {
-        var value = JsonValue.Create("hello");
+        var fieldValue = JsonValue.Create("hello");
+        var fieldConfig = Fields.String(1, "field", Partitioning.Invariant);
 
-        var field = Fields.String(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("hello", formatted);
     }
@@ -348,11 +324,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_string_field_with_photo_editor()
     {
-        var value = JsonValue.Create("hello");
+        var fieldValue = JsonValue.Create("hello");
+        var fieldConfig = Fields.String(1, "field", Partitioning.Invariant, new StringFieldProperties { Editor = StringFieldEditor.StockPhoto });
 
-        var field = Fields.String(1, "field", Partitioning.Invariant, new StringFieldProperties { Editor = StringFieldEditor.StockPhoto });
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("[Photo]", formatted);
     }
@@ -360,11 +335,10 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_tags_field()
     {
-        var value = JsonValue.Array("hello", "squidex", "and", "team");
+        var fieldValue = JsonValue.Array("hello", "squidex", "and", "team");
+        var fieldConfig = Fields.Tags(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Tags(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Equal("hello, squidex, and, team", formatted);
     }
@@ -372,12 +346,47 @@ public sealed class StringFormatterTests
     [Fact]
     public void Should_format_tags_field_with_invalid_type()
     {
-        var value = JsonValue.Zero;
+        var fieldValue = JsonValue.Zero;
+        var fieldConfig = Fields.Tags(1, "field", Partitioning.Invariant);
 
-        var field = Fields.Tags(1, "field", Partitioning.Invariant);
-
-        var formatted = StringFormatter.Format(field, value);
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
 
         Assert.Empty(formatted);
+    }
+
+    [Fact]
+    public void Should_format_rich_text_if_null()
+    {
+        var fieldValue = JsonValue.Null;
+        var fieldConfig = Fields.RichText(1, "field", Partitioning.Invariant);
+
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
+
+        Assert.Empty(formatted);
+    }
+
+    [Fact]
+    public void Should_format_rich_text()
+    {
+        var fieldConfig = Fields.RichText(1, "field", Partitioning.Invariant);
+        var fieldValue = JsonValue.Object()
+            .Add("type", "doc")
+            .Add("content", JsonValue.Array(
+                JsonValue.Object()
+                    .Add("type", "paragraph")
+                    .Add("content", JsonValue.Array(
+                        JsonValue.Object()
+                            .Add("type", "text")
+                            .Add("text", "Paragraph1"))),
+                JsonValue.Object()
+                    .Add("type", "paragraph")
+                    .Add("content", JsonValue.Array(
+                        JsonValue.Object()
+                            .Add("type", "text")
+                            .Add("text", "Paragraph2")))));
+
+        var formatted = StringFormatter.Format(fieldConfig, fieldValue);
+
+        Assert.Equal("Paragraph1 Paragraph2", formatted);
     }
 }

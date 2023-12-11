@@ -19,6 +19,7 @@ import { GeolocationUIComponent } from '../types/geolocation-ui.component';
 import { JsonUIComponent } from '../types/json-ui.component';
 import { NumberUIComponent } from '../types/number-ui.component';
 import { ReferencesUIComponent } from '../types/references-ui.component';
+import { RichTextUIComponent } from '../types/rich-text-ui.component';
 import { StringUIComponent } from '../types/string-ui.component';
 import { TagsUIComponent } from '../types/tags-ui.component';
 
@@ -42,6 +43,7 @@ import { TagsUIComponent } from '../types/tags-ui.component';
         NgSwitchCase,
         NumberUIComponent,
         ReactiveFormsModule,
+        RichTextUIComponent,
         ReferencesUIComponent,
         StringUIComponent,
         TagsUIComponent,
