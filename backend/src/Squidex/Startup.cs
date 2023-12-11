@@ -38,7 +38,7 @@ public sealed class Startup
         // They must be called in this order.
         services.AddSquidexMvcWithPlugins(config);
         services.AddSquidexIdentity(config);
-        services.AddSquidexIdentityServer(config);
+        services.AddSquidexIdentityServer();
         services.AddSquidexAuthentication(config);
 
         services.AddSquidexApps(config);
