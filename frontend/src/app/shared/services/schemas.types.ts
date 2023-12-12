@@ -421,6 +421,12 @@ export class RichTextFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly classNames?: ReadonlyArray<string>;
     public readonly folderId?: string;
+    public readonly maxCharacters?: number;
+    public readonly maxLength?: number;
+    public readonly maxWords?: number;
+    public readonly minCharacters?: number;
+    public readonly minLength?: number;
+    public readonly minWords?: number;
     public readonly schemaIds?: ReadonlyArray<string>;
 
     public get isSortable() {

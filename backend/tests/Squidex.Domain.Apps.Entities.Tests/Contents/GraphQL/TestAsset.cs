@@ -44,6 +44,7 @@ public static class TestAsset
             isProtected
             pixelWidth
             pixelHeight
+            parentId
             tags
             type
             metadataText
@@ -71,6 +72,7 @@ public static class TestAsset
             FileSize = 1024,
             FileHash = "ABC123",
             FileVersion = 123,
+            ParentId = id,
             MimeType = "image/png",
             Type = AssetType.Image,
             MetadataText = "metadata-text",
@@ -123,6 +125,7 @@ public static class TestAsset
             isProtected = asset.IsProtected,
             pixelWidth = asset.Metadata.GetPixelWidth(),
             pixelHeight = asset.Metadata.GetPixelHeight(),
+            parentId = asset.Id,
             tags = asset.TagNames,
             type = "IMAGE",
             metadataText = asset.MetadataText,

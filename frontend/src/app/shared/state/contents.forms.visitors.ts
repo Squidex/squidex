@@ -23,8 +23,8 @@ export class HtmlValue {
 export type FieldValue = string | HtmlValue;
 
 export function getContentValue(content: ContentDto, language: LanguageDto, field: RootFieldDto, allowHtml = true): { value: any; formatted: FieldValue } {
-    function getValue(source: ContentReferences, language: LanguageDto, field: RootFieldDto, secondLevel = false) {
-        const fieldValue = source[language.iso2Code];
+    function getValue(source: ContentReferences | undefined, language: LanguageDto, field: RootFieldDto, secondLevel = false) {
+        const fieldValue = source?.[field.name];
 
         if (!fieldValue) {
             return undefined;
@@ -48,7 +48,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
     const actualReference = getValue(content.referenceData, language, field, true);
     const actualValue = getValue(content.data, language, field);
 
-    if (!actualReference || !actualValue) {
+    if (!actualReference && !actualValue) {
         return { value: actualValue, formatted: '' };
     }
 
@@ -66,15 +66,11 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public static format(field: FieldDto, value: any, referenceValue?: any, allowHtml = true) {
-        if (value === null || value === undefined) {
+        if ((value === null || value === undefined) && !referenceValue) {
             return '';
         }
 
         return field.properties.accept(new FieldFormatter(value, referenceValue, allowHtml));
-    }
-
-    public visitArray(_: ArrayFieldPropertiesDto): string {
-        return this.formatArray('Item', 'Items');
     }
 
     public visitAssets(properties: AssetsFieldPropertiesDto): FieldValue {
@@ -92,7 +88,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
                     return `<img src="${src}?${format}" />`;
                 };
 
-                switch (properties.previewFormat) {
+                switch (properties.previewMode) {
                     case 'ImageAndFileName':
                         return new HtmlValue(`<div class="image">${buildImage(reference[0])} <span>${reference[1]}</span></div>`, reference[0]);
                     case 'Image':
@@ -108,6 +104,14 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
 
         return this.formatArray('Asset', 'Assets');
+    }
+
+    public visitArray(_: ArrayFieldPropertiesDto): string {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
+        return this.formatArray('Item', 'Items');
     }
 
     public visitComponents(_: ComponentsFieldPropertiesDto): string {
@@ -127,10 +131,18 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public visitBoolean(_: BooleanFieldPropertiesDto): string {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         return Types.booleanToString(this.value);
     }
 
     public visitComponent(_: ComponentFieldPropertiesDto): string {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         const inner = Types.objectToString(this.value, ['schemaId'], 100);
 
         if (inner.length > 0) {
@@ -141,6 +153,10 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public visitDateTime(properties: DateTimeFieldPropertiesDto): FieldValue {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         try {
             const parsed = DateTime.parseISO(this.value);
 
@@ -155,14 +171,26 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public visitJson(_: JsonFieldPropertiesDto): string {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         return '<Json />';
     }
 
     public visitUI(_: UIFieldPropertiesDto): any {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         return '';
     }
 
     public visitNumber(properties: NumberFieldPropertiesDto): FieldValue {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         if (!Types.isNumber(this.value)) {
             return '';
         }
@@ -185,6 +213,10 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public visitGeolocation(_: GeolocationFieldPropertiesDto): string {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         if (!Types.isObject(this.value)) {
             return '';
         }
@@ -197,10 +229,18 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
             return this.referenceValue;
         }
 
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         return '<Text />';
     }
 
     public visitTags(_: TagsFieldPropertiesDto): string {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         if (!Types.isArrayOfString(this.value)) {
             return '';
         }
@@ -209,6 +249,10 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public visitString(properties: StringFieldPropertiesDto): any {
+        if (this.referenceValue) {
+            return this.referenceValue;
+        }
+
         if (!Types.isString(this.value)) {
             return '';
         }

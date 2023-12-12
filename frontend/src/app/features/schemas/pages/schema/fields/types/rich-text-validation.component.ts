@@ -6,8 +6,8 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, RichTextFieldPropertiesDto } from '@app/shared';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { FieldDto, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -15,7 +15,9 @@ import { FieldDto, RichTextFieldPropertiesDto } from '@app/shared';
     styleUrls: ['rich-text-validation.component.scss'],
     templateUrl: 'rich-text-validation.component.html',
     imports: [
+        FormsModule,
         ReactiveFormsModule,
+        TranslatePipe,
     ],
 })
 export class RichTextValidationComponent  {

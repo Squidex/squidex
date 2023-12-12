@@ -153,6 +153,14 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
 
         AddField(new FieldType
         {
+            Name = "parentId",
+            ResolvedType = Scalars.NonNullString,
+            Resolver = Resolve(x => x.ParentId),
+            Description = FieldDescriptions.AssetParentId
+        });
+
+        AddField(new FieldType
+        {
             Name = "slug",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.Slug),
@@ -204,6 +212,15 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
 
         AddField(new FieldType
         {
+            Name = "metadata",
+            Arguments = AssetActions.Metadata.Arguments,
+            ResolvedType = Scalars.JsonNoop,
+            Resolver = AssetActions.Metadata.Resolver,
+            Description = FieldDescriptions.AssetMetadata
+        });
+
+        AddField(new FieldType
+        {
             Name = "metadataText",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.MetadataText),
@@ -216,15 +233,6 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             ResolvedType = Scalars.NonNullStrings,
             Resolver = Resolve(x => x.TagNames),
             Description = FieldDescriptions.AssetTags
-        });
-
-        AddField(new FieldType
-        {
-            Name = "metadata",
-            Arguments = AssetActions.Metadata.Arguments,
-            ResolvedType = Scalars.JsonNoop,
-            Resolver = AssetActions.Metadata.Resolver,
-            Description = FieldDescriptions.AssetMetadata
         });
 
         AddField(new FieldType

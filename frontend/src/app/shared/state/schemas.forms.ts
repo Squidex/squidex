@@ -334,6 +334,12 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     public visitRichText() {
         this.config['classNames'] = new UntypedFormControl(undefined);
         this.config['folderId'] = new UntypedFormControl(undefined);
+        this.config['maxCharacters'] = new UntypedFormControl(undefined);
+        this.config['maxLength'] = new UntypedFormControl(undefined);
+        this.config['maxWords'] = new UntypedFormControl(undefined);
+        this.config['minCharacters'] = new UntypedFormControl(undefined);
+        this.config['minLength'] = new UntypedFormControl(undefined);
+        this.config['minWords'] = new UntypedFormControl(undefined);
         this.config['schemaIds'] = new UntypedFormControl(undefined);
     }
 

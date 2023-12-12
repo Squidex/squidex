@@ -1,3 +1,55 @@
 <div [formGroup]="fieldForm">
-    
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.string.length' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minLength" placeholder="{{ 'schemas.fieldTypes.string.lengthMin' | sqxTranslate }}">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxLength" placeholder="{{ 'schemas.fieldTypes.string.lengthMax' | sqxTranslate }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.string.characters' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minCharacters" placeholder="{{ 'schemas.fieldTypes.string.charactersMin' | sqxTranslate }}">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxCharacters" placeholder="{{ 'schemas.fieldTypes.string.charactersMax' | sqxTranslate }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.string.words' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="minWords" placeholder="{{ 'schemas.fieldTypes.string.wordsMin' | sqxTranslate }}">
+                </div>
+                <div class="col-auto">
+                    <label class="col-form-label minmax">-</label>
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" formControlName="maxWords" placeholder="{{ 'schemas.fieldTypes.string.wordsMax' | sqxTranslate }}">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
