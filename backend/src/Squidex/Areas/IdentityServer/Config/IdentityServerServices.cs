@@ -126,6 +126,14 @@ public static class IdentityServerServices
             var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
             options.SuppressXFrameOptionsHeader = identityOptions.SuppressXFrameOptionsHeader;
+
+            // Set antiforgery cookie secure policy to always for https
+            var baseUrl = c.GetRequiredService<IUrlGenerator>().BuildUrl();
+
+            if (baseUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            }
         });
 
         services.Configure<OpenIddictServerOptions>((c, options) =>
