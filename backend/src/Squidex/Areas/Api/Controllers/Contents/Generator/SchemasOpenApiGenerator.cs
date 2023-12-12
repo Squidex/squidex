@@ -10,9 +10,9 @@ using NSwag;
 using NSwag.Generation;
 using NSwag.Generation.Processors.Contexts;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Caching;
 using Squidex.Properties;
 using Squidex.Shared;
@@ -43,7 +43,7 @@ public sealed class SchemasOpenApiGenerator
         this.requestCache = requestCache;
     }
 
-    public async Task<OpenApiDocument> GenerateAsync(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat)
+    public async Task<OpenApiDocument> GenerateAsync(HttpContext httpContext, App app, IEnumerable<Schema> schemas, bool flat)
     {
         var document = CreateApiDocument(httpContext, app);
 
@@ -58,19 +58,16 @@ public sealed class SchemasOpenApiGenerator
 
         var builder = new Builder(app, document, schemaResolver, schemaGenerator);
 
-        var validSchemas =
-            schemas.Where(x =>
-                x.SchemaDef.IsPublished &&
-                x.SchemaDef.Type != SchemaDefType.Component &&
-                x.SchemaDef.Fields.Count > 0);
-
         var partitionResolver = app.PartitionResolver();
 
-        foreach (var schema in validSchemas)
+        foreach (var schema in schemas)
         {
-            var components = await appProvider.GetComponentsAsync(schema, httpContext.RequestAborted);
+            if (schema.IsPublished && schema.Type != SchemaDefType.Component && schema.Fields.Count > 0)
+            {
+                var components = await appProvider.GetComponentsAsync(schema, httpContext.RequestAborted);
 
-            GenerateSchemaOperations(builder.Schema(schema.SchemaDef, partitionResolver, components, flat));
+                GenerateSchemaOperations(builder.Schema(schema, partitionResolver, components, flat));
+            }
         }
 
         GenerateSharedOperations(builder.Shared());
@@ -219,7 +216,7 @@ public sealed class SchemasOpenApiGenerator
             .Responds(204, "Content item deleted");
     }
 
-    private OpenApiDocument CreateApiDocument(HttpContext context, IAppEntity app)
+    private OpenApiDocument CreateApiDocument(HttpContext context, App app)
     {
         var appName = app.Name;
 
@@ -250,7 +247,7 @@ public sealed class SchemasOpenApiGenerator
                         .Replace("[REDOC_LINK_NORMAL]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs"), StringComparison.Ordinal)
                         .Replace("[REDOC_LINK_SIMPLE]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs/flat"), StringComparison.Ordinal)
             },
-            SchemaType = SchemaType.OpenApi3
+            SchemaType = NJsonSchema.SchemaType.OpenApi3
         };
 
         if (!string.IsNullOrWhiteSpace(context.Request.Host.Value))

@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text.Json.Serialization;
+using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -16,54 +15,35 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
 public sealed partial class AssetFolderDomainObject
 {
-    public sealed class State : DomainObjectState<State>, IAssetFolderEntity
+    protected override AssetFolder Apply(AssetFolder snapshot, Envelope<IEvent> @event)
     {
-        public NamedId<DomainId> AppId { get; set; }
+        var newSnapshot = snapshot;
 
-        public string FolderName { get; set; }
-
-        public DomainId ParentId { get; set; }
-
-        public bool IsDeleted { get; set; }
-
-        [JsonIgnore]
-        public DomainId UniqueId
+        switch (@event.Payload)
         {
-            get => DomainId.Combine(AppId, Id);
+            case AssetFolderCreated e:
+                newSnapshot = new AssetFolder { Id = e.AssetFolderId };
+                SimpleMapper.Map(e, newSnapshot);
+                break;
+
+            case AssetFolderRenamed e:
+                newSnapshot = snapshot.Rename(e.FolderName);
+                break;
+
+            case AssetFolderMoved e:
+                newSnapshot = snapshot.Move(e.ParentId);
+                break;
+
+            case AssetFolderDeleted:
+                newSnapshot = snapshot with { IsDeleted = true };
+                break;
         }
 
-        public override bool ApplyEvent(IEvent @event)
+        if (ReferenceEquals(newSnapshot, snapshot))
         {
-            switch (@event)
-            {
-                case AssetFolderCreated e:
-                    {
-                        Id = e.AssetFolderId;
-
-                        SimpleMapper.Map(e, this);
-                        return true;
-                    }
-
-                case AssetFolderRenamed e when Is.OptionalChange(FolderName, e.FolderName):
-                    {
-                        FolderName = e.FolderName;
-                        return true;
-                    }
-
-                case AssetFolderMoved e when Is.Change(ParentId, e.ParentId):
-                    {
-                        ParentId = e.ParentId;
-                        return true;
-                    }
-
-                case AssetFolderDeleted:
-                    {
-                        IsDeleted = true;
-                        return true;
-                    }
-            }
-
-            return false;
+            return snapshot;
         }
+
+        return newSnapshot.Apply(@event.To<SquidexEvent>());
     }
 }

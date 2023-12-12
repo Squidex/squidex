@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 
@@ -19,7 +20,7 @@ public sealed class RulesIndex : IRulesIndex
         this.ruleRepository = ruleRepository;
     }
 
-    public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
+    public async Task<List<Rule>> GetRulesAsync(DomainId appId,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("RulesIndex/GetRulesAsync"))
@@ -30,7 +31,7 @@ public sealed class RulesIndex : IRulesIndex
         }
     }
 
-    private static bool IsValid(IRuleEntity? rule)
+    private static bool IsValid(Rule? rule)
     {
         return rule is { Version: > EtagVersion.Empty, IsDeleted: false };
     }

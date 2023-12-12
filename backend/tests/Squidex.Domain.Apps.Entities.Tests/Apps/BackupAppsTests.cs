@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -59,14 +60,13 @@ public class BackupAppsTests : GivenContext
     public async Task Should_complete_reservation_with_previous_token()
     {
         var appObject = A.Fake<AppDomainObject>();
-        var appState = new AppDomainObject.State();
 
         var context = CreateRestoreContext();
 
         A.CallTo(() => appObject.Snapshot)
-            .Returns(appState);
+            .Returns(App);
 
-        A.CallTo(() => rebuilder.RebuildStateAsync<AppDomainObject, AppDomainObject.State>(context.AppId, CancellationToken))
+        A.CallTo(() => rebuilder.RebuildStateAsync<AppDomainObject, App>(context.AppId, CancellationToken))
             .Returns(appObject);
 
         A.CallTo(() => appsIndex.ReserveAsync(AppId.Id, AppId.Name, CancellationToken))
@@ -151,14 +151,13 @@ public class BackupAppsTests : GivenContext
     public async Task Should_register_app_to_provider()
     {
         var appObject = A.Fake<AppDomainObject>();
-        var appState = new AppDomainObject.State();
 
         var context = CreateRestoreContext();
 
         A.CallTo(() => appObject.Snapshot)
-            .Returns(appState);
+            .Returns(App);
 
-        A.CallTo(() => rebuilder.RebuildStateAsync<AppDomainObject, AppDomainObject.State>(context.AppId, CancellationToken))
+        A.CallTo(() => rebuilder.RebuildStateAsync<AppDomainObject, App>(context.AppId, CancellationToken))
             .Returns(appObject);
 
         await sut.RestoreAsync(context, CancellationToken);

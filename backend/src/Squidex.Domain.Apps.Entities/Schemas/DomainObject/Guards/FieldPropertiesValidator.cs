@@ -208,7 +208,26 @@ public sealed class FieldPropertiesValidator : IFieldPropertiesVisitor<IEnumerab
 
     public IEnumerable<ValidationError> Visit(RichTextFieldProperties properties, None args)
     {
-        yield break;
+        if (IsMaxGreaterThanMin(properties.MaxLength, properties.MinLength))
+        {
+            yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxLength), nameof(properties.MinLength)),
+                nameof(properties.MinLength),
+                nameof(properties.MaxLength));
+        }
+
+        if (IsMaxGreaterThanMin(properties.MaxWords, properties.MinWords))
+        {
+            yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxWords), nameof(properties.MinWords)),
+                nameof(properties.MinWords),
+                nameof(properties.MaxWords));
+        }
+
+        if (IsMaxGreaterThanMin(properties.MaxCharacters, properties.MinCharacters))
+        {
+            yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxCharacters), nameof(properties.MinCharacters)),
+                nameof(properties.MinCharacters),
+                nameof(properties.MaxCharacters));
+        }
     }
 
     public IEnumerable<ValidationError> Visit(StringFieldProperties properties, None args)

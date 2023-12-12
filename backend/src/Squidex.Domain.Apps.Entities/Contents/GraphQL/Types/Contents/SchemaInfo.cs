@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Text;
 
 #pragma warning disable MA0048 // File name must match type name
@@ -15,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal sealed class SchemaInfo
 {
-    public ISchemaEntity Schema { get; }
+    public Schema Schema { get; }
 
     public string DisplayName => Schema.DisplayName();
 
@@ -35,7 +34,7 @@ internal sealed class SchemaInfo
 
     public IReadOnlyList<FieldInfo> Fields { get; init; }
 
-    private SchemaInfo(ISchemaEntity schema, string typeName, ReservedNames typeNames)
+    private SchemaInfo(Schema schema, string typeName, ReservedNames typeNames)
     {
         Schema = schema;
 
@@ -53,7 +52,7 @@ internal sealed class SchemaInfo
         return TypeName;
     }
 
-    public static IEnumerable<SchemaInfo> Build(IEnumerable<ISchemaEntity> schemas, ReservedNames typeNames)
+    public static IEnumerable<SchemaInfo> Build(IEnumerable<Schema> schemas, ReservedNames typeNames)
     {
         foreach (var schema in schemas.OrderBy(x => x.Created))
         {
@@ -61,7 +60,7 @@ internal sealed class SchemaInfo
 
             yield return new SchemaInfo(schema, typeName, typeNames)
             {
-                Fields = FieldInfo.Build(schema.SchemaDef.Fields, $"{typeName}Data", typeNames).ToList()
+                Fields = FieldInfo.Build(schema.Fields, $"{typeName}Data", typeNames).ToList()
             };
         }
     }

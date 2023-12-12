@@ -8,7 +8,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
@@ -41,7 +41,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
 
         public string SearchTerms { get; set; }
 
-        public IAppEntity App { get; set; }
+        public App App { get; set; }
 
         public SearchScope SearchScope { get; set; }
     }
@@ -80,7 +80,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
 
     protected abstract T BuildTexts(Dictionary<string, string> source);
 
-    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
@@ -115,7 +115,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         }
     }
 
-    public virtual async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+    public virtual async Task<List<DomainId>?> SearchAsync(App app, GeoQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -136,7 +136,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         return byGeo.Select(x => x.ContentId).ToList();
     }
 
-    public virtual async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+    public virtual async Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);

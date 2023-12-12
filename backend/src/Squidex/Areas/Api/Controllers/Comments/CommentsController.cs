@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;

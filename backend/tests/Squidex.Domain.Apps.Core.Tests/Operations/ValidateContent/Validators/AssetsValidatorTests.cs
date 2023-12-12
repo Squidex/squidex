@@ -18,16 +18,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators;
 public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
 {
     private readonly List<string> errors = [];
-    private static readonly IAssetInfo Document = TestAssets.Document(DomainId.NewGuid());
-    private static readonly IAssetInfo Image1 = TestAssets.Image(DomainId.NewGuid());
-    private static readonly IAssetInfo Image2 = TestAssets.Image(DomainId.NewGuid());
-    private static readonly IAssetInfo ImageSvg = TestAssets.Svg(DomainId.NewGuid());
-    private static readonly IAssetInfo Video = TestAssets.Video(DomainId.NewGuid());
+    private static readonly Asset Document = TestAssets.Document(DomainId.NewGuid());
+    private static readonly Asset Image1 = TestAssets.Image(DomainId.NewGuid());
+    private static readonly Asset Image2 = TestAssets.Image(DomainId.NewGuid());
+    private static readonly Asset ImageSvg = TestAssets.Svg(DomainId.NewGuid());
+    private static readonly Asset Video = TestAssets.Video(DomainId.NewGuid());
 
     public static IEnumerable<object[]> AssetsWithDimensions()
     {
-        yield return new object[] { Image1.AssetId };
-        yield return new object[] { Video.AssetId };
+        yield return new object[] { Image1.Id };
+        yield return new object[] { Video.Id };
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties());
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id), errors);
 
         Assert.Empty(errors);
     }
@@ -65,7 +65,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { AllowDuplicates = true });
 
-        await sut.ValidateAsync(CreateValue(Image1.AssetId, Image1.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(Image1.Id, Image1.Id), errors);
 
         Assert.Empty(errors);
     }
@@ -75,7 +75,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { ExpectedType = AssetType.Image });
 
-        await sut.ValidateAsync(CreateValue(ImageSvg.AssetId, Image1.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(ImageSvg.Id, Image1.Id), errors);
 
         Assert.Empty(errors);
     }
@@ -94,14 +94,14 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     [Fact]
     public async Task Should_add_error_if_asset_are_not_valid()
     {
-        var assetId = DomainId.NewGuid();
+        var id = DomainId.NewGuid();
 
         var sut = Validator(new AssetsFieldProperties());
 
-        await sut.ValidateAsync(CreateValue(assetId), errors);
+        await sut.ValidateAsync(CreateValue(id), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { $"[1]: Id {assetId} not found." });
+            new[] { $"[1]: Id {id} not found." });
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { MinSize = 5 * 1024 });
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId, Image1.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "[1]: Size of 4 kB must be greater than 5 kB." });
@@ -120,7 +120,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { MaxSize = 5 * 1024 });
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId, Image1.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "[2]: Size of 8 kB must be less than 5 kB." });
@@ -131,7 +131,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { ExpectedType = AssetType.Image });
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId, Image1.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "[1]: Not of expected type: Image." });
@@ -143,7 +143,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { MinWidth = 1000 });
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId, videoOrImageId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "[2]: Width 800px must be greater than 1000px." });
@@ -155,7 +155,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { MaxWidth = 700 });
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId, videoOrImageId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "[2]: Width 800px must be less than 700px." });
@@ -167,7 +167,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { MinHeight = 800 });
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId, videoOrImageId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "[2]: Height 600px must be greater than 800px." });
@@ -179,7 +179,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { MaxHeight = 500 });
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId, videoOrImageId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "[2]: Height 600px must be less than 500px." });
@@ -191,7 +191,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { AspectWidth = 1, AspectHeight = 1 });
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId, videoOrImageId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "[2]: Must have aspect ratio 1:1." });
@@ -202,7 +202,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { MinItems = 2 });
 
-        await sut.ValidateAsync(CreateValue(Image1.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "Must have at least 2 item(s)." });
@@ -213,7 +213,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { MaxItems = 1 });
 
-        await sut.ValidateAsync(CreateValue(Image1.AssetId, Image2.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(Image1.Id, Image2.Id), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "Must not have more than 1 item(s)." });
@@ -224,7 +224,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties());
 
-        await sut.ValidateAsync(CreateValue(Image1.AssetId, Image1.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(Image1.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "Must not contain duplicate values." });
@@ -235,7 +235,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         var sut = Validator(new AssetsFieldProperties { AllowedExtensions = ReadonlyList.Create("mp4") });
 
-        await sut.ValidateAsync(CreateValue(Document.AssetId, Image1.AssetId), errors);
+        await sut.ValidateAsync(CreateValue(Document.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
             new[]
@@ -259,9 +259,9 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     {
         return (ids, ct) =>
         {
-            var actual = new List<IAssetInfo> { Document, Image1, Image2, ImageSvg, Video };
+            var actual = new List<Asset> { Document, Image1, Image2, ImageSvg, Video };
 
-            return Task.FromResult<IReadOnlyList<IAssetInfo>>(actual);
+            return Task.FromResult<IReadOnlyList<Asset>>(actual);
         };
     }
 }

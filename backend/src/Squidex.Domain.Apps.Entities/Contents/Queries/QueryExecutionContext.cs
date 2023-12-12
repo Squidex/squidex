@@ -44,16 +44,16 @@ public abstract class QueryExecutionContext : Dictionary<string, object?>
         Services = serviceProvider;
     }
 
-    public virtual Task<IEnrichedContentEntity?> FindContentAsync(string schemaIdOrName, DomainId id, long version,
+    public virtual Task<EnrichedContent?> FindContentAsync(string schemaIdOrName, DomainId id, long version,
         CancellationToken ct)
     {
         return ContentQuery.FindAsync(Context, schemaIdOrName, id, version, ct);
     }
 
-    public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(Q q,
+    public virtual async Task<IResultList<EnrichedAsset>> QueryAssetsAsync(Q q,
         CancellationToken ct)
     {
-        IResultList<IEnrichedAssetEntity> assets;
+        IResultList<EnrichedAsset> assets;
 
         await maxRequests.WaitAsync(ct);
         try
@@ -68,10 +68,10 @@ public abstract class QueryExecutionContext : Dictionary<string, object?>
         return assets;
     }
 
-    public virtual async Task<IResultList<IEnrichedContentEntity>> QueryContentsAsync(string schemaIdOrName, Q q,
+    public virtual async Task<IResultList<EnrichedContent>> QueryContentsAsync(string schemaIdOrName, Q q,
         CancellationToken ct)
     {
-        IResultList<IEnrichedContentEntity> contents;
+        IResultList<EnrichedContent> contents;
 
         await maxRequests.WaitAsync(ct);
         try
@@ -86,7 +86,7 @@ public abstract class QueryExecutionContext : Dictionary<string, object?>
         return contents;
     }
 
-    public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryAssetsByIdsAsync(IEnumerable<DomainId> ids,
+    public virtual async Task<IReadOnlyList<EnrichedAsset>> QueryAssetsByIdsAsync(IEnumerable<DomainId> ids,
         CancellationToken ct)
     {
         Guard.NotNull(ids);
@@ -104,7 +104,7 @@ public abstract class QueryExecutionContext : Dictionary<string, object?>
         }
     }
 
-    public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> QueryContentsByIdsAsync(IEnumerable<DomainId> ids, HashSet<string>? fields,
+    public virtual async Task<IReadOnlyList<EnrichedContent>> QueryContentsByIdsAsync(IEnumerable<DomainId> ids, HashSet<string>? fields,
         CancellationToken ct)
     {
         Guard.NotNull(ids);

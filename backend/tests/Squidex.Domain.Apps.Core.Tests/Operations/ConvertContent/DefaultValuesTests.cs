@@ -24,7 +24,7 @@ public class DefaultValuesTests
     public DefaultValuesTests()
     {
         schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddString(1, "myString", Partitioning.Language,
                     new StringFieldProperties { DefaultValue = "en-string", IsRequired = true })
                 .AddNumber(2, "myNumber", Partitioning.Invariant,
@@ -201,6 +201,39 @@ public class DefaultValuesTests
                     new ContentFieldData()
                         .AddInvariant(
                             JsonValue.Array()));
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Should_enrich_fields_if_at_field_names_is_given()
+    {
+        var source =
+            new ContentData()
+                .AddField("myString",
+                    new ContentFieldData()
+                        .AddLocalized("de", string.Empty))
+                .AddField("myNumber",
+                    new ContentFieldData()
+                        .AddInvariant(456));
+
+        var actual =
+            new ContentConverter(ResolvedComponents.Empty, schema)
+                .Add(new AddDefaultValues(languages.ToResolver())
+                {
+                    FieldNames = ["myString"]
+                })
+                .Convert(source);
+
+        var expected =
+            new ContentData()
+                .AddField("myString",
+                    new ContentFieldData()
+                        .AddLocalized("de", string.Empty)
+                        .AddLocalized("en", "en-string"))
+                .AddField("myNumber",
+                    new ContentFieldData()
+                        .AddInvariant(456));
 
         Assert.Equal(expected, actual);
     }

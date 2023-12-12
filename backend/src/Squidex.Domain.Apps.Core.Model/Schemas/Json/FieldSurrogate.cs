@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json;
 
-public sealed class FieldSurrogate : IFieldSettings
+public sealed class FieldSurrogate
 {
     public long Id { get; set; }
 
@@ -25,7 +25,35 @@ public sealed class FieldSurrogate : IFieldSettings
 
     public FieldSurrogate[]? Children { get; set; }
 
-    public RootField ToField()
+    public static FieldSurrogate FromSource(RootField source)
+    {
+        return new FieldSurrogate
+        {
+            Id = source.Id,
+            Name = source.Name,
+            Children = source is ArrayField array ? array.Fields.Select(FromSource).ToArray() : null,
+            IsLocked = source.IsLocked,
+            IsHidden = source.IsHidden,
+            IsDisabled = source.IsDisabled,
+            Partitioning = source.Partitioning.Key,
+            Properties = source.RawProperties
+        };
+    }
+
+    public static FieldSurrogate FromSource(NestedField source)
+    {
+        return new FieldSurrogate
+        {
+            Id = source.Id,
+            Name = source.Name,
+            IsLocked = source.IsLocked,
+            IsHidden = source.IsHidden,
+            IsDisabled = source.IsDisabled,
+            Properties = source.RawProperties
+        };
+    }
+
+    public RootField ToRootField()
     {
         var partitioning = Core.Partitioning.FromString(Partitioning);
 
@@ -33,16 +61,32 @@ public sealed class FieldSurrogate : IFieldSettings
         {
             var nested = Children?.Select(n => n.ToNestedField()).ToArray() ?? [];
 
-            return new ArrayField(Id, Name, partitioning, nested, arrayProperties, this);
+            return Fields.Array(Id, Name, partitioning, arrayProperties) with
+            {
+                FieldCollection = new FieldCollection<NestedField>(nested),
+                IsLocked = IsLocked,
+                IsHidden = IsHidden,
+                IsDisabled = IsDisabled
+            };
         }
         else
         {
-            return Properties.CreateRootField(Id, Name, partitioning, this);
+            return Properties.CreateRootField(Id, Name, partitioning) with
+            {
+                IsLocked = IsLocked,
+                IsHidden = IsHidden,
+                IsDisabled = IsDisabled
+            };
         }
     }
 
     public NestedField ToNestedField()
     {
-        return Properties.CreateNestedField(Id, Name, this);
+        return Properties.CreateNestedField(Id, Name) with
+        {
+            IsLocked = IsLocked,
+            IsHidden = IsHidden,
+            IsDisabled = IsDisabled
+        };
     }
 }

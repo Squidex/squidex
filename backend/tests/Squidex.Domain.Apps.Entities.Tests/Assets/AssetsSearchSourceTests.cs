@@ -25,7 +25,7 @@ public class AssetsSearchSourceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_return_empty_actuals_if_user_has_no_permission()
+    public async Task Should_return_empty_results_if_user_has_no_permission()
     {
         var actual = await sut.SearchAsync("logo", ApiContext, default);
 
@@ -36,14 +36,14 @@ public class AssetsSearchSourceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_return_assets_actuals_if_found()
+    public async Task Should_return_assets_results_if_found()
     {
         var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, AppId.Name);
 
         var requestContext = CreateContext(false, permission.Id);
 
-        var asset1 = CreateAsset("logo1.png");
-        var asset2 = CreateAsset("logo2.png");
+        var asset1 = CreateAsset() with { FileName = "logo1.png" };
+        var asset2 = CreateAsset() with { FileName = "logo2.png" };
 
         A.CallTo(() => urlGenerator.AssetsUI(AppId, asset1.Id.ToString()))
             .Returns("assets-url1");
@@ -60,10 +60,5 @@ public class AssetsSearchSourceTests : GivenContext
             new SearchResults()
                 .Add("logo1.png", SearchResultType.Asset, "assets-url1")
                 .Add("logo2.png", SearchResultType.Asset, "assets-url2"));
-    }
-
-    private static IEnrichedAssetEntity CreateAsset(string fileName)
-    {
-        return new AssetEntity { FileName = fileName, Id = DomainId.NewGuid() };
     }
 }

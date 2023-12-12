@@ -51,7 +51,7 @@ public class SearchManagerTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_aggregate_actuals_from_all_sources()
+    public async Task Should_aggregate_results_from_all_sources()
     {
         var actual1 = new SearchResults().Add("Name1", SearchResultType.Setting, "Url1");
         var actual2 = new SearchResults().Add("Name2", SearchResultType.Setting, "Url2");

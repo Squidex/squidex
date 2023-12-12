@@ -348,13 +348,9 @@ public class AssetUsageTrackerTests : GivenContext
     [Fact]
     public async Task Should_merge_tags_with_asset_if_previous_tags_not_in_store()
     {
-        IAssetEntity asset = new AssetEntity
+        var asset = CreateAsset() with
         {
-            Tags =
-            [
-                "tag1",
-                "tag2"
-            ]
+            Tags = ["tag1", "tag2"]
         };
 
         A.CallTo(() => assetLoader.GetAsync(AppId.Id, assetId, 41, default))

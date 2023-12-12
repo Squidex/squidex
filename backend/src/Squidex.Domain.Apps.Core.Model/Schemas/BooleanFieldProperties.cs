@@ -27,13 +27,13 @@ public sealed record BooleanFieldProperties : FieldProperties
         return visitor.Visit((IField<BooleanFieldProperties>)field, args);
     }
 
-    public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
+    public override RootField CreateRootField(long id, string name, Partitioning partitioning)
     {
-        return Fields.Boolean(id, name, partitioning, this, settings);
+        return Fields.Boolean(id, name, partitioning, this);
     }
 
-    public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
+    public override NestedField CreateNestedField(long id, string name)
     {
-        return Fields.Boolean(id, name, this, settings);
+        return Fields.Boolean(id, name, this);
     }
 }

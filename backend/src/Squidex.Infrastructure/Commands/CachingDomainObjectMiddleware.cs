@@ -8,7 +8,7 @@
 namespace Squidex.Infrastructure.Commands;
 
 public class CachingDomainObjectMiddleware<TCommand, T, TState> : AggregateCommandMiddleware<TCommand, T>
-    where TCommand : IAggregateCommand where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+    where TCommand : IAggregateCommand where T : DomainObject<TState> where TState : Entity, new()
 {
     private readonly IDomainObjectCache domainObjectCache;
 

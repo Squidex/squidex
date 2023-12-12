@@ -48,8 +48,10 @@ public sealed class AppUISettingsTests : GivenContext
     [Fact]
     public async Task Should_delete_app_and_contributors()
     {
-        A.CallTo(() => App.Contributors)
-            .Returns(Contributors.Empty.Assign(userId, Role.Owner));
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign(userId, Role.Owner)
+        };
 
         var rootState = new TestState<AppUISettings.State>(AppId.Id, state.PersistenceFactory);
 

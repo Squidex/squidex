@@ -26,7 +26,7 @@ public class RuleEnricherTests : GivenContext
     [Fact]
     public async Task Should_not_enrich_if_statistics_not_found()
     {
-        var source = CreateRule();
+        var source = CreateRule() with { Version = 13 };
 
         var actual = await sut.EnrichAsync(source, ApiContext, CancellationToken);
 
@@ -43,7 +43,7 @@ public class RuleEnricherTests : GivenContext
     [Fact]
     public async Task Should_enrich_rules_with_found_statistics()
     {
-        var source = CreateRule();
+        var source = CreateRule() with { Version = 13 };
 
         var stats = new Dictionary<DomainId, RuleCounters>
         {
@@ -66,10 +66,5 @@ public class RuleEnricherTests : GivenContext
 
         A.CallTo(() => requestCache.AddDependency(12L))
             .MustHaveHappened();
-    }
-
-    private IRuleEntity CreateRule()
-    {
-        return new RuleEntity { AppId = AppId, Id = DomainId.NewGuid(), Version = 13 };
     }
 }

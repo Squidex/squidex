@@ -35,8 +35,14 @@ describe('TableSettings', () => {
 
     const INVALID_FIELD = { name: 'invalid', label: 'invalid' };
     const INVALID_CONFIGS = [
-        { case: 'blank', fields: [] },
-        { case: 'broken', fields: [{ name: 'invalid', label: 'invalid' }] },
+        {
+            case: 'blank',
+            fields: [],
+        },
+        {
+            case: 'broken',
+            fields: [{ name: 'invalid', label: 'invalid' }],
+        },
     ];
 
     const EMPTY = { fields: [], sizes: {}, wrappings: {} };
@@ -78,7 +84,7 @@ describe('TableSettings', () => {
 
             expect(listFields!).toEqual([
                 META_FIELDS.lastModifiedByAvatar.name,
-                schema.fields[0].name,
+                `data.${schema.fields[0].name}`,
                 META_FIELDS.statusColor.name,
                 META_FIELDS.lastModified.name,
             ]);
@@ -256,12 +262,12 @@ describe('TableSettings', () => {
                 META_FIELDS.version.name,
             ],
             sizes: {
-                field1: 100,
-                field2: 200,
+                'data.field1': 100,
+                'data.field2': 200,
             },
             wrappings: {
-                field3: true,
-                field4: false,
+                'data.field3': true,
+                'data.field4': false,
             },
         };
 
@@ -286,7 +292,7 @@ describe('TableSettings', () => {
 
         expect(listFields!).toEqual([
             META_FIELDS.lastModifiedByAvatar.name,
-            schema.fields[0].name,
+            `data.${schema.fields[0].name}`,
             META_FIELDS.statusColor.name,
             META_FIELDS.lastModified.name,
         ]);

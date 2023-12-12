@@ -156,7 +156,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
     [Fact]
     public void Should_format_image()
     {
-        var source = new AssetEntity
+        var source = CreateAsset() with
         {
             Metadata = new AssetMetadata
             {
@@ -174,7 +174,10 @@ public class ImageAssetMetadataSourceTests : GivenContext
     [Fact]
     public void Should_not_format_video()
     {
-        var source = new AssetEntity { Type = AssetType.Video };
+        var source = CreateAsset() with
+        {
+            Type = AssetType.Video
+        };
 
         var formatted = sut.Format(source);
 
@@ -184,7 +187,10 @@ public class ImageAssetMetadataSourceTests : GivenContext
     [Fact]
     public void Should_not_format_audio()
     {
-        var source = new AssetEntity { Type = AssetType.Audio };
+        var source = CreateAsset() with
+        {
+            Type = AssetType.Audio
+        };
 
         var formatted = sut.Format(source);
 

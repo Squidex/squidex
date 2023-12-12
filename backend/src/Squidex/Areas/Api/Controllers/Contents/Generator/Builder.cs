@@ -11,9 +11,9 @@ using NSwag;
 using NSwag.Generation;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator;
@@ -34,7 +34,8 @@ internal sealed class Builder
 
     public OpenApiSchemaResolver OpenApiSchemaResolver { get; }
 
-    internal Builder(IAppEntity app,
+    internal Builder(
+        App app,
         OpenApiDocument document,
         OpenApiSchemaResolver schemaResolver,
         OpenApiSchemaGenerator schemaGenerator)

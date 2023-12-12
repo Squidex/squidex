@@ -8,10 +8,8 @@
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -21,7 +19,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets.MongoDb;
 
-public sealed class AssetsQueryFixture : IAsyncLifetime
+public sealed class AssetsQueryFixture : GivenContext, IAsyncLifetime
 {
     private readonly int numValues = 250;
 
@@ -75,26 +73,23 @@ public sealed class AssetsQueryFixture : IAsyncLifetime
             return;
         }
 
-        var batch = new List<SnapshotWriteJob<AssetDomainObject.State>>();
+        var batch = new List<SnapshotWriteJob<Asset>>();
 
-        async Task ExecuteBatchAsync(AssetDomainObject.State? entity)
+        async Task ExecuteBatchAsync(Asset? entity)
         {
             if (entity != null)
             {
-                batch.Add(new SnapshotWriteJob<AssetDomainObject.State>(entity.UniqueId, entity, 0));
+                batch.Add(new SnapshotWriteJob<Asset>(entity.UniqueId, entity, 0));
             }
 
             if ((entity == null || batch.Count >= 1000) && batch.Count > 0)
             {
-                var store = (ISnapshotStore<AssetDomainObject.State>)AssetRepository;
+                var store = (ISnapshotStore<Asset>)AssetRepository;
 
                 await store.WriteManyAsync(batch, ct);
                 batch.Clear();
             }
         }
-
-        var created = SystemClock.Instance.GetCurrentInstant();
-        var createdBy = RefToken.User("1");
 
         foreach (var appId in appIds)
         {
@@ -106,19 +101,10 @@ public sealed class AssetsQueryFixture : IAsyncLifetime
                 {
                     var tag = j.ToString(CultureInfo.InvariantCulture);
 
-                    var asset = new AssetDomainObject.State
+                    var asset = CreateAsset() with
                     {
-                        Id = DomainId.NewGuid(),
-                        AppId = appId,
-                        Created = created,
-                        CreatedBy = createdBy,
                         FileHash = fileName,
                         FileName = fileName,
-                        FileSize = 1024,
-                        LastModified = created,
-                        LastModifiedBy = createdBy,
-                        IsDeleted = false,
-                        IsProtected = false,
                         Metadata = new AssetMetadata
                         {
                             ["value"] = JsonValue.Create(tag)

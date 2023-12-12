@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -21,18 +22,18 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
-public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
+public partial class RuleDomainObject : DomainObject<Rule>
 {
     private readonly IServiceProvider serviceProvider;
 
-    public RuleDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<RuleDomainObject> log,
+    public RuleDomainObject(DomainId id, IPersistenceFactory<Rule> persistence, ILogger<RuleDomainObject> log,
         IServiceProvider serviceProvider)
         : base(id, persistence, log)
     {
         this.serviceProvider = serviceProvider;
     }
 
-    protected override bool IsDeleted(State snapshot)
+    protected override bool IsDeleted(Rule snapshot)
     {
         return snapshot.IsDeleted;
     }
@@ -125,7 +126,7 @@ public partial class RuleDomainObject : DomainObject<RuleDomainObject.State>
         SimpleMapper.Map(command, @event);
         SimpleMapper.Map(Snapshot, @event);
 
-        await RuleEnqueuer().EnqueueAsync(Snapshot.Id, Snapshot.RuleDef, Envelope.Create(@event));
+        await RuleEnqueuer().EnqueueAsync(Snapshot.Id, Snapshot, Envelope.Create(@event));
     }
 
     private IRuleEnqueuer RuleEnqueuer()

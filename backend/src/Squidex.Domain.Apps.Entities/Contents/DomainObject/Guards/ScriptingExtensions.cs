@@ -22,7 +22,7 @@ public static class ScriptingExtensions
     public static Task<ContentData> ExecuteCreateScriptAsync(this ContentOperation operation, ContentData data, Status status,
         CancellationToken ct)
     {
-        var script = operation.SchemaDef.Scripts.Create;
+        var script = operation.Schema.Scripts.Create;
 
         if (string.IsNullOrWhiteSpace(script))
         {
@@ -47,7 +47,7 @@ public static class ScriptingExtensions
     public static Task<ContentData> ExecuteUpdateScriptAsync(this ContentOperation operation, ContentData data,
         CancellationToken ct)
     {
-        var script = operation.SchemaDef.Scripts.Update;
+        var script = operation.Schema.Scripts.Update;
 
         if (string.IsNullOrWhiteSpace(script))
         {
@@ -58,11 +58,11 @@ public static class ScriptingExtensions
         var vars = Enrich(operation, new ContentScriptVars
         {
             Data = data,
-            DataOld = operation.Snapshot.Data,
-            OldData = operation.Snapshot.Data,
-            OldStatus = operation.Snapshot.Status,
+            DataOld = operation.Snapshot.EditingData,
+            OldData = operation.Snapshot.EditingData,
+            OldStatus = operation.Snapshot.EditingStatus,
             Operation = "Update",
-            Status = operation.Snapshot.EditingStatus(),
+            Status = operation.Snapshot.EditingStatus,
             StatusOld = default
         });
 
@@ -72,23 +72,23 @@ public static class ScriptingExtensions
     public static Task<ContentData> ExecuteChangeScriptAsync(this ContentOperation operation, Status status, StatusChange change,
         CancellationToken ct)
     {
-        var script = operation.SchemaDef.Scripts.Change;
+        var script = operation.Schema.Scripts.Change;
 
         if (string.IsNullOrWhiteSpace(script))
         {
-            return Task.FromResult(operation.Snapshot.Data);
+            return Task.FromResult(operation.Snapshot.EditingData);
         }
 
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = Enrich(operation, new ContentScriptVars
         {
-            Data = operation.Snapshot.Data.Clone(),
+            Data = operation.Snapshot.EditingData.Clone(),
             DataOld = null,
             OldData = null,
-            OldStatus = operation.Snapshot.EditingStatus(),
+            OldStatus = operation.Snapshot.EditingStatus,
             Operation = change.ToString(),
             Status = status,
-            StatusOld = operation.Snapshot.EditingStatus(),
+            StatusOld = operation.Snapshot.EditingStatus,
             Validate = Validate(operation, status)
         });
 
@@ -98,7 +98,7 @@ public static class ScriptingExtensions
     public static Task ExecuteDeleteScriptAsync(this ContentOperation operation, bool permanent,
         CancellationToken ct)
     {
-        var script = operation.SchemaDef.Scripts.Delete;
+        var script = operation.Schema.Scripts.Delete;
 
         if (string.IsNullOrWhiteSpace(script))
         {
@@ -108,13 +108,13 @@ public static class ScriptingExtensions
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = Enrich(operation, new ContentScriptVars
         {
-            Data = operation.Snapshot.Data,
+            Data = operation.Snapshot.EditingData,
             DataOld = null,
             OldData = null,
-            OldStatus = operation.Snapshot.EditingStatus(),
+            OldStatus = operation.Snapshot.EditingStatus,
             Operation = "Delete",
             Permanent = permanent,
-            Status = operation.Snapshot.EditingStatus(),
+            Status = operation.Snapshot.EditingStatus,
             StatusOld = default
         });
 
@@ -141,7 +141,7 @@ public static class ScriptingExtensions
             {
                 var snapshot = operation.Snapshot;
 
-                operation.ValidateContentAndInputAsync(snapshot.Data, false, snapshot.IsPublished() || status == Status.Published, default).Wait();
+                operation.ValidateContentAndInputAsync(snapshot.EditingData, false, snapshot.IsPublished || status == Status.Published, default).Wait();
             }
             catch (AggregateException ex) when (ex.InnerException != null)
             {
@@ -156,7 +156,7 @@ public static class ScriptingExtensions
         vars.AppName = operation.App.Name;
         vars.ContentId = operation.CommandId;
         vars.SchemaId = operation.Schema.Id;
-        vars.SchemaName = operation.Schema.SchemaDef.Name;
+        vars.SchemaName = operation.Schema.Name;
         vars.User = operation.User;
 
         return vars;

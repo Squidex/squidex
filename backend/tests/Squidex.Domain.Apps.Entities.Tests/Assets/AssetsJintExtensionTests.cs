@@ -398,7 +398,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
             .Invokes(x => x.GetArgument<Stream>(4)?.Write(bytes));
     }
 
-    private (ScriptVars, IAssetEntity[]) SetupAssetsVars(int count, int fileSize = 100, AssetType type = AssetType.Image)
+    private (ScriptVars, Asset[]) SetupAssetsVars(int count, int fileSize = 100, AssetType type = AssetType.Image)
     {
         var assets = Enumerable.Range(0, count).Select(x => CreateAsset(1, fileSize, type)).ToArray();
         var assetIds = assets.Select(x => x.Id);
@@ -426,9 +426,9 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
         return (vars, assets);
     }
 
-    private IEnrichedAssetEntity CreateAsset(int index, int fileSize = 100, AssetType type = AssetType.Image)
+    private EnrichedAsset CreateAsset(int index, int fileSize = 100, AssetType type = AssetType.Image)
     {
-        return new AssetEntity
+        return new EnrichedAsset
         {
             AppId = AppId,
             Id = DomainId.NewGuid(),

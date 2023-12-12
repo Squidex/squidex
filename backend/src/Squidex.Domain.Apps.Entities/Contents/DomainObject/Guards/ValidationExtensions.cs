@@ -6,12 +6,11 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ValidateContent;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Translations;
@@ -23,7 +22,7 @@ public static class ValidationExtensions
 {
     public static void MustDeleteDraft(this ContentOperation operation)
     {
-        if (operation.Snapshot.NewStatus == null)
+        if (operation.Snapshot.NewVersion == null)
         {
             throw new DomainException(T.Get("contents.draftToDeleteNotFound"));
         }
@@ -31,7 +30,7 @@ public static class ValidationExtensions
 
     public static void MustCreateDraft(this ContentOperation operation)
     {
-        if (operation.Snapshot.EditingStatus() != Status.Published)
+        if (operation.Snapshot.EditingStatus != Status.Published)
         {
             throw new DomainException(T.Get("contents.draftNotCreateForUnpublished"));
         }
@@ -92,7 +91,7 @@ public static class ValidationExtensions
         var converter =
             new ContentConverter(
                 operation.Components,
-                operation.Schema.SchemaDef);
+                operation.Schema);
         converter.Add(new AddDefaultValues(operation.Partition()) { IgnoreRequiredFields = true });
 
         return converter.Convert(data);
@@ -103,7 +102,7 @@ public static class ValidationExtensions
     {
         var contentRepository = operation.Resolve<IContentRepository>();
 
-        var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, ct);
+        var hasReferrer = await contentRepository.HasReferrersAsync(operation.App, operation.CommandId, SearchScope.All, ct);
 
         if (hasReferrer)
         {
@@ -114,12 +113,12 @@ public static class ValidationExtensions
     private static ContentValidator GetValidator(this ContentOperation operation, bool optimize, bool published)
     {
         var rootContext =
-            new RootContext(operation.Resolve<IJsonSerializer>(),
-                operation.App.NamedId(),
-                operation.Schema.NamedId(),
-                operation.SchemaDef,
+            new RootContext(
+                operation.App,
+                operation.Schema,
                 operation.CommandId,
-                operation.Components);
+                operation.Components,
+                operation.Resolve<IJsonSerializer>());
 
         var validationContext = new ValidationContext(rootContext).Optimized(optimize).AsPublishing(published);
 

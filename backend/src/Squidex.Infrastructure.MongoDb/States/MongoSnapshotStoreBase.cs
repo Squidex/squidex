@@ -57,7 +57,10 @@ public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TS
         {
             var entityJob = job.As(CreateDocument(job.Key, job.Value, job.OldVersion));
 
-            await Collection.UpsertVersionedAsync(entityJob, ct);
+            // Also update the version, because the persistence system cannot do it.
+            entityJob.Value.Version = job.NewVersion;
+
+            await Collection.UpsertVersionedAsync(entityJob, Field.Of<MongoState<T>>(x => nameof(x.Version)), ct);
         }
     }
 

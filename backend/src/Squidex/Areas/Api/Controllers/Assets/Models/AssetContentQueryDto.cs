@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Assets;
-using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
@@ -105,7 +105,7 @@ public sealed class AssetContentQueryDto
     [FromQuery(Name = "format")]
     public ImageFormat? Format { get; set; }
 
-    public ResizeOptions ToResizeOptions(IAssetEntity asset, IAssetThumbnailGenerator assetGenerator, HttpRequest request)
+    public ResizeOptions ToResizeOptions(Asset asset, IAssetThumbnailGenerator assetGenerator, HttpRequest request)
     {
         Guard.NotNull(asset);
 
@@ -122,7 +122,7 @@ public sealed class AssetContentQueryDto
         return result;
     }
 
-    private ImageFormat? GetFormat(IAssetEntity asset, IAssetThumbnailGenerator assetGenerator, HttpRequest request)
+    private ImageFormat? GetFormat(Asset asset, IAssetThumbnailGenerator assetGenerator, HttpRequest request)
     {
         if (Format.HasValue || !Auto)
         {
@@ -154,7 +154,7 @@ public sealed class AssetContentQueryDto
         return Format;
     }
 
-    private (float?, float?) GetFocusPoint(IAssetEntity asset)
+    private (float?, float?) GetFocusPoint(Asset asset)
     {
         if (IgnoreFocus)
         {

@@ -117,7 +117,7 @@ public sealed class AccountController : IdentityServerController
 
     [HttpGet]
     [Route("account/logout/")]
-    public async Task<IActionResult> Logout(string logoutId)
+    public async Task<IActionResult> Logout()
     {
         await SignInManager.SignOutAsync();
 

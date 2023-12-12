@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -510,7 +510,7 @@ public sealed class SchemaFieldsController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        var result = context.Result<ISchemaEntity>();
+        var result = context.Result<Schema>();
         var response = SchemaDto.FromDomain(result, Resources);
 
         return response;

@@ -31,7 +31,7 @@ public sealed class DoubleLinkedContentMiddleware : ICustomCommandMiddleware
         if (context.Command is UpdateContent update && context.IsCompleted && update.SchemaId.Name == "source")
         {
             // After a change is made, the content is put to the command context.
-            var content = context.Result<IContentEntity>();
+            var content = context.Result<Content>();
 
             var contentPrevious =
                 await contentLoader.GetAsync(
@@ -85,7 +85,7 @@ public sealed class DoubleLinkedContentMiddleware : ICustomCommandMiddleware
         }
     }
 
-    private static async Task UpdateReferencing(CommandContext context, IContentEntity reference, ContentData data,
+    private static async Task UpdateReferencing(CommandContext context, Content reference, ContentData data,
         CancellationToken ct)
     {
         // Also set the expected version, otherwise it will be overriden with the version from the request.

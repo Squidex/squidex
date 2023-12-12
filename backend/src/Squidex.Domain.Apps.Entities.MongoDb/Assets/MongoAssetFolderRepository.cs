@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -15,6 +15,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 
 public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<MongoAssetFolderEntity>, IAssetFolderRepository
 {
+    static MongoAssetFolderRepository()
+    {
+        MongoAssetFolderEntity.RegisterClassMap();
+    }
+
     public MongoAssetFolderRepository(IMongoDatabase database)
         : base(database)
     {
@@ -38,7 +43,7 @@ public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<Mon
         }, ct);
     }
 
-    public async Task<IResultList<IAssetFolderEntity>> QueryAsync(DomainId appId, DomainId? parentId,
+    public async Task<IResultList<AssetFolder>> QueryAsync(DomainId appId, DomainId? parentId,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/QueryAsync"))
@@ -49,7 +54,7 @@ public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<Mon
                 await Collection.Find(filter).SortBy(x => x.FolderName)
                     .ToListAsync(ct);
 
-            return ResultList.Create<IAssetFolderEntity>(assetFolderEntities.Count, assetFolderEntities);
+            return ResultList.Create<AssetFolder>(assetFolderEntities.Count, assetFolderEntities);
         }
     }
 
@@ -70,7 +75,7 @@ public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<Mon
         }
     }
 
-    public async Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId appId, DomainId id,
+    public async Task<AssetFolder?> FindAssetFolderAsync(DomainId appId, DomainId id,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/FindAssetFolderAsync"))

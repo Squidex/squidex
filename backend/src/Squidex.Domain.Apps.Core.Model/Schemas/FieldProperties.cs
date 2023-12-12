@@ -27,7 +27,7 @@ public abstract record FieldProperties : NamedElementPropertiesBase
 
     public abstract T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args);
 
-    public abstract RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null);
+    public abstract RootField CreateRootField(long id, string name, Partitioning partitioning);
 
-    public abstract NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null);
+    public abstract NestedField CreateNestedField(long id, string name);
 }

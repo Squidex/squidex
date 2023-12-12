@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 

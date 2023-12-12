@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Http;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -41,14 +42,14 @@ public sealed class EnrichWithTeamIdCommandMiddleware : ICommandMiddleware
 
     private DomainId GetTeamId()
     {
-        var feature = httpContextAccessor.HttpContext?.Features.Get<ITeamFeature>();
+        var team = httpContextAccessor.HttpContext?.Features.Get<Team>();
 
-        if (feature == null)
+        if (team == null)
         {
             ThrowHelper.InvalidOperationException("Cannot resolve team.");
             return default!;
         }
 
-        return feature.Team.Id;
+        return team.Id;
     }
 }

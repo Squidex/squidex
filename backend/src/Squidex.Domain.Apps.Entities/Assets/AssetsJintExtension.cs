@@ -13,12 +13,12 @@ using Jint.Runtime;
 using Jint.Runtime.Interop;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Domain.Apps.Core.Scripting.Internal;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
@@ -284,7 +284,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
         switch (objectWrapper.Target)
         {
-            case IAssetEntity asset:
+            case Asset asset:
                 assetRef = asset.ToRef();
                 return true;
 
@@ -316,7 +316,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         return true;
     }
 
-    private async Task<IAppEntity> GetAppAsync(DomainId appId,
+    private async Task<App> GetAppAsync(DomainId appId,
         CancellationToken ct)
     {
         var appProvider = serviceProvider.GetRequiredService<IAppProvider>();

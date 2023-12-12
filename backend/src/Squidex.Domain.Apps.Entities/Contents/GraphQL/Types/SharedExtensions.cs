@@ -19,6 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
 public static class SharedExtensions
 {
+    internal static string EscapePartition(this string value)
+    {
+        return value.Replace('-', '_');
+    }
+
     internal static FieldType WithouthResolver(this FieldType source)
     {
         return new FieldType

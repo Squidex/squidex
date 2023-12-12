@@ -7,8 +7,8 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Invitation;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -122,17 +122,17 @@ public sealed class TeamContributorsController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        if (context.PlainResult is InvitedResult<ITeamEntity> invited)
+        if (context.PlainResult is InvitedResult<Team> invited)
         {
             return await GetResponseAsync(invited.Entity, true);
         }
         else
         {
-            return await GetResponseAsync(context.Result<ITeamEntity>(), false);
+            return await GetResponseAsync(context.Result<Team>(), false);
         }
     }
 
-    private async Task<ContributorsDto> GetResponseAsync(ITeamEntity team, bool invited)
+    private async Task<ContributorsDto> GetResponseAsync(Team team, bool invited)
     {
         return await ContributorsDto.FromDomainAsync(team, Resources, userResolver, invited);
     }

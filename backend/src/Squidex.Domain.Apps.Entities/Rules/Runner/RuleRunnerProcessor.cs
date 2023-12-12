@@ -185,13 +185,12 @@ public sealed class RuleRunnerProcessor
                 run.Context = new RuleContext
                 {
                     AppId = rule.AppId,
-                    Rule = rule.RuleDef,
-                    RuleId = rule.Id,
                     IncludeStale = true,
-                    IncludeSkipped = true
+                    IncludeSkipped = true,
+                    Rule = rule,
                 };
 
-                if (run.Job.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(rule.RuleDef))
+                if (run.Job.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(rule))
                 {
                     await EnqueueFromSnapshotsAsync(run, ct);
                 }
@@ -239,7 +238,7 @@ public sealed class RuleRunnerProcessor
                     throw result.EnrichmentError;
                 }
 
-                log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.RuleId);
+                log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.Rule?.Id);
             }
         }
     }
@@ -285,7 +284,7 @@ public sealed class RuleRunnerProcessor
                         throw result.EnrichmentError;
                     }
 
-                    log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.RuleId);
+                    log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.Rule?.Id);
                 }
             }
         }

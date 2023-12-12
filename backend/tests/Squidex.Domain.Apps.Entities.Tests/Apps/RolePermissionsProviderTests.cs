@@ -27,8 +27,8 @@ public class RolePermissionsProviderTests : GivenContext
         A.CallTo(() => AppProvider.GetSchemasAsync(A<DomainId>._, default))
             .Returns(
             [
-                Mocks.Schema(AppId, NamedId.Of(DomainId.NewGuid(), "schema1")),
-                Mocks.Schema(AppId, NamedId.Of(DomainId.NewGuid(), "schema2"))
+                Schema.WithId(DomainId.NewGuid(), "my-schema1"),
+                Schema.WithId(DomainId.NewGuid(), "my-schema2")
             ]);
 
         var actual = await sut.GetPermissionsAsync(App);
@@ -36,7 +36,7 @@ public class RolePermissionsProviderTests : GivenContext
         Assert.True(actual.Contains("*"));
         Assert.True(actual.Contains("clients.read"));
         Assert.True(actual.Contains("schemas.*.update"));
-        Assert.True(actual.Contains("schemas.schema1.update"));
-        Assert.True(actual.Contains("schemas.schema2.update"));
+        Assert.True(actual.Contains("schemas.my-schema1.update"));
+        Assert.True(actual.Contains("schemas.my-schema2.update"));
     }
 }

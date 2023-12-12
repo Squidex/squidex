@@ -29,12 +29,12 @@ public sealed record ArrayFieldProperties : FieldProperties
         return visitor.Visit((IArrayField)field, args);
     }
 
-    public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
+    public override RootField CreateRootField(long id, string name, Partitioning partitioning)
     {
-        return Fields.Array(id, name, partitioning, this, settings);
+        return Fields.Array(id, name, partitioning, this);
     }
 
-    public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
+    public override NestedField CreateNestedField(long id, string name)
     {
         throw new NotSupportedException();
     }

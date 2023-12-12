@@ -10,38 +10,30 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules;
 
-public sealed class Rule
+public record Rule : AppEntity
 {
-    public string? Name { get; private set; }
+    public string? Name { get; init; }
 
-    public RuleTrigger Trigger { get; private set; }
+    public RuleTrigger Trigger { get; init; }
 
-    public RuleAction Action { get; private set; }
+    public RuleAction Action { get; init; }
 
-    public bool IsEnabled { get; private set; } = true;
+    public bool IsEnabled { get; init; } = true;
 
-    public Rule(RuleTrigger trigger, RuleAction action)
+    public override DomainId UniqueId
     {
-        Guard.NotNull(trigger);
-        Guard.NotNull(action);
-
-        Action = action;
-
-        Trigger = trigger;
+        get => DomainId.Combine(AppId.Id, Id);
     }
 
     [Pure]
-    public Rule Rename(string newName)
+    public Rule Rename(string? newName)
     {
         if (string.Equals(Name, newName, StringComparison.Ordinal))
         {
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.Name = newName;
-        });
+        return this with { Name = newName };
     }
 
     [Pure]
@@ -52,10 +44,7 @@ public sealed class Rule
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsEnabled = true;
-        });
+        return this with { IsEnabled = true };
     }
 
     [Pure]
@@ -66,10 +55,7 @@ public sealed class Rule
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsEnabled = false;
-        });
+        return this with { IsEnabled = false };
     }
 
     [Pure]
@@ -87,10 +73,7 @@ public sealed class Rule
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.Trigger = newTrigger;
-        });
+        return this with { Trigger = newTrigger };
     }
 
     [Pure]
@@ -108,18 +91,6 @@ public sealed class Rule
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.Action = newAction;
-        });
-    }
-
-    private Rule Clone(Action<Rule> updater)
-    {
-        var clone = (Rule)MemberwiseClone();
-
-        updater(clone);
-
-        return clone;
+        return this with { Action = newAction };
     }
 }

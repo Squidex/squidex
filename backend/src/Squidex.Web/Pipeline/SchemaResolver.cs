@@ -8,8 +8,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
@@ -29,9 +30,9 @@ public sealed class SchemaResolver : IAsyncActionFilter
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        var appId = context.HttpContext.Features.Get<IAppFeature>()?.App.Id ?? default;
+        var app = context.HttpContext.Features.Get<App>();
 
-        if (appId != default)
+        if (app != null)
         {
             if (context.RouteData.Values.TryGetValue("schema", out var schemaValue))
             {
@@ -43,7 +44,7 @@ public sealed class SchemaResolver : IAsyncActionFilter
                     return;
                 }
 
-                var schema = await GetSchemaAsync(appId, schemaIdOrName, context.HttpContext.User);
+                var schema = await GetSchemaAsync(app.Id, schemaIdOrName, context.HttpContext.User);
 
                 if (schema == null)
                 {
@@ -51,20 +52,20 @@ public sealed class SchemaResolver : IAsyncActionFilter
                     return;
                 }
 
-                if (context.ActionDescriptor.EndpointMetadata.Any(x => x is SchemaMustBePublishedAttribute) && !schema.SchemaDef.IsPublished)
+                if (context.ActionDescriptor.EndpointMetadata.Any(x => x is SchemaMustBePublishedAttribute) && !schema.IsPublished)
                 {
                     context.Result = new NotFoundResult();
                     return;
                 }
 
-                context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema));
+                context.HttpContext.Features.Set(schema);
             }
         }
 
         await next();
     }
 
-    private Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string schemaIdOrName, ClaimsPrincipal user)
+    private Task<Schema?> GetSchemaAsync(DomainId appId, string schemaIdOrName, ClaimsPrincipal user)
     {
         var canCache = !user.IsInClient(DefaultClients.Frontend);
 

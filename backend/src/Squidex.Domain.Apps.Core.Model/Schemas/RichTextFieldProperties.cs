@@ -14,6 +14,18 @@ public sealed record RichTextFieldProperties : FieldProperties
 {
     public string? FolderId { get; init; }
 
+    public int? MinLength { get; init; }
+
+    public int? MaxLength { get; init; }
+
+    public int? MinCharacters { get; init; }
+
+    public int? MaxCharacters { get; init; }
+
+    public int? MinWords { get; init; }
+
+    public int? MaxWords { get; init; }
+
     public ReadonlyList<string>? ClassNames { get; init; }
 
     public ReadonlyList<DomainId>? SchemaIds { get; init; }
@@ -28,13 +40,13 @@ public sealed record RichTextFieldProperties : FieldProperties
         return visitor.Visit((IField<RichTextFieldProperties>)field, args);
     }
 
-    public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
+    public override RootField CreateRootField(long id, string name, Partitioning partitioning)
     {
-        return Fields.RichText(id, name, partitioning, this, settings);
+        return Fields.RichText(id, name, partitioning, this);
     }
 
-    public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
+    public override NestedField CreateNestedField(long id, string name)
     {
-        return Fields.RichText(id, name, this, settings);
+        return Fields.RichText(id, name, this);
     }
 }

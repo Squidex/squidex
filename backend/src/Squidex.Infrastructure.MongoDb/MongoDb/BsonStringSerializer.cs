@@ -14,18 +14,16 @@ namespace Squidex.Infrastructure.MongoDb;
 
 public sealed class BsonStringSerializer<T> : SerializerBase<T>
 {
+    private static readonly BsonStringSerializer<T> Instance = new BsonStringSerializer<T>();
     private readonly TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(T));
 
     public static void Register()
     {
-        try
-        {
-            BsonSerializer.RegisterSerializer(new BsonStringSerializer<T>());
-        }
-        catch (BsonSerializationException)
-        {
-            return;
-        }
+        BsonSerializer.TryRegisterSerializer(Instance);
+    }
+
+    private BsonStringSerializer()
+    {
     }
 
     public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)

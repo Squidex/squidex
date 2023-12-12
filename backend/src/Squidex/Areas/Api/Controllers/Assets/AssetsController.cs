@@ -436,7 +436,7 @@ public sealed class AssetsController : ApiController
         }
         else
         {
-            return AssetDto.FromDomain(context.Result<IEnrichedAssetEntity>(), Resources);
+            return AssetDto.FromDomain(context.Result<EnrichedAsset>(), Resources);
         }
     }
 

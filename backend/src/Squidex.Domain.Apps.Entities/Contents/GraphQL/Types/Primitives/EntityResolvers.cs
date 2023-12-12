@@ -7,20 +7,21 @@
 
 using GraphQL.Resolvers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
 internal static class EntityResolvers
 {
-    public static readonly IFieldResolver Id = Resolve<IEntity>(x => x.Id.ToString());
-    public static readonly IFieldResolver Created = Resolve<IEntity>(x => x.Created.ToDateTimeUtc());
-    public static readonly IFieldResolver CreatedBy = Resolve<IEntityWithCreatedBy>(x => x.CreatedBy.ToString());
-    public static readonly IFieldResolver CreatedByUser = ResolveUser<IEntityWithCreatedBy>(x => x.CreatedBy);
-    public static readonly IFieldResolver LastModified = Resolve<IEntity>(x => x.LastModified.ToDateTimeUtc());
-    public static readonly IFieldResolver LastModifiedBy = Resolve<IEntityWithLastModifiedBy>(x => x.LastModifiedBy.ToString());
-    public static readonly IFieldResolver LastModifiedByUser = ResolveUser<IEntityWithLastModifiedBy>(x => x.LastModifiedBy);
-    public static readonly IFieldResolver Version = Resolve<IEntityWithVersion>(x => x.Version);
+    public static readonly IFieldResolver Id = Resolve<Entity>(x => x.Id.ToString());
+    public static readonly IFieldResolver Created = Resolve<Entity>(x => x.Created.ToDateTimeUtc());
+    public static readonly IFieldResolver CreatedBy = Resolve<Entity>(x => x.CreatedBy.ToString());
+    public static readonly IFieldResolver CreatedByUser = ResolveUser<Entity>(x => x.CreatedBy);
+    public static readonly IFieldResolver LastModified = Resolve<Entity>(x => x.LastModified.ToDateTimeUtc());
+    public static readonly IFieldResolver LastModifiedBy = Resolve<Entity>(x => x.LastModifiedBy.ToString());
+    public static readonly IFieldResolver LastModifiedByUser = ResolveUser<Entity>(x => x.LastModifiedBy);
+    public static readonly IFieldResolver Version = Resolve<Entity>(x => x.Version);
 
     private static IFieldResolver Resolve<TSource>(Func<TSource, object> resolver)
     {

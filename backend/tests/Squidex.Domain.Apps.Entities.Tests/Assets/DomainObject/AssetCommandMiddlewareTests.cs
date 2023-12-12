@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -14,7 +15,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.State>
+public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
 {
     private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
@@ -40,7 +41,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
         file = new NoopAssetFile();
 
         A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._, CancellationToken))
-            .Returns(Task.FromResult<IEnrichedAssetEntity?>(null));
+            .Returns(Task.FromResult<EnrichedAsset?>(null));
 
         sut = new AssetCommandMiddleware(
             domainObjectFactory,
@@ -52,33 +53,33 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
     }
 
     [Fact]
-    public async Task Should_not_invoke_enricher_for_other_actual()
+    public async Task Should_not_invoke_enricher_for_other_result()
     {
         await HandleAsync(new AnnotateAsset(), 12);
 
-        A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, ApiContext, A<CancellationToken>._))
+        A.CallTo(() => assetEnricher.EnrichAsync(A<EnrichedAsset>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_not_invoke_enricher_if_already_enriched()
     {
-        var actual = new AssetEntity();
+        var actual = new Asset();
 
         var context =
             await HandleAsync(new AnnotateAsset(),
                 actual);
 
-        A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, ApiContext, A<CancellationToken>._))
+        A.CallTo(() => assetEnricher.EnrichAsync(A<EnrichedAsset>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
-    public async Task Should_enrich_asset_actual()
+    public async Task Should_enrich_asset_result()
     {
-        var actual = A.Fake<IAssetEntity>();
+        var actual = new Asset();
 
-        var enriched = new AssetEntity();
+        var enriched = CreateAsset();
 
         A.CallTo(() => assetEnricher.EnrichAsync(actual, ApiContext, CancellationToken))
             .Returns(enriched);
@@ -87,19 +88,19 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
             await HandleAsync(new AnnotateAsset(),
                 actual);
 
-        Assert.Same(enriched, context.Result<IEnrichedAssetEntity>());
+        Assert.Same(enriched, context.Result<EnrichedAsset>());
     }
 
     [Fact]
     public async Task Create_should_upload_file()
     {
-        var actual = CreateAsset();
+        var actual = CreateAsset().WithId(assetId);
 
         var context =
             await HandleAsync(new CreateAsset { File = file },
                 actual);
 
-        Assert.Same(actual, context.Result<IEnrichedAssetEntity>());
+        Assert.Same(actual, context.Result<EnrichedAsset>());
 
         AssertAssetHasBeenUploaded(0);
         AssertMetadataEnriched();
@@ -116,9 +117,9 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
     }
 
     [Fact]
-    public async Task Create_should_not_return_duplicate_actual_if_file_with_same_hash_found_but_duplicate_allowed()
+    public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
     {
-        var actual = CreateAsset();
+        var actual = CreateAsset().WithId(assetId);
 
         SetupSameHashAsset(file.FileName, file.FileSize, out var _);
 
@@ -126,11 +127,11 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
             await HandleAsync(new CreateAsset { File = file, Duplicate = true },
                 actual);
 
-        Assert.Same(actual, context.Result<IEnrichedAssetEntity>());
+        Assert.Same(actual, context.Result<EnrichedAsset>());
     }
 
     [Fact]
-    public async Task Create_should_return_duplicate_actual_if_file_with_same_hash_found()
+    public async Task Create_should_return_duplicate_result_if_file_with_same_hash_found()
     {
         SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
 
@@ -144,7 +145,9 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
     [Fact]
     public async Task Update_should_upload_file()
     {
-        await HandleAsync(new UpdateAsset { File = file }, CreateAsset(1));
+        var actual = CreateAsset().WithId(assetId) with { FileVersion = 1 };
+
+        await HandleAsync(new UpdateAsset { File = file }, actual);
 
         AssertAssetHasBeenUploaded(1);
         AssertMetadataEnriched();
@@ -163,16 +166,18 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
     [Fact]
     public async Task Upsert_should_upload_file()
     {
-        await HandleAsync(new UpsertAsset { File = file, Duplicate = false }, CreateAsset(1));
+        var actual = CreateAsset().WithId(assetId) with { FileVersion = 1 };
+
+        await HandleAsync(new UpsertAsset { File = file, Duplicate = false }, actual);
 
         AssertAssetHasBeenUploaded(1);
         AssertMetadataEnriched();
     }
 
     [Fact]
-    public async Task Upsert_should_not_return_duplicate_actual_if_file_with_same_hash_found_but_duplicate_allowed()
+    public async Task Upsert_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
     {
-        var actual = CreateAsset();
+        var actual = CreateAsset().WithId(assetId);
 
         SetupSameHashAsset(file.FileName, file.FileSize, out var _);
 
@@ -180,11 +185,11 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
             await HandleAsync(new UpsertAsset { File = file },
                 actual);
 
-        Assert.Same(actual, context.Result<IEnrichedAssetEntity>());
+        Assert.Same(actual, context.Result<EnrichedAsset>());
     }
 
     [Fact]
-    public async Task Upsert_should_return_duplicate_actual_if_file_with_same_hash_found()
+    public async Task Upsert_should_return_duplicate_result_if_file_with_same_hash_found()
     {
         SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
 
@@ -217,9 +222,9 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
             .MustHaveHappened();
     }
 
-    private void SetupSameHashAsset(string fileName, long fileSize, out IEnrichedAssetEntity duplicate)
+    private void SetupSameHashAsset(string fileName, long fileSize, out EnrichedAsset duplicate)
     {
-        duplicate = new AssetEntity
+        duplicate = CreateAsset() with
         {
             FileName = fileName,
             FileSize = fileSize
@@ -250,10 +255,5 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject.Sta
             .Returns(domainObject);
 
         return HandleAsync(sut, command, CancellationToken);
-    }
-
-    private IAssetEntity CreateAsset(long fileVersion = 0)
-    {
-        return new AssetEntity { AppId = AppId, Id = assetId, FileVersion = fileVersion };
     }
 }

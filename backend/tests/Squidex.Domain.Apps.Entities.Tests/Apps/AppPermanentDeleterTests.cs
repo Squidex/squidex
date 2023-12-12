@@ -98,14 +98,12 @@ public class AppPermanentDeleterTests : GivenContext
     [Fact]
     public async Task Should_call_deleters_when_app_deleted()
     {
-        var app = new AppDomainObject.State { Id = AppId.Id, Name = AppId.Name };
-
         var domainObject = A.Fake<AppDomainObject>();
 
         A.CallTo(() => domainObject.Snapshot)
-            .Returns(app);
+            .Returns(App);
 
-        A.CallTo(() => domainObjectFactory.Create<AppDomainObject>(app.Id))
+        A.CallTo(() => domainObjectFactory.Create<AppDomainObject>(App.Id))
             .Returns(domainObject);
 
         await sut.On(Envelope.Create(new AppDeleted
@@ -113,10 +111,10 @@ public class AppPermanentDeleterTests : GivenContext
             AppId = AppId
         }));
 
-        A.CallTo(() => deleter1.DeleteAppAsync(app, default))
+        A.CallTo(() => deleter1.DeleteAppAsync(App, default))
             .MustHaveHappened();
 
-        A.CallTo(() => deleter2.DeleteAppAsync(app, default))
+        A.CallTo(() => deleter2.DeleteAppAsync(App, default))
             .MustHaveHappened();
     }
 }

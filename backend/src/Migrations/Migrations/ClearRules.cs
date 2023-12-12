@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Rules.DomainObject;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 
@@ -13,9 +13,9 @@ namespace Migrations.Migrations;
 
 public sealed class ClearRules : IMigration
 {
-    private readonly IStore<RuleDomainObject.State> store;
+    private readonly IStore<Rule> store;
 
-    public ClearRules(IStore<RuleDomainObject.State> store)
+    public ClearRules(IStore<Rule> store)
     {
         this.store = store;
     }

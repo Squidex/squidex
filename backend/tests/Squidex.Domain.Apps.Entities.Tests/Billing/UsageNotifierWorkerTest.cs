@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -64,7 +64,7 @@ public class UsageNotifierWorkerTest : GivenContext
 
         await sut.HandleAsync(message, default);
 
-        A.CallTo(() => notificationSender.SendUsageAsync(A<IUser>._, A<IAppEntity>._, A<long>._, A<long>._, A<CancellationToken>._))
+        A.CallTo(() => notificationSender.SendUsageAsync(A<IUser>._, A<App>._, A<long>._, A<long>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 

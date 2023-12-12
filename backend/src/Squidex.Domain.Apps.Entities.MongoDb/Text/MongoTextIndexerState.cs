@@ -7,7 +7,7 @@
 
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -18,7 +18,7 @@ public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState
 {
     static MongoTextIndexerState()
     {
-        BsonClassMap.RegisterClassMap<TextContentState>(cm =>
+        BsonClassMap.TryRegisterClassMap<TextContentState>(cm =>
         {
             cm.MapIdField(x => x.UniqueContentId);
 
@@ -56,7 +56,7 @@ public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState
         return "TextIndexerState";
     }
 
-    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);

@@ -22,6 +22,36 @@ public sealed class RichTextFieldPropertiesDto : FieldPropertiesDto
     public string? FolderId { get; set; }
 
     /// <summary>
+    /// The minimum allowed length for the field value.
+    /// </summary>
+    public int? MinLength { get; set; }
+
+    /// <summary>
+    /// The maximum allowed length for the field value.
+    /// </summary>
+    public int? MaxLength { get; set; }
+
+    /// <summary>
+    /// The minimum allowed of normal characters for the field value.
+    /// </summary>
+    public int? MinCharacters { get; set; }
+
+    /// <summary>
+    /// The maximum allowed of normal characters for the field value.
+    /// </summary>
+    public int? MaxCharacters { get; set; }
+
+    /// <summary>
+    /// The minimum allowed number of words for the field value.
+    /// </summary>
+    public int? MinWords { get; set; }
+
+    /// <summary>
+    /// The maximum allowed number of words for the field value.
+    /// </summary>
+    public int? MaxWords { get; set; }
+
+    /// <summary>
     /// The class names for the editor.
     /// </summary>
     public ReadonlyList<string>? ClassNames { get; set; }

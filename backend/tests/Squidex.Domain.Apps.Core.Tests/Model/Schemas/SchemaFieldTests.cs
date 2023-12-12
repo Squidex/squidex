@@ -29,12 +29,6 @@ public class SchemaFieldTests
     }
 
     [Fact]
-    public void Should_throw_exception_if_creating_field_with_invalid_name()
-    {
-        Assert.Throws<ArgumentException>(() => Fields.Number(1, string.Empty, Partitioning.Invariant));
-    }
-
-    [Fact]
     public void Should_hide_field()
     {
         var field_1 = field_0.Hide();

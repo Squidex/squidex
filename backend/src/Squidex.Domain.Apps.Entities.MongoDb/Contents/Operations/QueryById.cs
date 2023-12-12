@@ -6,15 +6,15 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 
 internal sealed class QueryById : OperationBase
 {
-    public async Task<IContentEntity?> QueryAsync(ISchemaEntity schema, DomainId id,
+    public async Task<Content?> QueryAsync(Schema schema, DomainId id,
         CancellationToken ct)
     {
         var filter = Filter.Eq(x => x.DocumentId, DomainId.Combine(schema.AppId, id));

@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
@@ -20,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
 public sealed class ResolveAssets : IContentEnricherStep
 {
-    private static readonly ILookup<DomainId, IEnrichedAssetEntity> EmptyAssets = Enumerable.Empty<IEnrichedAssetEntity>().ToLookup(x => x.Id);
+    private static readonly ILookup<DomainId, EnrichedAsset> EmptyAssets = Enumerable.Empty<EnrichedAsset>().ToLookup(x => x.Id);
 
     private readonly IUrlGenerator urlGenerator;
     private readonly IAssetQueryService assetQuery;
@@ -33,7 +32,7 @@ public sealed class ResolveAssets : IContentEnricherStep
         this.requestCache = requestCache;
     }
 
-    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
         if (!ShouldEnrich(context))
@@ -62,12 +61,12 @@ public sealed class ResolveAssets : IContentEnricherStep
         }
     }
 
-    private void ResolveAssetsUrls(ISchemaEntity schema, ResolvedComponents components,
-        IGrouping<DomainId, ContentEntity> contents, ILookup<DomainId, IEnrichedAssetEntity> assets)
+    private void ResolveAssetsUrls(Schema schema, ResolvedComponents components,
+        IGrouping<DomainId, EnrichedContent> contents, ILookup<DomainId, EnrichedAsset> assets)
     {
         HashSet<DomainId>? fieldIds = null;
 
-        foreach (var field in schema.SchemaDef.ResolvingAssets())
+        foreach (var field in schema.ResolvingAssets())
         {
             foreach (var content in contents)
             {
@@ -115,14 +114,14 @@ public sealed class ResolveAssets : IContentEnricherStep
         }
     }
 
-    private static bool IsImage(IEnrichedAssetEntity asset)
+    private static bool IsImage(EnrichedAsset asset)
     {
         const int PreviewLimit = 10 * 1024;
 
         return asset.Type == AssetType.Image || (asset.MimeType == "image/svg+xml" && asset.FileSize < PreviewLimit);
     }
 
-    private async Task<ILookup<DomainId, IEnrichedAssetEntity>> GetAssetsAsync(Context context, HashSet<DomainId> ids,
+    private async Task<ILookup<DomainId, EnrichedAsset>> GetAssetsAsync(Context context, HashSet<DomainId> ids,
         CancellationToken ct)
     {
         if (ids.Count == 0)
@@ -139,11 +138,11 @@ public sealed class ResolveAssets : IContentEnricherStep
         return assets.ToLookup(x => x.Id);
     }
 
-    private static void AddAssetIds(HashSet<DomainId> ids, ISchemaEntity schema, ResolvedComponents components, IEnumerable<ContentEntity> contents)
+    private static void AddAssetIds(HashSet<DomainId> ids, Schema schema, ResolvedComponents components, IEnumerable<EnrichedContent> contents)
     {
         foreach (var content in contents)
         {
-            content.Data.AddReferencedIds(schema.SchemaDef.ResolvingAssets(), ids, components, 1);
+            content.Data.AddReferencedIds(schema.ResolvingAssets(), ids, components, 1);
         }
     }
 

@@ -6,10 +6,9 @@
 // ==========================================================================
 
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
@@ -42,13 +41,13 @@ internal sealed class QueryByQuery : OperationBase
             .Descending(x => x.LastModified));
     }
 
-    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
+    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, Schema schema, FilterNode<ClrValue> filterNode,
         CancellationToken ct)
     {
         // We need to translate the query names to the document field names in MongoDB.
-        var adjustedFilter = filterNode.AdjustToModel(appId);
+        var adjustedFilter = filterNode.AdjustToModel(app.Id);
 
-        var filter = BuildFilter(appId, schemaId, adjustedFilter);
+        var filter = BuildFilter(app.Id, schema.Id, adjustedFilter);
 
         var contentEntities = await Collection.FindStatusAsync(filter, ct);
         var contentResults = contentEntities.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
@@ -56,7 +55,7 @@ internal sealed class QueryByQuery : OperationBase
         return contentResults;
     }
 
-    public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
+    public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,
         CancellationToken ct)
     {
         // We need to translate the query names to the document field names in MongoDB.
@@ -84,10 +83,10 @@ internal sealed class QueryByQuery : OperationBase
             }
         }
 
-        return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
+        return ResultList.Create<Content>(contentTotal, contentEntities);
     }
 
-    public async Task<IResultList<IContentEntity>> QueryAsync(ISchemaEntity schema, Q q,
+    public async Task<IResultList<Content>> QueryAsync(Schema schema, Q q,
         CancellationToken ct)
     {
         // We need to translate the query names to the document field names in MongoDB.
@@ -123,7 +122,7 @@ internal sealed class QueryByQuery : OperationBase
             }
         }
 
-        return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
+        return ResultList.Create<Content>(contentTotal, contentEntities);
     }
 
     private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId schemaId,

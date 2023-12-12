@@ -21,13 +21,13 @@ public sealed record JsonFieldProperties : FieldProperties
         return visitor.Visit((IField<JsonFieldProperties>)field, args);
     }
 
-    public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
+    public override RootField CreateRootField(long id, string name, Partitioning partitioning)
     {
-        return Fields.Json(id, name, partitioning, this, settings);
+        return Fields.Json(id, name, partitioning, this);
     }
 
-    public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
+    public override NestedField CreateNestedField(long id, string name)
     {
-        return Fields.Json(id, name, this, settings);
+        return Fields.Json(id, name, this);
     }
 }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Caching;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
@@ -31,7 +32,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         this.persistenceFactory = persistenceFactory;
     }
 
-    public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
+    public async Task<List<Schema>> GetSchemasAsync(DomainId appId,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("SchemasIndex/GetSchemasAsync"))
@@ -40,16 +41,11 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
             var schemas = await schemaRepository.QueryAllAsync(appId, ct);
 
-            foreach (var schema in schemas.Where(IsValid))
-            {
-                await CacheItAsync(schema);
-            }
-
-            return schemas.Where(IsValid).ToList();
+            return await schemas.Where(IsValid).SelectAsync(PrepareAsync);
         }
     }
 
-    public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache,
+    public async Task<Schema?> GetSchemaAsync(DomainId appId, string name, bool canCache,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaByNameAsync"))
@@ -61,7 +57,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
             if (canCache)
             {
-                if (schemaCache.TryGetValue(cacheKey, out var value) && value is ISchemaEntity cachedSchema)
+                if (schemaCache.TryGetValue(cacheKey, out var value) && value is Schema cachedSchema)
                 {
                     return cachedSchema;
                 }
@@ -69,21 +65,16 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
             var schema = await schemaRepository.FindAsync(appId, name, ct);
 
-            if (!IsValid(schema))
+            if (schema == null || !IsValid(schema))
             {
-                schema = null;
+                return null;
             }
 
-            if (schema != null)
-            {
-                await CacheItAsync(schema);
-            }
-
-            return schema;
+            return await PrepareAsync(schema);
         }
     }
 
-    public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache,
+    public async Task<Schema?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaAsync"))
@@ -95,7 +86,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
             if (canCache)
             {
-                if (schemaCache.TryGetValue(cacheKey, out var v) && v is ISchemaEntity cachedSchema)
+                if (schemaCache.TryGetValue(cacheKey, out var v) && v is Schema cachedSchema)
                 {
                     return cachedSchema;
                 }
@@ -103,17 +94,12 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
             var schema = await schemaRepository.FindAsync(appId, id, ct);
 
-            if (!IsValid(schema))
+            if (schema == null || !IsValid(schema))
             {
-                schema = null;
+                return null;
             }
 
-            if (schema != null)
-            {
-                await CacheItAsync(schema);
-            }
-
-            return schema;
+            return await PrepareAsync(schema);
         }
     }
 
@@ -124,9 +110,8 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 
         if (command is CreateSchema createSchema)
         {
-            var names = await GetNamesAsync(createSchema.AppId.Id, ct);
-
-            var token = await CheckSchemaAsync(createSchema, names, ct);
+            var schemaNames = await GetNamesAsync(createSchema.AppId.Id, ct);
+            var schemaTokens = await CheckSchemaAsync(createSchema, schemaNames, ct);
             try
             {
                 await next(context, ct);
@@ -134,7 +119,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
             finally
             {
                 // Always remove the reservation and therefore do not pass over cancellation token.
-                await names.RemoveReservationAsync(token, default);
+                await schemaNames.RemoveReservationAsync(schemaTokens, default);
             }
         }
         else
@@ -214,9 +199,24 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         return $"{typeof(SchemasIndex)}_Schemas_Id_{appId}_{id}";
     }
 
-    private static bool IsValid(ISchemaEntity? schema)
+    private static bool IsValid(Schema? schema)
     {
         return schema is { Version: > EtagVersion.Empty, IsDeleted: false };
+    }
+
+    private async Task<Schema> PrepareAsync(Schema schema)
+    {
+        // Run some fallback migrations.
+        schema = FieldNames.Migrate(schema);
+
+        // Do not use cancellation here as we already so far.
+        await schemaCache.AddAsync(new[]
+        {
+            new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Id), schema),
+            new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Name), schema),
+        }, CacheDuration);
+
+        return schema;
     }
 
     private Task InvalidateItAsync(DomainId appId, DomainId id, string name)
@@ -227,15 +227,5 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
             GetCacheKey(appId, id),
             GetCacheKey(appId, name)
         });
-    }
-
-    private Task CacheItAsync(ISchemaEntity schema)
-    {
-        // Do not use cancellation here as we already so far.
-        return schemaCache.AddAsync(new[]
-        {
-            new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Id), schema),
-            new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.SchemaDef.Name), schema),
-        }, CacheDuration);
     }
 }

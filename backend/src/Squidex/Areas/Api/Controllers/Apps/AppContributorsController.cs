@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Invitation;
@@ -119,17 +119,17 @@ public sealed class AppContributorsController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        if (context.PlainResult is InvitedResult<IAppEntity> invited)
+        if (context.PlainResult is InvitedResult<App> invited)
         {
             return await GetResponseAsync(invited.Entity, true);
         }
         else
         {
-            return await GetResponseAsync(context.Result<IAppEntity>(), false);
+            return await GetResponseAsync(context.Result<App>(), false);
         }
     }
 
-    private async Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
+    private async Task<ContributorsDto> GetResponseAsync(App app, bool invited)
     {
         var (plan, _, _) = await usageGate.GetPlanForAppAsync(app, false, HttpContext.RequestAborted);
 

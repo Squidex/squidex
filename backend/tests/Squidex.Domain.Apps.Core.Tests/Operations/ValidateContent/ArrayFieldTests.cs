@@ -147,6 +147,6 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
 
     private static RootField<ArrayFieldProperties> Field(ArrayFieldProperties properties)
     {
-        return Fields.Array(1, "myArray", Partitioning.Invariant, properties, null, Fields.String(2, "myString"));
+        return Fields.Array(1, "myArray", Partitioning.Invariant, properties, Fields.String(2, "myString"));
     }
 }

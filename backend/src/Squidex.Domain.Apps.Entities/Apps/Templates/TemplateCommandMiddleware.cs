@@ -19,6 +19,7 @@ using Squidex.CLI.Commands.Implementation.Sync.Workflows;
 using Squidex.CLI.Configuration;
 using Squidex.ClientLibrary;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Log;
@@ -49,11 +50,11 @@ public sealed class TemplateCommandMiddleware : ICommandMiddleware
 
         if (context.IsCompleted && context.Command is CreateApp createApp)
         {
-            await ApplyTemplateAsync(context.Result<IAppEntity>(), createApp.Template);
+            await ApplyTemplateAsync(context.Result<App>(), createApp.Template);
         }
     }
 
-    private async Task ApplyTemplateAsync(IAppEntity app, string? template)
+    private async Task ApplyTemplateAsync(App app, string? template)
     {
         if (string.IsNullOrWhiteSpace(template))
         {
@@ -109,7 +110,7 @@ public sealed class TemplateCommandMiddleware : ICommandMiddleware
         return new SyncService(fs, session);
     }
 
-    private ISession CreateSession(IAppEntity app)
+    private ISession CreateSession(App app)
     {
         var client = app.Clients.First();
 

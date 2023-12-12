@@ -31,13 +31,11 @@ public sealed record EmailAction : RuleAction
     [Editor(RuleFieldEditor.Text)]
     public int ServerPort { get; set; }
 
-    [LocalizedRequired]
     [Display(Name = "Username", Description = "The username for the SMTP server.")]
     [Editor(RuleFieldEditor.Text)]
     [Formattable]
     public string ServerUsername { get; set; }
 
-    [LocalizedRequired]
     [Display(Name = "Password", Description = "The password for the SMTP server.")]
     [Editor(RuleFieldEditor.Password)]
     public string ServerPassword { get; set; }

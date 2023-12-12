@@ -925,6 +925,7 @@
   "schemas.fieldTypes.references.queryHint": "The initial query that is used in the UI to narrow down the results for the user. In Odata notation.",
   "schemas.fieldTypes.references.resolve": "Referenties tonen",
   "schemas.fieldTypes.references.resolveHint": "Toon de naam van het item waarnaar wordt verwezen in de inhoudslijst wanneer MaxItems is ingesteld op 1.",
+  "schemas.fieldTypes.richText.description": "Text, convertible to HTML and markdown",
   "schemas.fieldTypes.string.characters": "Karakters",
   "schemas.fieldTypes.string.charactersMax": "Max. karakters",
   "schemas.fieldTypes.string.charactersMin": "Min. karakters",

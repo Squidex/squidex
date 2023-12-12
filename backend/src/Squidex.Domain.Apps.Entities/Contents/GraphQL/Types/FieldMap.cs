@@ -24,7 +24,7 @@ internal sealed class FieldMap
             var fieldMap = schema.Fields.ToDictionary(x => x.FieldName, x => x.Field.Name);
 
             schemas[schema.Schema.Id.ToString()] = fieldMap;
-            schemas[schema.Schema.SchemaDef.Name] = fieldMap;
+            schemas[schema.Schema.Name] = fieldMap;
         }
     }
 

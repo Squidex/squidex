@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -319,7 +320,7 @@ public class BackupAssetsTests : GivenContext
 
         var rebuildAssets = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
+        A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, Asset>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildAssets.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
         await sut.RestoreAsync(context, CancellationToken);
@@ -356,7 +357,7 @@ public class BackupAssetsTests : GivenContext
 
         var rebuildAssetFolders = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
+        A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolder>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildAssetFolders.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
         await sut.RestoreAsync(context, CancellationToken);

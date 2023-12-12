@@ -10,19 +10,13 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas;
 
-public class RootField<T> : RootField, IField<T> where T : FieldProperties, new()
+public record RootField<T> : RootField, IField<T> where T : FieldProperties, new()
 {
-    public T Properties { get; private set; }
+    public T Properties { get; init; }
 
     public override FieldProperties RawProperties
     {
         get => Properties;
-    }
-
-    public RootField(long id, string name, Partitioning partitioning, T? properties = null, IFieldSettings? settings = null)
-        : base(id, name, partitioning, settings)
-    {
-        Properties = properties ?? new T();
     }
 
     [Pure]
@@ -35,10 +29,7 @@ public class RootField<T> : RootField, IField<T> where T : FieldProperties, new(
             return this;
         }
 
-        return Clone(clone =>
-        {
-            ((RootField<T>)clone).Properties = typedProperties;
-        });
+        return this with { Properties = typedProperties };
     }
 
     private static T ValidateProperties(FieldProperties newProperties)

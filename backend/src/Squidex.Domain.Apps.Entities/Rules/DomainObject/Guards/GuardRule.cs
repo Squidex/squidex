@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
@@ -43,7 +44,7 @@ public static class GuardRule
         });
     }
 
-    public static Task CanUpdate(UpdateRule command, IRuleEntity rule, IAppProvider appProvider)
+    public static Task CanUpdate(UpdateRule command, Rule rule, IAppProvider appProvider)
     {
         Guard.NotNull(command);
 

@@ -345,7 +345,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         var httpClient = _.Client.CreateHttpClient();
 
         // Create the request manually to check the content type.
-        var response = await httpClient.PostAsync(_.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent());
+        var response = await httpClient.PostAsync(_.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent(_.Client.Options));
 
         Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
     }

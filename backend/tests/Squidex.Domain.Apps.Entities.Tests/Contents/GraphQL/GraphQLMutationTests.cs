@@ -7,8 +7,8 @@
 
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 public class GraphQLMutationTests : GraphQLTestBase
 {
     private readonly DomainId contentId = DomainId.NewGuid();
-    private readonly IEnrichedContentEntity content;
+    private readonly EnrichedContent content;
     private readonly CommandContext commandContext = new CommandContext(new PatchContent(), A.Dummy<ICommandBus>());
 
     public GraphQLMutationTests()

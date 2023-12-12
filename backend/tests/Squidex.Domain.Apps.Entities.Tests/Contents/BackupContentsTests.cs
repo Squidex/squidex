@@ -187,7 +187,7 @@ public class BackupContentsTests : GivenContext
 
         var rebuildContents = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
+        A.CallTo(() => rebuilder.InsertManyAsync<ContentDomainObject, WriteContent>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildContents.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
         await sut.RestoreAsync(context, CancellationToken);

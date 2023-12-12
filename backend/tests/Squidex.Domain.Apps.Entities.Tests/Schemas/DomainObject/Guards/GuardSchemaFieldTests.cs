@@ -17,21 +17,19 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards;
 
-public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
+public class GuardSchemaFieldTests : GivenContext, IClassFixture<TranslationsFixture>
 {
-    private readonly Schema schema_0;
     private readonly StringFieldProperties validProperties = new StringFieldProperties();
     private readonly StringFieldProperties invalidProperties = new StringFieldProperties { MinLength = 10, MaxLength = 5 };
 
     public GuardSchemaFieldTests()
     {
-        schema_0 =
-            new Schema("my-schema")
-                .AddString(1, "field1", Partitioning.Invariant)
-                .AddString(2, "field2", Partitioning.Invariant)
-                .AddArray(3, "field3", Partitioning.Invariant, f => f
-                    .AddNumber(301, "field301"))
-                .AddUI(4, "field4", Partitioning.Invariant);
+        Schema = Schema
+            .AddString(1, "field1", Partitioning.Invariant)
+            .AddString(2, "field2", Partitioning.Invariant)
+            .AddArray(3, "field3", Partitioning.Invariant, f => f
+                .AddNumber(301, "field301"))
+            .AddUI(4, "field4", Partitioning.Invariant);
     }
 
     private static Action<T, Schema> A<T>(Action<T, Schema> method) where T : FieldCommand
@@ -56,7 +54,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new T { FieldId = 5 };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => action(command, schema_0));
+        Assert.Throws<DomainObjectNotFoundException>(() => action(command, Schema));
     }
 
     [Theory]
@@ -65,7 +63,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new T { ParentFieldId = 4, FieldId = 401 };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => action(command, schema_0));
+        Assert.Throws<DomainObjectNotFoundException>(() => action(command, Schema));
     }
 
     [Theory]
@@ -74,7 +72,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new T { ParentFieldId = 3, FieldId = 302 };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => action(command, schema_0));
+        Assert.Throws<DomainObjectNotFoundException>(() => action(command, Schema));
     }
 
     [Fact]
@@ -82,9 +80,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new DisableField { FieldId = 1 };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Disable());
+        Schema = Schema.UpdateField(1, f => f.Disable());
 
-        GuardSchemaField.CanDisable(command, schema_1);
+        GuardSchemaField.CanDisable(command, Schema);
     }
 
     [Fact]
@@ -92,9 +90,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new DisableField { FieldId = 1 };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Lock());
+        Schema = Schema.UpdateField(1, f => f.Lock());
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanDisable(command, schema_1));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanDisable(command, Schema));
     }
 
     [Fact]
@@ -102,7 +100,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new DisableField { FieldId = 4 };
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanDisable(command, schema_0));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanDisable(command, Schema));
     }
 
     [Fact]
@@ -110,9 +108,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new EnableField { FieldId = 1 };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Enable());
+        Schema = Schema.UpdateField(1, f => f.Enable());
 
-        GuardSchemaField.CanEnable(command, schema_1);
+        GuardSchemaField.CanEnable(command, Schema);
     }
 
     [Fact]
@@ -120,9 +118,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new EnableField { FieldId = 1 };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Lock());
+        Schema = Schema.UpdateField(1, f => f.Lock());
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanEnable(command, schema_1));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanEnable(command, Schema));
     }
 
     [Fact]
@@ -130,7 +128,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new EnableField { FieldId = 4 };
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanEnable(command, schema_0));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanEnable(command, Schema));
     }
 
     [Fact]
@@ -138,9 +136,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new EnableField { FieldId = 1 };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Hide());
+        Schema = Schema.UpdateField(1, f => f.Hide());
 
-        GuardSchemaField.CanEnable(command, schema_1);
+        GuardSchemaField.CanEnable(command, Schema);
     }
 
     [Fact]
@@ -148,9 +146,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new HideField { FieldId = 1 };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Lock());
+        Schema = Schema.UpdateField(1, f => f.Lock());
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(command, schema_1));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(command, Schema));
     }
 
     [Fact]
@@ -158,7 +156,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new HideField { FieldId = 4 };
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(command, schema_0));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(command, Schema));
     }
 
     [Fact]
@@ -166,9 +164,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new EnableField { FieldId = 1 };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Show());
+        Schema = Schema.UpdateField(1, f => f.Show());
 
-        GuardSchemaField.CanEnable(command, schema_1);
+        GuardSchemaField.CanEnable(command, Schema);
     }
 
     [Fact]
@@ -176,9 +174,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new ShowField { FieldId = 1 };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Lock());
+        Schema = Schema.UpdateField(1, f => f.Lock());
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanShow(command, schema_1));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanShow(command, Schema));
     }
 
     [Fact]
@@ -186,7 +184,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new ShowField { FieldId = 4 };
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanShow(command, schema_0));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanShow(command, Schema));
     }
 
     [Fact]
@@ -194,9 +192,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new DeleteField { FieldId = 1 };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Lock());
+        Schema = Schema.UpdateField(1, f => f.Lock());
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanDelete(command, schema_1));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanDelete(command, Schema));
     }
 
     [Fact]
@@ -204,7 +202,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new DeleteField { FieldId = 1 };
 
-        GuardSchemaField.CanDelete(command, schema_0);
+        GuardSchemaField.CanDelete(command, Schema);
     }
 
     [Fact]
@@ -212,9 +210,9 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateField { FieldId = 1, Properties = validProperties };
 
-        var schema_1 = schema_0.UpdateField(1, f => f.Lock());
+        Schema = Schema.UpdateField(1, f => f.Lock());
 
-        Assert.Throws<DomainException>(() => GuardSchemaField.CanUpdate(command, schema_1));
+        Assert.Throws<DomainException>(() => GuardSchemaField.CanUpdate(command, Schema));
     }
 
     [Fact]
@@ -222,7 +220,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateField { FieldId = 1, Properties = validProperties };
 
-        GuardSchemaField.CanUpdate(command, schema_0);
+        GuardSchemaField.CanUpdate(command, Schema);
     }
 
     [Fact]
@@ -230,7 +228,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateField { FieldId = 2, Properties = null! };
 
-        ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(command, Schema),
             new ValidationError("Properties is required.", "Properties"));
     }
 
@@ -239,7 +237,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new UpdateField { FieldId = 2, Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 } };
 
-        ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(command, Schema),
             new ValidationError("Max length must be greater or equal to min length.", "Properties.MinLength", "Properties.MaxLength"));
     }
 
@@ -248,7 +246,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new AddField { Name = "field1", Properties = validProperties };
 
-        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, Schema),
             new ValidationError("A field with the same name already exists."));
     }
 
@@ -257,7 +255,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new AddField { Name = "field301", Properties = validProperties, ParentFieldId = 3 };
 
-        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, Schema),
             new ValidationError("A field with the same name already exists."));
     }
 
@@ -266,7 +264,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new AddField { Name = "INVALID_NAME", Properties = validProperties };
 
-        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, Schema),
             new ValidationError("Name is not a Javascript property name.", "Name"));
     }
 
@@ -275,7 +273,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new AddField { Name = "field5", Properties = invalidProperties };
 
-        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, Schema),
             new ValidationError("Max length must be greater or equal to min length.", "Properties.MinLength", "Properties.MaxLength"));
     }
 
@@ -284,7 +282,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new AddField { Name = "field5", Properties = null! };
 
-        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, Schema),
             new ValidationError("Properties is required.", "Properties"));
     }
 
@@ -293,7 +291,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new AddField { Name = "field5", Partitioning = "INVALID_PARTITIONING", Properties = validProperties };
 
-        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, schema_0),
+        ValidationAssert.Throws(() => GuardSchemaField.CanAdd(command, Schema),
             new ValidationError("Partitioning is not a valid value.", "Partitioning"));
     }
 
@@ -302,7 +300,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new AddField { Name = "field302", Properties = validProperties, ParentFieldId = 99 };
 
-        Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanAdd(command, schema_0));
+        Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanAdd(command, Schema));
     }
 
     [Fact]
@@ -310,7 +308,7 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new AddField { Name = "field5", Properties = validProperties };
 
-        GuardSchemaField.CanAdd(command, schema_0);
+        GuardSchemaField.CanAdd(command, Schema);
     }
 
     [Fact]
@@ -318,6 +316,6 @@ public class GuardSchemaFieldTests : IClassFixture<TranslationsFixture>
     {
         var command = new AddField { Name = "field1", Properties = validProperties, ParentFieldId = 3 };
 
-        GuardSchemaField.CanAdd(command, schema_0);
+        GuardSchemaField.CanAdd(command, Schema);
     }
 }

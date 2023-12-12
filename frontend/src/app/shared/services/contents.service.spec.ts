@@ -170,6 +170,46 @@ describe('ContentsService', () => {
             expect(content!).toEqual(createContent(12));
         }));
 
+    it('should make get request to get raw content',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+            let content: any;
+
+            contentsService.getRawContent('my-app', 'my-schema', '1').subscribe(result => {
+                content = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/1');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.headers.get('X-Flatten')).toBeNull();
+            expect(req.request.headers.get('X-Languages')).toBeNull();
+
+            req.flush({ id: '1' });
+
+            expect(content!).toEqual({ id: '1' });
+        }));
+
+    it('should make get request to get raw content with language',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+            let content: any;
+
+            contentsService.getRawContent('my-app', 'my-schema', '1', 'en').subscribe(result => {
+                content = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/1');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.headers.get('X-Flatten')).toEqual('1');
+            expect(req.request.headers.get('X-Languages')).toEqual('en');
+
+            req.flush({ id: '1' });
+
+            expect(content!).toEqual({ id: '1' });
+        }));
+
     it('should make post request to create content',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const dto = {};

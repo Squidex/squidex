@@ -19,7 +19,7 @@ public sealed class EnrichWithMetadataText : IAssetEnricherStep
         this.assetMetadataSources = assetMetadataSources;
     }
 
-    public Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
+    public Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {
         if (context.NoAssetEnrichment())

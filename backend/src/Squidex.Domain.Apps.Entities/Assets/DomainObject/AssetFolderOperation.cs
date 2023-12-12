@@ -6,20 +6,21 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public sealed class AssetFolderOperation : OperationContextBase<AssetFolderCommand, IAssetFolderEntity>
+public sealed class AssetFolderOperation : OperationContextBase<AssetFolderCommand, AssetFolder>
 {
-    public AssetFolderOperation(IServiceProvider serviceProvider, Func<IAssetFolderEntity> snapshot)
+    public AssetFolderOperation(IServiceProvider serviceProvider, Func<AssetFolder> snapshot)
         : base(serviceProvider, snapshot)
     {
         Guard.NotNull(serviceProvider);
     }
 
-    public static async Task<AssetFolderOperation> CreateAsync(IServiceProvider services, AssetFolderCommand command, Func<IAssetFolderEntity> snapshot)
+    public static async Task<AssetFolderOperation> CreateAsync(IServiceProvider services, AssetFolderCommand command, Func<AssetFolder> snapshot)
     {
         var appProvider = services.GetRequiredService<IAppProvider>();
 

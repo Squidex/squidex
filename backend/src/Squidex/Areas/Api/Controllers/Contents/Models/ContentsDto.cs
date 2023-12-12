@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Web;
 
@@ -29,8 +29,8 @@ public sealed class ContentsDto : Resource
     /// </summary>
     public StatusInfoDto[] Statuses { get; set; }
 
-    public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents, Resources resources,
-        ISchemaEntity? schema, IContentWorkflow workflow)
+    public static async Task<ContentsDto> FromContentsAsync(IResultList<EnrichedContent> contents, Resources resources,
+        Schema? schema, IContentWorkflow workflow)
     {
         var result = new ContentsDto
         {
@@ -48,16 +48,16 @@ public sealed class ContentsDto : Resource
         return result;
     }
 
-    private async Task AssignStatusesAsync(IContentWorkflow workflow, ISchemaEntity schema)
+    private async Task AssignStatusesAsync(IContentWorkflow workflow, Schema schema)
     {
         var allStatuses = await workflow.GetAllAsync(schema);
 
         Statuses = allStatuses.Select(StatusInfoDto.FromDomain).ToArray();
     }
 
-    private async Task CreateLinksAsync(Resources resources, IContentWorkflow workflow, ISchemaEntity schema)
+    private async Task CreateLinksAsync(Resources resources, IContentWorkflow workflow, Schema schema)
     {
-        var values = new { app = resources.App, schema = schema.SchemaDef.Name };
+        var values = new { app = resources.App, schema = schema.Name };
 
         AddSelfLink(resources.Url<ContentsController>(x => nameof(x.GetContents), values));
 

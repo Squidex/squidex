@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -12,7 +13,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
-public sealed class RuleCommandMiddlewareTests : HandlerTestBase<RuleDomainObject.State>
+public sealed class RuleCommandMiddlewareTests : HandlerTestBase<Rule>
 {
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
@@ -34,35 +35,35 @@ public sealed class RuleCommandMiddlewareTests : HandlerTestBase<RuleDomainObjec
     }
 
     [Fact]
-    public async Task Should_not_invoke_enricher_for_other_actual()
+    public async Task Should_not_invoke_enricher_for_other_result()
     {
         await HandleAsync(new EnableRule(), 12);
 
-        A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, ApiContext, A<CancellationToken>._))
+        A.CallTo(() => ruleEnricher.EnrichAsync(A<EnrichedRule>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_not_invoke_enricher_if_already_enriched()
     {
-        var rule = new RuleEntity();
+        var rule = CreateRule();
 
         var context =
             await HandleAsync(new EnableRule(),
                 rule);
 
-        Assert.Same(rule, context.Result<IEnrichedRuleEntity>());
+        Assert.Same(rule, context.Result<EnrichedRule>());
 
-        A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, ApiContext, A<CancellationToken>._))
+        A.CallTo(() => ruleEnricher.EnrichAsync(A<EnrichedRule>._, ApiContext, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_enrich_rule()
     {
-        var rule = A.Fake<IRuleEntity>();
+        var rule = new Rule();
 
-        var enriched = new RuleEntity();
+        var enriched = CreateRule();
 
         A.CallTo(() => ruleEnricher.EnrichAsync(rule, ApiContext, CancellationToken))
             .Returns(enriched);
@@ -71,7 +72,7 @@ public sealed class RuleCommandMiddlewareTests : HandlerTestBase<RuleDomainObjec
             await HandleAsync(new EnableRule(),
                 rule);
 
-        Assert.Same(enriched, context.Result<IEnrichedRuleEntity>());
+        Assert.Same(enriched, context.Result<EnrichedRule>());
     }
 
     private Task<CommandContext> HandleAsync(RuleCommand command, object actual)

@@ -30,15 +30,13 @@ public static class WorkflowExtensions
 
     public static async Task CheckTransitionAsync(this ContentOperation operation, Status status)
     {
-        if (operation.SchemaDef.Type != SchemaType.Singleton)
+        if (operation.Schema.Type != SchemaType.Singleton)
         {
             var workflow = GetWorkflow(operation);
 
-            var oldStatus = operation.Snapshot.EditingStatus();
-
-            if (!await workflow.CanMoveToAsync(operation.Snapshot, oldStatus, status, operation.User))
+            if (!await workflow.CanMoveToAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, status, operation.User))
             {
-                var values = new { oldStatus, newStatus = status };
+                var values = new { oldStatus = operation.Snapshot.EditingStatus, newStatus = status };
 
                 operation.AddError(T.Get("contents.statusTransitionNotAllowed", values), nameof(status));
                 operation.ThrowOnErrors();
@@ -48,11 +46,11 @@ public static class WorkflowExtensions
 
     public static async Task CheckStatusAsync(this ContentOperation operation, Status status)
     {
-        if (operation.SchemaDef.Type != SchemaType.Singleton)
+        if (operation.Schema.Type != SchemaType.Singleton)
         {
             var workflow = GetWorkflow(operation);
 
-            var statusInfo = await workflow.GetInfoAsync(operation.Snapshot, status);
+            var statusInfo = await workflow.GetInfoAsync(operation.Snapshot.ToContent(), status);
 
             if (statusInfo == null)
             {
@@ -68,11 +66,9 @@ public static class WorkflowExtensions
         {
             var workflow = GetWorkflow(operation);
 
-            var status = operation.Snapshot.EditingStatus();
-
-            if (!await workflow.CanUpdateAsync(operation.Snapshot, status, operation.User))
+            if (!await workflow.CanUpdateAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, operation.User))
             {
-                throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status }));
+                throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status = operation.Snapshot.EditingStatus }));
             }
         }
     }

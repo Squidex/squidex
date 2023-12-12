@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Web;
 
@@ -23,7 +23,7 @@ public sealed class WorkflowsDto : Resource
     /// </summary>
     public string[] Errors { get; set; }
 
-    public static async Task<WorkflowsDto> FromAppAsync(IWorkflowsValidator workflowsValidator, IAppEntity app, Resources resources)
+    public static async Task<WorkflowsDto> FromAppAsync(IWorkflowsValidator workflowsValidator, App app, Resources resources)
     {
         var result = new WorkflowsDto
         {

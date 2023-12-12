@@ -220,7 +220,7 @@ public class ComponentsFieldTests : IClassFixture<TranslationsFixture>
     private (DomainId, RootField<ComponentsFieldProperties>, ResolvedComponents) Field(ComponentsFieldProperties properties, bool isRequired = false)
     {
         var schema =
-            new Schema("my-component")
+            new Schema { Name = "my-component" }
                 .AddNumber(1, "componentField", Partitioning.Invariant,
                     new NumberFieldProperties { IsRequired = isRequired });
 

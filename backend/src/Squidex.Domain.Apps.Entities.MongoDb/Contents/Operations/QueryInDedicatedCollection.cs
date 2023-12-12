@@ -7,10 +7,9 @@
 
 using System.Collections.Concurrent;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
@@ -64,7 +63,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
 #pragma warning restore MA0106 // Avoid closure by using an overload with the 'factoryArgument' parameter
     }
 
-    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(IAppEntity app, ISchemaEntity schema, FilterNode<ClrValue> filterNode,
+    public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, Schema schema, FilterNode<ClrValue> filterNode,
         CancellationToken ct)
     {
         // We need to translate the filter names to the document field names in MongoDB.
@@ -79,7 +78,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
         return contentResults;
     }
 
-    public async Task<IResultList<IContentEntity>> QueryAsync(ISchemaEntity schema, Q q,
+    public async Task<IResultList<Content>> QueryAsync(Schema schema, Q q,
         CancellationToken ct)
     {
         // We need to translate the query names to the document field names in MongoDB.
@@ -108,7 +107,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
             }
         }
 
-        return ResultList.Create<IContentEntity>(contentTotal, contentEntities);
+        return ResultList.Create<Content>(contentTotal, contentEntities);
     }
 
     public async Task UpsertAsync(SnapshotWriteJob<MongoContentEntity> job,
@@ -124,7 +123,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
     {
         var collection = await GetCollectionAsync(job.Value.AppId.Id, job.Value.SchemaId.Id);
 
-        await collection.UpsertVersionedAsync(session, job, ct);
+        await collection.UpsertVersionedAsync(session, job, Field.Of<MongoContentEntity>(x => nameof(x.Version)), ct);
     }
 
     public async Task RemoveAsync(MongoContentEntity value,

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 
@@ -28,7 +29,7 @@ public sealed class FileTypeAssetMetadataSource : IAssetMetadataSource
         return Task.CompletedTask;
     }
 
-    public IEnumerable<string> Format(IAssetEntity asset)
+    public IEnumerable<string> Format(Asset asset)
     {
         yield break;
     }

@@ -13,6 +13,20 @@ namespace Squidex.Infrastructure;
 
 public static class CollectionExtensions
 {
+    public static async Task<List<TResult>> SelectAsync<T, TResult>(this IEnumerable<T> source, Func<T, Task<TResult>> selector)
+    {
+        var initialCapacity = source is IReadOnlyCollection<T> collection ? collection.Count : 1;
+
+        var result = new List<TResult>(initialCapacity);
+
+        foreach (var item in source)
+        {
+            result.Add(await selector(item));
+        }
+
+        return result;
+    }
+
     public static bool TryAdd<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key, TValue value, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> result) where TKey : notnull
     {
         result = null;

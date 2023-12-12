@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
@@ -52,7 +53,7 @@ internal sealed class ContentUnionGraphType : UnionGraphType
 
             ResolveType = value =>
             {
-                if (value is IContentEntity content)
+                if (value is Content content)
                 {
                     return types.GetValueOrDefault(content.SchemaId.Id);
                 }

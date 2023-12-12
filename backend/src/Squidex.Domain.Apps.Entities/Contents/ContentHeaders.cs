@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
@@ -42,11 +41,6 @@ public static class ContentHeaders
     public static SearchScope Scope(this Context context)
     {
         return context.Unpublished() || context.IsFrontendClient ? SearchScope.All : SearchScope.Published;
-    }
-
-    public static bool IsPublished(this IContentEntity content)
-    {
-        return content.EditingStatus() == Status.Published;
     }
 
     public static bool NoCleanup(this Context context)

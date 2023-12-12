@@ -23,7 +23,7 @@ public sealed class AssetsDto : Resource
     /// </summary>
     public AssetDto[] Items { get; set; }
 
-    public static AssetsDto FromDomain(IResultList<IEnrichedAssetEntity> assets, Resources resources)
+    public static AssetsDto FromDomain(IResultList<EnrichedAsset> assets, Resources resources)
     {
         var result = new AssetsDto
         {

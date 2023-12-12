@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
@@ -51,21 +52,21 @@ public sealed class AssetFoldersController : ApiController
     [ApiCosts(1)]
     public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] DomainId? parentId, [FromQuery] AssetFolderScope scope = AssetFolderScope.PathAndItems)
     {
-        Task<IReadOnlyList<IAssetFolderEntity>> GetAssetPathAsync()
+        Task<IReadOnlyList<AssetFolder>> GetAssetPathAsync()
         {
             if (scope == AssetFolderScope.Items || parentId == null)
             {
-                return Task.FromResult<IReadOnlyList<IAssetFolderEntity>>(ReadonlyList.Empty<IAssetFolderEntity>());
+                return Task.FromResult<IReadOnlyList<AssetFolder>>(ReadonlyList.Empty<AssetFolder>());
             }
 
             return assetQuery.FindAssetFolderAsync(Context.App.Id, parentId.Value, HttpContext.RequestAborted);
         }
 
-        Task<IResultList<IAssetFolderEntity>> GetAssetFoldersAsync()
+        Task<IResultList<AssetFolder>> GetAssetFoldersAsync()
         {
             if (scope == AssetFolderScope.Path)
             {
-                return Task.FromResult(ResultList.Empty<IAssetFolderEntity>());
+                return Task.FromResult(ResultList.Empty<AssetFolder>());
             }
 
             return assetQuery.QueryAssetFoldersAsync(Context, parentId, HttpContext.RequestAborted);
@@ -181,6 +182,6 @@ public sealed class AssetFoldersController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        return AssetFolderDto.FromDomain(context.Result<IAssetFolderEntity>(), Resources);
+        return AssetFolderDto.FromDomain(context.Result<AssetFolder>(), Resources);
     }
 }

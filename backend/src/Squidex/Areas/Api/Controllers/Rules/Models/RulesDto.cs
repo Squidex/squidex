@@ -24,7 +24,7 @@ public sealed class RulesDto : Resource
     /// </summary>
     public DomainId? RunningRuleId { get; set; }
 
-    public static async Task<RulesDto> FromRulesAsync(IEnumerable<IEnrichedRuleEntity> items, IRuleRunnerService ruleRunnerService, Resources resources)
+    public static async Task<RulesDto> FromRulesAsync(IEnumerable<EnrichedRule> items, IRuleRunnerService ruleRunnerService, Resources resources)
     {
         var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(resources.Context.App.Id);
         var runningAvailable = runningRuleId != default;

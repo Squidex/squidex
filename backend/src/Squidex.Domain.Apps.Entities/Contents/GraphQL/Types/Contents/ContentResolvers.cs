@@ -43,17 +43,17 @@ internal static class ContentResolvers
 
     public static readonly IFieldResolver ListItems = ResolveList(x => x);
 
-    private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, IResolveFieldContext, GraphQLExecutionContext, T> resolver)
+    private static IFieldResolver Resolve<T>(Func<EnrichedContent, IResolveFieldContext, GraphQLExecutionContext, T> resolver)
     {
         return Resolvers.Sync(resolver);
     }
 
-    private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, T> resolver)
+    private static IFieldResolver Resolve<T>(Func<EnrichedContent, T> resolver)
     {
         return Resolvers.Sync(resolver);
     }
 
-    private static IFieldResolver ResolveList<T>(Func<IResultList<IEnrichedContentEntity>, T> resolver)
+    private static IFieldResolver ResolveList<T>(Func<IResultList<EnrichedContent>, T> resolver)
     {
         return Resolvers.Sync(resolver);
     }

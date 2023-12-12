@@ -77,6 +77,6 @@ public class WorkflowJsonTests
 
         var actual = serialized.ToSource();
 
-        Assert.Equal(source.Role, actual?.Roles?.Single());
+        Assert.Equal("role_1", actual?.Roles?.Single());
     }
 }

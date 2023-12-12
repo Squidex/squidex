@@ -62,7 +62,8 @@ public class StringReferenceExtractorTests
                     .Add("marks", JsonValue.Array(
                         JsonValue.Object()
                             .Add("type", "link")
-                            .Add("href", href)))));
+                            .Add("attrs", JsonValue.Object()
+                                .Add("href", href))))));
 
         var ids = sut.GetEmbeddedContentIds(RichTextNode.Create(source));
 

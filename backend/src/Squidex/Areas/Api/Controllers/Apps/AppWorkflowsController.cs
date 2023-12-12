@@ -8,7 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
@@ -125,13 +125,13 @@ public sealed class AppWorkflowsController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        var result = context.Result<IAppEntity>();
+        var result = context.Result<App>();
         var response = await GetResponse(result);
 
         return response;
     }
 
-    private async Task<WorkflowsDto> GetResponse(IAppEntity result)
+    private async Task<WorkflowsDto> GetResponse(App result)
     {
         return await WorkflowsDto.FromAppAsync(workflowsValidator, result, Resources);
     }

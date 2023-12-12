@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent;
@@ -31,7 +32,7 @@ public class AssetsFieldTests : IClassFixture<TranslationsFixture>
                 {
                     var actual = ids.Select(TestAssets.Document).ToList();
 
-                    return Task.FromResult<IReadOnlyList<IAssetInfo>>(actual);
+                    return Task.FromResult<IReadOnlyList<Asset>>(actual);
                 });
             }
         }

@@ -775,7 +775,7 @@ public class RuleServiceTests
 
     private RuleContext Rule(bool disable = false, bool includeStale = false, bool includeSkipped = false, RuleAction? action = null, RuleTrigger? trigger = null)
     {
-        var rule = new Rule(trigger ?? new ContentChangedTriggerV2(), action ?? new ValidAction());
+        var rule = new Rule { Trigger = trigger ?? new ContentChangedTriggerV2(), Action = action ?? new ValidAction() };
 
         if (disable)
         {
@@ -785,10 +785,9 @@ public class RuleServiceTests
         return new RuleContext
         {
             AppId = appId,
-            Rule = rule,
-            RuleId = ruleId,
             IncludeStale = includeStale,
-            IncludeSkipped = includeSkipped
+            IncludeSkipped = includeSkipped,
+            Rule = rule
         };
     }
 

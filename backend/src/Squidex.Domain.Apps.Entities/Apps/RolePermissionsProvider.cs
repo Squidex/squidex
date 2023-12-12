@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Reflection;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
@@ -42,7 +43,7 @@ public sealed class RolePermissionsProvider
         }
     }
 
-    public async Task<List<string>> GetPermissionsAsync(IAppEntity app)
+    public async Task<List<string>> GetPermissionsAsync(App app)
     {
         var schemaNames = await GetSchemaNamesAsync(app);
 
@@ -76,7 +77,7 @@ public sealed class RolePermissionsProvider
         return result;
     }
 
-    private async Task<List<string>> GetSchemaNamesAsync(IAppEntity app)
+    private async Task<List<string>> GetSchemaNamesAsync(App app)
     {
         var schemas = await appProvider.GetSchemasAsync(app.Id);
 
@@ -85,7 +86,7 @@ public sealed class RolePermissionsProvider
             Permission.Any
         };
 
-        schemaNames.AddRange(schemas.Select(x => x.SchemaDef.Name));
+        schemaNames.AddRange(schemas.Select(x => x.Name));
 
         return schemaNames;
     }

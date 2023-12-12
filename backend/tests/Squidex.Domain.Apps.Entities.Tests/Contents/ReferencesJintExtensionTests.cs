@@ -110,7 +110,7 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
 
-    private (ScriptVars, IContentEntity[]) SetupReferenceVars(int count)
+    private (ScriptVars, EnrichedContent[]) SetupReferenceVars(int count)
     {
         var references = Enumerable.Range(0, count).Select((x, i) => CreateReference(i + 1)).ToArray();
         var referenceIds = references.Select(x => x.Id);
@@ -139,9 +139,9 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
         return (vars, references);
     }
 
-    private static IEnrichedContentEntity CreateReference(int index)
+    private EnrichedContent CreateReference(int index)
     {
-        return new ContentEntity
+        return CreateContent() with
         {
             Data =
                 new ContentData()
@@ -150,8 +150,7 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
                             .AddInvariant(JsonValue.Create($"Hello {index}")))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Create($"World {index}"))),
-            Id = DomainId.NewGuid()
+                            .AddInvariant(JsonValue.Create($"World {index}")))
         };
     }
 

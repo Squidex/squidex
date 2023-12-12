@@ -7,12 +7,10 @@
 
 using Squidex.Caching;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
-using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Domain.Apps.Entities.Teams.Indexes;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities;
@@ -148,7 +146,7 @@ public class AppProviderTests : GivenContext
     [Fact]
     public async Task Should_get_rules_from_index()
     {
-        var rule = new RuleEntity();
+        var rule = CreateRule();
 
         A.CallTo(() => indexForRules.GetRulesAsync(AppId.Id, CancellationToken))
             .Returns([rule]);
@@ -161,7 +159,7 @@ public class AppProviderTests : GivenContext
     [Fact]
     public async Task Should_get_rule_from_index()
     {
-        var rule = new RuleEntity { Id = DomainId.NewGuid() };
+        var rule = CreateRule();
 
         A.CallTo(() => indexForRules.GetRulesAsync(AppId.Id, CancellationToken))
             .Returns([rule]);

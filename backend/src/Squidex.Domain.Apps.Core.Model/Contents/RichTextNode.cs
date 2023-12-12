@@ -43,9 +43,18 @@ public sealed class RichTextNode : INode
         get => currentState.Text;
     }
 
-    public static bool IsValid(JsonValue source)
+    public static bool TryCreate(JsonValue source, out RichTextNode node)
     {
-        return new RichTextNode().TryUse(source, true);
+        var candidate = new RichTextNode();
+
+        if (candidate.TryUse(source, true))
+        {
+            node = candidate;
+            return true;
+        }
+
+        node = null!;
+        return false;
     }
 
     public static RichTextNode Create(JsonValue source)

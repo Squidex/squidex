@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
@@ -242,7 +244,7 @@ public sealed class Resources
 
     private string? GetSchemaName()
     {
-        return Controller.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
+        return Controller.HttpContext.Features.Get<Schema>()?.Name;
     }
 
     private DomainId GetAppId()
@@ -252,6 +254,6 @@ public sealed class Resources
 
     private DomainId GetTeamId()
     {
-        return Controller.HttpContext.Features.Get<ITeamFeature>()?.Team?.Id ?? default;
+        return Controller.HttpContext.Features.Get<Team>()?.Id ?? default;
     }
 }

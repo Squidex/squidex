@@ -9,7 +9,7 @@ using GraphQL.Types;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
-internal sealed class ContentInterfaceGraphType : InterfaceGraphType<IEnrichedContentEntity>
+internal sealed class ContentInterfaceGraphType : InterfaceGraphType<EnrichedContent>
 {
     public ContentInterfaceGraphType()
     {

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
@@ -15,7 +14,7 @@ public class AssetEnricherTests : GivenContext
     [Fact]
     public async Task Should_only_invoke_pre_enrich_for_empty_assets()
     {
-        var assets = Array.Empty<IAssetEntity>();
+        var assets = Array.Empty<EnrichedAsset>();
 
         var step1 = A.Fake<IAssetEnricherStep>();
         var step2 = A.Fake<IAssetEnricherStep>();
@@ -30,10 +29,10 @@ public class AssetEnricherTests : GivenContext
         A.CallTo(() => step2.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<AssetEntity>>._, A<CancellationToken>._))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<EnrichedAsset>>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<AssetEntity>>._, A<CancellationToken>._))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<EnrichedAsset>>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -55,15 +54,10 @@ public class AssetEnricherTests : GivenContext
         A.CallTo(() => step2.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<AssetEntity>>._, CancellationToken))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<EnrichedAsset>>._, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<AssetEntity>>._, CancellationToken))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<EnrichedAsset>>._, CancellationToken))
             .MustHaveHappened();
-    }
-
-    private AssetEntity CreateAsset()
-    {
-        return new AssetEntity { Id = DomainId.NewGuid(), AppId = AppId };
     }
 }

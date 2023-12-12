@@ -8,7 +8,7 @@
 using System.Text;
 using Microsoft.Extensions.Options;
 using Squidex.Assets;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 
@@ -31,7 +31,7 @@ public sealed class DefaultAssetFileStore : IAssetFileStore, IDeleter
         this.options = options.Value;
     }
 
-    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         if (options.FolderPerApp)

@@ -59,6 +59,9 @@ public static class ContentsServices
         services.AddSingletonAs<ConvertData>()
             .As<IContentEnricherStep>();
 
+        services.AddSingletonAs<CalculatePreviewText>()
+            .As<IContentEnricherStep>();
+
         services.AddSingletonAs<CalculateTokens>()
             .As<IContentEnricherStep>();
 

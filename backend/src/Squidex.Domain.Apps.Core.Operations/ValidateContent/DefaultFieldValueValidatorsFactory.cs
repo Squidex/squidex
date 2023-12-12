@@ -166,7 +166,24 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
 
         if (IsRequired(properties, args.Context, out _))
         {
-            yield return new RequiredValidator();
+            yield return new RequiredStringValidator(true);
+        }
+
+        if (properties.MinLength != null || properties.MaxLength != null)
+        {
+            yield return new StringLengthValidator(properties.MinLength, properties.MaxLength);
+        }
+
+        if (properties.MinCharacters != null ||
+            properties.MaxCharacters != null ||
+            properties.MinWords != null ||
+            properties.MaxWords != null)
+        {
+            yield return new StringTextValidator(null,
+               properties.MinCharacters,
+               properties.MaxCharacters,
+               properties.MinWords,
+               properties.MaxWords);
         }
     }
 

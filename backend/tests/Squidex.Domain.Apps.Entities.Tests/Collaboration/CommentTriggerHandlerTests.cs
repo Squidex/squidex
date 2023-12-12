@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Domain.Apps.Events.Contents;
@@ -22,7 +23,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Collaboration;
 
-public class CommentTriggerHandlerTests
+public class CommentTriggerHandlerTests : GivenContext
 {
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
     private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
@@ -295,15 +296,16 @@ public class CommentTriggerHandlerTests
         }
     }
 
-    private static RuleContext Context(RuleTrigger? trigger = null)
+    private RuleContext Context(RuleTrigger? trigger = null)
     {
         trigger ??= new CommentTrigger();
 
         return new RuleContext
         {
-            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
-            Rule = new Rule(trigger, A.Fake<RuleAction>()),
-            RuleId = DomainId.NewGuid()
+            AppId = AppId,
+            IncludeSkipped = false,
+            IncludeStale = false,
+            Rule = CreateRule() with { Trigger = trigger }
         };
     }
 }

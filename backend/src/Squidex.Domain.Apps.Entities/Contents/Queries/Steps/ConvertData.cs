@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
@@ -37,10 +37,14 @@ public sealed class ConvertData : IContentEnricherStep
         excludeChangedTypes = new ExcludeChangedTypes(serializer);
     }
 
-    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
+        // Get the references across all references to reduce number of database calls.
         var referenceCleaner = await CleanReferencesAsync(context, contents, schemas, ct);
+
+        // Get the fields, because they are the same for all schemas.
+        var fieldNames = GetFieldNames(context);
 
         foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
@@ -48,7 +52,8 @@ public sealed class ConvertData : IContentEnricherStep
 
             var (schema, components) = await schemas(group.Key);
 
-            var converter = GenerateConverter(context, components, schema.SchemaDef, referenceCleaner);
+            // Reuse the converter for all contents of this schema.
+            var converter = GenerateConverter(context, components, schema, fieldNames, referenceCleaner);
 
             foreach (var content in group)
             {
@@ -57,7 +62,7 @@ public sealed class ConvertData : IContentEnricherStep
         }
     }
 
-    private async Task<ValueReferencesConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    private async Task<ValueReferencesConverter?> CleanReferencesAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
         if (context.NoCleanup())
@@ -75,7 +80,7 @@ public sealed class ConvertData : IContentEnricherStep
 
                 foreach (var content in group)
                 {
-                    content.Data.AddReferencedIds(schema.SchemaDef, ids, components);
+                    content.Data.AddReferencedIds(schema, ids, components);
                 }
             }
 
@@ -97,7 +102,7 @@ public sealed class ConvertData : IContentEnricherStep
     private async Task<IEnumerable<DomainId>> QueryContentIdsAsync(Context context, HashSet<DomainId> ids,
         CancellationToken ct)
     {
-        var result = await contentRepository.QueryIdsAsync(context.App.Id, ids, context.Scope(), ct);
+        var result = await contentRepository.QueryIdsAsync(context.App, ids, context.Scope(), ct);
 
         return result.Select(x => x.Id);
     }
@@ -110,7 +115,7 @@ public sealed class ConvertData : IContentEnricherStep
         return result;
     }
 
-    private ContentConverter GenerateConverter(Context context, ResolvedComponents components, Schema schema, ValueReferencesConverter? cleanReferences)
+    private ContentConverter GenerateConverter(Context context, ResolvedComponents components, Schema schema, HashSet<string>? fieldNames, ValueReferencesConverter? cleanReferences)
     {
         var converter = new ContentConverter(components, schema);
 
@@ -130,7 +135,13 @@ public sealed class ConvertData : IContentEnricherStep
 
         if (!context.IsFrontendClient)
         {
-            converter.Add(new AddDefaultValues(context.App.PartitionResolver()) { IgnoreNonMasterFields = true });
+            converter.Add(new AddDefaultValues(context.App.PartitionResolver())
+            {
+                IgnoreNonMasterFields = true,
+                IgnoreRequiredFields = false,
+                // If field names are given we run the enrichment only on the specified fields.
+                FieldNames = fieldNames
+            });
         }
 
         converter.Add(
@@ -138,7 +149,9 @@ public sealed class ConvertData : IContentEnricherStep
                 context.App.Languages,
                 context.Languages().ToArray())
             {
-                ResolveFallback = !context.IsFrontendClient && !context.NoResolveLanguages()
+                ResolveFallback = !context.IsFrontendClient && !context.NoResolveLanguages(),
+                // If field names are given we run the enrichment only on the specified fields.
+                FieldNames = fieldNames
             });
 
         if (!context.IsFrontendClient)
@@ -157,5 +170,31 @@ public sealed class ConvertData : IContentEnricherStep
         }
 
         return converter;
+    }
+
+    private static HashSet<string>? GetFieldNames(Context context)
+    {
+        var source = context.Fields();
+
+        if (source is not { Count: > 0 })
+        {
+            return null;
+        }
+
+        var fields = new HashSet<string>();
+
+        foreach (var field in source)
+        {
+            if (FieldNames.IsDataField(field, out var dataField))
+            {
+                fields.Add(dataField);
+            }
+            else
+            {
+                fields.Add(field);
+            }
+        }
+
+        return fields.Count == 0 ? null : fields;
     }
 }

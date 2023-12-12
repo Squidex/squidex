@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using F = Squidex.Infrastructure.Queries.ClrFilter;
@@ -30,7 +30,7 @@ public abstract class ContentsQueryTestsBase
     {
         var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
-        var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), ids, SearchScope.Published);
+        var contents = await _.ContentRepository.QueryIdsAsync(_.RandomApp(), ids, SearchScope.Published);
 
         // The IDs are random here, as it does not really matter.
         Assert.NotNull(contents);
@@ -41,12 +41,7 @@ public abstract class ContentsQueryTestsBase
     {
         var ids = Enumerable.Repeat(0, 50).Select(_ => DomainId.NewGuid()).ToHashSet();
 
-        var schemas = new List<ISchemaEntity>
-        {
-            _.RandomSchema()
-        };
-
-        var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), schemas, Q.Empty.WithIds(ids), SearchScope.All);
+        var contents = await _.ContentRepository.QueryAsync(_.RandomApp(), [_.RandomSchema()], Q.Empty.WithIds(ids), SearchScope.All);
 
         // The IDs are random here, as it does not really matter.
         Assert.NotNull(contents);
@@ -68,7 +63,7 @@ public abstract class ContentsQueryTestsBase
     {
         var filter = F.Eq("data.field1.iv", 12);
 
-        var contents = await _.ContentRepository.QueryIdsAsync(_.RandomAppId(), _.RandomSchemaId(), filter, SearchScope.All);
+        var contents = await _.ContentRepository.QueryIdsAsync(_.RandomApp(), _.RandomSchema(), filter, SearchScope.All);
 
         // We have a concrete query, so we expect an actual.
         Assert.NotEmpty(contents);
@@ -194,7 +189,7 @@ public abstract class ContentsQueryTestsBase
         Assert.Equal(40, contents.Count);
     }
 
-    private async Task<IResultList<IContentEntity>> QueryAsync(IContentRepository contentRepository,
+    private async Task<IResultList<Content>> QueryAsync(IContentRepository contentRepository,
         ClrQuery clrQuery,
         int top = 1000,
         int skip = 100,

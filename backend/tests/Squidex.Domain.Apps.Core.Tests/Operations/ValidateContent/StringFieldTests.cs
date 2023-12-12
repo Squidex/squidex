@@ -94,10 +94,32 @@ public class StringFieldTests : IClassFixture<TranslationsFixture>
     {
         var sut = Field(new StringFieldProperties { MaxCharacters = 5 });
 
-        await sut.ValidateAsync(CreateValue("12345678"), errors);
+        await sut.ValidateAsync(CreateValue("123456"), errors);
 
         errors.Should().BeEquivalentTo(
             new[] { "Must not have more than 5 text character(s)." });
+    }
+
+    [Fact]
+    public async Task Should_add_error_if_string_is_shorter_than_min_words()
+    {
+        var sut = Field(new StringFieldProperties { MinWords = 10 });
+
+        await sut.ValidateAsync(CreateValue("word1 word2 word3"), errors);
+
+        errors.Should().BeEquivalentTo(
+            new[] { "Must have at least 10 word(s)." });
+    }
+
+    [Fact]
+    public async Task Should_add_error_if_string_is_longer_than_max_words()
+    {
+        var sut = Field(new StringFieldProperties { MaxWords = 5 });
+
+        await sut.ValidateAsync(CreateValue("word1 word2 word3 word4 word5 word6"), errors);
+
+        errors.Should().BeEquivalentTo(
+            new[] { "Must not have more than 5 word(s)." });
     }
 
     [Fact]

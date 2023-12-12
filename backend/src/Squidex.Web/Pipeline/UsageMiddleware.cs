@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
@@ -41,7 +42,7 @@ public sealed class UsageMiddleware : IMiddleware
         {
             if (context.Response.StatusCode != StatusCodes.Status429TooManyRequests)
             {
-                var app = context.Features.Get<IAppFeature>()?.App;
+                var app = context.Features.Get<App>();
 
                 if (app != null)
                 {

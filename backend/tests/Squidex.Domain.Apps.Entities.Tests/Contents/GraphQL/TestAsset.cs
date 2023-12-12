@@ -52,11 +52,11 @@ public static class TestAsset
             metadata
             slug";
 
-    public static IEnrichedAssetEntity Create(DomainId id)
+    public static EnrichedAsset Create(DomainId id)
     {
         var now = SystemClock.Instance.GetCurrentInstant();
 
-        var asset = new AssetEntity
+        var asset = new EnrichedAsset
         {
             Id = id,
             AppId = TestApp.DefaultId,
@@ -88,7 +88,7 @@ public static class TestAsset
         return asset;
     }
 
-    public static object Response(IEnrichedAssetEntity asset)
+    public static object Response(EnrichedAsset asset)
     {
         return new
         {

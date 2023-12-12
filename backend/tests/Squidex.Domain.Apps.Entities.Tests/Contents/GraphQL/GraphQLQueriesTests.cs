@@ -5,9 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -275,7 +276,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
                 A<Q>.That.HasIdsWithoutTotal(assetId),
                 A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom<IEnrichedAssetEntity>(1));
+            .Returns(ResultList.CreateFrom<EnrichedAsset>(1));
 
         var actual = await ExecuteAsync(new TestQuery
         {
@@ -472,7 +473,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),
                 A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1));
+            .Returns(ResultList.CreateFrom<EnrichedContent>(1));
 
         var actual = await ExecuteAsync(new TestQuery
         {

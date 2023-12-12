@@ -18,18 +18,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly string roleName = "Role1";
-    private Roles roles = Roles.Empty;
 
     public GuardAppRolesTests()
     {
-        A.CallTo(() => App.Contributors)
-            .Returns(Contributors.Empty.Assign(User.Identifier, "contributorRole"));
+        App = App with
+        {
+            Contributors = Contributors.Empty.Assign(User.Identifier, "contributorRole")
+        };
 
-        A.CallTo(() => App.Clients)
-            .Returns(AppClients.Empty.Add(Client.Identifier, "secret", "clientRole"));
-
-        A.CallTo(() => App.Roles)
-            .ReturnsLazily(() => roles);
+        App = App with
+        {
+            Clients = AppClients.Empty.Add(Client.Identifier, "secret", "clientRole")
+        };
     }
 
     [Fact]
@@ -44,7 +44,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanAdd_should_throw_exception_if_name_exists()
     {
-        roles = roles.Add(roleName);
+        App = App with
+        {
+            Roles = Roles.Empty.Add(roleName)
+        };
 
         var command = new AddRole { Name = roleName };
 
@@ -80,7 +83,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanDelete_should_throw_exception_if_contributor_found()
     {
-        roles = roles.Add("contributorRole");
+        App = App with
+        {
+            Roles = Roles.Empty.Add("contributorRole")
+        };
 
         var command = new DeleteRole { Name = "contributorRole" };
 
@@ -91,7 +97,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanDelete_should_throw_exception_if_client_found()
     {
-        roles = roles.Add("clientRole");
+        App = App with
+        {
+            Roles = Roles.Empty.Add("clientRole")
+        };
 
         var command = new DeleteRole { Name = "clientRole" };
 
@@ -102,7 +111,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanDelete_should_throw_exception_if_default_role()
     {
-        roles = roles.Add(Role.Developer);
+        App = App with
+        {
+            Roles = Roles.Empty.Add(Role.Developer)
+        };
 
         var command = new DeleteRole { Name = Role.Developer };
 
@@ -113,7 +125,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanDelete_should_not_throw_exception_if_command_is_valid()
     {
-        roles = roles.Add(roleName);
+        App = App with
+        {
+            Roles = Roles.Empty.Add(roleName)
+        };
 
         var command = new DeleteRole { Name = roleName };
 
@@ -123,7 +138,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanUpdate_should_throw_exception_if_name_empty()
     {
-        roles = roles.Add(roleName);
+        App = App with
+        {
+            Roles = Roles.Empty.Add(roleName)
+        };
 
         var command = new UpdateRole { Name = null!, Permissions = ["P1"] };
 
@@ -134,7 +152,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanUpdate_should_throw_exception_if_permission_is_null()
     {
-        roles = roles.Add(roleName);
+        App = App with
+        {
+            Roles = Roles.Empty.Add(roleName)
+        };
 
         var command = new UpdateRole { Name = roleName };
 
@@ -145,7 +166,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanUpdate_should_throw_exception_if_default_role()
     {
-        roles = roles.Add(Role.Developer);
+        App = App with
+        {
+            Roles = Roles.Empty.Add(Role.Developer)
+        };
 
         var command = new UpdateRole { Name = Role.Developer, Permissions = ["P1"] };
 
@@ -164,7 +188,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanUpdate_should_not_throw_exception_if_properties_is_null()
     {
-        roles = roles.Add(roleName);
+        App = App with
+        {
+            Roles = Roles.Empty.Add(roleName)
+        };
 
         var command = new UpdateRole { Name = roleName, Permissions = ["P1"] };
 
@@ -174,7 +201,10 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     [Fact]
     public void CanUpdate_should_not_throw_exception_if_role_exist_with_valid_command()
     {
-        roles = roles.Add(roleName);
+        App = App with
+        {
+            Roles = Roles.Empty.Add(roleName)
+        };
 
         var command = new UpdateRole { Name = roleName, Permissions = ["P1"] };
 

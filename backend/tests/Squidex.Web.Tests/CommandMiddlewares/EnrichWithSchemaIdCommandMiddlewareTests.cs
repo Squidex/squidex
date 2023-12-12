@@ -6,12 +6,12 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Http;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Web.Pipeline;
 
 namespace Squidex.Web.CommandMiddlewares;
 
@@ -23,8 +23,8 @@ public class EnrichWithSchemaIdCommandMiddlewareTests : GivenContext
 
     public EnrichWithSchemaIdCommandMiddlewareTests()
     {
-        httpContext.Features.Set<IAppFeature>(new AppFeature(App));
-        httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Schema));
+        httpContext.Features.Set(App);
+        httpContext.Features.Set(Schema);
 
         A.CallTo(() => httpContextAccessor.HttpContext)
             .Returns(httpContext);
@@ -35,7 +35,7 @@ public class EnrichWithSchemaIdCommandMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_throw_exception_if_schema_not_found()
     {
-        httpContext.Features.Set<ISchemaFeature>(null);
+        httpContext.Features.Set<Schema>(null);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => HandleAsync(new CreateContent()));
     }
