@@ -46,7 +46,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                     Filter.Exists(x => x.GeoField, false),
                     Filter.Exists(x => x.GeoObject, false)),
                 Update
-                    .Set(x => x.ServeAlways, upsert.ServeAlways)
+                    .Set(x => x.ServeAll, upsert.ServeAll)
                     .Set(x => x.ServePublished, upsert.ServePublished)
                     .Set(x => x.Texts, BuildTexts(upsert))
                     .SetOnInsert(x => x.Id, Guid.NewGuid().ToString())
@@ -81,7 +81,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                             GeoField = field,
                             GeoObject = geoObject,
                             SchemaId = upsert.SchemaId.Id,
-                            ServeAlways = upsert.ServeAlways,
+                            ServeAll = upsert.ServeAll,
                             ServePublished = upsert.ServePublished,
                             AppId = upsert.AppId.Id
                         }));
@@ -100,7 +100,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
             new UpdateOneModel<MongoTextIndexEntity<T>>(
                 Filter.Eq(x => x.DocId, update.DocId),
                 Update
-                    .Set(x => x.ServeAlways, update.ServeAll)
+                    .Set(x => x.ServeAll, update.ServeAll)
                     .Set(x => x.ServePublished, update.ServePublished)));
     }
 

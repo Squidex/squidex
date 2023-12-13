@@ -26,7 +26,7 @@ public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntit
                 Index
                     .Text("t.t")
                     .Ascending(x => x.AppId)
-                    .Ascending(x => x.ServeAlways)
+                    .Ascending(x => x.ServeAll)
                     .Ascending(x => x.ServePublished)
                     .Ascending(x => x.SchemaId)),
             cancellationToken: ct);

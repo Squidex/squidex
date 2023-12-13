@@ -114,7 +114,7 @@ public sealed class TextIndexingProcess : IEventConsumer
                     ContentId = @event.ContentId,
                     DocId = state.DocIdCurrent,
                     GeoObjects = data.ToGeo(serializer),
-                    ServeAlways = true,
+                    ServeAll = true,
                     ServePublished = false,
                     Texts = data.ToTexts(),
                     IsNew = true
@@ -171,7 +171,7 @@ public sealed class TextIndexingProcess : IEventConsumer
                             ContentId = @event.ContentId,
                             DocId = state.DocIdNew,
                             GeoObjects = data.ToGeo(serializer),
-                            ServeAlways = true,
+                            ServeAll = true,
                             ServePublished = false,
                             Texts = data.ToTexts()
                         });
@@ -194,7 +194,7 @@ public sealed class TextIndexingProcess : IEventConsumer
                             ContentId = @event.ContentId,
                             DocId = state.DocIdCurrent,
                             GeoObjects = data.ToGeo(serializer),
-                            ServeAlways = true,
+                            ServeAll = true,
                             ServePublished = isPublished,
                             Texts = data.ToTexts()
                         });
@@ -305,7 +305,7 @@ public sealed class TextIndexingProcess : IEventConsumer
                 commands.TryGetValue(command.DocId, out var existing) &&
                 existing is UpsertIndexEntry upsert)
             {
-                upsert.ServeAlways = update.ServeAll;
+                upsert.ServeAll = update.ServeAll;
                 upsert.ServePublished = update.ServePublished;
             }
             else

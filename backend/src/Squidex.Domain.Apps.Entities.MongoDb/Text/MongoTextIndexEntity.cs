@@ -20,27 +20,30 @@ public sealed class MongoTextIndexEntity<T>
     public string Id { get; set; }
 
     [BsonRequired]
-    [BsonElement("d")]
+    [BsonElement(nameof(DocId))]
     public string DocId { get; set; }
 
     [BsonRequired]
-    [BsonElement("c")]
+    [BsonElement("_ci")]
+    [BsonRepresentation(BsonType.String)]
     public DomainId ContentId { get; set; }
 
     [BsonRequired]
-    [BsonElement("a")]
+    [BsonElement("_ai")]
+    [BsonRepresentation(BsonType.String)]
     public DomainId AppId { get; set; }
 
     [BsonRequired]
-    [BsonElement("s")]
+    [BsonElement("_si")]
+    [BsonRepresentation(BsonType.String)]
     public DomainId SchemaId { get; set; }
 
     [BsonRequired]
-    [BsonElement("e")]
-    public bool ServeAlways { get; set; }
+    [BsonElement("fa")]
+    public bool ServeAll { get; set; }
 
     [BsonRequired]
-    [BsonElement("p")]
+    [BsonElement("fp")]
     public bool ServePublished { get; set; }
 
     [BsonIgnoreIfNull]
@@ -48,11 +51,11 @@ public sealed class MongoTextIndexEntity<T>
     public T Texts { get; set; }
 
     [BsonIgnoreIfNull]
-    [BsonElement("g")]
+    [BsonElement("gf")]
     public string GeoField { get; set; }
 
     [BsonIgnoreIfNull]
-    [BsonElement("o")]
+    [BsonElement("go")]
     [BsonJson]
     [BsonRepresentation(BsonType.Document)]
     public Geometry GeoObject { get; set; }

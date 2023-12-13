@@ -68,7 +68,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
             new CreateIndexModel<MongoTextIndexEntity<T>>(
                 Index
                     .Ascending(x => x.AppId)
-                    .Ascending(x => x.ServeAlways)
+                    .Ascending(x => x.ServeAll)
                     .Ascending(x => x.ServePublished)
                     .Ascending(x => x.SchemaId)
                     .Ascending(x => x.GeoField)
@@ -219,7 +219,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
     {
         if (scope == SearchScope.All)
         {
-            return Filter.Eq(x => x.ServeAlways, true);
+            return Filter.Eq(x => x.ServeAll, true);
         }
         else
         {
