@@ -12,8 +12,8 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds;
 
 public sealed class StringReferenceExtractor
 {
-    private readonly List<Regex> contentsPatterns = new List<Regex>();
-    private readonly List<Regex> assetsPatterns = new List<Regex>();
+    private readonly List<Regex> contentsPatterns = [];
+    private readonly List<Regex> assetsPatterns = [];
 
     public StringReferenceExtractor(IUrlGenerator urlGenerator)
     {

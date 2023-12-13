@@ -5,16 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiUrlConfig, Types } from '@app/framework/internal';
-import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto, TypedSimpleChanges } from '@app/shared';
+import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-extension',
     styleUrls: ['./content-extension.component.scss'],
     templateUrl: './content-extension.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        SafeResourceUrlPipe,
+    ],
 })
 export class ContentExtensionComponent {
     private readonly context: any;
@@ -24,13 +27,16 @@ export class ContentExtensionComponent {
     public iframe!: ElementRef<HTMLIFrameElement>;
 
     @Input({ required: true })
-    public content?: ContentDto | null;
+    public contentItem?: ContentDto | null;
 
     @Input({ required: true })
     public contentSchema!: SchemaDto;
 
+    @Input({ transform: booleanAttribute })
+    public scrollable?: boolean = false;
+
     @Input()
-    public set url(value: string | undefined | null) {
+    public set editorUrl(value: string | undefined | null) {
         this.computedUrl = computeEditorUrl(value, this.appsState.snapshot.selectedSettings);
     }
 
@@ -54,7 +60,7 @@ export class ContentExtensionComponent {
             this.context['schemaId'] = this.contentSchema?.id;
         }
 
-        if (changes.content) {
+        if (changes.contentItem) {
             this.sendContent();
         }
     }
@@ -69,7 +75,7 @@ export class ContentExtensionComponent {
 
                 this.sendInit();
                 this.sendContent();
-            } else if (type === 'resize') {
+            } else if (type === 'resize' && !this.scrollable) {
                 const { height } = event.data;
 
                 this.iframe.nativeElement.height = `${height}px`;
@@ -86,7 +92,7 @@ export class ContentExtensionComponent {
     }
 
     private sendContent() {
-        this.sendMessage('contentChanged', { content: this.content });
+        this.sendMessage('contentChanged', { content: this.contentItem });
     }
 
     private sendMessage(type: string, payload: any) {

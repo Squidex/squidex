@@ -23,7 +23,7 @@ public sealed class BackupContents : IBackupHandler
 {
     private const int BatchSize = 100;
     private const string UrlsFile = "Urls.json";
-    private readonly Dictionary<DomainId, HashSet<DomainId>> contentIdsBySchemaId = new Dictionary<DomainId, HashSet<DomainId>>();
+    private readonly Dictionary<DomainId, HashSet<DomainId>> contentIdsBySchemaId = [];
     private readonly Rebuilder rebuilder;
     private readonly IUrlGenerator urlGenerator;
     private Urls? assetsUrlNew;
@@ -116,7 +116,7 @@ public sealed class BackupContents : IBackupHandler
 
                         if (!ReferenceEquals(newValue, s))
                         {
-                            replacements ??= new List<(string, string)>();
+                            replacements ??= [];
                             replacements.Add((key, newValue));
                             break;
                         }
@@ -125,7 +125,7 @@ public sealed class BackupContents : IBackupHandler
 
                         if (!ReferenceEquals(newValue, s))
                         {
-                            replacements ??= new List<(string, string)>();
+                            replacements ??= [];
                             replacements.Add((key, newValue));
                             break;
                         }
@@ -194,7 +194,7 @@ public sealed class BackupContents : IBackupHandler
         var ids = contentIdsBySchemaId.Values.SelectMany(x => x);
         if (ids.Any())
         {
-            await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids, BatchSize, ct);
+            await rebuilder.InsertManyAsync<ContentDomainObject, WriteContent>(ids, BatchSize, ct);
         }
     }
 

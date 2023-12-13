@@ -55,7 +55,7 @@ internal sealed class CompositeUniqueValidator : IValidator
         {
             var filter = ClrFilter.And(filters);
 
-            var found = await contentRepository.QueryIdsAsync(context.Root.AppId.Id, context.Root.SchemaId.Id, filter, SearchScope.All);
+            var found = await contentRepository.QueryIdsAsync(context.Root.App, context.Root.Schema, filter, SearchScope.All);
 
             if (found.Any(x => x.Id != context.Root.ContentId))
             {

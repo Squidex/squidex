@@ -19,7 +19,7 @@ public sealed class DefaultDomainObjectFactory : IDomainObjectFactory
     private static class DefaultFactory<T>
     {
         private static readonly ObjectFactory ObjectFactory =
-            ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(DomainId) });
+            ActivatorUtilities.CreateFactory(typeof(T), [typeof(DomainId)]);
 
         public static T Create(IServiceProvider serviceProvider, DomainId id)
         {
@@ -30,7 +30,7 @@ public sealed class DefaultDomainObjectFactory : IDomainObjectFactory
     private static class PersistenceFactory<T, TState>
     {
         private static readonly ObjectFactory ObjectFactory =
-            ActivatorUtilities.CreateFactory(typeof(T), new[] { typeof(DomainId), typeof(IPersistenceFactory<TState>) });
+            ActivatorUtilities.CreateFactory(typeof(T), [typeof(DomainId), typeof(IPersistenceFactory<TState>)]);
 
         public static T Create(IServiceProvider serviceProvider, DomainId id, IPersistenceFactory<TState> persistenceFactory)
         {

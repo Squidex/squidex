@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
-import { WorkflowDto, WorkflowsPayload, WorkflowsService } from './../services/workflows.service';
+import { WorkflowDto, WorkflowsPayload, WorkflowsService } from '../services/workflows.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -26,7 +26,9 @@ interface Snapshot extends LoadingState {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class WorkflowsState extends State<Snapshot> {
     public workflows =
         this.project(x => x.workflows);

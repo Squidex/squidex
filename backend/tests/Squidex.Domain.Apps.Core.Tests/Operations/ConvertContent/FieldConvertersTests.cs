@@ -32,7 +32,7 @@ public class FieldConvertersTests
         var field2 = Fields.Number(2, "number2", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1)
                 .AddField(field2);
 
@@ -63,7 +63,7 @@ public class FieldConvertersTests
         var field2 = Fields.Number(2, "number2", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1)
                 .AddField(field2);
 
@@ -98,7 +98,7 @@ public class FieldConvertersTests
         var field2 = Fields.Number(2, "number2", Partitioning.Language).Hide();
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1)
                 .AddField(field2);
 
@@ -133,7 +133,7 @@ public class FieldConvertersTests
         var field2 = Fields.Number(2, "number2", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1)
                 .AddField(field2)
                 .HideField(2);
@@ -167,7 +167,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string1", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -199,7 +199,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string1", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -212,7 +212,7 @@ public class FieldConvertersTests
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
-                .Add(new ResolveLanguages(languages, new[] { Language.DE }) { ResolveFallback = true })
+                .Add(new ResolveLanguages(languages, [Language.DE]) { ResolveFallback = true })
                 .Convert(source);
 
         var expected =
@@ -231,7 +231,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -267,7 +267,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -290,7 +290,7 @@ public class FieldConvertersTests
         var expected =
             new ContentData()
                 .AddField(field1.Name,
-                    new ContentFieldData());
+                    []);
 
         Assert.Equal(expected, actual);
     }
@@ -302,7 +302,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -325,7 +325,7 @@ public class FieldConvertersTests
         var expected =
             new ContentData()
                 .AddField(field1.Name,
-                    new ContentFieldData());
+                    []);
 
         if (value != false)
         {
@@ -341,7 +341,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -370,7 +370,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Invariant);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -396,7 +396,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Invariant);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -432,7 +432,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Invariant);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -467,13 +467,13 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Invariant);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
             new ContentData()
                 .AddField(field1.Name,
-                    new ContentFieldData());
+                    []);
 
         var actual =
             new ContentConverter(ResolvedComponents.Empty, schema)
@@ -492,7 +492,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var config =
@@ -536,7 +536,7 @@ public class FieldConvertersTests
         var field1 = Fields.String(1, "string", Partitioning.Language);
 
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddField(field1);
 
         var source =
@@ -582,7 +582,7 @@ public class FieldConvertersTests
         var source = new ContentFieldData();
 
         var actual =
-            new ResolveLanguages(languages, Array.Empty<Language>()) { ResolveFallback = true }
+            new ResolveLanguages(languages, []) { ResolveFallback = true }
                 .ConvertFieldAfter(field, source);
 
         Assert.Same(source, actual);
@@ -608,7 +608,7 @@ public class FieldConvertersTests
         var field = Fields.Component(1, "component", Partitioning.Invariant);
 
         var componentId = DomainId.NewGuid();
-        var component = new Schema("my-component");
+        var component = new Schema { Name = "my-component" };
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
             [componentId] = component

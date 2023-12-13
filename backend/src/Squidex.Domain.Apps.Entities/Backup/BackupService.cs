@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
@@ -30,7 +30,7 @@ public sealed class BackupService : IBackupService, IDeleter
         restoreState = new SimpleState<BackupRestoreState>(persistenceFactoryRestore, GetType(), "Default");
     }
 
-    Task IDeleter.DeleteAppAsync(IAppEntity app,
+    Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         return messaging.PublishAsync(new BackupClear(app.Id), ct: ct);

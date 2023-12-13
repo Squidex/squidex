@@ -5,10 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgSwitch, NgSwitchCase } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
-import { Language } from './../../language-selector.component';
+import { Language, LanguageSelectorComponent } from '../../language-selector.component';
+import { IndeterminateValueDirective } from '../indeterminate-value.directive';
+import { DateTimeEditorComponent } from './date-time-editor.component';
+import { TagEditorComponent } from './tag-editor.component';
 
 export const SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => LocalizedInputComponent), multi: true,
@@ -22,6 +26,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-localized-input',
     styleUrls: ['./localized-input.component.scss'],
     templateUrl: './localized-input.component.html',
@@ -29,6 +34,15 @@ interface State {
         SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        DateTimeEditorComponent,
+        FormsModule,
+        IndeterminateValueDirective,
+        LanguageSelectorComponent,
+        NgSwitch,
+        NgSwitchCase,
+        TagEditorComponent,
+    ],
 })
 export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {
     private value: { [key: string]: any } | undefined;

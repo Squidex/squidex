@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Web;
 
@@ -44,7 +43,7 @@ public sealed class RoleDto : Resource
     /// </summary>
     public JsonObject Properties { get; set; }
 
-    public static RoleDto FromDomain(Role role, IAppEntity app)
+    public static RoleDto FromDomain(Role role, App app)
     {
         var result = new RoleDto
         {
@@ -59,12 +58,12 @@ public sealed class RoleDto : Resource
         return result;
     }
 
-    private static int GetNumContributors(Role role, IAppEntity app)
+    private static int GetNumContributors(Role role, App app)
     {
         return app.Contributors.Count(x => role.Equals(x.Value));
     }
 
-    private static int GetNumClients(Role role, IAppEntity app)
+    private static int GetNumClients(Role role, App app)
     {
         return app.Clients.Count(x => role.Equals(x.Value.Role));
     }

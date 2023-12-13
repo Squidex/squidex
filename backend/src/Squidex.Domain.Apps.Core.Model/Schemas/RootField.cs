@@ -6,36 +6,24 @@
 // ==========================================================================
 
 using System.Diagnostics.Contracts;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas;
 
-public abstract class RootField : FieldBase, IRootField
+public abstract record RootField : IRootField
 {
-    public Partitioning Partitioning { get; }
+    public long Id { get; init; }
 
-    public bool IsLocked { get; private set; }
+    public string Name { get; init; }
 
-    public bool IsHidden { get; private set; }
+    public Partitioning Partitioning { get; init; }
 
-    public bool IsDisabled { get; private set; }
+    public bool IsLocked { get; init; }
+
+    public bool IsHidden { get; init; }
+
+    public bool IsDisabled { get; init; }
 
     public abstract FieldProperties RawProperties { get; }
-
-    protected RootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
-        : base(id, name)
-    {
-        Guard.NotNull(partitioning);
-
-        Partitioning = partitioning;
-
-        if (settings != null)
-        {
-            IsLocked = settings.IsLocked;
-            IsHidden = settings.IsHidden;
-            IsDisabled = settings.IsDisabled;
-        }
-    }
 
     [Pure]
     public RootField Lock()
@@ -45,10 +33,7 @@ public abstract class RootField : FieldBase, IRootField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsLocked = true;
-        });
+        return this with { IsLocked = true };
     }
 
     [Pure]
@@ -59,10 +44,7 @@ public abstract class RootField : FieldBase, IRootField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsHidden = true;
-        });
+        return this with { IsHidden = true };
     }
 
     [Pure]
@@ -73,10 +55,7 @@ public abstract class RootField : FieldBase, IRootField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsHidden = false;
-        });
+        return this with { IsHidden = false };
     }
 
     [Pure]
@@ -87,10 +66,7 @@ public abstract class RootField : FieldBase, IRootField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsDisabled = true;
-        });
+        return this with { IsDisabled = true };
     }
 
     [Pure]
@@ -101,22 +77,10 @@ public abstract class RootField : FieldBase, IRootField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsDisabled = false;
-        });
+        return this with { IsDisabled = false };
     }
 
     public abstract T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, TArgs args);
 
     public abstract RootField Update(FieldProperties newProperties);
-
-    protected RootField Clone(Action<RootField> updater)
-    {
-        var clone = (RootField)MemberwiseClone();
-
-        updater(clone);
-
-        return clone;
-    }
 }

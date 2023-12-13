@@ -8,8 +8,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -246,11 +246,11 @@ public sealed class AppsController : ApiController
         });
     }
 
-    private async Task<T> InvokeCommandAsync<T>(ICommand command, Func<IAppEntity, T> converter)
+    private async Task<T> InvokeCommandAsync<T>(ICommand command, Func<App, T> converter)
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        var result = context.Result<IAppEntity>();
+        var result = context.Result<App>();
         var response = converter(result);
 
         return response;

@@ -96,7 +96,7 @@ public class GuardAppLanguagesTests : GivenContext, IClassFixture<TranslationsFi
     [Fact]
     public void CanUpdateLanguage_should_throw_exception_if_fallback_language_defined_and_master()
     {
-        var command = new UpdateLanguage { Language = Language.EN, Fallback = new[] { Language.DE } };
+        var command = new UpdateLanguage { Language = Language.EN, Fallback = [Language.DE] };
 
         ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(command, App),
             new ValidationError("Master language cannot have fallback languages.", "Fallback"));
@@ -105,7 +105,7 @@ public class GuardAppLanguagesTests : GivenContext, IClassFixture<TranslationsFi
     [Fact]
     public void CanUpdateLanguage_should_throw_exception_if_language_has_invalid_fallback()
     {
-        var command = new UpdateLanguage { Language = Language.DE, Fallback = new[] { Language.IT } };
+        var command = new UpdateLanguage { Language = Language.DE, Fallback = [Language.IT] };
 
         ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(command, App),
             new ValidationError("App does not have fallback language 'Italian'.", "Fallback"));
@@ -122,7 +122,7 @@ public class GuardAppLanguagesTests : GivenContext, IClassFixture<TranslationsFi
     [Fact]
     public void CanUpdateLanguage_should_not_throw_exception_if_language_is_valid()
     {
-        var command = new UpdateLanguage { Language = Language.DE, Fallback = new[] { Language.EN } };
+        var command = new UpdateLanguage { Language = Language.DE, Fallback = [Language.EN] };
 
         GuardAppLanguages.CanUpdate(command, App);
     }

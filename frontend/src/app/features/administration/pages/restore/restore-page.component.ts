@@ -5,14 +5,37 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
-import { AuthService, BackupsService, DialogService, RestoreForm, switchSafe } from '@app/shared';
+import { AuthService, BackupsService, ControlErrorsComponent, DialogService, ISODatePipe, LayoutComponent, ListViewComponent, RestoreForm, SidebarMenuDirective, switchSafe, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-restore-page',
     styleUrls: ['./restore-page.component.scss'],
     templateUrl: './restore-page.component.html',
+    imports: [
+        AsyncPipe,
+        ControlErrorsComponent,
+        FormsModule,
+        ISODatePipe,
+        LayoutComponent,
+        ListViewComponent,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        SidebarMenuDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class RestorePageComponent {
     public restoreForm = new RestoreForm();

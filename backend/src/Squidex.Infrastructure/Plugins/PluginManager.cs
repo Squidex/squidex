@@ -15,8 +15,8 @@ namespace Squidex.Infrastructure.Plugins;
 
 public sealed class PluginManager : DisposableObjectBase
 {
-    private readonly HashSet<PluginLoader> pluginLoaders = new HashSet<PluginLoader>();
-    private readonly HashSet<IPlugin> loadedPlugins = new HashSet<IPlugin>();
+    private readonly HashSet<PluginLoader> pluginLoaders = [];
+    private readonly HashSet<IPlugin> loadedPlugins = [];
     private readonly List<(string Plugin, string Action, Exception Exception)> exceptions = new List<(string, string, Exception)>();
 
     public static readonly PluginManager Instance = new PluginManager();

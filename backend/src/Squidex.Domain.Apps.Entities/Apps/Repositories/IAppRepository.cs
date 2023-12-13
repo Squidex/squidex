@@ -5,21 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Repositories;
 
 public interface IAppRepository
 {
-    Task<List<IAppEntity>> QueryAllAsync(string contributorId, IEnumerable<string> names,
+    Task<List<App>> QueryAllAsync(string contributorId, IEnumerable<string> names,
         CancellationToken ct = default);
 
-    Task<List<IAppEntity>> QueryAllAsync(DomainId teamId,
+    Task<List<App>> QueryAllAsync(DomainId teamId,
         CancellationToken ct = default);
 
-    Task<IAppEntity?> FindAsync(DomainId id,
+    Task<App?> FindAsync(DomainId id,
         CancellationToken ct = default);
 
-    Task<IAppEntity?> FindAsync(string name,
+    Task<App?> FindAsync(string name,
         CancellationToken ct = default);
 }

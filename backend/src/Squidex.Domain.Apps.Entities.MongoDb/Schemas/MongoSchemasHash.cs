@@ -7,7 +7,8 @@
 
 using MongoDB.Driver;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -35,7 +36,7 @@ public sealed class MongoSchemasHash : MongoRepositoryBase<MongoSchemasHashEntit
         return "SchemasHash";
     }
 
-    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
@@ -74,7 +75,7 @@ public sealed class MongoSchemasHash : MongoRepositoryBase<MongoSchemasHashEntit
         return Collection.BulkWriteAsync(writes, BulkUnordered);
     }
 
-    public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(IAppEntity app,
+    public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(App app,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -95,7 +96,7 @@ public sealed class MongoSchemasHash : MongoRepositoryBase<MongoSchemasHashEntit
         return (entity.Updated, hash);
     }
 
-    public ValueTask<string> ComputeHashAsync(IAppEntity app, IEnumerable<ISchemaEntity> schemas,
+    public ValueTask<string> ComputeHashAsync(App app, IEnumerable<Schema> schemas,
         CancellationToken ct = default)
     {
         var ids =

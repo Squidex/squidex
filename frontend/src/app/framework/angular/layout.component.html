@@ -49,7 +49,7 @@
                     </div>
                 </div>
 
-                <button class="btn panel2-collapse" (click)="toggle()" sqxStopClick>
+                <button class="btn panel2-collapse" attr.aria-label="{{ 'common.collapse' | sqxTranslate }}" (click)="toggle()" sqxStopClick>
                     <i class="icon-angle-left"></i>
                 </button>
 
@@ -94,7 +94,7 @@
             </div>
     
             <div class="panel2-main menu">
-                <ng-container *ngTemplateOutlet="sidebarMenuTemplate"></ng-container>
+                <ng-container *ngTemplateOutlet="sidebarMenuTemplate?.templateRef || null"></ng-container>
             </div>
         </div>
     </ng-container>
@@ -113,9 +113,5 @@
 
     <ng-template #headerTemplate>
         <ng-content select="[header]"></ng-content>
-    </ng-template>
-
-    <ng-template #sidebarMenuTemplate>
-        <ng-content select="[sidebarMenu]"></ng-content>
     </ng-template>
 </div>

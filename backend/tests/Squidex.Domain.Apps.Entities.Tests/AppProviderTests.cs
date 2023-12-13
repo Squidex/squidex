@@ -6,16 +6,11 @@
 // ==========================================================================
 
 using Squidex.Caching;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
-using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Indexes;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities;
@@ -51,7 +46,7 @@ public class AppProviderTests : GivenContext
     public async Task Should_get_team_apps_from_index()
     {
         A.CallTo(() => indexForApps.GetAppsForTeamAsync(TeamId, CancellationToken))
-            .Returns(new List<IAppEntity> { App });
+            .Returns([App]);
 
         var actual = await sut.GetTeamAppsAsync(TeamId, CancellationToken);
 
@@ -64,7 +59,7 @@ public class AppProviderTests : GivenContext
         var permissions = new PermissionSet("*");
 
         A.CallTo(() => indexForApps.GetAppsForUserAsync("user1", permissions, CancellationToken))
-            .Returns(new List<IAppEntity> { App });
+            .Returns([App]);
 
         var actual = await sut.GetUserAppsAsync("user1", permissions, CancellationToken);
 
@@ -108,7 +103,7 @@ public class AppProviderTests : GivenContext
     public async Task Should_get_teams_from_index()
     {
         A.CallTo(() => indexForTeams.GetTeamsAsync("user1", CancellationToken))
-            .Returns(new List<ITeamEntity> { Team });
+            .Returns([Team]);
 
         var actual = await sut.GetUserTeamsAsync("user1", CancellationToken);
 
@@ -141,7 +136,7 @@ public class AppProviderTests : GivenContext
     public async Task Should_get_schemas_from_index()
     {
         A.CallTo(() => indexForSchemas.GetSchemasAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { Schema });
+            .Returns([Schema]);
 
         var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
@@ -151,10 +146,10 @@ public class AppProviderTests : GivenContext
     [Fact]
     public async Task Should_get_rules_from_index()
     {
-        var rule = new RuleEntity();
+        var rule = CreateRule();
 
         A.CallTo(() => indexForRules.GetRulesAsync(AppId.Id, CancellationToken))
-            .Returns(new List<IRuleEntity> { rule });
+            .Returns([rule]);
 
         var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
@@ -164,10 +159,10 @@ public class AppProviderTests : GivenContext
     [Fact]
     public async Task Should_get_rule_from_index()
     {
-        var rule = new RuleEntity { Id = DomainId.NewGuid() };
+        var rule = CreateRule();
 
         A.CallTo(() => indexForRules.GetRulesAsync(AppId.Id, CancellationToken))
-            .Returns(new List<IRuleEntity> { rule });
+            .Returns([rule]);
 
         var actual = await sut.GetRuleAsync(AppId.Id, rule.Id, CancellationToken);
 

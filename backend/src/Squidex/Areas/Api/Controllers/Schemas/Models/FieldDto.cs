@@ -89,7 +89,7 @@ public sealed class FieldDto : Resource
 
         if (field is IArrayField arrayField)
         {
-            result.Nested = new List<NestedFieldDto>();
+            result.Nested = [];
 
             foreach (var nestedField in arrayField.Fields)
             {

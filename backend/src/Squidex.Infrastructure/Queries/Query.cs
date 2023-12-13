@@ -26,7 +26,7 @@ public class Query<TValue>
         set => Take = value;
     }
 
-    public List<SortNode>? Sort { get; set; } = new List<SortNode>();
+    public List<SortNode>? Sort { get; set; } = [];
 
     public HashSet<string> GetAllFields()
     {

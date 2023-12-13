@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
@@ -37,7 +37,7 @@ public sealed class AppSettingsDto : Resource
     /// </summary>
     public long Version { get; set; }
 
-    public static AppSettingsDto FromDomain(IAppEntity app, Resources resources)
+    public static AppSettingsDto FromDomain(App app, Resources resources)
     {
         var settings = app.Settings;
 

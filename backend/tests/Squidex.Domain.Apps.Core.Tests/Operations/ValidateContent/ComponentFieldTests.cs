@@ -18,7 +18,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
 {
     private readonly DomainId schemaId1 = DomainId.NewGuid();
     private readonly DomainId schemaId2 = DomainId.NewGuid();
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> errors = [];
 
     [Fact]
     public void Should_instantiate_field()
@@ -172,7 +172,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
     private (DomainId, RootField<ComponentFieldProperties>, ResolvedComponents) Field(ComponentFieldProperties properties, bool isRequired = false)
     {
         var schema =
-            new Schema("my-component")
+            new Schema { Name = "my-component" }
                 .AddNumber(1, "componentField", Partitioning.Invariant,
                     new NumberFieldProperties { IsRequired = isRequired });
 

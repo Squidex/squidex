@@ -15,8 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 public sealed class StringLogger : ILogger, ILogLine
 {
     private const int MaxActionLength = 40;
-    private readonly List<string> lines = new List<string>();
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> lines = [];
+    private readonly List<string> errors = [];
     private string startedLine = string.Empty;
 
     public bool CanWriteToSameLine => false;

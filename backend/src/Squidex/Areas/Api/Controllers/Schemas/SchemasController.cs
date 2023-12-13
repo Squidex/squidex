@@ -8,11 +8,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateFilters;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -369,7 +369,7 @@ public sealed class SchemasController : ApiController
     {
         var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
 
-        var filters = ContentQueryModel.Build(Schema.SchemaDef, App.PartitionResolver(), components).Flatten();
+        var filters = ContentQueryModel.Build(Schema, App.PartitionResolver(), components).Flatten();
 
         return Ok(filters);
     }
@@ -378,10 +378,10 @@ public sealed class SchemasController : ApiController
     {
         var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
 
-        return Schema.SchemaDef.BuildDataSchema(App.PartitionResolver(), components);
+        return Schema.BuildDataSchema(App.PartitionResolver(), components);
     }
 
-    private Task<ISchemaEntity?> GetSchemaAsync(string schema)
+    private Task<Schema?> GetSchemaAsync(string schema)
     {
         if (Guid.TryParseExact(schema, "D", out var guid))
         {
@@ -399,7 +399,7 @@ public sealed class SchemasController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        var result = context.Result<ISchemaEntity>();
+        var result = context.Result<Schema>();
         var response = SchemaDto.FromDomain(result, Resources);
 
         return response;

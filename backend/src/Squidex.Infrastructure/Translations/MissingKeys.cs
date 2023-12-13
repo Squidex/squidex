@@ -23,7 +23,7 @@ public sealed class MissingKeys
         }
         else
         {
-            missingTranslations = new HashSet<string>();
+            missingTranslations = [];
         }
     }
 

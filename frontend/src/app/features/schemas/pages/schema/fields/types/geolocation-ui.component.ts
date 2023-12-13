@@ -6,13 +6,19 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { FieldDto, GeolocationFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-geolocation-ui',
     styleUrls: ['geolocation-ui.component.scss'],
     templateUrl: 'geolocation-ui.component.html',
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class GeolocationUIComponent {
     @Input({ required: true })

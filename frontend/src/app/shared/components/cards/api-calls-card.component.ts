@@ -5,14 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { NgChartsModule } from 'ng2-charts';
+import { TranslatePipe } from '@app/framework';
 import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-api-calls-card',
     styleUrls: ['./api-calls-card.component.scss'],
     templateUrl: './api-calls-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        NgChartsModule,
+        NgIf,
+        TranslatePipe,
+    ],
 })
 export class ApiCallsCardComponent {
     @Input()

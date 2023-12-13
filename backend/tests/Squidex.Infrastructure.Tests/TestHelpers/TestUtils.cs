@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -86,20 +85,6 @@ public static class TestUtils
         configure?.Invoke(options);
 
         return options;
-    }
-
-    public static T SerializeAndDeserializeBinary<T>(this T source)
-    {
-        using (var stream = new MemoryStream())
-        {
-            var formatter = new BinaryFormatter();
-
-            formatter.Serialize(stream, source!);
-
-            stream.Position = 0;
-
-            return (T)formatter.Deserialize(stream);
-        }
     }
 
     public static T SerializeAndDeserializeBson<T>(this T value)

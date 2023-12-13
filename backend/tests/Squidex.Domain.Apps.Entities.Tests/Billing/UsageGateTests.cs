@@ -30,6 +30,11 @@ public class UsageGateTests : GivenContext
 
     public UsageGateTests()
     {
+        App = App with
+        {
+            TeamId = default
+        };
+
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (planFree, planFree.Id));
 
@@ -80,8 +85,10 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_get_free_plan_for_app_with_team()
     {
-        A.CallTo(() => App.TeamId)
-            .Returns(TeamId);
+        App = App with
+        {
+            TeamId = TeamId
+        };
 
         var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
 
@@ -91,8 +98,10 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_get_paid_plan_for_app()
     {
-        A.CallTo(() => App.Plan)
-            .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
+        App = App with
+        {
+            Plan = new AssignedPlan(User, planPaid.Id)
+        };
 
         var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
 
@@ -102,8 +111,10 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_get_paid_plan_for_app_id()
     {
-        A.CallTo(() => App.Plan)
-            .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
+        App = App with
+        {
+            Plan = new AssignedPlan(User, planPaid.Id)
+        };
 
         var plan = await sut.GetPlanForAppAsync(AppId.Id, false, CancellationToken);
 
@@ -113,11 +124,10 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_get_paid_plan_for_app_with_team()
     {
-        A.CallTo(() => Team.Plan)
-            .Returns(new AssignedPlan(RefToken.User("1"), planPaid.Id));
-
-        A.CallTo(() => App.TeamId)
-            .Returns(TeamId);
+        App = App with
+        {
+            Plan = new AssignedPlan(User, planPaid.Id), TeamId = TeamId
+        };
 
         var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
 
@@ -127,13 +137,15 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_block_with_true_if_over_client_limit()
     {
+        App = App with
+        {
+            Clients = AppClients.Empty.Add(clientId, clientId).Update(clientId, apiCallsLimit: 1000)
+        };
+
         var plan = new Plan { Id = "custom", BlockingApiCalls = 1600, MaxApiCalls = 1600 };
 
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
             .ReturnsLazily(x => (plan, plan.Id));
-
-        A.CallTo(() => App.Clients)
-            .Returns(AppClients.Empty.Add(clientId, clientId).Update(clientId, apiCallsLimit: 1000));
 
         A.CallTo(() => apiUsageTracker.GetMonthCallsAsync(AppId.Id.ToString(), today, A<string>._, CancellationToken))
             .Returns(1000);
@@ -272,8 +284,10 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_track_api_request_with_team()
     {
-        A.CallTo(() => App.TeamId)
-            .Returns(TeamId);
+        App = App with
+        {
+            TeamId = TeamId
+        };
 
         await sut.TrackRequestAsync(App, "client", today, 42, 50, 512, CancellationToken);
 
@@ -311,13 +325,15 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_track_rules_usage_with_team()
     {
+        App = App with
+        {
+            TeamId = TeamId
+        };
+
         Counters? countersSummary = null;
         Counters? countersDate = null;
 
         var ruleId = DomainId.NewGuid();
-
-        A.CallTo(() => App.TeamId)
-            .Returns(TeamId);
 
         A.CallTo(() => usageTracker.TrackAsync(default, $"{TeamId}_TeamRules", AppId.Id.ToString(), A<Counters>._, CancellationToken))
             .Invokes(x => countersSummary = x.GetArgument<Counters>(3));
@@ -345,15 +361,15 @@ public class UsageGateTests : GivenContext
             .Returns(
                 new Dictionary<string, List<(DateOnly, Counters)>>
                 {
-                    [AppId.Id.ToString()] = new List<(DateOnly, Counters)>
-                    {
+                    [AppId.Id.ToString()] =
+                    [
                         (default, new Counters
                         {
                             [UsageGate.RulesKeys.TotalCreated] = 100,
                             [UsageGate.RulesKeys.TotalSucceeded] = 120,
                             [UsageGate.RulesKeys.TotalFailed] = 140
                         })
-                    }
+                    ]
                 });
 
         var total = await ((IRuleUsageTracker)sut).GetTotalByAppAsync(AppId.Id, CancellationToken);
@@ -399,8 +415,8 @@ public class UsageGateTests : GivenContext
         A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(2), CancellationToken))
             .Returns(new Dictionary<string, List<(DateOnly, Counters)>>
             {
-                [usageTracker.FallbackCategory] = new List<(DateOnly, Counters)>
-                {
+                [usageTracker.FallbackCategory] =
+                [
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.RulesKeys.TotalCreated] = 50,
@@ -419,16 +435,16 @@ public class UsageGateTests : GivenContext
                         [UsageGate.RulesKeys.TotalSucceeded] = 320,
                         [UsageGate.RulesKeys.TotalFailed] = 340
                     })
-                },
-                ["Custom"] = new List<(DateOnly, Counters)>
-                {
+                ],
+                ["Custom"] =
+                [
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.RulesKeys.TotalCreated] = 50,
                         [UsageGate.RulesKeys.TotalSucceeded] = 60,
                         [UsageGate.RulesKeys.TotalFailed] = 70
                     })
-                }
+                ]
             });
     }
 
@@ -459,11 +475,13 @@ public class UsageGateTests : GivenContext
     [Fact]
     public async Task Should_track_assets_usage_with_team()
     {
+        App = App with
+        {
+            TeamId = TeamId
+        };
+
         Counters? countersSummary = null;
         Counters? countersDate = null;
-
-        A.CallTo(() => App.TeamId)
-            .Returns(TeamId);
 
         A.CallTo(() => usageTracker.TrackAsync(default, $"{TeamId}_TeamAssets", AppId.Id.ToString(), A<Counters>._, CancellationToken))
             .Invokes(x => countersSummary = x.GetArgument<Counters>(3));
@@ -548,8 +566,8 @@ public class UsageGateTests : GivenContext
         A.CallTo(() => usageTracker.QueryAsync(key, today, today.AddDays(2), CancellationToken))
             .Returns(new Dictionary<string, List<(DateOnly, Counters)>>
             {
-                [usageTracker.FallbackCategory] = new List<(DateOnly, Counters)>
-                {
+                [usageTracker.FallbackCategory] =
+                [
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.AssetsKeys.TotalSize] = 64,
@@ -565,15 +583,15 @@ public class UsageGateTests : GivenContext
                         [UsageGate.AssetsKeys.TotalSize] = 512,
                         [UsageGate.AssetsKeys.TotalAssets] = 4
                     })
-                },
-                ["Custom"] = new List<(DateOnly, Counters)>
-                {
+                ],
+                ["Custom"] =
+                [
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.AssetsKeys.TotalSize] = 64,
                         [UsageGate.AssetsKeys.TotalAssets] = 1
                     })
-                }
+                ]
             });
     }
 }

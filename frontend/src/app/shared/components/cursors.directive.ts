@@ -1,4 +1,3 @@
-
 /*
  * Squidex Headless CMS
  *
@@ -11,6 +10,7 @@ import { CollaborationService, Subscriptions } from '@app/shared/internal';
 
 @Directive({
     selector: '[sqxCursors]',
+    standalone: true,
 })
 export class CursorsDirective  {
     private readonly subscriptions = new Subscriptions();

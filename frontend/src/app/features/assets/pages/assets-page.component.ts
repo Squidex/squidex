@@ -5,16 +5,43 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AssetDto, AssetsState, DialogModel, LocalStoreService, MathHelper, Queries, Query, QueryFullTextSynchronizer, Router2State, UIState } from '@app/shared';
-import { Settings } from '@app/shared/state/settings';
+import { FormsModule } from '@angular/forms';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathComponent, AssetsListComponent, AssetsState, DialogModel, LayoutComponent, ListViewComponent, LocalStoreService, MathHelper, ModalDirective, PagerComponent, Queries, Query, QueryFullTextSynchronizer, Router2State, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, TagEditorComponent, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-assets-page',
     styleUrls: ['./assets-page.component.scss'],
     templateUrl: './assets-page.component.html',
     providers: [
         Router2State,
+    ],
+    imports: [
+        AssetDialogComponent,
+        AssetFolderDialogComponent,
+        AssetPathComponent,
+        AssetsListComponent,
+        AsyncPipe,
+        FormsModule,
+        LayoutComponent,
+        ListViewComponent,
+        ModalDirective,
+        NgIf,
+        PagerComponent,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        SearchFormComponent,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        TagEditorComponent,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
     ],
 })
 export class AssetsPageComponent implements OnInit {

@@ -2,7 +2,7 @@
 # Stage 1, Build Backend
 #
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 as backend
+FROM mcr.microsoft.com/dotnet/sdk:8.0 as backend
 
 ARG SQUIDEX__BUILD__VERSION=7.0.0
 
@@ -43,7 +43,7 @@ RUN dotnet tool install --tool-path /tools dotnet-counters \
 #
 # Stage 2, Build Frontend
 #
-FROM squidex/frontend-build:18.10 as frontend
+FROM squidex/frontend-build:20.9 as frontend
 
 WORKDIR /src
 
@@ -67,7 +67,7 @@ RUN cp -a build /build/
 #
 # Stage 3, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim
 
 ARG SQUIDEX__RUNTIME__VERSION=7.0.0
 
@@ -86,7 +86,7 @@ WORKDIR /app
 
 # Copy from build stages
 COPY --from=backend /build/ .
-COPY --from=frontend /build/ wwwroot/build/
+COPY --from=frontend /build/browser wwwroot/build/
 
 EXPOSE 80
 EXPOSE 443
@@ -95,6 +95,7 @@ ENV DIAGNOSTICS__COUNTERSTOOL=/tools/dotnet-counters
 ENV DIAGNOSTICS__DUMPTOOL=/tools/dotnet-dump
 ENV DIAGNOSTICS__GCDUMPTOOL=/tools/dotnet-gcdump
 ENV DIAGNOSTICS__TRACETOOL=/tools/dotnet-trace
+ENV ASPNETCORE_HTTP_PORTS=80
 
 ENTRYPOINT ["dotnet", "Squidex.dll"]
 

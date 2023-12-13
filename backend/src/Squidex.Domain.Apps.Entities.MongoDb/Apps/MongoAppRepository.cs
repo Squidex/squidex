@@ -6,19 +6,23 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Apps;
 
-public sealed class MongoAppRepository : MongoSnapshotStoreBase<AppDomainObject.State, MongoAppEntity>, IAppRepository, IDeleter
+public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEntity>, IAppRepository, IDeleter
 {
     public MongoAppRepository(IMongoDatabase database)
         : base(database)
     {
+    }
+
+    protected override string CollectionName()
+    {
+        return "States_Apps";
     }
 
     protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection,
@@ -38,13 +42,13 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<AppDomainObject.
         }, ct);
     }
 
-    Task IDeleter.DeleteAppAsync(IAppEntity app,
+    Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         return Collection.DeleteManyAsync(Filter.Eq(x => x.DocumentId, app.Id), ct);
     }
 
-    public async Task<List<IAppEntity>> QueryAllAsync(string contributorId, IEnumerable<string> names,
+    public async Task<List<App>> QueryAllAsync(string contributorId, IEnumerable<string> names,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsync"))
@@ -57,7 +61,7 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<AppDomainObject.
         }
     }
 
-    public async Task<List<IAppEntity>> QueryAllAsync(DomainId teamId,
+    public async Task<List<App>> QueryAllAsync(DomainId teamId,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsync"))
@@ -70,7 +74,7 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<AppDomainObject.
         }
     }
 
-    public async Task<IAppEntity?> FindAsync(DomainId id,
+    public async Task<App?> FindAsync(DomainId id,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAppRepository/FindAsync"))
@@ -83,7 +87,7 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<AppDomainObject.
         }
     }
 
-    public async Task<IAppEntity?> FindAsync(string name,
+    public async Task<App?> FindAsync(string name,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoAppRepository/FindAsyncByName"))
@@ -96,9 +100,9 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<AppDomainObject.
         }
     }
 
-    private static List<IAppEntity> RemoveDuplcateNames(List<MongoAppEntity> entities)
+    private static List<App> RemoveDuplcateNames(List<MongoAppEntity> entities)
     {
-        var byName = new Dictionary<string, IAppEntity>();
+        var byName = new Dictionary<string, App>();
 
         // Remove duplicate names, the latest wins.
         foreach (var entity in entities.OrderBy(x => x.IndexedCreated))

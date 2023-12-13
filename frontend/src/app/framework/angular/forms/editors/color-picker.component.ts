@@ -5,10 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ColorPickerModule } from 'ngx-color-picker';
 import { MathHelper, ModalModel, StatefulControlComponent } from '@app/framework/internal';
-import { FocusComponent } from './../forms-helper';
+import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
+import { ModalDirective } from '../../modals/modal.directive';
+import { FocusComponent } from '../forms-helper';
 
 export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ColorPickerComponent), multi: true,
@@ -23,6 +27,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-color-picker',
     styleUrls: ['./color-picker.component.scss'],
     templateUrl: './color-picker.component.html',
@@ -30,6 +35,13 @@ interface State {
         SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        ColorPickerModule,
+        FormsModule,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgIf,
+    ],
 })
 export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {
     private wasOpen = false;

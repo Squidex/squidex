@@ -15,7 +15,7 @@ public class ChangePropertiesModel
 
     public UserValues ToValues()
     {
-        var properties = Properties?.Select(x => x.ToTuple()).ToList() ?? new List<(string Name, string Value)>();
+        var properties = Properties?.Select(x => x.ToTuple()).ToList() ?? [];
 
         return new UserValues { Properties = properties };
     }

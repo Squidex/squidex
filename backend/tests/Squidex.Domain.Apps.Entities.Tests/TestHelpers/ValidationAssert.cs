@@ -18,7 +18,7 @@ public static class ValidationAssert
         {
             action();
 
-            Assert.True(false, $"Expected {typeof(ValidationException)} but succeeded");
+            Assert.Fail($"Expected {typeof(ValidationException)} but succeeded");
         }
         catch (ValidationException ex)
         {
@@ -30,7 +30,7 @@ public static class ValidationAssert
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Excepted {typeof(ValidationException)}, but got {ex.GetType()}");
+            Assert.Fail($"Excepted {typeof(ValidationException)}, but got {ex.GetType()}");
         }
     }
 
@@ -40,7 +40,7 @@ public static class ValidationAssert
         {
             await action();
 
-            Assert.True(false, $"Expected {typeof(ValidationException)} but succeeded");
+            Assert.Fail($"Expected {typeof(ValidationException)} but succeeded");
         }
         catch (ValidationException ex)
         {
@@ -52,7 +52,7 @@ public static class ValidationAssert
         }
         catch (Exception ex)
         {
-            Assert.True(false, $"Excepted {typeof(ValidationException)}, but got {ex.GetType()}");
+            Assert.Fail($"Excepted {typeof(ValidationException)}, but got {ex.GetType()}");
         }
     }
 }

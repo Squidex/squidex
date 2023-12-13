@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
@@ -27,18 +27,18 @@ public sealed class Context
 
     public ClaimsPrincipal UserPrincipal { get; }
 
-    public IAppEntity App { get; set; }
+    public App App { get; set; }
 
     public bool IsFrontendClient => UserPrincipal.IsInClient(DefaultClients.Frontend);
 
-    public Context(ClaimsPrincipal user, IAppEntity app)
+    public Context(ClaimsPrincipal user, App app)
         : this(app, user, user.Claims.Permissions(), EmptyHeaders)
     {
         Guard.NotNull(user);
     }
 
     private Context(
-        IAppEntity app,
+        App app,
         ClaimsPrincipal userPrincipal,
         ClaimsPermissions userPermissions,
         IReadOnlyDictionary<string, string> headers)
@@ -51,7 +51,7 @@ public sealed class Context
         Headers = headers;
     }
 
-    public static Context Anonymous(IAppEntity app)
+    public static Context Anonymous(App app)
     {
         var claimsIdentity = new ClaimsIdentity();
         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -59,7 +59,7 @@ public sealed class Context
         return new Context(claimsPrincipal, app);
     }
 
-    public static Context Admin(IAppEntity app)
+    public static Context Admin(App app)
     {
         var claimsIdentity = new ClaimsIdentity();
         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);

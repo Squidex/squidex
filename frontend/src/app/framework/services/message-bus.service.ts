@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { filter, map, Observable, Subject } from 'rxjs';
 
 interface Message {
@@ -16,14 +16,23 @@ interface Message {
     data: any;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class MessageBus {
     private message$ = new Subject<Message>();
+
+    constructor(
+        private readonly zone: NgZone,
+    ) {
+    }
 
     public emit<T>(data: T) {
         const channel = ((<any>data)['constructor']).name;
 
-        this.message$.next({ channel, data });
+        this.zone.run(() => {
+            this.message$.next({ channel, data });
+        });
     }
 
     public of<T>(messageType: { new(...args: ReadonlyArray<any>): T }): Observable<T> {

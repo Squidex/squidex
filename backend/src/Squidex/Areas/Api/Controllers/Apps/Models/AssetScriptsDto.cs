@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
@@ -53,7 +53,7 @@ public sealed class AssetScriptsDto : Resource
     /// </summary>
     public long Version { get; set; }
 
-    public static AssetScriptsDto FromDomain(IAppEntity app, Resources resources)
+    public static AssetScriptsDto FromDomain(App app, Resources resources)
     {
         var result = SimpleMapper.Map(app.AssetScripts, new AssetScriptsDto());
 

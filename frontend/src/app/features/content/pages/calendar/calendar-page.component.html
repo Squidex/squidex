@@ -29,13 +29,13 @@
     </ng-container>
 
     <ng-container content>
-        <div *ngIf="content && content.scheduleJob">
+        <div *ngIf="contentSelected && contentSelected.scheduleJob">
             <div class="form-group row">
                 <label class="col-4 col-form-label">{{ 'common.id' | sqxTranslate }}</label>
         
                 <div class="col-8">
                     <div class="input-group">
-                        <input readonly class="form-control" name="id" id="id" value="{{content.id}}" #inputId>
+                        <input readonly class="form-control" name="id" id="id" value="{{contentSelected.id}}" #inputId>
     
                         <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputId">
                             <i class="icon-copy"></i>
@@ -48,8 +48,8 @@
                 <label class="col-4 col-form-label">{{ 'common.content' | sqxTranslate }}</label>
         
                 <div class="col-8">
-                    <a class="truncate" [routerLink]="['../', content.schemaName, content.id]">
-                        {{createContentName(content)}}
+                    <a class="truncate" [routerLink]="['../', contentSelected.schemaName, contentSelected.id]">
+                        {{createContentName(contentSelected)}}
                     </a>
                 </div>
             </div>
@@ -58,8 +58,8 @@
                 <label class="col-4 col-form-label">{{ 'common.schema' | sqxTranslate }}</label>
         
                 <div class="col-8">
-                    <a class="truncate" [routerLink]="['../', content.schemaName]">
-                        {{content.schemaDisplayName}}
+                    <a class="truncate" [routerLink]="['../', contentSelected.schemaName]">
+                        {{contentSelected.schemaDisplayName}}
                     </a>
                 </div>
             </div>
@@ -70,8 +70,8 @@
                 <div class="col-8">
                     <sqx-content-status
                         layout="text"
-                        [status]="content.status"
-                        [statusColor]="content.statusColor"
+                        [status]="contentSelected.status"
+                        [statusColor]="contentSelected.statusColor"
                         small="true">
                     </sqx-content-status>
                 </div>
@@ -85,8 +85,8 @@
                 <div class="col-8">
                     <sqx-content-status
                         layout="text"
-                        [status]="content.scheduleJob.status"
-                        [statusColor]="content.scheduleJob.color"
+                        [status]="contentSelected.scheduleJob.status"
+                        [statusColor]="contentSelected.scheduleJob.color"
                         small="true">
                     </sqx-content-status>
                 </div>
@@ -96,7 +96,7 @@
                 <label class="col-4 col-form-label">{{ 'contents.scheduledAt' | sqxTranslate }}</label>
         
                 <div class="col-8">
-                    {{content.scheduleJob.dueTime | sqxFullDateTime}}
+                    {{contentSelected.scheduleJob.dueTime | sqxFullDateTime}}
                 </div>
             </div>
 
@@ -104,16 +104,16 @@
                 <label class="col-4 col-form-label">{{ 'contents.scheduledBy' | sqxTranslate }}</label>
         
                 <div class="col-8">
-                    <img class="user-picture" [src]="content.scheduleJob.scheduledBy | sqxUserPictureRef"> {{content.scheduleJob.scheduledBy | sqxUserNameRef}}
+                    <img class="user-picture" [src]="contentSelected.scheduleJob.scheduledBy | sqxUserPictureRef"> {{contentSelected.scheduleJob.scheduledBy | sqxUserNameRef}}
                 </div>
             </div>
 
-            <ng-container *ngIf="content.canCancelStatus">
+            <ng-container *ngIf="contentSelected.canCancelStatus">
                 <hr />
 
                 <div class="row">
                     <div class="col-8 offset-4">
-                        <button type="button" class="btn btn-outline-danger" [class.disabled]="!content.canCancelStatus"
+                        <button type="button" class="btn btn-outline-danger" [class.disabled]="!contentSelected.canCancelStatus"
                             (sqxConfirmClick)="cancelStatus()"
                             confirmTitle="i18n:contents.cancelStatusConfirmTitle"
                             confirmText="i18n:contents.cancelStatusConfirmText"

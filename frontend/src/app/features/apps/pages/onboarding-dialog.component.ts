@@ -5,17 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { fadeAnimation, slideAnimation } from '@app/framework';
-import { TourState, UsersService } from '@app/shared';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { fadeAnimation, MarkdownPipe, ModalDialogComponent, SafeHtmlPipe, slideAnimation, TourState, TranslatePipe, UsersService } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-onboarding-dialog',
     styleUrls: ['./onboarding-dialog.component.scss'],
     templateUrl: './onboarding-dialog.component.html',
     animations: [
         fadeAnimation, slideAnimation,
+    ],
+    imports: [
+        FormsModule,
+        MarkdownPipe,
+        ModalDialogComponent,
+        NgIf,
+        ReactiveFormsModule,
+        SafeHtmlPipe,
+        TranslatePipe,
     ],
 })
 export class OnboardingDialogComponent {

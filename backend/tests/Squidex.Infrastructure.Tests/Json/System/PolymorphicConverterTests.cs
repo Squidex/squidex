@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json.Serialization.Metadata;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
 
@@ -100,7 +101,8 @@ public class PolymorphicConverterTests
                     .Add<Base, A>("A")
                     .Add<Base, B>("B");
 
-            options.TypeInfoResolver = new PolymorphicTypeResolver(typeRegistry);
+            options.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+                .WithAddedModifier(PolymorphicConverter<None>.Modifier(typeRegistry));
             options.Converters.Add(new PolymorphicConverter<Base>(typeRegistry));
         });
     }

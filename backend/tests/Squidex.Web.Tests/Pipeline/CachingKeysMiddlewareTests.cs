@@ -18,7 +18,7 @@ namespace Squidex.Web.Pipeline;
 
 public class CachingKeysMiddlewareTests
 {
-    private readonly List<(object, Func<object, Task>)> callbacks = new List<(object, Func<object, Task>)>();
+    private readonly List<(object, Func<object, Task>)> callbacks = [];
     private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
     private readonly IHttpResponseBodyFeature httpResponseBodyFeature = A.Fake<IHttpResponseBodyFeature>();
     private readonly IHttpResponseFeature httpResponseFeature = A.Fake<IHttpResponseFeature>();
@@ -170,10 +170,10 @@ public class CachingKeysMiddlewareTests
 
         await MakeRequestAsync(() =>
         {
-            httpContext.Response.Headers[HeaderNames.ETag] = "13";
+            httpContext.Response.Headers[HeaderNames.ETag] = "\"13\"";
         });
 
-        Assert.Equal("13", httpContext.Response.Headers[HeaderNames.ETag]);
+        Assert.Equal("\"13\"", httpContext.Response.Headers[HeaderNames.ETag]);
     }
 
     [Fact]
@@ -181,10 +181,10 @@ public class CachingKeysMiddlewareTests
     {
         await MakeRequestAsync(() =>
         {
-            httpContext.Response.Headers[HeaderNames.ETag] = "W/13";
+            httpContext.Response.Headers[HeaderNames.ETag] = "W/\"13\"";
         });
 
-        Assert.Equal("W/13", httpContext.Response.Headers[HeaderNames.ETag]);
+        Assert.Equal("W/\"13\"", httpContext.Response.Headers[HeaderNames.ETag]);
     }
 
     [Fact]
@@ -192,10 +192,10 @@ public class CachingKeysMiddlewareTests
     {
         await MakeRequestAsync(() =>
         {
-            httpContext.Response.Headers[HeaderNames.ETag] = "13";
+            httpContext.Response.Headers[HeaderNames.ETag] = "\"13\"";
         });
 
-        Assert.Equal("W/13", httpContext.Response.Headers[HeaderNames.ETag]);
+        Assert.Equal("W/\"13\"", httpContext.Response.Headers[HeaderNames.ETag]);
     }
 
     [Fact]
@@ -358,7 +358,7 @@ public class CachingKeysMiddlewareTests
 
         var etag = httpContext.Response.Headers[HeaderNames.ETag].ToString();
 
-        Assert.True(ETagUtils.IsWeakEtag(etag));
+        Assert.True(EntityTagHeaderValue.TryParse(etag, out var parsed) && parsed.IsWeak);
         Assert.True(etag.Length > 20);
     }
 
@@ -379,7 +379,7 @@ public class CachingKeysMiddlewareTests
 
         var etag = httpContext.Response.Headers[HeaderNames.ETag].ToString();
 
-        Assert.True(ETagUtils.IsStrongEtag(etag));
+        Assert.True(EntityTagHeaderValue.TryParse(etag, out var parsed) && !parsed.IsWeak);
         Assert.True(etag.Length > 20);
     }
 

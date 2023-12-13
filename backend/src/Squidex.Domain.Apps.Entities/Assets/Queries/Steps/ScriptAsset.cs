@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure.Collections;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
@@ -19,7 +20,7 @@ public sealed class ScriptAsset : IAssetEnricherStep
         this.scriptEngine = scriptEngine;
     }
 
-    public async Task EnrichAsync(Context context, IEnumerable<AssetEntity> assets,
+    public async Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {
         if (!ShouldEnrich(context))
@@ -60,7 +61,7 @@ public sealed class ScriptAsset : IAssetEnricherStep
         }
     }
 
-    private async Task ScriptAsync(AssetScriptVars sharedVars, string script, AssetEntity asset,
+    private async Task ScriptAsync(AssetScriptVars sharedVars, string script, EnrichedAsset asset,
         CancellationToken ct)
     {
         // Script vars are just wrappers over dictionaries for better performance.
@@ -76,11 +77,11 @@ public sealed class ScriptAsset : IAssetEnricherStep
                 FileSlug = asset.Slug,
                 FileVersion = asset.FileVersion,
                 IsProtected = asset.IsProtected,
-                Metadata = asset.Metadata,
+                Metadata = asset.Metadata?.ToReadonlyDictionary(),
                 MimeType = asset.MimeType,
                 ParentId = asset.ParentId,
                 ParentPath = null,
-                Tags = asset.Tags
+                Tags = asset.Tags?.ToReadonlyList()
             }
         };
 

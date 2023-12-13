@@ -5,14 +5,29 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { ConfigureFieldRulesForm, FIELD_RULE_ACTIONS, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
+import { TranslatePipe } from '@app/framework';
+import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-field-rules-form',
     styleUrls: ['./schema-field-rules-form.component.scss'],
     templateUrl: './schema-field-rules-form.component.html',
+    imports: [
+        AsyncPipe,
+        CodeEditorComponent,
+        ConfirmClickDirective,
+        ControlErrorsComponent,
+        FormsModule,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class SchemaFieldRulesFormComponent implements  OnInit {
     @Input()

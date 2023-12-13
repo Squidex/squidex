@@ -9,8 +9,8 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
-import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService } from './../services/contents.service';
-import { Query } from './../services/query';
+import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService } from '../services/contents.service';
+import { Query } from '../services/query';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { SchemasState } from './schemas.state';
@@ -449,7 +449,9 @@ function isReferrerError(error?: ErrorDto) {
     return error?.errorCode === 'OBJECT_REFERENCED';
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ContentsState extends ContentsStateBase {
     constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
         private readonly schemasState: SchemasState,

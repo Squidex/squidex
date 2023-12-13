@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 
-public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
+public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 {
     private readonly string fieldName = "age";
     private readonly string arrayName = "array";
@@ -52,48 +52,56 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task Create_should_create_events_and_set_intitial_state()
     {
-        var properties = new SchemaProperties();
-
-        var command = new CreateSchema { Name = SchemaId.Name, SchemaId = SchemaId.Id, Properties = properties, Type = SchemaType.Singleton };
+        var command = new CreateSchema
+        {
+            Name = SchemaId.Name,
+            SchemaId = SchemaId.Id,
+            Scripts = null!,
+            Properties = new SchemaProperties()
+        };
 
         var actual = await PublishAsync(command);
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
         Assert.Equal(AppId, sut.Snapshot.AppId);
+        Assert.Equal(SchemaId.Id, sut.Snapshot.Id);
+        Assert.Equal(SchemaId.Name, sut.Snapshot.Name);
+        Assert.Equal(SchemaType.Default, sut.Snapshot.Type);
 
-        Assert.Equal(SchemaId.Name, sut.Snapshot.SchemaDef.Name);
-        Assert.Equal(SchemaType.Singleton, sut.Snapshot.SchemaDef.Type);
+        var schema = new Schema { Name = command.Name, Properties = command.Properties };
 
         LastEvents
             .ShouldHaveSameEvents(
-                CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, SchemaType.Singleton) })
+                CreateEvent(new SchemaCreated { Schema = schema })
             );
     }
 
     [Fact]
     public async Task Create_should_create_events_and_schema_with_initial_fields()
     {
-        var properties = new SchemaProperties();
-
-        var fields = new[]
+        var command = new CreateSchema
         {
-            new UpsertSchemaField { Name = "field1", Properties = ValidProperties() },
-            new UpsertSchemaField { Name = "field2", Properties = ValidProperties() },
-            new UpsertSchemaField
-            {
-                Name = "field3",
-                Partitioning = Partitioning.Language.Key,
-                Properties = new ArrayFieldProperties(),
-                Nested = new[]
+            Name = SchemaId.Name,
+            SchemaId = SchemaId.Id,
+            Properties = new SchemaProperties(),
+            Fields =
+            [
+                new UpsertSchemaField { Name = "field1", Properties = ValidProperties() },
+                new UpsertSchemaField { Name = "field2", Properties = ValidProperties() },
+                new UpsertSchemaField
                 {
-                    new UpsertSchemaNestedField { Name = "nested1", Properties = ValidProperties() },
-                    new UpsertSchemaNestedField { Name = "nested2", Properties = ValidProperties() }
-                }
-            }
+                    Name = "field3",
+                    Partitioning = Partitioning.Language.Key,
+                    Properties = new ArrayFieldProperties(),
+                    Nested =
+                    [
+                        new UpsertSchemaNestedField { Name = "nested1", Properties = ValidProperties() },
+                        new UpsertSchemaNestedField { Name = "nested2", Properties = ValidProperties() }
+                    ]
+                },
+            ]
         };
-
-        var command = new CreateSchema { Name = SchemaId.Name, SchemaId = SchemaId.Id, Properties = properties, Fields = fields };
 
         var actual = await PublishAsync(command);
 
@@ -102,16 +110,19 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
         var @event = (SchemaCreated)LastEvents.Single().Payload;
 
         Assert.Equal(AppId, sut.Snapshot.AppId);
-        Assert.Equal(SchemaId.Name, sut.Snapshot.SchemaDef.Name);
-        Assert.Equal(SchemaType.Default, sut.Snapshot.SchemaDef.Type);
-
+        Assert.Equal(SchemaId.Id, sut.Snapshot.Id);
+        Assert.Equal(SchemaId.Name, sut.Snapshot.Name);
+        Assert.Equal(SchemaType.Default, sut.Snapshot.Type);
         Assert.Equal(3, @event.Schema.Fields.Count);
     }
 
     [Fact]
     public async Task Update_should_create_events_and_update_schema_properties()
     {
-        var command = new UpdateSchema { Properties = new SchemaProperties { Label = "My Properties" } };
+        var command = new UpdateSchema
+        {
+            Properties = new SchemaProperties { Label = "My Properties" }
+        };
 
         await ExecuteCreateAsync();
 
@@ -119,7 +130,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(command.Properties, sut.Snapshot.SchemaDef.Properties);
+        Assert.Equal(command.Properties, sut.Snapshot.Properties);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -144,7 +155,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal("<query-script>", sut.Snapshot.SchemaDef.Scripts.Query);
+        Assert.Equal("<query-script>", sut.Snapshot.Scripts.Query);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -157,10 +168,10 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     {
         var command = new ConfigureFieldRules
         {
-            FieldRules = new[]
-            {
+            FieldRules =
+            [
                 new FieldRuleCommand { Field = "field1" }
-            }
+            ]
         };
 
         await ExecuteCreateAsync();
@@ -169,7 +180,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.NotEmpty(sut.Snapshot.SchemaDef.FieldRules);
+        Assert.NotEmpty(sut.Snapshot.FieldRules);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -182,7 +193,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     {
         var command = new ConfigureUIFields
         {
-            FieldsInLists = FieldNames.Create(fieldName)
+            FieldsInLists = FieldNames.Create($"data.{fieldName}")
         };
 
         await ExecuteCreateAsync();
@@ -192,7 +203,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(command.FieldsInLists, sut.Snapshot.SchemaDef.FieldsInLists);
+        Assert.Equal(command.FieldsInLists, sut.Snapshot.FieldsInLists);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -205,7 +216,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     {
         var command = new ConfigureUIFields
         {
-            FieldsInReferences = FieldNames.Create(fieldName)
+            FieldsInReferences = FieldNames.Create($"data.{fieldName}")
         };
 
         await ExecuteCreateAsync();
@@ -215,7 +226,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(command.FieldsInReferences, sut.Snapshot.SchemaDef.FieldsInReferences);
+        Assert.Equal(command.FieldsInReferences, sut.Snapshot.FieldsInReferences);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -234,7 +245,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.True(sut.Snapshot.SchemaDef.IsPublished);
+        Assert.True(sut.Snapshot.IsPublished);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -254,7 +265,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.False(sut.Snapshot.SchemaDef.IsPublished);
+        Assert.False(sut.Snapshot.IsPublished);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -273,7 +284,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(command.Name, sut.Snapshot.SchemaDef.Category);
+        Assert.Equal(command.Name, sut.Snapshot.Category);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -298,7 +309,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(command.PreviewUrls, sut.Snapshot.SchemaDef.PreviewUrls);
+        Assert.Equal(command.PreviewUrls, sut.Snapshot.PreviewUrls);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -328,7 +339,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task Reorder_should_create_events_and_reorder_fields()
     {
-        var command = new ReorderFields { FieldIds = new[] { 2L, 1L } };
+        var command = new ReorderFields
+        {
+            ParentFieldId = null,
+            FieldIds = [2L, 1L]
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync("field1");
@@ -347,7 +362,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task Reorder_should_create_events_and_reorder_nestedy_fields()
     {
-        var command = new ReorderFields { ParentFieldId = 1, FieldIds = new[] { 3L, 2L } };
+        var command = new ReorderFields
+        {
+            ParentFieldId = 1,
+            FieldIds = [3L, 2L]
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
@@ -367,7 +386,12 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task Add_should_create_events_and_add_field()
     {
-        var command = new AddField { Name = fieldName, Properties = ValidProperties() };
+        var command = new AddField
+        {
+            ParentFieldId = null,
+            Name = fieldName,
+            Properties = ValidProperties()
+        };
 
         await ExecuteCreateAsync();
 
@@ -386,7 +410,12 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task Add_should_create_events_and_add_field_to_array()
     {
-        var command = new AddField { ParentFieldId = 1, Name = fieldName, Properties = ValidProperties() };
+        var command = new AddField
+        {
+            ParentFieldId = 1,
+            Name = fieldName,
+            Properties = ValidProperties()
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
@@ -406,7 +435,12 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task UpdateField_should_create_events_and_update_field_properties()
     {
-        var command = new UpdateField { FieldId = 1, Properties = new StringFieldProperties() };
+        var command = new UpdateField
+        {
+            ParentFieldId = null,
+            FieldId = 1,
+            Properties = new StringFieldProperties()
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
@@ -426,7 +460,12 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task UpdateField_should_create_events_and_update_nested_field_properties()
     {
-        var command = new UpdateField { ParentFieldId = 1, FieldId = 2, Properties = new StringFieldProperties() };
+        var command = new UpdateField
+        {
+            ParentFieldId = 1,
+            FieldId = 2,
+            Properties = new StringFieldProperties()
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
@@ -447,7 +486,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task LockField_should_create_events_and_update_field_locked_flag()
     {
-        var command = new LockField { FieldId = 1 };
+        var command = new LockField
+        {
+            ParentFieldId = null,
+            FieldId = 1
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
@@ -467,7 +510,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task LockField_should_create_events_and_update_nested_field_locked_flag()
     {
-        var command = new LockField { ParentFieldId = 1, FieldId = 2 };
+        var command = new LockField
+        {
+            ParentFieldId = 1,
+            FieldId = 2
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
@@ -488,7 +535,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task HideField_should_create_events_and_update_field_hidden_flag()
     {
-        var command = new HideField { FieldId = 1 };
+        var command = new HideField
+        {
+            ParentFieldId = null,
+            FieldId = 1
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
@@ -508,7 +559,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task HideField_should_create_events_and_update_nested_field_hidden_flag()
     {
-        var command = new HideField { ParentFieldId = 1, FieldId = 2 };
+        var command = new HideField
+        {
+            ParentFieldId = 1,
+            FieldId = 2
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
@@ -529,7 +584,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task ShowField_should_create_events_and_update_field_hidden_flag()
     {
-        var command = new ShowField { FieldId = 1 };
+        var command = new ShowField
+        {
+            ParentFieldId = null,
+            FieldId = 1
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
@@ -550,7 +609,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task ShowField_should_create_events_and_update_nested_field_hidden_flag()
     {
-        var command = new ShowField { ParentFieldId = 1, FieldId = 2 };
+        var command = new ShowField
+        {
+            ParentFieldId = 1,
+            FieldId = 2
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
@@ -572,7 +635,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task DisableField_should_create_events_and_update_field_disabled_flag()
     {
-        var command = new DisableField { FieldId = 1 };
+        var command = new DisableField
+        {
+            ParentFieldId = null,
+            FieldId = 1
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
@@ -592,7 +659,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task DisableField_should_create_events_and_update_nested_field_disabled_flag()
     {
-        var command = new DisableField { ParentFieldId = 1, FieldId = 2 };
+        var command = new DisableField
+        {
+            ParentFieldId = 1,
+            FieldId = 2
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
@@ -613,7 +684,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task EnableField_should_create_events_and_update_field_disabled_flag()
     {
-        var command = new EnableField { FieldId = 1 };
+        var command = new EnableField
+        {
+            ParentFieldId = null,
+            FieldId = 1
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
@@ -634,7 +709,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task EnableField_should_create_events_and_update_nested_field_disabled_flag()
     {
-        var command = new EnableField { ParentFieldId = 1, FieldId = 2 };
+        var command = new EnableField
+        {
+            ParentFieldId = 1,
+            FieldId = 2
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
@@ -656,7 +735,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task DeleteField_should_create_events_and_delete_field()
     {
-        var command = new DeleteField { FieldId = 1 };
+        var command = new DeleteField
+        {
+            ParentFieldId = null,
+            FieldId = 1
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
@@ -676,7 +759,11 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
     [Fact]
     public async Task DeleteField_should_create_events_and_delete_nested_field()
     {
-        var command = new DeleteField { ParentFieldId = 1, FieldId = 2 };
+        var command = new DeleteField
+        {
+            ParentFieldId = 1,
+            FieldId = 2
+        };
 
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
@@ -708,7 +795,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.Equal(command.Category, sut.Snapshot.SchemaDef.Category);
+        Assert.Equal(command.Category, sut.Snapshot.Category);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -753,12 +840,12 @@ public class SchemaDomainObjectTests : HandlerTestBase<SchemaDomainObject.State>
 
     private IField GetField(int id)
     {
-        return sut.Snapshot.SchemaDef.FieldsById.GetValueOrDefault(id)!;
+        return sut.Snapshot.FieldsById.GetValueOrDefault(id)!;
     }
 
     private IField GetNestedField(int parentId, int childId)
     {
-        return ((IArrayField)sut.Snapshot.SchemaDef.FieldsById[parentId]).FieldsById.GetValueOrDefault(childId)!;
+        return ((IArrayField)sut.Snapshot.FieldsById[parentId]).FieldsById.GetValueOrDefault(childId)!;
     }
 
     private static StringFieldProperties ValidProperties()

@@ -8,6 +8,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using Microsoft.AspNetCore.Mvc;
 using Migrations;
 using NetTopologySuite.IO.Converters;
@@ -26,6 +27,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -58,12 +60,12 @@ public static class SerializationServices
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
         options.Converters.Add(new SurrogateJsonConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>());
+        options.Converters.Add(new SurrogateJsonConverter<FieldCollection<RootField>, FieldsSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<FilterNode<JsonValue>, JsonFilterSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<LanguageConfig, LanguageConfigSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<LanguagesConfig, LanguagesConfigSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<Roles, RolesSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<Rule, RuleSorrgate>());
-        options.Converters.Add(new SurrogateJsonConverter<Schema, SchemaSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowStep, WorkflowStepSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowTransition, WorkflowTransitionSurrogate>());
         options.Converters.Add(new StringConverter<CompareOperator>());
@@ -77,8 +79,11 @@ public static class SerializationServices
         options.Converters.Add(new StringConverter<RefToken>());
         options.Converters.Add(new StringConverter<Status>());
         options.Converters.Add(new JsonStringEnumConverter());
-        options.TypeInfoResolver = new PolymorphicTypeResolver(typeRegistry);
         options.IncludeFields = true;
+        options.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            .WithAddedModifier(PolymorphicConverter<None>.Modifier(typeRegistry))
+            .WithAddedModifier(JsonIgnoreReadonlyProperties.Modifier<Entity>())
+            .WithAddedModifier(JsonRenameAttribute.Modifier);
 
         return options;
     }

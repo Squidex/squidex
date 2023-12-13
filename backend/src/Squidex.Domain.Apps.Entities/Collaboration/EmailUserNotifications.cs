@@ -9,8 +9,8 @@ using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Teams;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Email;
 using Squidex.Shared.Identity;
@@ -47,11 +47,8 @@ public sealed class EmailUserNotifications : IUserNotifications
         get => true;
     }
 
-    public EmailUserNotifications(
-        IOptions<EmailUserNotificationOptions> texts,
-        IEmailSender emailSender,
-        IUrlGenerator urlGenerator,
-        ILogger<EmailUserNotifications> log)
+    public EmailUserNotifications(IOptions<EmailUserNotificationOptions> texts, IEmailSender emailSender,
+        IUrlGenerator urlGenerator, ILogger<EmailUserNotifications> log)
     {
         this.texts = texts.Value;
         this.emailSender = emailSender;
@@ -60,7 +57,7 @@ public sealed class EmailUserNotifications : IUserNotifications
         this.log = log;
     }
 
-    public Task SendUsageAsync(IUser user, IAppEntity app, long usage, long usageLimit,
+    public Task SendUsageAsync(IUser user, App app, long usage, long usageLimit,
         CancellationToken ct = default)
     {
         Guard.NotNull(user);
@@ -79,7 +76,7 @@ public sealed class EmailUserNotifications : IUserNotifications
             user, vars, ct);
     }
 
-    public Task SendInviteAsync(IUser assigner, IUser user, IAppEntity app,
+    public Task SendInviteAsync(IUser assigner, IUser user, App app,
         CancellationToken ct = default)
     {
         Guard.NotNull(assigner);
@@ -104,7 +101,7 @@ public sealed class EmailUserNotifications : IUserNotifications
         }
     }
 
-    public Task SendInviteAsync(IUser assigner, IUser user, ITeamEntity team,
+    public Task SendInviteAsync(IUser assigner, IUser user, Team team,
         CancellationToken ct = default)
     {
         Guard.NotNull(assigner);

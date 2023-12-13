@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 
@@ -26,18 +25,18 @@ public class RolePermissionsProviderTests : GivenContext
     public async Task Should_provide_all_permissions()
     {
         A.CallTo(() => AppProvider.GetSchemasAsync(A<DomainId>._, default))
-            .Returns(new List<ISchemaEntity>
-            {
-                Mocks.Schema(AppId, NamedId.Of(DomainId.NewGuid(), "schema1")),
-                Mocks.Schema(AppId, NamedId.Of(DomainId.NewGuid(), "schema2"))
-            });
+            .Returns(
+            [
+                Schema.WithId(DomainId.NewGuid(), "my-schema1"),
+                Schema.WithId(DomainId.NewGuid(), "my-schema2")
+            ]);
 
         var actual = await sut.GetPermissionsAsync(App);
 
         Assert.True(actual.Contains("*"));
         Assert.True(actual.Contains("clients.read"));
         Assert.True(actual.Contains("schemas.*.update"));
-        Assert.True(actual.Contains("schemas.schema1.update"));
-        Assert.True(actual.Contains("schemas.schema2.update"));
+        Assert.True(actual.Contains("schemas.my-schema1.update"));
+        Assert.True(actual.Contains("schemas.my-schema2.update"));
     }
 }

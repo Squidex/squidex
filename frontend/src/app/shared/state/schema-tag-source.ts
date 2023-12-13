@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { TagConverter, TagValue } from '@app/framework';
-import { SchemaDto } from './../services/schemas.service';
+import { SchemaDto } from '../services/schemas.service';
 import { SchemasState } from './schemas.state';
 
 class SchemaConverter implements TagConverter {
@@ -46,7 +46,9 @@ class SchemaConverter implements TagConverter {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SchemaTagSource {
     public converter =
         this.schemasState.schemas.pipe(

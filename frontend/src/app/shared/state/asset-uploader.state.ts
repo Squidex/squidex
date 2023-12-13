@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, shareReplay, Subject, takeUntil } from 'rxjs';
 import { debug, DialogService, MathHelper, State, Types } from '@app/framework';
-import { AssetDto, AssetsService } from './../services/assets.service';
+import { AssetDto, AssetsService } from '../services/assets.service';
 import { AppsState } from './apps.state';
 
 export interface Upload {
@@ -35,7 +35,9 @@ interface Snapshot {
 
 export class UploadCanceled {}
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AssetUploaderState extends State<Snapshot> {
     public uploads =
         this.project(x => x.uploads);

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
 using static OpenIddict.Server.OpenIddictServerEvents;
@@ -23,7 +22,7 @@ public sealed class AlwaysAddScopeHandler : IOpenIddictServerHandler<ProcessSign
 
         if (!string.IsNullOrWhiteSpace(context.Response.AccessToken))
         {
-            var scopes = context.AccessTokenPrincipal?.GetScopes() ?? ImmutableArray<string>.Empty;
+            var scopes = context.AccessTokenPrincipal?.GetScopes() ?? [];
 
             context.Response.Scope = string.Join(' ', scopes);
         }

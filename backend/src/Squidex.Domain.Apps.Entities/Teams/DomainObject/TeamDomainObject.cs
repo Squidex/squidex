@@ -8,6 +8,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards;
@@ -23,18 +24,18 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
 
-public partial class TeamDomainObject : DomainObject<TeamDomainObject.State>
+public partial class TeamDomainObject : DomainObject<Team>
 {
     private readonly IServiceProvider serviceProvider;
 
-    public TeamDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<TeamDomainObject> log,
+    public TeamDomainObject(DomainId id, IPersistenceFactory<Team> persistence, ILogger<TeamDomainObject> log,
         IServiceProvider serviceProvider)
         : base(id, persistence, log)
     {
         this.serviceProvider = serviceProvider;
     }
 
-    protected override bool IsDeleted(State snapshot)
+    protected override bool IsDeleted(Team snapshot)
     {
         return false;
     }

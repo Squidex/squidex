@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
@@ -52,7 +51,7 @@ public sealed class AssetCommandScriptVars : ScriptVars
     [FieldDescription(nameof(FieldDescriptions.AssetMetadata))]
     public AssetMetadata? Metadata
     {
-        set => SetInitial(value != null ? new AssetMetadataWrapper(value) : null);
+        set => SetInitial(value);
     }
 
     [FieldDescription(nameof(FieldDescriptions.AssetTags))]

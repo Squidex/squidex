@@ -7,20 +7,25 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
+import { AfterViewInit, booleanAttribute, Directive, ElementRef, Input, numberAttribute, Renderer2 } from '@angular/core';
+import { TypedSimpleChanges, Types } from '../internal';
 
 @Directive({
     selector: '[sqxScrollActive]',
+    standalone: true,
 })
 export class ScrollActiveDirective implements AfterViewInit {
     @Input({ alias: 'sqxScrollActive', transform: booleanAttribute })
     public isActive = false;
 
+    @Input({ alias: 'sqxScrollOffset', transform: numberAttribute })
+    public offset = 0;
+
     @Input('sqxScrollContainer')
-    public container!: HTMLElement;
+    public container?: HTMLElement | string | null;
 
     constructor(
-        private readonly element: ElementRef,
+        private readonly element: ElementRef<HTMLElement>,
         private readonly renderer: Renderer2,
     ) {
     }
@@ -29,33 +34,43 @@ export class ScrollActiveDirective implements AfterViewInit {
         this.check();
     }
 
-    public ngOnChanges() {
-        this.check();
+    public ngOnChanges(changes: TypedSimpleChanges<ScrollActiveDirective>) {
+        if (changes.isActive) {
+            this.check();
+        }
     }
 
     private check() {
         if (this.isActive && this.container) {
-            this.scrollInView(this.container, this.element.nativeElement);
+            let container = this.container;
+
+            if (Types.isString(container)) {
+                container = this.element.nativeElement.closest(container) as HTMLElement;
+            }
+
+            if (container) {
+                this.scrollInView(container, this.element.nativeElement);
+            }
         }
     }
 
     private scrollInView(parent: HTMLElement, target: HTMLElement) {
-        const parentRect = parent.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
+        const boundsParent = parent.getBoundingClientRect();
+        const boundsTarget = target.getBoundingClientRect();
 
         const body = document.body;
 
-        const scrollDiff = (targetRect.top + body.scrollTop) - (parentRect.top + body.scrollTop);
+        const scrollDiff = (boundsTarget.top + body.scrollTop) - (boundsParent.top + body.scrollTop);
         const scrollTop = parent.scrollTop;
 
         if (scrollDiff < 0) {
             this.renderer.setProperty(parent, 'scrollTop', scrollTop + scrollDiff);
         } else {
-            const targetHeight = targetRect.height;
-            const parentHeight = parentRect.height;
+            const targetHeight = boundsTarget.height;
+            const parentHeight = boundsParent.height;
 
             if ((scrollDiff + targetHeight) > parentHeight) {
-                this.renderer.setProperty(parent, 'scrollTop', scrollTop + scrollDiff - parentHeight + targetHeight);
+                this.renderer.setProperty(parent, 'scrollTop', scrollTop + scrollDiff - parentHeight + targetHeight + this.offset);
             }
         }
     }

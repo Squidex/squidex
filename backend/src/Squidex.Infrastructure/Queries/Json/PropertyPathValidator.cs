@@ -28,7 +28,7 @@ public static class PropertyPathValidator
             {
                 if (index == lastIndex || field.Schema.Type == FilterSchemaType.Any)
                 {
-                    result ??= new List<FilterField>();
+                    result ??= [];
                     result.Add(field);
                 }
                 else

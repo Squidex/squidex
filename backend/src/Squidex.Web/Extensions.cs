@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web;
@@ -55,23 +53,5 @@ public static class Extensions
         var subject = controller.User.OpenIdSubject();
 
         return string.Equals(subject, userId, StringComparison.OrdinalIgnoreCase);
-    }
-
-    public static bool TryGetString(this IHeaderDictionary headers, string header, [MaybeNullWhen(false)] out string result)
-    {
-        result = null!;
-
-        if (headers.TryGetValue(header, out var value))
-        {
-            string? valueString = value;
-
-            if (!string.IsNullOrWhiteSpace(valueString))
-            {
-                result = valueString;
-                return true;
-            }
-        }
-
-        return false;
     }
 }

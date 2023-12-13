@@ -98,7 +98,7 @@ public sealed class UsagesController : ApiController
     }
 
     /// <summary>
-    /// Get api calls in date range.
+    /// Get api calls in date range for app.
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="fromDate">The from date.</param>
@@ -148,7 +148,7 @@ public sealed class UsagesController : ApiController
     }
 
     /// <summary>
-    /// Get total asset size.
+    /// Get total asset size for app.
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <response code="200">Storage usage returned.</response>
@@ -171,7 +171,7 @@ public sealed class UsagesController : ApiController
     }
 
     /// <summary>
-    /// Get total asset size by team.
+    /// Get total asset size for team.
     /// </summary>
     /// <param name="team">The ID of the team.</param>
     /// <response code="200">Storage usage returned.</response>
@@ -194,7 +194,7 @@ public sealed class UsagesController : ApiController
     }
 
     /// <summary>
-    /// Get asset usage by date.
+    /// Get asset usage by date for app.
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="fromDate">The from date.</param>

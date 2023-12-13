@@ -7,7 +7,7 @@
 
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Infrastructure;
@@ -19,7 +19,7 @@ public sealed class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEve
 {
     static MongoHistoryEventRepository()
     {
-        BsonClassMap.RegisterClassMap<HistoryEvent>(cm =>
+        BsonClassMap.TryRegisterClassMap<HistoryEvent>(cm =>
         {
             cm.AutoMap();
 
@@ -60,7 +60,7 @@ public sealed class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEve
         }, ct);
     }
 
-    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         await Collection.DeleteManyAsync(Filter.Eq(x => x.OwnerId, app.Id), ct);

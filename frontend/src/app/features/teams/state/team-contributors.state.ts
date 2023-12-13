@@ -8,8 +8,8 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { TeamContributorsService } from '@app/features/teams/internal';
 import { AssignContributorDto, ContributorDto, ContributorsPayload, debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, TeamsState, Types, Version } from '@app/shared';
+import { TeamContributorsService } from '../internal';
 
 interface Snapshot extends ListState<string> {
     // The current contributors.
@@ -25,7 +25,9 @@ interface Snapshot extends ListState<string> {
     canCreate?: boolean;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'any',
+})
 export class TeamContributorsState extends State<Snapshot> {
     public contributors =
         this.project(x => x.contributors);

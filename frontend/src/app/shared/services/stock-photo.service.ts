@@ -20,7 +20,9 @@ export class StockPhotoDto {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class StockPhotoService {
     constructor(
         private readonly http: HttpClient,

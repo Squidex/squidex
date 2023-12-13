@@ -19,6 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
 public static class SharedExtensions
 {
+    internal static string EscapePartition(this string value)
+    {
+        return value.Replace('-', '_');
+    }
+
     internal static FieldType WithouthResolver(this FieldType source)
     {
         return new FieldType
@@ -160,7 +165,7 @@ public static class SharedExtensions
                 {
                     if (item.Value is string id)
                     {
-                        result ??= new List<DomainId>();
+                        result ??= [];
                         result.Add(DomainId.Create(id));
                     }
                 }
@@ -193,7 +198,7 @@ public static class SharedExtensions
     {
         private readonly GraphQLDocument document;
         private readonly ISchema schema;
-        private HashSet<string>? fieldNames = new HashSet<string>();
+        private HashSet<string>? fieldNames = [];
         private IComplexGraphType? currentParent;
 
         public FieldNameResolver(GraphQLDocument document, ISchema schema)

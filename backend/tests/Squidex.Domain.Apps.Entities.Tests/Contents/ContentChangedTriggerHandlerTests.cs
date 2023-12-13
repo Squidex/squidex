@@ -126,10 +126,10 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         var ctx = Context();
 
         A.CallTo(() => contentRepository.StreamAll(AppId.Id, null, SearchScope.All, CancellationToken))
-            .Returns(new List<ContentEntity>
+            .Returns(new List<Content>
             {
-                new ContentEntity { SchemaId = schemaMatching },
-                new ContentEntity { SchemaId = schemaNotMatching }
+                CreateContent() with { SchemaId = schemaMatching },
+                CreateContent() with { SchemaId = schemaNotMatching }
             }.ToAsyncEnumerable());
 
         var actual = await sut.CreateSnapshotEventsAsync(ctx, CancellationToken).ToListAsync(CancellationToken);
@@ -158,10 +158,10 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         var ctx = Context(trigger);
 
         A.CallTo(() => contentRepository.StreamAll(AppId.Id, A<HashSet<DomainId>>.That.Is(schemaMatching.Id), SearchScope.All, CancellationToken))
-            .Returns(new List<ContentEntity>
+            .Returns(new List<Content>
             {
-                new ContentEntity { SchemaId = schemaMatching },
-                new ContentEntity { SchemaId = schemaMatching }
+                CreateContent() with { SchemaId = schemaMatching },
+                CreateContent() with { SchemaId = schemaMatching }
             }.ToAsyncEnumerable());
 
         var actual = await sut.CreateSnapshotEventsAsync(ctx, CancellationToken).ToListAsync(CancellationToken);
@@ -184,7 +184,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
         A.CallTo(() => contentLoader.GetAsync(AppId.Id, @event.ContentId, 12, CancellationToken))
-            .Returns(SimpleMapper.Map(@event, new ContentEntity()));
+            .Returns(SimpleMapper.Map(@event, new Content()));
 
         var actuals = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
         var actual = (EnrichedContentEvent)actuals.Single();
@@ -209,10 +209,10 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         var dataOld = new ContentData();
 
         A.CallTo(() => contentLoader.GetAsync(AppId.Id, @event.ContentId, 12, CancellationToken))
-            .Returns(new ContentEntity { AppId = AppId, SchemaId = schemaMatching, Version = 12, Data = dataNow, Id = @event.ContentId });
+            .Returns(new Content { AppId = AppId, SchemaId = schemaMatching, Version = 12, Data = dataNow, Id = @event.ContentId });
 
         A.CallTo(() => contentLoader.GetAsync(AppId.Id, @event.ContentId, 11, CancellationToken))
-            .Returns(new ContentEntity { AppId = AppId, SchemaId = schemaMatching, Version = 11, Data = dataOld });
+            .Returns(new Content { AppId = AppId, SchemaId = schemaMatching, Version = 11, Data = dataOld });
 
         var actuals = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
         var actual = actuals.Single() as EnrichedContentEvent;
@@ -232,10 +232,10 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         SetupData(@event, 12);
 
         A.CallTo(() => contentRepository.StreamReferencing(AppId.Id, @event.ContentId, 100, SearchScope.All, CancellationToken))
-            .Returns(new List<ContentEntity>
+            .Returns(new List<Content>
             {
-                new ContentEntity { SchemaId = schemaMatching },
-                new ContentEntity { SchemaId = schemaMatching }
+                new Content { SchemaId = schemaMatching },
+                new Content { SchemaId = schemaMatching }
             }.ToAsyncEnumerable());
 
         var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
@@ -493,10 +493,10 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         var dataOld = new ContentData();
 
         A.CallTo(() => contentLoader.GetAsync(AppId.Id, @event.ContentId, version, CancellationToken))
-            .Returns(new ContentEntity { AppId = AppId, SchemaId = schemaMatching, Version = version, Data = dataNow, Id = @event.ContentId });
+            .Returns(new Content { AppId = AppId, SchemaId = schemaMatching, Version = version, Data = dataNow, Id = @event.ContentId });
 
         A.CallTo(() => contentLoader.GetAsync(AppId.Id, @event.ContentId, version, CancellationToken))
-            .Returns(new ContentEntity { AppId = AppId, SchemaId = schemaMatching, Version = version - 1, Data = dataOld });
+            .Returns(new Content { AppId = AppId, SchemaId = schemaMatching, Version = version - 1, Data = dataOld });
     }
 
     private RulesContext ReferencingContext(int? maxEvents, bool allowExtra, NamedId<DomainId>? schemaId = null)
@@ -522,7 +522,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
             IncludeStale = true,
             Rules = new Dictionary<DomainId, Rule>
             {
-                [DomainId.NewGuid()] = new Rule(trigger, A.Fake<RuleAction>())
+                [DomainId.NewGuid()] = CreateRule() with { Trigger = trigger }
             }.ToReadonlyDictionary(),
             AllowExtraEvents = allowExtra
         };
@@ -535,8 +535,9 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         return new RuleContext
         {
             AppId = AppId,
-            Rule = new Rule(trigger, A.Fake<RuleAction>()),
-            RuleId = DomainId.NewGuid()
+            IncludeSkipped = false,
+            IncludeStale = false,
+            Rule = CreateRule() with { Trigger = trigger }
         };
     }
 }

@@ -106,10 +106,10 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
 
         await parentContents.CreateAsync(new TestEntityWithReferencesData
         {
-            References = new[]
-            {
+            References =
+            [
                 referencedContent.Id
-            }
+            ],
         });
 
 
@@ -133,20 +133,20 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
-                Schemas = new List<SchemaCondition>
-                {
+                Schemas =
+                [
                     new SchemaCondition
                     {
                         SchemaId = parentSchema.Id
-                    }
-                },
-                ReferencedSchemas = new List<SchemaCondition>
-                {
+                    },
+                ],
+                ReferencedSchemas =
+                [
                     new SchemaCondition
                     {
                         SchemaId = referencedSchema.Id
-                    }
-                }
+                    },
+                ]
             }
         };
 
@@ -464,11 +464,11 @@ public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<Webho
         }
     }
 
-    private void AssertRequest(WebhookRequest request)
+    private void AssertRequest(WebhookRequest? request)
     {
         Assert.NotNull(request);
-        Assert.NotNull(request.Headers["X-Signature"]);
+        Assert.NotNull(request?.Headers["X-Signature"]);
 
-        Assert.Equal(request.Headers["X-Signature"], WebhookUtils.CalculateSignature(request.Content, secret));
+        Assert.Equal(request?.Headers["X-Signature"], WebhookUtils.CalculateSignature(request?.Content ?? string.Empty, secret));
     }
 }

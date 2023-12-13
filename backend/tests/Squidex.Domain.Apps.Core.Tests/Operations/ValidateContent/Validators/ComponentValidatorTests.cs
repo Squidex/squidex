@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators;
 
 public class ComponentValidatorTests : IClassFixture<TranslationsFixture>
 {
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> errors = [];
 
     [Fact]
     public async Task Should_create_validator_from_component_and_invoke()
@@ -24,7 +24,7 @@ public class ComponentValidatorTests : IClassFixture<TranslationsFixture>
         var validator = A.Fake<IValidator>();
 
         var componentData = JsonValue.Object();
-        var componentObject = new Component("type", componentData, new Schema("my-schema"));
+        var componentObject = new Component("type", componentData, new Schema { Name = "my-schema" });
 
         var isFactoryCalled = false;
 

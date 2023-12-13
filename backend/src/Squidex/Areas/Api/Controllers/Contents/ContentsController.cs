@@ -58,7 +58,7 @@ public sealed class ContentsController : ApiController
     {
         var contents = contentQuery.StreamAsync(Context, schema, skip, HttpContext.RequestAborted);
 
-        return new JsonStreamResult<IEnrichedContentEntity>(contents);
+        return new JsonStreamResult<EnrichedContent>(contents);
     }
 
     /// <summary>
@@ -617,7 +617,7 @@ public sealed class ContentsController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        var result = context.Result<IEnrichedContentEntity>();
+        var result = context.Result<EnrichedContent>();
         var response = ContentDto.FromDomain(result, Resources);
 
         return response;

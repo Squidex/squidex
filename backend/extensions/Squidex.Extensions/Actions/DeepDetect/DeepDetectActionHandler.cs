@@ -23,7 +23,7 @@ namespace Squidex.Extensions.Actions.DeepDetect;
 
 #pragma warning disable MA0048 // File name must match type name
 
-internal partial class DeepDetectActionHandler : RuleActionHandler<DeepDetectAction, DeepDetectJob>
+internal sealed partial class DeepDetectActionHandler : RuleActionHandler<DeepDetectAction, DeepDetectJob>
 {
     private const string Description = "Analyze Image";
     private readonly IHttpClientFactory httpClientFactory;
@@ -131,7 +131,7 @@ internal partial class DeepDetectActionHandler : RuleActionHandler<DeepDetectAct
         var command = new AnnotateAsset
         {
             Tags = asset.TagNames,
-            AssetId = asset.AssetId,
+            AssetId = asset.Id,
             AppId = asset.AppId,
             Actor = job.Actor,
             FromRule = true

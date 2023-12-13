@@ -35,22 +35,22 @@ public sealed record AssetChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
 
         if (SendCreate)
         {
-            conditions.Add($"event.type == '{EnrichedAssetEventType.Created}'");
+            conditions.Add($"event.type == '{nameof(EnrichedAssetEventType.Created)}'");
         }
 
         if (SendUpdate)
         {
-            conditions.Add($"event.type == '{EnrichedAssetEventType.Updated}'");
+            conditions.Add($"event.type == '{nameof(EnrichedAssetEventType.Updated)}'");
         }
 
         if (SendRename)
         {
-            conditions.Add($"event.type == '{EnrichedAssetEventType.Annotated}'");
+            conditions.Add($"event.type == '{nameof(EnrichedAssetEventType.Annotated)}'");
         }
 
         if (SendDelete)
         {
-            conditions.Add($"event.type == '{EnrichedAssetEventType.Deleted}'");
+            conditions.Add($"event.type == '{nameof(EnrichedAssetEventType.Deleted)}'");
         }
 
         var condition = string.Empty;

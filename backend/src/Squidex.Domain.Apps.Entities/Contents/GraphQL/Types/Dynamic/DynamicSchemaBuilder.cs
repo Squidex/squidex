@@ -15,7 +15,7 @@ internal static class DynamicSchemaBuilder
     {
         if (string.IsNullOrWhiteSpace(typeDefinitions))
         {
-            return Array.Empty<IGraphType>();
+            return [];
         }
 
         Schema schema;
@@ -25,7 +25,7 @@ internal static class DynamicSchemaBuilder
         }
         catch
         {
-            return Array.Empty<IGraphType>();
+            return [];
         }
 
         var map = schema.AdditionalTypeInstances.ToDictionary(x => x.Name);

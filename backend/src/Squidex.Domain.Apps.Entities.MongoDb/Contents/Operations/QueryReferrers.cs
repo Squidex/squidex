@@ -7,7 +7,8 @@
 
 using System.Runtime.CompilerServices;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
@@ -23,10 +24,10 @@ internal sealed class QueryReferrers : OperationBase
             .Ascending(x => x.IsDeleted));
     }
 
-    public async Task<bool> CheckExistsAsync(DomainId appId, DomainId reference,
+    public async Task<bool> CheckExistsAsync(App app, DomainId reference,
         CancellationToken ct)
     {
-        var filter = BuildFilter(appId, reference);
+        var filter = BuildFilter(app.Id, reference);
 
         var hasReferrerAsync =
             await Collection.Find(filter).Only(x => x.Id)
@@ -35,7 +36,7 @@ internal sealed class QueryReferrers : OperationBase
         return hasReferrerAsync;
     }
 
-    public async IAsyncEnumerable<IContentEntity> StreamReferencing(DomainId appId, DomainId reference, int take,
+    public async IAsyncEnumerable<Content> StreamReferencing(DomainId appId, DomainId reference, int take,
         [EnumeratorCancellation] CancellationToken ct)
     {
         var filter = BuildFilter(appId, reference);

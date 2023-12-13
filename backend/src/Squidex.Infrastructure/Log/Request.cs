@@ -17,5 +17,5 @@ public sealed class Request
 
     public string Key;
 
-    public Dictionary<string, string> Properties = new Dictionary<string, string>();
+    public Dictionary<string, string> Properties = [];
 }

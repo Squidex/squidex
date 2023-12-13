@@ -5,17 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnDestroy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, combineLatest, of } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto, ToolbarService, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, CodeEditorComponent, ContentDto, ContentsService, ContentsState, ErrorDto, FormErrorComponent, ToolbarService, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 type Mode = 'Content' | 'Data' | 'FlatData';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-inspection',
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',
+    imports: [
+        AsyncPipe,
+        CodeEditorComponent,
+        FormErrorComponent,
+        FormsModule,
+        NgIf,
+        TranslatePipe,
+    ],
 })
 export class ContentInspectionComponent implements OnDestroy {
     private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);
@@ -39,17 +50,18 @@ export class ContentInspectionComponent implements OnDestroy {
 
     public actualData =
         combineLatest([
-            this.languageChanges$,
+            this.languageChanges$.pipe(filter(x => !!x)),
             this.mode,
         ]).pipe(
-            filter(x => !!x[0]),
             switchMap(([language, mode]) => {
-                if (mode === 'Content') {
-                    return of(this.content);
-                } else if (mode === 'Data') {
+                if (mode === 'Data') {
                     return of(this.content.data);
+                } else if (mode === 'Content') {
+                    return this.contentsService.getRawContent(this.appName,
+                        this.content.schemaName,
+                        this.content.id);
                 } else {
-                    return this.contentsService.getContent(this.appName,
+                    return this.contentsService.getRawContent(this.appName,
                         this.content.schemaName,
                         this.content.id,
                         language?.iso2Code).pipe(

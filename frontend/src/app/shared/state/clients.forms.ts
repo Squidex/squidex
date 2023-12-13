@@ -9,7 +9,7 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
-import { ClientDto, CreateClientDto, UpdateClientDto } from './../services/clients.service';
+import { ClientDto, CreateClientDto, UpdateClientDto } from '../services/clients.service';
 
 export class RenameClientForm extends Form<ExtendedFormGroup, UpdateClientDto, ClientDto> {
     constructor() {

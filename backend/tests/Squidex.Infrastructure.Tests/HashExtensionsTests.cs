@@ -107,6 +107,34 @@ public class HashExtensionsTests
         Assert.Equal(hash1, hash2);
     }
 
+    [Fact]
+    public void Should_calculate_incremental_hash()
+    {
+        using var hash = IncrementalHash.CreateHash(HashAlgorithmName.MD5);
+
+        hash.AppendString($"{Guid.Empty}-{Guid.Empty}");
+        hash.AppendString($"{Guid.Empty}-{Guid.Empty}-{Guid.Empty}-{Guid.Empty}");
+        hash.AppendLong(42);
+
+        var result = hash.GetHexStringAndReset();
+
+        Assert.Equal("62D6F977A8C2B79983A489AA5932C512", result);
+    }
+
+    [Fact]
+    public void Should_calculate_incremental_quoted_hash()
+    {
+        using var hash = IncrementalHash.CreateHash(HashAlgorithmName.MD5);
+
+        hash.AppendString($"{Guid.Empty}-{Guid.Empty}");
+        hash.AppendString($"{Guid.Empty}-{Guid.Empty}-{Guid.Empty}-{Guid.Empty}");
+        hash.AppendLong(42);
+
+        var result = hash.GetQuotedHexStringAndReset();
+
+        Assert.Equal("\"62D6F977A8C2B79983A489AA5932C512\"", result);
+    }
+
     private delegate string HashFromBytes(ReadOnlySpan<byte> source);
 
     private static void AssertHashFromBytes(HashFromBytes hasher, int length)

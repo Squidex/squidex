@@ -50,11 +50,6 @@ public class EnrichWithSchemaTests : GivenContext
         Assert.Equal("my-schema", content.SchemaDisplayName);
     }
 
-    private ContentEntity CreateContent()
-    {
-        return new ContentEntity { SchemaId = SchemaId };
-    }
-
     private ProvideSchema SchemaProvider()
     {
         return x => Task.FromResult((Schema, ResolvedComponents.Empty));

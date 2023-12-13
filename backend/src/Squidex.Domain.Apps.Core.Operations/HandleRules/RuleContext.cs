@@ -32,8 +32,6 @@ public readonly struct RuleContext
 {
     public NamedId<DomainId> AppId { get; init; }
 
-    public DomainId RuleId { get; init; }
-
     public Rule Rule { get; init; }
 
     public bool IncludeSkipped { get; init; }
@@ -49,7 +47,7 @@ public readonly struct RuleContext
             IncludeStale = IncludeStale,
             Rules = new Dictionary<DomainId, Rule>
             {
-                [RuleId] = Rule
+                [Rule.Id] = Rule
             }.ToReadonlyDictionary()
         };
     }

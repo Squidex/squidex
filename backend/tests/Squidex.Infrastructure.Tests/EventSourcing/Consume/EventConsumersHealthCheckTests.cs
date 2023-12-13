@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.EventSourcing.Consume;
 public class EventConsumersHealthCheckTests
 {
     private readonly IEventConsumerManager eventConsumerManager = A.Fake<IEventConsumerManager>();
-    private readonly List<EventConsumerInfo> consumers = new List<EventConsumerInfo>();
+    private readonly List<EventConsumerInfo> consumers = [];
     private readonly CancellationTokenSource cts = new CancellationTokenSource();
     private readonly CancellationToken ct;
     private readonly EventConsumersHealthCheck sut;

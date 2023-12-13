@@ -27,7 +27,9 @@ export class SearchResultDto {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SearchService {
     constructor(
         private readonly http: HttpClient,

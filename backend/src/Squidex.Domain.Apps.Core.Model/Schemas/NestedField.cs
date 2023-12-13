@@ -9,26 +9,19 @@ using System.Diagnostics.Contracts;
 
 namespace Squidex.Domain.Apps.Core.Schemas;
 
-public abstract class NestedField : FieldBase, INestedField
+public abstract record NestedField : INestedField
 {
-    public bool IsLocked { get; private set; }
+    public long Id { get; init; }
 
-    public bool IsHidden { get; private set; }
+    public string Name { get; init; }
 
-    public bool IsDisabled { get; private set; }
+    public bool IsLocked { get; init; }
+
+    public bool IsHidden { get; init; }
+
+    public bool IsDisabled { get; init; }
 
     public abstract FieldProperties RawProperties { get; }
-
-    protected NestedField(long id, string name, IFieldSettings? settings = null)
-        : base(id, name)
-    {
-        if (settings != null)
-        {
-            IsLocked = settings.IsLocked;
-            IsHidden = settings.IsHidden;
-            IsDisabled = settings.IsDisabled;
-        }
-    }
 
     [Pure]
     public NestedField Lock()
@@ -38,10 +31,7 @@ public abstract class NestedField : FieldBase, INestedField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsLocked = true;
-        });
+        return this with { IsLocked = true };
     }
 
     [Pure]
@@ -52,10 +42,7 @@ public abstract class NestedField : FieldBase, INestedField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsHidden = true;
-        });
+        return this with { IsHidden = true };
     }
 
     [Pure]
@@ -66,10 +53,7 @@ public abstract class NestedField : FieldBase, INestedField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsHidden = false;
-        });
+        return this with { IsHidden = false };
     }
 
     [Pure]
@@ -80,10 +64,7 @@ public abstract class NestedField : FieldBase, INestedField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsDisabled = true;
-        });
+        return this with { IsDisabled = true };
     }
 
     [Pure]
@@ -94,22 +75,10 @@ public abstract class NestedField : FieldBase, INestedField
             return this;
         }
 
-        return Clone(clone =>
-        {
-            clone.IsDisabled = false;
-        });
+        return this with { IsDisabled = false };
     }
 
     public abstract T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, TArgs args);
 
     public abstract NestedField Update(FieldProperties newProperties);
-
-    protected NestedField Clone(Action<NestedField> updater)
-    {
-        var clone = (NestedField)MemberwiseClone();
-
-        updater(clone);
-
-        return clone;
-    }
 }

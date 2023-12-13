@@ -38,9 +38,9 @@ public sealed class AtlasTextIndexFixture : IAsyncLifetime
                 {
                     options.BaseAddress = new Uri("https://cloud.mongodb.com/");
                 })
-                .ConfigureHttpMessageHandlerBuilder(builder =>
+                .ConfigurePrimaryHttpMessageHandler(() =>
                 {
-                    builder.PrimaryHandler = new HttpClientHandler
+                    return new HttpClientHandler
                     {
                         Credentials = new NetworkCredential(options.PublicKey, options.PrivateKey, "cloud.mongodb.com")
                     };

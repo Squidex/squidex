@@ -7,7 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -16,9 +16,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 
 public sealed class RuleTriggerValidator : IRuleTriggerVisitor<Task<IEnumerable<ValidationError>>>
 {
-    public Func<DomainId, Task<ISchemaEntity?>> SchemaProvider { get; }
+    public Func<DomainId, Task<Schema?>> SchemaProvider { get; }
 
-    public RuleTriggerValidator(Func<DomainId, Task<ISchemaEntity?>> schemaProvider)
+    public RuleTriggerValidator(Func<DomainId, Task<Schema?>> schemaProvider)
     {
         SchemaProvider = schemaProvider;
     }

@@ -10,8 +10,10 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 
-public interface IBackupJob : IWithId<DomainId>
+public interface IBackupJob
 {
+    DomainId Id { get; }
+
     Instant Started { get; }
 
     Instant? Stopped { get; }

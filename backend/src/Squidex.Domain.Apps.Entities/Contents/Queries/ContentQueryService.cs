@@ -7,8 +7,9 @@
 
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
@@ -42,7 +43,7 @@ public sealed class ContentQueryService : IContentQueryService
         this.queryParser = queryParser;
     }
 
-    public async IAsyncEnumerable<IEnrichedContentEntity> StreamAsync(Context context, string schemaIdOrName, int skip,
+    public async IAsyncEnumerable<EnrichedContent> StreamAsync(Context context, string schemaIdOrName, int skip,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -65,7 +66,7 @@ public sealed class ContentQueryService : IContentQueryService
         }
     }
 
-    public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
+    public async Task<EnrichedContent?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -77,7 +78,7 @@ public sealed class ContentQueryService : IContentQueryService
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
 
-            IContentEntity? content;
+            Content? content;
 
             // A special ID to always query the single content of the singleton.
             if (id.ToString().Equals(SingletonId, StringComparison.Ordinal))
@@ -103,7 +104,7 @@ public sealed class ContentQueryService : IContentQueryService
         }
     }
 
-    public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q q,
+    public async Task<IResultList<EnrichedContent>> QueryAsync(Context context, string schemaIdOrName, Q q,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -115,7 +116,7 @@ public sealed class ContentQueryService : IContentQueryService
             // Usually the query should not be null, but we never know.
             if (q == null)
             {
-                return ResultList.Empty<IEnrichedContentEntity>();
+                return ResultList.Empty<EnrichedContent>();
             }
 
             var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
@@ -139,7 +140,7 @@ public sealed class ContentQueryService : IContentQueryService
         }
     }
 
-    public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, Q q,
+    public async Task<IResultList<EnrichedContent>> QueryAsync(Context context, Q q,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -149,7 +150,7 @@ public sealed class ContentQueryService : IContentQueryService
             // Usually the query should not be null, but we never know.
             if (q == null)
             {
-                return ResultList.Empty<IEnrichedContentEntity>();
+                return ResultList.Empty<EnrichedContent>();
             }
 
             var schemas = await GetSchemasAsync(context, ct);
@@ -157,7 +158,7 @@ public sealed class ContentQueryService : IContentQueryService
             // If the user does not have a permission to query a single schema the database would return an empty result anyway.
             if (schemas.Count == 0)
             {
-                return ResultList.Empty<IEnrichedContentEntity>();
+                return ResultList.Empty<EnrichedContent>();
             }
 
             q = await ParseCoreAsync(context, q, null, ct);
@@ -173,7 +174,7 @@ public sealed class ContentQueryService : IContentQueryService
         }
     }
 
-    private async Task<IResultList<IEnrichedContentEntity>> TransformAsync(Context context, IResultList<IContentEntity> contents,
+    private async Task<IResultList<EnrichedContent>> TransformAsync(Context context, IResultList<Content> contents,
         CancellationToken ct)
     {
         var transformed = await TransformCoreAsync(context, contents, ct);
@@ -181,7 +182,7 @@ public sealed class ContentQueryService : IContentQueryService
         return ResultList.Create(contents.Total, transformed);
     }
 
-    private async Task<IEnrichedContentEntity> TransformAsync(Context context, IContentEntity content,
+    private async Task<EnrichedContent> TransformAsync(Context context, Content content,
         CancellationToken ct)
     {
         var transformed = await TransformCoreAsync(context, Enumerable.Repeat(content, 1), ct);
@@ -189,7 +190,7 @@ public sealed class ContentQueryService : IContentQueryService
         return transformed[0];
     }
 
-    private async Task<IReadOnlyList<IEnrichedContentEntity>> TransformCoreAsync(Context context, IEnumerable<IContentEntity> contents,
+    private async Task<IReadOnlyList<EnrichedContent>> TransformCoreAsync(Context context, IEnumerable<Content> contents,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("ContentQueryService/TransformCoreAsync"))
@@ -198,7 +199,7 @@ public sealed class ContentQueryService : IContentQueryService
         }
     }
 
-    public async Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName,
+    public async Task<Schema> GetSchemaOrThrowAsync(Context context, string schemaIdOrName,
         CancellationToken ct = default)
     {
         var schema = await GetSchemaAsync(context, schemaIdOrName, ct);
@@ -211,13 +212,13 @@ public sealed class ContentQueryService : IContentQueryService
         return schema;
     }
 
-    public async Task<ISchemaEntity?> GetSchemaAsync(Context context, string schemaIdOrName,
+    public async Task<Schema?> GetSchemaAsync(Context context, string schemaIdOrName,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
         Guard.NotNullOrEmpty(schemaIdOrName);
 
-        ISchemaEntity? schema = null;
+        Schema? schema = null;
 
         var canCache = !context.IsFrontendClient;
 
@@ -228,10 +229,7 @@ public sealed class ContentQueryService : IContentQueryService
             schema = await appProvider.GetSchemaAsync(context.App.Id, schemaId, canCache, ct);
         }
 
-        if (schema == null)
-        {
-            schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache, ct);
-        }
+        schema ??= await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache, ct);
 
         if (schema != null && !HasPermission(context, schema, PermissionIds.AppContentsReadOwn))
         {
@@ -241,7 +239,7 @@ public sealed class ContentQueryService : IContentQueryService
         return schema;
     }
 
-    private async Task<List<ISchemaEntity>> GetSchemasAsync(Context context,
+    private async Task<List<Schema>> GetSchemasAsync(Context context,
         CancellationToken ct)
     {
         var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
@@ -249,7 +247,7 @@ public sealed class ContentQueryService : IContentQueryService
         return schemas.Where(x => IsAccessible(x) && HasPermission(context, x, PermissionIds.AppContentsReadOwn)).ToList();
     }
 
-    private async Task<Q> ParseCoreAsync(Context context, Q q, ISchemaEntity? schema,
+    private async Task<Q> ParseCoreAsync(Context context, Q q, Schema? schema,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -261,7 +259,7 @@ public sealed class ContentQueryService : IContentQueryService
         }
     }
 
-    private async Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, Q q, ISchemaEntity schema,
+    private async Task<IResultList<Content>> QueryCoreAsync(Context context, Q q, Schema schema,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -273,7 +271,7 @@ public sealed class ContentQueryService : IContentQueryService
         }
     }
 
-    private async Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, Q q, List<ISchemaEntity> schemas,
+    private async Task<IResultList<Content>> QueryCoreAsync(Context context, Q q, List<Schema> schemas,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -285,7 +283,7 @@ public sealed class ContentQueryService : IContentQueryService
         }
     }
 
-    private async Task<IContentEntity?> FindCoreAsync(Context context, DomainId id, ISchemaEntity schema,
+    private async Task<Content?> FindCoreAsync(Context context, DomainId id, Schema schema,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))
@@ -297,13 +295,13 @@ public sealed class ContentQueryService : IContentQueryService
         }
     }
 
-    private static bool IsAccessible(ISchemaEntity schema)
+    private static bool IsAccessible(Schema schema)
     {
-        return schema.SchemaDef.IsPublished;
+        return schema.IsPublished;
     }
 
-    private static bool HasPermission(Context context, ISchemaEntity schema, string permissionId)
+    private static bool HasPermission(Context context, Schema schema, string permissionId)
     {
-        return context.UserPermissions.Allows(permissionId, context.App.Name, schema.SchemaDef.Name);
+        return context.UserPermissions.Allows(permissionId, context.App.Name, schema.Name);
     }
 }

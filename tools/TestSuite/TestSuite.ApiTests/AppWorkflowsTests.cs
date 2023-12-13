@@ -110,6 +110,6 @@ public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
         var workflows = await app.Apps.PostWorkflowAsync(createRequest);
         var workflow = workflows.Items.Find(x => x.Name == workflowName);
 
-        return workflow;
+        return workflow!;
     }
 }

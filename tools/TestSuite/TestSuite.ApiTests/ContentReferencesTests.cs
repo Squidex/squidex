@@ -35,14 +35,14 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         // STEP 2: Create a content with a reference.
         var contentB_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
         {
-            References = new[] { contentA_1.Id }
+            References = [contentA_1.Id]
         }, ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Query new item.
         var contentB_2 = await _.Contents.GetAsync(contentB_1.Id);
 
-        Assert.Empty(contentB_2.Data.References);
+        Assert.Empty(contentB_2.Data.References!);
 
 
         // STEP 4: Publish reference.
@@ -55,7 +55,7 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         // STEP 5: Query new item again.
         var contentB_3 = await _.Contents.GetAsync(contentB_1.Id);
 
-        Assert.Equal(new string[] { contentA_1.Id }, contentB_3.Data.References);
+        Assert.Equal(new[] { contentA_1.Id }, contentB_3.Data.References);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         // STEP 2: Create a content with a reference.
         await _.Contents.CreateAsync(new TestEntityWithReferencesData
         {
-            References = new[] { contentA_1.Id }
+            References = [contentA_1.Id]
         }, ContentCreateOptions.AsPublish);
 
 
@@ -101,7 +101,7 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         // STEP 2: Create a content with a reference.
         await _.Contents.CreateAsync(new TestEntityWithReferencesData
         {
-            References = new[] { contentA_1.Id }
+            References = [contentA_1.Id]
         }, ContentCreateOptions.AsPublish);
 
 
@@ -139,22 +139,22 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         // STEP 2: Create a content with a reference.
         await _.Contents.CreateAsync(new TestEntityWithReferencesData
         {
-            References = new[] { contentA_1.Id }
+            References = [contentA_1.Id]
         }, ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Try to delete with referrer check.
         var result1 = await _.Contents.BulkUpdateAsync(new BulkUpdate
         {
-            Jobs = new List<BulkUpdateJob>
-            {
+            Jobs =
+            [
                 new BulkUpdateJob
                 {
                     Id = contentA_1.Id,
                     Type = BulkUpdateType.Delete,
                     Status = "Draft"
-                }
-            },
+                },
+            ],
             CheckReferrers = true
         });
 
@@ -164,15 +164,15 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         // STEP 4: Delete without referrer check.
         var result2 = await _.Contents.BulkUpdateAsync(new BulkUpdate
         {
-            Jobs = new List<BulkUpdateJob>
-            {
+            Jobs =
+            [
                 new BulkUpdateJob
                 {
                     Id = contentA_1.Id,
                     Type = BulkUpdateType.Delete,
                     Status = "Draft"
-                }
-            },
+                },
+            ],
             CheckReferrers = false
         });
 
@@ -192,22 +192,22 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         // STEP 2: Create a published content with a reference.
         await _.Contents.CreateAsync(new TestEntityWithReferencesData
         {
-            References = new[] { contentA_1.Id }
+            References = [contentA_1.Id]
         }, ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Try to delete with referrer check.
         var result1 = await _.Contents.BulkUpdateAsync(new BulkUpdate
         {
-            Jobs = new List<BulkUpdateJob>
-            {
+            Jobs =
+            [
                 new BulkUpdateJob
                 {
                     Id = contentA_1.Id,
                     Type = BulkUpdateType.ChangeStatus,
                     Status = "Draft"
-                }
-            },
+                },
+            ],
             CheckReferrers = true
         });
 
@@ -217,15 +217,15 @@ public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
         // STEP 4: Delete without referrer check.
         var result2 = await _.Contents.BulkUpdateAsync(new BulkUpdate
         {
-            Jobs = new List<BulkUpdateJob>
-            {
+            Jobs =
+            [
                 new BulkUpdateJob
                 {
                     Id = contentA_1.Id,
                     Type = BulkUpdateType.ChangeStatus,
                     Status = "Draft"
-                }
-            },
+                },
+            ],
             CheckReferrers = false
         });
 

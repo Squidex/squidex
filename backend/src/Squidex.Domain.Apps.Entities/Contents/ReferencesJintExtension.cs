@@ -9,9 +9,9 @@ using System.Security.Claims;
 using Jint.Native;
 using Jint.Runtime;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Internal;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
 
@@ -134,7 +134,7 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
         });
     }
 
-    private async Task<IAppEntity> GetAppAsync(DomainId appId)
+    private async Task<App> GetAppAsync(DomainId appId)
     {
         var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
 

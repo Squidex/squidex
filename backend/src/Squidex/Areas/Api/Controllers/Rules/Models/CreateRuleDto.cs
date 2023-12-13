@@ -29,7 +29,7 @@ public sealed class CreateRuleDto
 
     public Rule ToRule()
     {
-        return new Rule(Trigger.ToTrigger(), Action);
+        return new Rule { Trigger = Trigger.ToTrigger(), Action = Action };
     }
 
     public CreateRule ToCommand()

@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.Schemas;
 
 public sealed class FieldRules : ReadonlyList<FieldRule>
 {
-    public static readonly FieldRules Empty = new FieldRules(new List<FieldRule>());
+    public static readonly new FieldRules Empty = new FieldRules(new List<FieldRule>());
 
     public FieldRules()
     {
@@ -22,8 +22,8 @@ public sealed class FieldRules : ReadonlyList<FieldRule>
     {
     }
 
-    public static FieldRules Create(params FieldRule[] rules)
+    public static FieldRules Create(params FieldRule[]? rules)
     {
-        return new FieldRules(rules.ToArray());
+        return rules is not { Length: > 0 } ? Empty : new FieldRules(rules.ToArray());
     }
 }

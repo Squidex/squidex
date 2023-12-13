@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
@@ -18,7 +18,7 @@ public sealed class CounterService : ICounterService, IDeleter
     [CollectionName("Counters")]
     public sealed class State
     {
-        public Dictionary<string, long> Counters { get; set; } = new Dictionary<string, long>();
+        public Dictionary<string, long> Counters { get; set; } = [];
 
         public bool Increment(string name)
         {
@@ -40,7 +40,7 @@ public sealed class CounterService : ICounterService, IDeleter
         this.persistenceFactory = persistenceFactory;
     }
 
-    async Task IDeleter.DeleteAppAsync(IAppEntity app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         var state = await GetStateAsync(app.Id, ct);

@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using Squidex.Caching;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
-using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Indexes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
@@ -37,7 +37,7 @@ public sealed class AppProvider : IAppProvider
         this.indexForTeams = indexForTeams;
     }
 
-    public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
+    public async Task<(App?, Schema?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
         CancellationToken ct = default)
     {
         var app = await GetAppAsync(appId, canCache, ct);
@@ -57,7 +57,7 @@ public sealed class AppProvider : IAppProvider
         return (app, schema);
     }
 
-    public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+    public async Task<App?> GetAppAsync(DomainId appId, bool canCache = false,
         CancellationToken ct = default)
     {
         var cacheKey = AppCacheKey(appId);
@@ -75,7 +75,7 @@ public sealed class AppProvider : IAppProvider
         return app;
     }
 
-    public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false,
+    public async Task<App?> GetAppAsync(string appName, bool canCache = false,
         CancellationToken ct = default)
     {
         var cacheKey = AppCacheKey(appName);
@@ -93,7 +93,7 @@ public sealed class AppProvider : IAppProvider
         return app;
     }
 
-    public async Task<ITeamEntity?> GetTeamAsync(DomainId teamId,
+    public async Task<Team?> GetTeamAsync(DomainId teamId,
         CancellationToken ct = default)
     {
         var cacheKey = TeamCacheKey(teamId);
@@ -106,7 +106,7 @@ public sealed class AppProvider : IAppProvider
         return team;
     }
 
-    public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false,
+    public async Task<Schema?> GetSchemaAsync(DomainId appId, string name, bool canCache = false,
         CancellationToken ct = default)
     {
         var cacheKey = SchemaCacheKey(appId, name);
@@ -124,7 +124,7 @@ public sealed class AppProvider : IAppProvider
         return schema;
     }
 
-    public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
+    public async Task<Schema?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
         CancellationToken ct = default)
     {
         var cacheKey = SchemaCacheKey(appId, id);
@@ -136,13 +136,13 @@ public sealed class AppProvider : IAppProvider
 
         if (schema != null)
         {
-            localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
+            localCache.Add(SchemaCacheKey(appId, schema.Name), schema);
         }
 
         return schema;
     }
 
-    public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions,
+    public async Task<List<App>> GetUserAppsAsync(string userId, PermissionSet permissions,
         CancellationToken ct = default)
     {
         var apps = await GetOrCreate($"GetUserApps({userId})", () =>
@@ -150,10 +150,10 @@ public sealed class AppProvider : IAppProvider
             return indexForApps.GetAppsForUserAsync(userId, permissions, ct)!;
         });
 
-        return apps?.ToList() ?? new List<IAppEntity>();
+        return apps?.ToList() ?? [];
     }
 
-    public async Task<List<IAppEntity>> GetTeamAppsAsync(DomainId teamId,
+    public async Task<List<App>> GetTeamAppsAsync(DomainId teamId,
         CancellationToken ct = default)
     {
         var apps = await GetOrCreate($"GetTeamApps({teamId})", () =>
@@ -161,20 +161,20 @@ public sealed class AppProvider : IAppProvider
             return indexForApps.GetAppsForTeamAsync(teamId, ct)!;
         });
 
-        return apps?.ToList() ?? new List<IAppEntity>();
+        return apps?.ToList() ?? [];
     }
 
-    public async Task<List<ITeamEntity>> GetUserTeamsAsync(string userId, CancellationToken ct = default)
+    public async Task<List<Team>> GetUserTeamsAsync(string userId, CancellationToken ct = default)
     {
         var teams = await GetOrCreate($"GetUserTeams({userId})", () =>
         {
             return indexForTeams.GetTeamsAsync(userId, ct)!;
         });
 
-        return teams?.ToList() ?? new List<ITeamEntity>();
+        return teams?.ToList() ?? [];
     }
 
-    public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
+    public async Task<List<Schema>> GetSchemasAsync(DomainId appId,
         CancellationToken ct = default)
     {
         var schemas = await GetOrCreate($"GetSchemasAsync({appId})", () =>
@@ -187,14 +187,14 @@ public sealed class AppProvider : IAppProvider
             foreach (var schema in schemas)
             {
                 localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
-                localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
+                localCache.Add(SchemaCacheKey(appId, schema.Name), schema);
             }
         }
 
-        return schemas?.ToList() ?? new List<ISchemaEntity>();
+        return schemas?.ToList() ?? [];
     }
 
-    public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
+    public async Task<List<Rule>> GetRulesAsync(DomainId appId,
         CancellationToken ct = default)
     {
         var rules = await GetOrCreate($"GetRulesAsync({appId})", () =>
@@ -202,10 +202,10 @@ public sealed class AppProvider : IAppProvider
             return indexForRules.GetRulesAsync(appId, ct)!;
         });
 
-        return rules?.ToList() ?? new List<IRuleEntity>();
+        return rules?.ToList() ?? [];
     }
 
-    public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id,
+    public async Task<Rule?> GetRuleAsync(DomainId appId, DomainId id,
         CancellationToken ct = default)
     {
         var rules = await GetRulesAsync(appId, ct);
@@ -213,7 +213,7 @@ public sealed class AppProvider : IAppProvider
         return rules.Find(x => x.Id == id);
     }
 
-    public void RegisterAppForLocalContext(DomainId appId, IAppEntity app)
+    public void RegisterAppForLocalContext(DomainId appId, App app)
     {
         localCache.Add(AppCacheKey(appId), app);
     }

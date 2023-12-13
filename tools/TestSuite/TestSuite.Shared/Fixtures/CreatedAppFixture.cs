@@ -39,10 +39,12 @@ public class CreatedAppFixture : ClientFixture
         {
             try
             {
-                await Client.Apps.PostAppAsync(new CreateAppDto
+                var createRequest = new CreateAppDto
                 {
                     Name = AppName
-                });
+                };
+
+                await Client.Apps.PostAppAsync(createRequest);
             }
             catch (SquidexException ex)
             {

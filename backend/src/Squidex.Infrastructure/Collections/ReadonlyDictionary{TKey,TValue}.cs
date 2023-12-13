@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Collections;
 
 public class ReadonlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IEquatable<ReadonlyDictionary<TKey, TValue>> where TKey : notnull
 {
-    private static readonly Dictionary<TKey, TValue> EmptyInner = new Dictionary<TKey, TValue>();
+    private static readonly Dictionary<TKey, TValue> EmptyInner = [];
     private readonly IDictionary<TKey, TValue> inner;
 
     public TValue this[TKey key]

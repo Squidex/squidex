@@ -40,6 +40,16 @@ public sealed class SchemaPropertiesDto
     public string? ContentEditorUrl { get; set; }
 
     /// <summary>
+    /// The url to the editor plugin.
+    /// </summary>
+    public string? ContentsEditorUrl { get; set; }
+
+    /// <summary>
+    /// The url to the content list plugin.
+    /// </summary>
+    public string? ContentsListUrl { get; set; }
+
+    /// <summary>
     /// True to validate the content items on publish.
     /// </summary>
     public bool ValidateOnPublish { get; set; }

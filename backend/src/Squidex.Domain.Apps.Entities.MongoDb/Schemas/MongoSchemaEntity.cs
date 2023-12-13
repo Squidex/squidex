@@ -7,13 +7,13 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 
-public sealed class MongoSchemaEntity : MongoState<SchemaDomainObject.State>
+public sealed class MongoSchemaEntity : MongoState<Schema>
 {
     [BsonRequired]
     [BsonElement("_ai")]
@@ -40,7 +40,7 @@ public sealed class MongoSchemaEntity : MongoState<SchemaDomainObject.State>
         IndexedAppId = Document.AppId.Id;
         IndexedDeleted = Document.IsDeleted;
         IndexedId = Document.Id;
-        IndexedName = Document.SchemaDef.Name;
+        IndexedName = Document.Name;
         IndexedCreated = Document.Created;
     }
 }

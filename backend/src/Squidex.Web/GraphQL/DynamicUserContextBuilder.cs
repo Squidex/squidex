@@ -15,7 +15,7 @@ namespace Squidex.Web.GraphQL;
 
 public sealed class DynamicUserContextBuilder : IUserContextBuilder
 {
-    private readonly ObjectFactory factory = ActivatorUtilities.CreateFactory(typeof(GraphQLExecutionContext), new[] { typeof(Context) });
+    private readonly ObjectFactory factory = ActivatorUtilities.CreateFactory(typeof(GraphQLExecutionContext), [typeof(Context)]);
 
     public ValueTask<IDictionary<string, object?>?> BuildUserContextAsync(HttpContext context, object? payload)
     {

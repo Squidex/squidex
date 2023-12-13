@@ -63,7 +63,7 @@ public class PersistenceEventSourcingTests
     [Fact]
     public async Task Should_ignore_old_events()
     {
-        var storedEvent = new StoredEvent("1", "1", 0, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+        var storedEvent = new StoredEvent("1", "1", 0, new EventData("Type", [], "Payload"));
 
         A.CallTo(() => eventStore.QueryStreamAsync(key.ToString(), -1, A<CancellationToken>._))
             .Returns(new List<StoredEvent> { storedEvent });
@@ -368,7 +368,7 @@ public class PersistenceEventSourcingTests
 
         foreach (var @event in events)
         {
-            var eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
+            var eventData = new EventData("Type", [], "Payload");
             var eventStored = new StoredEvent(key.ToString(), i.ToString(CultureInfo.InvariantCulture), i, eventData);
 
             eventsStored.Add(eventStored);

@@ -7,7 +7,6 @@
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
@@ -41,7 +40,10 @@ public class ScriptContentTests : GivenContext
     [Fact]
     public async Task Should_not_call_script_engine_for_frontend_user()
     {
-        SetupScript(query: "my-query");
+        Schema = Schema.SetScripts(new SchemaScripts
+        {
+            Query = "my-query"
+        });
 
         var content = CreateContent();
 
@@ -54,7 +56,10 @@ public class ScriptContentTests : GivenContext
     [Fact]
     public async Task Should_not_call_script_engine_if_disabled_and_user_has_permission()
     {
-        SetupScript(query: "my-query");
+        Schema = Schema.SetScripts(new SchemaScripts
+        {
+            Query = "my-query"
+        });
 
         var content = CreateContent();
 
@@ -67,7 +72,10 @@ public class ScriptContentTests : GivenContext
     [Fact]
     public async Task Should_call_script_engine()
     {
-        SetupScript(query: "my-query");
+        Schema = Schema.SetScripts(new SchemaScripts
+        {
+            Query = "my-query"
+        });
 
         var contentBefore = CreateContent();
         var contentData = contentBefore.Data;
@@ -92,7 +100,11 @@ public class ScriptContentTests : GivenContext
     [Fact]
     public async Task Should_call_script_engine_with_pre_query_script()
     {
-        SetupScript(query: "my-query", queryPre: "my-pre-query");
+        Schema = Schema.SetScripts(new SchemaScripts
+        {
+            Query = "my-query",
+            QueryPre = "my-pre-query",
+        });
 
         var contentBefore = CreateContent();
         var contentData = contentBefore.Data;
@@ -128,11 +140,13 @@ public class ScriptContentTests : GivenContext
     [Fact]
     public async Task Should_make_test_with_pre_query_script()
     {
-        SetupScript(
-            query: @"
+        Schema = Schema.SetScripts(new SchemaScripts
+        {
+            Query = @"
                     ctx.data.test = { iv: ctx.custom };
                     replace()",
-            queryPre: "ctx.custom = 123;");
+            QueryPre = "ctx.custom = 123;"
+        });
 
         var content = CreateContent();
 
@@ -149,23 +163,6 @@ public class ScriptContentTests : GivenContext
         await sut2.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
 
         Assert.Equal(JsonValue.Create(123), content.Data["test"]!["iv"]);
-    }
-
-    private void SetupScript(string? query = null, string? queryPre = null)
-    {
-        A.CallTo(() => Schema.SchemaDef)
-            .Returns(
-                new Schema(SchemaId.Name)
-                    .SetScripts(new SchemaScripts
-                    {
-                        Query = query,
-                        QueryPre = queryPre
-                    }));
-    }
-
-    private ContentEntity CreateContent()
-    {
-        return new ContentEntity { Data = new ContentData(), SchemaId = SchemaId };
     }
 
     private ProvideSchema SchemaProvider()

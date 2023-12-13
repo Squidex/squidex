@@ -96,13 +96,13 @@ public sealed class Startup
 
         if (!app.ApplicationServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
         {
-            app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixIdentityServer, StringComparison.OrdinalIgnoreCase), builder =>
+            app.UseWhenPath(Constants.PrefixIdentityServer, builder =>
             {
                 builder.UseExceptionHandler("/identity-server/error");
             });
         }
 
-        app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixApi, StringComparison.OrdinalIgnoreCase), builder =>
+        app.UseWhenPath(Constants.PrefixApi, builder =>
         {
             builder.UseSquidexCacheKeys();
             builder.UseSquidexExceptionHandling();

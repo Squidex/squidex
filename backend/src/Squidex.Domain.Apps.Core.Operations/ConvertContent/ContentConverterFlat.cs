@@ -46,7 +46,7 @@ public static class ContentConverterFlat
 
     private static object? GetFirst(ContentFieldData? fieldData)
     {
-        if (fieldData == null || fieldData.Count == 0)
+        if (fieldData is not { Count: > 0 })
         {
             return null;
         }

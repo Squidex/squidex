@@ -6,12 +6,20 @@
  */
 
 import { Component, Input } from '@angular/core';
-import { SchemaDto, SchemasState } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
+import { FieldListComponent } from './field-list.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-ui-form',
     styleUrls: ['./schema-ui-form.component.scss'],
     templateUrl: './schema-ui-form.component.html',
+    imports: [
+        FieldListComponent,
+        FormsModule,
+        TranslatePipe,
+    ],
 })
 export class SchemaUIFormComponent {
     @Input()

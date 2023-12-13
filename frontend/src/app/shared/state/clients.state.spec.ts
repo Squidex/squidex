@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ClientsPayload, ClientsService, ClientsState, DialogService, versioned } from '@app/shared/internal';
-import { createClients } from './../services/clients.service.spec';
+import { createClients } from '../services/clients.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('ClientsState', () => {

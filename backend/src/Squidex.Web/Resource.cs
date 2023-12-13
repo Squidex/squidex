@@ -17,7 +17,7 @@ public abstract class Resource
     [LocalizedRequired]
     [Display(Description = "The links.")]
     [JsonPropertyName("_links")]
-    public Dictionary<string, ResourceLink> Links { get; } = new Dictionary<string, ResourceLink>();
+    public Dictionary<string, ResourceLink> Links { get; } = [];
 
     protected void AddSelfLink(string href)
     {

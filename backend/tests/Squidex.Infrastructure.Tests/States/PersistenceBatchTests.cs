@@ -42,8 +42,8 @@ public class PersistenceBatchTests
 
         SetupEventStore(new Dictionary<DomainId, List<MyEvent>>
         {
-            [key1] = new List<MyEvent> { event1_1, event1_2 },
-            [key2] = new List<MyEvent> { event2_1, event2_2 }
+            [key1] = [event1_1, event1_2],
+            [key2] = [event2_1, event2_2]
         });
 
         await bulk.LoadAsync(new[] { key1, key2 });
@@ -193,7 +193,7 @@ public class PersistenceBatchTests
 
             foreach (var @event in stream)
             {
-                var eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
+                var eventData = new EventData("Type", [], "Payload");
                 var eventStored = new StoredEvent(id.ToString(), i.ToString(CultureInfo.InvariantCulture), i, eventData);
 
                 A.CallTo(() => eventFormatter.Parse(eventStored))

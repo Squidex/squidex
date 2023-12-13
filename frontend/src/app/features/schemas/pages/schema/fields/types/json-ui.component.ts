@@ -10,6 +10,7 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-json-ui',
     styleUrls: ['json-ui.component.scss'],
     templateUrl: 'json-ui.component.html',

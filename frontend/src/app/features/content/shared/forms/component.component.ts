@@ -5,25 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, EditContentForm, FieldDto, FieldSection, ModalModel, SchemaDto, Subscriptions, TypedSimpleChanges, Types } from '@app/shared';
+import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, DropdownMenuComponent, EditContentForm, FieldDto, FieldSection, FormHintComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-component',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        ComponentSectionComponent,
+        DropdownMenuComponent,
+        FormHintComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        TranslatePipe,
+    ],
 })
 export class ComponentComponent {
     private readonly subscriptions = new Subscriptions();
 
     @Input({ required: true })
     public hasChatBot!: boolean;
-
-    @Input({ transform: booleanAttribute })
-    public canUnset?: boolean | null;
 
     @Input({ required: true })
     public form!: EditContentForm;

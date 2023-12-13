@@ -46,6 +46,36 @@ affinity: { }
 ## @skip clusterSuffix
 clusterSuffix: cluster.local
 
+## @param runAsNonRoot
+## Set to true to run Squidex as nonroot. Defaults to false for backwards compatibility.
+runAsNonRoot: false
+
+## @param podSecurityContext - object - optional
+## You can modify the security context used to run PODS in the cluster
+## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+## An example that follows the Restricted profile is described below:
+#
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  runAsNonRoot: true
+  runAsUser: 10000
+  runAsGroup: 10000
+  fsGroup: 10000
+
+## @param containerSecurityContext - object - optional
+## You can modify the security context used to run CONTAINERS in the cluster
+## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+## An example that follows the Restricted profile is described below:
+#
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+
 ## @skip auth
 auth:
   ## 
@@ -165,7 +195,7 @@ env:
 
   ## @param env.LOGGING__APPLICATIONINSIGHTS__ENABLED Enable monitoring via application insights.
   ##
-  LOGGING__APPLICATIONINSIGHTS__ENABLED: falsen
+  LOGGING__APPLICATIONINSIGHTS__ENABLED: false
   ## @param env.LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING The connection string to application insights.
   ##
   LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING: null # "instrumentationkey=keyvalue"

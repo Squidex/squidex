@@ -18,6 +18,8 @@ public sealed class ResolveLanguages : IContentFieldConverter
 
     public bool ResolveFallback { get; init; }
 
+    public HashSet<string>? FieldNames { get; init; }
+
     public ResolveLanguages(LanguagesConfig languages, params Language[] filteredLanguages)
     {
         HashSet<string> languageCodes;
@@ -44,6 +46,12 @@ public sealed class ResolveLanguages : IContentFieldConverter
 
     public ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
     {
+        if (FieldNames?.Contains(field.Name) == false)
+        {
+            // If the fields are set, we only enrich the given matching field names.
+            return source;
+        }
+
         if (!field.Partitioning.Equals(Partitioning.Language))
         {
             return source;

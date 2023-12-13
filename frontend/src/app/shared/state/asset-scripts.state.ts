@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, Resource, shareSubscribed, State, Version } from '@app/framework';
-import { AppsService, AssetScripts, AssetScriptsPayload } from './../services/apps.service';
+import { AppsService, AssetScripts, AssetScriptsPayload } from '../services/apps.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -26,7 +26,9 @@ interface Snapshot extends LoadingState {
     resource: Resource;
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AssetScriptsState extends State<Snapshot> {
     public scripts =
         this.project(x => x.scripts);

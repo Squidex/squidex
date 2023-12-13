@@ -5,16 +5,28 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, switchMap } from 'rxjs';
-import { SchemaDto, ScriptCompletions, TypedSimpleChanges, value$ } from '@app/shared';
+import { CodeEditorComponent, ConfirmClickDirective, ControlErrorsComponent, SchemaDto, ScriptCompletions, TranslatePipe, TypedSimpleChanges, value$ } from '@app/shared';
 import { CompletionsCache } from './completions-cache';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-changed-schema',
     styleUrls: ['./content-changed-schema.component.scss'],
     templateUrl: './content-changed-schema.component.html',
+    imports: [
+        AsyncPipe,
+        CodeEditorComponent,
+        ConfirmClickDirective,
+        ControlErrorsComponent,
+        FormsModule,
+        NgFor,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class ContentChangedSchemaComponent {
     @Input({ required: true })

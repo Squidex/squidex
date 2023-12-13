@@ -9,8 +9,8 @@ namespace Squidex.Infrastructure;
 
 public class CollectionExtensionsTests
 {
-    private readonly Dictionary<int, int> valueDictionary = new Dictionary<int, int>();
-    private readonly Dictionary<int, List<int>> listDictionary = new Dictionary<int, List<int>>();
+    private readonly Dictionary<int, int> valueDictionary = [];
+    private readonly Dictionary<int, List<int>> listDictionary = [];
 
     [Fact]
     public void SetEquals_should_return_false_if_subset()

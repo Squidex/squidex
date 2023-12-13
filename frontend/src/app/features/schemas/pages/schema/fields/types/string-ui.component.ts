@@ -5,15 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FieldDto, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, Subscriptions, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-string-ui',
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',
+    imports: [
+        AssetFolderDropdownComponent,
+        AsyncPipe,
+        FormHintComponent,
+        FormsModule,
+        NgFor,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class StringUIComponent  {
     private readonly subscriptions = new Subscriptions();

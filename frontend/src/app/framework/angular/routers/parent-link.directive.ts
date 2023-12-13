@@ -11,6 +11,7 @@ import { Subscriptions } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxParentLink]',
+    standalone: true,
 })
 export class ParentLinkDirective implements OnInit {
     private readonly subscriptions = new Subscriptions();

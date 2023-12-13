@@ -68,7 +68,7 @@ public sealed record SimulatedRuleEventDto
     {
         var result = SimpleMapper.Map(ruleEvent, new SimulatedRuleEventDto
         {
-            SkipReasons = new List<SkipReason>()
+            SkipReasons = []
         });
 
         foreach (var reason in Enum.GetValues<SkipReason>())

@@ -5,10 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResolveAssets, ResolveContents, SchemaDto, SchemasState } from '@app/shared';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ContentSectionComponent } from '../forms/content-section.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-creator',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
@@ -16,6 +20,19 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, Re
         ResolveAssets,
         ResolveContents,
         ComponentContentsState,
+    ],
+    imports: [
+        AsyncPipe,
+        FormErrorComponent,
+        FormsModule,
+        LanguageSelectorComponent,
+        ModalDialogComponent,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        TooltipDirective,
+        TranslatePipe,
+        forwardRef(() => ContentSectionComponent),
     ],
 })
 export class ContentCreatorComponent implements OnInit {

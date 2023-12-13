@@ -63,14 +63,14 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         // STEP 2: Update role..
         var updateRequest = new UpdateRoleDto
         {
-            Permissions = new List<string> { "a", "b" }
+            Permissions = ["a", "b"]
         };
 
         var roles_2 = await _.Client.Apps.PutRoleAsync(roleName, updateRequest);
         var role_2 = roles_2.Items.Find(x => x.Name == roleName);
 
         // Should return role with correct name.
-        Assert.Equal(updateRequest.Permissions, role_2.Permissions);
+        Assert.Equal(updateRequest.Permissions, role_2?.Permissions);
 
         await Verify(role_2)
             .IgnoreMember<RoleDto>(x => x.Name);
@@ -97,8 +97,8 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         var role_2 = roles_2.Items.Find(x => x.Name == roleName);
 
         // Should return role with correct number of users and clients.
-        Assert.Equal(1, role_2.NumClients);
-        Assert.Equal(0, role_2.NumContributors);
+        Assert.Equal(1, role_2?.NumClients);
+        Assert.Equal(0, role_2?.NumContributors);
 
 
         // STEP 4: Try to delete role.
@@ -132,8 +132,8 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         var role_2 = roles_2.Items.Find(x => x.Name == roleName);
 
         // Should return role with correct number of users and clients.
-        Assert.Equal(0, role_2.NumClients);
-        Assert.Equal(1, role_2.NumContributors);
+        Assert.Equal(0, role_2?.NumClients);
+        Assert.Equal(1, role_2?.NumContributors);
 
 
         // STEP 4: Try to delete role..
@@ -153,7 +153,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         Assert.DoesNotContain(roles_3.Items, x => x.Name == roleName);
     }
 
-    private async Task AssignContributor(string role = null)
+    private async Task AssignContributor(string? role = null)
     {
         var assignRequest = new AssignContributorDto
         {
@@ -167,7 +167,7 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         await _.Client.Apps.PostContributorAsync(assignRequest);
     }
 
-    private async Task AssignClient(string role = null)
+    private async Task AssignClient(string? role = null)
     {
         var updateRequest = new UpdateClientDto
         {
@@ -187,6 +187,6 @@ public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
         var roles = await _.Client.Apps.PostRoleAsync(createRequest);
         var role = roles.Items.Find(x => x.Name == name);
 
-        return role;
+        return role!;
     }
 }

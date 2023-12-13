@@ -22,6 +22,8 @@ public sealed class AddDefaultValues : IContentDataConverter, IContentItemConver
 
     public bool IgnoreNonMasterFields { get; init; }
 
+    public HashSet<string>? FieldNames { get; init; }
+
     public AddDefaultValues(PartitionResolver partitionResolver, IClock? clock = null)
     {
         this.partitionResolver = partitionResolver;
@@ -33,6 +35,12 @@ public sealed class AddDefaultValues : IContentDataConverter, IContentItemConver
     {
         foreach (var field in schema.Fields)
         {
+            // If the fields are set, we only enrich the given matching field names.
+            if (FieldNames?.Contains(field.Name) == false)
+            {
+                continue;
+            }
+
             if (data.TryGetValue(field.Name, out var fieldData) && fieldData != null)
             {
                 continue;
@@ -43,7 +51,7 @@ public sealed class AddDefaultValues : IContentDataConverter, IContentItemConver
                 continue;
             }
 
-            data[field.Name] = new ContentFieldData();
+            data[field.Name] = [];
         }
     }
 
@@ -53,6 +61,12 @@ public sealed class AddDefaultValues : IContentDataConverter, IContentItemConver
 
         foreach (var partitionKey in partitioning.AllKeys)
         {
+            // If the fields are set, we only enrich the given matching field names.
+            if (FieldNames?.Contains(field.Name) == false)
+            {
+                continue;
+            }
+
             if (!partitioning.IsMaster(partitionKey) && IgnoreNonMasterFields)
             {
                 continue;

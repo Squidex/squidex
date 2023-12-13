@@ -84,7 +84,7 @@ public static class ValidationExtensions
     {
         var contentRepository = operation.Resolve<IContentRepository>();
 
-        var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, ct);
+        var hasReferrer = await contentRepository.HasReferrersAsync(operation.App, operation.CommandId, SearchScope.All, ct);
 
         if (hasReferrer)
         {

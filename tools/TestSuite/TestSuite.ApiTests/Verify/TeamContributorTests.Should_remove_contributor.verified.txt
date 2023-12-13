@@ -1,0 +1,23 @@
+﻿{
+  Items: [
+    {
+      Role: Owner,
+      Links: {
+        delete: {
+          Method: DELETE
+        },
+        update: {
+          Method: POST
+        }
+      }
+    }
+  ],
+  Links: {
+    create: {
+      Method: POST
+    },
+    self: {
+      Method: GET
+    }
+  }
+}

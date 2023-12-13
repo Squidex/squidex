@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 @Directive({
     selector: '[sqxTabRouterLink]',
+    standalone: true,
 })
 export class TabRouterlinkDirective {
     @Input('sqxTabRouterLink')

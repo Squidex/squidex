@@ -5,7 +5,7 @@
     <sqx-layout layout="main" innerWidth="54">
         <ng-container title>
             <div class="d-flex align-items-center">
-                <a class="btn btn-text-secondary" (click)="back()">
+                <a class="btn btn-text-secondary" attr.aria-label="{{ 'common.back' | sqxTranslate }}" (click)="back()">
                     <i class="icon-angle-left"></i>
                 </a>
     
@@ -155,7 +155,7 @@
             </sqx-list-view>
         </ng-container>
 
-        <ng-container sidebarMenu>
+        <ng-template sidebarMenu>
             <div class="panel-nav">
                 <ng-container  *ngIf="rule && (rulesState.canReadEvents | async)">
                     <a class="panel-link panel-link-gray"
@@ -192,7 +192,7 @@
                     <i class="icon-help2"></i>
                 </a>
             </div>
-        </ng-container>
+        </ng-template>
     </sqx-layout>
 </form>
 

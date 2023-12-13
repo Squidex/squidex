@@ -28,7 +28,7 @@ public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreFixt
 
     public sealed class MyEventConsumer : IEventConsumer
     {
-        private readonly HashSet<Guid> uniqueReceivedEvents = new HashSet<Guid>();
+        private readonly HashSet<Guid> uniqueReceivedEvents = [];
         private readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
         private readonly int expectedCount;
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Teams;
@@ -14,9 +13,4 @@ namespace Squidex.Domain.Apps.Events.Teams;
 public sealed class TeamPlanChanged : TeamEvent
 {
     public string PlanId { get; set; }
-
-    public AssignedPlan ToPlan()
-    {
-        return new AssignedPlan(Actor, PlanId);
-    }
 }

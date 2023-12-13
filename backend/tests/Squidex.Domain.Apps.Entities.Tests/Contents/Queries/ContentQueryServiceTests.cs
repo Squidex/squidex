@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -23,26 +22,27 @@ public class ContentQueryServiceTests : GivenContext
     private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
-    private readonly ContentData contentData = new ContentData();
+    private readonly ContentData contentData = [];
     private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
     private readonly ContentQueryService sut;
 
     public ContentQueryServiceTests()
     {
-        var schemaDef =
-            new Schema(SchemaId.Name)
-                .Publish()
-                .SetScripts(new SchemaScripts { Query = "<query-script>" });
-
-        A.CallTo(() => Schema.SchemaDef)
-            .Returns(schemaDef);
+        Schema = Schema with
+        {
+            Scripts = new SchemaScripts
+            {
+                Query = "<query-script>"
+            },
+            IsPublished = true
+        };
 
         SetupEnricher();
 
         A.CallTo(() => AppProvider.GetSchemasAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { Schema });
+            .Returns([Schema]);
 
-        A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<ISchemaEntity?>._, CancellationToken))
+        A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<Schema?>._, CancellationToken))
             .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
         var options = Options.Create(new ContentOptions());
@@ -95,10 +95,10 @@ public class ContentQueryServiceTests : GivenContext
     {
         var requestContext = SetupContext(allowSchema: false);
 
-        var content = CreateContent(DomainId.NewGuid());
+        var content = CreateContent() as Content;
 
         A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
-            .Returns(CreateContent(DomainId.NewGuid()));
+            .Returns(content);
 
         await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken));
     }
@@ -108,10 +108,10 @@ public class ContentQueryServiceTests : GivenContext
     {
         var requestContext = SetupContext();
 
-        var content = CreateContent(DomainId.NewGuid());
+        var content = CreateContent();
 
         A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
-            .Returns<IContentEntity?>(null);
+            .Returns<Content?>(null);
 
         var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken);
 
@@ -123,7 +123,7 @@ public class ContentQueryServiceTests : GivenContext
     {
         var requestContext = SetupContext();
 
-        var content = CreateContent(DomainId.NewGuid());
+        var content = CreateContent();
 
         A.CallTo(() => contentRepository.FindContentAsync(App, Schema, SchemaId.Id, SearchScope.Published, A<CancellationToken>._))
             .Returns(content);
@@ -142,7 +142,7 @@ public class ContentQueryServiceTests : GivenContext
     {
         var requestContext = SetupContext(isFrontend, isUnpublished: unpublished);
 
-        var content = CreateContent(DomainId.NewGuid());
+        var content = CreateContent();
 
         A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, scope, A<CancellationToken>._))
             .Returns(content);
@@ -157,7 +157,7 @@ public class ContentQueryServiceTests : GivenContext
     {
         var requestContext = SetupContext();
 
-        var content = CreateContent(DomainId.NewGuid());
+        var content = CreateContent();
 
         A.CallTo(() => contentVersionLoader.GetAsync(AppId.Id, content.Id, 13, A<CancellationToken>._))
             .Returns(content);
@@ -184,8 +184,8 @@ public class ContentQueryServiceTests : GivenContext
     {
         var requestContext = SetupContext(isFrontend, isUnpublished: unpublished);
 
-        var content1 = CreateContent(DomainId.NewGuid());
-        var content2 = CreateContent(DomainId.NewGuid());
+        var content1 = CreateContent();
+        var content2 = CreateContent();
 
         var q = Q.Empty.WithReference(DomainId.NewGuid());
 
@@ -210,12 +210,12 @@ public class ContentQueryServiceTests : GivenContext
         var requestContext = SetupContext(isFrontend, isUnpublished: unpublished);
 
         var contentIds = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
-        var contents = contentIds.Select(CreateContent).ToList();
+        var contents = contentIds.Select(x => CreateContent().WithId(x)).ToList();
 
         var q = Q.Empty.WithIds(contentIds);
 
         A.CallTo(() => contentRepository.QueryAsync(App,
-                A<List<ISchemaEntity>>.That.Matches(x => x.Count == 1), q, scope,
+                A<List<Schema>>.That.Matches(x => x.Count == 1), q, scope,
                 A<CancellationToken>._))
             .Returns(ResultList.Create(5, contents));
 
@@ -235,12 +235,12 @@ public class ContentQueryServiceTests : GivenContext
         var requestContext = SetupContext(allowSchema: false);
 
         var contentIds = Enumerable.Range(0, 5).Select(x => DomainId.NewGuid()).ToList();
-        var contents = contentIds.Select(CreateContent).ToList();
+        var contents = contentIds.Select(x => CreateContent().WithId(x)).ToList();
 
         var q = Q.Empty.WithIds(contentIds);
 
         A.CallTo(() => contentRepository.QueryAsync(App,
-                A<List<ISchemaEntity>>.That.Matches(x => x.Count == 0), q, SearchScope.All,
+                A<List<Schema>>.That.Matches(x => x.Count == 0), q, SearchScope.All,
                 A<CancellationToken>._))
             .Returns(ResultList.Create(0, contents));
 
@@ -277,12 +277,12 @@ public class ContentQueryServiceTests : GivenContext
 
     private void SetupEnricher()
     {
-        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>._, A<Context>._, CancellationToken))
+        A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<Content>>._, A<Context>._, CancellationToken))
             .ReturnsLazily(x =>
             {
-                var input = x.GetArgument<IEnumerable<IContentEntity>>(0)!;
+                var input = x.GetArgument<IEnumerable<Content>>(0)!;
 
-                return Task.FromResult<IReadOnlyList<IEnrichedContentEntity>>(input.Select(c => SimpleMapper.Map(c, new ContentEntity())).ToList());
+                return Task.FromResult<IReadOnlyList<EnrichedContent>>(input.Select(c => SimpleMapper.Map(c, new EnrichedContent())).ToList());
             });
     }
 
@@ -304,24 +304,11 @@ public class ContentQueryServiceTests : GivenContext
         return CreateContext(isFrontend == 1, permissions.ToArray()).Clone(b => b.WithUnpublished(isUnpublished == 1));
     }
 
-    private static void AssertContent(IContentEntity source, IEnrichedContentEntity? actual)
+    private static void AssertContent(EnrichedContent source, EnrichedContent? actual)
     {
         Assert.NotNull(actual);
         Assert.NotSame(source, actual);
         Assert.Same(source.Data, actual?.Data);
         Assert.Equal(source.Id, actual?.Id);
-    }
-
-    private IContentEntity CreateContent(DomainId id)
-    {
-        var content = new ContentEntity
-        {
-            Id = id,
-            Data = contentData,
-            SchemaId = SchemaId,
-            Status = Status.Published
-        };
-
-        return content;
     }
 }

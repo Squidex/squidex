@@ -8,33 +8,33 @@
 using GraphQL;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Dynamic;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using GraphQLSchema = GraphQL.Types.Schema;
+using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
 internal sealed class Builder
 {
-    private readonly Dictionary<FieldInfo, ComponentUnionGraphType> componentUnionTypes = new ();
-    private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = new ();
-    private readonly Dictionary<FieldInfo, NestedGraphType> nestedTypes = new ();
-    private readonly Dictionary<SchemaInfo, ComponentGraphType> componentTypes = new ();
-    private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new ();
-    private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new ();
-    private readonly Dictionary<string, ContentUnionGraphType> unionTypes = new ();
-    private readonly Dictionary<string, EnumerationGraphType?> enumTypes = new ();
-    private readonly Dictionary<string, IGraphType[]> dynamicTypes = new ();
+    private readonly Dictionary<FieldInfo, ComponentUnionGraphType> componentUnionTypes = [];
+    private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = [];
+    private readonly Dictionary<FieldInfo, NestedGraphType> nestedTypes = [];
+    private readonly Dictionary<SchemaInfo, ComponentGraphType> componentTypes = [];
+    private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = [];
+    private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = [];
+    private readonly Dictionary<string, ContentUnionGraphType> unionTypes = [];
+    private readonly Dictionary<string, EnumerationGraphType?> enumTypes = [];
+    private readonly Dictionary<string, IGraphType[]> dynamicTypes = [];
     private readonly FieldVisitor fieldVisitor;
     private readonly FieldInputVisitor fieldInputVisitor;
     private readonly PartitionResolver partitionResolver;
-    private readonly HashSet<SchemaInfo> allSchemas = new HashSet<SchemaInfo>();
+    private readonly HashSet<SchemaInfo> allSchemas = [];
     private readonly ReservedNames typeNames = ReservedNames.ForTypes();
     private readonly GraphQLOptions options;
 
@@ -50,7 +50,7 @@ internal sealed class Builder
 
     public FieldMap FieldMap { get; private set; }
 
-    public Builder(IAppEntity app, GraphQLOptions options)
+    public Builder(App app, GraphQLOptions options)
     {
         partitionResolver = app.PartitionResolver();
 
@@ -60,7 +60,7 @@ internal sealed class Builder
         this.options = options;
     }
 
-    public GraphQLSchema BuildSchema(IEnumerable<ISchemaEntity> schemas)
+    public GraphQLSchema BuildSchema(IEnumerable<Schema> schemas)
     {
         // Do not add schema without fields.
         allSchemas.AddRange(SchemaInfo.Build(schemas, typeNames).Where(x => x.Fields.Count > 0));
@@ -138,7 +138,7 @@ internal sealed class Builder
 
     private static bool IsNormalSchema(SchemaInfo schema)
     {
-        return schema.Schema.SchemaDef.IsPublished && schema.Schema.SchemaDef.Type != SchemaType.Component;
+        return schema.Schema.IsPublished && schema.Schema.Type != SchemaType.Component;
     }
 
     public FieldGraphSchema GetGraphType(FieldInfo fieldInfo)

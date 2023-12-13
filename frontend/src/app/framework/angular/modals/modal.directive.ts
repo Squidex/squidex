@@ -15,6 +15,7 @@ declare type Model = DialogModel | ModalModel | any;
 
 @Directive({
     selector: '[sqxModal]',
+    standalone: true,
 })
 export class ModalDirective<T = unknown> implements OnDestroy {
     private readonly eventsView = new Subscriptions();

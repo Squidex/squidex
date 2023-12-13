@@ -9,13 +9,11 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
@@ -24,52 +22,39 @@ using SortBuilder = Squidex.Infrastructure.Queries.SortBuilder;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
 
-public class ContentQueryTests
+public class ContentQueryTests : GivenContext
 {
-    private readonly DomainId appId = DomainId.NewGuid();
-    private readonly Schema schemaDef;
-    private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
-
     static ContentQueryTests()
     {
+        MongoContentEntity.RegisterClassMap();
+
         TestUtils.SetupBson();
     }
 
     public ContentQueryTests()
     {
-        schemaDef =
-            new Schema("user")
-                .AddString(1, "firstName", Partitioning.Language,
-                    new StringFieldProperties())
-                .AddString(2, "lastName", Partitioning.Language,
-                    new StringFieldProperties())
-                .AddBoolean(3, "isAdmin", Partitioning.Invariant,
-                    new BooleanFieldProperties())
-                .AddNumber(4, "age", Partitioning.Invariant,
-                    new NumberFieldProperties())
-                .AddDateTime(5, "birthday", Partitioning.Invariant,
-                    new DateTimeFieldProperties())
-                .AddAssets(6, "pictures", Partitioning.Invariant,
-                    new AssetsFieldProperties())
-                .AddReferences(7, "friends", Partitioning.Invariant,
-                    new ReferencesFieldProperties())
-                .AddString(8, "dashed-field", Partitioning.Invariant,
-                    new StringFieldProperties())
-                .AddJson(9, "json", Partitioning.Invariant,
-                    new JsonFieldProperties())
-                .AddArray(10, "hobbies", Partitioning.Invariant, a => a
-                    .AddString(101, "name"))
-                .Update(new SchemaProperties());
-
-        var schema = A.Dummy<ISchemaEntity>();
-        A.CallTo(() => schema.Id).Returns(DomainId.NewGuid());
-        A.CallTo(() => schema.Version).Returns(3);
-        A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
-
-        var app = A.Dummy<IAppEntity>();
-        A.CallTo(() => app.Id).Returns(DomainId.NewGuid());
-        A.CallTo(() => app.Version).Returns(3);
-        A.CallTo(() => app.Languages).Returns(languages);
+        Schema = Schema with { Version = 3 };
+        Schema = Schema
+            .AddString(1, "firstName", Partitioning.Language,
+                new StringFieldProperties())
+            .AddString(2, "lastName", Partitioning.Language,
+                new StringFieldProperties())
+            .AddBoolean(3, "isAdmin", Partitioning.Invariant,
+                new BooleanFieldProperties())
+            .AddNumber(4, "age", Partitioning.Invariant,
+                new NumberFieldProperties())
+            .AddDateTime(5, "birthday", Partitioning.Invariant,
+                new DateTimeFieldProperties())
+            .AddAssets(6, "pictures", Partitioning.Invariant,
+                new AssetsFieldProperties())
+            .AddReferences(7, "friends", Partitioning.Invariant,
+                new ReferencesFieldProperties())
+            .AddString(8, "dashed-field", Partitioning.Invariant,
+                new StringFieldProperties())
+            .AddJson(9, "json", Partitioning.Invariant,
+                new JsonFieldProperties())
+            .AddArray(10, "hobbies", Partitioning.Invariant, a => a
+                .AddString(101, "name"));
     }
 
     [Fact]
@@ -79,7 +64,7 @@ public class ContentQueryTests
 
         var filter = ClrFilter.Eq("id", id);
 
-        AssertQuery($"{{ '_id' : '{appId}--{id}' }}", filter);
+        AssertQuery($"{{ '_id' : '{AppId.Id}--{id}' }}", filter);
     }
 
     [Fact]
@@ -89,7 +74,7 @@ public class ContentQueryTests
 
         var filter = ClrFilter.Eq("id", id);
 
-        AssertQuery($"{{ '_id' : '{appId}--{id}' }}", filter);
+        AssertQuery($"{{ '_id' : '{AppId.Id}--{id}' }}", filter);
     }
 
     [Fact]
@@ -99,7 +84,7 @@ public class ContentQueryTests
 
         var filter = ClrFilter.In("id", new List<Guid> { id });
 
-        AssertQuery($"{{ '_id' : {{ '$in' : ['{appId}--{id}'] }} }}", filter);
+        AssertQuery($"{{ '_id' : {{ '$in' : ['{AppId.Id}--{id}'] }} }}", filter);
     }
 
     [Fact]
@@ -109,7 +94,7 @@ public class ContentQueryTests
 
         var filter = ClrFilter.In("id", new List<string> { id });
 
-        AssertQuery($"{{ '_id' : {{ '$in' : ['{appId}--{id}'] }} }}", filter);
+        AssertQuery($"{{ '_id' : {{ '$in' : ['{AppId.Id}--{id}'] }} }}", filter);
     }
 
     [Fact]
@@ -238,7 +223,7 @@ public class ContentQueryTests
 
     private void AssertQuery(ClrQuery query, string expected, object? arg = null)
     {
-        var filter = query.AdjustToModel(appId).BuildFilter<MongoContentEntity>(false).Filter!;
+        var filter = query.AdjustToModel(AppId.Id).BuildFilter<MongoContentEntity>(false).Filter!;
 
         var rendered =
             filter.Render(
@@ -265,7 +250,7 @@ public class ContentQueryTests
                    .ToString();
             });
 
-        cursor.QuerySort(new ClrQuery { Sort = sort.ToList() }.AdjustToModel(appId));
+        cursor.QuerySort(new ClrQuery { Sort = sort.ToList() }.AdjustToModel(AppId.Id));
 
         Assert.Equal(Cleanup(expected), rendered);
     }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Reflection;
@@ -22,7 +23,7 @@ public sealed class RuleEnricher : IRuleEnricher
         this.requestCache = requestCache;
     }
 
-    public async Task<IEnrichedRuleEntity> EnrichAsync(IRuleEntity rule, Context context,
+    public async Task<EnrichedRule> EnrichAsync(Rule rule, Context context,
         CancellationToken ct)
     {
         Guard.NotNull(rule);
@@ -32,7 +33,7 @@ public sealed class RuleEnricher : IRuleEnricher
         return enriched[0];
     }
 
-    public async Task<IReadOnlyList<IEnrichedRuleEntity>> EnrichAsync(IEnumerable<IRuleEntity> rules, Context context,
+    public async Task<IReadOnlyList<EnrichedRule>> EnrichAsync(IEnumerable<Rule> rules, Context context,
         CancellationToken ct)
     {
         Guard.NotNull(rules);
@@ -40,36 +41,36 @@ public sealed class RuleEnricher : IRuleEnricher
 
         using (Telemetry.Activities.StartActivity("RuleEnricher/EnrichAsync"))
         {
-            var results = new List<RuleEntity>();
-
-            foreach (var rule in rules)
-            {
-                var result = SimpleMapper.Map(rule, new RuleEntity());
-
-                results.Add(result);
-            }
+            var results = new List<EnrichedRule>();
 
             // Sometimes we just want to skip this for performance reasons.
             var enrichCacheKeys = !context.NoCacheKeys();
 
-            foreach (var group in results.GroupBy(x => x.AppId.Id))
+            foreach (var group in rules.GroupBy(x => x.AppId.Id))
             {
                 var statistics = await ruleUsageTracker.GetTotalByAppAsync(group.Key, ct);
 
                 foreach (var rule in group)
                 {
+                    var result = SimpleMapper.Map(rule, new EnrichedRule());
+
                     if (statistics.TryGetValue(rule.Id, out var statistic))
                     {
-                        rule.NumFailed = statistic.TotalFailed;
-                        rule.NumSucceeded = statistic.TotalSucceeded;
+                        result = result with
+                        {
+                            NumFailed = statistic.TotalFailed,
+                            NumSucceeded = statistic.TotalSucceeded
+                        };
                     }
 
                     if (enrichCacheKeys)
                     {
-                        requestCache.AddDependency(rule.UniqueId, rule.Version);
-                        requestCache.AddDependency(rule.NumFailed);
-                        requestCache.AddDependency(rule.NumSucceeded);
+                        requestCache.AddDependency(result.UniqueId, result.Version);
+                        requestCache.AddDependency(result.NumFailed);
+                        requestCache.AddDependency(result.NumSucceeded);
                     }
+
+                    results.Add(result);
                 }
             }
 

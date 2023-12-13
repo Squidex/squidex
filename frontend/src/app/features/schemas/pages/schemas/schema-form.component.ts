@@ -5,13 +5,33 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ApiUrlConfig, AppsState, CreateSchemaForm, SchemaDto, SchemasState } from '@app/shared';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, SchemaDto, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-schema-form',
     styleUrls: ['./schema-form.component.scss'],
     templateUrl: './schema-form.component.html',
+    imports: [
+        AsyncPipe,
+        CodeEditorComponent,
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        FormAlertComponent,
+        FormErrorComponent,
+        FormHintComponent,
+        FormsModule,
+        ModalDialogComponent,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        TooltipDirective,
+        TransformInputDirective,
+        TranslatePipe,
+    ],
 })
 export class SchemaFormComponent implements OnInit {
     @Output()

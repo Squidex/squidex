@@ -10,6 +10,7 @@ import { UntypedFormGroup } from '@angular/forms';
 import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-component-ui',
     styleUrls: ['component-ui.component.scss'],
     templateUrl: 'component-ui.component.html',

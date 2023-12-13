@@ -5,8 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ListViewComponent, ModalDialogComponent, PagerComponent, TagEditorComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings, StatefulComponent } from '@app/shared/internal';
+import { SearchFormComponent } from '../search/search-form.component';
+import { AssetsListComponent } from './assets-list.component';
 
 interface State {
     // The selected assets.
@@ -20,6 +25,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-selector',
     styleUrls: ['./asset-selector.component.scss'],
     templateUrl: './asset-selector.component.html',
@@ -27,6 +33,18 @@ interface State {
         ComponentAssetsState,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AssetsListComponent,
+        AsyncPipe,
+        FormsModule,
+        ListViewComponent,
+        ModalDialogComponent,
+        PagerComponent,
+        SearchFormComponent,
+        TagEditorComponent,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class AssetSelectorComponent extends StatefulComponent<State> implements OnInit {
     @Output()

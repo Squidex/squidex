@@ -74,7 +74,9 @@ export class Profile {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AuthService {
     private readonly userManager!: UserManager;
     private readonly user$ = new ReplaySubject<Profile | null>(1);
@@ -168,8 +170,10 @@ export class AuthService {
         throw new Error('Retry limit exceeded.');
     }
 
-    private checkState(promise: Promise<User | null>) {
-        promise.then(user => {
+    private async checkState(promise: Promise<User | null>) {
+        try {
+            const user = await promise;
+
             if (user) {
                 this.user$.next(getProfile(user));
             } else {
@@ -177,11 +181,11 @@ export class AuthService {
             }
 
             return true;
-        }, _ => {
+        } catch {
             this.user$.next(null);
 
             return false;
-        });
+        }
     }
 }
 

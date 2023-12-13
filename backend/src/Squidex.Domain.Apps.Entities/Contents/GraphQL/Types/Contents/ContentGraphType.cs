@@ -7,12 +7,13 @@
 
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
-internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
+internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
 {
     // We need the schema identity at runtime.
     public DomainId SchemaId { get; set; }
@@ -31,7 +32,7 @@ internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
 
         IsTypeOf = value =>
         {
-            return value is IContentEntity content && content.SchemaId?.Id == schemaId;
+            return value is Content content && content.SchemaId?.Id == schemaId;
         };
 
         AddField(ContentFields.Id);
@@ -157,7 +158,7 @@ internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
 
     private static bool IsReference(SchemaInfo from, SchemaInfo to)
     {
-        return from.Schema.SchemaDef.Fields.Any(x => IsReferencing(x, to.Schema.Id));
+        return from.Schema.Fields.Any(x => IsReferencing(x, to.Schema.Id));
     }
 
     private static bool IsReferencing(IField field, DomainId schemaId)

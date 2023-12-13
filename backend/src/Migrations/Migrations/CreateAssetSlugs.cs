@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 
@@ -14,9 +14,9 @@ namespace Migrations.Migrations;
 
 public sealed class CreateAssetSlugs : IMigration
 {
-    private readonly ISnapshotStore<AssetDomainObject.State> stateForAssets;
+    private readonly ISnapshotStore<Asset> stateForAssets;
 
-    public CreateAssetSlugs(ISnapshotStore<AssetDomainObject.State> stateForAssets)
+    public CreateAssetSlugs(ISnapshotStore<Asset> stateForAssets)
     {
         this.stateForAssets = stateForAssets;
     }
@@ -28,7 +28,7 @@ public sealed class CreateAssetSlugs : IMigration
         {
             state.Slug = state.FileName.ToAssetSlug();
 
-            var job = new SnapshotWriteJob<AssetDomainObject.State>(key, state, version);
+            var job = new SnapshotWriteJob<Asset>(key, state, version);
 
             await stateForAssets.WriteAsync(job, ct);
         }

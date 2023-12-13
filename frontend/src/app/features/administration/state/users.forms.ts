@@ -7,7 +7,7 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, ValidatorsEx } from '@app/shared';
-import { UpsertUserDto, UserDto } from './../services/users.service';
+import { UpsertUserDto, UserDto } from '../services/users.service';
 
 export class UserForm extends Form<ExtendedFormGroup, UpsertUserDto, UserDto> {
     constructor() {

@@ -145,8 +145,8 @@ public class ContentDataTests
     {
         var source = new ContentData
         {
-            ["field1"] = new ContentFieldData(),
-            ["field2"] = new ContentFieldData()
+            ["field1"] = [],
+            ["field2"] = []
         };
 
         var clone = source.Clone();

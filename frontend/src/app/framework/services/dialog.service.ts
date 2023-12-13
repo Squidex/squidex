@@ -9,9 +9,9 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject, Subject, throwError } from 'rxjs';
-import { ErrorDto } from './../utils/error';
-import { FloatingPlacement } from './../utils/modal-view';
-import { Types } from './../utils/types';
+import { ErrorDto } from '../utils/error';
+import { FloatingPlacement } from '../utils/modal-view';
+import { Types } from '../utils/types';
 import { LocalStoreService } from './local-store.service';
 
 export class DialogRequest {
@@ -87,7 +87,9 @@ export class Notification {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class DialogService {
     private readonly requestStream$ = new Subject<DialogRequest>();
     private readonly notificationsStream$ = new Subject<Notification>();

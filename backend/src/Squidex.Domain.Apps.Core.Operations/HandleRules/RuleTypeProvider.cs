@@ -20,7 +20,7 @@ public sealed class RuleTypeProvider : ITypeProvider
 {
     private const string ActionSuffix = "Action";
     private const string ActionSuffixV2 = "ActionV2";
-    private readonly Dictionary<string, RuleActionDefinition> actionTypes = new Dictionary<string, RuleActionDefinition>();
+    private readonly Dictionary<string, RuleActionDefinition> actionTypes = [];
 
     public IReadOnlyDictionary<string, RuleActionDefinition> Actions
     {

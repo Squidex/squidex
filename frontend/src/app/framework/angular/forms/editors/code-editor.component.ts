@@ -8,16 +8,15 @@
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, numberAttribute, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
-import { ResourceLoaderService, ScriptCompletions, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
-import { FocusComponent } from './../forms-helper';
-
-declare const ace: any;
+import { ResourceLoaderService, ScriptCompletion, ScriptCompletions, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { FocusComponent } from '../forms-helper';
 
 export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CodeEditorComponent), multi: true,
 };
 
 @Component({
+    standalone: true,
     selector: 'sqx-code-editor',
     styleUrls: ['./code-editor.component.scss'],
     templateUrl: './code-editor.component.html',
@@ -27,11 +26,11 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodeEditorComponent extends StatefulControlComponent<{}, any> implements AfterViewInit, FocusComponent {
-    private aceEditor: any;
-    private aceTools: any;
+    private aceModes?: ModeList;
+    private aceEditor?: AceAjax.Editor;
+    private aceTools = false;
     private valueChanged = new Subject();
     private value = '';
-    private modelist: any;
     private completions: ReadonlyArray<{ name: string; value: string }> = [];
 
     @ViewChild('editor', { static: false })
@@ -136,84 +135,88 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
         this.aceEditor.focus();
     }
 
-    public ngAfterViewInit() {
+    public async ngAfterViewInit() {
         this.valueChanged.pipe(debounceTime(500))
             .subscribe(() => {
                 this.changeValue();
             });
 
-        Promise.all([
+        await Promise.all([
             this.resourceLoader.loadLocalScript('dependencies/ace/ace.js'),
-            this.resourceLoader.loadLocalScript('dependencies/ace/ext/modelist.js'),
-            this.resourceLoader.loadLocalScript('dependencies/ace/ext/language_tools.js'),
-        ]).then(() => {
-            this.modelist = ace.require('ace/ext/modelist');
+            this.resourceLoader.loadLocalScript('dependencies/ace/ext-modelist.js'),
+            this.resourceLoader.loadLocalScript('dependencies/ace/ext-language_tools.js'),
+        ]);
 
-            this.aceEditor = ace.edit(this.editor.nativeElement);
-            this.aceEditor.setFontSize(14);
-            this.aceTools = ace.require('ace/ext/language_tools');
+        this.aceEditor = ace.edit(this.editor.nativeElement);
+        this.aceEditor.setFontSize('14px');
+        this.aceModes = ace.require('ace/ext-modelist');
+        this.aceTools = !!ace.require('ace/ext-language_tools');
 
-            this.setValue(this.value);
-            this.setMode();
-            this.setOptions();
-            this.setWordWrap();
-            this.onDisabled(this.snapshot.isDisabled);
+        this.setValue(this.value);
+        this.setMode();
+        this.setOptions();
+        this.setWordWrap();
+        this.onDisabled(this.snapshot.isDisabled);
 
-            if (this.aceTools) {
-                const previous = this.aceEditor.completers;
+        if (this.aceTools) {
+            const previous = (this.aceEditor as any)['completers'] as AceAjax.Completer[];
 
-                this.aceEditor.completers = [
-                    previous?.[0], {
-                        getCompletions: (editor: any, session: any, pos: any, prefix: any, callback: any) => {
-                            callback(null, this.completions);
-                        },
-                        getDocTooltip: (item: any) => {
-                            if (item.path && item.description) {
-                                item.docHTML = `<b>${item.value}</b><hr></hr>${item.description}`;
-
-                                if (item.allowedValues) {
-                                    item.docHTML += '<div class="mt-2 mb-2">Allowed Values:<ul>';
-
-                                    for (const value of item.allowedValues) {
-                                        item.docHTML += `<li><code>${value}</code></li>`;
-                                    }
-
-                                    item.docHTML += '</ul></div>';
-                                }
-
-                                if (item.deprecationReason) {
-                                    item.docHTML += `<div class="mt-2 mb-2"><strong>Deprecated</strong>: ${item.deprecationReason}</div>`;
-                                }
-                            }
-                        },
-                        // eslint-disable-next-line no-useless-escape
-                        identifierRegexps: [/[a-zA-Z_0-9\$\-\.\u00A2-\u2000\u2070-\uFFFF]/],
+            (this.aceEditor as any)['completers'] = [
+                previous?.[0], {
+                    getCompletions: (editor: any, session: any, pos: any, prefix: any, callback: any) => {
+                        callback(null, this.completions);
                     },
-                ];
-            }
-            this.aceEditor.on('blur', () => {
-                this.changeValue();
+                    getDocTooltip: (item: AceAjax.Completion) => {
+                        const source = item as unknown as ScriptCompletion;
 
-                this.callTouched();
-            });
+                        if (source.path && source.description) {
+                            item.docHTML = `<b>${item.value}</b><hr></hr>${source.description}`;
 
-            this.aceEditor.on('change', () => {
-                this.valueChanged.next(true);
-            });
+                            if (source.allowedValues) {
+                                item.docHTML += '<div class="mt-2 mb-2">Allowed Values:<ul>';
 
-            this.aceEditor.on('paste', (event: any) => {
-                if (this.singleLine) {
-                    event.text = event.text.replace(/[\r\n]+/g, ' ');
-                }
-            });
+                                for (const value of source.allowedValues) {
+                                    item.docHTML += `<li><code>${value}</code></li>`;
+                                }
 
-            this.detach();
+                                item.docHTML += '</ul></div>';
+                            }
+
+                            if (source.deprecationReason) {
+                                item.docHTML += `<div class="mt-2 mb-2"><strong>Deprecated</strong>: ${source.deprecationReason}</div>`;
+                            }
+                        }
+                    },
+                    identifierRegexps: [/[a-zA-Z_0-9\$\-\.\u00A2-\u2000\u2070-\uFFFF]/],
+                } as AceAjax.Completer,
+            ];
+        }
+        this.aceEditor.on('blur', () => {
+            this.changeValue();
+
+            this.callTouched();
         });
+
+        this.aceEditor.on('change', () => {
+            this.valueChanged.next(true);
+        });
+
+        this.aceEditor.on('paste', (event: any) => {
+            if (this.singleLine) {
+                event.text = event.text.replace(/[\r\n]+/g, ' ');
+            }
+        });
+
+        this.detach();
     }
 
     private changeValue() {
+        if (!this.aceEditor) {
+            return;
+        }
+
         let newValueText = this.aceEditor.getValue();
-        let newValueOut = newValueText;
+        let newValueOut: string | null = newValueText;
 
         if (this.valueMode === 'Json') {
             const isValid = this.aceEditor.getSession().getAnnotations().length === 0;
@@ -251,8 +254,8 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
             return;
         }
 
-        if (this.valueFile && this.modelist) {
-            const mode = this.modelist.getModeForPath(this.valueFile).mode;
+        if (this.valueFile && this.aceModes) {
+            const mode = this.aceModes.getModeForPath(this.valueFile).mode;
 
             this.aceEditor.getSession().setMode(mode);
         } else {
@@ -285,9 +288,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
 
         this.aceEditor.setOptions({
             autoScrollEditorIntoView: this.singleLine,
-            enableBasicAutocompletion: !!this.aceTools,
-            enableLiveAutocompletion: !!this.aceTools,
-            enableSnippets: !!this.aceTools && !this.singleLine && this.snippets,
+            enableBasicAutocompletion: this.aceTools,
+            enableLiveAutocompletion: this.aceTools,
+            enableSnippets: this.aceTools && !this.singleLine && this.snippets,
             highlightActiveLine: !this.singleLine,
             maxLines,
             minLines,
@@ -295,11 +298,15 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
             showGutter: !this.singleLine,
         });
 
-        this.aceEditor.commands.bindKey('Enter|Shift-Enter', this.singleLine ? 'null' : undefined);
+        this.aceEditor.commands.bindKey('Enter|Shift-Enter', this.singleLine ? 'null' : undefined as any);
     }
 
     private setValue(value: string) {
-        this.aceEditor.setValue(value);
-        this.aceEditor.clearSelection();
+        this.aceEditor?.setValue(value);
+        this.aceEditor?.clearSelection();
     }
+}
+
+interface ModeList {
+    getModeForPath(path: string): { mode: string };
 }

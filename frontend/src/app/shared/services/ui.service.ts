@@ -16,7 +16,9 @@ export type UISettingsDto = Readonly<{
     canCreateApps?: boolean;
 }> & Record<string, any>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class UIService {
     constructor(
         private readonly http: HttpClient,

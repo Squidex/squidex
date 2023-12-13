@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
@@ -49,7 +48,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Trigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadonlyList.Empty<SchemaCondition>()
+                Schemas = []
             },
             Action = null!
         });
@@ -65,7 +64,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Trigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadonlyList.Empty<SchemaCondition>()
+                Schemas = []
             },
             Action = new TestAction
             {
@@ -81,7 +80,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule();
 
-        await GuardRule.CanUpdate(command, Rule(), AppProvider);
+        await GuardRule.CanUpdate(command, CreateRule(), AppProvider);
     }
 
     [Fact]
@@ -89,17 +88,17 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule { Name = "MyName" };
 
-        await GuardRule.CanUpdate(command, Rule(), AppProvider);
+        await GuardRule.CanUpdate(command, CreateRule(), AppProvider);
     }
 
     [Fact]
-    public async Task CanUpdate_should_not_throw_exception_if_trigger_action__and_name_are_valid()
+    public async Task CanUpdate_should_not_throw_exception_if_trigger_action_and_name_are_valid()
     {
         var command = new UpdateRule
         {
             Trigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadonlyList.Empty<SchemaCondition>()
+                Schemas = []
             },
             Action = new TestAction
             {
@@ -108,7 +107,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             Name = "NewName"
         };
 
-        await GuardRule.CanUpdate(command, Rule(), AppProvider);
+        await GuardRule.CanUpdate(command, CreateRule(), AppProvider);
     }
 
     private CreateRule CreateCommand(CreateRule command)
@@ -116,14 +115,5 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         command.AppId = AppId;
 
         return command;
-    }
-
-    private IRuleEntity Rule()
-    {
-        var rule = A.Fake<IRuleEntity>();
-
-        A.CallTo(() => rule.AppId).Returns(AppId);
-
-        return rule;
     }
 }

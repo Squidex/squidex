@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
@@ -17,7 +17,7 @@ public sealed class ClientsDto : Resource
     /// </summary>
     public ClientDto[] Items { get; set; }
 
-    public static ClientsDto FromApp(IAppEntity app, Resources resources)
+    public static ClientsDto FromApp(App app, Resources resources)
     {
         var result = new ClientsDto
         {

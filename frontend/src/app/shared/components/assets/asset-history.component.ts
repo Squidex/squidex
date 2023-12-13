@@ -5,17 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ExternalLinkDirective, FromNowPipe, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppsState, AssetDto, HistoryEventDto, HistoryService } from '@app/shared/internal';
+import { HistoryMessagePipe } from '../history/pipes';
+import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
+import { AssetUrlPipe } from './pipes';
 
 interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean }
 
 @Component({
+    standalone: true,
     selector: 'sqx-asset-history',
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
+    imports: [
+        AssetUrlPipe,
+        AsyncPipe,
+        ExternalLinkDirective,
+        FromNowPipe,
+        HistoryMessagePipe,
+        NgFor,
+        NgIf,
+        TooltipDirective,
+        TranslatePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class AssetHistoryComponent {
     @Input({ required: true })

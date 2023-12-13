@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 
@@ -30,35 +31,34 @@ public class EnrichWithMetadataTextTests : GivenContext
     [Fact]
     public async Task Should_not_enrich_if_disabled()
     {
-        var asset = new AssetEntity();
+        var asset = CreateAsset();
 
         await sut.EnrichAsync(ApiContext.Clone(b => b.WithNoAssetEnrichment()), Enumerable.Repeat(asset, 1), CancellationToken);
 
-        A.CallTo(() => assetMetadataSource1.Format(A<IAssetEntity>._))
+        A.CallTo(() => assetMetadataSource1.Format(A<Asset>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => assetMetadataSource2.Format(A<IAssetEntity>._))
+        A.CallTo(() => assetMetadataSource2.Format(A<Asset>._))
             .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_enrich_asset_with_metadata()
     {
-        var asset = new AssetEntity
+        var asset = CreateAsset() with
         {
             FileSize = 2 * 1024,
-            Tags = new HashSet<string>
-            {
+            Tags =
+            [
                 "id1",
                 "id2"
-            },
-            AppId = AppId
+            ]
         };
 
-        A.CallTo(() => assetMetadataSource1.Format(A<IAssetEntity>._))
+        A.CallTo(() => assetMetadataSource1.Format(asset))
             .Returns(new[] { "metadata1" });
 
-        A.CallTo(() => assetMetadataSource2.Format(A<IAssetEntity>._))
+        A.CallTo(() => assetMetadataSource2.Format(asset))
             .Returns(new[] { "metadata2", "metadata3" });
 
         await sut.EnrichAsync(FrontendContext, Enumerable.Repeat(asset, 1), CancellationToken);

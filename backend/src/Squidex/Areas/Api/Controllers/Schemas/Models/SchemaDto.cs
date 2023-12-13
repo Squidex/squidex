@@ -8,7 +8,6 @@
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
@@ -115,29 +114,28 @@ public class SchemaDto : Resource
     /// <summary>
     /// The field rules.
     /// </summary>
-    public List<FieldRuleDto> FieldRules { get; set; } = new List<FieldRuleDto>();
+    public List<FieldRuleDto> FieldRules { get; set; } = [];
 
     /// <summary>
     /// The list of fields.
     /// </summary>
     [LocalizedRequired]
-    public List<FieldDto> Fields { get; set; } = new List<FieldDto>();
+    public List<FieldDto> Fields { get; set; } = [];
 
-    public static SchemaDto FromDomain(ISchemaEntity schema, Resources resources)
+    public static SchemaDto FromDomain(Schema schema, Resources resources)
     {
         var result = new SchemaDto();
 
         SimpleMapper.Map(schema, result);
-        SimpleMapper.Map(schema.SchemaDef, result);
-        SimpleMapper.Map(schema.SchemaDef.Scripts, result.Scripts);
-        SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
+        SimpleMapper.Map(schema.Scripts, result.Scripts);
+        SimpleMapper.Map(schema.Properties, result.Properties);
 
-        foreach (var rule in schema.SchemaDef.FieldRules)
+        foreach (var rule in schema.FieldRules)
         {
             result.FieldRules.Add(FieldRuleDto.FromDomain(rule));
         }
 
-        foreach (var field in schema.SchemaDef.Fields)
+        foreach (var field in schema.Fields)
         {
             result.Fields.Add(FieldDto.FromDomain(field));
         }

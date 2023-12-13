@@ -56,7 +56,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return html2Text(value);
+                html2Text(value);
             ";
 
         var actual = sut.Execute(vars, script).AsString;
@@ -73,7 +73,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return markdown2Text(value);
+                markdown2Text(value);
             ";
 
         var actual = sut.Execute(vars, script).AsString;
@@ -90,7 +90,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return wordCount(value);
+                wordCount(value);
             ";
 
         var actual = sut.Execute(vars, script).AsNumber;
@@ -107,7 +107,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return characterCount(value);
+                characterCount(value);
             ";
 
         var actual = sut.Execute(vars, script).AsNumber;
@@ -124,7 +124,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return toCamelCase(value);
+                toCamelCase(value);
             ";
 
         var actual = sut.Execute(vars, script).AsString;
@@ -141,7 +141,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return toPascalCase(value);
+                toPascalCase(value);
             ";
 
         var actual = sut.Execute(vars, script).AsString;
@@ -158,7 +158,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return slugify(value);
+                slugify(value);
             ";
 
         var actual = sut.Execute(vars, script).AsString;
@@ -175,7 +175,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return slugify(value, true);
+                slugify(value, true);
             ";
 
         var actual = sut.Execute(vars, script).AsString;
@@ -192,7 +192,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return sha256(value);
+                sha256(value);
             ";
 
         var actual = sut.Execute(vars, script).AsString;
@@ -209,7 +209,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return sha512(value);
+                sha512(value);
             ";
 
         var actual = sut.Execute(vars, script).AsString;
@@ -226,7 +226,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return md5(value);
+                md5(value);
             ";
 
         var actual = sut.Execute(vars, script).AsString;
@@ -242,7 +242,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                return guid();
+                guid();
             ";
 
         var actual = sut.Execute(vars, script).AsString;

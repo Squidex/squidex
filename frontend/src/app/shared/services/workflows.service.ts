@@ -255,7 +255,9 @@ export type CreateWorkflowDto = Readonly<{
     name: string;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class WorkflowsService {
     constructor(
         private readonly http: HttpClient,

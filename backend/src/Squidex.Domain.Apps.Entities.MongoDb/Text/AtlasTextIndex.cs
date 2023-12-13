@@ -11,7 +11,7 @@ using Lucene.Net.Util;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
@@ -66,7 +66,7 @@ public sealed class AtlasTextIndex : MongoTextIndexBase<Dictionary<string, strin
         return texts;
     }
 
-    public override async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+    public override async Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);

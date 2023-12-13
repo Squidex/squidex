@@ -46,7 +46,7 @@ public class EventConsumerProcessorTests
     private readonly IEventSubscription eventSubscription = A.Fake<IEventSubscription>();
     private readonly TestState<EventConsumerState> state;
     private readonly StoredEvent storedEvent;
-    private readonly EventData eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
+    private readonly EventData eventData = new EventData("Type", [], "Payload");
     private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
     private readonly MyEventConsumerProcessor sut;
     private readonly string consumerName = Guid.NewGuid().ToString();

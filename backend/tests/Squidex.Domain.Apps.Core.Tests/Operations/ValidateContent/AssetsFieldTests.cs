@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent;
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent;
 
 public class AssetsFieldTests : IClassFixture<TranslationsFixture>
 {
-    private readonly List<string> errors = new List<string>();
+    private readonly List<string> errors = [];
     private readonly DomainId asset1 = DomainId.NewGuid();
     private readonly DomainId asset2 = DomainId.NewGuid();
     private readonly IValidatorsFactory factory;
@@ -31,7 +32,7 @@ public class AssetsFieldTests : IClassFixture<TranslationsFixture>
                 {
                     var actual = ids.Select(TestAssets.Document).ToList();
 
-                    return Task.FromResult<IReadOnlyList<IAssetInfo>>(actual);
+                    return Task.FromResult<IReadOnlyList<Asset>>(actual);
                 });
             }
         }

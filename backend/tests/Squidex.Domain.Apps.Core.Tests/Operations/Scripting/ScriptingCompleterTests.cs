@@ -23,7 +23,7 @@ public class ScriptingCompleterTests
     public ScriptingCompleterTests()
     {
         var schema =
-            new Schema("simple")
+            new Schema { Name = "my-schema" }
                 .AddString(1, "my-field", Partitioning.Invariant);
 
         dataSchema = schema.BuildDataSchema(LanguagesConfig.English.ToResolver(), ResolvedComponents.Empty);
@@ -50,8 +50,7 @@ public class ScriptingCompleterTests
 
         AssertCompletion(actual,
             PresetUser("ctx.user"),
-            new[]
-            {
+            [
                 "ctx",
                 "ctx.appId",
                 "ctx.appName",
@@ -73,7 +72,7 @@ public class ScriptingCompleterTests
                 "ctx.status",
                 "ctx.statusOld",
                 "ctx.validate"
-            });
+            ]);
     }
 
     [Fact]
@@ -83,8 +82,7 @@ public class ScriptingCompleterTests
 
         AssertCompletion(actual,
             PresetUser("ctx.user"),
-            new[]
-            {
+            [
                 "ctx",
                 "ctx.appId",
                 "ctx.appName",
@@ -117,7 +115,7 @@ public class ScriptingCompleterTests
                 "ctx.command.permanent",
                 "ctx.command.tags",
                 "ctx.operation"
-            });
+            ]);
     }
 
     [Fact]
@@ -141,8 +139,7 @@ public class ScriptingCompleterTests
         AssertCompletion(actual,
             PresetActor("event.actor"),
             PresetUser("event.user"),
-            new[]
-            {
+            [
                 "event",
                 "event.appId",
                 "event.appId.id",
@@ -171,7 +168,7 @@ public class ScriptingCompleterTests
                 "event.timestamp",
                 "event.type",
                 "event.version"
-            });
+            ]);
     }
 
     [Fact]
@@ -233,8 +230,7 @@ public class ScriptingCompleterTests
         AssertCompletion(actual,
             PresetActor("event.actor"),
             PresetUser("event.user"),
-            new[]
-            {
+            [
                 "event",
                 "event.appId",
                 "event.appId.id",
@@ -266,7 +262,7 @@ public class ScriptingCompleterTests
                 "event.timestamp",
                 "event.type",
                 "event.version"
-            });
+            ]);
     }
 
     [Fact]
@@ -291,8 +287,7 @@ public class ScriptingCompleterTests
             PresetActor("event.actor"),
             PresetUser("event.user"),
             PresetUser("event.mentionedUser"),
-            new[]
-            {
+            [
                 "event",
                 "event.appId",
                 "event.appId.id",
@@ -301,7 +296,7 @@ public class ScriptingCompleterTests
                 "event.text",
                 "event.timestamp",
                 "event.version"
-            });
+            ]);
     }
 
     [Fact]
@@ -325,8 +320,7 @@ public class ScriptingCompleterTests
         AssertCompletion(actual,
             PresetActor("event.actor"),
             PresetUser("event.user"),
-            new[]
-            {
+            [
                 "event",
                 "event.appId",
                 "event.appId.id",
@@ -338,7 +332,7 @@ public class ScriptingCompleterTests
                 "event.timestamp",
                 "event.type",
                 "event.version"
-            });
+            ]);
     }
 
     [Fact]
@@ -393,18 +387,18 @@ public class ScriptingCompleterTests
 
     private static string[] PresetActor(string path)
     {
-        return new[]
-        {
+        return
+        [
             $"{path}",
             $"{path}.identifier",
             $"{path}.type"
-        };
+        ];
     }
 
     private static string[] PresetUser(string path)
     {
-        return new[]
-        {
+        return
+        [
             $"{path}",
             $"{path}.claims",
             $"{path}.claims.name",
@@ -412,6 +406,6 @@ public class ScriptingCompleterTests
             $"{path}.id",
             $"{path}.isClient",
             $"{path}.isUser"
-        };
+        ];
     }
 }

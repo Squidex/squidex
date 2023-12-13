@@ -113,7 +113,7 @@ public sealed class ContentDto : Resource
     /// </summary>
     public long Version { get; set; }
 
-    public static ContentDto FromDomain(IEnrichedContentEntity content, Resources resources)
+    public static ContentDto FromDomain(EnrichedContent content, Resources resources)
     {
         var response = SimpleMapper.Map(content, new ContentDto
         {
@@ -153,7 +153,7 @@ public sealed class ContentDto : Resource
         return response.CreateLinksAsync(content, resources, content.SchemaId.Name);
     }
 
-    private ContentDto CreateLinksAsync(IEnrichedContentEntity content, Resources resources, string schema)
+    private ContentDto CreateLinksAsync(EnrichedContent content, Resources resources, string schema)
     {
         var app = resources.App;
 

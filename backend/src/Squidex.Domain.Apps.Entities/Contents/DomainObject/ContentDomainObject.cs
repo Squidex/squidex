@@ -24,18 +24,18 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public partial class ContentDomainObject : DomainObject<ContentDomainObject.State>
+public partial class ContentDomainObject : DomainObject<WriteContent>
 {
     private readonly IServiceProvider serviceProvider;
 
-    public ContentDomainObject(DomainId id, IPersistenceFactory<State> persistence, ILogger<ContentDomainObject> log,
+    public ContentDomainObject(DomainId id, IPersistenceFactory<WriteContent> persistence, ILogger<ContentDomainObject> log,
         IServiceProvider serviceProvider)
         : base(id, persistence, log)
     {
         this.serviceProvider = serviceProvider;
     }
 
-    protected override bool IsDeleted(State snapshot)
+    protected override bool IsDeleted(WriteContent snapshot)
     {
         return snapshot.IsDeleted;
     }
@@ -88,7 +88,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
                         await UpdateCore(c.AsUpdate(), operation, ct);
                     }
 
-                    if (Is.OptionalChange(operation.Snapshot.EditingStatus(), c.Status))
+                    if (Is.OptionalChange(operation.Snapshot.EditingStatus, c.Status))
                     {
                         await ChangeCore(c.AsChange(c.Status.Value), operation, ct);
                     }
@@ -103,11 +103,11 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
                     await CreateCore(c, operation, ct);
 
-                    if (operation.Schema.SchemaDef.Type == SchemaType.Singleton)
+                    if (operation.Schema.Type == SchemaType.Singleton)
                     {
                         ChangeStatus(c.AsChange(Status.Published));
                     }
-                    else if (Is.OptionalChange(Snapshot.Status, c.Status))
+                    else if (c.Status != null && c.Status != Snapshot.EditingStatus)
                     {
                         await ChangeCore(c.AsChange(c.Status.Value), operation, ct);
                     }
@@ -238,7 +238,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished(), ct);
+            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
 
         var status = await operation.GetInitialStatusAsync();
@@ -252,7 +252,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateContentAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished(), ct);
+            await operation.ValidateContentAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
 
         Create(c, status);
@@ -264,7 +264,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
         operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
         operation.MustNotChangeSingleton(c.Status);
 
-        if (c.Status == Snapshot.EditingStatus())
+        if (c.Status == Snapshot.EditingStatus)
         {
             return;
         }
@@ -282,31 +282,20 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
         {
             var newData = await operation.ExecuteChangeScriptAsync(c.Status, GetChange(c.Status), ct);
 
-            if (!newData.Equals(Snapshot.Data))
+            if (!newData.Equals(Snapshot.EditingData))
             {
-                var previousEvent =
-                   GetUncomittedEvents().Select(x => x.Payload)
-                       .OfType<ContentDataCommand>().FirstOrDefault();
-
-                if (previousEvent != null)
-                {
-                    previousEvent.Data = newData;
-                }
-                else if (!newData.Equals(Snapshot.Data))
-                {
-                    Update(c, newData);
-                }
+                Update(c, newData);
             }
         }
 
-        if (c.CheckReferrers && Snapshot.IsPublished())
+        if (c.CheckReferrers && Snapshot.IsPublished)
         {
             await operation.CheckReferrersAsync(ct);
         }
 
         if (!c.DoNotValidate && await operation.ShouldValidateAsync(c.Status))
         {
-            await operation.ValidateContentAndInputAsync(Snapshot.Data, c.OptimizeValidation, true, ct);
+            await operation.ValidateContentAndInputAsync(Snapshot.EditingData, c.OptimizeValidation, true, ct);
         }
 
         ChangeStatus(c);
@@ -320,7 +309,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished(), ct);
+            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
 
         if (!c.DoNotValidateWorkflow)
@@ -330,7 +319,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         var newData = c.Data;
 
-        if (newData.Equals(Snapshot.Data))
+        if (newData.Equals(Snapshot.EditingData))
         {
             return;
         }
@@ -342,7 +331,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished(), ct);
+            await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
 
         Update(c, newData);
@@ -356,7 +345,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished(), ct);
+            await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
 
         if (!c.DoNotValidateWorkflow)
@@ -364,9 +353,9 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
             await operation.CheckUpdateAsync();
         }
 
-        var newData = c.Data.MergeInto(Snapshot.Data);
+        var newData = c.Data.MergeInto(Snapshot.EditingData);
 
-        if (newData.Equals(Snapshot.Data))
+        if (newData.Equals(Snapshot.EditingData))
         {
             return;
         }
@@ -378,7 +367,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished(), ct);
+            await operation.ValidateContentAsync(newData, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
 
         Update(c, newData);
@@ -399,7 +388,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
     {
         operation.MustHavePermission(PermissionIds.AppContentsRead);
 
-        await operation.ValidateContentAndInputAsync(Snapshot.Data, false, Snapshot.IsPublished(), ct);
+        await operation.ValidateContentAndInputAsync(Snapshot.EditingData, false, Snapshot.IsPublished, ct);
     }
 
     private async Task CreateDraftCore(CreateContentDraft c, ContentOperation operation)
@@ -494,7 +483,7 @@ public partial class ContentDomainObject : DomainObject<ContentDomainObject.Stat
         {
             return StatusChange.Published;
         }
-        else if (Snapshot.IsPublished())
+        else if (Snapshot.IsPublished)
         {
             return StatusChange.Unpublished;
         }

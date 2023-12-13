@@ -5,20 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
-
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { LanguagesState } from './../state/languages.state';
+import { LanguagesState } from '@app/shared/internal';
 
-@Injectable()
-export class LoadLanguagesGuard  {
-    constructor(
-        private readonly languagesState: LanguagesState,
-    ) {
-    }
+export const loadLanguagesGuard = () => {
+    const languagesState = inject(LanguagesState);
 
-    public canActivate(): Observable<boolean> {
-        return this.languagesState.load().pipe(map(_ => true));
-    }
-}
+    return languagesState.load().pipe(map(_ => true));
+};

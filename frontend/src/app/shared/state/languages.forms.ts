@@ -7,7 +7,7 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, value$ } from '@app/framework';
-import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
+import { AppLanguageDto, UpdateAppLanguageDto } from '../services/app-languages.service';
 
 export class EditLanguageForm extends Form<ExtendedFormGroup, UpdateAppLanguageDto, AppLanguageDto> {
     public get isMaster() {

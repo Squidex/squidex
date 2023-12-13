@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
@@ -26,28 +25,28 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
 {
     private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-    private readonly ISchemaEntity normalSchema;
-    private readonly ISchemaEntity normalUnpublishedSchema;
-    private readonly ISchemaEntity singletonSchema;
-    private readonly ISchemaEntity singletonUnpublishedSchema;
-    private readonly ISchemaEntity componentSchema;
+    private readonly Schema normalSchema;
+    private readonly Schema normalUnpublishedSchema;
+    private readonly Schema singletonSchema;
+    private readonly Schema singletonUnpublishedSchema;
+    private readonly Schema componentSchema;
 
     public GuardContentTests()
     {
         normalUnpublishedSchema =
-            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name));
+            Schema.Unpublish();
 
         normalSchema =
-            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name).Publish());
+            normalUnpublishedSchema.Publish();
 
         singletonUnpublishedSchema =
-            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name, type: SchemaType.Singleton));
+            normalUnpublishedSchema with { Type = SchemaType.Singleton };
 
         singletonSchema =
-            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name, type: SchemaType.Singleton).Publish());
+            normalSchema with { Type = SchemaType.Singleton };
 
         componentSchema =
-            Mocks.Schema(AppId, SchemaId.Id, new Schema(SchemaId.Name, type: SchemaType.Component).Publish());
+            normalSchema with { Type = SchemaType.Component };
     }
 
     [Fact]
@@ -207,7 +206,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        operation.MustHaveData(new ContentData());
+        operation.MustHaveData([]);
     }
 
     [Fact]
@@ -226,7 +225,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.CanUpdateAsync(operation.Snapshot, operation.Snapshot.EditingStatus(), operation.User))
+        A.CallTo(() => contentWorkflow.CanUpdateAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, operation.User))
             .Returns(false);
 
         await Assert.ThrowsAsync<DomainException>(() => operation.CheckUpdateAsync());
@@ -237,7 +236,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.CanUpdateAsync(operation.Snapshot, operation.Snapshot.EditingStatus(), operation.User))
+        A.CallTo(() => contentWorkflow.CanUpdateAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, operation.User))
             .Returns(true);
 
         await operation.CheckUpdateAsync();
@@ -248,7 +247,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)operation.Snapshot, Status.Archived))
+        A.CallTo(() => contentWorkflow.GetInfoAsync(operation.Snapshot.ToContent(), Status.Archived))
             .Returns(ValueTask.FromResult<StatusInfo?>(null));
 
         await Assert.ThrowsAsync<ValidationException>(() => operation.CheckStatusAsync(Status.Archived));
@@ -259,7 +258,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)operation.Snapshot, Status.Archived))
+        A.CallTo(() => contentWorkflow.GetInfoAsync(operation.Snapshot.ToContent(), Status.Archived))
             .Returns(new StatusInfo(Status.Archived, StatusColors.Archived));
 
         await operation.CheckStatusAsync(Status.Archived);
@@ -272,7 +271,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
 
         await operation.CheckStatusAsync(Status.Archived);
 
-        A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)operation.Snapshot, Status.Archived))
+        A.CallTo(() => contentWorkflow.GetInfoAsync(operation.Snapshot.ToContent(), Status.Archived))
             .MustNotHaveHappened();
     }
 
@@ -281,7 +280,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)operation.Snapshot, Status.Draft, Status.Archived, operation.User))
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, Status.Archived, operation.User))
             .Returns(false);
 
         await Assert.ThrowsAsync<ValidationException>(() => operation.CheckTransitionAsync(Status.Archived));
@@ -292,7 +291,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)operation.Snapshot, Status.Draft, Status.Archived, operation.User))
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, Status.Archived, operation.User))
             .Returns(true);
 
         await operation.CheckTransitionAsync(Status.Archived);
@@ -305,7 +304,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
 
         await operation.CheckTransitionAsync(Status.Archived);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)operation.Snapshot, A<Status>._, A<Status>._, A<ClaimsPrincipal>._))
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, A<Status>._, A<ClaimsPrincipal>._))
             .MustNotHaveHappened();
     }
 
@@ -315,9 +314,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
         var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsDelete, AppId.Name, SchemaId.Name).Id;
         var userObject = Mocks.FrontendUser(permission: userPermission);
 
-        var operation = Operation(CreateContent(Status.Draft), normalSchema, userObject);
-
-        ((ContentEntity)operation.Snapshot).CreatedBy = RefToken.User("456");
+        var operation = Operation(CreateContent(Status.Draft) with { CreatedBy = RefToken.User("invalid") }, normalSchema, userObject);
 
         operation.MustHavePermission(PermissionIds.AppContentsDelete);
     }
@@ -327,17 +324,13 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        ((ContentEntity)operation.Snapshot).CreatedBy = User;
-
         operation.MustHavePermission(PermissionIds.AppContentsDelete);
     }
 
     [Fact]
     public void Should_not_throw_exception_if_user_is_null()
     {
-        var operation = Operation(CreateContent(Status.Draft), normalSchema, null);
-
-        ((ContentEntity)operation.Snapshot).CreatedBy = RefToken.User("456");
+        var operation = Operation(CreateContent(Status.Draft) with { CreatedBy = RefToken.User("invalid") }, normalSchema, null);
 
         operation.MustHavePermission(PermissionIds.AppContentsDelete);
     }
@@ -345,9 +338,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     [Fact]
     public void Should_throw_exception_if_content_is_from_another_user_and_user_has_no_permission()
     {
-        var operation = Operation(CreateContent(Status.Draft), normalSchema);
-
-        ((ContentEntity)operation.Snapshot).CreatedBy = RefToken.User("456");
+        var operation = Operation(CreateContent(Status.Draft) with { CreatedBy = RefToken.User("invalid") }, normalSchema);
 
         Assert.Throws<DomainForbiddenException>(() => operation.MustHavePermission(PermissionIds.AppContentsDelete));
     }
@@ -357,7 +348,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, operation.CommandId, SearchScope.All, CancellationToken))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, operation.CommandId, SearchScope.All, CancellationToken))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync(CancellationToken));
@@ -368,18 +359,18 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, operation.CommandId, SearchScope.All, CancellationToken))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, operation.CommandId, SearchScope.All, CancellationToken))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync(CancellationToken));
     }
 
-    private ContentOperation Operation(ContentEntity content, ISchemaEntity operationSchema)
+    private ContentOperation Operation(WriteContent content, Schema operationSchema)
     {
         return Operation(content, operationSchema, Mocks.FrontendUser());
     }
 
-    private ContentOperation Operation(ContentEntity content, ISchemaEntity operationSchema, ClaimsPrincipal? currentUser)
+    private ContentOperation Operation(WriteContent content, Schema operationSchema, ClaimsPrincipal? currentUser)
     {
         var serviceProvider =
             new ServiceCollection()
@@ -396,24 +387,29 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
         };
     }
 
-    private ContentEntity CreateDraftContent(Status status, DomainId? id = null)
+    private WriteContent CreateDraftContent(Status status, DomainId? id = null)
     {
-        return CreateContentCore(new ContentEntity { NewStatus = status }, id);
+        return CreateContentCore(Status.Published, status, id);
     }
 
-    private ContentEntity CreateContent(Status status, DomainId? id = null)
+    private WriteContent CreateContent(Status status, DomainId? id = null)
     {
-        return CreateContentCore(new ContentEntity { Status = status }, id);
+        return CreateContentCore(status, null, id);
     }
 
-    private ContentEntity CreateContentCore(ContentEntity content, DomainId? id = null)
+    private WriteContent CreateContentCore(Status status, Status? newStatus, DomainId? id = null)
     {
-        content.Id = id ?? DomainId.NewGuid();
-        content.AppId = AppId;
-        content.Created = default;
-        content.CreatedBy = User;
-        content.SchemaId = SchemaId;
-
-        return content;
+        return new WriteContent
+        {
+            Id = id ?? DomainId.NewGuid(),
+            AppId = AppId,
+            Created = default,
+            CreatedBy = User,
+            CurrentVersion = new ContentVersion(status, []),
+            LastModified = default,
+            LastModifiedBy = User,
+            NewVersion = newStatus != null ? new ContentVersion(newStatus.Value, []) : null,
+            SchemaId = SchemaId
+        };
     }
 }

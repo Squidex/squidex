@@ -125,7 +125,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         // STEP 1: Create a content item with a text that caused a bug before.
         var content = await _.Contents.CreateAsync(new TestEntityData
         {
-            Localized = new Dictionary<string, string>
+            Localized = new Dictionary<string, string?>
             {
                 ["en"] = null
             }
@@ -156,7 +156,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         // STEP 2: Get the item and ensure that the text is the same.
         var queried = await _.Contents.GetAsync(content.Id, QueryContext.Default.IgnoreFallback());
 
-        Assert.Equal(42, (int)queried.Data.Json["field.with.dot"]);
+        Assert.Equal(42, (int)queried.Data.Json!["field.with.dot"]!);
 
         await Verify(queried);
     }
@@ -167,7 +167,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         // STEP 1: Create a content item with a text that caused a bug before.
         var content = await _.Contents.CreateAsync(new TestEntityData
         {
-            Localized = new Dictionary<string, string>()
+            Localized = []
         }, ContentCreateOptions.AsPublish);
 
 
@@ -331,13 +331,13 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
-    [InlineData(Strategies.Update.Normal)]
-    [InlineData(Strategies.Update.Upsert)]
-    [InlineData(Strategies.Update.UpsertBulk)]
-    [InlineData(Strategies.Update.Bulk)]
-    [InlineData(Strategies.Update.BulkShared)]
-    [InlineData(Strategies.Update.BulkWithSchema)]
-    public async Task Should_update_content(Strategies.Update strategy)
+    [InlineData(ContentStrategies.Update.Normal)]
+    [InlineData(ContentStrategies.Update.Upsert)]
+    [InlineData(ContentStrategies.Update.UpsertBulk)]
+    [InlineData(ContentStrategies.Update.Bulk)]
+    [InlineData(ContentStrategies.Update.BulkShared)]
+    [InlineData(ContentStrategies.Update.BulkWithSchema)]
+    public async Task Should_update_content(ContentStrategies.Update strategy)
     {
         // STEP 1: Create a new item.
         var content = await _.Contents.CreateAsync(new TestEntityData
@@ -361,13 +361,13 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
-    [InlineData(Strategies.Update.Normal)]
-    [InlineData(Strategies.Update.Upsert)]
-    [InlineData(Strategies.Update.UpsertBulk)]
-    [InlineData(Strategies.Update.Bulk)]
-    [InlineData(Strategies.Update.BulkShared)]
-    [InlineData(Strategies.Update.BulkWithSchema)]
-    public async Task Should_update_content_to_null(Strategies.Update strategy)
+    [InlineData(ContentStrategies.Update.Normal)]
+    [InlineData(ContentStrategies.Update.Upsert)]
+    [InlineData(ContentStrategies.Update.UpsertBulk)]
+    [InlineData(ContentStrategies.Update.Bulk)]
+    [InlineData(ContentStrategies.Update.BulkShared)]
+    [InlineData(ContentStrategies.Update.BulkWithSchema)]
+    public async Task Should_update_content_to_null(ContentStrategies.Update strategy)
     {
         // STEP 1: Create a new item.
         var content = await _.Contents.CreateAsync(new TestEntityData
@@ -388,13 +388,13 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
-    [InlineData(Strategies.Patch.Normal)]
-    [InlineData(Strategies.Patch.Upsert)]
-    [InlineData(Strategies.Patch.UpsertBulk)]
-    [InlineData(Strategies.Patch.Bulk)]
-    [InlineData(Strategies.Patch.BulkShared)]
-    [InlineData(Strategies.Patch.BulkWithSchema)]
-    public async Task Should_patch_content(Strategies.Patch strategy)
+    [InlineData(ContentStrategies.Patch.Normal)]
+    [InlineData(ContentStrategies.Patch.Upsert)]
+    [InlineData(ContentStrategies.Patch.UpsertBulk)]
+    [InlineData(ContentStrategies.Patch.Bulk)]
+    [InlineData(ContentStrategies.Patch.BulkShared)]
+    [InlineData(ContentStrategies.Patch.BulkWithSchema)]
+    public async Task Should_patch_content(ContentStrategies.Patch strategy)
     {
         // STEP 1: Create a new item.
         var content = await _.Contents.CreateAsync(new TestEntityData
@@ -418,13 +418,13 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
-    [InlineData(Strategies.Patch.Normal)]
-    [InlineData(Strategies.Patch.Upsert)]
-    [InlineData(Strategies.Patch.UpsertBulk)]
-    [InlineData(Strategies.Patch.Bulk)]
-    [InlineData(Strategies.Patch.BulkShared)]
-    [InlineData(Strategies.Patch.BulkWithSchema)]
-    public async Task Should_patch_id_data_value(Strategies.Patch strategy)
+    [InlineData(ContentStrategies.Patch.Normal)]
+    [InlineData(ContentStrategies.Patch.Upsert)]
+    [InlineData(ContentStrategies.Patch.UpsertBulk)]
+    [InlineData(ContentStrategies.Patch.Bulk)]
+    [InlineData(ContentStrategies.Patch.BulkShared)]
+    [InlineData(ContentStrategies.Patch.BulkWithSchema)]
+    public async Task Should_patch_id_data_value(ContentStrategies.Patch strategy)
     {
         // STEP 1: Create a new item.
         var content = await _.Contents.CreateAsync(new TestEntityData
@@ -445,13 +445,13 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
-    [InlineData(Strategies.Patch.Normal)]
-    [InlineData(Strategies.Patch.Upsert)]
-    [InlineData(Strategies.Patch.UpsertBulk)]
-    [InlineData(Strategies.Patch.Bulk)]
-    [InlineData(Strategies.Patch.BulkShared)]
-    [InlineData(Strategies.Patch.BulkWithSchema)]
-    public async Task Should_patch_content_to_null(Strategies.Patch strategy)
+    [InlineData(ContentStrategies.Patch.Normal)]
+    [InlineData(ContentStrategies.Patch.Upsert)]
+    [InlineData(ContentStrategies.Patch.UpsertBulk)]
+    [InlineData(ContentStrategies.Patch.Bulk)]
+    [InlineData(ContentStrategies.Patch.BulkShared)]
+    [InlineData(ContentStrategies.Patch.BulkWithSchema)]
+    public async Task Should_patch_content_to_null(ContentStrategies.Patch strategy)
     {
         // STEP 1: Create a new item.
         var content = await _.Contents.CreateAsync(new TestEntityData
@@ -463,7 +463,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         // STEP 2: Patch with selected strategy.
         await _.Client.PatchAsync(content, new
         {
-            @string = new { iv = (string)null }
+            @string = new { iv = (string?)null }
         }, strategy);
 
         var updated = await _.Contents.GetAsync(content.Id);
@@ -472,11 +472,11 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
-    [InlineData(Strategies.Deletion.SingleSoft)]
-    [InlineData(Strategies.Deletion.SinglePermanent)]
-    [InlineData(Strategies.Deletion.BulkSoft)]
-    [InlineData(Strategies.Deletion.BulkPermanent)]
-    public async Task Should_delete_content(Strategies.Deletion strategy)
+    [InlineData(ContentStrategies.Deletion.SingleSoft)]
+    [InlineData(ContentStrategies.Deletion.SinglePermanent)]
+    [InlineData(ContentStrategies.Deletion.BulkSoft)]
+    [InlineData(ContentStrategies.Deletion.BulkPermanent)]
+    public async Task Should_delete_content(ContentStrategies.Deletion strategy)
     {
         // STEP 1: Create a new item.
         var content = await _.Contents.CreateAsync(new TestEntityData
@@ -500,15 +500,15 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
         var deleted = await _.Contents.GetAsync(q, QueryContext.Default.Unpublished(true));
 
-        Assert.Equal(strategy is Strategies.Deletion.SingleSoft or Strategies.Deletion.BulkSoft, deleted.Items.Exists(x => x.Id == content.Id));
+        Assert.Equal(strategy is ContentStrategies.Deletion.SingleSoft or ContentStrategies.Deletion.BulkSoft, deleted.Items.Exists(x => x.Id == content.Id));
     }
 
     [Theory]
-    [InlineData(Strategies.Deletion.SingleSoft)]
-    [InlineData(Strategies.Deletion.SinglePermanent)]
-    [InlineData(Strategies.Deletion.BulkSoft)]
-    [InlineData(Strategies.Deletion.BulkPermanent)]
-    public async Task Should_create_content_with_custom_id_and_delete_it(Strategies.Deletion strategy)
+    [InlineData(ContentStrategies.Deletion.SingleSoft)]
+    [InlineData(ContentStrategies.Deletion.SinglePermanent)]
+    [InlineData(ContentStrategies.Deletion.BulkSoft)]
+    [InlineData(ContentStrategies.Deletion.BulkPermanent)]
+    public async Task Should_create_content_with_custom_id_and_delete_it(ContentStrategies.Deletion strategy)
     {
         var id = $"custom-{Guid.NewGuid()}";
 
@@ -534,11 +534,11 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
-    [InlineData(Strategies.Deletion.SingleSoft)]
-    [InlineData(Strategies.Deletion.SinglePermanent)]
-    [InlineData(Strategies.Deletion.BulkSoft)]
-    [InlineData(Strategies.Deletion.BulkPermanent)]
-    public async Task Should_recreate_deleted_content(Strategies.Deletion strategy)
+    [InlineData(ContentStrategies.Deletion.SingleSoft)]
+    [InlineData(ContentStrategies.Deletion.SinglePermanent)]
+    [InlineData(ContentStrategies.Deletion.BulkSoft)]
+    [InlineData(ContentStrategies.Deletion.BulkPermanent)]
+    public async Task Should_recreate_deleted_content(ContentStrategies.Deletion strategy)
     {
         // STEP 1: Create a new item.
         var content_1 = await _.Contents.CreateAsync(new TestEntityData
@@ -571,11 +571,11 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
-    [InlineData(Strategies.Deletion.SingleSoft)]
-    [InlineData(Strategies.Deletion.SinglePermanent)]
-    [InlineData(Strategies.Deletion.BulkSoft)]
-    [InlineData(Strategies.Deletion.BulkPermanent)]
-    public async Task Should_recreate_deleted_content_with_upsert(Strategies.Deletion strategy)
+    [InlineData(ContentStrategies.Deletion.SingleSoft)]
+    [InlineData(ContentStrategies.Deletion.SinglePermanent)]
+    [InlineData(ContentStrategies.Deletion.BulkSoft)]
+    [InlineData(ContentStrategies.Deletion.BulkPermanent)]
+    public async Task Should_recreate_deleted_content_with_upsert(ContentStrategies.Deletion strategy)
     {
         // STEP 1: Create a new item.
         var content_1 = await _.Contents.CreateAsync(new TestEntityData
@@ -598,11 +598,11 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
-    [InlineData(Strategies.Deletion.SingleSoft)]
-    [InlineData(Strategies.Deletion.SinglePermanent)]
-    [InlineData(Strategies.Deletion.BulkSoft)]
-    [InlineData(Strategies.Deletion.BulkPermanent)]
-    public async Task Should_delete_recreated_content(Strategies.Deletion strategy)
+    [InlineData(ContentStrategies.Deletion.SingleSoft)]
+    [InlineData(ContentStrategies.Deletion.SinglePermanent)]
+    [InlineData(ContentStrategies.Deletion.BulkSoft)]
+    [InlineData(ContentStrategies.Deletion.BulkPermanent)]
+    public async Task Should_delete_recreated_content(ContentStrategies.Deletion strategy)
     {
         var id = $"custom-{Guid.NewGuid()}";
 
@@ -643,14 +643,14 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
             Name = schemaName,
             IsPublished = true,
             IsSingleton = true,
-            Fields = new List<UpsertSchemaFieldDto>
-            {
+            Fields =
+            [
                 new UpsertSchemaFieldDto
                 {
                     Name = "my-field",
                     Properties = new StringFieldPropertiesDto()
-                }
-            }
+                },
+            ]
         };
 
         await _.Client.Schemas.PostSchemaAsync(createRequest);

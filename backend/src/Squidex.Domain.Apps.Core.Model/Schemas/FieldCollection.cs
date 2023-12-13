@@ -14,8 +14,8 @@ public sealed class FieldCollection<T> where T : IField
 {
     public static readonly FieldCollection<T> Empty = new FieldCollection<T>();
 
-    private static readonly Dictionary<long, T> EmptyById = new Dictionary<long, T>();
-    private static readonly Dictionary<string, T> EmptyByString = new Dictionary<string, T>();
+    private static readonly Dictionary<long, T> EmptyById = [];
+    private static readonly Dictionary<string, T> EmptyByString = [];
 
     private readonly T[] fieldsOrdered;
     private Dictionary<long, T>? fieldsById;
@@ -68,7 +68,7 @@ public sealed class FieldCollection<T> where T : IField
 
     private FieldCollection()
     {
-        fieldsOrdered = Array.Empty<T>();
+        fieldsOrdered = [];
     }
 
     public FieldCollection(T[] fields)
@@ -78,9 +78,9 @@ public sealed class FieldCollection<T> where T : IField
         fieldsOrdered = fields;
     }
 
-    private FieldCollection(IEnumerable<T> fields)
+    public static FieldCollection<T> Create(params T[]? fields)
     {
-        fieldsOrdered = fields.ToArray();
+        return fields is not { Length: > 0 } ? Empty : new FieldCollection<T>(fields);
     }
 
     [Pure]
@@ -91,7 +91,7 @@ public sealed class FieldCollection<T> where T : IField
             return this;
         }
 
-        return new FieldCollection<T>(fieldsOrdered.Where(x => x.Id != fieldId));
+        return new FieldCollection<T>(fieldsOrdered.Where(x => x.Id != fieldId).ToArray());
     }
 
     [Pure]
@@ -109,7 +109,7 @@ public sealed class FieldCollection<T> where T : IField
             return this;
         }
 
-        return new FieldCollection<T>(fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)));
+        return new FieldCollection<T>(fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)).ToArray());
     }
 
     [Pure]
@@ -127,7 +127,7 @@ public sealed class FieldCollection<T> where T : IField
             ThrowHelper.ArgumentException($"A field with ID {field.Id} already exists.", nameof(field));
         }
 
-        return new FieldCollection<T>(fieldsOrdered.Union(Enumerable.Repeat(field, 1)));
+        return new FieldCollection<T>(fieldsOrdered.Union(Enumerable.Repeat(field, 1)).ToArray());
     }
 
     [Pure]
@@ -153,6 +153,6 @@ public sealed class FieldCollection<T> where T : IField
             return default!;
         }
 
-        return new FieldCollection<T>(fieldsOrdered.Select(x => ReferenceEquals(x, field) ? newField : x));
+        return new FieldCollection<T>(fieldsOrdered.Select(x => ReferenceEquals(x, field) ? newField : x).ToArray());
     }
 }

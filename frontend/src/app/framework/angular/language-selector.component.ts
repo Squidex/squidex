@@ -5,16 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
 import { FloatingPlacement, ModalModel } from '@app/framework/internal';
+import { DropdownMenuComponent } from './dropdown-menu.component';
+import { ModalPlacementDirective } from './modals/modal-placement.directive';
+import { ModalDirective } from './modals/modal.directive';
+import { TooltipDirective } from './modals/tooltip.directive';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
 
 @Component({
+    standalone: true,
     selector: 'sqx-language-selector',
     styleUrls: ['./language-selector.component.scss'],
     templateUrl: './language-selector.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        TooltipDirective,
+    ],
 })
 export class LanguageSelectorComponent implements  OnInit {
     @Output()

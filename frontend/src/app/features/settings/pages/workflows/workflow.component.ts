@@ -5,13 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { ErrorDto, MathHelper, SchemaTagSource, WorkflowDto, WorkflowsState, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormHintComponent, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues } from '@app/shared';
+import { WorkflowDiagramComponent } from './workflow-diagram.component';
+import { WorkflowStepComponent } from './workflow-step.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-workflow',
     styleUrls: ['./workflow.component.scss'],
     templateUrl: './workflow.component.html',
+    imports: [
+        AsyncPipe,
+        ConfirmClickDirective,
+        FormErrorComponent,
+        FormHintComponent,
+        FormsModule,
+        NgFor,
+        NgIf,
+        TagEditorComponent,
+        TranslatePipe,
+        WorkflowDiagramComponent,
+        WorkflowStepComponent,
+    ],
 })
 export class WorkflowComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };

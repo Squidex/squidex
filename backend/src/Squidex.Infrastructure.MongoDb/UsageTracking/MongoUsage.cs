@@ -31,5 +31,5 @@ public sealed class MongoUsage
 
     [BsonRequired]
     [BsonElement(nameof(Counters))]
-    public Counters Counters { get; set; } = new Counters();
+    public Counters Counters { get; set; } = [];
 }

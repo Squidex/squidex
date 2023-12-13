@@ -223,7 +223,7 @@ public class FluidTemplateEngineTests
     {
         var template = "{% for x of event %}";
 
-        await Assert.ThrowsAsync<TemplateParseException>(() => sut.RenderAsync(template, new TemplateVars()));
+        await Assert.ThrowsAsync<TemplateParseException>(() => sut.RenderAsync(template, []));
     }
 
     private Task<string> RenderAync(string template, object value)

@@ -13,7 +13,7 @@ public static class Factories
 {
     private static readonly ConcurrentDictionary<string, Task<object>> Instances = new ConcurrentDictionary<string, Task<object>>();
 
-    public static async Task<T> CreateAsync<T>(string key, Func<Task<T>> factory)
+    public static async Task<T> CreateAsync<T>(string key, Func<Task<T>> factory) where T : notnull
     {
         return (T)await Instances.GetOrAdd(key, async (_, f) => await f(), factory);
     }

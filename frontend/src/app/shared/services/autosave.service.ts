@@ -10,7 +10,9 @@ import { LocalStoreService, Version } from '@app/framework';
 
 export declare type AutoSaveKey = { schemaId: string; schemaVersion: Version; contentId?: string };
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AutoSaveService {
     constructor(
         private readonly localStore: LocalStoreService,

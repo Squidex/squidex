@@ -5,10 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
+import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
 import { merge } from 'rxjs';
 import { LocalizerService, StatefulComponent, Subscriptions, Types } from '@app/framework/internal';
+import { ControlErrorsMessagesComponent } from './control-errors-messages.component';
 import { formatError } from './error-formatting';
 import { touchedChange$ } from './forms-helper';
 
@@ -18,10 +20,15 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-control-errors',
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        ControlErrorsMessagesComponent,
+        NgIf,
+    ],
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements  OnDestroy {
     private readonly subscriptions = new Subscriptions();

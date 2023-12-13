@@ -11,9 +11,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 
-public sealed class TemplatesClient
+public sealed partial class TemplatesClient
 {
-    private static readonly Regex Regex = new Regex("\\* \\[(?<Title>.*)\\]\\((?<Name>.*)\\/README\\.md\\): (?<Description>.*)", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+    private static readonly Regex RegexTemplate = BuildTemplateRegex();
     private readonly IHttpClientFactory httpClientFactory;
     private readonly TemplatesOptions options;
 
@@ -34,7 +34,7 @@ public sealed class TemplatesClient
 
             var text = await httpClient.GetStringAsync(url, ct);
 
-            foreach (Match match in Regex.Matches(text).OfType<Match>())
+            foreach (var match in RegexTemplate.Matches(text).OfType<Match>())
             {
                 var currentName = match.Groups["Name"].Value;
 
@@ -61,7 +61,7 @@ public sealed class TemplatesClient
 
             var text = await httpClient.GetStringAsync(url, ct);
 
-            foreach (Match match in Regex.Matches(text).OfType<Match>())
+            foreach (Match match in RegexTemplate.Matches(text).OfType<Match>())
             {
                 var title = match.Groups["Title"].Value;
 
@@ -97,4 +97,7 @@ public sealed class TemplatesClient
 
         return null;
     }
+
+    [GeneratedRegex("\\* \\[(?<Title>.*)\\]\\((?<Name>.*)\\/README\\.md\\): (?<Description>.*)", RegexOptions.ExplicitCapture | RegexOptions.Compiled)]
+    private static partial Regex BuildTemplateRegex();
 }

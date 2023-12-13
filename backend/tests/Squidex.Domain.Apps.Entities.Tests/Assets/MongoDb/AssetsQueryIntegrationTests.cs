@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
@@ -177,13 +178,13 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
         yield return new object?[] { DomainId.Empty };
     }
 
-    private async Task<IResultList<IAssetEntity>> QueryAsync(DomainId? parentId, ClrQuery clrQuery,
+    private async Task<IResultList<Asset>> QueryAsync(DomainId? parentId, ClrQuery clrQuery,
         int top = 1000,
         int skip = 100)
     {
         clrQuery.Top = top;
         clrQuery.Skip = skip;
-        clrQuery.Sort ??= new List<SortNode>();
+        clrQuery.Sort ??= [];
 
         if (clrQuery.Sort.Count == 0)
         {

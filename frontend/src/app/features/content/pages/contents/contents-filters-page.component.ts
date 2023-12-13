@@ -5,14 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { ContentsState, defined, Queries, Query, SchemasState, UIState } from '@app/shared';
+import { ContentsState, defined, LayoutComponent, Queries, Query, QueryListComponent, SavedQueriesComponent, SchemasState, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-contents-filters-page',
     styleUrls: ['./contents-filters-page.component.scss'],
     templateUrl: './contents-filters-page.component.html',
+    imports: [
+        AsyncPipe,
+        LayoutComponent,
+        NgIf,
+        QueryListComponent,
+        SavedQueriesComponent,
+        TranslatePipe,
+    ],
 })
 export class ContentsFiltersPageComponent {
     public schemaQueries =

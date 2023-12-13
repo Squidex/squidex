@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.Assets;
 
 public sealed class AssetMetadata : Dictionary<string, JsonValue>
 {
-    private static readonly char[] PathSeparators = { '.', '[', ']' };
+    private static readonly char[] PathSeparators = ['.', '[', ']'];
 
     public const string FocusX = "focusX";
     public const string FocusY = "focusY";
@@ -37,28 +37,28 @@ public sealed class AssetMetadata : Dictionary<string, JsonValue>
 
     public AssetMetadata SetPixelWidth(int value)
     {
-        this[PixelWidth] = (double)value;
+        this[PixelWidth] = value;
 
         return this;
     }
 
     public AssetMetadata SetPixelHeight(int value)
     {
-        this[PixelHeight] = (double)value;
+        this[PixelHeight] = value;
 
         return this;
     }
 
     public AssetMetadata SetVideoWidth(int value)
     {
-        this[VideoWidth] = (double)value;
+        this[VideoWidth] = value;
 
         return this;
     }
 
     public AssetMetadata SetVideoHeight(int value)
     {
-        this[VideoHeight] = (double)value;
+        this[VideoHeight] = value;
 
         return this;
     }

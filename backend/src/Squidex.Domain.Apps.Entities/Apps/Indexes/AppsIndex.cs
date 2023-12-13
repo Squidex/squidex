@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Caching;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Hosting;
@@ -58,7 +59,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         return await namesState.ReserveAsync(id, name, ct);
     }
 
-    public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
+    public async Task<List<App>> GetAppsForUserAsync(string userId, PermissionSet permissions,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppsForUserAsync"))
@@ -67,16 +68,11 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             var apps = await appRepository.QueryAllAsync(userId, permissions.ToAppNames(), ct);
 
-            foreach (var app in apps.Where(IsValid))
-            {
-                await CacheItAsync(app);
-            }
-
-            return apps.Where(IsValid).ToList();
+            return await apps.Where(IsValid).SelectAsync(PrepareAsync);
         }
     }
 
-    public async Task<List<IAppEntity>> GetAppsForTeamAsync(DomainId teamId,
+    public async Task<List<App>> GetAppsForTeamAsync(DomainId teamId,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppsForTeamAsync"))
@@ -85,16 +81,11 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             var apps = await appRepository.QueryAllAsync(teamId, ct);
 
-            foreach (var app in apps.Where(IsValid))
-            {
-                await CacheItAsync(app);
-            }
-
-            return apps.Where(IsValid).ToList();
+            return await apps.Where(IsValid).SelectAsync(PrepareAsync);
         }
     }
 
-    public async Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
+    public async Task<App?> GetAppAsync(string name, bool canCache = false,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppByNameAsync"))
@@ -103,7 +94,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             if (canCache)
             {
-                if (appCache.TryGetValue(GetCacheKey(name), out var v) && v is IAppEntity cacheApp)
+                if (appCache.TryGetValue(GetCacheKey(name), out var v) && v is App cacheApp)
                 {
                     return cacheApp;
                 }
@@ -111,21 +102,16 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             var app = await appRepository.FindAsync(name, ct);
 
-            if (!IsValid(app))
+            if (app == null || !IsValid(app))
             {
-                app = null;
+                return null;
             }
 
-            if (app != null)
-            {
-                await CacheItAsync(app);
-            }
-
-            return app;
+            return await PrepareAsync(app);
         }
     }
 
-    public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+    public async Task<App?> GetAppAsync(DomainId appId, bool canCache = false,
         CancellationToken ct = default)
     {
         using (var activity = Telemetry.Activities.StartActivity("AppsIndex/GetAppAsync"))
@@ -134,7 +120,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             if (canCache)
             {
-                if (appCache.TryGetValue(GetCacheKey(appId), out var cached) && cached is IAppEntity cachedApp)
+                if (appCache.TryGetValue(GetCacheKey(appId), out var cached) && cached is App cachedApp)
                 {
                     return cachedApp;
                 }
@@ -142,17 +128,12 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
             var app = await appRepository.FindAsync(appId, ct);
 
-            if (!IsValid(app))
+            if (app == null || !IsValid(app))
             {
-                app = null;
+                return null;
             }
 
-            if (app != null)
-            {
-                await CacheItAsync(app);
-            }
-
-            return app;
+            return await PrepareAsync(app);
         }
     }
 
@@ -234,9 +215,21 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         return $"{typeof(AppsIndex)}_Apps_Name_{name}";
     }
 
-    private static bool IsValid(IAppEntity? app)
+    private static bool IsValid(App? app)
     {
         return app is { Version: > EtagVersion.Empty, IsDeleted: false };
+    }
+
+    private async Task<App> PrepareAsync(App app)
+    {
+        // Do not use cancellation here as we already so far.
+        await appCache.AddAsync(new[]
+        {
+            new KeyValuePair<string, object?>(GetCacheKey(app.Id), app),
+            new KeyValuePair<string, object?>(GetCacheKey(app.Name), app),
+        }, CacheDuration);
+
+        return app;
     }
 
     private Task InvalidateItAsync(DomainId id, string name)
@@ -247,15 +240,5 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
             GetCacheKey(id),
             GetCacheKey(name)
         });
-    }
-
-    private Task CacheItAsync(IAppEntity app)
-    {
-        // Do not use cancellation here as we already so far.
-        return appCache.AddAsync(new[]
-        {
-            new KeyValuePair<string, object?>(GetCacheKey(app.Id), app),
-            new KeyValuePair<string, object?>(GetCacheKey(app.Name), app),
-        }, CacheDuration);
     }
 }

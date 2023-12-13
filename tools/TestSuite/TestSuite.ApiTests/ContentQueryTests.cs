@@ -25,6 +25,30 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     }
 
     [Fact]
+    public async Task Should_query_with_old_fields()
+    {
+        var context =
+            QueryContext.Default
+                .WithFields(TestEntityData.StringField);
+
+        var items_0 = await _.Client.DynamicContents(_.SchemaName).GetAsync(context: context);
+
+        Assert.True(items_0.Items.All(x => x.Data.Count == 1));
+    }
+
+    [Fact]
+    public async Task Should_query_with_new_fields()
+    {
+        var context =
+            QueryContext.Default
+                .WithFields($"data.{TestEntityData.StringField}");
+
+        var items_0 = await _.Client.DynamicContents(_.SchemaName).GetAsync(context: context);
+
+        Assert.True(items_0.Items.All(x => x.Data.Count == 1));
+    }
+
+    [Fact]
     public async Task Should_query_newly_created_schema()
     {
         for (var i = 0; i < 20; i++)
@@ -81,11 +105,11 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     [Fact]
     public async Task Should_query_by_ids_filter()
     {
-        var q0 = new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" };
+        var q_0 = new ContentQuery { Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc" };
 
-        var items_0 = await _.Contents.GetAsync(q0);
+        var items_0 = await _.Contents.GetAsync(q_0);
 
-        var q1 = new ContentQuery
+        var q_1 = new ContentQuery
         {
             JsonQuery = new
             {
@@ -108,10 +132,10 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var items_1 = await _.Contents.GetAsync(q1);
+        var items_1 = await _.Contents.GetAsync(q_1);
 
-        AssertItems(items_0, 3, new[] { 4, 5, 6 });
-        AssertItems(items_1, 3, new[] { 4, 5, 6 });
+        AssertItems(items_0, 3, [4, 5, 6]);
+        AssertItems(items_1, 3, [4, 5, 6]);
     }
 
     [Fact]
@@ -149,7 +173,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+        AssertItems(items, 10, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     }
 
     [Fact]
@@ -171,7 +195,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+        AssertItems(items, 10, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     }
 
     [Fact]
@@ -207,7 +231,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 6, 7, 8, 9, 10 });
+        AssertItems(items, 10, [6, 7, 8, 9, 10]);
     }
 
     [Fact]
@@ -230,7 +254,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 6, 7, 8, 9, 10 });
+        AssertItems(items, 10, [6, 7, 8, 9, 10]);
     }
 
     [Fact]
@@ -240,7 +264,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 3, 4, 5, 6, 7 });
+        AssertItems(items, 10, [3, 4, 5, 6, 7]);
     }
 
     [Fact]
@@ -264,7 +288,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 10, new[] { 3, 4, 5, 6, 7 });
+        AssertItems(items, 10, [3, 4, 5, 6, 7]);
     }
 
     [Fact]
@@ -274,7 +298,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 3, new[] { 4, 5, 6 });
+        AssertItems(items, 3, [4, 5, 6]);
     }
 
     [Fact]
@@ -314,7 +338,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 3, new[] { 4, 5, 6 });
+        AssertItems(items, 3, [4, 5, 6]);
     }
 
     [Fact]
@@ -354,7 +378,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.GetAsync(q);
 
-        AssertItems(items, 3, new[] { 4, 5, 6 });
+        AssertItems(items, 3, [4, 5, 6]);
     }
 
     [Fact]
@@ -364,7 +388,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 2 });
+        AssertItems(items, 1, [2]);
     }
 
     [Fact]
@@ -380,7 +404,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 2 });
+        AssertItems(items, 1, [2]);
     }
 
     [Fact]
@@ -390,7 +414,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 3 });
+        AssertItems(items, 1, [3]);
     }
 
     [Fact]
@@ -416,7 +440,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 3 });
+        AssertItems(items, 1, [3]);
     }
 
     [Fact]
@@ -426,13 +450,13 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 4 });
+        AssertItems(items, 1, [4]);
     }
 
     [Fact]
     public async Task Should_query_json_with_dot()
     {
-        TestEntity content = null;
+        TestEntity? content = null;
         try
         {
             // STEP 1: Create a content item with a text that caused a bug before.
@@ -467,7 +491,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
             var queried = await _.Contents.GetAsync(q);
 
-            Assert.Equal(42, (int)queried.Items[0].Data.Json["search.field.with.dot"]);
+            Assert.Equal(42, (int)queried.Items[0].Data.Json!["search.field.with.dot"]!);
         }
         finally
         {
@@ -501,7 +525,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items = await _.Contents.PollAsync(q, x => true);
 
-        AssertItems(items, 1, new[] { 4 });
+        AssertItems(items, 1, [4]);
     }
 
     [Fact]
@@ -528,7 +552,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
 
-        var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
+        var value = result?["createMyReadsContent"]?["data"]?["number"]?["iv"]?.Value<int>();
 
         Assert.Equal(555, value);
     }
@@ -563,7 +587,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
 
-        var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
+        var value = result?["createMyReadsContent"]?["data"]?["number"]?["iv"]?.Value<int>();
 
         Assert.Equal(998, value);
     }
@@ -614,8 +638,8 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var items1 = results.ElementAt(0).Data.Items;
         var items2 = results.ElementAt(1).Data.Items;
 
-        Assert.Equal(items1.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
-        Assert.Equal(items2.Select(x => x.Data.Number).ToArray(), new[] { 5, 6 });
+        Assert.Equal(new[] { 4, 5, 6 }, items1.Select(x => x.Data.Number).ToArray());
+        Assert.Equal(new[] { 5, 6 }, items2.Select(x => x.Data.Number).ToArray());
     }
 
     [Fact]
@@ -643,7 +667,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>(query);
         var items = result.Items;
 
-        Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
+        Assert.Equal(new[] { 4, 5, 6 }, items.Select(x => x.Data.Number).ToArray());
     }
 
     [Fact]
@@ -671,7 +695,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlGetAsync<QueryResult>(query);
         var items = result.Items;
 
-        Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
+        Assert.Equal(new[] { 4, 5, 6 }, items.Select(x => x.Data.Number).ToArray());
     }
 
     [Fact]
@@ -695,7 +719,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
         var items = result["queryMyReadsContents"];
 
-        Assert.Equal(items.Select(x => x["data"]["number"]["iv"].Value<int>()).ToArray(), new[] { 4, 5, 6 });
+        Assert.Equal(new[] { 4, 5, 6 }, items?.Select(x => x["data"]?["number"]?["iv"]?.Value<int>() ?? -1).ToArray());
     }
 
     [Fact]

@@ -15,16 +15,11 @@ namespace Squidex.Infrastructure.MongoDb;
 
 public sealed class BsonInstantSerializer : SerializerBase<Instant>, IBsonPolymorphicSerializer, IRepresentationConfigurable<BsonInstantSerializer>
 {
+    private static readonly BsonInstantSerializer Instance = new BsonInstantSerializer();
+
     public static void Register()
     {
-        try
-        {
-            BsonSerializer.RegisterSerializer(new BsonInstantSerializer());
-        }
-        catch (BsonSerializationException)
-        {
-            return;
-        }
+        BsonSerializer.TryRegisterSerializer(Instance);
     }
 
     public bool IsDiscriminatorCompatibleWithObjectSerializer
@@ -34,7 +29,7 @@ public sealed class BsonInstantSerializer : SerializerBase<Instant>, IBsonPolymo
 
     public BsonType Representation { get; }
 
-    public BsonInstantSerializer()
+    private BsonInstantSerializer()
         : this(BsonType.DateTime)
     {
     }

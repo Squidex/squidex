@@ -38,8 +38,8 @@ public sealed class TextIndexingProcess : IEventConsumer
     {
         private readonly Dictionary<DomainId, TextContentState> states;
         private readonly IJsonSerializer serializer;
-        private readonly Dictionary<DomainId, TextContentState> updates = new Dictionary<DomainId, TextContentState>();
-        private readonly Dictionary<string, IndexCommand> commands = new Dictionary<string, IndexCommand>();
+        private readonly Dictionary<DomainId, TextContentState> updates = [];
+        private readonly Dictionary<string, IndexCommand> commands = [];
 
         public Updates(Dictionary<DomainId, TextContentState> states, IJsonSerializer serializer)
         {

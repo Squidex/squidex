@@ -57,7 +57,17 @@
         
                 <input type="url" class="form-control" id="contentEditorUrl" formControlName="contentEditorUrl">
 
-                <sqx-form-hint>{{ 'schemas.contentEditorUrl' | sqxTranslate }}</sqx-form-hint>
+                <sqx-form-hint>{{ 'schemas.contentEditorUrlHint' | sqxTranslate }}</sqx-form-hint>
+            </div>
+        
+            <div class="form-group">
+                <label for="hints">{{ 'schemas.contentsListUrl' | sqxTranslate }}</label>
+                
+                <sqx-control-errors for="contentsListUrl"></sqx-control-errors>
+        
+                <input type="url" class="form-control" id="contentsListUrl" formControlName="contentsListUrl">
+
+                <sqx-form-hint>{{ 'schemas.contentsListUrlHint' | sqxTranslate }}</sqx-form-hint>
             </div>
         
             <div class="form-group">

@@ -97,7 +97,7 @@ public sealed class AssetContentController : ApiController
         return await DeliverAssetAsync(requestContext, asset, request);
     }
 
-    private async Task<IActionResult> DeliverAssetAsync(Context context, IAssetEntity? asset, AssetContentQueryDto request)
+    private async Task<IActionResult> DeliverAssetAsync(Context context, Asset? asset, AssetContentQueryDto request)
     {
         request ??= new AssetContentQueryDto();
 
@@ -190,13 +190,13 @@ public sealed class AssetContentController : ApiController
         };
     }
 
-    private async Task DownloadAsync(IAssetEntity asset, Stream bodyStream, string? suffix, BytesRange range,
+    private async Task DownloadAsync(Asset asset, Stream bodyStream, string? suffix, BytesRange range,
         CancellationToken ct)
     {
         await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, suffix, bodyStream, range, ct);
     }
 
-    private async Task ResizeAsync(IAssetEntity asset, string suffix, Stream target, ResizeOptions resizeOptions, bool overwrite,
+    private async Task ResizeAsync(Asset asset, string suffix, Stream target, ResizeOptions resizeOptions, bool overwrite,
         CancellationToken ct)
     {
 #pragma warning disable MA0040 // Flow the cancellation token

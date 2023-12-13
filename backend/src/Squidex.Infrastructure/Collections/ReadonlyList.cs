@@ -23,7 +23,7 @@ public static class ReadonlyList
 
     public static ReadonlyList<T> Create<T>(params T[]? items)
     {
-        if (items == null || items.Length == 0)
+        if (items is not { Length: > 0 })
         {
             return Empty<T>();
         }

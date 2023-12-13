@@ -31,7 +31,7 @@ public static class Extensions
 
                     if (geoJson != null)
                     {
-                        result ??= new Dictionary<string, Geometry>();
+                        result ??= [];
                         result[$"{field}.{key}"] = geoJson;
                     }
                 }
@@ -65,7 +65,7 @@ public static class Extensions
                 {
                     if (sb.Length > 0)
                     {
-                        result ??= new Dictionary<string, string>();
+                        result ??= [];
                         result[key] = sb.ToString();
                     }
                 }

@@ -150,7 +150,7 @@ public sealed class AssetDto : Resource
         get => Metadata.GetPixelHeight();
     }
 
-    public static AssetDto FromDomain(IEnrichedAssetEntity asset, Resources resources, bool isDuplicate = false)
+    public static AssetDto FromDomain(EnrichedAsset asset, Resources resources, bool isDuplicate = false)
     {
         var result = SimpleMapper.Map(asset, new AssetDto());
 

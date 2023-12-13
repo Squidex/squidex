@@ -8,14 +8,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
-using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Web.CommandMiddlewares;
 
-public class ETagCommandMiddlewareTests
+public class ETagCommandMiddlewareTests : GivenContext
 {
     private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
     private readonly HttpContext httpContext = new DefaultHttpContext();
@@ -51,7 +51,7 @@ public class ETagCommandMiddlewareTests
     [Fact]
     public async Task Should_add_expected_version_to_command()
     {
-        httpContext.Request.Headers[HeaderNames.IfMatch] = "13";
+        httpContext.Request.Headers[HeaderNames.IfMatch] = "\"13\"";
 
         var context = await HandleAsync(new CreateContent(), true);
 
@@ -61,7 +61,7 @@ public class ETagCommandMiddlewareTests
     [Fact]
     public async Task Should_add_weak_etag_as_expected_version_to_command()
     {
-        httpContext.Request.Headers[HeaderNames.IfMatch] = "W/13";
+        httpContext.Request.Headers[HeaderNames.IfMatch] = "W/\"13\"";
 
         var context = await HandleAsync(new CreateContent(), true);
 
@@ -69,7 +69,7 @@ public class ETagCommandMiddlewareTests
     }
 
     [Fact]
-    public async Task Should_add_version_from_actual_as_etag_to_response()
+    public async Task Should_add_version_from_result_as_etag_to_response()
     {
         var actual = CommandResult.Empty(DomainId.Empty, 17, 16);
 
@@ -81,7 +81,7 @@ public class ETagCommandMiddlewareTests
     [Fact]
     public async Task Should_add_version_from_entity_as_etag_to_response()
     {
-        var actual = new ContentEntity { Version = 17 };
+        var actual = CreateContent() with { Version = 17 };
 
         await HandleAsync(new CreateContent(), actual);
 

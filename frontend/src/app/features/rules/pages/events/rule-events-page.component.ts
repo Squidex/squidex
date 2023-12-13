@@ -5,16 +5,33 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Router2State, RuleEventDto, RuleEventsState, Subscriptions } from '@app/shared';
+import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleEventDto, RuleEventsState, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { RuleEventComponent } from './rule-event.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-rule-events-page',
     styleUrls: ['./rule-events-page.component.scss'],
     templateUrl: './rule-events-page.component.html',
     providers: [
         Router2State,
+    ],
+    imports: [
+        AsyncPipe,
+        ConfirmClickDirective,
+        LayoutComponent,
+        ListViewComponent,
+        NgFor,
+        NgIf,
+        PagerComponent,
+        RuleEventComponent,
+        ShortcutDirective,
+        TitleComponent,
+        TooltipDirective,
+        TranslatePipe,
     ],
 })
 export class RuleEventsPageComponent implements OnInit {

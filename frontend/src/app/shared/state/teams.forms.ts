@@ -9,7 +9,7 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form } from '@app/framework';
-import { CreateTeamDto, TeamDto, UpdateTeamDto } from './../services/teams.service';
+import { CreateTeamDto, TeamDto, UpdateTeamDto } from '../services/teams.service';
 
 export class CreateTeamForm extends Form<ExtendedFormGroup, CreateTeamDto> {
     constructor() {

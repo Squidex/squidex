@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models;
@@ -17,7 +17,7 @@ public sealed class AppLanguagesDto : Resource
     /// </summary>
     public AppLanguageDto[] Items { get; set; }
 
-    public static AppLanguagesDto FromDomain(IAppEntity app, Resources resources)
+    public static AppLanguagesDto FromDomain(App app, Resources resources)
     {
         var config = app.Languages;
 

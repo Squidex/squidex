@@ -7,9 +7,9 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
@@ -34,7 +34,7 @@ internal sealed class QueryReferences : OperationBase
         this.queryByIds = queryByIds;
     }
 
-    public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
+    public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,
         CancellationToken ct)
     {
         var find =
@@ -49,9 +49,9 @@ internal sealed class QueryReferences : OperationBase
             throw new DomainObjectNotFoundException(q.Referencing.ToString());
         }
 
-        if (contentEntity.ReferencedIds == null || contentEntity.ReferencedIds.Count == 0)
+        if (contentEntity.ReferencedIds is not { Count: > 0 })
         {
-            return ResultList.Empty<IContentEntity>();
+            return ResultList.Empty<Content>();
         }
 
         q = q.WithReferencing(default).WithIds(contentEntity.ReferencedIds!);

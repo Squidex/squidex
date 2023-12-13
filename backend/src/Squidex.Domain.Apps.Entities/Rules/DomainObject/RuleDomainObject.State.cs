@@ -5,98 +5,74 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
 public partial class RuleDomainObject
 {
-    [CollectionName("Rules")]
-    public sealed class State : DomainObjectState<State>, IRuleEntity
+    protected override Rule Apply(Rule snapshot, Envelope<IEvent> @event)
     {
-        public NamedId<DomainId> AppId { get; set; }
+        var newSnapshot = snapshot;
 
-        public Rule RuleDef { get; set; }
-
-        public bool IsDeleted { get; set; }
-
-        [JsonIgnore]
-        public DomainId UniqueId
+        switch (@event.Payload)
         {
-            get => DomainId.Combine(AppId, Id);
+            case RuleCreated e:
+                newSnapshot = new Rule { Id = e.RuleId };
+                SimpleMapper.Map(e, newSnapshot);
+                break;
+
+            case RuleUpdated e:
+                {
+                    if (e.Trigger != null)
+                    {
+                        newSnapshot = newSnapshot.Update(e.Trigger);
+                    }
+
+                    if (e.Action != null)
+                    {
+                        newSnapshot = newSnapshot.Update(e.Action);
+                    }
+
+                    if (e.Name != null)
+                    {
+                        newSnapshot = newSnapshot.Rename(e.Name);
+                    }
+
+                    if (e.IsEnabled == true)
+                    {
+                        newSnapshot = newSnapshot.Enable();
+                    }
+                    else if (e.IsEnabled == false)
+                    {
+                        newSnapshot = newSnapshot.Disable();
+                    }
+
+                    break;
+                }
+
+            case RuleEnabled:
+                newSnapshot = newSnapshot.Enable();
+                break;
+
+            case RuleDisabled:
+                newSnapshot = newSnapshot.Disable();
+                break;
+
+            case RuleDeleted:
+                newSnapshot = newSnapshot with { IsDeleted = true };
+                break;
         }
 
-        public override bool ApplyEvent(IEvent @event)
+        if (ReferenceEquals(newSnapshot, snapshot))
         {
-            var previousRule = RuleDef;
-
-            switch (@event)
-            {
-                case RuleCreated e:
-                    {
-                        Id = e.RuleId;
-
-                        RuleDef = new Rule(e.Trigger, e.Action);
-                        RuleDef = RuleDef.Rename(e.Name);
-
-                        AppId = e.AppId;
-                        return true;
-                    }
-
-                case RuleUpdated e:
-                    {
-                        if (e.Trigger != null)
-                        {
-                            RuleDef = RuleDef.Update(e.Trigger);
-                        }
-
-                        if (e.Action != null)
-                        {
-                            RuleDef = RuleDef.Update(e.Action);
-                        }
-
-                        if (e.Name != null)
-                        {
-                            RuleDef = RuleDef.Rename(e.Name);
-                        }
-
-                        if (e.IsEnabled == true)
-                        {
-                            RuleDef = RuleDef.Enable();
-                        }
-                        else if (e.IsEnabled == false)
-                        {
-                            RuleDef = RuleDef.Disable();
-                        }
-
-                        break;
-                    }
-
-                case RuleEnabled:
-                    {
-                        RuleDef = RuleDef.Enable();
-                        break;
-                    }
-
-                case RuleDisabled:
-                    {
-                        RuleDef = RuleDef.Disable();
-                        break;
-                    }
-
-                case RuleDeleted:
-                    {
-                        IsDeleted = true;
-                        return true;
-                    }
-            }
-
-            return !ReferenceEquals(previousRule, RuleDef);
+            return snapshot;
         }
+
+        return newSnapshot.Apply(@event.To<SquidexEvent>());
     }
 }

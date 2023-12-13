@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -59,12 +59,12 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1", "2" }
+            Users = ["1", "2"]
         };
 
         await sut.HandleAsync(message, default);
 
-        A.CallTo(() => notificationSender.SendUsageAsync(A<IUser>._, A<IAppEntity>._, A<long>._, A<long>._, A<CancellationToken>._))
+        A.CallTo(() => notificationSender.SendUsageAsync(A<IUser>._, A<App>._, A<long>._, A<long>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -80,7 +80,7 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1", "2", "3" }
+            Users = ["1", "2", "3"]
         };
 
         await sut.HandleAsync(message, default);
@@ -105,7 +105,7 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1" }
+            Users = ["1"]
         };
 
         await sut.HandleAsync(message, default);
@@ -125,7 +125,7 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1" }
+            Users = ["1"]
         };
 
         await sut.HandleAsync(message, default);
@@ -153,7 +153,7 @@ public class UsageNotifierWorkerTest : GivenContext
             AppId = AppId.Id,
             Usage = 1000,
             UsageLimit = 3000,
-            Users = new[] { "1" }
+            Users = ["1"]
         };
 
         await sut.HandleAsync(message, default);

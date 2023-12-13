@@ -1,4 +1,17 @@
 ﻿{
+  Items: [
+    {
+      Role: Owner,
+      Links: {
+        delete: {
+          Method: DELETE
+        },
+        update: {
+          Method: POST
+        }
+      }
+    }
+  ],
   MaxContributors: -1,
   Links: {
     create: {

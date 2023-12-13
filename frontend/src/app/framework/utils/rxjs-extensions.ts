@@ -7,7 +7,7 @@
 
 import { EMPTY, Observable, of, onErrorResumeNextWith, ReplaySubject, throwError } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, share, switchMap, tap } from 'rxjs/operators';
-import { DialogService } from './../services/dialog.service';
+import { DialogService } from '../services/dialog.service';
 import { Version, versioned, Versioned } from './version';
 
 export function mapVersioned<T = any, R = any>(project: (value: T, version: Version) => R) {

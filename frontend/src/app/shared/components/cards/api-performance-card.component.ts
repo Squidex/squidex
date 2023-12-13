@@ -6,13 +6,22 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared/internal';
+import { FormsModule } from '@angular/forms';
+import { NgChartsModule } from 'ng2-charts';
+import { TranslatePipe } from '@app/framework';
+import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-api-performance-card',
     styleUrls: ['./api-performance-card.component.scss'],
     templateUrl: './api-performance-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        FormsModule,
+        NgChartsModule,
+        TranslatePipe,
+    ],
 })
 export class ApiPerformanceCardComponent {
     @Input({ required: true })

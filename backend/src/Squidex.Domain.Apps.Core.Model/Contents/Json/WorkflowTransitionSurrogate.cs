@@ -13,9 +13,18 @@ public sealed class WorkflowTransitionSurrogate : ISurrogate<WorkflowTransition>
 {
     public string? Expression { get; set; }
 
-    public string? Role { get; set; }
-
     public string[]? Roles { get; set; }
+
+    public string? Role
+    {
+        set
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                Roles = [value];
+            }
+        }
+    }
 
     public void FromSource(WorkflowTransition source)
     {
@@ -27,11 +36,6 @@ public sealed class WorkflowTransitionSurrogate : ISurrogate<WorkflowTransition>
     public WorkflowTransition ToSource()
     {
         var roles = Roles;
-
-        if (!string.IsNullOrEmpty(Role))
-        {
-            roles = new[] { Role };
-        }
 
         return WorkflowTransition.When(Expression, roles);
     }

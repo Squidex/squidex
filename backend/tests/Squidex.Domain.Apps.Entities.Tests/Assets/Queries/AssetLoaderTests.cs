@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -25,8 +26,8 @@ public class AssetLoaderTests : GivenContext
     {
         uniqueId = DomainId.Combine(AppId.Id, id);
 
-        A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(A<DomainId>._, A<long>._, CancellationToken))
-            .Returns(Task.FromResult<AssetDomainObject.State>(null!));
+        A.CallTo(() => domainObjectCache.GetAsync<Asset>(A<DomainId>._, A<long>._, CancellationToken))
+            .Returns(Task.FromResult<Asset>(null!));
 
         A.CallTo(() => domainObjectFactory.Create<AssetDomainObject>(uniqueId))
             .Returns(domainObject);
@@ -37,7 +38,7 @@ public class AssetLoaderTests : GivenContext
     [Fact]
     public async Task Should_return_null_if_no_state_returned()
     {
-        var asset = (AssetDomainObject.State)null!;
+        var asset = (Asset)null!;
 
         A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(asset);
@@ -48,7 +49,7 @@ public class AssetLoaderTests : GivenContext
     [Fact]
     public async Task Should_return_null_if_state_empty()
     {
-        var asset = new AssetDomainObject.State { Version = EtagVersion.Empty };
+        var asset = CreateAsset() with { Version = EtagVersion.Empty };
 
         A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(asset);
@@ -59,7 +60,7 @@ public class AssetLoaderTests : GivenContext
     [Fact]
     public async Task Should_return_null_if_state_has_other_version()
     {
-        var asset = new AssetDomainObject.State { Version = 5 };
+        var asset = CreateAsset() with { Version = 5 };
 
         A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(asset);
@@ -70,7 +71,7 @@ public class AssetLoaderTests : GivenContext
     [Fact]
     public async Task Should_not_return_null_if_state_has_other_version_than_any()
     {
-        var asset = new AssetDomainObject.State { Version = 5 };
+        var asset = CreateAsset() with { Version = 5 };
 
         A.CallTo(() => domainObject.GetSnapshotAsync(EtagVersion.Any, CancellationToken))
             .Returns(asset);
@@ -83,7 +84,7 @@ public class AssetLoaderTests : GivenContext
     [Fact]
     public async Task Should_return_asset_from_state()
     {
-        var asset = new AssetDomainObject.State { Version = 10 };
+        var asset = CreateAsset() with { Version = 10 };
 
         A.CallTo(() => domainObject.GetSnapshotAsync(10, CancellationToken))
             .Returns(asset);
@@ -96,9 +97,9 @@ public class AssetLoaderTests : GivenContext
     [Fact]
     public async Task Should_return_content_from_cache()
     {
-        var content = new AssetDomainObject.State { Version = 10 };
+        var content = CreateAsset() with { Version = 10 };
 
-        A.CallTo(() => domainObjectCache.GetAsync<AssetDomainObject.State>(DomainId.Combine(AppId.Id, id), 10, CancellationToken))
+        A.CallTo(() => domainObjectCache.GetAsync<Asset>(DomainId.Combine(AppId.Id, id), 10, CancellationToken))
             .Returns(content);
 
         var actual = await sut.GetAsync(AppId.Id, id, 10, CancellationToken);

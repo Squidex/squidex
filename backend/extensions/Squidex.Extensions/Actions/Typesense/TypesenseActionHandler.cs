@@ -136,7 +136,7 @@ public sealed class TypesenseContent
     public string Id { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, object> More { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> More { get; set; } = [];
 }
 
 public sealed class TypesenseJob

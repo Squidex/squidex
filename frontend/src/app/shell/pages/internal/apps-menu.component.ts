@@ -5,17 +5,32 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppDto, AppsState, DialogModel, ModalModel, TeamDto, TeamsState, Title, TitleService, UIState } from '@app/shared';
+import { AppDto, AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TeamDto, TeamFormComponent, TeamsState, Title, TitleService, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-apps-menu',
     styleUrls: ['./apps-menu.component.scss'],
     templateUrl: './apps-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AppFormComponent,
+        AsyncPipe,
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        RouterLink,
+        RouterLinkActive,
+        TeamFormComponent,
+        TranslatePipe,
+    ],
 })
 export class AppsMenuComponent {
     public addAppDialog = new DialogModel();

@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
@@ -15,9 +15,9 @@ public class ContentEnricherTests : GivenContext
 {
     private sealed class ResolveSchema : IContentEnricherStep
     {
-        public ISchemaEntity Schema { get; private set; }
+        public Schema Schema { get; private set; }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+        public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
             CancellationToken ct)
         {
             foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
@@ -30,7 +30,7 @@ public class ContentEnricherTests : GivenContext
     [Fact]
     public async Task Should_only_invoke_pre_enrich_for_empty_contents()
     {
-        var source = Array.Empty<IContentEntity>();
+        var source = Array.Empty<Content>();
 
         var step1 = A.Fake<IContentEnricherStep>();
         var step2 = A.Fake<IContentEnricherStep>();
@@ -45,10 +45,10 @@ public class ContentEnricherTests : GivenContext
         A.CallTo(() => step2.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<EnrichedContent>>._, A<ProvideSchema>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<EnrichedContent>>._, A<ProvideSchema>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -70,10 +70,10 @@ public class ContentEnricherTests : GivenContext
         A.CallTo(() => step2.EnrichAsync(ApiContext, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, CancellationToken))
+        A.CallTo(() => step1.EnrichAsync(ApiContext, A<IEnumerable<EnrichedContent>>._, A<ProvideSchema>._, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, CancellationToken))
+        A.CallTo(() => step2.EnrichAsync(ApiContext, A<IEnumerable<EnrichedContent>>._, A<ProvideSchema>._, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -99,7 +99,7 @@ public class ContentEnricherTests : GivenContext
     [Fact]
     public async Task Should_clone_data_if_requested()
     {
-        var source = CreateContent(new ContentData());
+        var source = CreateContent();
 
         var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), AppProvider);
 
@@ -111,17 +111,12 @@ public class ContentEnricherTests : GivenContext
     [Fact]
     public async Task Should_not_clone_data_if_not_requested()
     {
-        var source = CreateContent(new ContentData());
+        var source = CreateContent();
 
         var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), AppProvider);
 
         var actual = await sut.EnrichAsync(source, false, ApiContext, CancellationToken);
 
         Assert.Same(source.Data, actual.Data);
-    }
-
-    private ContentEntity CreateContent(ContentData? data = null)
-    {
-        return new ContentEntity { SchemaId = SchemaId, Data = data! };
     }
 }

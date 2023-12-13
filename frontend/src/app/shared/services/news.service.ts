@@ -26,7 +26,9 @@ export type FeaturesDto = Readonly<{
     version: number;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class NewsService {
     constructor(
         private readonly http: HttpClient,

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -62,16 +63,16 @@ public class BackupRulesTests : GivenContext
 
         var rebuildAssets = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<RuleDomainObject, RuleDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
+        A.CallTo(() => rebuilder.InsertManyAsync<RuleDomainObject, Rule>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildAssets.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
         await sut.RestoreAsync(context, CancellationToken);
 
-        Assert.Equal(new HashSet<DomainId>
-        {
+        Assert.Equal(
+        [
             DomainId.Combine(AppId, ruleId1),
             DomainId.Combine(AppId, ruleId2)
-        }, rebuildAssets);
+        ], rebuildAssets);
     }
 
     private Envelope<RuleEvent> AppEvent(RuleEvent @event)

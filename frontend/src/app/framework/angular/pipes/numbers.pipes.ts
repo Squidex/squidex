@@ -10,6 +10,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
     name: 'sqxKNumber',
     pure: true,
+    standalone: true,
 })
 export class KNumberPipe implements PipeTransform {
     public transform(value: number) {
@@ -34,6 +35,7 @@ export class KNumberPipe implements PipeTransform {
 @Pipe({
     name: 'sqxFileSize',
     pure: true,
+    standalone: true,
 })
 export class FileSizePipe implements PipeTransform {
     public transform(value: number) {

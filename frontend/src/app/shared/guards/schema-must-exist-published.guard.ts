@@ -5,33 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { allParams } from '@app/framework';
-import { SchemasState } from './../state/schemas.state';
+import { SchemasState } from '../state/schemas.state';
 
-@Injectable()
-export class SchemaMustExistPublishedGuard  {
-    constructor(
-        private readonly schemasState: SchemasState,
-        private readonly router: Router,
-    ) {
-    }
+export const schemaMustExistPublishedGuard = (route: ActivatedRouteSnapshot) => {
+    const schemasState = inject(SchemasState);
+    const schemaName = allParams(route)['schemaName'];
+    const router = inject(Router);
 
-    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
-        const schemaName = allParams(route)['schemaName'];
+    const result =
+        schemasState.select(schemaName).pipe(
+            tap(schema => {
+                if (!schema || !schema.isPublished || schema.type === 'Component') {
+                    router.navigate(['/404']);
+                }
+            }),
+            map(schema => schema?.isPublished === true && schema.type !== 'Component'));
 
-        const result =
-            this.schemasState.select(schemaName).pipe(
-                tap(schema => {
-                    if (!schema || !schema.isPublished || schema.type === 'Component') {
-                        this.router.navigate(['/404']);
-                    }
-                }),
-                map(schema => schema?.isPublished === true && schema.type !== 'Component'));
-
-        return result;
-    }
-}
+    return result;
+};

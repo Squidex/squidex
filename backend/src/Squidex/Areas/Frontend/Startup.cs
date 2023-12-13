@@ -40,12 +40,12 @@ public static class Startup
 
         app.UseMiddleware<NotifoMiddleware>();
 
-        app.UseWhen(c => c.IsSpaFile(), builder =>
+        app.UseWhen(IsSpaFile, builder =>
         {
             builder.UseMiddleware<SetupMiddleware>();
         });
 
-        app.UseWhen(c => c.IsSpaFile() || c.IsHtmlPath(), builder =>
+        app.UseWhen(IsSpaFileOrHtml, builder =>
         {
             // Adjust the base for all potential html files.
             builder.UseHtmlTransform(new HtmlTransformOptions
@@ -82,23 +82,40 @@ public static class Startup
 
     private static void UseSquidexStaticFiles(this IApplicationBuilder app, IFileProvider fileProvider)
     {
+        static bool HasQueryString(HttpContext context)
+        {
+            return !string.IsNullOrWhiteSpace(context.Request.QueryString.ToString());
+        }
+
+        static bool IsHtml(HttpContext context)
+        {
+            return string.Equals(context.Response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase);
+        }
+
         app.UseStaticFiles(new StaticFileOptions
         {
             OnPrepareResponse = context =>
             {
                 var response = context.Context.Response;
 
-                if (!string.IsNullOrWhiteSpace(context.Context.Request.QueryString.ToString()))
-                {
-                    response.Headers[HeaderNames.CacheControl] = "max-age=5184000";
-                }
-                else if (string.Equals(response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase))
+                if (IsHtml(context.Context) || HasQueryString(context.Context))
                 {
                     response.Headers[HeaderNames.CacheControl] = "no-cache";
+                    response.Headers.Remove(HeaderNames.ETag);
+                    response.Headers.Remove(HeaderNames.LastModified);
+                }
+                else
+                {
+                    response.Headers[HeaderNames.CacheControl] = "max-age=5184000";
                 }
             },
             FileProvider = fileProvider
         });
+    }
+
+    private static bool IsSpaFileOrHtml(this HttpContext context)
+    {
+        return context.IsSpaFile() || context.IsHtmlPath();
     }
 
     private static bool IsSpaFile(this HttpContext context)

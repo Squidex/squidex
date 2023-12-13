@@ -24,7 +24,7 @@ public sealed record Workflow(Status Initial, ReadonlyDictionary<Status, Workflo
 
     public ReadonlyDictionary<Status, WorkflowStep> Steps { get; } = Steps ?? ReadonlyDictionary.Empty<Status, WorkflowStep>();
 
-    public ReadonlyList<DomainId> SchemaIds { get; } = SchemaIds ?? ReadonlyList.Empty<DomainId>();
+    public ReadonlyList<DomainId> SchemaIds { get; } = SchemaIds ?? [];
 
     public static Workflow CreateDefault(string? name = null)
     {

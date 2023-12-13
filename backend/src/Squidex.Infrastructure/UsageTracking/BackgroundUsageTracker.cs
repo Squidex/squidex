@@ -154,7 +154,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
             {
                 var counters = value.Find(x => x.Date == date)?.Counters;
 
-                enriched.Add((date, counters ?? new Counters()));
+                enriched.Add((date, counters ?? []));
             }
 
             result[category] = enriched;

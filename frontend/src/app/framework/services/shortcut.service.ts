@@ -8,7 +8,9 @@
 import { Injectable } from '@angular/core';
 import * as Mousetrap from 'mousetrap';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ShortcutService {
     public listen(keys: string, callback: (e: KeyboardEvent, combo: string) => void): () => void {
         const trimmed = keys.toLowerCase().replace(/\s/g, '').split(',');

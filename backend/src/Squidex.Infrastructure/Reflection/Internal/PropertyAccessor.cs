@@ -30,7 +30,7 @@ public static class PropertyAccessor
 
         var propertyGetMethod = propertyInfo.GetGetMethod()!;
 
-        var getMethod = new DynamicMethod(propertyGetMethod.Name, typeof(TValue), new[] { typeof(TSource) }, true);
+        var getMethod = new DynamicMethod(propertyGetMethod.Name, typeof(TValue), [typeof(TSource)], true);
         var getGenerator = getMethod.GetILGenerator();
 
         // Load this to stack.
@@ -71,7 +71,7 @@ public static class PropertyAccessor
 
         var propertySetMethod = propertyInfo.GetSetMethod()!;
 
-        var setMethod = new DynamicMethod(propertySetMethod.Name, null, new[] { typeof(TSource), typeof(TValue) }, true);
+        var setMethod = new DynamicMethod(propertySetMethod.Name, null, [typeof(TSource), typeof(TValue)], true);
         var setGenerator = setMethod.GetILGenerator();
 
         // Load this to stack.

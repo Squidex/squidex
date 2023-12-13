@@ -6,19 +6,23 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Teams;
-using Squidex.Domain.Apps.Entities.Teams.DomainObject;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Teams;
 
-public sealed class MongoTeamRepository : MongoSnapshotStoreBase<TeamDomainObject.State, MongoTeamEntity>, ITeamRepository
+public sealed class MongoTeamRepository : MongoSnapshotStoreBase<Team, MongoTeamEntity>, ITeamRepository
 {
     public MongoTeamRepository(IMongoDatabase database)
         : base(database)
     {
+    }
+
+    protected override string CollectionName()
+    {
+        return "States_Teams";
     }
 
     protected override Task SetupCollectionAsync(IMongoCollection<MongoTeamEntity> collection,
@@ -32,7 +36,7 @@ public sealed class MongoTeamRepository : MongoSnapshotStoreBase<TeamDomainObjec
         }, ct);
     }
 
-    public async Task<List<ITeamEntity>> QueryAllAsync(string contributorId,
+    public async Task<List<Team>> QueryAllAsync(string contributorId,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoTeamRepository/QueryAllAsync"))
@@ -41,11 +45,11 @@ public sealed class MongoTeamRepository : MongoSnapshotStoreBase<TeamDomainObjec
                 await Collection.Find(x => x.IndexedUserIds.Contains(contributorId))
                     .ToListAsync(ct);
 
-            return entities.Select(x => (ITeamEntity)x.Document).ToList();
+            return entities.Select(x => x.Document).ToList();
         }
     }
 
-    public async Task<ITeamEntity?> FindAsync(DomainId id,
+    public async Task<Team?> FindAsync(DomainId id,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoTeamRepository/FindAsync"))

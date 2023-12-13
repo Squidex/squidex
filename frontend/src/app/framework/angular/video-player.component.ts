@@ -11,6 +11,7 @@ import { ResourceLoaderService } from '@app/framework/internal';
 declare const videojs: any;
 
 @Component({
+    standalone: true,
     selector: 'sqx-video-player',
     styleUrls: ['./video-player.component.scss'],
     templateUrl: './video-player.component.html',
@@ -48,18 +49,18 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    public ngAfterViewInit() {
-        Promise.all([
+    public async ngAfterViewInit() {
+        await Promise.all([
             this.resourceLoader.loadLocalScript('dependencies/videojs/video.min.js'),
-            this.resourceLoader.loadLocalStyle('dependencies/videojs/video-js.min.css'),
-        ]).then(() => {
-            this.renderer.removeClass(this.video.nativeElement, 'hidden');
+            this.resourceLoader.loadLocalStyle('dependencies/videojs/videojs.min.css'),
+        ]);
 
-            this.player = videojs(this.video.nativeElement, {
-                fluid: true,
-            });
+        this.renderer.removeClass(this.video.nativeElement, 'hidden');
 
-            this.ngOnChanges();
+        this.player = videojs(this.video.nativeElement, {
+            fluid: true,
         });
+
+        this.ngOnChanges();
     }
 }

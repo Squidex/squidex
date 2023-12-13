@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -42,7 +43,7 @@ public class BackupAssetsTests : GivenContext
     {
         var tags = new TagsExport
         {
-            Tags = new Dictionary<string, Tag>()
+            Tags = []
         };
 
         var context = CreateBackupContext();
@@ -55,8 +56,8 @@ public class BackupAssetsTests : GivenContext
         A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Tags, CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias!, A<CancellationToken>._))
-            .MustNotHaveHappened();
+        A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias, A<CancellationToken>._))
+            .MustHaveHappened();
     }
 
     [Fact]
@@ -68,7 +69,7 @@ public class BackupAssetsTests : GivenContext
             {
                 ["tag1"] = "new-name"
             },
-            Tags = new Dictionary<string, Tag>()
+            Tags = []
         };
 
         var context = CreateBackupContext();
@@ -319,16 +320,16 @@ public class BackupAssetsTests : GivenContext
 
         var rebuildAssets = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
+        A.CallTo(() => rebuilder.InsertManyAsync<AssetDomainObject, Asset>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildAssets.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
         await sut.RestoreAsync(context, CancellationToken);
 
-        Assert.Equal(new HashSet<DomainId>
-        {
+        Assert.Equal(
+        [
             DomainId.Combine(AppId, assetId1),
             DomainId.Combine(AppId, assetId2)
-        }, rebuildAssets);
+        ], rebuildAssets);
     }
 
     [Fact]
@@ -356,16 +357,16 @@ public class BackupAssetsTests : GivenContext
 
         var rebuildAssetFolders = new HashSet<DomainId>();
 
-        A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
+        A.CallTo(() => rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolder>(A<IEnumerable<DomainId>>._, A<int>._, CancellationToken))
             .Invokes(x => rebuildAssetFolders.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
         await sut.RestoreAsync(context, CancellationToken);
 
-        Assert.Equal(new HashSet<DomainId>
-        {
+        Assert.Equal(
+        [
             DomainId.Combine(AppId, assetFolderId1),
             DomainId.Combine(AppId, assetFolderId2)
-        }, rebuildAssetFolders);
+        ], rebuildAssetFolders);
     }
 
     private BackupContext CreateBackupContext()

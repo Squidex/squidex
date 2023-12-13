@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
@@ -33,8 +32,8 @@ public class EnrichForCachingTests : GivenContext
 
         await sut.EnrichAsync(ApiContext, CancellationToken);
 
-        Assert.Equal(new List<string>
-        {
+        Assert.Equal(
+        [
             "X-Fields",
             "X-Flatten",
             "X-Languages",
@@ -44,13 +43,13 @@ public class EnrichForCachingTests : GivenContext
             "X-ResolveFlow",
             "X-ResolveUrls",
             "X-Unpublished"
-        }, headers);
+        ], headers);
     }
 
     [Fact]
     public async Task Should_add_app_version_and_schema_as_dependency()
     {
-        var content = CreateContent();
+        var content = CreateContent() with { Version = 13 };
 
         await sut.EnrichAsync(ApiContext, Enumerable.Repeat(content, 1), SchemaProvider(), CancellationToken);
 
@@ -76,17 +75,12 @@ public class EnrichForCachingTests : GivenContext
     [Fact]
     public async Task Should_not_add_cache_headers_for_contents_if_disabled()
     {
-        var content = CreateContent();
+        var content = CreateContent() with { Version = 13 };
 
         await sut.EnrichAsync(ApiContext.Clone(b => b.WithNoCacheKeys()), Enumerable.Repeat(content, 1), SchemaProvider(), CancellationToken);
 
         A.CallTo(() => requestCache.AddHeader(A<string>._))
             .MustNotHaveHappened();
-    }
-
-    private ContentEntity CreateContent()
-    {
-        return new ContentEntity { AppId = AppId, Id = DomainId.NewGuid(), SchemaId = SchemaId, Version = 13 };
     }
 
     private ProvideSchema SchemaProvider()

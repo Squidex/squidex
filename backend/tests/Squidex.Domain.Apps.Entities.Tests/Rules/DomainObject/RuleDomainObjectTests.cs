@@ -18,7 +18,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
-public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
+public class RuleDomainObjectTests : HandlerTestBase<Rule>
 {
     private readonly IRuleEnqueuer ruleEnqueuer = A.Fake<IRuleEnqueuer>();
     private readonly DomainId ruleId = DomainId.NewGuid();
@@ -70,8 +70,8 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
         Assert.Equal(AppId, sut.Snapshot.AppId);
 
-        Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
-        Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
+        Assert.Same(command.Trigger, sut.Snapshot.Trigger);
+        Assert.Same(command.Action, sut.Snapshot.Action);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -90,12 +90,12 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.True(sut.Snapshot.RuleDef.IsEnabled);
+        Assert.True(sut.Snapshot.IsEnabled);
 
-        Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
-        Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
+        Assert.Same(command.Trigger, sut.Snapshot.Trigger);
+        Assert.Same(command.Action, sut.Snapshot.Action);
 
-        Assert.Equal(command.Name, sut.Snapshot.RuleDef.Name);
+        Assert.Equal(command.Name, sut.Snapshot.Name);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -115,7 +115,7 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.True(sut.Snapshot.RuleDef.IsEnabled);
+        Assert.True(sut.Snapshot.IsEnabled);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -138,7 +138,7 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.True(sut.Snapshot.RuleDef.IsEnabled);
+        Assert.True(sut.Snapshot.IsEnabled);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -157,7 +157,7 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.False(sut.Snapshot.RuleDef.IsEnabled);
+        Assert.False(sut.Snapshot.IsEnabled);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -179,7 +179,7 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
         actual.ShouldBeEquivalent(sut.Snapshot);
 
-        Assert.False(sut.Snapshot.RuleDef.IsEnabled);
+        Assert.False(sut.Snapshot.IsEnabled);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -217,7 +217,7 @@ public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject.State>
 
         Assert.Equal(0, sut.Version);
 
-        A.CallTo(() => ruleEnqueuer.EnqueueAsync(sut.Snapshot.Id, sut.Snapshot.RuleDef,
+        A.CallTo(() => ruleEnqueuer.EnqueueAsync(sut.Snapshot.Id, sut.Snapshot,
                 A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered)))
             .MustHaveHappened();
     }

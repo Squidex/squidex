@@ -70,7 +70,9 @@ export type UpdateClientDto = Readonly<{
     apiCallsLimit?: number;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ClientsService {
     constructor(
         private readonly http: HttpClient,

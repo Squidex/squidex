@@ -4,8 +4,8 @@
     </ng-container>
 
     <ng-container content>
-        <div class="scroll-container" #scrollContainer>
-            <div (sqxResized)="scrollDown()">
+        <div class="scroll-container" #container>
+            <div>
                 <div class="item">
                     <div class="row">
                         <div class="col-auto">
@@ -22,7 +22,10 @@
                     </div>
                 </div>
 
-                <div class="item" [sqxScrollActive]="true" *ngFor="let item of snapshot.chatTalk">
+                <div class="item" *ngFor="let item of snapshot.chatTalk"
+                    [sqxScrollActive]="true"
+                    [sqxScrollOffset]="30"
+                    [sqxScrollContainer]="container">
                     <div class="row mt-3" *ngIf="item.type === 'user'">
                         <div class="col">
                             <div class="bubble bubble-left">
@@ -71,7 +74,10 @@
                     </div>
                 </div>
 
-                <div class="row mt-3" [sqxScrollActive]="true" *ngIf="snapshot.isRunning">
+                <div class="row mt-3" *ngIf="snapshot.isRunning"
+                    [sqxScrollActive]="true"
+                    [sqxScrollOffset]="30"
+                    [sqxScrollContainer]="container">
                     <div class="col-auto">
                         <div class="squid squid-sm d-flex align-items-center justify-content-center">
                             <img src="./images/squid.svg">

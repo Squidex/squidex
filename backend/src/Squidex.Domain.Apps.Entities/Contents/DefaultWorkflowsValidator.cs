@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -41,7 +41,7 @@ public sealed class DefaultWorkflowsValidator : IWorkflowsValidator
 
                 if (schema != null)
                 {
-                    errors.Add(T.Get("workflows.schemaOverlap", new { schema = schema.SchemaDef.Name }));
+                    errors.Add(T.Get("workflows.schemaOverlap", new { schema = schema.Name }));
                 }
             }
         }

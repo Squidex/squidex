@@ -28,7 +28,7 @@
 
     &:disabled,
     &.disabled {
-        border: none;
+        border-color: transparent;
         border-radius: 0;
         opacity: .4;
     }

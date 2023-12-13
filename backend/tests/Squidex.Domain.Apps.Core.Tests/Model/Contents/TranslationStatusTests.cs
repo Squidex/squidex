@@ -19,9 +19,9 @@ public class TranslationStatusTests
     [Fact]
     public void Should_create_info_for_empty_schema()
     {
-        var schema = new Schema("my-schema");
+        var schema = new Schema { Name = "my-schema" };
 
-        var actual = TranslationStatus.Create(new ContentData(), schema, languages);
+        var actual = TranslationStatus.Create([], schema, languages);
 
         Assert.Equal(new TranslationStatus
         {
@@ -35,10 +35,10 @@ public class TranslationStatusTests
     public void Should_create_info_for_schema_without_localized_field()
     {
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddString(1, "field1", Partitioning.Invariant);
 
-        var actual = TranslationStatus.Create(new ContentData(), schema, languages);
+        var actual = TranslationStatus.Create([], schema, languages);
 
         Assert.Equal(new TranslationStatus
         {
@@ -52,10 +52,10 @@ public class TranslationStatusTests
     public void Should_create_info_for_schema_with_localized_field()
     {
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddString(1, "field1", Partitioning.Language);
 
-        var actual = TranslationStatus.Create(new ContentData(), schema, languages);
+        var actual = TranslationStatus.Create([], schema, languages);
 
         Assert.Equal(new TranslationStatus
         {
@@ -69,7 +69,7 @@ public class TranslationStatusTests
     public void Should_create_translation_info()
     {
         var schema =
-            new Schema("my-schema")
+            new Schema { Name = "my-schema" }
                 .AddString(1, "field1", Partitioning.Language)
                 .AddString(2, "field2", Partitioning.Language)
                 .AddString(3, "field3", Partitioning.Language)

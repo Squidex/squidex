@@ -16,7 +16,7 @@ public class StringExtensionsTests
     [InlineData("me@@web.com", false)]
     [InlineData("me@web.com", true)]
     [InlineData("Me@web.com", true)]
-    public void Should_check_email(string email, bool isEmail)
+    public void Should_check_email(string? email, bool isEmail)
     {
         Assert.Equal(isEmail, email.IsEmail());
     }
@@ -25,7 +25,7 @@ public class StringExtensionsTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public void Should_provide_fallback_if_invalid(string value)
+    public void Should_provide_fallback_if_invalid(string? value)
     {
         Assert.Equal("fallback", value.Or("fallback"));
     }

@@ -9,7 +9,6 @@ using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
-using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using GraphQLSchema = GraphQL.Types.Schema;
 using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
@@ -18,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
 public class GraphQLIntrospectionTests : GraphQLTestBase
 {
+    private Schema schema = new Schema { AppId = TestApp.DefaultId, Id = DomainId.NewGuid(), Name = "my-schema" };
+
     [Fact]
     public async Task Should_introspect()
     {
@@ -126,12 +127,9 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_build_graphql_schema_without_schema()
+    public async Task Should_build_graphql_schema_without_published_schema()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("content").Publish());
+        schema = schema.Unpublish();
 
         var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -141,11 +139,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_build_graphql_schema_on_schema_with_ui_fields_only()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("content").Publish()
-                    .AddUI(1, "ui", Partitioning.Invariant));
+        schema = schema.Publish().AddUI(1, "ui", Partitioning.Invariant);
 
         var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -155,11 +149,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_build_graphql_schema_on_schema_with_invalid_fields_only()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("content").Publish()
-                    .AddComponent(1, "component", Partitioning.Invariant));
+        schema = schema.Publish().AddComponent(1, "component", Partitioning.Invariant);
 
         var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -169,11 +159,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_build_graphql_schema_on_unpublished_schema()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("content")
-                    .AddString(1, "myField", Partitioning.Invariant));
+        schema = schema.Publish().AddString(1, "myField", Partitioning.Invariant);
 
         var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -183,11 +169,8 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_build_graphql_schema_on_reserved_schema_name()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("content").Publish()
-                    .AddString(1, "myField", Partitioning.Invariant));
+        schema = schema with { Name = "Content" };
+        schema = schema.Publish().AddString(1, "myField", Partitioning.Invariant);
 
         var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -197,11 +180,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_build_graphql_schema_with_reserved_field_name()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("my-schema").Publish()
-                    .AddString(1, "content", Partitioning.Invariant));
+        schema = schema.Publish().AddString(1, "content", Partitioning.Invariant);
 
         var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -213,11 +192,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_build_graphql_schema_on_invalid_field_name()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("my-schema").Publish()
-                    .AddString(1, "2-field", Partitioning.Invariant));
+        schema = schema.Publish().AddString(1, "2-field", Partitioning.Invariant);
 
         var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -229,12 +204,10 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_build_graphql_schema_on_duplicate_field_name()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("my-schema").Publish()
-                    .AddString(1, "my-field", Partitioning.Invariant)
-                    .AddString(2, "my_field", Partitioning.Invariant));
+        schema = schema
+            .Publish()
+            .AddString(1, "my-field", Partitioning.Invariant)
+            .AddString(2, "my_field", Partitioning.Invariant);
 
         var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -247,13 +220,11 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_not_build_grapqhl_schema_on_invalid_component()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("my-schema").Publish()
-                    .AddComponent(1, "my-component", Partitioning.Invariant,
-                        new ComponentFieldProperties())
-                    .AddString(2, "my-string", Partitioning.Invariant));
+        schema = schema
+            .Publish()
+            .AddComponent(1, "my-component", Partitioning.Invariant,
+                    new ComponentFieldProperties())
+            .AddString(2, "my-string", Partitioning.Invariant);
 
         var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -265,13 +236,11 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_not_build_grapqhl_schema_on_invalid_components()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("my-schema").Publish()
-                    .AddComponents(1, "my-components", Partitioning.Invariant,
-                        new ComponentsFieldProperties())
-                    .AddString(2, "my-string", Partitioning.Invariant));
+        schema = schema
+            .Publish()
+            .AddComponents(1, "my-components", Partitioning.Invariant,
+                new ComponentsFieldProperties())
+            .AddString(2, "my-string", Partitioning.Invariant);
 
         var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
@@ -283,13 +252,11 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
     [Fact]
     public async Task Should_not_build_grapqhl_schema_on_invalid_references()
     {
-        var schema =
-            Mocks.Schema(TestApp.DefaultId,
-                DomainId.NewGuid(),
-                new Schema("my-schema").Publish()
-                    .AddReferences(1, "my-references", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
-                    .AddString(2, "my-string", Partitioning.Invariant));
+        schema = schema
+            .Publish()
+            .AddReferences(1, "my-references", Partitioning.Invariant,
+                new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
+            .AddString(2, "my-string", Partitioning.Invariant);
 
         var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 

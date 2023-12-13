@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models;
@@ -17,7 +17,7 @@ public sealed class SchemasDto : Resource
     /// </summary>
     public SchemaDto[] Items { get; set; }
 
-    public static SchemasDto FromDomain(IList<ISchemaEntity> schemas, Resources resources)
+    public static SchemasDto FromDomain(IList<Schema> schemas, Resources resources)
     {
         var result = new SchemasDto
         {

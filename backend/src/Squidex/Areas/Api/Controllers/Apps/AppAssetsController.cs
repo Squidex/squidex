@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -47,7 +47,7 @@ public sealed class AppAssetsController : ApiController
     }
 
     /// <summary>
-    /// Update the app asset scripts.
+    /// Update the asset scripts.
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
     /// <param name="request">The values to update.</param>
@@ -70,13 +70,13 @@ public sealed class AppAssetsController : ApiController
     {
         var context = await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
-        var result = context.Result<IAppEntity>();
+        var result = context.Result<App>();
         var response = GetResponse(result);
 
         return response;
     }
 
-    private AssetScriptsDto GetResponse(IAppEntity result)
+    private AssetScriptsDto GetResponse(App result)
     {
         return AssetScriptsDto.FromDomain(result, Resources);
     }

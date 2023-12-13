@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AssetDto, DialogModel, LocalStoreService, MessageBus, ResolveAssets, Settings, sorted, StatefulControlComponent, Subscriptions, Types } from '@app/shared';
+import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, DialogModel, FileDropDirective, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, sorted, StatefulControlComponent, Subscriptions, TranslatePipe, Types } from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true,
@@ -40,6 +41,7 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
@@ -47,6 +49,19 @@ interface State {
         SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AssetComponent,
+        AssetDialogComponent,
+        AssetSelectorComponent,
+        CdkDrag,
+        CdkDropList,
+        FileDropDirective,
+        ModalDirective,
+        NgFor,
+        NgIf,
+        ResizedDirective,
+        TranslatePipe,
+    ],
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
     private readonly subscriptions = new Subscriptions();

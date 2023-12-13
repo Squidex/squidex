@@ -7,6 +7,7 @@
 
 using System.Security.Cryptography;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Infrastructure;
@@ -14,7 +15,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<AssetCommand, AssetDomainObject, AssetDomainObject.State>
+public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<AssetCommand, AssetDomainObject, Asset>
 {
     private readonly IAssetFileStore assetFileStore;
     private readonly IAssetEnricher assetEnricher;
@@ -128,7 +129,7 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
     {
         var payload = await base.EnrichResultAsync(context, result, ct);
 
-        if (payload is not IAssetEntity asset)
+        if (payload is not Asset asset)
         {
             return payload;
         }
@@ -138,14 +139,14 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
             var tempFile = context.ContextId.ToString();
             try
             {
-                await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion, null, ct);
+                await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.Id, asset.FileVersion, null, ct);
             }
             catch (AssetAlreadyExistsException)
             {
             }
         }
 
-        if (payload is not IEnrichedAssetEntity)
+        if (payload is not EnrichedAsset)
         {
             payload = await assetEnricher.EnrichAsync(asset, contextProvider.Context, ct);
         }

@@ -5,31 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { finalize, Observable } from 'rxjs';
+import { HttpHandlerFn, HttpRequest } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { finalize } from 'rxjs';
 import { LoadingService, MathHelper } from '@app/framework/internal';
 
-@Injectable()
-export class LoadingInterceptor implements HttpInterceptor {
-    constructor(
-        private readonly loadingService: LoadingService,
-    ) {
+export const loadingInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
+    const id = MathHelper.guid();
+
+    const silent = req.headers.has('X-Silent');
+
+    if (silent) {
+        return next(req);
     }
 
-    public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        const id = MathHelper.guid();
+    const loadingService = inject(LoadingService);
 
-        const silent = req.headers.has('X-Silent');
+    loadingService.startLoading(id);
 
-        if (silent) {
-            return next.handle(req);
-        }
-
-        this.loadingService.startLoading(id);
-
-        return next.handle(req).pipe(finalize(() => {
-            this.loadingService.completeLoading(id);
-        }));
-    }
-}
+    return next(req).pipe(finalize(() => {
+        loadingService.completeLoading(id);
+    }));
+};

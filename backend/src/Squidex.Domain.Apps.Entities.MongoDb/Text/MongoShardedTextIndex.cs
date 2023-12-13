@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
@@ -41,13 +41,13 @@ public sealed class MongoShardedTextIndex<T> : ShardedService<MongoTextIndexBase
         }
     }
 
-    public Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+    public Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         return Shard(app.Id).SearchAsync(app, query, scope, ct);
     }
 
-    public Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+    public Task<List<DomainId>?> SearchAsync(App app, GeoQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         return Shard(app.Id).SearchAsync(app, query, scope, ct);

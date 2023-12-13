@@ -18,7 +18,7 @@ public class PartitionedActionBlockTests
 
         for (var i = 0; i < Partitions; i++)
         {
-            lists[i] = new List<int>();
+            lists[i] = [];
         }
 
         var scheduler = new PartitionedScheduler<(int Partition, int Value)>((item, ct) =>

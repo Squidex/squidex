@@ -9,6 +9,7 @@ import { booleanAttribute, Directive, HostListener, Input } from '@angular/core'
 
 @Directive({
     selector: '[sqxStopClick]',
+    standalone: true,
 })
 export class StopClickDirective {
     @Input({ alias: 'sqxStopClick', transform: booleanAttribute })

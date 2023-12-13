@@ -16,7 +16,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets;
 
-internal sealed class AssetGraphType : SharedObjectGraphType<IEnrichedAssetEntity>
+internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
 {
     public AssetGraphType()
     {
@@ -267,12 +267,12 @@ internal sealed class AssetGraphType : SharedObjectGraphType<IEnrichedAssetEntit
         return urlGenerator.AssetThumbnail(asset.AppId, asset.Id.ToString(), asset.Type);
     });
 
-    private static IFieldResolver Resolve<T>(Func<IEnrichedAssetEntity, IResolveFieldContext, GraphQLExecutionContext, T> resolver)
+    private static IFieldResolver Resolve<T>(Func<EnrichedAsset, IResolveFieldContext, GraphQLExecutionContext, T> resolver)
     {
         return Resolvers.Sync(resolver);
     }
 
-    private static IFieldResolver Resolve<T>(Func<IEnrichedAssetEntity, T> resolver)
+    private static IFieldResolver Resolve<T>(Func<EnrichedAsset, T> resolver)
     {
         return Resolvers.Sync(resolver);
     }

@@ -6,20 +6,24 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Entities.Rules.DomainObject;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules;
 
-public sealed class MongoRuleRepository : MongoSnapshotStoreBase<RuleDomainObject.State, MongoRuleEntity>, IRuleRepository, IDeleter
+public sealed class MongoRuleRepository : MongoSnapshotStoreBase<Rule, MongoRuleEntity>, IRuleRepository, IDeleter
 {
     public MongoRuleRepository(IMongoDatabase database)
         : base(database)
     {
+    }
+
+    protected override string CollectionName()
+    {
+        return "States_Rules";
     }
 
     protected override Task SetupCollectionAsync(IMongoCollection<MongoRuleEntity> collection,
@@ -33,13 +37,13 @@ public sealed class MongoRuleRepository : MongoSnapshotStoreBase<RuleDomainObjec
         }, ct);
     }
 
-    Task IDeleter.DeleteAppAsync(IAppEntity app,
+    Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
     }
 
-    public async Task<List<IRuleEntity>> QueryAllAsync(DomainId appId,
+    public async Task<List<Rule>> QueryAllAsync(DomainId appId,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoRuleRepository/QueryAllAsync"))
@@ -48,7 +52,7 @@ public sealed class MongoRuleRepository : MongoSnapshotStoreBase<RuleDomainObjec
                 await Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted)
                     .ToListAsync(ct);
 
-            return entities.Select(x => (IRuleEntity)x.Document).ToList();
+            return entities.Select(x => x.Document).ToList();
         }
     }
 }

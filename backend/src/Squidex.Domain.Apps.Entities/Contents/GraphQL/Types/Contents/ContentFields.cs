@@ -225,7 +225,7 @@ internal static class ContentFields
         return Resolvers.Sync(resolver);
     }
 
-    private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, T> resolver)
+    private static IFieldResolver Resolve<T>(Func<EnrichedContent, T> resolver)
     {
         return Resolvers.Sync(resolver);
     }

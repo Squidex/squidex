@@ -50,7 +50,7 @@ public static class JsonMapper
         return JsValue.Null;
     }
 
-    private static JsValue FromArray(JsonArray arr, Engine engine)
+    private static JsArray FromArray(JsonArray arr, Engine engine)
     {
         var target = new JsValue[arr.Count];
 
@@ -62,7 +62,7 @@ public static class JsonMapper
         return engine.Realm.Intrinsics.Array.Construct(target);
     }
 
-    private static JsValue FromObject(JsonObject obj, Engine engine)
+    private static JsonObjectInstance FromObject(JsonObject obj, Engine engine)
     {
         var target = new JsonObjectInstance(engine);
 

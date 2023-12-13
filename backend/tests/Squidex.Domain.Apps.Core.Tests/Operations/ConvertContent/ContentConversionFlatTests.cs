@@ -31,7 +31,7 @@ public class ContentConversionFlatTests
                 new ContentFieldData()
                     .AddLocalized("it", 7))
             .AddField("field5",
-                new ContentFieldData());
+                []);
 
     [Fact]
     public void Should_return_flatten_value()

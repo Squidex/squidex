@@ -12,20 +12,13 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.TestHelpers;
 
-public sealed record MyDomainState : IDomainState<MyDomainState>
+public sealed record MyDomainState : Entity
 {
     public const long Unchanged = 13;
 
     public bool IsDeleted { get; set; }
 
-    public long Version { get; set; }
-
     public long Value { get; set; }
-
-    public MyDomainState Copy()
-    {
-        return (MyDomainState)MemberwiseClone();
-    }
 
     public MyDomainState Apply(Envelope<IEvent> @event)
     {

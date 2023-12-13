@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -197,7 +196,7 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
 
         property.ExtensionData = new Dictionary<string, object>
         {
-            ["schemaIds"] = field.Properties.SchemaIds ?? ReadonlyList.Empty<DomainId>()
+            ["schemaIds"] = field.Properties.SchemaIds ?? []
         };
 
         property.UniqueItems = !field.Properties.AllowDuplicates;
@@ -218,7 +217,7 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
 
         if (field.Properties.AllowedValues != null)
         {
-            var names = property.EnumerationNames ??= new Collection<string>();
+            var names = property.EnumerationNames ??= [];
 
             foreach (var value in field.Properties.AllowedValues)
             {

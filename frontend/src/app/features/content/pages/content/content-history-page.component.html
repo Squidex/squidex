@@ -1,6 +1,6 @@
 <sqx-layout layout="right" titleText="i18n:common.workflow" width="20" white="true" overflow="true" padding="true">
     <ng-container>
-        <div class="section mb-4">
+        <div class="section mb-2">
             <label for="id">{{ 'common.id' | sqxTranslate }}</label>
 
             <div class="input-group">
@@ -10,6 +10,9 @@
                     <i class="icon-copy"></i>
                 </button>
             </div>
+        </div>
+        <div class="section mb-4">
+            <label for="version">{{ 'common.version' | sqxTranslate }}</label>: <span id="version">{{content.version}}</span>
         </div>
 
         <div class="section mb-4" *ngIf="content.canDraftCreate || content.canDraftDelete">

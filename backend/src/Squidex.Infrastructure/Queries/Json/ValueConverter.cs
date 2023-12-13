@@ -16,11 +16,11 @@ public static class ValueConverter
     private delegate bool Parser<T>(List<string> errors, PropertyPath path, JsonValue value, out T result);
 
     private static readonly InstantPattern[] InstantPatterns =
-    {
+    [
         InstantPattern.General,
         InstantPattern.ExtendedIso,
         InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd")
-    };
+    ];
 
     public static ClrValue? Convert(FilterField field, JsonValue value, PropertyPath path, List<string> errors)
     {

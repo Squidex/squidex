@@ -8,7 +8,6 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -54,7 +53,7 @@ public class ETagCommandMiddleware : ICommandMiddleware
         {
             SetResponsEtag(httpContext, result.NewVersion);
         }
-        else if (context.PlainResult is IEntityWithVersion entity)
+        else if (context.PlainResult is Entity entity)
         {
             SetResponsEtag(httpContext, entity.Version);
         }

@@ -9,14 +9,14 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 
-public class UsageTriggerHandlerTests
+public class UsageTriggerHandlerTests : GivenContext
 {
     private readonly IRuleTriggerHandler sut = new UsageTriggerHandler();
 
@@ -70,22 +70,23 @@ public class UsageTriggerHandlerTests
     {
         var ctx = Context();
 
-        var @event = new AppUsageExceeded { RuleId = ctx.RuleId };
+        var @event = new AppUsageExceeded { RuleId = ctx.Rule.Id };
 
         var actual = sut.Trigger(Envelope.Create<AppEvent>(@event), ctx.Rule.Trigger);
 
         Assert.True(actual);
     }
 
-    private static RuleContext Context(RuleTrigger? trigger = null)
+    private RuleContext Context(RuleTrigger? trigger = null)
     {
         trigger ??= new UsageTrigger();
 
         return new RuleContext
         {
-            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
-            Rule = new Rule(trigger, A.Fake<RuleAction>()),
-            RuleId = DomainId.NewGuid()
+            AppId = AppId,
+            IncludeSkipped = false,
+            IncludeStale = false,
+            Rule = CreateRule() with { Trigger = trigger }
         };
     }
 }

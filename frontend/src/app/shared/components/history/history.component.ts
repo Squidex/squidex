@@ -5,17 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { merge, Observable, timer } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { LayoutComponent } from '@app/framework';
 import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistoryService, MessageBus, SchemasState, switchSafe, TeamsState } from '@app/shared/internal';
+import { HistoryListComponent } from './history-list.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-history',
     styleUrls: ['./history.component.scss'],
     templateUrl: './history.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        HistoryListComponent,
+        LayoutComponent,
+    ],
 })
 export class HistoryComponent {
     private readonly channel = this.calculateChannel();

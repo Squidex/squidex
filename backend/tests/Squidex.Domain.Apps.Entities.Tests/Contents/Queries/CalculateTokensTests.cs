@@ -50,11 +50,6 @@ public class CalculateTokensTests : GivenContext
             .MustHaveHappened();
     }
 
-    private ContentEntity CreateContent()
-    {
-        return new ContentEntity { AppId = AppId, SchemaId = SchemaId };
-    }
-
     private ProvideSchema SchemaProvider()
     {
         return x => Task.FromResult((Schema, ResolvedComponents.Empty));

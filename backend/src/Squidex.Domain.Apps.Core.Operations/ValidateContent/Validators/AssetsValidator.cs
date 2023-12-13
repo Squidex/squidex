@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-public delegate Task<IReadOnlyList<IAssetInfo>> CheckAssets(IEnumerable<DomainId> ids,
+public delegate Task<IReadOnlyList<Asset>> CheckAssets(IEnumerable<DomainId> ids,
     CancellationToken ct);
 
 public sealed class AssetsValidator : IValidator
@@ -63,7 +63,7 @@ public sealed class AssetsValidator : IValidator
             foreach (var assetId in assetIds)
             {
                 var assetPath = context.Path.Enqueue($"[{index}]");
-                var assetItem = assets.FirstOrDefault(x => x.AssetId == assetId);
+                var assetItem = assets.FirstOrDefault(x => x.Id == assetId);
 
                 if (assetItem == null)
                 {
@@ -75,7 +75,7 @@ public sealed class AssetsValidator : IValidator
                     continue;
                 }
 
-                foundIds.Add(assetItem.AssetId);
+                foundIds.Add(assetItem.Id);
 
                 ValidateCommon(assetItem, assetPath, context);
                 ValidateType(assetItem, assetPath, context);
@@ -116,7 +116,7 @@ public sealed class AssetsValidator : IValidator
         }
     }
 
-    private void ValidateCommon(IAssetInfo asset, ImmutableQueue<string> path, ValidationContext context)
+    private void ValidateCommon(Asset asset, ImmutableQueue<string> path, ValidationContext context)
     {
         if (properties.MinSize != null && asset.FileSize < properties.MinSize)
         {
@@ -138,7 +138,7 @@ public sealed class AssetsValidator : IValidator
         }
     }
 
-    private void ValidateType(IAssetInfo asset, ImmutableQueue<string> path, ValidationContext context)
+    private void ValidateType(Asset asset, ImmutableQueue<string> path, ValidationContext context)
     {
         var type = asset.MimeType == "image/svg+xml" ? AssetType.Image : asset.Type;
 

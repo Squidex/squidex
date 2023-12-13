@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Queries;
 
 public sealed class PropertyPath : ReadonlyList<string>, IEquatable<string>
 {
-    private static readonly char[] Separators = { '.', '/' };
+    private static readonly char[] Separators = ['.', '/'];
 
     public PropertyPath(IList<string> items)
         : base(items)
@@ -97,7 +97,7 @@ public sealed class PropertyPath : ReadonlyList<string>, IEquatable<string>
     {
         var inner = source?.ToList();
 
-        if (inner == null || inner.Count == 0)
+        if (inner is not { Count: > 0 })
         {
             ThrowHelper.ArgumentException("Path cannot be empty.", nameof(source));
             return null!;

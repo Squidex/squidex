@@ -19,11 +19,11 @@ public class RolesJsonTests
     {
         var source = new Dictionary<string, string[]>
         {
-            ["Custom"] = new[]
-            {
+            ["Custom"] =
+            [
                 "Permission1",
                 "Permission2"
-            }
+            ]
         };
 
         var expected =

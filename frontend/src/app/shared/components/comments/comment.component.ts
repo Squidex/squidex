@@ -5,23 +5,53 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgForOf, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { MentionConfig } from 'angular-mentions';
-import { Comment, ContributorDto, DialogService, Keys, SharedArray, StatefulComponent } from '@app/shared/internal';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { MentionConfig, MentionModule } from 'angular-mentions';
+import { bounceAnimation, ConfirmClickDirective, FocusOnInitDirective, FromNowPipe, MarkdownPipe, SafeHtmlPipe, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { CommentItem, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent, UpsertCommentForm } from '@app/shared/internal';
+import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 
 interface State {
-    isEditing: boolean;
+    mode?: 'Normal' | 'Edit' | 'Reply';
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-comment',
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    animations: [
+        bounceAnimation,
+    ],
+    imports: [
+        ConfirmClickDirective,
+        FocusOnInitDirective,
+        FormsModule,
+        FromNowPipe,
+        MarkdownPipe,
+        MentionModule,
+        NgIf,
+        NgForOf,
+        ReactiveFormsModule,
+        RouterLink,
+        SafeHtmlPipe,
+        ScrollActiveDirective,
+        TooltipDirective,
+        TranslatePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class CommentComponent extends StatefulComponent<State> {
     @Input({ transform: booleanAttribute })
     public canFollow?: boolean | null;
+
+    @Input({ transform: booleanAttribute })
+    public canAnswer?: boolean | null;
 
     @Input({ transform: booleanAttribute })
     public canDelete?: boolean | null;
@@ -33,21 +63,27 @@ export class CommentComponent extends StatefulComponent<State> {
     public confirmDelete?: boolean | null = true;
 
     @Input({ required: true })
-    public comment!: Comment;
+    public commentItem!: CommentItem;
 
     @Input({ required: true })
-    public commentIndex!: number;
-
-    @Input({ required: true })
-    public comments!: SharedArray<Comment>;
+    public comments!: CommentsState;
 
     @Input()
     public userToken = '';
 
     @Input()
+    public currenUrl = '';
+
+    @Input({ required: true })
     public mentionUsers?: ReadonlyArray<ContributorDto>;
 
-    public mentionConfig: MentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
+    @Input({ required: true })
+    public mentionConfig!: MentionConfig;
+
+    @Input()
+    public scrollContainer?: string;
+
+    public replyForm = new UpsertCommentForm();
 
     public isDeletable = false;
     public isEditable = false;
@@ -57,24 +93,28 @@ export class CommentComponent extends StatefulComponent<State> {
     constructor(
         private readonly dialogs: DialogService,
     ) {
-        super({ isEditing: false });
+        super({});
     }
 
     public ngOnChanges() {
-        const isMyComment = this.comment.user === this.userToken;
+        const isMyComment = this.commentItem.comment.user === this.userToken;
 
         this.isDeletable = isMyComment;
         this.isEditable = isMyComment;
     }
 
     public startEdit() {
-        this.editingText = this.comment.text;
+        this.editingText = this.commentItem.comment.text;
 
-        this.next({ isEditing: true });
+        this.next({ mode: 'Edit' });
     }
 
-    public cancelEdit() {
-        this.next({ isEditing: false });
+    public startReply() {
+        this.next({ mode: 'Reply' });
+    }
+
+    public cancelEditOrReply() {
+        this.next({ mode: 'Normal' });
     }
 
     public delete() {
@@ -82,17 +122,24 @@ export class CommentComponent extends StatefulComponent<State> {
             return;
         }
 
-        this.comments.remove(this.commentIndex);
+        this.comments.remove(this.commentItem.index);
     }
 
-    public updateWhenEnter(event: KeyboardEvent) {
-        if (Keys.isEnter(event) && !event.altKey && !event.shiftKey && !event.defaultPrevented) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            event.stopPropagation();
-
-            this.update();
+    public reply() {
+        if (!this.canAnswer) {
+            return;
         }
+
+        const { text } = this.replyForm.submit() || {};
+
+        if (text && text.length > 0 && this.commentItem.comment.id) {
+            const replyTo = this.commentItem.comment.id!;
+
+            this.comments.create(this.userToken, text, this.currenUrl, { replyTo });
+        }
+
+        this.replyForm.submitCompleted();
+        this.cancelEditOrReply();
     }
 
     public update() {
@@ -110,8 +157,27 @@ export class CommentComponent extends StatefulComponent<State> {
                     }
                 });
         } else {
-            this.comments.set(this.commentIndex, { ...this.comment, text });
-            this.cancelEdit();
+            this.comments.update(this.commentItem.index, { text });
         }
+
+        this.cancelEditOrReply();
+    }
+
+    public replayOnEnter(event: KeyboardEvent) {
+        if (Keys.isEnter(event) && !event.altKey && !event.shiftKey) {
+            event.preventDefault();
+            this.reply();
+        }
+    }
+
+    public updateOnEnter(event: KeyboardEvent) {
+        if (Keys.isEnter(event) && !event.altKey && !event.shiftKey) {
+            event.preventDefault();
+            this.update();
+        }
+    }
+
+    public trackByComment(_: number, item: { index: number }) {
+        return item.index;
     }
 }

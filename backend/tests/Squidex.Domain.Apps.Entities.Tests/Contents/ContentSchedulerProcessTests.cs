@@ -36,17 +36,13 @@ public class ContentSchedulerProcessTests : GivenContext
     {
         var now = SystemClock.Instance.GetCurrentInstant();
 
-        var content1 = new ContentEntity
+        var content1 = CreateContent() with
         {
-            AppId = AppId,
-            Id = DomainId.NewGuid(),
             ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, null!, now)
         };
 
-        var content2 = new ContentEntity
+        var content2 = CreateContent() with
         {
-            AppId = AppId,
-            Id = DomainId.NewGuid(),
             ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Draft, null!, now)
         };
 
@@ -80,10 +76,8 @@ public class ContentSchedulerProcessTests : GivenContext
     {
         var now = SystemClock.Instance.GetCurrentInstant();
 
-        var content1 = new ContentEntity
+        var content1 = CreateContent() with
         {
-            AppId = AppId,
-            Id = DomainId.NewGuid(),
             ScheduleJob = null
         };
 
@@ -104,10 +98,8 @@ public class ContentSchedulerProcessTests : GivenContext
     {
         var now = SystemClock.Instance.GetCurrentInstant();
 
-        var content1 = new ContentEntity
+        var content1 = CreateContent() with
         {
-            AppId = AppId,
-            Id = DomainId.NewGuid(),
             ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, null!, now)
         };
 

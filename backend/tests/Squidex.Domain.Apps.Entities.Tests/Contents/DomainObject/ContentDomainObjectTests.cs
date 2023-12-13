@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -24,10 +25,10 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.State>
+public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 {
     private readonly DomainId contentId = DomainId.NewGuid();
-    private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>(x => x.Wrapping(new DefaultContentWorkflow()));
+    private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
 
@@ -67,27 +68,40 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
     public ContentDomainObjectTests()
     {
-        var scripts = new SchemaScripts
-        {
-            Change = "<change-script>",
-            Create = "<create-script>",
-            Delete = "<delete-script>",
-            Update = "<update-script>"
-        };
-
-        var schemaDef =
-             new Schema("my-schema").Publish()
-                 .AddNumber(1, "my-field1", Partitioning.Invariant,
-                     new NumberFieldProperties { IsRequired = true })
-                 .AddNumber(2, "my-field2", Partitioning.Invariant,
-                     new NumberFieldProperties { IsRequired = false })
-                .SetScripts(scripts);
-
-        A.CallTo(() => Schema.SchemaDef)
-            .Returns(schemaDef);
+        Schema = Schema
+            .AddNumber(1, "my-field1", Partitioning.Invariant,
+                    new NumberFieldProperties { IsRequired = true })
+                .AddNumber(2, "my-field2", Partitioning.Invariant,
+                    new NumberFieldProperties { IsRequired = false })
+            .SetScripts(new SchemaScripts
+            {
+                Change = "<change-script>",
+                Create = "<create-script>",
+                Delete = "<delete-script>",
+                Update = "<update-script>"
+            })
+            .Publish();
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), CancellationToken))
             .ReturnsLazily(x => Task.FromResult(x.GetArgument<DataScriptVars>(0)!.Data!));
+
+        A.CallTo(() => contentWorkflow.GetInitialStatusAsync(Schema))
+            .Returns(Status.Draft);
+
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Draft, Status.Published, A<ClaimsPrincipal?>._))
+            .Returns(true);
+
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Draft, Status.Archived, A<ClaimsPrincipal?>._))
+            .Returns(true);
+
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Published, Status.Draft, A<ClaimsPrincipal?>._))
+            .Returns(true);
+
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Published, Status.Archived, A<ClaimsPrincipal?>._))
+            .Returns(true);
+
+        A.CallTo(() => contentWorkflow.CanUpdateAsync(A<Content>._, A<Status>._, A<ClaimsPrincipal?>._))
+            .Returns(true);
 
         patched = patch.MergeInto(data);
 
@@ -175,7 +189,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         actual.ShouldBeEquivalent(sut.Snapshot);
 
         Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Archived, sut.Snapshot.Status);
+        Assert.Equal(Status.Archived, sut.Snapshot.EditingStatus);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -229,7 +243,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         actual.ShouldBeEquivalent(sut.Snapshot);
 
         Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Draft, sut.Snapshot.Status);
+        Assert.Equal(Status.Draft, sut.Snapshot.EditingStatus);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -252,7 +266,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         actual.ShouldBeEquivalent(sut.Snapshot);
 
         Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Draft, sut.Snapshot.Status);
+        Assert.Equal(Status.Draft, sut.Snapshot.EditingStatus);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -275,7 +289,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         actual.ShouldBeEquivalent(sut.Snapshot);
 
         Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Archived, sut.Snapshot.Status);
+        Assert.Equal(Status.Archived, sut.Snapshot.EditingStatus);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -367,7 +381,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         actual.ShouldBeEquivalent(sut.Snapshot);
 
         Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Archived, sut.Snapshot.Status);
+        Assert.Equal(Status.Archived, sut.Snapshot.EditingStatus);
 
         LastEvents
             .ShouldHaveSameEvents(
@@ -729,7 +743,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         var command = new ChangeContentStatus { Status = Status.Archived, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Archived, ApiContext.UserPrincipal))
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Draft, Status.Archived, ApiContext.UserPrincipal))
             .Returns(true);
 
         var actual = await PublishAsync(command);
@@ -757,7 +771,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         var command = new ChangeContentStatus { Status = Status.Published, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>._, Status.Draft, Status.Published, ApiContext.UserPrincipal))
+        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Draft, Status.Published, ApiContext.UserPrincipal))
             .Returns(false);
 
         var actual = await PublishAsync(command);
@@ -783,7 +797,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         await ExecuteCreateAsync();
         await ExecuteChangeStatusAsync(Status.Published);
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, contentId, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, contentId, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
@@ -797,7 +811,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
         await ExecuteCreateAsync();
         await ExecuteChangeStatusAsync(Status.Published);
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, contentId, SearchScope.Published, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, contentId, SearchScope.Published, A<CancellationToken>._))
             .Returns(true);
 
         await PublishAsync(command);
@@ -882,7 +896,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         var command = new DeleteContent { CheckReferrers = true };
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, contentId, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, contentId, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
@@ -895,7 +909,7 @@ public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject.Stat
 
         await ExecuteCreateAsync();
 
-        A.CallTo(() => contentRepository.HasReferrersAsync(AppId.Id, contentId, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.HasReferrersAsync(App, contentId, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
         await PublishAsync(command);

@@ -6,7 +6,7 @@
  */
 
 import { ErrorHandler, Injectable, NgZone } from '@angular/core';
-import { DialogService } from './../internal';
+import { DialogService } from '../internal';
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {

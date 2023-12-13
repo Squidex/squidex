@@ -14,16 +14,15 @@ namespace Squidex.Infrastructure.MongoDb;
 
 public sealed class BsonDomainIdSerializer : SerializerBase<DomainId>, IBsonPolymorphicSerializer, IRepresentationConfigurable<BsonDomainIdSerializer>
 {
+    private static readonly BsonDomainIdSerializer Instance = new BsonDomainIdSerializer(BsonType.String);
+
     public static void Register()
     {
-        try
-        {
-            BsonSerializer.RegisterSerializer(new BsonDomainIdSerializer(BsonType.String));
-        }
-        catch (BsonSerializationException)
-        {
-            return;
-        }
+        BsonSerializer.TryRegisterSerializer(Instance);
+    }
+
+    private BsonDomainIdSerializer()
+    {
     }
 
     public bool IsDiscriminatorCompatibleWithObjectSerializer

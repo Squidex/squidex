@@ -26,6 +26,8 @@ public class AssetQueryTests
 
     static AssetQueryTests()
     {
+        MongoAssetEntity.RegisterClassMap();
+
         TestUtils.SetupBson();
     }
 

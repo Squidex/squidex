@@ -19,8 +19,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent;
 public class ContentValidationTests : IClassFixture<TranslationsFixture>
 {
     private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
-    private readonly List<ValidationError> errors = new List<ValidationError>();
-    private Schema schema = new Schema("my-schema");
+    private readonly List<ValidationError> errors = [];
+    private Schema schema = new Schema { Name = "my-schema" };
 
     [Fact]
     public async Task Should_add_error_if_value_validator_throws_exception()
@@ -90,7 +90,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         var data =
             new ContentData()
                 .AddField("unknown",
-                    new ContentFieldData());
+                    []);
 
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
@@ -271,7 +271,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         var data =
             new ContentData()
                 .AddField("unknown",
-                    new ContentFieldData());
+                    []);
 
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 

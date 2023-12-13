@@ -24,7 +24,6 @@ namespace Squidex.Web.Pipeline;
 public sealed class CachingManager : IRequestCache
 {
     public const string SurrogateKeySizeHeader = "X-SurrogateKeys";
-    private const int MaxStackSize = 256;
     private const int MaxAllowedKeysSize = 20000;
     private readonly ObjectPool<StringBuilder> stringBuilderPool;
     private readonly CachingOptions cachingOptions;
@@ -33,8 +32,8 @@ public sealed class CachingManager : IRequestCache
     internal sealed class CacheContext : IDisposable
     {
         private readonly IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
-        private readonly HashSet<string> keys = new HashSet<string>();
-        private readonly HashSet<string> headers = new HashSet<string>();
+        private readonly HashSet<string> keys = [];
+        private readonly HashSet<string> headers = [];
         private readonly ReaderWriterLockSlim slimLock = new ReaderWriterLockSlim();
         private readonly int maxKeysSize;
         private bool hasDependency;
@@ -118,7 +117,7 @@ public sealed class CachingManager : IRequestCache
                 {
                     using (Telemetry.Activities.StartActivity("CalculateEtag"))
                     {
-                        response.Headers.Add(HeaderNames.ETag, hasher.GetHexStringAndReset());
+                        response.Headers[HeaderNames.ETag] = new EntityTagHeaderValue(hasher.GetQuotedHexStringAndReset()).ToString();
                     }
                 }
 

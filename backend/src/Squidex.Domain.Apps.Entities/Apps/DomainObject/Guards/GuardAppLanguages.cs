@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 
 public static class GuardAppLanguages
 {
-    public static void CanAdd(AddLanguage command, IAppEntity app)
+    public static void CanAdd(AddLanguage command, App app)
     {
         Guard.NotNull(command);
 
@@ -35,7 +35,7 @@ public static class GuardAppLanguages
         });
     }
 
-    public static void CanRemove(RemoveLanguage command, IAppEntity app)
+    public static void CanRemove(RemoveLanguage command, App app)
     {
         Guard.NotNull(command);
 
@@ -60,7 +60,7 @@ public static class GuardAppLanguages
         });
     }
 
-    public static void CanUpdate(UpdateLanguage command, IAppEntity app)
+    public static void CanUpdate(UpdateLanguage command, App app)
     {
         Guard.NotNull(command);
 

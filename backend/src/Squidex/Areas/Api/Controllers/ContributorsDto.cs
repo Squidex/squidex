@@ -8,9 +8,9 @@
 using System.Text.Json.Serialization;
 using Squidex.Areas.Api.Controllers.Apps;
 using Squidex.Areas.Api.Controllers.Teams;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Billing;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Shared.Users;
 using Squidex.Web;
 
@@ -34,7 +34,7 @@ public sealed class ContributorsDto : Resource
     [JsonPropertyName("_meta")]
     public ContributorsMetadata? Metadata { get; set; }
 
-    public static async Task<ContributorsDto> FromDomainAsync(IAppEntity app, Resources resources, IUserResolver userResolver, Plan plan, bool invited)
+    public static async Task<ContributorsDto> FromDomainAsync(App app, Resources resources, IUserResolver userResolver, Plan plan, bool invited)
     {
         var users = await userResolver.QueryManyAsync(app.Contributors.Keys.ToArray());
 
@@ -54,7 +54,7 @@ public sealed class ContributorsDto : Resource
         return result.CreateAppLinks(resources);
     }
 
-    public static async Task<ContributorsDto> FromDomainAsync(ITeamEntity team, Resources resources, IUserResolver userResolver, bool invited)
+    public static async Task<ContributorsDto> FromDomainAsync(Team team, Resources resources, IUserResolver userResolver, bool invited)
     {
         var users = await userResolver.QueryManyAsync(team.Contributors.Keys.ToArray());
 

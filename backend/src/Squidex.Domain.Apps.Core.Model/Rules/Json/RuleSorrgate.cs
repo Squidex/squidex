@@ -5,21 +5,25 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.Json.Serialization;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Rules.Json;
 
-public sealed class RuleSorrgate : ISurrogate<Rule>
+public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
 {
-    public RuleTrigger Trigger { get; set; }
+    [Obsolete("Old serialization format.")]
+    private Rule? ruleDef;
 
-    public RuleAction Action { get; set; }
-
-    public bool IsEnabled { get; set; }
-
-    public string Name { get; set; }
+    [JsonPropertyName("ruleDef")]
+    [Obsolete("Old serialization format.")]
+    public Rule? RuleDef
+    {
+        // Because this property is old we old want to read it and never to write it.
+        set => ruleDef = value;
+    }
 
     public void FromSource(Rule source)
     {
@@ -28,25 +32,31 @@ public sealed class RuleSorrgate : ISurrogate<Rule>
 
     public Rule ToSource()
     {
-        var trigger = Trigger;
+        var result = this;
 
-        if (trigger is IMigrated<RuleTrigger> migrated)
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (ruleDef != null)
         {
-            trigger = migrated.Migrate();
+            // In previous versions, the actual rule was stored in a nested object.
+            return ruleDef with
+            {
+                Id = Id,
+                AppId = AppId,
+                Created = Created,
+                CreatedBy = CreatedBy,
+                IsDeleted = IsDeleted,
+                LastModified = LastModified,
+                LastModifiedBy = LastModifiedBy,
+                Version = Version,
+            };
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        if (result.Trigger is IMigrated<RuleTrigger> migrated)
+        {
+            return this with { Trigger = migrated.Migrate() };
         }
 
-        var rule = new Rule(trigger, Action);
-
-        if (!IsEnabled)
-        {
-            rule = rule.Disable();
-        }
-
-        if (Name != null)
-        {
-            rule = rule.Rename(Name);
-        }
-
-        return rule;
+        return this;
     }
 }

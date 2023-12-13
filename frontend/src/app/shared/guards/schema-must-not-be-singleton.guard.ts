@@ -5,24 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import { defined } from '@app/framework';
-import { SchemasState } from './../state/schemas.state';
+import { SchemasState } from '../state/schemas.state';
 
-@Injectable()
-export class SchemaMustNotBeSingletonGuard  {
-    constructor(
-        private readonly schemasState: SchemasState,
-        private readonly router: Router,
-    ) {
-    }
+export const schemaMustNotBeSingletonGuard = (forExtension: boolean) => {
+    return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
+        const schemasState = inject(SchemasState);
+        const router = inject(Router);
 
-    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
         const result =
-            this.schemasState.selectedSchema.pipe(
+            schemasState.selectedSchema.pipe(
                 defined(),
                 take(1),
                 tap(schema => {
@@ -30,14 +25,20 @@ export class SchemaMustNotBeSingletonGuard  {
                         if (state.url.includes('/new')) {
                             const parentUrl = state.url.slice(0, state.url.indexOf(route.url[route.url.length - 1].path));
 
-                            this.router.navigate([parentUrl, schema.id]);
+                            router.navigate([parentUrl, schema.id]);
                         } else {
-                            this.router.navigate([state.url, schema.id]);
+                            router.navigate([state.url, schema.id]);
+                        }
+                    } else if (!!schema.properties.contentsListUrl !== forExtension) {
+                        if (forExtension) {
+                            router.navigate([state.url, '..']);
+                        } else {
+                            router.navigate([state.url, 'extension']);
                         }
                     }
                 }),
-                map(schema => schema.type === 'Default'));
+                map(schema => schema.type === 'Default' && !!schema.properties.contentsListUrl === forExtension));
 
         return result;
-    }
-}
+    };
+};

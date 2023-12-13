@@ -12,11 +12,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands;
 
 public abstract class UploadAssetCommand : AssetCommand
 {
-    public HashSet<string> Tags { get; set; } = new HashSet<string>();
+    public HashSet<string> Tags { get; set; } = [];
 
     public AssetFile File { get; set; }
 
-    public AssetMetadata Metadata { get; } = new AssetMetadata();
+    public AssetMetadata Metadata { get; } = [];
 
     public AssetType Type { get; set; }
 

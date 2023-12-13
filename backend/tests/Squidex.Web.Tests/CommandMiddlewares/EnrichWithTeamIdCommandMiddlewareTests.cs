@@ -6,12 +6,12 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Http;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Web.Pipeline;
 
 namespace Squidex.Web.CommandMiddlewares;
 
@@ -23,7 +23,7 @@ public class EnrichWithTeamIdCommandMiddlewareTests : GivenContext
 
     public EnrichWithTeamIdCommandMiddlewareTests()
     {
-        httpContext.Features.Set<ITeamFeature>(new TeamFeature(Team));
+        httpContext.Features.Set(Team);
 
         A.CallTo(() => httpContextAccessor.HttpContext)
             .Returns(httpContext);
@@ -34,7 +34,7 @@ public class EnrichWithTeamIdCommandMiddlewareTests : GivenContext
     [Fact]
     public async Task Should_throw_exception_if_team_not_found()
     {
-        httpContext.Features.Set<ITeamFeature>(null);
+        httpContext.Features.Set<Team>(null);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => HandleAsync(new UpdateTeam()));
     }

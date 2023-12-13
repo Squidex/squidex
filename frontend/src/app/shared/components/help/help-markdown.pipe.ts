@@ -21,11 +21,12 @@ renderer.link = (href, _, text) => {
 @Pipe({
     name: 'sqxHelpMarkdown',
     pure: true,
+    standalone: true,
 })
 export class HelpMarkdownPipe implements PipeTransform {
     public transform(text: string | undefined | null): string {
         if (text) {
-            return marked(text, { renderer, mangle: false, headerIds: false });
+            return marked(text, { renderer });
         } else {
             return '';
         }

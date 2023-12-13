@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Objects;
@@ -18,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
 public sealed class ResolveReferences : IContentEnricherStep
 {
-    private static readonly ILookup<DomainId, IEnrichedContentEntity> EmptyContents = Enumerable.Empty<IEnrichedContentEntity>().ToLookup(x => x.Id);
+    private static readonly ILookup<DomainId, EnrichedContent> EmptyContents = Enumerable.Empty<EnrichedContent>().ToLookup(x => x.Id);
     private readonly Lazy<IContentQueryService> contentQuery;
     private readonly IRequestCache requestCache;
 
@@ -33,7 +32,7 @@ public sealed class ResolveReferences : IContentEnricherStep
         this.requestCache = requestCache;
     }
 
-    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
         if (!ShouldEnrich(context))
@@ -62,18 +61,18 @@ public sealed class ResolveReferences : IContentEnricherStep
         }
     }
 
-    private async Task ResolveReferencesAsync(Context context, ISchemaEntity schema, ResolvedComponents components,
-        IEnumerable<ContentEntity> contents, ILookup<DomainId, IEnrichedContentEntity> references, ProvideSchema schemas)
+    private async Task ResolveReferencesAsync(Context context, Schema schema, ResolvedComponents components,
+        IEnumerable<EnrichedContent> contents, ILookup<DomainId, EnrichedContent> references, ProvideSchema schemas)
     {
         HashSet<DomainId>? fieldIds = null;
 
-        var formatted = new Dictionary<IContentEntity, JsonObject>();
+        var formatted = new Dictionary<EnrichedContent, JsonObject>();
 
-        foreach (var field in schema.SchemaDef.ResolvingReferences())
+        foreach (var field in schema.ResolvingReferences())
         {
             foreach (var content in contents)
             {
-                content.ReferenceData ??= new ContentData();
+                content.ReferenceData ??= [];
 
                 var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData())!;
 
@@ -83,7 +82,7 @@ public sealed class ResolveReferences : IContentEnricherStep
                     {
                         foreach (var (partition, partitionValue) in fieldData)
                         {
-                            fieldIds ??= new HashSet<DomainId>();
+                            fieldIds ??= [];
                             fieldIds.Clear();
 
                             partitionValue.AddReferencedIds(field, fieldIds, components);
@@ -124,12 +123,12 @@ public sealed class ResolveReferences : IContentEnricherStep
         }
     }
 
-    private static JsonObject Format(IContentEntity content, Context context, ISchemaEntity referencedSchema)
+    private static JsonObject Format(Content content, Context context, Schema referencedSchema)
     {
-        return content.Data.FormatReferences(referencedSchema.SchemaDef, context.App.Languages);
+        return content.Data.FormatReferences(referencedSchema, context.App.Languages);
     }
 
-    private static JsonObject CreateFallback(Context context, List<IEnrichedContentEntity> referencedContents)
+    private static JsonObject CreateFallback(Context context, List<EnrichedContent> referencedContents)
     {
         var text = T.Get("contents.listReferences", new { count = referencedContents.Count });
 
@@ -143,15 +142,15 @@ public sealed class ResolveReferences : IContentEnricherStep
         return value;
     }
 
-    private static void AddReferenceIds(HashSet<DomainId> ids, ISchemaEntity schema, ResolvedComponents components, IEnumerable<ContentEntity> contents)
+    private static void AddReferenceIds(HashSet<DomainId> ids, Schema schema, ResolvedComponents components, IEnumerable<EnrichedContent> contents)
     {
         foreach (var content in contents)
         {
-            content.Data.AddReferencedIds(schema.SchemaDef.ResolvingReferences(), ids, components);
+            content.Data.AddReferencedIds(schema.ResolvingReferences(), ids, components);
         }
     }
 
-    private async Task<ILookup<DomainId, IEnrichedContentEntity>> GetReferencesAsync(Context context, HashSet<DomainId> ids,
+    private async Task<ILookup<DomainId, EnrichedContent>> GetReferencesAsync(Context context, HashSet<DomainId> ids,
         CancellationToken ct)
     {
         if (ids.Count == 0)

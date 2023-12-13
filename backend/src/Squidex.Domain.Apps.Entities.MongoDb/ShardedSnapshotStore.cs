@@ -6,8 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
-using Namotion.Reflection;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
@@ -46,7 +45,7 @@ public abstract class ShardedSnapshotStore<T, TState> : ShardedService<T>, ISnap
         return shard.ReadAsync(key, ct);
     }
 
-    public Task DeleteAppAsync(IAppEntity app,
+    public Task DeleteAppAsync(App app,
         CancellationToken ct)
     {
         var shard = Shard(app.Id);

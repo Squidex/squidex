@@ -1,5 +1,5 @@
 <div class="field" [class.expanded]="isExpanded" *ngIf="formModel">
-    <div class="buttons-container" *ngIf="canUnset">
+    <div class="buttons-container" *ngIf="!(isDisabled | async)">
         <div class="buttons">
             <button *ngIf="hasChatBot" type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" tabindex="-1">
                 AI
@@ -48,7 +48,6 @@
 			<ng-container [ngSwitch]="field.properties.fieldType">
                 <ng-container *ngSwitchCase="'Array'">
                     <sqx-array-editor
-                        [canUnset]="canUnset"
                         [form]="form"
                         [formLevel]="formLevel"
                         [formModel]="$any(formModel)"
@@ -78,7 +77,6 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'Component'">
                     <sqx-component
-                        [canUnset]="canUnset"
                         [form]="form"
                         [formContext]="formContext"
                         [formLevel]="formLevel"
@@ -91,7 +89,6 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'Components'">
                     <sqx-array-editor
-                        [canUnset]="canUnset"
                         [form]="form"
                         [formLevel]="formLevel"
                         [formModel]="$any(formModel)"
@@ -195,9 +192,14 @@
 						<ng-container *ngSwitchCase="'RichText'">
 							<sqx-rich-editor #editor
                                 mode="Html"
+                                [annotations]="annotations | async"
+                                (annotationsCreate)="annotationCreate($event)"
+                                (annotationsSelect)="annotationsSelect($event)"
+                                (annotationsUpdate)="annotationsUpdate($event)"
                                 [classNames]="field.rawProperties.classNames"
                                 [formControl]="$any(fieldForm)"
                                 [folderId]="field.rawProperties.folderId"
+                                [hasAnnotations]="!!comments"
                                 [hasChatBot]="hasChatBot"
                                 [language]="language"
                                 [languages]="languages"
@@ -210,9 +212,14 @@
 						<ng-container *ngSwitchCase="'Markdown'">
 							<sqx-rich-editor #editor
                                 mode="Markdown"
+                                [annotations]="annotations | async"
+                                (annotationsCreate)="annotationCreate($event)"
+                                (annotationsSelect)="annotationsSelect($event)"
+                                (annotationsUpdate)="annotationsUpdate($event)"
                                 [classNames]="undefined"
                                 [formControl]="$any(fieldForm)"
                                 [folderId]="field.rawProperties.folderId"
+                                [hasAnnotations]="!!comments"
                                 [hasChatBot]="hasChatBot"
                                 [language]="language"
                                 [languages]="languages"
@@ -264,5 +271,5 @@
 </div>
 
 <sqx-chat-dialog *sqxModal="chatDialog" showFormatHint="true"
-    (select)="setValue($event)">
+    (textSelect)="setValue($event)">
 </sqx-chat-dialog>

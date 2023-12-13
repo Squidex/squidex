@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities;
 
 public static class ContextHeaders
 {
-    private static readonly char[] Separators = { ',', ';' };
+    private static readonly char[] Separators = [',', ';'];
 
     public const string KeyBatchSize = "X-BatchSize";
     public const string KeyNoCacheKeys = "X-NoCacheKeys";

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
@@ -33,7 +34,7 @@ internal sealed class FilterTagTransformer : AsyncTransformVisitor<ClrValue, Fil
 
     public override async ValueTask<FilterNode<ClrValue>?> Visit(CompareFilter<ClrValue> nodeIn, Args args)
     {
-        if (string.Equals(nodeIn.Path[0], nameof(IAssetEntity.Tags), StringComparison.OrdinalIgnoreCase) && nodeIn.Value.Value is string stringValue)
+        if (string.Equals(nodeIn.Path[0], nameof(Asset.Tags), StringComparison.OrdinalIgnoreCase) && nodeIn.Value.Value is string stringValue)
         {
             var tagNames = await args.TagService.GetTagIdsAsync(args.AppId, TagGroups.Assets, HashSet.Of(stringValue), args.CancellationToken);
 

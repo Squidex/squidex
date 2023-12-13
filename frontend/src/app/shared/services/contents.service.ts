@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
-import { StatusInfo } from './../state/contents.state';
+import { StatusInfo } from '../state/contents.state';
 import { Query, sanitize } from './query';
 import { parseField, RootFieldDto } from './schemas.service';
 
@@ -204,7 +204,9 @@ export type ContentsByQuery = Readonly<{
 
 type FullQuery = ContentsByIds | ContentsBySchedule | ContentsByReferences | ContentsByReferencing;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ContentsService {
     constructor(
         private readonly http: HttpClient,
@@ -260,7 +262,17 @@ export class ContentsService {
             pretifyError('i18n:contents.loadFailed'));
     }
 
-    public getContent(appName: string, schemaName: string, id: string, language?: string): Observable<ContentDto> {
+    public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+
+        return HTTP.getVersioned(this.http, url).pipe(
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            pretifyError('i18n:contents.loadContentFailed'));
+    }
+
+    public getRawContent(appName: string, schemaName: string, id: string, language?: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         let headers = new HttpHeaders();
@@ -272,7 +284,7 @@ export class ContentsService {
 
         return HTTP.getVersioned(this.http, url, undefined, headers).pipe(
             map(({ payload }) => {
-                return parseContent(payload.body);
+                return payload.body;
             }),
             pretifyError('i18n:contents.loadContentFailed'));
     }

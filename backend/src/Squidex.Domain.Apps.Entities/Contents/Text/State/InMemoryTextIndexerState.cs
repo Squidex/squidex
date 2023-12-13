@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State;
 
 public sealed class InMemoryTextIndexerState : ITextIndexerState
 {
-    private readonly Dictionary<DomainId, TextContentState> states = new Dictionary<DomainId, TextContentState>();
+    private readonly Dictionary<DomainId, TextContentState> states = [];
 
     public Task ClearAsync(
         CancellationToken ct = default)

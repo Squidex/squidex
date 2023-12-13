@@ -17,7 +17,7 @@ namespace Squidex.Translator;
 
 public class Commands
 {
-    [Command(Name = "info", Description = "Shows information about the translator.")]
+    [Command("info", Description = "Shows information about the translator.")]
     public void Info()
     {
         var version = typeof(Commands).Assembly.GetName().Version;
@@ -25,11 +25,11 @@ public class Commands
         Console.WriteLine($"Squidex Translator Version v{version}");
     }
 
-    [Command(Name = "translate", Description = "Translates different parts.")]
-    [SubCommand]
+    [Command("translate", Description = "Translates different parts.")]
+    [Subcommand]
     public class Translate
     {
-        [Command(Name = "check-backend", Description = "Check backend files.")]
+        [Command("check-backend", Description = "Check backend files.")]
         public void CheckBackend(TranslateArguments arguments)
         {
             var (folder, service) = Setup(arguments, "backend");
@@ -37,7 +37,7 @@ public class Commands
             new CheckBackend(folder, service).Run();
         }
 
-        [Command(Name = "check-frontend", Description = "Check frontend files.")]
+        [Command("check-frontend", Description = "Check frontend files.")]
         public void CheckFrontend(TranslateArguments arguments)
         {
             var (folder, service) = Setup(arguments, "frontend");
@@ -45,7 +45,7 @@ public class Commands
             new CheckFrontend(folder, service).Run(arguments.Fix);
         }
 
-        [Command(Name = "backend", Description = "Translate backend files.")]
+        [Command("backend", Description = "Translate backend files.")]
         public void Backend(TranslateArguments arguments)
         {
             var (folder, service) = Setup(arguments, "backend");
@@ -53,7 +53,7 @@ public class Commands
             new TranslateBackend(folder, service).Run();
         }
 
-        [Command(Name = "templates", Description = "Translate angular templates.")]
+        [Command("templates", Description = "Translate angular templates.")]
         public void Templates(TranslateArguments arguments)
         {
             var (folder, service) = Setup(arguments, "frontend");
@@ -61,7 +61,7 @@ public class Commands
             new TranslateTemplates(folder, service).Run(arguments.Report);
         }
 
-        [Command(Name = "typescript", Description = "Translate typescript files.")]
+        [Command("typescript", Description = "Translate typescript files.")]
         public void Typescript(TranslateArguments arguments)
         {
             var (folder, service) = Setup(arguments, "frontend");
@@ -69,7 +69,7 @@ public class Commands
             new TranslateTypescript(folder, service).Run();
         }
 
-        [Command(Name = "gen-backend", Description = "Generate the backend translations.")]
+        [Command("gen-backend", Description = "Generate the backend translations.")]
         public void GenerateBackend(TranslateArguments arguments)
         {
             var (folder, service) = Setup(arguments, "backend");
@@ -77,7 +77,7 @@ public class Commands
             new GenerateBackendResources(folder, service).Run();
         }
 
-        [Command(Name = "gen-frontend", Description = "Generate the frontend translations.")]
+        [Command("gen-frontend", Description = "Generate the frontend translations.")]
         public void GenerateFrontend(TranslateArguments arguments)
         {
             var (folder, service) = Setup(arguments, "frontend");
@@ -85,7 +85,7 @@ public class Commands
             new GenerateFrontendResources(folder, service).Run();
         }
 
-        [Command(Name = "clean-backend", Description = "Clean the backend translations.")]
+        [Command("clean-backend", Description = "Clean the backend translations.")]
         public void CleanBackend(TranslateArguments arguments)
         {
             var (_, service) = Setup(arguments, "backend");
@@ -95,7 +95,7 @@ public class Commands
             service.Save();
         }
 
-        [Command(Name = "clean-frontend", Description = "Clean the frontend translations.")]
+        [Command("clean-frontend", Description = "Clean the frontend translations.")]
         public void CleanFrontend(TranslateArguments arguments)
         {
             var (_, service) = Setup(arguments, "frontend");
@@ -105,7 +105,7 @@ public class Commands
             service.Save();
         }
 
-        [Command(Name = "gen-keys", Description = "Generate the keys for translations.")]
+        [Command("gen-keys", Description = "Generate the keys for translations.")]
         public void GenerateBackendKeys(TranslateArguments arguments)
         {
             var (backendFolder, serviceBackend) = Setup(arguments, "backend");
@@ -117,7 +117,7 @@ public class Commands
             new GenerateKeys(frontendFolder, frontendService, "frontend_keys.json").Run();
         }
 
-        [Command(Name = "migrate-backend", Description = "Migrate the backend files.")]
+        [Command("migrate-backend", Description = "Migrate the backend files.")]
         public void MigrateBackend(TranslateArguments arguments)
         {
             var (_, service) = Setup(arguments, "backend");
@@ -125,7 +125,7 @@ public class Commands
             service.Migrate();
         }
 
-        [Command(Name = "migrate-frontend", Description = "Migrate the frontend files.")]
+        [Command("migrate-frontend", Description = "Migrate the frontend files.")]
         public void MigrateFrontend(TranslateArguments arguments)
         {
             var (_, service) = Setup(arguments, "frontend");
@@ -164,20 +164,20 @@ public class Commands
     [Validator(typeof(Validator))]
     public sealed class TranslateArguments : IArgumentModel
     {
-        [Operand(Name = "folder", Description = "The squidex folder.")]
+        [Operand("folder", Description = "The squidex folder.")]
         public string Folder { get; set; }
 
-        [Option(LongName = "single", ShortName = "s", Description = "Single words only.")]
+        [Option('s', "single", Description = "Single words only.")]
         public bool SingleWords { get; set; }
 
-        [Option(LongName = "report", ShortName = "r")]
+        [Option('r', "report")]
         public bool Report { get; set; }
 
-        [Option(LongName = "fix")]
+        [Option("fix")]
         public bool Fix { get; set; }
 
-        [Option(LongName = "locale", ShortName = "l")]
-        public IEnumerable<string> Locales { get; set; }
+        [Option('l', "locale")]
+        public IEnumerable<string> Locales { get; set; } = Array.Empty<string>();
 
         public sealed class Validator : AbstractValidator<TranslateArguments>
         {

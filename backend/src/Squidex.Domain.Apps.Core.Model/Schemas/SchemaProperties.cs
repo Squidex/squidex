@@ -21,5 +21,7 @@ public sealed record SchemaProperties : NamedElementPropertiesBase
 
     public string? ContentEditorUrl { get; init; }
 
+    public string? ContentsListUrl { get; init; }
+
     public bool ValidateOnPublish { get; init; }
 }

@@ -32,7 +32,7 @@
     </ng-container>
 
     <div class="apps-section" *ngIf="(uiState.settings | async)?.canCreateApps">
-        <div class="card card-template card-href" (click)="createNewApp()" sqxTourStep="addApp">
+        <div class="card card-template card-href" data-testid="new-app" (click)="createNewApp()" sqxTourStep="addApp">
             <div class="card-body">
                 <div class="card-image">
                     <img src="./images/add-app.svg">

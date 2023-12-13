@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Web;
 
@@ -53,7 +52,7 @@ public sealed class AppLanguageDto : Resource
         return result;
     }
 
-    public AppLanguageDto CreateLinks(Resources resources, IAppEntity app)
+    public AppLanguageDto CreateLinks(Resources resources, App app)
     {
         var values = new { app = resources.App, language = Iso2Code };
 

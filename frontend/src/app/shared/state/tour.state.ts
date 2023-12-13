@@ -30,7 +30,9 @@ interface Snapshot {
     status?: 'Ready' | 'Started' | 'Completed';
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TourState extends State<Snapshot> {
     private readonly isDisabled = inject(UIOptions).value.hideOnboarding;
 

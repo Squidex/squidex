@@ -23,5 +23,5 @@ public sealed class RuleActionDefinition
 
     public string Description { get; set; }
 
-    public List<RuleActionProperty> Properties { get; } = new List<RuleActionProperty>();
+    public List<RuleActionProperty> Properties { get; } = [];
 }

@@ -7,12 +7,17 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { LanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shared/internal';
+import { TableHeaderComponent } from '../table-header.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-list-header',
     styleUrls: ['./content-list-header.component.scss'],
     templateUrl: './content-list-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        TableHeaderComponent,
+    ],
 })
 export class ContentListHeaderComponent {
     public readonly metaFields = META_FIELDS;
@@ -42,9 +47,9 @@ export class ContentListHeaderComponent {
         } else if (field.rootField?.properties.isSortable !== true) {
             this.sortPath = undefined;
         } else if (field.rootField.isLocalizable && language) {
-            this.sortPath = `data.${field.name}.${language.iso2Code}`;
+            this.sortPath = `${field.name}.${language.iso2Code}`;
         } else {
-            this.sortPath = `data.${field.name}.iv`;
+            this.sortPath = `${field.name}.iv`;
         }
 
         if (field === META_FIELDS.lastModified) {

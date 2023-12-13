@@ -8,8 +8,8 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, versioned } from '@app/shared/internal';
-import { AppsService, AssetScriptsPayload } from './../services/apps.service';
-import { createAssetScripts } from './../services/apps.service.spec';
+import { AppsService, AssetScriptsPayload } from '../services/apps.service';
+import { createAssetScripts } from '../services/apps.service.spec';
 import { TestValues } from './_test-helpers';
 import { AssetScriptsState } from './asset-scripts.state';
 

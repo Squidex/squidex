@@ -6,7 +6,7 @@
  */
 
 import { ChartOptions as IChartOptions } from 'chart.js';
-import { DateTime } from '@app/shared';
+import { DateTime } from '@app/framework';
 
 const ColorSchema: ReadonlyArray<string> = [
     ' 51, 137, 213',

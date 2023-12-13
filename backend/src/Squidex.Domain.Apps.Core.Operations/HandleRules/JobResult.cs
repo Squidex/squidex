@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
@@ -53,8 +52,6 @@ public sealed record JobResult
         SkipReason = SkipReason.WrongEventForTrigger
     };
 
-    public DomainId RuleId { get; set; }
-
     public Rule? Rule { get; init; }
 
     public RuleJob? Job { get; init; }
@@ -66,6 +63,11 @@ public sealed record JobResult
     public SkipReason SkipReason { get; init; }
 
     public int Offset { get; set; }
+
+    public static JobResult Skipped(Rule rule, SkipReason reason)
+    {
+        return new JobResult { Rule = rule, SkipReason = reason };
+    }
 
     public static JobResult ConditionDoesNotMatch(EnrichedEvent? enrichedEvent = null, RuleJob? job = null)
     {

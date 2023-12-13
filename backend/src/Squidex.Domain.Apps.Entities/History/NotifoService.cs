@@ -116,10 +116,10 @@ public class NotifoService : IUserEvents
 
             var response = await client.Users.PostUsersAsync(options.AppId, new UpsertUsersDto
             {
-                Requests = new List<UpsertUserDto>
-                {
+                Requests =
+                [
                     userRequest
-                }
+                ]
             });
 
             var apiKey = response.First().ApiKey;
@@ -254,7 +254,7 @@ public class NotifoService : IUserEvents
     {
         var publishRequest = new PublishDto
         {
-            Properties = new NotificationProperties()
+            Properties = []
         };
 
         foreach (var (key, value) in historyEvent.Parameters)

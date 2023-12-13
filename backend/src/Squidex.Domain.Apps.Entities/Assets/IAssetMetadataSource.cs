@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
@@ -16,5 +17,5 @@ public interface IAssetMetadataSource
     Task EnhanceAsync(UploadAssetCommand command,
         CancellationToken ct);
 
-    IEnumerable<string> Format(IAssetEntity asset);
+    IEnumerable<string> Format(Asset asset);
 }

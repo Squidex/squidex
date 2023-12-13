@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 
 internal sealed class RuleQueueWriter : IAsyncDisposable
 {
-    private readonly List<RuleEventWrite> writes = new List<RuleEventWrite>();
+    private readonly List<RuleEventWrite> writes = [];
     private readonly IRuleEventRepository ruleEventRepository;
     private readonly IRuleUsageTracker ruleUsageTracker;
     private readonly ILogger? log;
@@ -55,7 +55,7 @@ internal sealed class RuleQueueWriter : IAsyncDisposable
         var totalCreated = 1;
 
         // Unfortunately we cannot write in batches here, because the result could be from multiple rules.
-        await ruleUsageTracker.TrackAsync(result.Job.AppId, result.RuleId, result.Job.Created.ToDateOnly(), totalCreated, 0, totalFailure);
+        await ruleUsageTracker.TrackAsync(result.Job.AppId, result.Rule?.Id ?? default, result.Job.Created.ToDateOnly(), totalCreated, 0, totalFailure);
 
         if (writes.Count >= 100)
         {

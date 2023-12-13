@@ -8,7 +8,7 @@
 import { AbstractControl, UntypedFormArray, UntypedFormGroup, ValidatorFn } from '@angular/forms';
 import { combineLatest, Observable } from 'rxjs';
 import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
-import { Types } from './../../utils/types';
+import { Types } from '../../utils/types';
 
 export interface FocusComponent {
     focus(): void;
@@ -115,8 +115,7 @@ export function changed$(lhs: AbstractControl, rhs: AbstractControl) {
     return combineLatest([
         value$(lhs),
         value$(rhs),
-    ]).pipe(map(([lhs, rhs]) => !Types.equals(lhs, rhs, true)),
-        distinctUntilChanged());
+    ], (lhs, rhs) => !Types.equals(lhs, rhs, true)).pipe(distinctUntilChanged());
 }
 
 export function touchedChange$(form: AbstractControl) {

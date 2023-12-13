@@ -5,17 +5,38 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AppsState, ContentDto, ContentsService, DateTime, DialogModel, getContentValue, LanguageDto, LanguagesState, LocalizerService, ResourceLoaderService } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { AppsState, ConfirmClickDirective, ContentDto, ContentsService, ContentStatusComponent, CopyDirective, DateTime, DialogModel, FullDateTimePipe, getContentValue, LanguageDto, LanguagesState, LayoutComponent, LocalizerService, ModalDialogComponent, ModalDirective, ResourceLoaderService, TitleComponent, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 declare const tui: any;
 
 type ViewMode = 'day' | 'week' | 'month';
 
 @Component({
+    standalone: true,
     selector: 'sqx-calendar-page',
     styleUrls: ['./calendar-page.component.scss'],
     templateUrl: './calendar-page.component.html',
+    imports: [
+        ConfirmClickDirective,
+        ContentStatusComponent,
+        CopyDirective,
+        FormsModule,
+        FullDateTimePipe,
+        LayoutComponent,
+        ModalDialogComponent,
+        ModalDirective,
+        NgIf,
+        RouterLink,
+        TitleComponent,
+        TooltipDirective,
+        TranslatePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
     private calendar: any;
@@ -26,7 +47,7 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
 
     public view: ViewMode = 'month';
 
-    public content?: ContentDto;
+    public contentSelected?: ContentDto;
     public contentDialog = new DialogModel();
 
     public title = '';
@@ -51,39 +72,39 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
         this.language = this.languagesState.snapshot.languages.find(x => x.language.isMaster)!.language;
     }
 
-    public ngAfterViewInit() {
-        Promise.all([
+    public async ngAfterViewInit() {
+        await Promise.all([
             this.resourceLoader.loadLocalStyle('dependencies/tui-calendar/tui-calendar.min.css'),
             this.resourceLoader.loadLocalScript('dependencies/tui-calendar/tui-code-snippet.min.js'),
             this.resourceLoader.loadLocalScript('dependencies/tui-calendar/tui-calendar.min.js'),
-        ]).then(() => {
-            const Calendar = tui.Calendar;
+        ]);
 
-            this.calendar = new Calendar(this.calendarContainer.nativeElement, {
-                defaultView: 'month',
-                isReadOnly: true,
-                scheduleView: ['time'],
-                taskView: false,
-                ...getLocalizationSettings(),
-            });
-
-            this.calendar.on('clickSchedule', (event: any) => {
-                this.content = event.schedule.raw;
-                this.contentDialog.show();
-
-                this.changeDetector.detectChanges();
-            });
-
-            this.calendar.on('clickDayname', (event: any) => {
-                if (this.calendar.getViewName() === 'week') {
-                    this.calendar.setDate(new Date(event.date));
-
-                    this.changeView('day');
-                }
-            });
-
-            this.load();
+        this.calendar?.destroy();
+        this.calendar = new tui.Calendar(this.calendarContainer.nativeElement, {
+            defaultView: 'month',
+            isReadOnly: true,
+            isLoading: false,
+            scheduleView: ['time'],
+            taskView: false,
+            ...getLocalizationSettings(),
         });
+
+        this.calendar.on('clickSchedule', (event: any) => {
+            this.contentSelected = event.schedule.raw;
+            this.contentDialog.show();
+
+            this.changeDetector.detectChanges();
+        });
+
+        this.calendar.on('clickDayname', (event: any) => {
+            if (this.calendar.getViewName() === 'week') {
+                this.calendar.setDate(new Date(event.date));
+
+                this.changeView('day');
+            }
+        });
+
+        this.load();
     }
 
     @HostListener('click', ['$event'])
@@ -123,12 +144,12 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     public cancelStatus() {
-        this.contentsService.cancelStatus(this.appsState.appName, this.content!, this.content!.version)
+        this.contentsService.cancelStatus(this.appsState.appName, this.contentSelected!, this.contentSelected!.version)
             .subscribe(content => {
                 this.calendar?.deleteSchedule(content.id, '1');
 
                 this.contentDialog.hide();
-                this.content = undefined;
+                this.contentSelected = undefined;
             });
     }
 

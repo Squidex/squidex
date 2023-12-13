@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Repositories;
 
 public interface IRuleRepository
 {
-    Task<List<IRuleEntity>> QueryAllAsync(DomainId appId,
+    Task<List<Rule>> QueryAllAsync(DomainId appId,
         CancellationToken ct = default);
 }

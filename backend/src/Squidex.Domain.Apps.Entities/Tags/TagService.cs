@@ -22,10 +22,10 @@ public sealed class TagService : ITagService
         public ValueTask OnReadAsync()
         {
             // Tags should never be null, but it might happen due of bugs.
-            Tags ??= new Dictionary<string, Tag>();
+            Tags ??= [];
 
             // Alias can be null, because it was not part of the initial release.
-            Alias ??= new Dictionary<string, string>();
+            Alias ??= [];
 
             return default;
         }

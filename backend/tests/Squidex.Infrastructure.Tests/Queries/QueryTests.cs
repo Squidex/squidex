@@ -14,12 +14,12 @@ public class QueryTests
     {
         var query = new ClrQuery
         {
-            Sort = new List<SortNode>
-            {
+            Sort =
+            [
                 new SortNode("field1", SortOrder.Ascending),
                 new SortNode("field1", SortOrder.Ascending),
                 new SortNode("field2", SortOrder.Ascending)
-            }
+            ]
         };
 
         var fields = query.GetAllFields();

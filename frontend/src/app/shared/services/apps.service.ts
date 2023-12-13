@@ -157,7 +157,9 @@ export type UpdateAppDto = Readonly<{
     description?: string;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AppsService {
     constructor(
         private readonly http: HttpClient,

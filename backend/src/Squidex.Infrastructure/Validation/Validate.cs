@@ -17,7 +17,7 @@ public static class Validate
 
         var addValidation = new AddValidation((m, p) =>
         {
-            errors ??= new List<ValidationError>();
+            errors ??= [];
             errors.Add(new ValidationError(m, p));
         });
 
@@ -35,7 +35,7 @@ public static class Validate
 
         var addValidation = new AddValidation((m, p) =>
         {
-            errors ??= new List<ValidationError>();
+            errors ??= [];
             errors.Add(new ValidationError(m, p));
         });
 

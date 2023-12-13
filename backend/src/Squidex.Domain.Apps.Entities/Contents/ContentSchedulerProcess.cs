@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Hosting;
@@ -67,7 +68,7 @@ public sealed class ContentSchedulerProcess : IBackgroundProcess
         }
     }
 
-    private async Task TryPublishAsync(IContentEntity content)
+    private async Task TryPublishAsync(Content content)
     {
         var id = content.Id;
 

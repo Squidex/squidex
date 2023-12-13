@@ -49,7 +49,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                     .Set(x => x.ServeAlways, upsert.ServeAlways)
                     .Set(x => x.ServePublished, upsert.ServePublished)
                     .Set(x => x.Texts, BuildTexts(upsert))
-                    .SetOnInsert(x => x.Id, ObjectId.GenerateNewId())
+                    .SetOnInsert(x => x.Id, Guid.NewGuid().ToString())
                     .SetOnInsert(x => x.DocId, upsert.DocId)
                     .SetOnInsert(x => x.AppId, upsert.AppId.Id)
                     .SetOnInsert(x => x.ContentId, upsert.ContentId)
@@ -58,7 +58,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                 IsUpsert = true
             });
 
-        if (upsert.GeoObjects?.Any() == true)
+        if (upsert.GeoObjects?.Count > 0)
         {
             if (!upsert.IsNew)
             {

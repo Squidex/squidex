@@ -40,9 +40,9 @@ public sealed class UpdateSchemaDto
     public string? ContentSidebarUrl { get; set; }
 
     /// <summary>
-    /// The url to the editor plugin.
+    /// The url to the content list plugin.
     /// </summary>
-    public string? ContentEditorUrl { get; set; }
+    public string? ContentsListUrl { get; set; }
 
     /// <summary>
     /// True to validate the content items on publish.

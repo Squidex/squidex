@@ -19,7 +19,7 @@ public sealed class ScriptContent : IContentEnricherStep
         this.scriptEngine = scriptEngine;
     }
 
-    public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+    public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
         // Sometimes we just want to skip this for performance reasons.
@@ -32,7 +32,7 @@ public sealed class ScriptContent : IContentEnricherStep
         {
             var (schema, _) = await schemas(group.Key);
 
-            var script = schema.SchemaDef.Scripts.Query;
+            var script = schema.Scripts.Query;
 
             if (string.IsNullOrWhiteSpace(script))
             {
@@ -45,11 +45,11 @@ public sealed class ScriptContent : IContentEnricherStep
                 AppId = schema.AppId.Id,
                 AppName = schema.AppId.Name,
                 SchemaId = schema.Id,
-                SchemaName = schema.SchemaDef.Name,
+                SchemaName = schema.Name,
                 User = context.UserPrincipal
             };
 
-            var preScript = schema.SchemaDef.Scripts.QueryPre;
+            var preScript = schema.Scripts.QueryPre;
 
             if (!string.IsNullOrWhiteSpace(preScript))
             {
@@ -68,7 +68,7 @@ public sealed class ScriptContent : IContentEnricherStep
         }
     }
 
-    private async Task TransformAsync(ContentScriptVars sharedVars, string script, ContentEntity content,
+    private async Task TransformAsync(ContentScriptVars sharedVars, string script, EnrichedContent content,
         CancellationToken ct)
     {
         // Script vars are just wrappers over dictionaries for better performance.

@@ -5,9 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { FileDropDirective, TourStepDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetFolderDto, AssetsState, getFiles, StatefulComponent, Types } from '@app/shared/internal';
+import { AssetFolderComponent } from './asset-folder.component';
+import { AssetComponent } from './asset.component';
 
 interface State {
     // The new files.
@@ -15,10 +19,24 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-assets-list',
     styleUrls: ['./assets-list.component.scss'],
     templateUrl: './assets-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AssetComponent,
+        AssetFolderComponent,
+        AsyncPipe,
+        CdkDrag,
+        CdkDropList,
+        CdkDropListGroup,
+        FileDropDirective,
+        NgFor,
+        NgIf,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class AssetsListComponent extends StatefulComponent<State> {
     @Output()

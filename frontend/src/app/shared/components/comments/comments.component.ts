@@ -5,76 +5,95 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, Input, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MentionConfig } from 'angular-mentions';
-import { Observable } from 'rxjs';
-import { AuthService, CollaborationService, Comment, ContributorsState, SharedArray, UpsertCommentForm } from '@app/shared/internal';
+import { MentionConfig, MentionModule } from 'angular-mentions';
+import { BehaviorSubject } from 'rxjs';
+import { MessageBus, ResizedDirective, Subscriptions, TranslatePipe } from '@app/framework';
+import { AnnotationCreateAfterNavigate, AnnotationsSelectAfterNavigate, AuthService, CommentsState, ContributorsState, UpsertCommentForm } from '@app/shared/internal';
 import { CommentComponent } from './comment.component';
 
 @Component({
+    standalone: true,
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
+    imports: [
+        AsyncPipe,
+        CommentComponent,
+        FormsModule,
+        MentionModule,
+        NgFor,
+        NgIf,
+        ReactiveFormsModule,
+        ResizedDirective,
+        TranslatePipe,
+    ],
 })
-export class CommentsComponent {
-    @ViewChild('scrollContainer', { static: false })
-    public scrollContainer!: ElementRef<HTMLDivElement>;
+export class CommentsComponent implements OnInit {
+    private readonly subscriptions = new Subscriptions();
+    private readonly selection = new BehaviorSubject<ReadonlyArray<string>>([]);
+    private reference?: AnnotationCreateAfterNavigate;
 
-    @ViewChildren(CommentComponent)
-    public children!: QueryList<CommentComponent>;
+    @ViewChild('input', { static: false })
+    public input!: ElementRef<HTMLInputElement>;
 
     @Input()
     public commentsId = '';
 
-    public commentsUrl!: string;
-    public commentsArray!: Observable<SharedArray<Comment>>;
-    public commentForm = new UpsertCommentForm();
-
     public mentionUsers = this.contributorsState.contributors;
     public mentionConfig: MentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
 
-    public userToken = '';
+    public commentForm = new UpsertCommentForm();
+    public commentsItems = this.commentsState.getGroupedComments(this.selection);
+    public commentUser: string;
 
     constructor(authService: AuthService,
-        private readonly collaboration: CollaborationService,
+        public readonly commentsState: CommentsState,
+        public readonly router: Router,
         private readonly contributorsState: ContributorsState,
-        private readonly router: Router,
+        private readonly messageBus: MessageBus,
     ) {
-        this.userToken = authService.user!.token;
+        this.commentUser = authService.user!.token;
     }
 
-    public ngOnChanges() {
-        this.commentsArray = this.collaboration.getArray<Comment>('stream');
+    public ngOnInit() {
+        this.subscriptions.add(
+            this.messageBus.of(AnnotationsSelectAfterNavigate)
+                .subscribe(message => {
+                    this.selection.next(message.annotations);
+                }));
+
+        this.subscriptions.add(
+            this.messageBus.of(AnnotationCreateAfterNavigate)
+                .subscribe(message => {
+                    this.reference = message;
+
+                    this.input.nativeElement.focus();
+                }));
     }
 
-    public scrollDown() {
-        if (this.scrollContainer && this.scrollContainer.nativeElement) {
-            let isEditing = false;
+    public comment() {
+        const { text } = this.commentForm.submit() || {};
 
-            this.children.forEach(x => {
-                isEditing = isEditing || x.snapshot.isEditing;
-            });
+        if (text && text.length > 0) {
+            const { from, to } = this.reference?.annotation || {};
 
-            if (!isEditing) {
-                const height = this.scrollContainer.nativeElement.scrollHeight;
-
-                this.scrollContainer.nativeElement.scrollTop = height;
-            }
-        }
-    }
-
-    public comment(comments: SharedArray<Comment>) {
-        const value = this.commentForm.submit();
-
-        if (value?.text && value.text.length > 0) {
-            comments.add({ text: value.text, url: this.router.url, time: new Date().toISOString(), user: this.userToken });
+            this.commentsState.create(this.commentUser, text, this.router.url, { editorId: this.reference?.editorId, from, to });
         }
 
         this.commentForm.submitCompleted();
     }
 
-    public trackByComment(index: number) {
-        return index;
+    public blurComment() {
+        setTimeout(() => {
+            this.reference = undefined;
+        }, 100);
+    }
+
+    public trackByComment(_: number, item: { index: number }) {
+        return item.index;
     }
 }

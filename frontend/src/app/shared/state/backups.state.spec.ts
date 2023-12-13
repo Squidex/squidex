@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { BackupsService, BackupsState, DialogService } from '@app/shared/internal';
-import { createBackup } from './../services/backups.service.spec';
+import { createBackup } from '../services/backups.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('BackupsState', () => {

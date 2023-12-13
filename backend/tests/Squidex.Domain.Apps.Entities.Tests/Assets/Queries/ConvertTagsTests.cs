@@ -26,7 +26,7 @@ public class ConvertTagsTests : GivenContext
     [Fact]
     public async Task Should_not_enrich_if_asset_has_null_tags()
     {
-        var asset = new AssetEntity();
+        var asset = CreateAsset() with { Tags = null! };
 
         await sut.EnrichAsync(ApiContext, Enumerable.Repeat(asset, 1), CancellationToken);
 
@@ -36,7 +36,7 @@ public class ConvertTagsTests : GivenContext
     [Fact]
     public async Task Should_not_enrich_asset_with_tag_names_if_disabled()
     {
-        var asset = new AssetEntity();
+        var asset = CreateAsset() with { TagNames = null! };
 
         await sut.EnrichAsync(ApiContext.Clone(b => b.WithNoAssetEnrichment()), Enumerable.Repeat(asset, 1), CancellationToken);
 
@@ -46,14 +46,9 @@ public class ConvertTagsTests : GivenContext
     [Fact]
     public async Task Should_enrich_asset_with_tag_names()
     {
-        var asset = new AssetEntity
+        var asset = CreateAsset() with
         {
-            Tags = new HashSet<string>
-            {
-                "id1",
-                "id2"
-            },
-            AppId = AppId
+            Tags = ["id1", "id2"]
         };
 
         A.CallTo(() => tagService.GetTagNamesAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2"), CancellationToken))
@@ -65,30 +60,20 @@ public class ConvertTagsTests : GivenContext
 
         await sut.EnrichAsync(ApiContext, Enumerable.Repeat(asset, 1), CancellationToken);
 
-        Assert.Equal(new HashSet<string> { "name1", "name2" }, asset.TagNames);
+        Assert.Equal(["name1", "name2"], asset.TagNames);
     }
 
     [Fact]
     public async Task Should_enrich_multiple_assets_with_tag_names()
     {
-        var asset1 = new AssetEntity
+        var asset1 = CreateAsset() with
         {
-            Tags = new HashSet<string>
-            {
-                "id1",
-                "id2"
-            },
-            AppId = AppId
+            Tags = ["id1", "id2"]
         };
 
-        var asset2 = new AssetEntity
+        var asset2 = CreateAsset() with
         {
-            Tags = new HashSet<string>
-            {
-                "id2",
-                "id3"
-            },
-            AppId = AppId
+            Tags = ["id2", "id3"]
         };
 
         A.CallTo(() => tagService.GetTagNamesAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2", "id3"), CancellationToken))
@@ -101,7 +86,7 @@ public class ConvertTagsTests : GivenContext
 
         await sut.EnrichAsync(ApiContext, new[] { asset1, asset2 }, CancellationToken);
 
-        Assert.Equal(new HashSet<string> { "name1", "name2" }, asset1.TagNames);
-        Assert.Equal(new HashSet<string> { "name2", "name3" }, asset2.TagNames);
+        Assert.Equal(["name1", "name2"], asset1.TagNames);
+        Assert.Equal(["name2", "name3"], asset2.TagNames);
     }
 }

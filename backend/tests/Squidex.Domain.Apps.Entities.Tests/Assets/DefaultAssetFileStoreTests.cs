@@ -233,8 +233,8 @@ public class DefaultAssetFileStoreTests : GivenContext
     [Fact]
     public async Task Should_delete_assets_invidually__on_app_deletion()
     {
-        var asset1 = new AssetEntity { Id = DomainId.NewGuid() };
-        var asset2 = new AssetEntity { Id = DomainId.NewGuid() };
+        var asset1 = CreateAsset();
+        var asset2 = CreateAsset();
 
         A.CallTo(() => assetRepository.StreamAll(AppId.Id, CancellationToken))
             .Returns(new[] { asset1, asset2 }.ToAsyncEnumerable());

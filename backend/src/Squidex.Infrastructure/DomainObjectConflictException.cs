@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure;
@@ -17,11 +16,6 @@ public class DomainObjectConflictException : DomainObjectException
 
     public DomainObjectConflictException(string id, Exception? inner = null)
         : base(FormatMessage(id), id, ExposedErrorCode, inner)
-    {
-    }
-
-    protected DomainObjectConflictException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
     {
     }
 

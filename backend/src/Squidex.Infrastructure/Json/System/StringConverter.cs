@@ -78,7 +78,7 @@ public sealed class StringConverter<T> : JsonConverter<T> where T : notnull
 internal static class OptionClones
 #pragma warning restore MA0048 // File name must match type name
 {
-    private static readonly ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions> Clones = new ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions>();
+    private static readonly ConditionalWeakTable<JsonSerializerOptions, JsonSerializerOptions> Clones = [];
 
     public static JsonSerializerOptions GetOptionsWithoutConverter(JsonSerializerOptions source, JsonConverter converter)
     {

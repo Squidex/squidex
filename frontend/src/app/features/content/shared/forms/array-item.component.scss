@@ -18,6 +18,10 @@
         line-height: 2.2rem;
     }
 
+    &-body {
+        padding-top: 1.75rem;
+    }
+
     .header-index {
         @include force-width(3rem);
         display: inline-block;

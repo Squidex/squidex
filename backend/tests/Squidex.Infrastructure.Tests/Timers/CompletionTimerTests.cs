@@ -22,7 +22,9 @@ public class CompletionTimerTests
         }, 2000);
 
         timer.SkipCurrentDelay();
+#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
         timer.StopAsync().Wait();
+#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
 
         Assert.True(called);
     }

@@ -41,7 +41,7 @@
             </button>
         </div>
 
-        <button type="button" class="btn btn-text-secondary me-2" (click)="editOptionsDropdown.toggle()" #buttonOptions>
+        <button type="button" class="btn btn-text-secondary me-2" attr.aria-label="{{ 'common.options' | sqxTranslate }}" (click)="editOptionsDropdown.toggle()" #buttonOptions>
             <i class="icon-dots"></i>
         </button>
 
@@ -106,7 +106,7 @@
         </ng-container>
     </ng-container>
 
-    <ng-container sidebarMenu>
+    <ng-template sidebarMenu>
         <div class="panel-nav">
             <a class="panel-link"
                 routerLink="history"
@@ -128,7 +128,7 @@
                 <i class="icon-help2"></i>
             </a>
         </div>
-    </ng-container>
+    </ng-template>
 </sqx-layout>
 
 <router-outlet></router-outlet>

@@ -22,17 +22,17 @@ public sealed class AzureMetadataSource : IAssetMetadataSource
     private readonly ILogger<AzureMetadataSource> log;
     private readonly ComputerVisionClient client;
     private readonly char[] trimChars =
-    {
+    [
         ' ',
         '_',
         '-'
-    };
-    private readonly List<VisualFeatureTypes?> features = new List<VisualFeatureTypes?>
-    {
+    ];
+    private readonly List<VisualFeatureTypes?> features =
+    [
         VisualFeatureTypes.Categories,
         VisualFeatureTypes.Description,
         VisualFeatureTypes.Color
-    };
+    ];
 
     public int Order => int.MaxValue;
 
@@ -58,7 +58,7 @@ public sealed class AzureMetadataSource : IAssetMetadataSource
                 {
                     var result = await client.AnalyzeImageInStreamAsync(stream, features, cancellationToken: ct);
 
-                    command.Tags ??= new HashSet<string>();
+                    command.Tags ??= [];
 
                     if (result.Color?.DominantColorForeground != null)
                     {
@@ -88,7 +88,7 @@ public sealed class AzureMetadataSource : IAssetMetadataSource
         }
     }
 
-    public IEnumerable<string> Format(IAssetEntity asset)
+    public IEnumerable<string> Format(Asset asset)
     {
         yield break;
     }

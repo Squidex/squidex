@@ -7,7 +7,7 @@
 
 using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Validation;
@@ -16,14 +16,14 @@ namespace Squidex.Domain.Apps.Entities;
 
 public abstract class OperationContextBase<TCommand, TSnapShot> where TCommand : SquidexCommand, IAggregateCommand
 {
-    private readonly List<ValidationError> errors = new List<ValidationError>();
+    private readonly List<ValidationError> errors = [];
     private readonly IServiceProvider serviceProvider;
     private readonly Func<TSnapShot> snapshotProvider;
     private readonly TSnapShot snapshotInitial;
 
     public RefToken Actor => Command.Actor;
 
-    public IAppEntity App { get; init; }
+    public App App { get; init; }
 
     public DomainId CommandId { get; init; }
 
@@ -35,7 +35,7 @@ public abstract class OperationContextBase<TCommand, TSnapShot> where TCommand :
 
     public ClaimsPrincipal? User => Command.User;
 
-    public Dictionary<string, object> Context { get; } = new Dictionary<string, object>();
+    public Dictionary<string, object> Context { get; } = [];
 
     protected OperationContextBase(IServiceProvider serviceProvider, Func<TSnapShot> snapshotProvider)
     {

@@ -5,15 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { LocalizerService, TypedSimpleChanges } from '@app/framework';
+import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/framework';
 import { ScheduleDto } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-content-status',
     styleUrls: ['./content-status.component.scss'],
     templateUrl: './content-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        FullDateTimePipe,
+        NgIf,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class ContentStatusComponent {
     @Input({ required: true })
@@ -50,7 +58,7 @@ export class ContentStatusComponent {
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.scheduled) {
+        if (changes.scheduled || changes.status) {
             if (this.scheduled) {
                 const args = { status: this.scheduled.status, time: this.scheduled.dueTime.toStringFormat('PPpp') };
 

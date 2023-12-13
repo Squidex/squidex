@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
 internal sealed class FieldMap
 {
-    private readonly Dictionary<string, Dictionary<string, string>> schemas = new Dictionary<string, Dictionary<string, string>>();
+    private readonly Dictionary<string, Dictionary<string, string>> schemas = [];
 
     public FieldMap(IEnumerable<SchemaInfo> source)
     {
@@ -24,7 +24,7 @@ internal sealed class FieldMap
             var fieldMap = schema.Fields.ToDictionary(x => x.FieldName, x => x.Field.Name);
 
             schemas[schema.Schema.Id.ToString()] = fieldMap;
-            schemas[schema.Schema.SchemaDef.Name] = fieldMap;
+            schemas[schema.Schema.Name] = fieldMap;
         }
     }
 

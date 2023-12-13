@@ -5,14 +5,33 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ApiUrlConfig, AppsState, CreateAppForm, TemplateDto } from '@app/shared/internal';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ApiUrlConfig, ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
+import { AppsState, CreateAppForm, TemplateDto } from '@app/shared/internal';
 
 @Component({
+    standalone: true,
     selector: 'sqx-app-form',
     styleUrls: ['./app-form.component.scss'],
     templateUrl: './app-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        AsyncPipe,
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        FormAlertComponent,
+        FormErrorComponent,
+        FormHintComponent,
+        FormsModule,
+        ModalDialogComponent,
+        NgIf,
+        ReactiveFormsModule,
+        TooltipDirective,
+        TransformInputDirective,
+        TranslatePipe,
+    ],
 })
 export class AppFormComponent {
     @Output()

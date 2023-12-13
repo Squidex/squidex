@@ -85,8 +85,8 @@ public sealed class TeamResolver : IAsyncActionFilter
             }
 
             context.HttpContext.Features.Set(requestContext);
-            context.HttpContext.Features.Set<ITeamFeature>(new TeamFeature(team));
-            context.HttpContext.Response.Headers.Add("X-TeamId", team.Id.ToString());
+            context.HttpContext.Features.Set(team);
+            context.HttpContext.Response.Headers["X-TeamId"] = team.Id.ToString();
         }
 
         await next();

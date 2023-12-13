@@ -10,6 +10,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
@@ -27,6 +28,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -112,6 +114,7 @@ public static class TestUtils
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
         options.Converters.Add(new SurrogateJsonConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>());
+        options.Converters.Add(new SurrogateJsonConverter<FieldCollection<RootField>, FieldsSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<FilterNode<JsonValue>, JsonFilterSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<LanguageConfig, LanguageConfigSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<LanguagesConfig, LanguagesConfigSurrogate>());
@@ -130,7 +133,11 @@ public static class TestUtils
         options.Converters.Add(new StringConverter<RefToken>());
         options.Converters.Add(new StringConverter<Status>());
         options.Converters.Add(new JsonStringEnumConverter());
-        options.TypeInfoResolver = new PolymorphicTypeResolver(TypeRegistry);
+        options.IncludeFields = true;
+        options.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            .WithAddedModifier(PolymorphicConverter<None>.Modifier(TypeRegistry))
+            .WithAddedModifier(JsonIgnoreReadonlyProperties.Modifier<Entity>())
+            .WithAddedModifier(JsonRenameAttribute.Modifier);
         configure?.Invoke(options);
 
         return options;
@@ -191,9 +198,48 @@ public static class TestUtils
         return DefaultSerializer.Deserialize<ObjectHolder<T>>(json).Value1;
     }
 
+    public static string SerializeWithoutNulls<T>(this T value)
+    {
+        var options = DefaultOptions(options =>
+        {
+            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        });
+
+        return new SystemJsonSerializer(options).Serialize(value, true).CleanJson();
+    }
+
     public static string CleanJson(this string json)
     {
-        using var document = JsonDocument.Parse(json);
+        var document = System.Text.Json.Nodes.JsonNode.Parse(json);
+
+        static void Handle(System.Text.Json.Nodes.JsonNode? node)
+        {
+            if (node is System.Text.Json.Nodes.JsonArray array)
+            {
+                foreach (var item in array)
+                {
+                    Handle(item);
+                }
+            }
+            else if (node is System.Text.Json.Nodes.JsonObject obj)
+            {
+                var properties = obj.ToList();
+
+                foreach (var (key, _) in properties)
+                {
+                    obj.Remove(key);
+                }
+
+                foreach (var (key, value) in properties.OrderBy(x => x.Key))
+                {
+                    Handle(value);
+
+                    obj.Add(key, value);
+                }
+            }
+        }
+
+        Handle(document?.Root);
 
         return DefaultSerializer.Serialize(document, true);
     }

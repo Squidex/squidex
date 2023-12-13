@@ -38,7 +38,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             var downloaded = await _.DownloadAsync(asset_1);
 
             // Should dowload with correct size.
-            Assert.Equal(stream.Length, downloaded.Length);
+            Assert.Equal(stream.Length, downloaded?.Length);
         }
 
         await Verify(asset_1);
@@ -64,7 +64,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             var downloaded = await _.DownloadAsync(progress.Asset);
 
             // Should dowload with correct size.
-            Assert.Equal(stream.Length, downloaded.Length);
+            Assert.Equal(stream.Length, downloaded?.Length);
         }
     }
 
@@ -90,7 +90,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                 var downloaded = await _.DownloadAsync(progress.Asset);
 
                 // Should dowload with correct size.
-                Assert.Equal(stream.Length, downloaded.Length);
+                Assert.Equal(stream.Length, downloaded?.Length);
             }
         }
     }
@@ -164,14 +164,14 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 2: Reupload asset.
-        var asset_2 = await _.Client.Assets.UploadFileAsync("Assets/logo-wide.png", asset_1);
+        var asset_2 = await _.Client.Assets.ReplaceFileAsync(asset_1.Id, "Assets/logo-wide.png", "image/png");
 
         await using (var stream = new FileStream("Assets/logo-wide.png", FileMode.Open))
         {
             var downloaded = await _.DownloadAsync(asset_2);
 
             // Should dowload with correct size.
-            Assert.Equal(stream.Length, downloaded.Length);
+            Assert.Equal(stream.Length, downloaded?.Length);
         }
 
         await Verify(asset_2);
@@ -201,7 +201,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             var downloaded = await _.DownloadAsync(progress.Asset);
 
             // Should dowload with correct size.
-            Assert.Equal(stream.Length, downloaded.Length);
+            Assert.Equal(stream.Length, downloaded?.Length);
         }
     }
 
@@ -231,101 +231,9 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
                 var downloaded = await _.DownloadAsync(progress.Asset);
 
                 // Should dowload with correct size.
-                Assert.Equal(stream.Length, downloaded.Length);
+                Assert.Equal(stream.Length, downloaded?.Length);
             }
         }
-    }
-
-    [Fact]
-    public async Task Should_annote_asset_file_name()
-    {
-        // STEP 1: Create asset.
-        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
-
-
-        // STEP 2: Annotate file name.
-        var fileNameRequest = new AnnotateAssetDto
-        {
-            FileName = "My Image"
-        };
-
-        var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, fileNameRequest);
-
-        // Should provide updated file name.
-        Assert.Equal(fileNameRequest.FileName, asset_2.FileName);
-
-        await Verify(asset_2);
-    }
-
-    [Fact]
-    public async Task Should_annote_asset_metadata()
-    {
-        // STEP 1: Create asset.
-        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
-
-
-        // STEP 2: Annotate metadata.
-        var metadataRequest = new AnnotateAssetDto
-        {
-            Metadata = new Dictionary<string, object>
-            {
-                ["pw"] = 100L,
-                ["ph"] = 20L
-            }
-        };
-
-        var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, metadataRequest);
-
-        // Should provide metadata.
-        Assert.Equal(metadataRequest.Metadata, asset_2.Metadata);
-
-        await Verify(asset_2);
-    }
-
-    [Fact]
-    public async Task Should_annote_asset_slug()
-    {
-        // STEP 1: Create asset.
-        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
-
-
-        // STEP 2: Annotate slug.
-        var slugRequest = new AnnotateAssetDto
-        {
-            Slug = "my-image"
-        };
-
-        var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, slugRequest);
-
-        // Should provide updated slug.
-        Assert.Equal(slugRequest.Slug, asset_2.Slug);
-
-        await Verify(asset_2);
-    }
-
-    [Fact]
-    public async Task Should_annote_asset_tags()
-    {
-        // STEP 1: Create asset.
-        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
-
-
-        // STEP 2: Annotate tags.
-        var tagsRequest = new AnnotateAssetDto
-        {
-            Tags = new List<string>
-            {
-                "tag1",
-                "tag2"
-            }
-        };
-
-        var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, tagsRequest);
-
-        // Should provide updated tags.
-        Assert.Equal(tagsRequest.Tags, asset_2.Tags);
-
-        await Verify(asset_2);
     }
 
     [Fact]
@@ -345,11 +253,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
                 var randomMetadataRequest = new AnnotateAssetDto
                 {
-                    Tags = new List<string>
-                    {
+                    Tags =
+                    [
                         randomTag1,
                         randomTag2
-                    }
+                    ]
                 };
 
                 await _.Client.Assets.PutAssetAsync(asset_1.Id, randomMetadataRequest, ct);
@@ -367,11 +275,11 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
         var metadataRequest = new AnnotateAssetDto
         {
-            Tags = new List<string>
-            {
+            Tags =
+            [
                 tag1,
                 tag2
-            }
+            ]
         };
 
         var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, metadataRequest);
@@ -391,8 +299,118 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             .IgnoreMember<AssetDto>(x => x.Tags);
     }
 
-    [Fact]
-    public async Task Should_protect_asset()
+    [Theory]
+    [InlineData(ContentStrategies.Annotate.Single)]
+    [InlineData(ContentStrategies.Annotate.Bulk)]
+    public async Task Should_annote_asset_file_name(ContentStrategies.Annotate strategy)
+    {
+        // STEP 1: Create asset.
+        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+        // STEP 2: Annotate file name.
+        var fileNameRequest = new AnnotateAssetDto
+        {
+            FileName = "My Image"
+        };
+
+        await _.Client.Assets.AnnotateAsync(asset_1, fileNameRequest, strategy);
+
+        var asset_2 = await _.Client.Assets.GetAssetAsync(asset_1.Id);
+
+        // Should provide updated file name.
+        Assert.Equal(fileNameRequest.FileName, asset_2.FileName);
+
+        await Verify(asset_2).UseParameters(strategy);
+    }
+
+    [Theory]
+    [InlineData(ContentStrategies.Annotate.Single)]
+    [InlineData(ContentStrategies.Annotate.Bulk)]
+    public async Task Should_annote_asset_metadata(ContentStrategies.Annotate strategy)
+    {
+        // STEP 1: Create asset.
+        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+        // STEP 2: Annotate metadata.
+        var metadataRequest = new AnnotateAssetDto
+        {
+            Metadata = new Dictionary<string, object>
+            {
+                ["pw"] = 100L,
+                ["ph"] = 20L
+            }
+        };
+
+        await _.Client.Assets.AnnotateAsync(asset_1, metadataRequest, strategy);
+
+        var asset_2 = await _.Client.Assets.GetAssetAsync(asset_1.Id);
+
+        // Should provide metadata.
+        Assert.Equal(metadataRequest.Metadata, asset_2.Metadata);
+
+        await Verify(asset_2).UseParameters(strategy);
+    }
+
+    [Theory]
+    [InlineData(ContentStrategies.Annotate.Single)]
+    [InlineData(ContentStrategies.Annotate.Bulk)]
+    public async Task Should_annote_asset_slug(ContentStrategies.Annotate strategy)
+    {
+        // STEP 1: Create asset.
+        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+        // STEP 2: Annotate slug.
+        var slugRequest = new AnnotateAssetDto
+        {
+            Slug = "my-image"
+        };
+
+        await _.Client.Assets.AnnotateAsync(asset_1, slugRequest, strategy);
+
+        var asset_2 = await _.Client.Assets.GetAssetAsync(asset_1.Id);
+
+        // Should provide updated slug.
+        Assert.Equal(slugRequest.Slug, asset_2.Slug);
+
+        await Verify(asset_2).UseParameters(strategy);
+    }
+
+    [Theory]
+    [InlineData(ContentStrategies.Annotate.Single)]
+    [InlineData(ContentStrategies.Annotate.Bulk)]
+    public async Task Should_annote_asset_tags(ContentStrategies.Annotate strategy)
+    {
+        // STEP 1: Create asset.
+        var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+        // STEP 2: Annotate tags.
+        var tagsRequest = new AnnotateAssetDto
+        {
+            Tags =
+            [
+                "tag1",
+                "tag2"
+            ]
+        };
+
+        await _.Client.Assets.AnnotateAsync(asset_1, tagsRequest, strategy);
+
+        var asset_2 = await _.Client.Assets.GetAssetAsync(asset_1.Id);
+
+        // Should provide updated tags.
+        Assert.Equal(tagsRequest.Tags, asset_2.Tags);
+
+        await Verify(asset_2).UseParameters(strategy);
+    }
+
+    [Theory]
+    [InlineData(ContentStrategies.Annotate.Single)]
+    [InlineData(ContentStrategies.Annotate.Bulk)]
+    public async Task Should_protect_asset(ContentStrategies.Annotate strategy)
     {
         // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
@@ -404,7 +422,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             var downloaded = await _.DownloadAsync(asset_1);
 
             // Should dowload with correct size.
-            Assert.Equal(stream.Length, downloaded.Length);
+            Assert.Equal(stream.Length, downloaded?.Length);
         }
 
 
@@ -414,7 +432,9 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             IsProtected = true
         };
 
-        var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, protectRequest);
+        await _.Client.Assets.AnnotateAsync(asset_1, protectRequest, strategy);
+
+        var asset_2 = await _.Client.Assets.GetAssetAsync(asset_1.Id);
 
 
         // STEP 5: Download asset with authentication.
@@ -457,7 +477,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
         }
 
-        await Verify(asset_2);
+        await Verify(asset_2).UseParameters(strategy);
     }
 
     [Fact]
@@ -486,7 +506,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             var downloaded = await _.DownloadAsync(asset_1);
 
             // Should dowload with correct size.
-            Assert.Equal(stream.Length, downloaded.Length);
+            Assert.Equal(stream.Length, downloaded?.Length);
         }
 
 
@@ -558,7 +578,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 4: Create asset.
-        var asset_2 = await app.Assets.UpdateFileAsync(asset_1.Id, "Assets/logo-wide.png", "image/png");
+        var asset_2 = await app.Assets.ReplaceFileAsync(asset_1.Id, "Assets/logo-wide.png", "image/png");
 
         Assert.NotNull(asset_1.Metadata["blurHash"]);
         Assert.NotNull(asset_2.Metadata["blurHash"]);
@@ -684,16 +704,18 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Should_delete_asset(bool permanent)
+    [InlineData(ContentStrategies.Deletion.SingleSoft)]
+    [InlineData(ContentStrategies.Deletion.SinglePermanent)]
+    [InlineData(ContentStrategies.Deletion.BulkSoft)]
+    [InlineData(ContentStrategies.Deletion.BulkPermanent)]
+    public async Task Should_delete_asset(ContentStrategies.Deletion strategy)
     {
         // STEP 1: Create asset.
         var asset = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
         // STEP 2: Delete asset.
-        await _.Client.Assets.DeleteAssetAsync(asset.Id, permanent: permanent);
+        await _.Client.Assets.DeleteAsync(asset, strategy);
 
         // Should return 404 when asset deleted.
         var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
@@ -705,7 +727,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
 
         // STEP 3: Retrieve all items and ensure that the deleted item does not exist.
-        var updated = await _.Client.Assets.GetAssetsAsync((AssetQuery)null);
+        var updated = await _.Client.Assets.GetAssetsAsync((AssetQuery?)null);
 
         Assert.DoesNotContain(updated.Items, x => x.Id == asset.Id);
 
@@ -716,20 +738,24 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
             Filter = "isDeleted eq true"
         });
 
+        var permanent = strategy is ContentStrategies.Deletion.SinglePermanent or ContentStrategies.Deletion.BulkPermanent;
+
         Assert.Equal(!permanent, deleted.Items.Exists(x => x.Id == asset.Id));
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Should_recreate_deleted_asset(bool permanent)
+    [InlineData(ContentStrategies.Deletion.SingleSoft)]
+    [InlineData(ContentStrategies.Deletion.SinglePermanent)]
+    [InlineData(ContentStrategies.Deletion.BulkSoft)]
+    [InlineData(ContentStrategies.Deletion.BulkPermanent)]
+    public async Task Should_recreate_deleted_asset(ContentStrategies.Deletion strategy)
     {
         // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
 
         // STEP 2: Delete asset.
-        await _.Client.Assets.DeleteAssetAsync(asset_1.Id, permanent: permanent);
+        await _.Client.Assets.DeleteAsync(asset_1, strategy);
 
 
         // STEP 3: Recreate asset.
@@ -781,5 +807,32 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         var asset_2 = await client.Assets.GetAssetAsync(asset_1.Id);
 
         Assert.NotNull(asset_2);
+    }
+
+    [Fact]
+    public async Task Should_rename_tag()
+    {
+        // STEP 0: Create app.
+        var (client, _) = await _.PostAppAsync();
+
+
+        // STEP 1: Create asset.
+        await client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+        // STEP 2: Rename tag.
+        var renameRequest = new RenameTagDto
+        {
+            TagName = "pngs"
+        };
+
+        await client.Assets.PutTagAsync("type/png", renameRequest);
+
+
+        // STEP 2: Create asset.
+        var asset2 = await client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+        Assert.Contains("pngs", asset2.Tags);
+        Assert.DoesNotContain("type/png", asset2.Tags);
     }
 }

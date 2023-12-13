@@ -17,7 +17,7 @@ public sealed class MongoTextIndexEntity<T>
 {
     [BsonId]
     [BsonElement("_id")]
-    public ObjectId Id { get; set; }
+    public string Id { get; set; }
 
     [BsonRequired]
     [BsonElement("d")]
@@ -25,17 +25,14 @@ public sealed class MongoTextIndexEntity<T>
 
     [BsonRequired]
     [BsonElement("c")]
-    [BsonRepresentation(BsonType.Binary)]
     public DomainId ContentId { get; set; }
 
     [BsonRequired]
     [BsonElement("a")]
-    [BsonRepresentation(BsonType.Binary)]
     public DomainId AppId { get; set; }
 
     [BsonRequired]
     [BsonElement("s")]
-    [BsonRepresentation(BsonType.Binary)]
     public DomainId SchemaId { get; set; }
 
     [BsonRequired]

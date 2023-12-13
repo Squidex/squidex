@@ -23,10 +23,10 @@ public class RulesIndexTests : GivenContext
     [Fact]
     public async Task Should_resolve_rules_by_id()
     {
-        var rule = SetupRule(0);
+        var rule = CreateRule();
 
         A.CallTo(() => ruleRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<IRuleEntity> { rule });
+            .Returns([rule]);
 
         var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
@@ -36,10 +36,10 @@ public class RulesIndexTests : GivenContext
     [Fact]
     public async Task Should_return_empty_rules_if_rule_not_created()
     {
-        var rule = SetupRule(-1);
+        var rule = CreateRule() with { Version = -1 };
 
         A.CallTo(() => ruleRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<IRuleEntity> { rule });
+            .Returns([rule]);
 
         var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
@@ -49,18 +49,13 @@ public class RulesIndexTests : GivenContext
     [Fact]
     public async Task Should_return_empty_rules_if_rule_deleted()
     {
-        var rule = SetupRule(0, true);
+        var rule = CreateRule() with { IsDeleted = true };
 
         A.CallTo(() => ruleRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<IRuleEntity> { rule });
+            .Returns([rule]);
 
         var actual = await sut.GetRulesAsync(AppId.Id, CancellationToken);
 
         Assert.Empty(actual);
-    }
-
-    private IRuleEntity SetupRule(long version, bool isDeleted = false)
-    {
-        return new RuleEntity { AppId = AppId, Version = version, IsDeleted = isDeleted };
     }
 }

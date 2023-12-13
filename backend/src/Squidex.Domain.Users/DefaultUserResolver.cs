@@ -67,10 +67,10 @@ public sealed class DefaultUserResolver : IUserResolver
 
             var values = new UserValues
             {
-                CustomClaims = new List<Claim>
-                {
+                CustomClaims =
+                [
                     new Claim(type, value)
-                }
+                ]
             };
 
             await userService.UpdateAsync(id, values, silent, ct);

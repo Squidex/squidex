@@ -6,9 +6,10 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Billing;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -127,7 +128,7 @@ public static class GuardApp
         });
     }
 
-    public static Task CanTransfer(TransferToTeam command, IAppEntity app, IAppProvider appProvider, CancellationToken ct)
+    public static Task CanTransfer(TransferToTeam command, App app, IAppProvider appProvider, CancellationToken ct)
     {
         Guard.NotNull(command);
 
@@ -151,7 +152,7 @@ public static class GuardApp
             }
         });
 
-        static bool IsContributor(ITeamEntity team, RefToken actor)
+        static bool IsContributor(Team team, RefToken actor)
         {
             return team.Contributors.ContainsKey(actor.Identifier);
         }
@@ -169,7 +170,7 @@ public static class GuardApp
         }
     }
 
-    public static void CanChangePlan(ChangePlan command, IAppEntity app, IBillingPlans billingPlans)
+    public static void CanChangePlan(ChangePlan command, App app, IBillingPlans billingPlans)
     {
         Guard.NotNull(command);
 

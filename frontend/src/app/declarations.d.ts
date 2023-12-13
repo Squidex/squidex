@@ -17,6 +17,8 @@ declare class SquidexEditorWrapper {
 
     setIsDisabled(isDisabled: boolean): void;
 
+    setAnnotations(annotations?: ReadonlyArray<Annotation> | null): void;
+
     destroy(): void;
 }
 
@@ -45,11 +47,16 @@ type Content = {
     title: string;
 };
 
+type OnAnnotationCreate = (annotation: AnnotationSelection) => void;
+type OnAnnotationUpdate = (annotation: ReadonlyArray<Annotation>) => void;
+type OnAnnotationFocus = (annotation: ReadonlyArray<string>) => void;
+type OnAssetEdit = (id: string) => void;
+type OnAssetUpload = (images: UploadRequest[]) => DelayedPromiseCreator<Asset>[];
+type OnChange = (value: string | undefined) => void;
+type OnContentEdit = (schemaName: string, contentId: string) => void;
 type OnSelectAIText = () => Promise<string | undefined | null>;
 type OnSelectAssets = () => Promise<Asset[]>;
 type OnSelectContents = () => Promise<Content[]>;
-
-type OnChange = (value: string | undefined) => void;
 
 type SquidexEditorMode = 'Html' | 'Markdown';
 
@@ -90,14 +97,22 @@ interface EditorProps {
     onSelectContents?: OnSelectContents;
 
     // Called when an asset is to be edited.
-    onEditAsset: (assetId: string) => void;
+    onEditAsset: OnAssetEdit;
 
     // Called when a content is to be edited.
-    onEditContent: (schemaName: string, contentId: string) => void;
-
+    onEditContent: OnContentEdit;
 
     // Called when a file needs to be uploaded.
-    onUpload?: (images: UploadRequest[]) => DelayedPromiseCreator<Asset>[];
+    onUpload?: OnAssetUpload;
+
+    // Triggered, when an annotation is clicked.
+    onAnnotationsFocus?: OnAnnotationFocus;
+
+    // Triggered, when an annotation are updated.
+    onAnnotationsUpdate?: OnAnnotationUpdate;
+
+    // Triggered, when an annotation is created.
+    onAnnotationCreate?: OnAnnotationCreate;
 
     // True, if disabled.
     isDisabled?: boolean;
@@ -110,6 +125,25 @@ interface EditorProps {
 
     // Indicates whether content items can be selected.
     canSelectContents?: boolean;
+
+    // Indicates whether annotations can be added.
+    canAddAnnotation?: boolean;
+
+    // The annotations.
+    annotations?: ReadonlyArray<Annotation> | null;
+}
+
+interface AnnotationSelection {
+    // The start of the annotation selection.
+    from: number;
+
+    // The end of the annotation selection.
+    to: number;
+}
+
+interface Annotation extends AnnotationSelection {
+    // The ID of the annotation.
+    id: string;
 }
 
 type DelayedPromiseCreator<T> = (context: unknown) => Promise<T>;

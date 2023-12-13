@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
@@ -43,7 +43,7 @@ public class InviteUserCommandMiddlewareTests : GivenContext
 
         await sut.HandleAsync(context, CancellationToken);
 
-        Assert.Same(context.Result<InvitedResult<IAppEntity>>().Entity, App);
+        Assert.Same(context.Result<InvitedResult<App>>().Entity, App);
         Assert.Equal(user.Id, command.ContributorId);
 
         A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
@@ -66,7 +66,7 @@ public class InviteUserCommandMiddlewareTests : GivenContext
 
         await sut.HandleAsync(context, CancellationToken);
 
-        Assert.Same(context.Result<InvitedResult<ITeamEntity>>().Entity, Team);
+        Assert.Same(context.Result<InvitedResult<Team>>().Entity, Team);
         Assert.Equal(user.Id, command.ContributorId);
 
         A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
@@ -89,7 +89,7 @@ public class InviteUserCommandMiddlewareTests : GivenContext
 
         await sut.HandleAsync(context, CancellationToken);
 
-        Assert.Same(context.Result<IAppEntity>(), App);
+        Assert.Same(context.Result<App>(), App);
         Assert.Equal(user.Id, command.ContributorId);
 
         A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))
@@ -112,7 +112,7 @@ public class InviteUserCommandMiddlewareTests : GivenContext
 
         await sut.HandleAsync(context, CancellationToken);
 
-        Assert.Same(context.Result<ITeamEntity>(), Team);
+        Assert.Same(context.Result<Team>(), Team);
         Assert.Equal(user.Id, command.ContributorId);
 
         A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, CancellationToken))

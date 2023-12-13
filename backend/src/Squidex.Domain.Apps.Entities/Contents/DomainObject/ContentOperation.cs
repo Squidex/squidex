@@ -6,30 +6,25 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public sealed class ContentOperation : OperationContextBase<ContentCommand, IContentEntity>
+public sealed class ContentOperation : OperationContextBase<ContentCommand, WriteContent>
 {
-    public ISchemaEntity Schema { get; init; }
+    public Schema Schema { get; init; }
 
     public ResolvedComponents Components { get; init; }
 
-    public Schema SchemaDef
-    {
-        get => Schema.SchemaDef;
-    }
-
-    public ContentOperation(IServiceProvider serviceProvider, Func<IContentEntity> snapshot)
+    public ContentOperation(IServiceProvider serviceProvider, Func<WriteContent> snapshot)
         : base(serviceProvider, snapshot)
     {
     }
 
-    public static async Task<ContentOperation> CreateAsync(IServiceProvider services, ContentCommand command, Func<IContentEntity> snapshot)
+    public static async Task<ContentOperation> CreateAsync(IServiceProvider services, ContentCommand command, Func<WriteContent> snapshot)
     {
         var appProvider = services.GetRequiredService<IAppProvider>();
 

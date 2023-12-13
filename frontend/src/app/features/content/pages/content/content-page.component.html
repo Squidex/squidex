@@ -4,7 +4,8 @@
     <sqx-layout layout="main" [hideSidebar]="!content">
         <ng-container title>
             <div class="d-flex align-items-center">
-                <a class="btn btn-text-secondary" (click)="back()" *ngIf="schema.type !== 'Singleton'">
+                <a class="btn btn-text-secondary" aria-labelledby="content-back" (click)="back()" *ngIf="schema.type !== 'Singleton'">
+                    <span id="content-back" hidden>{{ 'common.back' | sqxTranslate }}</span>
                     <i class="icon-angle-left"></i>
                 </a>
 
@@ -64,6 +65,7 @@
 
                     <ng-container *ngIf="content?.canDelete">
                         <button type="button" class="btn btn-outline-secondary ms-2" (click)="dropdown.toggle()" #buttonOptions>
+                            <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
                             <i class="icon-dots"></i>
                         </button>
 
@@ -146,9 +148,9 @@
                     </ng-container>
                     <ng-container *ngSwitchCase="'extension'">
                         <sqx-content-extension mode="referencing" *ngIf="schema.properties.contentEditorUrl && content"
-                            [content]="content" 
-                            [contentSchema]="schema"
-                            [url]="schema.properties.contentEditorUrl">
+                            [editorUrl]="schema.properties.contentEditorUrl"
+                            [contentItem]="content" 
+                            [contentSchema]="schema">
                         </sqx-content-extension>
                     </ng-container>
                 </ng-container>
@@ -156,23 +158,24 @@
 
             <ng-container *ngIf="!content || (contentTab | async) === 'editor'">
                 <sqx-content-editor
-                    (loadLatest)="loadLatest()"
-                    [(language)]="language"
+                    [(contentId)]="contentId"
                     [isNew]="!content"
                     [isDeleted]="content?.isDeleted"
                     [contentForm]="contentForm"
                     [contentFormCompare]="contentFormCompare"
                     [contentVersion]="contentVersion"
                     [formContext]="formContext"
+                    [language]="language"
+                    (languageChange)="language = $event"
                     [languages]="languages"
+                    (loadLatest)="loadLatest()"
                     [schema]="schema"
-                    [showIdInput]="showIdInput"
-                    [(contentId)]="contentId">
+                    [showIdInput]="showIdInput">
                 </sqx-content-editor>
             </ng-container>
         </ng-container>
 
-        <ng-container sidebarMenu>
+        <ng-template sidebarMenu>
             <div class="panel-nav">
                 <a class="panel-link"
                     routerLink="history"
@@ -180,7 +183,6 @@
                     queryParamsHandling="preserve"
                     title="i18n:common.workflow"
                     titlePosition="left"
-
                     sqxTourStep="history"
                     #linkHistory>
                     <i class="icon-time"></i>
@@ -209,7 +211,7 @@
                     <i class="icon-plugin"></i>
                 </a>
             </div>
-        </ng-container>
+        </ng-template>
     </sqx-layout>
 </form>
 

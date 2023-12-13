@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Types } from './../utils/types';
+import { Types } from '../utils/types';
 import { LocalizerService } from './localizer.service';
 
 export class TitlesConfig {
@@ -21,7 +21,9 @@ export class TitlesConfig {
 
 export type Title = { route?: any; localized: string; value: string };
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class TitleService {
     private readonly path$ = new BehaviorSubject<ReadonlyArray<Title>>([]);
 

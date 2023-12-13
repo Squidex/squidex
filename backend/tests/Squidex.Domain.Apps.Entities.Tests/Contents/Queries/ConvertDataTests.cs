@@ -29,18 +29,14 @@ public class ConvertDataTests : GivenContext
 
     public ConvertDataTests()
     {
-        var schemaDef =
-            new Schema(SchemaId.Name)
-                .AddReferences(1, "references", Partitioning.Invariant,
-                    new ReferencesFieldProperties { DefaultValue = ReadonlyList.Create("default1") })
-                .AddAssets(2, "assets", Partitioning.Invariant,
-                    new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("default2") })
-                .AddArray(3, "array", Partitioning.Invariant, a => a
-                    .AddAssets(31, "nested",
-                        new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("default3") }));
-
-        A.CallTo(() => Schema.SchemaDef)
-            .Returns(schemaDef);
+        Schema = Schema
+            .AddReferences(1, "references", Partitioning.Invariant,
+                new ReferencesFieldProperties { DefaultValue = ReadonlyList.Create("default1") })
+            .AddAssets(2, "assets", Partitioning.Invariant,
+                new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("default2") })
+            .AddArray(3, "array", Partitioning.Invariant, a => a
+                .AddAssets(31, "nested",
+                    new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("default3") }));
 
         sut = new ConvertData(urlGenerator, TestUtils.DefaultSerializer, assetRepository, contentRepository);
     }
@@ -48,7 +44,7 @@ public class ConvertDataTests : GivenContext
     [Fact]
     public async Task Should_convert_data_and_data_draft_if_frontend_user()
     {
-        var content = CreateContent(new ContentData());
+        var content = CreateContent();
 
         await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
 
@@ -66,7 +62,10 @@ public class ConvertDataTests : GivenContext
                             JsonValue.Array(
                                 JsonValue.Object())));
 
-        var content = CreateContent(source);
+        var content = CreateContent() with
+        {
+            Data = source
+        };
 
         var expected =
             new ContentData()
@@ -96,7 +95,10 @@ public class ConvertDataTests : GivenContext
 
         var source = BuildTestData(id1, id2);
 
-        var content = CreateContent(source);
+        var content = CreateContent() with
+        {
+            Data = source
+        };
 
         var expected =
             new ContentData()
@@ -116,7 +118,7 @@ public class ConvertDataTests : GivenContext
         A.CallTo(() => assetRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), CancellationToken))
             .Returns(new List<DomainId> { id2 });
 
-        A.CallTo(() => contentRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, CancellationToken))
+        A.CallTo(() => contentRepository.QueryIdsAsync(App, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, CancellationToken))
             .Returns(new List<ContentIdStatus> { new ContentIdStatus(id2, id2, Status.Published) });
 
         await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
@@ -132,7 +134,10 @@ public class ConvertDataTests : GivenContext
 
         var source = BuildTestData(id1, id2);
 
-        var content = CreateContent(source);
+        var content = CreateContent() with
+        {
+            Data = source
+        };
 
         var expected =
             new ContentData()
@@ -152,7 +157,7 @@ public class ConvertDataTests : GivenContext
         A.CallTo(() => assetRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), CancellationToken))
             .Returns(new List<DomainId>());
 
-        A.CallTo(() => contentRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, CancellationToken))
+        A.CallTo(() => contentRepository.QueryIdsAsync(App, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, CancellationToken))
             .Returns(new List<ContentIdStatus>());
 
         await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
@@ -175,19 +180,6 @@ public class ConvertDataTests : GivenContext
                         JsonValue.Array(
                             JsonValue.Object()
                                 .Add("nested", JsonValue.Array(id1, id2)))));
-    }
-
-    private ContentEntity CreateContent(ContentData data)
-    {
-        return new ContentEntity
-        {
-            AppId = AppId,
-            Created = default,
-            CreatedBy = User,
-            Data = data,
-            SchemaId = SchemaId,
-            Status = Status.Published
-        };
     }
 
     private ProvideSchema SchemaProvider()

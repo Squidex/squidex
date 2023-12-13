@@ -45,10 +45,10 @@ public class CachingFilterTests
     }
 
     [Theory]
-    [InlineData("13", "13")]
-    [InlineData("13", "W/13")]
-    [InlineData("W/13", "13")]
-    [InlineData("W/13", "W/13")]
+    [InlineData("\"13\"", "\"13\"")]
+    [InlineData("\"13\"", "W/\"13\"")]
+    [InlineData("W/\"13\"", "\"13\"")]
+    [InlineData("W/\"13\"", "W/\"13\"")]
     public async Task Should_return_304_for_same_etags(string ifNoneMatch, string etag)
     {
         httpContext.Request.Method = HttpMethods.Get;
@@ -62,10 +62,10 @@ public class CachingFilterTests
     }
 
     [Theory]
-    [InlineData("13", "13")]
-    [InlineData("13", "W/13")]
-    [InlineData("W/13", "13")]
-    [InlineData("W/13", "W/13")]
+    [InlineData("\"13\"", "\"13\"")]
+    [InlineData("\"13\"", "W/\"13\"")]
+    [InlineData("W/\"13\"", "\"13\"")]
+    [InlineData("W/\"13\"", "W/\"13\"")]
     public async Task Should_not_return_304_for_same_etags_when_disabled_via_metadata(string ifNoneMatch, string etag)
     {
         executingContext.ActionDescriptor.EndpointMetadata = new List<object>
@@ -87,7 +87,7 @@ public class CachingFilterTests
     public async Task Should_return_304_for_same_etags_from_cache_manager()
     {
         httpContext.Request.Method = HttpMethods.Get;
-        httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "2C70E12B7A0646F92279F427C7B38E7334D8E5389CFF167A1DC30E73F826B683";
+        httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "\"2C70E12B7A0646F92279F427C7B38E7334D8E5389CFF167A1DC30E73F826B683\"";
 
         await sut.OnActionExecutionAsync(executingContext, () =>
         {

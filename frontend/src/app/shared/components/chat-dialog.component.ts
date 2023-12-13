@@ -5,9 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { delay } from 'rxjs/operators';
+import { FocusOnInitDirective, ModalDialogComponent, ResizedDirective, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppsState, AuthService, StatefulComponent, TranslationsService } from '@app/shared/internal';
+import { UserIdPicturePipe } from './pipes';
 
 interface State {
     // True, when running
@@ -21,9 +25,22 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-chat-dialog',
     styleUrls: ['./chat-dialog.component.scss'],
     templateUrl: './chat-dialog.component.html',
+    imports: [
+        FocusOnInitDirective,
+        FormsModule,
+        ModalDialogComponent,
+        NgFor,
+        NgIf,
+        ResizedDirective,
+        ScrollActiveDirective,
+        TooltipDirective,
+        TranslatePipe,
+        UserIdPicturePipe,
+    ],
 })
 export class ChatDialogComponent extends StatefulComponent<State> {
     @Output()
@@ -31,9 +48,6 @@ export class ChatDialogComponent extends StatefulComponent<State> {
 
     @Input({ required: true, transform: booleanAttribute })
     public showFormatHint = false;
-
-    @ViewChild('scrollContainer', { static: false })
-    public scrollContainer!: ElementRef<HTMLDivElement>;
 
     @ViewChild('input', { static: false })
     public input!: ElementRef<HTMLInputElement>;
@@ -50,14 +64,6 @@ export class ChatDialogComponent extends StatefulComponent<State> {
             chatQuestion: '',
             chatTalk: [],
         });
-    }
-
-    public scrollDown() {
-        if (this.scrollContainer && this.scrollContainer.nativeElement) {
-            const height = this.scrollContainer.nativeElement.scrollHeight;
-
-            this.scrollContainer.nativeElement.scrollTop = height;
-        }
     }
 
     public setQuestion(chatQuestion: string) {

@@ -14,9 +14,9 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands;
 
-public abstract partial class DomainObject<T> : IAggregate where T : class, IDomainState<T>, new()
+public abstract partial class DomainObject<T> : IAggregate where T : Entity, new()
 {
-    private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
+    private readonly List<Envelope<IEvent>> uncomittedEvents = [];
     private readonly ILogger log;
     private readonly IPersistenceFactory<T> persistenceFactory;
     private readonly IPersistence<T> persistence;
@@ -75,9 +75,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         persistence = persistenceFactory.WithSnapshotsAndEventSourcing(GetType(), UniqueId,
             new HandleSnapshot<T>((newSnapshot, version) =>
             {
-                newSnapshot.Version = version;
-
-                snapshot = newSnapshot;
+                snapshot = newSnapshot with { Version = version };
             }),
             @event =>
             {
@@ -356,37 +354,37 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         return false;
     }
 
-    private (T?, bool Success) ApplyEvent(Envelope<IEvent> @event, T snapshot, long version, bool loading, bool update)
+    private (T?, bool Success) ApplyEvent(Envelope<IEvent> @event, T previousSnapshot, long version, bool loading, bool update)
     {
-        if (IsDeleted(snapshot))
+        if (IsDeleted(previousSnapshot))
         {
             if (!IsRecreation(@event.Payload))
             {
                 return default;
             }
 
-            snapshot = new T
+            previousSnapshot = new T
             {
                 Version = Version
             };
         }
 
-        @event = @event.Migrate(snapshot);
+        @event = @event.Migrate(previousSnapshot);
 
         var newVersion = version + 1;
-        var newSnapshot = Apply(snapshot, @event);
+        var newSnapshot = Apply(previousSnapshot, @event);
 
-        var isChanged = loading || !ReferenceEquals(snapshot, newSnapshot);
+        var isChanged = loading || !ReferenceEquals(previousSnapshot, newSnapshot);
 
         // If we are loading events at the moment, we will always update the version.
         if (isChanged)
         {
-            newSnapshot.Version = newVersion;
+            newSnapshot = newSnapshot with { Version = newVersion };
         }
 
         if (update)
         {
-            this.snapshot = newSnapshot;
+            snapshot = newSnapshot;
         }
 
         return (newSnapshot, isChanged);
@@ -417,10 +415,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : class, IDom
         await persistence.WriteSnapshotAsync(Snapshot, ct);
     }
 
-    protected virtual T Apply(T snapshot, Envelope<IEvent> @event)
-    {
-        return snapshot.Apply(@event);
-    }
+    protected abstract T Apply(T snapshot, Envelope<IEvent> @event);
 
     public abstract Task<CommandResult> ExecuteAsync(IAggregateCommand command,
         CancellationToken ct);

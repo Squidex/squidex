@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -22,8 +23,8 @@ public sealed class BackupAssets : IBackupHandler
     private const int BatchSize = 100;
     private const string TagsFile = "AssetTags.json";
     private const string TagsAliasFile = "AssetTagsAlias.json";
-    private readonly HashSet<DomainId> assetIds = new HashSet<DomainId>();
-    private readonly HashSet<DomainId> assetFolderIds = new HashSet<DomainId>();
+    private readonly HashSet<DomainId> assetIds = [];
+    private readonly HashSet<DomainId> assetFolderIds = [];
     private readonly Rebuilder rebuilder;
     private readonly IAssetFileStore assetFileStore;
     private readonly ITagService tagService;
@@ -107,12 +108,12 @@ public sealed class BackupAssets : IBackupHandler
     {
         if (assetIds.Count > 0)
         {
-            await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds, BatchSize, ct);
+            await rebuilder.InsertManyAsync<AssetDomainObject, Asset>(assetIds, BatchSize, ct);
         }
 
         if (assetFolderIds.Count > 0)
         {
-            await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(assetFolderIds, BatchSize, ct);
+            await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolder>(assetFolderIds, BatchSize, ct);
         }
     }
 

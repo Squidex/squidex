@@ -7,12 +7,14 @@
 
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { Types } from './../internal';
+import { Types } from '../internal';
 
 type TrackEvent = (name: string, properties: any) => void;
 type TrackPage = (url: string) => void;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class AnalyticsService {
     private readonly globalTrackEvent?: TrackEvent;
     private readonly globalTrackPage?: TrackPage;

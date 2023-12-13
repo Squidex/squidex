@@ -19,7 +19,9 @@ export class LanguageDto {
     }
 }
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class LanguagesService {
     constructor(
         private readonly http: HttpClient,

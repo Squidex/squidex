@@ -41,10 +41,10 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
         this.messaging = messaging;
     }
 
-    public Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
+    public Task<List<SimulatedRuleEvent>> SimulateAsync(Rule rule,
         CancellationToken ct = default)
     {
-        return SimulateAsync(rule.AppId, rule.Id, rule.RuleDef, ct);
+        return SimulateAsync(rule.AppId, rule.Id, rule, ct);
     }
 
     public async Task<List<SimulatedRuleEvent>> SimulateAsync(NamedId<DomainId> appId, DomainId ruleId, Rule rule,
@@ -107,14 +107,14 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
         return simulatedEvents;
     }
 
-    public bool CanRunRule(IRuleEntity rule)
+    public bool CanRunRule(Rule rule)
     {
-        return rule.RuleDef.Trigger is not ManualTrigger;
+        return rule.Trigger is not ManualTrigger;
     }
 
-    public bool CanRunFromSnapshots(IRuleEntity rule)
+    public bool CanRunFromSnapshots(Rule rule)
     {
-        return rule.RuleDef.Trigger is not ManualTrigger && ruleService.CanCreateSnapshotEvents(rule.RuleDef);
+        return rule.Trigger is not ManualTrigger && ruleService.CanCreateSnapshotEvents(rule);
     }
 
     public Task CancelAsync(DomainId appId,

@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 
@@ -24,7 +23,7 @@ public sealed class ScriptingExtensionsTests : GivenContext
     {
         var script = "ctx.command.tags.add('tag');";
 
-        var command = new AnnotateAsset { Tags = new HashSet<string>() };
+        var command = new AnnotateAsset { Tags = [] };
 
         var operation = Operation(script, CreateAsset(), command);
 
@@ -38,7 +37,7 @@ public sealed class ScriptingExtensionsTests : GivenContext
     {
         var script = "ctx.command.metadata['foo'] = 42;";
 
-        var command = new AnnotateAsset { Metadata = new AssetMetadata() };
+        var command = new AnnotateAsset { Metadata = [] };
 
         var operation = Operation(script, CreateAsset(), command);
 
@@ -71,15 +70,15 @@ public sealed class ScriptingExtensionsTests : GivenContext
         await Assert.ThrowsAsync<ValidationException>(() => operation.ExecuteAnnotateScriptAsync(command, CancellationToken));
     }
 
-    private AssetOperation Operation(string script, AssetEntity asset, AnnotateAsset command)
+    private AssetOperation Operation(string script, Asset asset, AnnotateAsset command)
     {
-        var scripts = new AssetScripts
+        App = App with
         {
-            Annotate = script
+            AssetScripts = new AssetScripts
+            {
+                Annotate = script
+            }
         };
-
-        A.CallTo(() => App.AssetScripts)
-            .Returns(scripts);
 
         var serviceProvider =
             new ServiceCollection()
@@ -97,19 +96,6 @@ public sealed class ScriptingExtensionsTests : GivenContext
             App = App,
             CommandId = asset.Id,
             Command = command
-        };
-    }
-
-    private AssetEntity CreateAsset()
-    {
-        return new AssetEntity
-        {
-            Id = DomainId.NewGuid(),
-            AppId = AppId,
-            Created = default,
-            CreatedBy = User,
-            Metadata = new AssetMetadata(),
-            Tags = new HashSet<string>()
         };
     }
 }

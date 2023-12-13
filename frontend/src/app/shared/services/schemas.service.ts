@@ -25,67 +25,67 @@ export const META_FIELDS = {
         title: '',
     },
     id: {
-        name: 'meta.id',
+        name: 'id',
         label: 'i18n:schemas.tableHeaders.id',
         title: 'i18n:schemas.tableHeaders.id_title',
     },
     created: {
-        name: 'meta.created',
+        name: 'created',
         label: 'i18n:schemas.tableHeaders.created',
         title: 'i18n:schemas.tableHeaders.created_title',
     },
     createdByAvatar: {
-        name: 'meta.createdBy.avatar',
+        name: 'createdBy.avatar',
         label: 'i18n:schemas.tableHeaders.createdByShort',
         title: 'i18n:schemas.tableHeaders.createdByShort_title',
     },
     createdByName: {
-        name: 'meta.createdBy.name',
+        name: 'createdBy.name',
         label: 'i18n:schemas.tableHeaders.createdBy',
         title: 'i18n:schemas.tableHeaders.createdBy_title',
     },
     lastModified: {
-        name: 'meta.lastModified',
+        name: 'lastModified',
         label: 'i18n:schemas.tableHeaders.lastModified',
         title: 'i18n:schemas.tableHeaders.lastModified_title',
     },
     lastModifiedByAvatar: {
-        name: 'meta.lastModifiedBy.avatar',
+        name: 'lastModifiedBy.avatar',
         label: 'i18n:schemas.tableHeaders.lastModifiedByShort',
         title: 'i18n:schemas.tableHeaders.lastModifiedByShort_title',
     },
     lastModifiedByName: {
-        name: 'meta.lastModifiedBy.name',
+        name: 'lastModifiedBy.name',
         label: 'i18n:schemas.tableHeaders.lastModifiedBy',
         title: 'i18n:schemas.tableHeaders.lastModifiedBy_title',
     },
     status: {
-        name: 'meta.status',
+        name: 'status',
         label: 'i18n:schemas.tableHeaders.status',
         title: 'i18n:schemas.tableHeaders.status_title',
     },
     statusColor: {
-        name: 'meta.status.color',
+        name: 'status.color',
         label: 'i18n:schemas.tableHeaders.status',
         title: 'i18n:schemas.tableHeaders.status_title',
     },
     statusNext: {
-        name: 'meta.status.next',
+        name: 'status.next',
         label: 'i18n:schemas.tableHeaders.nextStatus',
         title: 'i18n:schemas.tableHeaders.nextStatus_title',
     },
     version: {
-        name: 'meta.version',
+        name: 'version',
         label: 'i18n:schemas.tableHeaders.version',
         title: 'i18n:schemas.tableHeaders.version_title',
     },
     translationStatus: {
-        name: 'meta.translationStatus',
+        name: 'translationStatus',
         label: 'i18n:schemas.tableHeaders.translationStatus',
         title: 'i18n:schemas.tableHeaders.translationStatus_title',
     },
     translationStatusAverage: {
-        name: 'meta.translationStatusAverage',
+        name: 'translationStatusAverage',
         label: 'i18n:schemas.tableHeaders.translationStatusAverage',
         title: 'i18n:schemas.tableHeaders.translationStatusAverage_title',
     },
@@ -95,7 +95,7 @@ export function getTableFields(fields: ReadonlyArray<TableField>) {
     const result: string[] = [];
 
     for (const field of fields) {
-        if (field.name && field.name.indexOf('meta') < 0) {
+        if (field.name?.startsWith('data.')) {
             result.push(field.name);
         }
     }
@@ -181,13 +181,13 @@ export class SchemaDto {
         function tableField(rootField: RootFieldDto) {
             const label = rootField.displayName;
 
-            return { name: rootField.name, label, rootField };
+            return { name: `data.${rootField.name}`, label, rootField };
         }
 
         if (fields) {
             this.contentFields = fields.filter(x => x.properties.isContentField).map(tableField);
 
-            function tableFields(names: ReadonlyArray<string>, fields: ReadonlyArray<RootFieldDto>): TableField[] {
+            function tableFields(names: ReadonlyArray<string>, fields: ReadonlyArray<TableField>): TableField[] {
                 const result: TableField[] = [];
 
                 for (const name of names) {
@@ -196,10 +196,10 @@ export class SchemaDto {
                     if (metaField) {
                         result.push(metaField);
                     } else {
-                        const field = fields.find(x => x.name === name && x.properties.isContentField);
+                        const field = fields.find(x => x.name === name);
 
                         if (field) {
-                            result.push(tableField(field));
+                            result.push(field);
                         }
                     }
                 }
@@ -207,7 +207,7 @@ export class SchemaDto {
                 return result;
             }
 
-            const listFields = tableFields(fieldsInLists, fields);
+            const listFields = tableFields(fieldsInLists, this.contentFields);
 
             if (listFields.length === 0) {
                 listFields.push(META_FIELDS.lastModifiedByAvatar);
@@ -224,7 +224,7 @@ export class SchemaDto {
 
             this.defaultListFields = listFields;
 
-            const referenceFields = tableFields(fieldsInReferences, fields);
+            const referenceFields = tableFields(fieldsInReferences, this.contentFields);
 
             if (referenceFields.length === 0) {
                 if (fields.length > 0) {
@@ -380,6 +380,7 @@ export class SchemaPropertiesDto {
         public readonly contentsSidebarUrl?: string,
         public readonly contentSidebarUrl?: string,
         public readonly contentEditorUrl?: string,
+        public readonly contentsListUrl?: string,
         public readonly validateOnPublish?: boolean,
         public readonly tags?: ReadonlyArray<string>,
     ) {
@@ -495,6 +496,9 @@ export type UpdateSchemaDto = Readonly<{
     // The URL to an editor to replace the editor.
     contentEditorUrl?: string;
 
+    // The url to the content list plugin.
+    contentsListUrl?: string;
+
     // True, if the content should be validated on publishing.
     validateOnPublish?: boolean;
 
@@ -502,7 +506,9 @@ export type UpdateSchemaDto = Readonly<{
     tags?: ReadonlyArray<string>;
 }>;
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SchemasService {
     constructor(
         private readonly http: HttpClient,
@@ -833,6 +839,7 @@ function parseProperties(response: any) {
         response.contentsSidebarUrl,
         response.contentSidebarUrl,
         response.contentEditorUrl,
+        response.contentsListUrl,
         response.validateOnPublish,
         response.tags);
 }

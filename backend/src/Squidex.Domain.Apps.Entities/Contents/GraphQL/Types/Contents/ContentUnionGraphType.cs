@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
@@ -13,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal sealed class ContentUnionGraphType : UnionGraphType
 {
-    private readonly Dictionary<DomainId, IObjectGraphType> types = new Dictionary<DomainId, IObjectGraphType>();
+    private readonly Dictionary<DomainId, IObjectGraphType> types = [];
 
     // We need the schema identity at runtime.
     public IReadOnlyDictionary<DomainId, IObjectGraphType> SchemaTypes => types;
@@ -52,7 +53,7 @@ internal sealed class ContentUnionGraphType : UnionGraphType
 
             ResolveType = value =>
             {
-                if (value is IContentEntity content)
+                if (value is Content content)
                 {
                     return types.GetValueOrDefault(content.SchemaId.Id);
                 }

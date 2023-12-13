@@ -5,14 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/shared';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
+    standalone: true,
     selector: 'sqx-component-validation',
     styleUrls: ['component-validation.component.scss'],
     templateUrl: 'component-validation.component.html',
+    imports: [
+        AsyncPipe,
+        FormsModule,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class ComponentValidationComponent {
     @Input({ required: true })

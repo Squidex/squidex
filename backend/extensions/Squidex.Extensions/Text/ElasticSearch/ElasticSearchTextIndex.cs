@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Text.RegularExpressions;
-using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Hosting;
@@ -15,10 +15,10 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Text.ElasticSearch;
 
-public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
+public sealed partial class ElasticSearchTextIndex : ITextIndex, IInitializable
 {
-    private static readonly Regex LanguageRegex = new Regex(@"[^\w]+([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
-    private static readonly Regex LanguageRegexStart = new Regex(@"$^([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+    private static readonly Regex RegexLanguageNormal = BuildLanguageRegexNormal();
+    private static readonly Regex RegexLanguageStart = BuildLanguageRegexStart();
     private readonly IJsonSerializer jsonSerializer;
     private readonly IElasticSearchClient elasticClient;
     private readonly QueryParser queryParser = new QueryParser(ElasticSearchIndexDefinition.GetFieldPath);
@@ -61,7 +61,7 @@ public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
         return elasticClient.BulkAsync(args, ct);
     }
 
-    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(App app, GeoQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -123,7 +123,7 @@ public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
         return await SearchAsync(elasticQuery, ct);
     }
 
-    public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+    public async Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
@@ -227,4 +227,10 @@ public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
     {
         return scope == SearchScope.Published ? "servePublished" : "serveAll";
     }
+
+    [GeneratedRegex("[^\\w]+([a-z\\-_]{2,}):", RegexOptions.ExplicitCapture | RegexOptions.Compiled)]
+    private static partial Regex BuildLanguageRegexNormal();
+
+    [GeneratedRegex("$^([a-z\\-_]{2,}):", RegexOptions.ExplicitCapture | RegexOptions.Compiled)]
+    private static partial Regex BuildLanguageRegexStart();
 }

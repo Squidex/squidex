@@ -16,17 +16,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
 
 public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixture>
 {
-    private AppClients clients = AppClients.Empty;
-
-    public GuardAppClientsTests()
-    {
-        A.CallTo(() => App.Roles)
-            .Returns(Roles.Empty);
-
-        A.CallTo(() => App.Clients)
-            .ReturnsLazily(() => clients);
-    }
-
     [Fact]
     public void CanAttach_should_throw_execption_if_client_id_is_null()
     {
@@ -41,7 +30,10 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     {
         var command = new AttachClient { Id = "android" };
 
-        clients = clients.Add("android", "secret");
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("android", "secret")
+        };
 
         ValidationAssert.Throws(() => GuardAppClients.CanAttach(command, App),
             new ValidationError("A client with the same id already exists."));
@@ -52,7 +44,10 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     {
         var command = new AttachClient { Id = "ios" };
 
-        clients = clients.Add("android", "secret");
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("android", "secret")
+        };
 
         GuardAppClients.CanAttach(command, App);
     }
@@ -79,7 +74,10 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     {
         var command = new RevokeClient { Id = "ios" };
 
-        clients = clients.Add("ios", "secret");
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("ios", "secret")
+        };
 
         GuardAppClients.CanRevoke(command, App);
     }
@@ -106,7 +104,10 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     {
         var command = new UpdateClient { Id = "ios", Role = "Invalid" };
 
-        clients = clients.Add("ios", "secret");
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("ios", "secret")
+        };
 
         ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
             new ValidationError("Role is not a valid value.", "Role"));
@@ -117,7 +118,10 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     {
         var command = new UpdateClient { Id = "ios", ApiCallsLimit = -10 };
 
-        clients = clients.Add("ios", "secret");
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("ios", "secret")
+        };
 
         ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
             new ValidationError("ApiCallsLimit must be greater or equal to 0.", "ApiCallsLimit"));
@@ -128,7 +132,10 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     {
         var command = new UpdateClient { Id = "ios", ApiTrafficLimit = -10 };
 
-        clients = clients.Add("ios", "secret");
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("ios", "secret")
+        };
 
         ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
             new ValidationError("ApiTrafficLimit must be greater or equal to 0.", "ApiTrafficLimit"));
@@ -139,7 +146,10 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     {
         var command = new UpdateClient { Id = "ios", Name = "ios" };
 
-        clients = clients.Add("ios", "secret");
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("ios", "secret")
+        };
 
         GuardAppClients.CanUpdate(command, App);
     }
@@ -149,7 +159,10 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     {
         var command = new UpdateClient { Id = "ios", Role = Role.Editor };
 
-        clients = clients.Add("ios", "secret");
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("ios", "secret")
+        };
 
         GuardAppClients.CanUpdate(command, App);
     }
@@ -159,7 +172,10 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     {
         var command = new UpdateClient { Id = "ios", Name = "iOS", Role = Role.Reader };
 
-        clients = clients.Add("ios", "secret");
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("ios", "secret")
+        };
 
         GuardAppClients.CanUpdate(command, App);
     }

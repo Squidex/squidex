@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Search;
 
 public sealed class SearchManager : ISearchManager
 {
-    private static readonly SearchResults Empty = new SearchResults();
+    private static readonly SearchResults Empty = [];
     private readonly IEnumerable<ISearchSource> searchSources;
     private readonly ILogger<SearchManager> log;
 
@@ -27,7 +27,7 @@ public sealed class SearchManager : ISearchManager
     {
         if (string.IsNullOrWhiteSpace(query) || query.Length < 3)
         {
-            return new SearchResults();
+            return [];
         }
 
         var tasks = searchSources.Select(x => SearchAsync(x, query, context, ct));

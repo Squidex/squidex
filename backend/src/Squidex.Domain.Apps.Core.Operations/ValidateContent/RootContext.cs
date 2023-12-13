@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -16,16 +17,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent;
 
 public sealed class RootContext
 {
-    private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
+    private readonly ConcurrentBag<ValidationError> errors = [];
     private readonly Scheduler scheduler = new Scheduler();
 
     public IJsonSerializer Serializer { get; }
 
     public DomainId ContentId { get; }
 
-    public NamedId<DomainId> AppId { get; }
-
-    public NamedId<DomainId> SchemaId { get; }
+    public App App { get; }
 
     public Schema Schema { get; }
 
@@ -36,20 +35,14 @@ public sealed class RootContext
         get => errors;
     }
 
-    public RootContext(
-        IJsonSerializer serializer,
-        NamedId<DomainId> appId,
-        NamedId<DomainId> schemaId,
-        Schema schema,
-        DomainId contentId,
-        ResolvedComponents components)
+    public RootContext(App app, Schema schema, DomainId contentId, ResolvedComponents components,
+        IJsonSerializer serializer)
     {
-        AppId = appId;
+        App = app;
         Components = components;
         ContentId = contentId;
         Serializer = serializer;
         Schema = schema;
-        SchemaId = schemaId;
     }
 
     public void AddError(IEnumerable<string> path, string message)

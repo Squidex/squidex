@@ -125,19 +125,19 @@ internal sealed class Persistence<T> : IPersistence<T>
     private async Task ReadSnapshotAsync(
         CancellationToken ct)
     {
-        var (_, state, version, valid) = await snapshotStore.ReadAsync(ownerKey, ct);
+        var (_, state, versionRead, valid) = await snapshotStore.ReadAsync(ownerKey, ct);
 
-        version = Math.Max(version, EtagVersion.Empty);
-        versionSnapshot = version;
+        versionRead = Math.Max(versionRead, EtagVersion.Empty);
+        versionSnapshot = versionRead;
 
         if (valid)
         {
-            versionEvents = version;
+            versionEvents = versionRead;
         }
 
-        if (applyState != null && version > EtagVersion.Empty && valid)
+        if (applyState != null && versionRead > EtagVersion.Empty && valid)
         {
-            applyState(state, version);
+            applyState(state, versionRead);
         }
     }
 
@@ -227,7 +227,7 @@ internal sealed class Persistence<T> : IPersistence<T>
         }
         catch (WrongEventVersionException ex)
         {
-            throw new InconsistentStateException(ex.CurrentVersion, ex.ExpectedVersion, ex);
+            throw new InconsistentStateException(ex.VersionCurrent, ex.VersionExpected, ex);
         }
 
         versionEvents += eventData.Length;

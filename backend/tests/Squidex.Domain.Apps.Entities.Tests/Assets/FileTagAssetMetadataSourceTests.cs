@@ -8,11 +8,12 @@
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class FileTagAssetMetadataSourceTests
+public class FileTagAssetMetadataSourceTests : GivenContext
 {
     private readonly FileTagAssetMetadataSource sut = new FileTagAssetMetadataSource();
 
@@ -85,7 +86,7 @@ public class FileTagAssetMetadataSourceTests
     [Fact]
     public void Should_format_video()
     {
-        var source = new AssetEntity
+        var source = CreateAsset() with
         {
             Metadata = new AssetMetadata
             {
@@ -104,7 +105,7 @@ public class FileTagAssetMetadataSourceTests
     [Fact]
     public void Should_format_audio()
     {
-        var source = new AssetEntity
+        var source = CreateAsset() with
         {
             Metadata = new AssetMetadata
             {
@@ -121,7 +122,10 @@ public class FileTagAssetMetadataSourceTests
     [Fact]
     public void Should_not_format_image()
     {
-        var source = new AssetEntity { Type = AssetType.Image };
+        var source = CreateAsset() with
+        {
+            Type = AssetType.Image
+        };
 
         var formatted = sut.Format(source);
 

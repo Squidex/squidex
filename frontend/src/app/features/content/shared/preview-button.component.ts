@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AuthService, ContentDto, interpolate, LocalStoreService, ModalModel, SchemaDto, Settings, StatefulComponent } from '@app/shared';
+import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, StatefulComponent, TranslatePipe } from '@app/shared';
 
 interface State {
     // The name of the selected preview config.
@@ -19,10 +20,19 @@ interface State {
 }
 
 @Component({
+    standalone: true,
     selector: 'sqx-preview-button',
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        NgFor,
+        NgIf,
+        TranslatePipe,
+    ],
 })
 export class PreviewButtonComponent extends StatefulComponent<State> implements OnInit {
     @Input()

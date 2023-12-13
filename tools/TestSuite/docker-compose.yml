@@ -10,23 +10,26 @@ services:
   squidex1:
     image: squidex-local
     environment:
-      - URLS__BASEURL=http://localhost:8080
+      - ASPNETCORE_URLS=http://+:5000
       - ASSETS__RESIZERURL=http://resizer
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
       - EVENTSTORE__MONGODB__DATABASE=squidex1
       - GRAPHQL__CACHEDURATION=00:00:00
       - IDENTITY__ADMINCLIENTID=root
       - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
+      - IDENTITY__ADMINEMAIL=hello@squidex.io
+      - IDENTITY__ADMINPASSWORD=1q2w3e$$R
       - IDENTITY__MULTIPLEDOMAINS=true
       - RULES__RULESCACHEDURATION=00:00:00
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
-      - STORE__MONGODB__DATABASE=squidex1
       - STORE__MONGODB__CONTENTDATABASE=squidex1_content
-      - STORE__TYPE=MongoDB
+      - STORE__MONGODB__DATABASE=squidex1
       - TEMPLATES__LOCALURL=http://localhost:5000
-      - ASPNETCORE_URLS=http://+:5000
+      - UI__HIDENEWS=true
+      - UI__HIDEONBOARDING=true
+      - URLS__BASEURL=http://localhost:8080
     networks:
       - internal
     depends_on:
@@ -35,24 +38,28 @@ services:
   squidex2:
     image: squidex-local
     environment:
-      - URLS__BASEURL=http://localhost:8081/squidex/
-      - URLS__BASEPATH=squidex/
+      - ASPNETCORE_URLS=http://+:5000
       - ASSETS__RESIZERURL=http://resizer
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
       - EVENTSTORE__MONGODB__DATABASE=squidex2
       - GRAPHQL__CACHEDURATION=00:00:00
       - IDENTITY__ADMINCLIENTID=root
       - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
+      - IDENTITY__ADMINEMAIL=hello@squidex.io
+      - IDENTITY__ADMINPASSWORD=1q2w3e$$R
       - IDENTITY__MULTIPLEDOMAINS=true
       - RULES__RULESCACHEDURATION=00:00:00
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
-      - STORE__MONGODB__DATABASE=squidex2
       - STORE__MONGODB__CONTENTDATABASE=squidex2_content
+      - STORE__MONGODB__DATABASE=squidex2
       - STORE__TYPE=MongoDB
       - TEMPLATES__LOCALURL=http://localhost:5000
-      - ASPNETCORE_URLS=http://+:5000
+      - UI__HIDENEWS=true
+      - UI__HIDEONBOARDING=true
+      - URLS__BASEURL=http://localhost:8081/squidex/
+      - URLS__BASEPATH=squidex/
     networks:
       - internal
     depends_on:
@@ -61,7 +68,7 @@ services:
   squidex3:
     image: squidex-local
     environment:
-      - URLS__BASEURL=http://localhost:8082
+      - ASPNETCORE_URLS=http://+:5000
       - ASSETS__RESIZERURL=http://resizer
       - CONTENTS__OPTIMIZEFORSELFHOSTING=true
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
@@ -69,16 +76,20 @@ services:
       - GRAPHQL__CACHEDURATION=00:00:00
       - IDENTITY__ADMINCLIENTID=root
       - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
+      - IDENTITY__ADMINEMAIL=hello@squidex.io
+      - IDENTITY__ADMINPASSWORD=1q2w3e$$R
       - IDENTITY__MULTIPLEDOMAINS=true
       - RULES__RULESCACHEDURATION=00:00:00
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
-      - STORE__MONGODB__DATABASE=squidex3
       - STORE__MONGODB__CONTENTDATABASE=squidex3_content
+      - STORE__MONGODB__DATABASE=squidex3
       - STORE__TYPE=MongoDB
       - TEMPLATES__LOCALURL=http://localhost:5000
-      - ASPNETCORE_URLS=http://+:5000
+      - UI__HIDENEWS=true
+      - UI__HIDEONBOARDING=true
+      - URLS__BASEURL=http://localhost:8082
     networks:
       - internal
     depends_on:

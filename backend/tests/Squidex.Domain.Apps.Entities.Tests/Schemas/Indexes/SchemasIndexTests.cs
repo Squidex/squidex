@@ -8,6 +8,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Caching;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -110,7 +111,7 @@ public class SchemasIndexTests : GivenContext
     public async Task Should_resolve_schemas()
     {
         A.CallTo(() => schemaRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { Schema });
+            .Returns([Schema]);
 
         var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
@@ -120,11 +121,10 @@ public class SchemasIndexTests : GivenContext
     [Fact]
     public async Task Should_return_empty_schemas_if_schema_not_created()
     {
-        A.CallTo(() => Schema.Version)
-            .Returns(EtagVersion.Empty);
+        Schema = Schema with { Version = EtagVersion.Empty };
 
         A.CallTo(() => schemaRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { Schema });
+            .Returns([Schema]);
 
         var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
@@ -134,11 +134,10 @@ public class SchemasIndexTests : GivenContext
     [Fact]
     public async Task Should_return_empty_schemas_if_schema_deleted()
     {
-        A.CallTo(() => Schema.IsDeleted)
-            .Returns(true);
+        Schema = Schema with { IsDeleted = true };
 
         A.CallTo(() => schemaRepository.QueryAllAsync(AppId.Id, CancellationToken))
-            .Returns(new List<ISchemaEntity> { Schema });
+            .Returns([Schema]);
 
         var actual = await sut.GetSchemasAsync(AppId.Id, CancellationToken);
 
@@ -149,7 +148,7 @@ public class SchemasIndexTests : GivenContext
     public async Task Should_take_and_remove_reservation_if_created()
     {
         A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
-            .Returns(Task.FromResult<ISchemaEntity?>(null));
+            .Returns(Task.FromResult<Schema?>(null));
 
         var command = Create(SchemaId.Name);
 
@@ -176,7 +175,7 @@ public class SchemasIndexTests : GivenContext
     public async Task Should_clear_reservation_if_schema_creation_failed()
     {
         A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
-            .Returns(Task.FromResult<ISchemaEntity?>(null));
+            .Returns(Task.FromResult<Schema?>(null));
 
         var command = Create(SchemaId.Name);
 
@@ -205,7 +204,7 @@ public class SchemasIndexTests : GivenContext
         state.Snapshot.Reservations.Add(new NameReservation(RandomHash.Simple(), SchemaId.Name, DomainId.NewGuid()));
 
         A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
-            .Returns(Task.FromResult<ISchemaEntity?>(null));
+            .Returns(Task.FromResult<Schema?>(null));
 
         var command = Create(SchemaId.Name);
 

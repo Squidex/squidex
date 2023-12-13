@@ -32,7 +32,7 @@ public static class EnvelopeExtensions
 
     public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class, IEvent
     {
-        envelope.Headers[CommonHeaders.EventStreamNumber] = (double)value;
+        envelope.Headers[CommonHeaders.EventStreamNumber] = value;
 
         return envelope;
     }

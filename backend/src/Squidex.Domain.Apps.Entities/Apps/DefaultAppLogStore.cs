@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
@@ -43,7 +44,7 @@ public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
         this.requestLogStore = requestLogStore;
     }
 
-    Task IDeleter.DeleteAppAsync(IAppEntity app,
+    Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         return requestLogStore.DeleteAsync(app.Id.ToString(), ct);

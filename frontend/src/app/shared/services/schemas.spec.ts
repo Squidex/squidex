@@ -6,7 +6,7 @@
  */
 
 import { createProperties, META_FIELDS, SchemaPropertiesDto } from '@app/shared/internal';
-import { TestValues } from './../state/_test-helpers';
+import { TestValues } from '../state/_test-helpers';
 
 const {
     createField,
@@ -37,21 +37,37 @@ describe('SchemaDto', () => {
     });
 
     it('should return configured fields as list fields if fields are declared', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3], fieldsInLists: ['field1', 'field3', META_FIELDS.status.name] });
+        const schema = createSchema({
+            properties: new SchemaPropertiesDto(''),
+            fieldsInLists: [
+                'data.field1',
+                'data.field3',
+                META_FIELDS.status.name,
+            ],
+            fields: [field1, field2, field3],
+        });
 
         expect(schema.defaultListFields).toEqual([
-            { name: field1.name, rootField: field1, label: field1.displayName },
-            { name: field3.name, rootField: field3, label: field3.displayName },
+            { name: 'data.field1', rootField: field1, label: field1.displayName },
+            { name: 'data.field3', rootField: field3, label: field3.displayName },
             META_FIELDS.status,
         ]);
     });
 
     it('should return configured fields as references fields if fields are declared', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3], fieldsInReferences: ['field1', 'field3', META_FIELDS.status.name] });
+        const schema = createSchema({
+            properties: new SchemaPropertiesDto(''),
+            fieldsInReferences: [
+                'data.field1',
+                'data.field3',
+                META_FIELDS.status.name,
+            ],
+            fields: [field1, field2, field3],
+        });
 
         expect(schema.defaultReferenceFields).toEqual([
-            { name: field1.name, rootField: field1, label: field1.displayName },
-            { name: field3.name, rootField: field3, label: field3.displayName },
+            { name: 'data.field1', rootField: field1, label: field1.displayName },
+            { name: 'data.field3', rootField: field3, label: field3.displayName },
             META_FIELDS.status,
         ]);
     });
@@ -61,7 +77,7 @@ describe('SchemaDto', () => {
 
         expect(schema.defaultListFields).toEqual([
             META_FIELDS.lastModifiedByAvatar,
-            { name: field1.name, rootField: field1, label: field1.displayName },
+            { name: 'data.field1', rootField: field1, label: field1.displayName },
             META_FIELDS.statusColor,
             META_FIELDS.lastModified,
         ]);
@@ -82,7 +98,7 @@ describe('SchemaDto', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
 
         expect(schema.defaultReferenceFields).toEqual([
-            { name: field1.name, rootField: field1, label: field1.displayName },
+            { name: 'data.field1', rootField: field1, label: field1.displayName },
         ]);
     });
 

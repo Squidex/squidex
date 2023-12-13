@@ -76,7 +76,7 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
     }
 
     [Fact]
-    public async Task Should_query_content_with_scripting_and_pre_query()
+    public async Task Should_query_content_with_scripting_and_prepare_script()
     {
         var scripts = new SchemaScriptsDto
         {
@@ -123,8 +123,8 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         {
             DoNotScript = false,
             DoNotValidate = false,
-            Jobs = new List<BulkUpdateJob>
-            {
+            Jobs =
+            [
                 new BulkUpdateJob
                 {
                     Type = BulkUpdateType.Upsert,
@@ -135,8 +135,8 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
                             iv = 99
                         }
                     }
-                }
-            },
+                },
+            ],
             Publish = true
         });
 
@@ -151,7 +151,7 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
     }
 
     [Fact]
-    public async Task Should_create_bulk_content_with_scripting_but_disabled()
+    public async Task Should_create_bulk_content_with_disabled_scripting()
     {
         // STEP 1: Create a schema.
         var scripts = new SchemaScriptsDto
@@ -171,8 +171,8 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
         {
             DoNotScript = true,
             DoNotValidate = false,
-            Jobs = new List<BulkUpdateJob>
-            {
+            Jobs =
+            [
                 new BulkUpdateJob
                 {
                     Type = BulkUpdateType.Upsert,
@@ -183,8 +183,8 @@ public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
                             iv = 99
                         }
                     }
-                }
-            },
+                },
+            ],
             Publish = true
         });
 

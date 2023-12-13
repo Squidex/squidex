@@ -1,0 +1,19 @@
+﻿{
+    "appId": "06c68527-a2ca-4d84-91eb-a1707aa5b6fb,hotels",
+    "created": "2022-12-05T11:00:23Z",
+    "createdBy": "subject:63761585e06d5466c71521b3",
+    "id": "265aaf1e-5dff-4c40-b1e6-1149f652cd30",
+    "isDeleted": true,
+    "lastModified": "2022-12-05T11:00:23Z",
+    "lastModifiedBy": "subject:63761585e06d5466c71521b3",
+    "ruleDef": {
+        "trigger": {
+            "$type": "ManualTrigger"
+        },
+        "action": {
+            "actionType": "TestAction1"
+        },
+        "isEnabled": true
+    },
+    "version": 0
+}

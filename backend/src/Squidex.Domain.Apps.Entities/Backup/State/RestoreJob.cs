@@ -27,7 +27,7 @@ public sealed class RestoreJob : IRestoreJob
 
     public Instant? Stopped { get; set; }
 
-    public List<string> Log { get; set; } = new List<string>();
+    public List<string> Log { get; set; } = [];
 
     public JobStatus Status { get; set; }
 

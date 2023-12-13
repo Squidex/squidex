@@ -39,10 +39,10 @@ public sealed class RecursiveDeleter : IEventConsumer
         this.log = log;
 
         // Compute the event types names once for performance reasons and use hashset for extensibility.
-        consumingTypes = new HashSet<string>
-        {
+        consumingTypes =
+        [
             typeRegistry.GetName<IEvent, AssetFolderDeleted>()
-        };
+        ];
     }
 
     public bool Handles(StoredEvent @event)
