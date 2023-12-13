@@ -155,7 +155,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
         {
             Name = "parentId",
             ResolvedType = Scalars.NonNullString,
-            Resolver = Resolve(x => x.ParentId),
+            Resolver = Resolve(x => x.ParentId.ToString()),
             Description = FieldDescriptions.AssetParentId
         });
 
