@@ -40,11 +40,11 @@ public sealed class MongoTextIndexEntity<T>
 
     [BsonRequired]
     [BsonElement("fa")]
-    public bool ScopeAll { get; set; }
+    public bool ServeAll { get; set; }
 
     [BsonRequired]
     [BsonElement("fp")]
-    public bool ScopePublished { get; set; }
+    public bool ServePublished { get; set; }
 
     [BsonIgnoreIfNull]
     [BsonElement("t")]

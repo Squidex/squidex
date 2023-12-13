@@ -24,7 +24,7 @@ public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState
             cm.MapIdField(x => x.UniqueContentId);
 
             cm.MapProperty(x => x.AppId)
-                .SetElementName("a").SetSerializer(new BsonDomainIdSerializer(BsonType.Binary));
+                .SetElementName("a");
 
             cm.MapProperty(x => x.DocIdCurrent)
                 .SetElementName("c");

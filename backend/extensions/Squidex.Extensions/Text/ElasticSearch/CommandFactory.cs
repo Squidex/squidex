@@ -87,8 +87,8 @@ public static class CommandFactory
                 contentId = upsert.ContentId.ToString(),
                 schemaId = upsert.SchemaId.Id.ToString(),
                 schemaName = upsert.SchemaId.Name,
-                serveAll = upsert.ScopeAll,
-                servePublished = upsert.ScopePublished,
+                serveAll = upsert.ServeAll,
+                servePublished = upsert.ServePublished,
                 texts,
                 geoField,
                 geoObject

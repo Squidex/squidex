@@ -46,8 +46,8 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                     Filter.Exists(x => x.GeoField, false),
                     Filter.Exists(x => x.GeoObject, false)),
                 Update
-                    .Set(x => x.ScopeAll, upsert.ScopeAll)
-                    .Set(x => x.ScopePublished, upsert.ScopePublished)
+                    .Set(x => x.ServeAll, upsert.ServeAll)
+                    .Set(x => x.ServePublished, upsert.ServePublished)
                     .Set(x => x.Texts, BuildTexts(upsert))
                     .SetOnInsert(x => x.Id, Guid.NewGuid().ToString())
                     .SetOnInsert(x => x.DocId, upsert.DocId)
@@ -76,14 +76,15 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                     new InsertOneModel<MongoTextIndexEntity<T>>(
                         new MongoTextIndexEntity<T>
                         {
+                            Id = Guid.NewGuid().ToString(),
                             DocId = upsert.DocId,
-                            AppId = upsert.AppId.Id,
                             ContentId = upsert.ContentId,
                             GeoField = field,
                             GeoObject = geoObject,
                             SchemaId = upsert.SchemaId.Id,
-                            ScopeAll = upsert.ScopeAll,
-                            ScopePublished = upsert.ScopePublished,
+                            ServeAll = upsert.ServeAll,
+                            ServePublished = upsert.ServePublished,
+                            AppId = upsert.AppId.Id,
                         }));
             }
         }
@@ -100,8 +101,8 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
             new UpdateOneModel<MongoTextIndexEntity<T>>(
                 Filter.Eq(x => x.DocId, update.DocId),
                 Update
-                    .Set(x => x.ScopeAll, update.ServeAll)
-                    .Set(x => x.ScopePublished, update.ServePublished)));
+                    .Set(x => x.ServeAll, update.ServeAll)
+                    .Set(x => x.ServePublished, update.ServePublished)));
     }
 
     private static void DeleteEntry(DeleteIndexEntry delete, List<WriteModel<MongoTextIndexEntity<T>>> writes)

@@ -42,7 +42,7 @@ public abstract class ShardedSnapshotStore<T, TState> : ShardedService<T>, ISnap
     {
         var shard = Shard(GetAppId(key));
 
-        return shard.ReadAsync(key, ct);
+        return shard.RemoveAsync(key, ct);
     }
 
     public Task DeleteAppAsync(App app,
