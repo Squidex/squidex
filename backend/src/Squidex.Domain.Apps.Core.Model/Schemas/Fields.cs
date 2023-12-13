@@ -71,6 +71,12 @@ public static class Fields
         return new RootField<ReferencesFieldProperties> { Id = id, Name = name, Partitioning = partitioning, Properties = properties ?? new() };
     }
 
+    public static RootField<RichTextFieldProperties> RichText(long id, string name, Partitioning partitioning,
+        RichTextFieldProperties? properties = null)
+    {
+        return new RootField<RichTextFieldProperties> { Id = id, Name = name, Partitioning = partitioning, Properties = properties ?? new() };
+    }
+
     public static RootField<StringFieldProperties> String(long id, string name, Partitioning partitioning,
         StringFieldProperties? properties = null)
     {
@@ -141,6 +147,12 @@ public static class Fields
         ReferencesFieldProperties? properties = null)
     {
         return new NestedField<ReferencesFieldProperties> { Id = id, Name = name, Properties = properties ?? new() };
+    }
+
+    public static NestedField<RichTextFieldProperties> RichText(long id, string name,
+        RichTextFieldProperties? properties = null)
+    {
+        return new NestedField<RichTextFieldProperties> { Id = id, Name = name, Properties = properties ?? new() };
     }
 
     public static NestedField<StringFieldProperties> String(long id, string name,
@@ -228,6 +240,12 @@ public static class Fields
         return schema.AddField(References(id, name, partitioning, properties));
     }
 
+    public static Schema AddRichText(this Schema schema, long id, string name, Partitioning partitioning,
+        RichTextFieldProperties? properties = null)
+    {
+        return schema.AddField(RichText(id, name, partitioning, properties));
+    }
+
     public static Schema AddString(this Schema schema, long id, string name, Partitioning partitioning,
         StringFieldProperties? properties = null)
     {
@@ -298,6 +316,12 @@ public static class Fields
         ReferencesFieldProperties? properties = null)
     {
         return field.AddField(References(id, name, properties));
+    }
+
+    public static ArrayField AddRichText(this ArrayField field, long id, string name,
+        RichTextFieldProperties? properties = null)
+    {
+        return field.AddField(RichText(id, name, properties));
     }
 
     public static ArrayField AddString(this ArrayField field, long id, string name,

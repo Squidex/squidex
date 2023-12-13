@@ -339,7 +339,7 @@ describe('NumberField', () => {
     it('should not format to stars if html not allowed', () => {
         const field2 = createField({ properties: createProperties('Number', { editor: 'Stars' }) });
 
-        expect(FieldFormatter.format(field2, 3, false)).toEqual('3');
+        expect(FieldFormatter.format(field2, 3, undefined, false)).toEqual('3');
     });
 
     it('should return default value from properties', () => {
@@ -366,7 +366,7 @@ describe('ReferencesField', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
     });
 
-    it('should format to plural count for many items', () => {
+    it('should format to text', () => {
         expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 References');
     });
 
@@ -391,6 +391,26 @@ describe('ReferencesField', () => {
     });
 });
 
+describe('RichTextField', () => {
+    const field = createField({ properties: createProperties('RichText') });
+
+    it('should create validators', () => {
+        expect(FieldsValidators.create(field, false).length).toBe(0);
+    });
+
+    it('should format to empty string if null', () => {
+        expect(FieldFormatter.format(field, null)).toBe('');
+    });
+
+    it('should format to plural count for many items', () => {
+        expect(FieldFormatter.format(field, 'text')).toBe('<Text />');
+    });
+
+    it('should return default value as null', () => {
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
+    });
+});
+
 describe('StringField', () => {
     const field = createField({ properties: createProperties('String', { isRequired: true, pattern: 'pattern', minLength: 1, maxLength: 5, allowedValues: ['a', 'b'] }) });
 
@@ -409,19 +429,19 @@ describe('StringField', () => {
     it('should not format to preview image if html not allowed', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
-        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', false)).toBe('https://images.unsplash.com/123?x');
+        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', undefined, false)).toBe('https://images.unsplash.com/123?x');
     });
 
     it('should format to preview image', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
-        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', true)).toEqual(new HtmlValue('<div class="image"><img src="https://images.unsplash.com/123?x&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=50&fit=max" /></div>', 'https://images.unsplash.com/123?x'));
+        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', undefined, true)).toEqual(new HtmlValue('<div class="image"><img src="https://images.unsplash.com/123?x&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=50&fit=max" /></div>', 'https://images.unsplash.com/123?x'));
     });
 
     it('should not format to preview image if not unsplash image', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
-        expect(FieldFormatter.format(field2, 'https://images.com/123?x', true)).toEqual(new HtmlValue('<div class="image"><img src="https://images.com/123?x" /></div>', 'https://images.com/123?x'));
+        expect(FieldFormatter.format(field2, 'https://images.com/123?x', undefined, true)).toEqual(new HtmlValue('<div class="image"><img src="https://images.com/123?x" /></div>', 'https://images.com/123?x'));
     });
 
     it('should return default value from properties', () => {

@@ -502,6 +502,9 @@
   <data name="contents.invalidNumber" xml:space="preserve">
     <value>Errore nel json,, atteso un number.</value>
   </data>
+  <data name="contents.invalidRichText" xml:space="preserve">
+    <value>Invalid rich text.</value>
+  </data>
   <data name="contents.invalidString" xml:space="preserve">
     <value>Errore nel json, atteso una string.</value>
   </data>

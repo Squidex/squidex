@@ -925,6 +925,7 @@
   "schemas.fieldTypes.references.queryHint": "The initial query that is used in the UI to narrow down the results for the user. In Odata notation.",
   "schemas.fieldTypes.references.resolve": "Resolver referências",
   "schemas.fieldTypes.references.resolveHint": "Mostre o nome do item referenciado na lista de conteúdos quando maxItems estiver definido para 1.",
+  "schemas.fieldTypes.richText.description": "Text, convertible to HTML and markdown",
   "schemas.fieldTypes.string.characters": "Personagens",
   "schemas.fieldTypes.string.charactersMax": "Personagens Max",
   "schemas.fieldTypes.string.charactersMin": "Personagens de Min",

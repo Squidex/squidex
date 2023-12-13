@@ -351,6 +351,9 @@
   <data name="GraphqlRequest" xml:space="preserve">
     <value>The graphql request.</value>
   </data>
+  <data name="Indentation" xml:space="preserve">
+    <value>Number of spaces to format the output.</value>
+  </data>
   <data name="ItemData" xml:space="preserve">
     <value>The current item, if the field is part of an array.</value>
   </data>
@@ -395,6 +398,24 @@
   </data>
   <data name="QueryVersion" xml:space="preserve">
     <value>The optional version of the content to retrieve an older instance (not cached).</value>
+  </data>
+  <data name="RichTextFieldAssets" xml:space="preserve">
+    <value>The referenced assets.</value>
+  </data>
+  <data name="RichTextFieldHtml" xml:space="preserve">
+    <value>The value as HTML.</value>
+  </data>
+  <data name="RichTextFieldMarkdown" xml:space="preserve">
+    <value>The value as markdown.</value>
+  </data>
+  <data name="RichTextFieldReferences" xml:space="preserve">
+    <value>The referenced content items.</value>
+  </data>
+  <data name="RichTextFieldText" xml:space="preserve">
+    <value>The value as plain text.</value>
+  </data>
+  <data name="RichTextFieldValue" xml:space="preserve">
+    <value>The raw value.</value>
   </data>
   <data name="SchemaId" xml:space="preserve">
     <value>The ID of the schema.</value>

@@ -925,6 +925,7 @@
   "schemas.fieldTypes.references.queryHint": "The initial query that is used in the UI to narrow down the results for the user. In Odata notation.",
   "schemas.fieldTypes.references.resolve": "Resolve references",
   "schemas.fieldTypes.references.resolveHint": "当 MaxItems 设置为 1 时，在内容列表中显示引用项的名称。",
+  "schemas.fieldTypes.richText.description": "Text, convertible to HTML and markdown",
   "schemas.fieldTypes.string.characters": "字符",
   "schemas.fieldTypes.string.charactersMax": "最大字符数",
   "schemas.fieldTypes.string.charactersMin": "最小字符数",

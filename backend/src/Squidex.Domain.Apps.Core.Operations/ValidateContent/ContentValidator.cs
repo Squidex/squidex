@@ -85,10 +85,10 @@ public sealed class ContentValidator
 
     private void ValidateContentCore(ContentData data)
     {
-        CreatecSchemaValidator().Validate(data, context);
+        CreateSchemaValidator().Validate(data, context);
     }
 
-    private IValidator CreatecSchemaValidator()
+    private IValidator CreateSchemaValidator()
     {
         return new AggregateValidator(CreateContentValidators());
     }

@@ -139,6 +139,7 @@
   "contents.invalidGeolocationLatitude": "Latitude must be between -90 and 90.",
   "contents.invalidGeolocationLongitude": "Longitude must be between -180 and 180.",
   "contents.invalidNumber": "Invalid json type, expected number.",
+  "contents.invalidRichText": "Invalid rich text.",
   "contents.invalidString": "Invalid json type, expected string.",
   "contents.listReferences": "{count} Reference(s)",
   "contents.referenced": "Content is referenced by another content and cannot be deleted or unpublished.",

@@ -243,6 +243,23 @@
 						</ng-container>
 					</ng-container>
 				</ng-container>
+                <ng-container *ngSwitchCase="'RichText'">
+                    <sqx-rich-editor #editor
+                        mode="State"
+                        [annotations]="annotations | async"
+                        (annotationsCreate)="annotationCreate($event)"
+                        (annotationsSelect)="annotationsSelect($event)"
+                        (annotationsUpdate)="annotationsUpdate($event)"
+                        [classNames]="field.rawProperties.classNames"
+                        [formControl]="$any(fieldForm)"
+                        [folderId]="field.rawProperties.folderId"
+                        [hasAnnotations]="!!comments"
+                        [hasChatBot]="hasChatBot"
+                        [language]="language"
+                        [languages]="languages"
+                        [schemaIds]="field.rawProperties.schemaIds">
+                    </sqx-rich-editor>
+                </ng-container>
 				<ng-container *ngSwitchCase="'Tags'">
                     <ng-container [ngSwitch]="field.rawProperties.editor">
                         <ng-container *ngSwitchCase="'Tags'">

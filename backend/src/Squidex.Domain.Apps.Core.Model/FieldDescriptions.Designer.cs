@@ -763,6 +763,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Number of spaces to format the output..
+        /// </summary>
+        public static string Indentation {
+            get {
+                return ResourceManager.GetString("Indentation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The current item, if the field is part of an array..
         /// </summary>
         public static string ItemData {
@@ -894,6 +903,60 @@ namespace Squidex.Domain.Apps.Core {
         public static string QueryVersion {
             get {
                 return ResourceManager.GetString("QueryVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The referenced assets..
+        /// </summary>
+        public static string RichTextFieldAssets {
+            get {
+                return ResourceManager.GetString("RichTextFieldAssets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value as HTML..
+        /// </summary>
+        public static string RichTextFieldHtml {
+            get {
+                return ResourceManager.GetString("RichTextFieldHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value as markdown..
+        /// </summary>
+        public static string RichTextFieldMarkdown {
+            get {
+                return ResourceManager.GetString("RichTextFieldMarkdown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The referenced content items..
+        /// </summary>
+        public static string RichTextFieldReferences {
+            get {
+                return ResourceManager.GetString("RichTextFieldReferences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value as plain text..
+        /// </summary>
+        public static string RichTextFieldText {
+            get {
+                return ResourceManager.GetString("RichTextFieldText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The raw value..
+        /// </summary>
+        public static string RichTextFieldValue {
+            get {
+                return ResourceManager.GetString("RichTextFieldValue", resourceCulture);
             }
         }
         

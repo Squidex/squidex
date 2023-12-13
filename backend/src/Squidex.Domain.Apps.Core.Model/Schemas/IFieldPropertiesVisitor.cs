@@ -29,6 +29,8 @@ public interface IFieldPropertiesVisitor<out T, in TArgs>
 
     T Visit(ReferencesFieldProperties properties, TArgs args);
 
+    T Visit(RichTextFieldProperties properties, TArgs args);
+
     T Visit(StringFieldProperties properties, TArgs args);
 
     T Visit(TagsFieldProperties properties, TArgs args);

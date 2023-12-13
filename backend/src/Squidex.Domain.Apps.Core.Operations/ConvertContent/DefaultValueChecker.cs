@@ -75,6 +75,11 @@ internal sealed class DefaultValueChecker : IFieldPropertiesVisitor<bool, None>
         return properties.DefaultValue != null || properties.DefaultValues != null;
     }
 
+    public bool Visit(RichTextFieldProperties properties, None args)
+    {
+        return false;
+    }
+
     public bool Visit(StringFieldProperties properties, None args)
     {
         return properties.DefaultValue != null || properties.DefaultValues != null;

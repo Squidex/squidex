@@ -57,7 +57,7 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEnt
                 await Collection.Find(x => (x.IndexedUserIds.Contains(contributorId) || names.Contains(x.IndexedName)) && !x.IndexedDeleted)
                     .ToListAsync(ct);
 
-            return RemoveDuplcateNames(entities);
+            return RemoveDuplicateNames(entities);
         }
     }
 
@@ -70,7 +70,7 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEnt
                 await Collection.Find(x => x.IndexedTeamId == teamId).SortBy(x => x.IndexedCreated)
                     .ToListAsync(ct);
 
-            return RemoveDuplcateNames(entities);
+            return RemoveDuplicateNames(entities);
         }
     }
 
@@ -100,7 +100,7 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEnt
         }
     }
 
-    private static List<App> RemoveDuplcateNames(List<MongoAppEntity> entities)
+    private static List<App> RemoveDuplicateNames(List<MongoAppEntity> entities)
     {
         var byName = new Dictionary<string, App>();
 

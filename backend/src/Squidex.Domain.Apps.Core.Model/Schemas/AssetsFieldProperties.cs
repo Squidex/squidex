@@ -20,7 +20,7 @@ public sealed record AssetsFieldProperties : FieldProperties
 
     public string? FolderId { get; init; }
 
-    public string? PreviewFormat { get; set; }
+    public string? PreviewFormat { get; init; }
 
     public int? MinItems { get; init; }
 
@@ -42,7 +42,7 @@ public sealed record AssetsFieldProperties : FieldProperties
 
     public int? AspectHeight { get; init; }
 
-    public AssetType? ExpectedType { get; set; }
+    public AssetType? ExpectedType { get; init; }
 
     public bool AllowDuplicates { get; init; }
 
@@ -60,7 +60,7 @@ public sealed record AssetsFieldProperties : FieldProperties
         init => ResolveFirst = value;
     }
 
-    public ReadonlyList<string>? AllowedExtensions { get; set; }
+    public ReadonlyList<string>? AllowedExtensions { get; init; }
 
     public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
     {

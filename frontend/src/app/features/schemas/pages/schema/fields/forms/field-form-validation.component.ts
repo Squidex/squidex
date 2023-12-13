@@ -19,6 +19,7 @@ import { GeolocationValidationComponent } from '../types/geolocation-validation.
 import { JsonValidationComponent } from '../types/json-validation.component';
 import { NumberValidationComponent } from '../types/number-validation.component';
 import { ReferencesValidationComponent } from '../types/references-validation.component';
+import { RichTextValidationComponent } from '../types/rich-text-validation.component';
 import { StringValidationComponent } from '../types/string-validation.component';
 import { TagsValidationComponent } from '../types/tags-validation.component';
 
@@ -42,6 +43,7 @@ import { TagsValidationComponent } from '../types/tags-validation.component';
         NumberValidationComponent,
         ReactiveFormsModule,
         ReferencesValidationComponent,
+        RichTextValidationComponent,
         StringValidationComponent,
         TagsValidationComponent,
         TranslatePipe,

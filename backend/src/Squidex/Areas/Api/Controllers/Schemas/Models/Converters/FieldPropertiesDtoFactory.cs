@@ -74,6 +74,11 @@ internal sealed class FieldPropertiesDtoFactory : IFieldPropertiesVisitor<FieldP
         return ReferencesFieldPropertiesDto.FromDomain(fieldProperties);
     }
 
+    public FieldPropertiesDto Visit(RichTextFieldProperties fieldProperties, None args)
+    {
+        return RichTextFieldPropertiesDto.FromDomain(fieldProperties);
+    }
+
     public FieldPropertiesDto Visit(StringFieldProperties fieldProperties, None args)
     {
         return StringFieldPropertiesDto.FromDomain(fieldProperties);

@@ -104,6 +104,13 @@
             [properties]="field.rawProperties">
         </sqx-references-validation>
     </ng-container>
+    <ng-container *ngSwitchCase="'RichText'">
+        <sqx-rich-text-validation
+            [fieldForm]="fieldForm"
+            [field]="field"
+            [properties]="field.rawProperties">
+        </sqx-rich-text-validation>
+    </ng-container>
     <ng-container *ngSwitchCase="'String'">
         <sqx-string-validation
             [languages]="languages"

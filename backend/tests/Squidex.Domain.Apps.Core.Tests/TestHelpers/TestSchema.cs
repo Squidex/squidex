@@ -95,7 +95,9 @@ public static class TestSchema
                 .AddTags(211, "nested-tags",
                     new TagsFieldProperties())
                 .AddUI(212, "nested-ui",
-                    new UIFieldProperties()))
+                    new UIFieldProperties())
+                .AddRichText(213, "nested-richtext",
+                    new RichTextFieldProperties()))
             .AddAssets(102, "root-assets", Partitioning.Invariant,
                 new AssetsFieldProperties())
             .AddBoolean(103, "root-boolean", Partitioning.Invariant,
@@ -124,6 +126,8 @@ public static class TestSchema
                 new ComponentFieldProperties { SchemaIds = componentIds })
             .AddComponents(115, "root-components", Partitioning.Language,
                 new ComponentsFieldProperties { SchemaIds = componentIds })
+            .AddRichText(116, "root-richtext", Partitioning.Invariant,
+                new RichTextFieldProperties())
             .Update(new SchemaProperties { Hints = "The User" })
             .HideField(104)
             .HideField(211, 101)

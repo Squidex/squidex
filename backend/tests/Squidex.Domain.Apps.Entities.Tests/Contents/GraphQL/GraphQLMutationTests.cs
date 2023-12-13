@@ -23,7 +23,7 @@ public class GraphQLMutationTests : GraphQLTestBase
 
     public GraphQLMutationTests()
     {
-        content = TestContent.Create(contentId, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id, null);
+        content = TestContent.Create(contentId);
 
         A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored, A<CancellationToken>._))
             .Returns(commandContext);
@@ -102,7 +102,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id),
+                data = TestContent.Input(content),
             },
             Permission = PermissionIds.AppContentsCreate
         });
@@ -147,7 +147,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id)
+                data = TestContent.Input(content)
             },
             Permission = PermissionIds.AppContentsCreate
         });
@@ -251,7 +251,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id)
+                data = TestContent.Input(content)
             },
             Permission = PermissionIds.AppContentsUpdateOwn
         });
@@ -350,7 +350,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id)
+                data = TestContent.Input(content)
             },
             Permission = PermissionIds.AppContentsUpsert
         });
@@ -454,7 +454,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             },
             Variables = new
             {
-                data = TestContent.Input(content, TestSchemas.Reference1.Id, TestSchemas.Reference2.Id)
+                data = TestContent.Input(content)
             },
             Permission = PermissionIds.AppContentsUpdateOwn
         });

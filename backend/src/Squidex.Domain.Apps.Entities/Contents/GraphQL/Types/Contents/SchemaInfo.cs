@@ -90,6 +90,8 @@ internal sealed class FieldInfo
 
     public string NestedType { get; }
 
+    public string RichTextType { get; }
+
     public string UnionComponentType { get; }
 
     public string UnionReferenceType { get; }
@@ -109,6 +111,7 @@ internal sealed class FieldInfo
         LocalizedTypeDynamic = typeNames[$"{typeName}Dto__Dynamic"];
         NestedInputType = typeNames[$"{typeName}ChildInputDto"];
         NestedType = typeNames[$"{typeName}ChildDto"];
+        RichTextType = typeNames[$"{typeName}RichText"];
         UnionComponentType = typeNames[$"{typeName}ComponentUnionDto"];
         UnionReferenceType = typeNames[$"{typeName}UnionDto"];
     }

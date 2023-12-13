@@ -180,7 +180,7 @@ describe('GetContentValue', () => {
     const fieldLocalized = createField({ properties: createProperties('Number') });
     const fieldAssets = createField({ properties: createProperties('Assets') });
 
-    it('should resolve image url and filename from referenced asset', () => {
+    it('should resolve formatted text as image url and filename from referenced asset', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -193,11 +193,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, assetWithImageAndFileName);
 
-        expect(result).toEqual({ value: ['url/to/13', 'file13'],
-            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&" /> <span>file13</span></div>', 'url/to/13') });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&" /> <span>file13</span></div>', 'url/to/13'),
+        });
     });
 
-    it('should resolve image url only from referenced asset', () => {
+    it('should resolve formatted text as image url from referenced asset', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -210,11 +212,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, assetWithImage);
 
-        expect(result).toEqual({ value: ['url/to/13', 'file13'],
-            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&" /></div>', 'url/to/13') });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&" /></div>', 'url/to/13'),
+        });
     });
 
-    it('should resolve image url only from referenced asset with custom format', () => {
+    it('should resolve formatted text as image url from referenced asset with custom format', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -227,11 +231,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, assetWithImage);
 
-        expect(result).toEqual({ value: ['url/to/13', 'file13'],
-            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=100&height=100" /></div>', 'url/to/13') });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=100&height=100" /></div>', 'url/to/13'),
+        });
     });
 
-    it('should resolve image url only from referenced asset with merged format', () => {
+    it('should resolve formatted text as image url from referenced asset with merged format', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -244,11 +250,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, assetWithImage);
 
-        expect(result).toEqual({ value: ['url/to/13', 'file13'],
-            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&bg=red" /></div>', 'url/to/13') });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: new HtmlValue('<div class="image"><img src="url/to/13?width=50&height=50&mode=Pad&bg=red" /></div>', 'url/to/13'),
+        });
     });
 
-    it('should resolve filename only from referenced asset', () => {
+    it('should resolve formatted text as filename from referenced asset', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -261,10 +269,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, assetWithFileName);
 
-        expect(result).toEqual({ value: ['url/to/13', 'file13'], formatted: 'file13' });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: 'file13',
+        });
     });
 
-    it('should resolve filename from referenced asset', () => {
+    it('should resolve formatted text as filename from referenced asset with fallback format', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -275,10 +286,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldAssets);
 
-        expect(result).toEqual({ value: ['file13'], formatted: 'file13' });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: 'file13',
+        });
     });
 
-    it('should not image url if not found', () => {
+    it('should not resolve formatted text as image url if not found', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -289,29 +303,35 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldAssets);
 
-        expect(result).toEqual({ value: '-', formatted: '-' });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: '',
+        });
     });
 
-    it('should resolve string field from references value', () => {
+    it('should resolve formatted text from invariant reference data', () => {
         const content: any = {
             referenceData: {
                 field1: {
-                    iv: '13',
+                    iv: '42',
                 },
             },
         };
 
         const result = getContentValue(content, language, fieldInvariant);
 
-        expect(result).toEqual({ value: '13', formatted: '13' });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: '42',
+        });
     });
 
-    it('should resolve invariant field from references value', () => {
+    it('should resolve formatted text from localized-invariant reference data', () => {
         const content: any = {
             referenceData: {
                 field1: {
                     iv: {
-                        en: '13',
+                        en: '42',
                     },
                 },
             },
@@ -319,10 +339,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldInvariant);
 
-        expect(result).toEqual({ value: '13', formatted: '13' });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: '42',
+        });
     });
 
-    it('should resolve localized field from references value', () => {
+    it('should resolve formatted text from localized-localized reference data', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -335,10 +358,10 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldLocalized);
 
-        expect(result).toEqual({ value: '13', formatted: '13' });
+        expect(result).toEqual({ value: undefined, formatted: '13' });
     });
 
-    it('should return default value if reference field not found', () => {
+    it('should not resolve formatted text if reference data not found', () => {
         const content: any = {
             referenceData: {
                 field1: {
@@ -351,10 +374,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldLocalized);
 
-        expect(result).toEqual({ value: '-', formatted: '-' });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: '',
+        });
     });
 
-    it('should resolve invariant field', () => {
+    it('should resolve value from invariant field', () => {
         const content: any = {
             data: {
                 field1: {
@@ -365,10 +391,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldInvariant);
 
-        expect(result).toEqual({ value: 13, formatted: '13' });
+        expect(result).toEqual({
+            value: 13,
+            formatted: '13',
+        });
     });
 
-    it('should resolve localized field', () => {
+    it('should resolve value from localized field', () => {
         const content: any = {
             data: {
                 field1: {
@@ -379,10 +408,13 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldLocalized);
 
-        expect(result).toEqual({ value: 13, formatted: '13' });
+        expect(result).toEqual({
+            value: 13,
+            formatted: '13',
+        });
     });
 
-    it('should return default values if field not found', () => {
+    it('should not resolve value if field not found', () => {
         const content: any = {
             data: {
                 other: {
@@ -393,7 +425,10 @@ describe('GetContentValue', () => {
 
         const result = getContentValue(content, language, fieldLocalized);
 
-        expect(result).toEqual({ value: undefined, formatted: '' });
+        expect(result).toEqual({
+            value: undefined,
+            formatted: '',
+        });
     });
 });
 

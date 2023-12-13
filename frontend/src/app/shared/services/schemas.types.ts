@@ -16,6 +16,7 @@ export type FieldType =
     'Geolocation' |
     'Number' |
     'References' |
+    'RichText' |
     'String' |
     'Tags' |
     'UI';
@@ -51,6 +52,9 @@ export const fieldTypes: ReadonlyArray<{ type: FieldType; description: string }>
     }, {
         type: 'References',
         description: 'i18n:schemas.fieldTypes.references.description',
+    }, {
+        type: 'RichText',
+        description: 'i18n:schemas.fieldTypes.richText.description',
     }, {
         type: 'Tags',
         description: 'i18n:schemas.fieldTypes.tags.description',
@@ -99,6 +103,9 @@ export function createProperties(fieldType: FieldType, values?: any): FieldPrope
         case 'References':
             properties = new ReferencesFieldPropertiesDto();
             break;
+        case 'RichText':
+            properties = new RichTextFieldPropertiesDto();
+            break;
         case 'String':
             properties = new StringFieldPropertiesDto();
             break;
@@ -139,6 +146,8 @@ export interface FieldPropertiesVisitor<T> {
     visitNumber(properties: NumberFieldPropertiesDto): T;
 
     visitReferences(properties: ReferencesFieldPropertiesDto): T;
+
+    visitRichText(properties: RichTextFieldPropertiesDto): T;
 
     visitString(properties: StringFieldPropertiesDto): T;
 
@@ -404,6 +413,28 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
         return visitor.visitReferences(this);
+    }
+}
+
+export class RichTextFieldPropertiesDto extends FieldPropertiesDto {
+    public readonly fieldType = 'RichText';
+
+    public readonly classNames?: ReadonlyArray<string>;
+    public readonly folderId?: string;
+    public readonly maxCharacters?: number;
+    public readonly maxLength?: number;
+    public readonly maxWords?: number;
+    public readonly minCharacters?: number;
+    public readonly minLength?: number;
+    public readonly minWords?: number;
+    public readonly schemaIds?: ReadonlyArray<string>;
+
+    public get isSortable() {
+        return false;
+    }
+
+    public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
+        return visitor.visitRichText(this);
     }
 }
 

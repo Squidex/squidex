@@ -159,6 +159,11 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
         return JsonTypeBuilder.JsonProperty();
     }
 
+    public JsonSchemaProperty? Visit(IField<RichTextFieldProperties> field, Args args)
+    {
+        return JsonTypeBuilder.JsonProperty();
+    }
+
     public JsonSchemaProperty? Visit(IField<NumberFieldProperties> field, Args args)
     {
         var property = JsonTypeBuilder.NumberProperty();

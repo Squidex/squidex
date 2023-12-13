@@ -6,10 +6,12 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
@@ -184,7 +186,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_return_multiple_assets_if_querying_assets()
+    public async Task Should_query_assets()
     {
         var asset = TestAsset.Create(DomainId.NewGuid());
 
@@ -222,7 +224,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_return_multiple_assets_with_total_if_querying_assets_with_total()
+    public async Task Should_query_assets_with_total()
     {
         var asset = TestAsset.Create(DomainId.NewGuid());
 
@@ -303,7 +305,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_return_single_asset_if_finding_asset()
+    public async Task Should_find_single_asset()
     {
         var assetId = DomainId.NewGuid();
         var asset = TestAsset.Create(assetId);
@@ -340,7 +342,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_return_multiple_flat_contents_if_querying_contents()
+    public async Task Should_query_contents_with_flat_data()
     {
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
@@ -379,7 +381,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_return_multiple_contents_if_querying_contents()
+    public async Task Should_query_contents()
     {
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
@@ -418,7 +420,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_return_multiple_contents_with_total_if_querying_contents_with_total()
+    public async Task Should_query_contents_with_total()
     {
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
@@ -701,13 +703,19 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_embedded_contents_if_field_is_included_in_query()
+    public async Task Should_resolve_embedded_contents()
     {
         var contentRefId = DomainId.NewGuid();
         var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
+        var data =
+            new ContentData()
+                .AddField("my-embeds",
+                     new ContentFieldData()
+                        .AddInvariant(JsonValue.Create($"contents:{contentRefId}")));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentRefId),
@@ -765,7 +773,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         {
                             iv = new
                             {
-                                text = $"assets:{DomainId.Empty}, contents:{contentRefId}",
+                                text = $"contents:{contentRefId}",
                                 contents = new[]
                                 {
                                     new
@@ -791,13 +799,135 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_referenced_contents_if_field_is_included_in_query()
+    public async Task Should_resolve_richtext_contents()
     {
         var contentRefId = DomainId.NewGuid();
         var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
+        var data =
+            new ContentData()
+                .AddField("my-richtext",
+                     new ContentFieldData()
+                        .AddInvariant(JsonValue.Object()
+                            .Add("type", "text")
+                            .Add("marks", JsonValue.Array(
+                                JsonValue.Object()
+                                    .Add("type", "link")
+                                    .Add("attrs", JsonValue.Object()
+                                        .Add("href", $"contents:{contentRefId}"))))));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
+        var content = TestContent.Create(contentId, data);
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, contentRef));
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}') {
+                    id
+                    data {
+                      myRichtext {
+                        iv {
+                          value
+                          contents {
+                            ... on Content {
+                              id
+                            }
+                            ... on MyReference1 {
+                              data {
+                                reference1Field {
+                                  iv
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
+
+        var expected = new
+        {
+            data = new
+            {
+                findMySchemaContent = new
+                {
+                    id = content.Id,
+                    data = new
+                    {
+                        myRichtext = new
+                        {
+                            iv = new
+                            {
+                                value = new
+                                {
+                                    type = "text",
+                                    marks = new[]
+                                    {
+                                        new
+                                        {
+                                            type = "link",
+                                            attrs = new
+                                            {
+                                                href = $"contents:{contentRefId}"
+                                            }
+                                        }
+                                    }
+                                },
+                                contents = new[]
+                                {
+                                    new
+                                    {
+                                        id = contentRefId,
+                                        data = new
+                                        {
+                                            reference1Field = new
+                                            {
+                                                iv = "reference1"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        AssertResult(expected, actual);
+    }
+
+    [Fact]
+    public async Task Should_resolve_referenced_contents()
+    {
+        var contentRefId = DomainId.NewGuid();
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+
+        var data =
+            new ContentData()
+                .AddField("my-references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(contentRefId)));
+
+        var contentId = DomainId.NewGuid();
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentRefId),
@@ -870,13 +1000,19 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_referenced_contents_from_flat_data_if_field_is_included_in_query()
+    public async Task Should_resolve_referenced_contents_from_flat_data()
     {
         var contentRefId = DomainId.NewGuid();
         var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
+        var data =
+            new ContentData()
+                .AddField("my-references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(contentRefId)));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentRefId),
@@ -932,13 +1068,19 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_cache_referenced_contents_from_flat_data_if_field_is_included_in_query()
+    public async Task Should_cache_referenced_contents_from_flat_data()
     {
         var contentRefId = DomainId.NewGuid();
         var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
+        var data =
+            new ContentData()
+                .AddField("my-references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(contentRefId)));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentRefId),
@@ -1003,13 +1145,22 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_referencing_contents_if_field_is_included_in_query()
+    public async Task Should_resolve_referencing_contents()
     {
         var contentRefId = DomainId.NewGuid();
         var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
+        var data =
+            new ContentData()
+                .AddField("my-references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(contentRefId)))
+                .AddField("my-localized-string",
+                    new ContentFieldData()
+                        .AddLocalized("de-DE", "de-DE"));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentRefId),
@@ -1072,13 +1223,22 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_referencing_contents_with_total_if_field_is_included_in_query()
+    public async Task Should_resolve_referencing_contents_with_total()
     {
         var contentRefId = DomainId.NewGuid();
         var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
+        var data =
+            new ContentData()
+                .AddField("my-references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(contentRefId)))
+                .AddField("my-localized-string",
+                    new ContentFieldData()
+                        .AddLocalized("de-DE", "de-DE"));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentRefId),
@@ -1148,13 +1308,19 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_references_contents_if_field_is_included_in_query()
+    public async Task Should_resolve_references_contents()
     {
         var contentRefId = DomainId.NewGuid();
         var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
+        var data =
+            new ContentData()
+                .AddField("my-references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(contentRefId)));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),
@@ -1205,13 +1371,19 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_references_contents_with_total_if_field_is_included_in_query()
+    public async Task Should_resolve_references_contents_with_total()
     {
         var contentRefId = DomainId.NewGuid();
         var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
+        var data =
+            new ContentData()
+                .AddField("my-references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(contentRefId)));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),
@@ -1269,13 +1441,19 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_union_contents_if_field_is_included_in_query()
+    public async Task Should_resolve_union_contents()
     {
         var contentRefId = DomainId.NewGuid();
         var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
 
+        var data =
+            new ContentData()
+                .AddField("my-union",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(contentRefId)));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, contentRefId);
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentRefId),
@@ -1354,13 +1532,19 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_embedded_assets_if_field_is_included_in_query()
+    public async Task Should_resolve_embedded_assets()
     {
         var assetRefId = DomainId.NewGuid();
         var assetRef = TestAsset.Create(assetRefId);
 
+        var data =
+            new ContentData()
+                .AddField("my-embeds",
+                     new ContentFieldData()
+                        .AddInvariant(JsonValue.Create($"assets:{assetRefId}")));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, assetId: assetRefId);
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),
@@ -1409,7 +1593,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         {
                             iv = new
                             {
-                                text = $"assets:{assetRefId}, contents:{DomainId.Empty}",
+                                text = $"assets:{assetRefId}",
                                 assets = new[]
                                 {
                                     new
@@ -1428,13 +1612,109 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_also_fetch_referenced_assets_if_field_is_included_in_query()
+    public async Task Should_resolve_richtext_assets()
     {
         var assetRefId = DomainId.NewGuid();
         var assetRef = TestAsset.Create(assetRefId);
 
+        var data =
+            new ContentData()
+                .AddField("my-richtext",
+                     new ContentFieldData()
+                        .AddInvariant(JsonValue.Object()
+                            .Add("type", "image")
+                            .Add("attrs", JsonValue.Object()
+                                .Add("src", $"assets:{assetRefId}"))));
+
         var contentId = DomainId.NewGuid();
-        var content = TestContent.Create(contentId, assetId: assetRefId);
+        var content = TestContent.Create(contentId, data);
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
+                A<Q>.That.HasIdsWithoutTotal(assetRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, assetRef));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}') {
+                    id
+                    data {
+                      myRichtext {
+                        iv {
+                          value
+                          assets {
+                            id
+                          }
+                        }
+                      }
+                    }
+                  }
+                }",
+            Args = new
+            {
+                contentId
+            }
+        });
+
+        var expected = new
+        {
+            data = new
+            {
+                findMySchemaContent = new
+                {
+                    id = content.Id,
+                    data = new
+                    {
+                        myRichtext = new
+                        {
+                            iv = new
+                            {
+                                value = new
+                                {
+                                    type = "image",
+                                    attrs = new
+                                    {
+                                        src = $"assets:{assetRefId}"
+                                    }
+                                },
+                                assets = new[]
+                                {
+                                    new
+                                    {
+                                        id = assetRefId
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        AssertResult(expected, actual);
+    }
+
+    [Fact]
+    public async Task Should_resolve_referenced_assets()
+    {
+        var assetRefId = DomainId.NewGuid();
+        var assetRef = TestAsset.Create(assetRefId);
+
+        var data =
+            new ContentData()
+                .AddField("my-assets",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(assetRefId)));
+
+        var contentId = DomainId.NewGuid();
+        var content = TestContent.Create(contentId, data);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                 A<Q>.That.HasIdsWithoutTotal(contentId),

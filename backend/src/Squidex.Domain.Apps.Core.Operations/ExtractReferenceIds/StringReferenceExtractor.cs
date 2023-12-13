@@ -7,6 +7,7 @@
 
 using System.Text.RegularExpressions;
 using Squidex.Infrastructure;
+using Squidex.Text.RichText.Model;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds;
 
@@ -71,30 +72,71 @@ public sealed class StringReferenceExtractor
         contentsPatterns.Add(new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture));
     }
 
-    public IEnumerable<DomainId> GetEmbeddedContentIds(string text)
+    public IEnumerable<DomainId> GetEmbeddedContentIds(INode node)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        var result = new List<DomainId>();
+
+        static void Visit(INode node, List<DomainId> result, List<Regex> patterns)
         {
-            yield break;
+            if (node.Type == NodeType.Text)
+            {
+                IMark? mark = null;
+                while ((mark = node.GetNextMark()) != null)
+                {
+                    if (mark.Type == MarkType.Link)
+                    {
+                        var href = mark.GetStringAttr("href", string.Empty);
+
+                        result.AddRange(GetEmbeddedIds(href, patterns));
+                    }
+                }
+            }
+
+            node.IterateContent((result, patterns), static (node, s, _, _) => Visit(node, s.result, s.patterns));
         }
 
-        foreach (var pattern in contentsPatterns)
+        Visit(node, result, contentsPatterns);
+        return result;
+    }
+
+    public IEnumerable<DomainId> GetEmbeddedContentIds(string text)
+    {
+        return GetEmbeddedIds(text, contentsPatterns);
+    }
+
+    public IEnumerable<DomainId> GetEmbeddedAssetIds(INode node)
+    {
+        var result = new List<DomainId>();
+
+        static void Visit(INode node, List<DomainId> result, List<Regex> patterns)
         {
-            foreach (Match match in pattern.Matches(text).OfType<Match>())
+            if (node.Type == NodeType.Image)
             {
-                yield return DomainId.Create(match.Groups["Id"].Value);
+                var src = node.GetStringAttr("src", string.Empty);
+
+                result.AddRange(GetEmbeddedIds(src, patterns));
             }
+
+            node.IterateContent((result, patterns), static (node, s, _, _) => Visit(node, s.result, s.patterns));
         }
+
+        Visit(node, result, assetsPatterns);
+        return result;
     }
 
     public IEnumerable<DomainId> GetEmbeddedAssetIds(string text)
     {
+        return GetEmbeddedIds(text, assetsPatterns);
+    }
+
+    private static IEnumerable<DomainId> GetEmbeddedIds(string text, List<Regex> patterns)
+    {
         if (string.IsNullOrWhiteSpace(text))
         {
             yield break;
         }
 
-        foreach (var pattern in assetsPatterns)
+        foreach (var pattern in patterns)
         {
             foreach (Match match in pattern.Matches(text).OfType<Match>())
             {

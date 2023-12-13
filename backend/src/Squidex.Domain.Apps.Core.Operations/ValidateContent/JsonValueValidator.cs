@@ -95,6 +95,11 @@ public sealed class JsonValueValidator : IFieldPropertiesVisitor<bool, JsonValue
         return IsValidStringList(args.Value);
     }
 
+    public bool Visit(RichTextFieldProperties properties, Args args)
+    {
+        return args.Value.Type == JsonValueType.Null || RichTextNode.TryCreate(args.Value, out _);
+    }
+
     public bool Visit(StringFieldProperties properties, Args args)
     {
         return args.Value.Value is string;
