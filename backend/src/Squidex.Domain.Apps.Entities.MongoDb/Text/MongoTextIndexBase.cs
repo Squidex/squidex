@@ -68,8 +68,8 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
             new CreateIndexModel<MongoTextIndexEntity<T>>(
                 Index
                     .Ascending(x => x.AppId)
-                    .Ascending(x => x.ServeAll)
-                    .Ascending(x => x.ServePublished)
+                    .Ascending(x => x.ScopeAll)
+                    .Ascending(x => x.ScopePublished)
                     .Ascending(x => x.SchemaId)
                     .Ascending(x => x.GeoField)
                     .Geo2DSphere(x => x.GeoObject))
@@ -78,7 +78,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
 
     protected override string CollectionName()
     {
-        return $"TextIndex2{shardKey}";
+        return $"TextIndex{shardKey}";
     }
 
     protected abstract T BuildTexts(Dictionary<string, string> source);
@@ -219,11 +219,11 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
     {
         if (scope == SearchScope.All)
         {
-            return Filter.Eq(x => x.ServeAll, true);
+            return Filter.Eq(x => x.ScopeAll, true);
         }
         else
         {
-            return Filter.Eq(x => x.ServePublished, true);
+            return Filter.Eq(x => x.ScopePublished, true);
         }
     }
 

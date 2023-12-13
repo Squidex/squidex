@@ -66,8 +66,8 @@ public static class CommandFactory
                 ["contentId"] = upsert.ContentId.ToString(),
                 ["schemaId"] = upsert.SchemaId.Id.ToString(),
                 ["schemaName"] = upsert.SchemaId.Name,
-                ["serveAll"] = upsert.ServeAll,
-                ["servePublished"] = upsert.ServePublished,
+                ["serveAll"] = upsert.ScopeAll,
+                ["servePublished"] = upsert.ScopePublished,
                 ["geoField"] = geoField,
                 ["geoObject"] = geoObject
             };

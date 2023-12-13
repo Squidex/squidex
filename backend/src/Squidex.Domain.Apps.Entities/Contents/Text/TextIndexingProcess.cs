@@ -25,7 +25,7 @@ public sealed class TextIndexingProcess : IEventConsumer
 
     public int BatchDelay => 1000;
 
-    public string Name => "TextIndexer6";
+    public string Name => "TextIndexer5";
 
     public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("content-");
 
@@ -114,8 +114,8 @@ public sealed class TextIndexingProcess : IEventConsumer
                     ContentId = @event.ContentId,
                     DocId = state.DocIdCurrent,
                     GeoObjects = data.ToGeo(serializer),
-                    ServeAll = true,
-                    ServePublished = false,
+                    ScopeAll = true,
+                    ScopePublished = false,
                     Texts = data.ToTexts(),
                     IsNew = true
                 });
@@ -171,8 +171,8 @@ public sealed class TextIndexingProcess : IEventConsumer
                             ContentId = @event.ContentId,
                             DocId = state.DocIdNew,
                             GeoObjects = data.ToGeo(serializer),
-                            ServeAll = true,
-                            ServePublished = false,
+                            ScopeAll = true,
+                            ScopePublished = false,
                             Texts = data.ToTexts()
                         });
 
@@ -194,8 +194,8 @@ public sealed class TextIndexingProcess : IEventConsumer
                             ContentId = @event.ContentId,
                             DocId = state.DocIdCurrent,
                             GeoObjects = data.ToGeo(serializer),
-                            ServeAll = true,
-                            ServePublished = isPublished,
+                            ScopeAll = true,
+                            ScopePublished = isPublished,
                             Texts = data.ToTexts()
                         });
                 }
@@ -305,8 +305,8 @@ public sealed class TextIndexingProcess : IEventConsumer
                 commands.TryGetValue(command.DocId, out var existing) &&
                 existing is UpsertIndexEntry upsert)
             {
-                upsert.ServeAll = update.ServeAll;
-                upsert.ServePublished = update.ServePublished;
+                upsert.ScopeAll = update.ServeAll;
+                upsert.ScopePublished = update.ServePublished;
             }
             else
             {
