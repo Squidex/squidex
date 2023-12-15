@@ -33,7 +33,7 @@ public sealed class MongoShardedTextIndex<T> : ShardedService<MongoTextIndexBase
         CancellationToken ct = default)
     {
         // Some commands might share a shared, therefore we don't group by app id.
-        foreach (var byShard in commands.GroupBy(c => GetShardKey(c.AppId.Id)))
+        foreach (var byShard in commands.GroupBy(c => GetShardKey(c.UniqueContentId.AppId)))
         {
             var shard = Shard(byShard.Key);
 

@@ -11,9 +11,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public abstract class IndexCommand
 {
-    public NamedId<DomainId> AppId { get; set; }
+    public UniqueContentId UniqueContentId { get; set; }
 
     public NamedId<DomainId> SchemaId { get; set; }
 
-    public string DocId { get; set; }
+    public byte Stage { get; set; }
+
+    public string ToDocId()
+    {
+        return $"{UniqueContentId.AppId}__{UniqueContentId.ContentId}_{Stage}";
+    }
 }

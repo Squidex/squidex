@@ -7,9 +7,13 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.State;
 
-public sealed class TextContentState
+public enum TextState
 {
-    public UniqueContentId UniqueContentId { get; set; }
-
-    public TextState State { get; set; }
+    Stage0_Draft__Stage1_None,
+    Stage0_Published__Stage1_None,
+    Stage0_Published__Stage1_Draft,
+    Stage1_Draft__Stage0_None,
+    Stage1_Published__Stage0_None,
+    Stage1_Published__Stage0_Draft,
+    Deleted,
 }

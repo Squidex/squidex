@@ -5,11 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text.State;
+using Squidex.Infrastructure;
 
-public sealed class TextContentState
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
+
+public record struct UniqueContentId(DomainId AppId, DomainId ContentId)
 {
-    public UniqueContentId UniqueContentId { get; set; }
-
-    public TextState State { get; set; }
 }

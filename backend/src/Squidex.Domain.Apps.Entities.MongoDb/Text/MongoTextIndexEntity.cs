@@ -16,34 +16,34 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 public sealed class MongoTextIndexEntity<T>
 {
     [BsonId]
-    [BsonElement("_id")]
-    public string Id { get; set; }
+    public ObjectId Id { get; set; }
 
     [BsonRequired]
-    [BsonElement(nameof(DocId))]
-    public string DocId { get; set; }
-
-    [BsonRequired]
-    [BsonElement("_ci")]
-    [BsonRepresentation(BsonType.String)]
-    public DomainId ContentId { get; set; }
-
-    [BsonRequired]
-    [BsonElement("_ai")]
+    [BsonElement("a")]
     [BsonRepresentation(BsonType.String)]
     public DomainId AppId { get; set; }
 
     [BsonRequired]
-    [BsonElement("_si")]
+    [BsonElement("s")]
     [BsonRepresentation(BsonType.String)]
     public DomainId SchemaId { get; set; }
 
     [BsonRequired]
-    [BsonElement("fa")]
+    [BsonElement("c")]
+    [BsonRepresentation(BsonType.String)]
+    public DomainId ContentId { get; set; }
+
+    [BsonRequired]
+    [BsonElement("x")]
+    [BsonRepresentation(BsonType.Int32)]
+    public byte Stage { get; set; }
+
+    [BsonRequired]
+    [BsonElement("e")]
     public bool ServeAll { get; set; }
 
     [BsonRequired]
-    [BsonElement("fp")]
+    [BsonElement("p")]
     public bool ServePublished { get; set; }
 
     [BsonIgnoreIfNull]
@@ -51,11 +51,11 @@ public sealed class MongoTextIndexEntity<T>
     public T Texts { get; set; }
 
     [BsonIgnoreIfNull]
-    [BsonElement("gf")]
+    [BsonElement("g")]
     public string GeoField { get; set; }
 
     [BsonIgnoreIfNull]
-    [BsonElement("go")]
+    [BsonElement("o")]
     [BsonJson]
     [BsonRepresentation(BsonType.Document)]
     public Geometry GeoObject { get; set; }

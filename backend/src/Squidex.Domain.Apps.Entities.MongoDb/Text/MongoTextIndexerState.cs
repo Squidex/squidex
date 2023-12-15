@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -19,37 +19,20 @@ public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState
 {
     static MongoTextIndexerState()
     {
+        BsonUniqueContentIdSerializer.Register();
+
         BsonClassMap.TryRegisterClassMap<TextContentState>(cm =>
         {
-            cm.MapIdField(x => x.UniqueContentId);
+            cm.MapIdProperty(x => x.UniqueContentId);
 
-            cm.MapProperty(x => x.AppId)
-                .SetElementName("a");
-
-            cm.MapProperty(x => x.DocIdCurrent)
-                .SetElementName("c");
-
-            cm.MapProperty(x => x.DocIdNew)
-                .SetElementName("n").SetIgnoreIfNull(true);
-
-            cm.MapProperty(x => x.DocIdForPublished)
-                .SetElementName("p").SetIgnoreIfNull(true);
+            cm.MapProperty(x => x.State)
+                .SetElementName("s");
         });
     }
 
     public MongoTextIndexerState(IMongoDatabase database)
         : base(database)
     {
-    }
-
-    protected override Task SetupCollectionAsync(IMongoCollection<TextContentState> collection,
-        CancellationToken ct)
-    {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
-            new CreateIndexModel<TextContentState>(
-                Index.Ascending(x => x.AppId))
-        }, ct);
     }
 
     protected override string CollectionName()
@@ -60,10 +43,15 @@ public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState
     async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
-        await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
+        var filter =
+            Filter.And(
+                Filter.Gte(x => x.UniqueContentId, new UniqueContentId(app.Id, DomainId.Empty)),
+                Filter.Lt(x => x.UniqueContentId, BsonUniqueContentIdSerializer.NextAppId(app.Id)));
+
+        await Collection.DeleteManyAsync(filter, ct);
     }
 
-    public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+    public async Task<Dictionary<UniqueContentId, TextContentState>> GetAsync(HashSet<UniqueContentId> ids,
         CancellationToken ct = default)
     {
         var entities = await Collection.Find(Filter.In(x => x.UniqueContentId, ids)).ToListAsync(ct);
@@ -78,7 +66,7 @@ public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState
 
         foreach (var update in updates)
         {
-            if (update.IsDeleted)
+            if (update.State == TextState.Deleted)
             {
                 writes.Add(
                     new DeleteOneModel<TextContentState>(
@@ -89,9 +77,9 @@ public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState
                 writes.Add(
                     new ReplaceOneModel<TextContentState>(
                         Filter.Eq(x => x.UniqueContentId, update.UniqueContentId), update)
-                    {
-                        IsUpsert = true
-                    });
+                        {
+                            IsUpsert = true
+                        });
             }
         }
 

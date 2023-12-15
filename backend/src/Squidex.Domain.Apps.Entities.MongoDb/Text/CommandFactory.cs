@@ -42,17 +42,17 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
         writes.Add(
             new UpdateOneModel<MongoTextIndexEntity<T>>(
                 Filter.And(
-                    Filter.Eq(x => x.DocId, upsert.DocId),
+                    FilterByCommand(upsert),
                     Filter.Exists(x => x.GeoField, false),
                     Filter.Exists(x => x.GeoObject, false)),
                 Update
                     .Set(x => x.ServeAll, upsert.ServeAll)
                     .Set(x => x.ServePublished, upsert.ServePublished)
                     .Set(x => x.Texts, BuildTexts(upsert))
-                    .SetOnInsert(x => x.Id, Guid.NewGuid().ToString())
-                    .SetOnInsert(x => x.DocId, upsert.DocId)
-                    .SetOnInsert(x => x.AppId, upsert.AppId.Id)
-                    .SetOnInsert(x => x.ContentId, upsert.ContentId)
+                    .SetOnInsert(x => x.Id, ObjectId.GenerateNewId())
+                    .SetOnInsert(x => x.AppId, upsert.UniqueContentId.AppId)
+                    .SetOnInsert(x => x.ContentId, upsert.UniqueContentId.ContentId)
+                    .SetOnInsert(x => x.Stage, upsert.Stage)
                     .SetOnInsert(x => x.SchemaId, upsert.SchemaId.Id))
             {
                 IsUpsert = true
@@ -65,7 +65,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                 writes.Add(
                     new DeleteOneModel<MongoTextIndexEntity<T>>(
                         Filter.And(
-                            Filter.Eq(x => x.DocId, upsert.DocId),
+                            FilterByCommand(upsert),
                             Filter.Exists(x => x.GeoField),
                             Filter.Exists(x => x.GeoObject))));
             }
@@ -76,15 +76,15 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
                     new InsertOneModel<MongoTextIndexEntity<T>>(
                         new MongoTextIndexEntity<T>
                         {
-                            Id = Guid.NewGuid().ToString(),
-                            DocId = upsert.DocId,
-                            ContentId = upsert.ContentId,
+                            Id = ObjectId.GenerateNewId(),
+                            AppId = upsert.UniqueContentId.AppId,
+                            ContentId = upsert.UniqueContentId.ContentId,
                             GeoField = field,
                             GeoObject = geoObject,
                             SchemaId = upsert.SchemaId.Id,
                             ServeAll = upsert.ServeAll,
                             ServePublished = upsert.ServePublished,
-                            AppId = upsert.AppId.Id,
+                            Stage = upsert.Stage,
                         }));
             }
         }
@@ -99,7 +99,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
     {
         writes.Add(
             new UpdateOneModel<MongoTextIndexEntity<T>>(
-                Filter.Eq(x => x.DocId, update.DocId),
+                FilterByCommand(update),
                 Update
                     .Set(x => x.ServeAll, update.ServeAll)
                     .Set(x => x.ServePublished, update.ServePublished)));
@@ -109,6 +109,14 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
     {
         writes.Add(
             new DeleteOneModel<MongoTextIndexEntity<T>>(
-                Filter.Eq(x => x.DocId, delete.DocId)));
+                FilterByCommand(delete)));
+    }
+
+    private static FilterDefinition<MongoTextIndexEntity<T>> FilterByCommand(IndexCommand command)
+    {
+        return Filter.And(
+            Filter.Eq(x => x.AppId, command.UniqueContentId.AppId),
+            Filter.Eq(x => x.ContentId, command.UniqueContentId.ContentId),
+            Filter.Eq(x => x.Stage, command.Stage));
     }
 }

@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State;
 
 public sealed class InMemoryTextIndexerState : ITextIndexerState
 {
-    private readonly Dictionary<DomainId, TextContentState> states = [];
+    private readonly Dictionary<UniqueContentId, TextContentState> states = [];
 
     public Task ClearAsync(
         CancellationToken ct = default)
@@ -21,12 +21,12 @@ public sealed class InMemoryTextIndexerState : ITextIndexerState
         return Task.CompletedTask;
     }
 
-    public Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+    public Task<Dictionary<UniqueContentId, TextContentState>> GetAsync(HashSet<UniqueContentId> ids,
         CancellationToken ct = default)
     {
         Guard.NotNull(ids);
 
-        var result = new Dictionary<DomainId, TextContentState>();
+        var result = new Dictionary<UniqueContentId, TextContentState>();
 
         foreach (var id in ids)
         {
@@ -46,7 +46,7 @@ public sealed class InMemoryTextIndexerState : ITextIndexerState
 
         foreach (var update in updates)
         {
-            if (update.IsDeleted)
+            if (update.State == TextState.Deleted)
             {
                 states.Remove(update.UniqueContentId);
             }

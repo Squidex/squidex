@@ -15,11 +15,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 public class CachingTextIndexerStateTests : GivenContext
 {
     private readonly ITextIndexerState inner = A.Fake<ITextIndexerState>();
-    private readonly DomainId contentId = DomainId.NewGuid();
+    private readonly UniqueContentId contentId;
     private readonly CachingTextIndexerState sut;
 
     public CachingTextIndexerStateTests()
     {
+        contentId = new UniqueContentId(AppId.Id, DomainId.NewGuid());
+
         sut = new CachingTextIndexerState(inner);
     }
 
@@ -30,12 +32,12 @@ public class CachingTextIndexerStateTests : GivenContext
 
         var state = new TextContentState { UniqueContentId = contentId };
 
-        var states = new Dictionary<DomainId, TextContentState>
+        var states = new Dictionary<UniqueContentId, TextContentState>
         {
             [contentId] = state
         };
 
-        A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds), CancellationToken))
+        A.CallTo(() => inner.GetAsync(A<HashSet<UniqueContentId>>.That.Is(contentIds), CancellationToken))
             .Returns(states);
 
         var found1 = await sut.GetAsync(HashSet.Of(contentId), CancellationToken);
@@ -44,7 +46,7 @@ public class CachingTextIndexerStateTests : GivenContext
         Assert.Same(state, found1[contentId]);
         Assert.Same(state, found2[contentId]);
 
-        A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds), CancellationToken))
+        A.CallTo(() => inner.GetAsync(A<HashSet<UniqueContentId>>.That.Is(contentIds), CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -53,7 +55,7 @@ public class CachingTextIndexerStateTests : GivenContext
     {
         var contentIds = HashSet.Of(contentId);
 
-        A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds), CancellationToken))
+        A.CallTo(() => inner.GetAsync(A<HashSet<UniqueContentId>>.That.Is(contentIds), CancellationToken))
             .Returns([]);
 
         var found1 = await sut.GetAsync(HashSet.Of(contentId), CancellationToken);
@@ -62,7 +64,7 @@ public class CachingTextIndexerStateTests : GivenContext
         Assert.Empty(found1);
         Assert.Empty(found2);
 
-        A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds), CancellationToken))
+        A.CallTo(() => inner.GetAsync(A<HashSet<UniqueContentId>>.That.Is(contentIds), CancellationToken))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -84,7 +86,7 @@ public class CachingTextIndexerStateTests : GivenContext
         A.CallTo(() => inner.SetAsync(A<List<TextContentState>>.That.IsSameSequenceAs(state), CancellationToken))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>._, A<CancellationToken>._))
+        A.CallTo(() => inner.GetAsync(A<HashSet<UniqueContentId>>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -102,7 +104,7 @@ public class CachingTextIndexerStateTests : GivenContext
 
         await sut.SetAsync(
         [
-            new TextContentState { UniqueContentId = contentId, IsDeleted = true }
+            new TextContentState { UniqueContentId = contentId, State = TextState.Deleted }
         ], CancellationToken);
 
         var found1 = await sut.GetAsync(contentIds, CancellationToken);
@@ -111,10 +113,10 @@ public class CachingTextIndexerStateTests : GivenContext
         Assert.Empty(found1);
         Assert.Empty(found2);
 
-        A.CallTo(() => inner.SetAsync(A<List<TextContentState>>.That.Matches(x => x.Count == 1 && x[0].IsDeleted), CancellationToken))
+        A.CallTo(() => inner.SetAsync(A<List<TextContentState>>.That.Matches(x => x.Count == 1 && x[0].State == TextState.Deleted), CancellationToken))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>._, A<CancellationToken>._))
+        A.CallTo(() => inner.GetAsync(A<HashSet<UniqueContentId>>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 }
