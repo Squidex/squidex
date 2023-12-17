@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using LibGit2Sharp;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Events.Contents;
@@ -16,7 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public sealed class TextIndexingProcess : IEventConsumer
 {
-    private const string NotFound = "<404>";
     private readonly IJsonSerializer serializer;
     private readonly ITextIndex textIndex;
     private readonly ITextIndexerState textIndexerState;
@@ -25,7 +25,7 @@ public sealed class TextIndexingProcess : IEventConsumer
 
     public int BatchDelay => 1000;
 
-    public string Name => "TextIndexer5";
+    public string Name => "TextIndexer6";
 
     public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("content-");
 
@@ -36,14 +36,15 @@ public sealed class TextIndexingProcess : IEventConsumer
 
     private sealed class Updates
     {
-        private readonly Dictionary<DomainId, TextContentState> states;
+        private readonly Dictionary<UniqueContentId, TextContentState> currentState;
+        private readonly Dictionary<UniqueContentId, TextContentState> currentUpdates;
+        private readonly Dictionary<(UniqueContentId, byte), IndexCommand> commands = [];
         private readonly IJsonSerializer serializer;
-        private readonly Dictionary<DomainId, TextContentState> updates = [];
-        private readonly Dictionary<string, IndexCommand> commands = [];
 
-        public Updates(Dictionary<DomainId, TextContentState> states, IJsonSerializer serializer)
+        public Updates(Dictionary<UniqueContentId, TextContentState> states, IJsonSerializer serializer)
         {
-            this.states = states;
+            currentState = states;
+            currentUpdates = [];
             this.serializer = serializer;
         }
 
@@ -54,9 +55,9 @@ public sealed class TextIndexingProcess : IEventConsumer
                 await textIndex.ExecuteAsync(commands.Values.ToArray());
             }
 
-            if (updates.Count > 0)
+            if (currentUpdates.Count > 0)
             {
-                await textIndexerState.SetAsync(updates.Values.ToList());
+                await textIndexerState.SetAsync(currentUpdates.Values.ToList());
             }
         }
 
@@ -98,211 +99,228 @@ public sealed class TextIndexingProcess : IEventConsumer
 
         private void Create(ContentEvent @event, ContentData data)
         {
-            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+            var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
             var state = new TextContentState
             {
-                AppId = @event.AppId.Id,
                 UniqueContentId = uniqueId
             };
-
-            state.GenerateDocIdCurrent();
 
             Index(@event,
                 new UpsertIndexEntry
                 {
-                    ContentId = @event.ContentId,
-                    DocId = state.DocIdCurrent,
+                    UniqueContentId = uniqueId,
                     GeoObjects = data.ToGeo(serializer),
+                    IsNew = true,
+                    Stage = 0,
                     ServeAll = true,
                     ServePublished = false,
                     Texts = data.ToTexts(),
-                    IsNew = true
                 });
 
-            states[state.UniqueContentId] = state;
-
-            updates[state.UniqueContentId] = state;
+            currentState[state.UniqueContentId] = state;
+            currentUpdates[state.UniqueContentId] = state;
         }
 
         private void CreateDraft(ContentEvent @event)
         {
-            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+            var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (states.TryGetValue(uniqueId, out var state))
+            if (currentState.TryGetValue(uniqueId, out var state))
             {
-                state.GenerateDocIdNew();
+                switch (state.State)
+                {
+                    case TextState.Stage0_Published__Stage1_None:
+                        state.State = TextState.Stage0_Published__Stage1_Draft;
+                        break;
+                    case TextState.Stage1_Published__Stage0_None:
+                        state.State = TextState.Stage1_Published__Stage0_Draft;
+                        break;
+                }
 
-                updates[state.UniqueContentId] = state;
+                currentUpdates[state.UniqueContentId] = state;
             }
         }
 
         private void Unpublish(ContentEvent @event)
         {
-            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+            var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (states.TryGetValue(uniqueId, out var state) && state.DocIdForPublished != null)
+            if (currentState.TryGetValue(uniqueId, out var state))
             {
-                Index(@event,
-                    new UpdateIndexEntry
-                    {
-                        DocId = state.DocIdForPublished,
-                        ServeAll = true,
-                        ServePublished = false
-                    });
+                switch (state.State)
+                {
+                    case TextState.Stage0_Published__Stage1_None:
+                        CoreUpdate(@event, uniqueId, 0, true, false);
 
-                state.DocIdForPublished = null;
+                        state.State = TextState.Stage0_Draft__Stage1_None;
+                        break;
+                    case TextState.Stage1_Published__Stage0_None:
+                        CoreUpdate(@event, uniqueId, 1, true, false);
 
-                updates[state.UniqueContentId] = state;
+                        state.State = TextState.Stage1_Draft__Stage0_None;
+                        break;
+                }
+
+                currentUpdates[state.UniqueContentId] = state;
             }
         }
 
         private void Update(ContentEvent @event, ContentData data)
         {
-            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+            var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (states.TryGetValue(uniqueId, out var state))
+            if (currentState.TryGetValue(uniqueId, out var state))
             {
-                if (state.DocIdNew != null)
+                switch (state.State)
                 {
-                    Index(@event,
-                        new UpsertIndexEntry
-                        {
-                            ContentId = @event.ContentId,
-                            DocId = state.DocIdNew,
-                            GeoObjects = data.ToGeo(serializer),
-                            ServeAll = true,
-                            ServePublished = false,
-                            Texts = data.ToTexts()
-                        });
-
-                    Index(@event,
-                        new UpdateIndexEntry
-                        {
-                            DocId = state.DocIdCurrent,
-                            ServeAll = false,
-                            ServePublished = true
-                        });
+                    case TextState.Stage0_Draft__Stage1_None:
+                        CoreUpsert(@event, uniqueId, 0, true, false, data);
+                        break;
+                    case TextState.Stage0_Published__Stage1_None:
+                        CoreUpsert(@event, uniqueId, 0, true, true, data);
+                        break;
+                    case TextState.Stage0_Published__Stage1_Draft:
+                        CoreUpsert(@event, uniqueId, 1, true, false, data);
+                        CoreUpdate(@event, uniqueId, 0, false, true);
+                        break;
+                    case TextState.Stage1_Draft__Stage0_None:
+                        CoreUpsert(@event, uniqueId, 1, true, false, data);
+                        break;
+                    case TextState.Stage1_Published__Stage0_None:
+                        CoreUpsert(@event, uniqueId, 1, true, true, data);
+                        break;
+                    case TextState.Stage1_Published__Stage0_Draft:
+                        CoreUpsert(@event, uniqueId, 0, true, false, data);
+                        CoreUpdate(@event, uniqueId, 1, false, true);
+                        break;
                 }
-                else
-                {
-                    var isPublished = state.DocIdCurrent == state.DocIdForPublished;
 
-                    Index(@event,
-                        new UpsertIndexEntry
-                        {
-                            ContentId = @event.ContentId,
-                            DocId = state.DocIdCurrent,
-                            GeoObjects = data.ToGeo(serializer),
-                            ServeAll = true,
-                            ServePublished = isPublished,
-                            Texts = data.ToTexts()
-                        });
-                }
+                currentUpdates[state.UniqueContentId] = state;
             }
         }
 
         private void Publish(ContentEvent @event)
         {
-            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+            var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (states.TryGetValue(uniqueId, out var state))
+            if (currentState.TryGetValue(uniqueId, out var state))
             {
-                if (state.DocIdNew != null)
+                switch (state.State)
                 {
-                    Index(@event,
-                        new UpdateIndexEntry
-                        {
-                            DocId = state.DocIdNew,
-                            ServeAll = true,
-                            ServePublished = true
-                        });
+                    case TextState.Stage0_Published__Stage1_Draft:
+                        CoreUpdate(@event, uniqueId, 1, true, true);
+                        CoreDelete(@event, uniqueId, 0);
 
-                    Index(@event,
-                        new DeleteIndexEntry
-                        {
-                            DocId = state.DocIdCurrent
-                        });
+                        state.State = TextState.Stage1_Published__Stage0_None;
+                        break;
+                    case TextState.Stage1_Published__Stage0_Draft:
+                        CoreUpdate(@event, uniqueId, 0, true, true);
+                        CoreDelete(@event, uniqueId, 1);
 
-                    state.DocIdForPublished = state.DocIdNew;
-                    state.DocIdCurrent = state.DocIdNew;
-                }
-                else
-                {
-                    Index(@event,
-                        new UpdateIndexEntry
-                        {
-                            DocId = state.DocIdCurrent,
-                            ServeAll = true,
-                            ServePublished = true
-                        });
+                        state.State = TextState.Stage0_Published__Stage1_None;
+                        break;
+                    case TextState.Stage0_Draft__Stage1_None:
+                        CoreUpdate(@event, uniqueId, 0, true, true);
 
-                    state.DocIdForPublished = state.DocIdCurrent;
+                        state.State = TextState.Stage0_Published__Stage1_None;
+                        break;
+                    case TextState.Stage1_Draft__Stage0_None:
+                        CoreUpdate(@event, uniqueId, 1, true, true);
+
+                        state.State = TextState.Stage1_Published__Stage0_None;
+                        break;
                 }
 
-                state.DocIdNew = null;
-
-                updates[state.UniqueContentId] = state;
+                currentUpdates[state.UniqueContentId] = state;
             }
         }
 
         private void DeleteDraft(ContentEvent @event)
         {
-            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+            var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (states.TryGetValue(uniqueId, out var state) && state.DocIdNew != null)
+            if (currentState.TryGetValue(uniqueId, out var state))
             {
-                Index(@event,
-                    new UpdateIndexEntry
-                    {
-                        DocId = state.DocIdCurrent,
-                        ServeAll = true,
-                        ServePublished = true
-                    });
+                switch (state.State)
+                {
+                    case TextState.Stage0_Published__Stage1_Draft:
+                        CoreUpdate(@event, uniqueId, 0, true, true);
+                        CoreDelete(@event, uniqueId, 1);
 
-                Index(@event,
-                    new DeleteIndexEntry
-                    {
-                        DocId = state.DocIdNew
-                    });
+                        state.State = TextState.Stage0_Published__Stage1_None;
+                        break;
+                    case TextState.Stage1_Published__Stage0_Draft:
+                        CoreUpdate(@event, uniqueId, 1, true, true);
+                        CoreDelete(@event, uniqueId, 0);
 
-                state.DocIdNew = null;
+                        state.State = TextState.Stage1_Published__Stage0_None;
+                        break;
+                }
 
-                updates[state.UniqueContentId] = state;
+                currentUpdates[state.UniqueContentId] = state;
             }
         }
 
         private void Delete(ContentEvent @event)
         {
-            var uniqueId = DomainId.Combine(@event.AppId, @event.ContentId);
+            var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (states.TryGetValue(uniqueId, out var state))
+            if (currentState.TryGetValue(uniqueId, out var state))
             {
-                Index(@event,
-                    new DeleteIndexEntry
-                    {
-                        DocId = state.DocIdCurrent
-                    });
+                CoreDelete(@event, uniqueId, 0);
+                CoreDelete(@event, uniqueId, 1);
 
-                Index(@event,
-                    new DeleteIndexEntry
-                    {
-                        DocId = state.DocIdNew ?? NotFound
-                    });
+                state.State = TextState.Deleted;
 
-                state.IsDeleted = true;
-
-                updates[state.UniqueContentId] = state;
+                currentUpdates[state.UniqueContentId] = state;
             }
+        }
+
+        private void CoreUpsert(ContentEvent @event, UniqueContentId uniqueId, byte stage, bool all, bool published, ContentData data)
+        {
+            Index(@event,
+                new UpsertIndexEntry
+                {
+                    UniqueContentId = uniqueId,
+                    GeoObjects = data.ToGeo(serializer),
+                    Stage = stage,
+                    ServeAll = all,
+                    ServePublished = published,
+                    Texts = data.ToTexts()
+                });
+        }
+
+        private void CoreUpdate(ContentEvent @event, UniqueContentId uniqueId, byte stage, bool all, bool published)
+        {
+            Index(@event,
+                new UpdateIndexEntry
+                {
+                    UniqueContentId = uniqueId,
+                    Stage = stage,
+                    ServeAll = all,
+                    ServePublished = published,
+                });
+        }
+
+        private void CoreDelete(ContentEvent @event, UniqueContentId uniqueId, byte stage)
+        {
+            Index(@event,
+                new DeleteIndexEntry
+                {
+                    UniqueContentId = uniqueId,
+                    Stage = stage,
+                });
         }
 
         private void Index(ContentEvent @event, IndexCommand command)
         {
-            command.AppId = @event.AppId;
             command.SchemaId = @event.SchemaId;
 
+            var key = (command.UniqueContentId, command.Stage);
+
             if (command is UpdateIndexEntry update &&
-                commands.TryGetValue(command.DocId, out var existing) &&
+                commands.TryGetValue(key, out var existing) &&
                 existing is UpsertIndexEntry upsert)
             {
                 upsert.ServeAll = update.ServeAll;
@@ -310,7 +328,7 @@ public sealed class TextIndexingProcess : IEventConsumer
             }
             else
             {
-                commands[command.DocId] = command;
+                commands[key] = command;
             }
         }
     }
@@ -345,12 +363,12 @@ public sealed class TextIndexingProcess : IEventConsumer
         await updates.WriteAsync(textIndex, textIndexerState);
     }
 
-    private Task<Dictionary<DomainId, TextContentState>> QueryStatesAsync(IEnumerable<Envelope<IEvent>> events)
+    private Task<Dictionary<UniqueContentId, TextContentState>> QueryStatesAsync(IEnumerable<Envelope<IEvent>> events)
     {
         var ids =
             events
                 .Select(x => x.Payload).OfType<ContentEvent>()
-                .Select(x => DomainId.Combine(x.AppId, x.ContentId))
+                .Select(x => new UniqueContentId(x.AppId.Id, x.ContentId))
                 .ToHashSet();
 
         return textIndexerState.GetAsync(ids);

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using NetTopologySuite.Geometries;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
@@ -19,8 +18,6 @@ public sealed class UpsertIndexEntry : IndexCommand
     public bool ServeAll { get; set; }
 
     public bool ServePublished { get; set; }
-
-    public DomainId ContentId { get; set; }
 
     public bool IsNew { get; set; }
 }

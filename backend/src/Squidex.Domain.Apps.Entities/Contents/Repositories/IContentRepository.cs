@@ -43,6 +43,6 @@ public interface IContentRepository
     Task<bool> HasReferrersAsync(App app, DomainId reference, SearchScope scope,
         CancellationToken ct = default);
 
-    Task ResetScheduledAsync(DomainId documentId, SearchScope scope,
+    Task ResetScheduledAsync(DomainId appId, DomainId contentId, SearchScope scope,
         CancellationToken ct = default);
 }

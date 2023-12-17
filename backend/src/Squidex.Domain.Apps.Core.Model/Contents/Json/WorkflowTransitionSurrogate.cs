@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json;

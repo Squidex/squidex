@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
@@ -97,9 +96,11 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         return collection.Indexes.CreateManyAsync(operations.SelectMany(x => x.CreateIndexes()), ct);
     }
 
-    public Task ResetScheduledAsync(DomainId documentId,
+    public Task ResetScheduledAsync(DomainId appId, DomainId contentId,
         CancellationToken ct)
     {
+        var documentId = DomainId.Combine(appId, contentId);
+
         return Collection.UpdateOneAsync(
             x => x.DocumentId == documentId,
             Update

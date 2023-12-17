@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State;
 public sealed class CachingTextIndexerState : ITextIndexerState
 {
     private readonly ITextIndexerState inner;
-    private readonly LRUCache<DomainId, Tuple<TextContentState?>> cache = new LRUCache<DomainId, Tuple<TextContentState?>>(10000);
+    private readonly LRUCache<UniqueContentId, Tuple<TextContentState?>> cache = new LRUCache<UniqueContentId, Tuple<TextContentState?>>(10000);
 
     public CachingTextIndexerState(ITextIndexerState inner)
     {
@@ -30,14 +30,14 @@ public sealed class CachingTextIndexerState : ITextIndexerState
         cache.Clear();
     }
 
-    public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+    public async Task<Dictionary<UniqueContentId, TextContentState>> GetAsync(HashSet<UniqueContentId> ids,
         CancellationToken ct = default)
     {
         Guard.NotNull(ids);
 
-        var missingIds = new HashSet<DomainId>();
+        var missingIds = new HashSet<UniqueContentId>();
 
-        var result = new Dictionary<DomainId, TextContentState>();
+        var result = new Dictionary<UniqueContentId, TextContentState>();
 
         foreach (var id in ids)
         {
@@ -81,7 +81,7 @@ public sealed class CachingTextIndexerState : ITextIndexerState
 
         foreach (var update in updates)
         {
-            if (update.IsDeleted)
+            if (update.State == TextState.Deleted)
             {
                 cache.Set(update.UniqueContentId, Tuple.Create<TextContentState?>(null));
             }

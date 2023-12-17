@@ -60,10 +60,10 @@ public static class CommandFactory
         {
             var document = new SearchDocument
             {
-                ["docId"] = upsert.DocId.ToBase64(),
-                ["appId"] = upsert.AppId.Id.ToString(),
-                ["appName"] = upsert.AppId.Name,
-                ["contentId"] = upsert.ContentId.ToString(),
+                ["docId"] = upsert.ToDocId(),
+                ["appId"] = upsert.UniqueContentId.AppId.ToString(),
+                ["appName"] = string.Empty,
+                ["contentId"] = upsert.UniqueContentId.ToString(),
                 ["schemaId"] = upsert.SchemaId.Id.ToString(),
                 ["schemaName"] = upsert.SchemaId.Name,
                 ["serveAll"] = upsert.ServeAll,
@@ -94,7 +94,7 @@ public static class CommandFactory
     {
         var document = new SearchDocument
         {
-            ["docId"] = update.DocId.ToBase64(),
+            ["docId"] = update.ToDocId(),
             ["serveAll"] = update.ServeAll,
             ["servePublished"] = update.ServePublished
         };
@@ -104,7 +104,7 @@ public static class CommandFactory
 
     private static void DeleteEntry(DeleteIndexEntry delete, IList<IndexDocumentsAction<SearchDocument>> batch)
     {
-        batch.Add(IndexDocumentsAction.Delete("docId", delete.DocId.ToBase64()));
+        batch.Add(IndexDocumentsAction.Delete("docId", delete.ToDocId().ToBase64()));
     }
 
     private static string ToBase64(this string value)

@@ -18,16 +18,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
 public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndexEntity<T>>, ITextIndex, IDeleter where T : class
 {
-    private readonly CommandFactory<T> commandFactory;
+    private readonly CommandFactory<T> factory;
+    private readonly string shardKey;
 
     protected sealed class MongoTextResult
     {
         [BsonId]
         [BsonElement]
-        public string Id { get; set; }
+        public ObjectId Id { get; set; }
 
         [BsonRequired]
-        [BsonElement("_ci")]
+        [BsonElement("c")]
         public DomainId ContentId { get; set; }
 
         [BsonIgnoreIfDefault]
@@ -35,23 +36,11 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         public double Score { get; set; }
     }
 
-    private sealed class SearchOperation
-    {
-        public List<(DomainId Id, double Score)> Results { get; } = [];
-
-        public string SearchTerms { get; set; }
-
-        public App App { get; set; }
-
-        public SearchScope SearchScope { get; set; }
-    }
-
-    protected MongoTextIndexBase(IMongoDatabase database)
+    protected MongoTextIndexBase(IMongoDatabase database, string shardKey, CommandFactory<T> factory)
         : base(database)
     {
-#pragma warning disable MA0056 // Do not call overridable members in constructor
-        commandFactory = new CommandFactory<T>(BuildTexts);
-#pragma warning restore MA0056 // Do not call overridable members in constructor
+        this.shardKey = shardKey;
+        this.factory = factory;
     }
 
     protected override Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<T>> collection,
@@ -60,13 +49,13 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         return collection.Indexes.CreateManyAsync(new[]
         {
             new CreateIndexModel<MongoTextIndexEntity<T>>(
-                Index.Ascending(x => x.DocId)),
+                Index
+                    .Ascending(x => x.AppId)
+                    .Ascending(x => x.ContentId)),
 
             new CreateIndexModel<MongoTextIndexEntity<T>>(
                 Index
                     .Ascending(x => x.AppId)
-                    .Ascending(x => x.ServeAll)
-                    .Ascending(x => x.ServePublished)
                     .Ascending(x => x.SchemaId)
                     .Ascending(x => x.GeoField)
                     .Geo2DSphere(x => x.GeoObject))
@@ -75,10 +64,8 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
 
     protected override string CollectionName()
     {
-        return "TextIndex";
+        return $"TextIndex2{shardKey}";
     }
-
-    protected abstract T BuildTexts(Dictionary<string, string> source);
 
     async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
@@ -93,7 +80,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
 
         foreach (var command in commands)
         {
-            commandFactory.CreateCommands(command, writes);
+            factory.CreateCommands(command, writes);
         }
 
         if (writes.Count == 0)
@@ -107,7 +94,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         }
         catch (MongoBulkWriteException ex)
         {
-            // Ignore invalid geo data.
+            // Ignore invalid geo data when writing content. Our insert is unordered anyway.
             if (ex.WriteErrors.Any(error => error.Code != MongoDbErrorCodes.Errror16755_InvalidGeoData))
             {
                 throw;
@@ -121,12 +108,14 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         Guard.NotNull(app);
         Guard.NotNull(query);
 
+        // Use the filter in the correct order to leverage the index in the best way.
         var findFilter =
             Filter.And(
                 Filter.Eq(x => x.AppId, app.Id),
                 Filter.Eq(x => x.SchemaId, query.SchemaId),
-                Filter_ByScope(scope),
-                Filter.GeoWithinCenterSphere(x => x.GeoObject, query.Longitude, query.Latitude, query.Radius / 6378100));
+                Filter.Eq(x => x.GeoField, query.Field),
+                Filter.GeoWithinCenterSphere(x => x.GeoObject, query.Longitude, query.Latitude, query.Radius / 6378100),
+                FilterByScope(scope));
 
         var byGeo =
             await GetCollection(scope).Find(findFilter).Limit(query.Take)
@@ -136,83 +125,10 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         return byGeo.Select(x => x.ContentId).ToList();
     }
 
-    public virtual async Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
-        CancellationToken ct = default)
-    {
-        Guard.NotNull(app);
-        Guard.NotNull(query);
+    public abstract Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
+        CancellationToken ct = default);
 
-        if (string.IsNullOrWhiteSpace(query.Text))
-        {
-            return null;
-        }
-
-        var search = new SearchOperation
-        {
-            App = app,
-            SearchTerms = Tokenizer.TokenizeQuery(query.Text),
-            SearchScope = scope
-        };
-
-        if (query.RequiredSchemaIds?.Count > 0)
-        {
-            await SearchBySchemaAsync(search, query.RequiredSchemaIds, query.Take, 1, ct);
-        }
-        else if (query.PreferredSchemaId == null)
-        {
-            await SearchByAppAsync(search, query.Take, 1, ct);
-        }
-        else
-        {
-            var halfBucket = query.Take / 2;
-
-            var schemaIds = Enumerable.Repeat(query.PreferredSchemaId.Value, 1);
-
-            await SearchBySchemaAsync(search, schemaIds, halfBucket, 1.1, ct);
-            await SearchByAppAsync(search, halfBucket, 1, ct);
-        }
-
-        return search.Results.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
-    }
-
-    private Task SearchBySchemaAsync(SearchOperation search, IEnumerable<DomainId> schemaIds, int take, double factor,
-        CancellationToken ct = default)
-    {
-        var filter =
-            Filter.And(
-                Filter.Eq(x => x.AppId, search.App.Id),
-                Filter.In(x => x.SchemaId, schemaIds),
-                Filter_ByScope(search.SearchScope),
-                Filter.Text(search.SearchTerms, "none"));
-
-        return SearchAsync(search, filter, take, factor, ct);
-    }
-
-    private Task SearchByAppAsync(SearchOperation search, int take, double factor,
-        CancellationToken ct = default)
-    {
-        var filter =
-            Filter.And(
-                Filter.Eq(x => x.AppId, search.App.Id),
-                Filter.Exists(x => x.SchemaId),
-                Filter_ByScope(search.SearchScope),
-                Filter.Text(search.SearchTerms, "none"));
-
-        return SearchAsync(search, filter, take, factor, ct);
-    }
-
-    private async Task SearchAsync(SearchOperation search, FilterDefinition<MongoTextIndexEntity<T>> filter, int take, double factor,
-        CancellationToken ct = default)
-    {
-        var byText =
-            await GetCollection(search.SearchScope).Find(filter).Limit(take)
-                .Project<MongoTextResult>(Projection.Include(x => x.ContentId).MetaTextScore("score")).Sort(Sort.MetaTextScore("score"))
-                .ToListAsync(ct);
-
-        search.Results.AddRange(byText.Select(x => (x.ContentId, x.Score * factor)));
-    }
-
-    private static FilterDefinition<MongoTextIndexEntity<T>> Filter_ByScope(SearchScope scope)
+    protected static FilterDefinition<MongoTextIndexEntity<T>> FilterByScope(SearchScope scope)
     {
         if (scope == SearchScope.All)
         {
@@ -224,7 +140,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         }
     }
 
-    private IMongoCollection<MongoTextIndexEntity<T>> GetCollection(SearchScope scope)
+    protected IMongoCollection<MongoTextIndexEntity<T>> GetCollection(SearchScope scope)
     {
         if (scope == SearchScope.All)
         {

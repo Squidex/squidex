@@ -31,7 +31,6 @@ public class RuleServiceTests
     private readonly string actionDump = "MyDump";
     private readonly string actionName = "ValidAction";
     private readonly string actionDescription = "MyDescription";
-    private readonly DomainId ruleId = DomainId.NewGuid();
     private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private readonly TypeRegistry typeRegistry = new TypeRegistry();
     private readonly RuleService sut;

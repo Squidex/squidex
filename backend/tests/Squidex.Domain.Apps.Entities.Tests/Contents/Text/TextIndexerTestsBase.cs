@@ -128,6 +128,14 @@ public abstract class TextIndexerTestsBase : GivenContext
     }
 
     [Fact]
+    public async Task Should_search_by_app()
+    {
+        await CreateTextAsync(ids1[0], "iv", "Hello");
+
+        await SearchByAppText(expected: ids1, text: "helo~");
+    }
+
+    [Fact]
     public async Task Should_index_invariant_content_and_retrieve()
     {
         await CreateTextAsync(ids1[0], "iv", "Hello");
@@ -183,10 +191,13 @@ public abstract class TextIndexerTestsBase : GivenContext
     [Fact]
     public async Task Should_also_update_published_content()
     {
+        // Create initial content.
         await CreateTextAsync(ids1[0], "iv", "V1");
 
+        // Publish the content.
         await PublishAsync(ids1[0]);
 
+        // Update the published content once.
         await UpdateTextAsync(ids1[0], "iv", "V2");
 
         await SearchText(expected: null, text: "V1", target: SearchScope.All);
@@ -199,10 +210,13 @@ public abstract class TextIndexerTestsBase : GivenContext
     [Fact]
     public async Task Should_also_update_published_content_multiple_times()
     {
+        // Create initial content.
         await CreateTextAsync(ids1[0], "iv", "V1");
 
+        // Publish the content.
         await PublishAsync(ids1[0]);
 
+        // Update the published content twice.
         await UpdateTextAsync(ids1[0], "iv", "V2");
         await UpdateTextAsync(ids1[0], "iv", "V3");
 
@@ -216,6 +230,7 @@ public abstract class TextIndexerTestsBase : GivenContext
     [Fact]
     public async Task Should_simulate_new_version()
     {
+        // Create initial content.
         await CreateTextAsync(ids1[0], "iv", "V1");
 
         // Publish the content.
@@ -454,6 +469,25 @@ public abstract class TextIndexerTestsBase : GivenContext
         var query = new TextQuery(text, 1000)
         {
             RequiredSchemaIds = new List<DomainId> { SchemaId.Id }
+        };
+
+        var actual = await Sut.TextIndex.SearchAsync(App, query, target, default);
+
+        if (expected != null)
+        {
+            actual.Should().BeEquivalentTo(expected.ToHashSet());
+        }
+        else
+        {
+            actual.Should().BeEmpty();
+        }
+    }
+
+    protected async Task SearchByAppText(List<DomainId>? expected, string text, SearchScope target = SearchScope.All)
+    {
+        var query = new TextQuery(text, 1000)
+        {
+            PreferredSchemaId = Schema.Id
         };
 
         var actual = await Sut.TextIndex.SearchAsync(App, query, target, default);

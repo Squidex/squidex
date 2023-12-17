@@ -12,23 +12,23 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class MongoTextIndexFixture : IAsyncLifetime
+public sealed class MongoTextIndexerStateFixture : IAsyncLifetime
 {
-    public MongoTextIndex Index { get; }
+    public MongoTextIndexerState State { get; }
 
-    public MongoTextIndexFixture()
+    public MongoTextIndexerStateFixture()
     {
         TestUtils.SetupBson();
 
         var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongoDb:configuration"]!);
         var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]!);
 
-        Index = new MongoTextIndex(mongoDatabase, string.Empty);
+        State = new MongoTextIndexerState(mongoDatabase);
     }
 
     public Task InitializeAsync()
     {
-        return Index.InitializeAsync(default);
+        return State.InitializeAsync(default);
     }
 
     public Task DisposeAsync()

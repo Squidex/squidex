@@ -31,22 +31,18 @@ public class MongoTextIndexTests : TextIndexerTestsBase, IClassFixture<MongoText
     [Fact]
     public async Task Should_retrieve_all_stopwords_for_english_query()
     {
-        var both = ids2.Union(ids1).ToList();
-
         await CreateTextAsync(ids1[0], "de", "and und");
         await CreateTextAsync(ids2[0], "en", "and und");
 
-        await SearchText(expected: both, text: "and");
+        await SearchText(expected: ids1, text: "de:and");
     }
 
     [Fact]
     public async Task Should_retrieve_all_stopwords_for_german_query()
     {
-        var both = ids2.Union(ids1).ToList();
-
         await CreateTextAsync(ids1[0], "de", "and und");
         await CreateTextAsync(ids2[0], "en", "and und");
 
-        await SearchText(expected: both, text: "und");
+        await SearchText(expected: ids2, text: "en:und");
     }
 }

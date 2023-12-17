@@ -25,15 +25,15 @@ public sealed class AtlasTextIndex : MongoTextIndexBase<Dictionary<string, strin
     private static readonly LuceneQueryAnalyzer QueryParser =
         new LuceneQueryAnalyzer(LuceneVersion.LUCENE_48, "*",
             new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.EMPTY_SET));
-    private readonly AtlasOptions options;
-    private readonly IHttpClientFactory httpClientFactory;
+    private readonly AtlasOptions atlasOptions;
+    private readonly IHttpClientFactory atlasClient;
     private string index;
 
-    public AtlasTextIndex(IMongoDatabase database, IHttpClientFactory httpClientFactory, IOptions<AtlasOptions> options)
-        : base(database)
+    public AtlasTextIndex(IMongoDatabase database, IHttpClientFactory atlasClient, IOptions<AtlasOptions> atlasOptions, string shardKey)
+        : base(database, shardKey, new CommandFactory<Dictionary<string, string>>(BuildTexts))
     {
-        this.httpClientFactory = httpClientFactory;
-        this.options = options.Value;
+        this.atlasClient = atlasClient;
+        this.atlasOptions = atlasOptions.Value;
     }
 
     protected override async Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<Dictionary<string, string>>> collection,
@@ -41,29 +41,8 @@ public sealed class AtlasTextIndex : MongoTextIndexBase<Dictionary<string, strin
     {
         await base.SetupCollectionAsync(collection, ct);
 
-        index = await AtlasIndexDefinition.CreateIndexAsync(options, httpClientFactory,
+        index = await AtlasIndexDefinition.CreateIndexAsync(atlasOptions, atlasClient,
             Database.DatabaseNamespace.DatabaseName, CollectionName(), ct);
-    }
-
-    protected override Dictionary<string, string> BuildTexts(Dictionary<string, string> source)
-    {
-        var texts = new Dictionary<string, string>();
-
-        foreach (var (key, value) in source)
-        {
-            var text = value;
-
-            var languageCode = AtlasIndexDefinition.GetFieldName(key);
-
-            if (texts.TryGetValue(languageCode, out var existing))
-            {
-                text = $"{existing} {value}";
-            }
-
-            texts[languageCode] = text;
-        }
-
-        return texts;
     }
 
     public override async Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
@@ -157,5 +136,26 @@ public sealed class AtlasTextIndex : MongoTextIndexBase<Dictionary<string, strin
                 .ToListAsync(ct);
 
         return results.Select(x => x.ContentId).ToList();
+    }
+
+    private static Dictionary<string, string> BuildTexts(Dictionary<string, string> source)
+    {
+        var texts = new Dictionary<string, string>();
+
+        foreach (var (key, value) in source)
+        {
+            var text = value;
+
+            var languageCode = AtlasIndexDefinition.GetFieldName(key);
+
+            if (texts.TryGetValue(languageCode, out var existing))
+            {
+                text = $"{existing} {value}";
+            }
+
+            texts[languageCode] = text;
+        }
+
+        return texts;
     }
 }

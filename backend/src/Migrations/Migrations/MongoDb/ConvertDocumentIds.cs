@@ -16,7 +16,7 @@ namespace Migrations.Migrations.MongoDb;
 
 public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
 {
-    private readonly IMongoDatabase database;
+    private readonly IMongoDatabase databaseDefault;
     private readonly IMongoDatabase databaseContent;
     private Scope scope;
 
@@ -27,9 +27,9 @@ public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
         Contents
     }
 
-    public ConvertDocumentIds(IMongoDatabase database, IMongoDatabase databaseContent)
+    public ConvertDocumentIds(IMongoDatabase databaseDefault, IMongoDatabase databaseContent)
     {
-        this.database = database;
+        this.databaseDefault = databaseDefault;
         this.databaseContent = databaseContent;
     }
 
@@ -58,8 +58,8 @@ public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
         switch (scope)
         {
             case Scope.Assets:
-                await RebuildAsync(database, ConvertParentId, "States_Assets", ct);
-                await RebuildAsync(database, ConvertParentId, "States_AssetFolders", ct);
+                await RebuildAsync(databaseDefault, ConvertParentId, "States_Assets", ct);
+                await RebuildAsync(databaseDefault, ConvertParentId, "States_AssetFolders", ct);
                 break;
             case Scope.Contents:
                 await RebuildAsync(databaseContent, null, "State_Contents_All", ct);

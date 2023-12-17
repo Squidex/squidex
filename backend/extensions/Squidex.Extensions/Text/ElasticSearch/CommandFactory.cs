@@ -56,7 +56,7 @@ public static class CommandFactory
             {
                 index = new
                 {
-                    _id = upsert.DocId,
+                    _id = upsert.ToDocId(),
                     _index = indexName
                 }
             });
@@ -82,9 +82,9 @@ public static class CommandFactory
 
             args.Add(new
             {
-                appId = upsert.AppId.Id.ToString(),
-                appName = upsert.AppId.Name,
-                contentId = upsert.ContentId.ToString(),
+                appId = upsert.UniqueContentId.AppId.ToString(),
+                appName = string.Empty,
+                contentId = upsert.UniqueContentId.ContentId.ToString(),
                 schemaId = upsert.SchemaId.Id.ToString(),
                 schemaName = upsert.SchemaId.Name,
                 serveAll = upsert.ServeAll,
@@ -102,7 +102,7 @@ public static class CommandFactory
         {
             update = new
             {
-                _id = update.DocId,
+                _id = update.ToDocId(),
                 _index = indexName
             }
         });
@@ -123,7 +123,7 @@ public static class CommandFactory
         {
             delete = new
             {
-                _id = delete.DocId,
+                _id = delete.ToDocId(),
                 _index = indexName
             }
         });
