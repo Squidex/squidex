@@ -64,7 +64,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
 
     protected override string CollectionName()
     {
-        return $"TextIndex{shardKey}";
+        return $"TextIndex2{shardKey}";
     }
 
     async Task IDeleter.DeleteAppAsync(App app,

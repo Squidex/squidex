@@ -25,7 +25,7 @@ public sealed class TextIndexingProcess : IEventConsumer
 
     public int BatchDelay => 1000;
 
-    public string Name => "TextIndexer5";
+    public string Name => "TextIndexer6";
 
     public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("content-");
 
