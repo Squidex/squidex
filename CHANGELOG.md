@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.10.0] - 2023-12-17
+
+This release will rebuild the text indexes for improved performance. Usually it will handle around 500 events per second, so depending on the number of changes in your system it can take from a few minutes up to several minutes. Other endpoints are not effected. If you have a dedicated worker, you can deploy this first and wait for the process to be finished before you deploy other nodes. This will not cause any downtimes in the full text search functionality.
+
+This release also updates the backend to .NET 8.
+
+### Fixed
+
+* **UI**: Fixes to the chat dialog.
+
+### Changed
+
+* **Assets**: New configuration flag to enable the automatic conversion of assets into AVIF or WEBP, depending on the browser support.
+* **ContentS**: Change field names for field rules to the JSON compatible name (e.g. `data.fieldName`).
+* **Contents**: Use correct indexes for improved performance.
+* **UI**: Add script for redoc directly to the output and do not rely on CDN.
+* **Update**: Update to .NET 8.
+* **Update**: Update to Angular 17 and standalone components.
+
+### Added
+
+* **Contents**: New rich text field that stores the content as JSON structure and provides on demand formatting into HTML and markdown over GraphQL.
+* **MongoDB**: Ability to split up your assets database into multiple databases by using the app ID as a partition key. Only important if you have many apps.
+* **MongoDB**: Ability to split up your contents database into multiple databases by using the app ID as a partition key. Only important if you have many apps.
+* **MongoDB**: Ability to split up your texts database into multiple databases by using the app ID as a partition key. Only important if you have many apps.
+* **UI**: Annotations for rich text editor.
+* **UI**: Plugin for contents list.
+
+### Security
+
+* **Security**: Set secure policy on antiforgery cookie to always.
+
 ## [7.9.0] - 2023-11-07
 
 This release contains a breaking change. Due to security reasons content policy headers where added to prevent script execution for assets. If you have uploaded html files with scripts as assets, this will not work anymore. There is no fallback, you haveto upload your files to another location like a github repository. We might remove the header if we have a better solution for that.
