@@ -5,23 +5,25 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
 public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntityText>>
 {
-    private readonly record struct SearchOperation
+    private record struct SearchOperation
     {
         required public App App { get; init; }
 
-        required public List<(DomainId Id, double Score)> Results { get; init; }
+        required public string SearchTerms { get; set; }
 
-        required public string SearchTerms { get; init; }
+        required public int Take { get; set; }
 
         required public SearchScope SearchScope { get; init; }
     }
@@ -36,11 +38,21 @@ public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntit
     {
         await base.SetupCollectionAsync(collection, ct);
 
+        // In compound indexes you have to use equality for all prefix keys, therefore we cannot add the schema.
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<MongoTextIndexEntity<List<MongoTextIndexEntityText>>>(
                 Index
+                    .Ascending(x => x.AppId)
                     .Text("t.t")
-                    .Ascending(x => x.AppId)),
+                    .Text(x => x.SchemaId),
+                new CreateIndexOptions
+                {
+                    Weights = new BsonDocument
+                    {
+                        ["t.t"] = 2,
+                        ["s"] = 1
+                    }
+                }),
             cancellationToken: ct);
     }
 
@@ -59,74 +71,66 @@ public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntit
         var search = new SearchOperation
         {
             App = app,
-            SearchTerms = Tokenizer.TokenizeQuery(query.Text),
+            SearchTerms = Tokenizer.Query(query.Text),
             SearchScope = scope,
-            Results = []
+            Take = query.Take
         };
 
         if (query.RequiredSchemaIds?.Count > 0)
         {
-            await SearchBySchemaAsync(search, query.RequiredSchemaIds, query.Take, 1, ct);
+            return await SearchBySchemaAsync(search, query.RequiredSchemaIds, ct);
         }
         else if (query.PreferredSchemaId == null)
         {
-            await SearchByAppAsync(search, query.Take, 1, ct);
+            return await SearchByAppAsync(search, ct);
         }
         else
         {
-            // We cannot write queries that prefer results from the same schema, therefore make two queries.
-            var halfBucket = query.Take / 2;
+            // Also include the schema Id as additional search term to prefer that.
+            search.SearchTerms = $"{query.PreferredSchemaId} {search.SearchTerms}";
 
-            var schemaIds = Enumerable.Repeat(query.PreferredSchemaId.Value, 1);
-
-            // Increasing the scoring of the results from the schema by 10 percent.
-            await SearchBySchemaAsync(search, schemaIds, halfBucket, 1.1, ct);
-            await SearchByAppAsync(search, halfBucket, 1, ct);
+            return await SearchByAppAsync(search, ct);
         }
-
-        return search.Results.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
     }
 
-    private Task SearchBySchemaAsync(SearchOperation search, IEnumerable<DomainId> schemaIds, int take, double factor,
+    private Task<List<DomainId>> SearchBySchemaAsync(SearchOperation search, IEnumerable<DomainId> schemaIds,
         CancellationToken ct = default)
     {
         var filter =
             Filter.And(
-                Filter.Text(search.SearchTerms, "none"),
                 Filter.Eq(x => x.AppId, search.App.Id),
+                Filter.Text(search.SearchTerms, "none"),
                 Filter.In(x => x.SchemaId, schemaIds),
                 FilterByScope(search.SearchScope));
 
-        return SearchAsync(search, filter, take, factor, ct);
+        return SearchAsync(search, filter, ct);
     }
 
-    private Task SearchByAppAsync(SearchOperation search, int take, double factor,
+    private Task<List<DomainId>> SearchByAppAsync(SearchOperation search,
         CancellationToken ct = default)
     {
         var filter =
             Filter.And(
-                Filter.Text(search.SearchTerms, "none"),
                 Filter.Eq(x => x.AppId, search.App.Id),
-                Filter.Exists(x => x.SchemaId),
+                Filter.Text(search.SearchTerms, "none"),
                 FilterByScope(search.SearchScope));
 
-        return SearchAsync(search, filter, take, factor, ct);
+        return SearchAsync(search, filter, ct);
     }
 
-    private async Task SearchAsync(SearchOperation search, FilterDefinition<MongoTextIndexEntity<List<MongoTextIndexEntityText>>> filter, int take, double factor,
+    private async Task<List<DomainId>> SearchAsync(SearchOperation search, FilterDefinition<MongoTextIndexEntity<List<MongoTextIndexEntityText>>> filter,
         CancellationToken ct = default)
     {
         var byText =
-            await GetCollection(search.SearchScope).Find(filter).Limit(take)
-                .Project<MongoTextResult>(Projection.Include(x => x.ContentId).MetaTextScore("score")).Sort(Sort.MetaTextScore("score"))
+            await GetCollection(search.SearchScope).Find(filter).Limit(search.Take).Only(x => x.ContentId).Sort(Sort.MetaTextScore("score"))
                 .ToListAsync(ct);
 
-        search.Results.AddRange(byText.Select(x => (x.ContentId, x.Score * factor)));
+        return byText.Select(x => DomainId.Create(x["c"].AsString)).ToList();
     }
 
     private static List<MongoTextIndexEntityText> BuildTexts(Dictionary<string, string> source)
     {
         // Use a custom tokenizer to leverage stop words from multiple languages.
-        return source.Select(x => MongoTextIndexEntityText.FromText(Tokenizer.TokenizerTerms(x.Value, x.Key))).ToList();
+        return source.Select(x => MongoTextIndexEntityText.FromText(Tokenizer.Terms(x.Value, x.Key))).ToList();
     }
 }

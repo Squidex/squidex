@@ -16,7 +16,7 @@ public class TokenizerTests
     {
         var source = "The only thing that matters, is time.";
 
-        var parsed = Tokenizer.TokenizeQuery(source);
+        var parsed = Tokenizer.Query(source);
 
         Assert.Equal("only thing matters time", parsed);
     }
@@ -26,7 +26,7 @@ public class TokenizerTests
     {
         var source = "en:The only thing that matters, is time.";
 
-        var parsed = Tokenizer.TokenizeQuery(source);
+        var parsed = Tokenizer.Query(source);
 
         Assert.Equal("only thing matters time", parsed);
     }
@@ -36,7 +36,7 @@ public class TokenizerTests
     {
         var source = "en:when i do this it is pretty slow";
 
-        var parsed = Tokenizer.TokenizeQuery(source);
+        var parsed = Tokenizer.Query(source);
 
         Assert.Equal("when i do pretty slow", parsed);
     }
@@ -46,7 +46,7 @@ public class TokenizerTests
     {
         var source = "iv:The only thing that matters, is time.";
 
-        var parsed = Tokenizer.TokenizeQuery(source);
+        var parsed = Tokenizer.Query(source);
 
         Assert.Equal("the only thing that matters is time", parsed);
     }
@@ -56,7 +56,7 @@ public class TokenizerTests
     {
         var source = "de:Nur die Zeit spielt eine Rolle";
 
-        var parsed = Tokenizer.TokenizeQuery(source);
+        var parsed = Tokenizer.Query(source);
 
         Assert.Equal("zeit spielt rolle", parsed);
     }

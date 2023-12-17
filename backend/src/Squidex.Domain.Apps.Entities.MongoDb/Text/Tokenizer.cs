@@ -59,7 +59,7 @@ public static class Tokenizer
         }
     }
 
-    public static string TokenizeQuery(string query)
+    public static string Query(string query)
     {
         query = query.Trim();
 
@@ -73,10 +73,10 @@ public static class Tokenizer
             textReader.Read();
         }
 
-        return TokenizeWord(textReader, textLanguage);
+        return Word(textReader, textLanguage);
     }
 
-    public static string TokenizerTerms(string query, string language)
+    public static string Terms(string query, string language)
     {
         var stopWords =
             string.Equals(language, InvariantPartitioning.Key, StringComparison.OrdinalIgnoreCase) ?
@@ -87,7 +87,7 @@ public static class Tokenizer
         return Tokenize(new StringReader(query), stopWords);
     }
 
-    private static string TokenizeWord(TextReader reader, string language)
+    private static string Word(TextReader reader, string language)
     {
         var stopWords =
             string.Equals(language, InvariantPartitioning.Key, StringComparison.OrdinalIgnoreCase) ?
