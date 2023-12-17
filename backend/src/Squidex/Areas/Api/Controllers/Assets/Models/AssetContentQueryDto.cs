@@ -105,7 +105,12 @@ public sealed class AssetContentQueryDto
     [FromQuery(Name = "format")]
     public ImageFormat? Format { get; set; }
 
-    public ResizeOptions ToResizeOptions(Asset asset, IAssetThumbnailGenerator assetGenerator, HttpRequest request)
+    public ResizeOptions ToResizeOptions(
+        Asset asset,
+        bool allowAvifAuto,
+        bool allowWebpAuto,
+        IAssetThumbnailGenerator assetGenerator,
+        HttpRequest request)
     {
         Guard.NotNull(asset);
 
@@ -117,12 +122,17 @@ public sealed class AssetContentQueryDto
         result.FocusY = y;
         result.TargetWidth = Width;
         result.TargetHeight = Height;
-        result.Format = GetFormat(asset, assetGenerator, request);
+        result.Format = GetFormat(asset, allowAvifAuto, allowWebpAuto, assetGenerator, request);
 
         return result;
     }
 
-    private ImageFormat? GetFormat(Asset asset, IAssetThumbnailGenerator assetGenerator, HttpRequest request)
+    private ImageFormat? GetFormat(
+        Asset asset,
+        bool allowAvifAuto,
+        bool allowWebpAuto,
+        IAssetThumbnailGenerator assetGenerator,
+        HttpRequest request)
     {
         if (Format.HasValue || !Auto)
         {
@@ -140,13 +150,13 @@ public sealed class AssetContentQueryDto
 
             return accept.Any(x => x?.Contains(mimeType, StringComparison.OrdinalIgnoreCase) == true) && assetGenerator.CanReadAndWrite(mimeType);
         }
-#if ENABLE_AVIF
-        if (Accepts("image/avif"))
+
+        if (allowAvifAuto && Accepts("image/avif"))
         {
             return ImageFormat.AVIF;
         }
-#endif
-        if (Accepts("image/webp"))
+
+        if (allowWebpAuto && Accepts("image/webp"))
         {
             return ImageFormat.WEBP;
         }

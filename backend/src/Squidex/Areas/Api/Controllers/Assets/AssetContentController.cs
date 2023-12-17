@@ -8,6 +8,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Assets;
@@ -30,19 +31,22 @@ public sealed class AssetContentController : ApiController
     private readonly IAssetQueryService assetQuery;
     private readonly IAssetLoader assetLoader;
     private readonly IAssetThumbnailGenerator assetGenerator;
+    private readonly AssetOptions assetOptions;
 
     public AssetContentController(
         ICommandBus commandBus,
         IAssetFileStore assetFileStore,
         IAssetQueryService assetQuery,
         IAssetLoader assetLoader,
-        IAssetThumbnailGenerator assetGenerator)
+        IAssetThumbnailGenerator assetGenerator,
+        IOptions<AssetOptions> assetOptions)
         : base(commandBus)
     {
         this.assetFileStore = assetFileStore;
         this.assetQuery = assetQuery;
         this.assetLoader = assetLoader;
         this.assetGenerator = assetGenerator;
+        this.assetOptions = assetOptions.Value;
     }
 
     /// <summary>
@@ -138,7 +142,12 @@ public sealed class AssetContentController : ApiController
             Response.Headers[HeaderNames.CacheControl] = $"public,max-age={request.CacheDuration}";
         }
 
-        var resizeOptions = request.ToResizeOptions(asset, assetGenerator, HttpContext.Request);
+        var resizeOptions = request.ToResizeOptions(
+            asset,
+            assetOptions.AllowAvifAuto,
+            assetOptions.AllowWebpAuto,
+            assetGenerator,
+            HttpContext.Request);
 
         var contentLength = (long?)null;
         var contentCallback = (FileCallback?)null;

@@ -13,6 +13,10 @@ public sealed class AssetOptions
 
     public bool CanCache { get; set; }
 
+    public bool AllowAvifAuto { get; set; }
+
+    public bool AllowWebpAuto { get; set; } = true;
+
     public int DefaultPageSize { get; set; } = 200;
 
     public int MaxResults { get; set; } = 200;
