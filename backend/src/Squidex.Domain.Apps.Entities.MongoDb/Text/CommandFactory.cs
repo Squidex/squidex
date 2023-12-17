@@ -63,7 +63,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
             if (!upsert.IsNew)
             {
                 writes.Add(
-                    new DeleteOneModel<MongoTextIndexEntity<T>>(
+                    new DeleteManyModel<MongoTextIndexEntity<T>>(
                         Filter.And(
                             FilterByCommand(upsert),
                             Filter.Exists(x => x.GeoField),
@@ -108,7 +108,7 @@ public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where
     private static void DeleteEntry(DeleteIndexEntry delete, List<WriteModel<MongoTextIndexEntity<T>>> writes)
     {
         writes.Add(
-            new DeleteOneModel<MongoTextIndexEntity<T>>(
+            new DeleteManyModel<MongoTextIndexEntity<T>>(
                 FilterByCommand(delete)));
     }
 
