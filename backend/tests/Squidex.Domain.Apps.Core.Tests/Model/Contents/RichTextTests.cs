@@ -27,7 +27,7 @@ public class RichTextTests
     {
         var expected = File.ReadAllText("Model/Contents/ComplexText.html");
 
-        Assert.Equal(expected.Trim(), node.ToHtml().Trim());
+        Assert.Equal(Sanitize(expected), Sanitize(node.ToHtml()));
     }
 
     [Fact]
@@ -35,7 +35,7 @@ public class RichTextTests
     {
         var expected = File.ReadAllText("Model/Contents/ComplexText.min.html");
 
-        Assert.Equal(expected.Trim(), node.ToHtml(0).Trim());
+        Assert.Equal(Sanitize(expected), Sanitize(node.ToHtml(0)));
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class RichTextTests
     {
         var expected = File.ReadAllText("Model/Contents/ComplexText.md");
 
-        Assert.Equal(expected.Trim(), node.ToMarkdown().Trim());
+        Assert.Equal(Sanitize(expected), Sanitize(node.ToMarkdown()));
     }
 
     [Fact]
@@ -51,6 +51,11 @@ public class RichTextTests
     {
         var expected = File.ReadAllText("Model/Contents/ComplexText.txt");
 
-        Assert.Equal(expected.Trim(), node.ToText().Trim());
+        Assert.Equal(Sanitize(expected), Sanitize(node.ToText()));
+    }
+
+    private static string Sanitize(string source)
+    {
+        return source.Replace("\r\n", "\n").Trim();
     }
 }
