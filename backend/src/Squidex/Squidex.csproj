@@ -63,18 +63,18 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.7.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="5.2.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="6.3.4" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.3.4" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="6.3.4" />
-    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.3.4" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.3.4" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="6.3.4" />
-    <PackageReference Include="Squidex.Assets.S3" Version="6.3.4" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.3.4" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="6.3.5" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.3.5" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="6.3.5" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.3.5" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.3.5" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="6.3.5" />
+    <PackageReference Include="Squidex.Assets.S3" Version="6.3.5" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.3.5" />
     <PackageReference Include="Squidex.ClientLibrary" Version="17.2.0" />
-    <PackageReference Include="Squidex.Hosting" Version="6.3.4" />
-    <PackageReference Include="Squidex.Messaging.All" Version="6.3.4" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.3.4" />
+    <PackageReference Include="Squidex.Hosting" Version="6.3.5" />
+    <PackageReference Include="Squidex.Messaging.All" Version="6.3.5" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.3.5" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="4.0.1-dev" />
     <PackageReference Include="Squidex.YDotNet" Version="0.2.9" />
     <PackageReference Include="Squidex.YDotNet.Native" Version="0.2.9" />
