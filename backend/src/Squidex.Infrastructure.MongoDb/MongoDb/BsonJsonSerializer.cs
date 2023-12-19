@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Buffers;
 using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
@@ -76,7 +77,7 @@ public sealed class BsonJsonSerializer<T> : SerializerBase<T?>, IRepresentationC
             default:
                 using (var stream = DefaultPools.MemoryStream.GetStream())
                 {
-                    using (var writer = new Utf8JsonWriter(stream))
+                    using (var writer = new Utf8JsonWriter((IBufferWriter<byte>)stream))
                     {
                         FromBson(reader, writer);
                     }

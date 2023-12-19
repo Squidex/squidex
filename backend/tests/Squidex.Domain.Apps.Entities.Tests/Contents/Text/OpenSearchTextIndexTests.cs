@@ -16,9 +16,9 @@ public class OpenSearchTextIndexTests : TextIndexerTestsBase, IClassFixture<Open
 
     public override int WaitAfterUpdate => 2000;
 
-    public ElasticSearchTextIndexFixture _ { get; }
+    public OpenSearchTextIndexFixture _ { get; }
 
-    public OpenSearchTextIndexTests(ElasticSearchTextIndexFixture fixture)
+    public OpenSearchTextIndexTests(OpenSearchTextIndexFixture fixture)
     {
         _ = fixture;
     }
