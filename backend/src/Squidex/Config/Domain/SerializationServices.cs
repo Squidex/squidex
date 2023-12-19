@@ -66,6 +66,7 @@ public static class SerializationServices
         options.Converters.Add(new SurrogateJsonConverter<LanguagesConfig, LanguagesConfigSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<Roles, RolesSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<Rule, RuleSorrgate>());
+        options.Converters.Add(new SurrogateJsonConverter<Schema, SchemaSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowStep, WorkflowStepSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowTransition, WorkflowTransitionSurrogate>());
         options.Converters.Add(new StringConverter<CompareOperator>());
