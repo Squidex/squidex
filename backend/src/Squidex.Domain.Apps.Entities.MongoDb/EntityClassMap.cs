@@ -23,7 +23,7 @@ internal static class EntityClassMap
 
             cm.MapProperty(x => x.IsDeleted)
                 .SetElementName("dl")
-                .SetIsRequired(true);
+                .SetIgnoreIfDefault(false);
         });
 
         BsonClassMap.TryRegisterClassMap<Entity>(cm =>
