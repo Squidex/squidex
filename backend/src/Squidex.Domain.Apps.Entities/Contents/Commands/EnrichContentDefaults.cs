@@ -7,14 +7,6 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands;
 
-public enum BulkUpdateContentType
+public sealed class EnrichContentDefaults : ContentCommand
 {
-    Upsert,
-    ChangeStatus,
-    Create,
-    Delete,
-    Patch,
-    Update,
-    Validate,
-    EnrichDefaults
 }
