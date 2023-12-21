@@ -1,0 +1,245 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1--Guid_2,
+    Snapshot: {
+      Name: my-schema,
+      IsPublished: false,
+      FieldCollection: {
+        Ordered: [
+          {
+            Properties: {
+              MinLength: 10,
+              MaxLength: 20,
+              IsUnique: false,
+              IsEmbeddable: false,
+              InlineEditable: false,
+              CreateEnum: false,
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            RawProperties: {
+              MinLength: 10,
+              MaxLength: 20,
+              IsUnique: false,
+              IsEmbeddable: false,
+              InlineEditable: false,
+              CreateEnum: false,
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            Id: 1,
+            Name: age,
+            Partitioning: {
+              Key: invariant
+            },
+            IsLocked: false,
+            IsHidden: false,
+            IsDisabled: true
+          }
+        ],
+        ById: {
+          1: {
+            Properties: {
+              MinLength: 10,
+              MaxLength: 20,
+              IsUnique: false,
+              IsEmbeddable: false,
+              InlineEditable: false,
+              CreateEnum: false,
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            RawProperties: {
+              MinLength: 10,
+              MaxLength: 20,
+              IsUnique: false,
+              IsEmbeddable: false,
+              InlineEditable: false,
+              CreateEnum: false,
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            Id: 1,
+            Name: age,
+            Partitioning: {
+              Key: invariant
+            },
+            IsLocked: false,
+            IsHidden: false,
+            IsDisabled: true
+          }
+        },
+        ByName: {
+          age: {
+            Properties: {
+              MinLength: 10,
+              MaxLength: 20,
+              IsUnique: false,
+              IsEmbeddable: false,
+              InlineEditable: false,
+              CreateEnum: false,
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            RawProperties: {
+              MinLength: 10,
+              MaxLength: 20,
+              IsUnique: false,
+              IsEmbeddable: false,
+              InlineEditable: false,
+              CreateEnum: false,
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            Id: 1,
+            Name: age,
+            Partitioning: {
+              Key: invariant
+            },
+            IsLocked: false,
+            IsHidden: false,
+            IsDisabled: true
+          }
+        }
+      },
+      Scripts: {},
+      Properties: {
+        ValidateOnPublish: false
+      },
+      SchemaFieldsTotal: 1,
+      Fields: [
+        {
+          Properties: {
+            MinLength: 10,
+            MaxLength: 20,
+            IsUnique: false,
+            IsEmbeddable: false,
+            InlineEditable: false,
+            CreateEnum: false,
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          RawProperties: {
+            MinLength: 10,
+            MaxLength: 20,
+            IsUnique: false,
+            IsEmbeddable: false,
+            InlineEditable: false,
+            CreateEnum: false,
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          Id: 1,
+          Name: age,
+          Partitioning: {
+            Key: invariant
+          },
+          IsLocked: false,
+          IsHidden: false,
+          IsDisabled: true
+        }
+      ],
+      FieldsById: {
+        1: {
+          Properties: {
+            MinLength: 10,
+            MaxLength: 20,
+            IsUnique: false,
+            IsEmbeddable: false,
+            InlineEditable: false,
+            CreateEnum: false,
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          RawProperties: {
+            MinLength: 10,
+            MaxLength: 20,
+            IsUnique: false,
+            IsEmbeddable: false,
+            InlineEditable: false,
+            CreateEnum: false,
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          Id: 1,
+          Name: age,
+          Partitioning: {
+            Key: invariant
+          },
+          IsLocked: false,
+          IsHidden: false,
+          IsDisabled: true
+        }
+      },
+      FieldsByName: {
+        age: {
+          Properties: {
+            MinLength: 10,
+            MaxLength: 20,
+            IsUnique: false,
+            IsEmbeddable: false,
+            InlineEditable: false,
+            CreateEnum: false,
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          RawProperties: {
+            MinLength: 10,
+            MaxLength: 20,
+            IsUnique: false,
+            IsEmbeddable: false,
+            InlineEditable: false,
+            CreateEnum: false,
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          Id: 1,
+          Name: age,
+          Partitioning: {
+            Key: invariant
+          },
+          IsLocked: false,
+          IsHidden: false,
+          IsDisabled: true
+        }
+      },
+      AppId: Guid_1,my-app,
+      IsDeleted: false,
+      UniqueId: Guid_1--Guid_2,
+      Id: Guid_2,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 2
+    },
+    Version: 2,
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1--Guid_2,
+        EventId: Guid_3,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        FieldId: 1,age,
+        SchemaId: Guid_2,my-schema,
+        AppId: Guid_1,my-app,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

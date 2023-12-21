@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Esprima;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Assets;
@@ -14,12 +15,15 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
+[UsesVerify]
 public class AssetDomainObjectTests : HandlerTestBase<Asset>
 {
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
@@ -87,27 +91,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
     {
         var command = new CreateAsset { File = file, FileHash = "NewHash" };
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(0, sut.Snapshot.FileVersion);
-        Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetCreated
-                {
-                    FileName = file.FileName,
-                    FileSize = file.FileSize,
-                    FileHash = command.FileHash,
-                    FileVersion = 0,
-                    Metadata = [],
-                    MimeType = file.MimeType,
-                    Tags = [],
-                    Slug = file.FileName.ToAssetSlug()
-                })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -121,7 +107,7 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
         await ExecuteCreateAsync();
         await ExecuteDeleteAsync();
 
-        await PublishAsync(command);
+        await PublishAsync(sut, command);
     }
 
     [Fact]
@@ -132,7 +118,7 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
         await ExecuteCreateAsync();
         await ExecuteDeleteAsync(true);
 
-        await PublishAsync(command);
+        await PublishAsync(sut, command);
     }
 
     [Fact]
@@ -140,27 +126,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
     {
         var command = new UpsertAsset { File = file, FileHash = "NewHash" };
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(0, sut.Snapshot.FileVersion);
-        Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetCreated
-                {
-                    FileName = file.FileName,
-                    FileSize = file.FileSize,
-                    FileHash = command.FileHash,
-                    FileVersion = 0,
-                    Metadata = [],
-                    MimeType = file.MimeType,
-                    Tags = [],
-                    Slug = file.FileName.ToAssetSlug()
-                })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -173,24 +141,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(1, sut.Snapshot.FileVersion);
-        Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetUpdated
-                {
-                    FileSize = file.FileSize,
-                    FileHash = command.FileHash,
-                    FileVersion = 1,
-                    Metadata = [],
-                    MimeType = file.MimeType
-                })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -203,24 +156,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(1, sut.Snapshot.FileVersion);
-        Assert.Equal(command.FileHash, sut.Snapshot.FileHash);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetUpdated
-                {
-                    FileSize = file.FileSize,
-                    FileHash = command.FileHash,
-                    FileVersion = 1,
-                    Metadata = [],
-                    MimeType = file.MimeType
-                })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -233,16 +171,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.FileName, sut.Snapshot.FileName);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetAnnotated { FileName = command.FileName })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -255,16 +186,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Slug, sut.Snapshot.Slug);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetAnnotated { Slug = command.Slug })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -277,16 +201,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.IsProtected, sut.Snapshot.IsProtected);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetAnnotated { IsProtected = command.IsProtected })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -299,16 +216,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Metadata, sut.Snapshot.Metadata);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetAnnotated { Metadata = command.Metadata })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<anootate-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
@@ -321,14 +231,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetAnnotated { Tags = ["tag1"] })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -341,16 +246,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(parentId, sut.Snapshot.ParentId);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetMoved { ParentId = parentId })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<move-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -364,16 +262,9 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
         await ExecuteCreateAsync();
         await ExecuteUpdateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(None.Value);
-
-        Assert.True(sut.Snapshot.IsDeleted);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetEvent(new AssetDeleted { DeletedSize = 2048, OldTags = [] })
-            );
+        await VerifySutAsync(actual, None.Value);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -389,11 +280,8 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
         A.CallTo(() => contentRepository.HasReferrersAsync(App, Id, SearchScope.All, A<CancellationToken>._))
             .Returns(false);
 
-        var actual = await PublishAsync(command);
+        await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(None.Value);
-
-        Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
         Assert.Empty(LastEvents);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))
@@ -410,7 +298,7 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
         A.CallTo(() => contentRepository.HasReferrersAsync(App, Id, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
-        await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
+        await Assert.ThrowsAsync<DomainException>(() => PublishAsync(sut, command));
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
@@ -426,7 +314,7 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
         A.CallTo(() => contentRepository.HasReferrersAsync(App, Id, SearchScope.All, A<CancellationToken>._))
             .Returns(true);
 
-        await PublishAsync(command);
+        await PublishAsync(sut, command);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -434,17 +322,17 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
     private Task ExecuteCreateAsync()
     {
-        return PublishAsync(new CreateAsset { File = file, FileHash = "123" });
+        return PublishAsync(sut, new CreateAsset { File = file, FileHash = "123" });
     }
 
     private Task ExecuteUpdateAsync()
     {
-        return PublishAsync(new UpdateAsset { File = file, FileHash = "456" });
+        return PublishAsync(sut, new UpdateAsset { File = file, FileHash = "456" });
     }
 
     private Task ExecuteDeleteAsync(bool permanent = false)
     {
-        return PublishAsync(new DeleteAsset { Permanent = permanent });
+        return PublishAsync(sut, new DeleteAsset { Permanent = permanent });
     }
 
     private static ScriptOptions ScriptOptions()
@@ -452,29 +340,26 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
         return A<ScriptOptions>.That.Matches(x => x.CanDisallow && x.CanReject && x.AsContext);
     }
 
-    private T CreateAssetEvent<T>(T @event) where T : AssetEvent
+    protected override IAggregateCommand CreateCommand(IAggregateCommand command)
     {
-        @event.AssetId = assetId;
+        ((AssetCommand)command).AssetId = assetId;
 
-        return CreateEvent(@event);
+        return base.CreateCommand(command);
     }
 
-    private T CreateAssetCommand<T>(T command) where T : AssetCommand
+    private async Task VerifySutAsync(object? actual, object? expected = null)
     {
-        command.AssetId = assetId;
+        if (expected == null)
+        {
+            actual.Should().BeEquivalentTo(sut.Snapshot, o => o.IncludingProperties());
+        }
+        else
+        {
+            actual.Should().BeEquivalentTo(expected);
+        }
 
-        return CreateCommand(command);
-    }
+        Assert.Equal(AppId, sut.Snapshot.AppId);
 
-    private Task<object> PublishIdempotentAsync(AssetCommand command)
-    {
-        return PublishIdempotentAsync(sut, CreateAssetCommand(command));
-    }
-
-    private async Task<object> PublishAsync(AssetCommand command)
-    {
-        var actual = await sut.ExecuteAsync(CreateAssetCommand(command), CancellationToken);
-
-        return actual.Payload;
+        await Verify(new { sut, events = LastEvents });
     }
 }

@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Api.Controllers.Contents.Models;
-using Squidex.ClientLibrary.Utils;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;

@@ -1,0 +1,28 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1,
+    Snapshot: {
+      Name: My Team,
+      Id: Guid_1,
+      CreatedBy: client:client,
+      LastModifiedBy: client:client,
+      UniqueId: Guid_1
+    },
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1,
+        EventId: Guid_2,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        Name: My Team,
+        TeamId: Guid_1,
+        Actor: client:client,
+        FromRule: false
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1,
+    Snapshot: {
+      Name: My Team,
+      Contributors: {
+        me: Owner
+      },
+      Id: Guid_1,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 1,
+      UniqueId: Guid_1
+    },
+    Version: 1,
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1,
+        EventId: Guid_2,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        Name: My Team,
+        TeamId: Guid_1,
+        Actor: subject:me,
+        FromRule: false
+      }
+    },
+    {
+      Headers: {
+        AggregateId: Guid_1,
+        EventId: Guid_3,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        ContributorId: me,
+        Role: Owner,
+        IsCreated: false,
+        IsAdded: false,
+        TeamId: Guid_1,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

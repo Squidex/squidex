@@ -45,13 +45,13 @@ public abstract class HandlerTestBase<TState> : GivenContext
 #pragma warning restore MA0056 // Do not call overridable members in constructor
     }
 
-    protected CommandContext CreateCommandContext<TCommand>(TCommand command) where TCommand : SquidexCommand
+    protected CommandContext CreateCommandContext<TCommand>(TCommand command) where TCommand : IAggregateCommand
     {
         return new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
     }
 
     protected async Task<CommandContext> HandleAsync<TCommand>(ICommandMiddleware middleware, TCommand command,
-        CancellationToken ct = default) where TCommand : SquidexCommand
+        CancellationToken ct = default) where TCommand : IAggregateCommand
     {
         var context = new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
 
@@ -60,29 +60,39 @@ public abstract class HandlerTestBase<TState> : GivenContext
         return context;
     }
 
-    protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : Entity, new()
+    protected async Task<object> PublishAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : Entity, new()
     {
-        var actual = await domainObject.ExecuteAsync(command, CancellationToken);
-
-        var previousSnapshot = domainObject.Snapshot;
-        var previousVersion = domainObject.Snapshot.Version;
-
-        await domainObject.ExecuteAsync(command, CancellationToken);
-
-        Assert.Same(previousSnapshot, domainObject.Snapshot);
-        Assert.Equal(previousVersion, domainObject.Snapshot.Version);
+        var actual = await domainObject.ExecuteAsync(CreateCommand(command), CancellationToken);
 
         return actual.Payload;
     }
 
-    protected TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
+    protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : Entity, new()
     {
-        command.ExpectedVersion = EtagVersion.Any;
-        command.Actor ??= User;
+        var actual = await PublishAsync(domainObject, command);
 
-        if (command.User == null && command.Actor.IsUser)
+        var previousSnapshot = domainObject.Snapshot;
+        var previousVersion = domainObject.Snapshot.Version;
+
+        await PublishAsync(domainObject, command);
+
+        Assert.Same(previousSnapshot, domainObject.Snapshot);
+        Assert.Equal(previousVersion, domainObject.Snapshot.Version);
+
+        return actual;
+    }
+
+    protected virtual IAggregateCommand CreateCommand(IAggregateCommand command)
+    {
+        if (command is SquidexCommand baseCommand)
         {
-            command.User = ApiContext.UserPrincipal;
+            baseCommand.ExpectedVersion = EtagVersion.Any;
+            baseCommand.Actor ??= User;
+
+            if (baseCommand.User == null && baseCommand.Actor.IsUser)
+            {
+                baseCommand.User = ApiContext.UserPrincipal;
+            }
         }
 
         if (command is IAppCommand { AppId: null } appCommand)

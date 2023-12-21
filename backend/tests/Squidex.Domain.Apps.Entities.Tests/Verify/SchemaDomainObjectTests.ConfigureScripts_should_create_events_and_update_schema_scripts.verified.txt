@@ -1,0 +1,43 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1--Guid_2,
+    Snapshot: {
+      Name: my-schema,
+      IsPublished: false,
+      FieldCollection: {},
+      Scripts: {
+        Query: <query-script>
+      },
+      Properties: {
+        ValidateOnPublish: false
+      },
+      AppId: Guid_1,my-app,
+      IsDeleted: false,
+      UniqueId: Guid_1--Guid_2,
+      Id: Guid_2,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 1
+    },
+    Version: 1,
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1--Guid_2,
+        EventId: Guid_3,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        Scripts: {
+          Query: <query-script>
+        },
+        SchemaId: Guid_2,my-schema,
+        AppId: Guid_1,my-app,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

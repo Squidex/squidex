@@ -110,7 +110,7 @@ public partial class RuleDomainObject : DomainObject<Rule>
                 {
                     await Trigger(triggerRule);
 
-                    return true;
+                    return None.Value;
                 }, ct);
 
             default:

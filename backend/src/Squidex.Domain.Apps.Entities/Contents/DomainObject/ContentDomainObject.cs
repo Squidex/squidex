@@ -334,11 +334,6 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
 
         var newData = c.Data;
 
-        if (!c.DoNotScript)
-        {
-            newData = await operation.ExecuteUpdateScriptAsync(newData, ct);
-        }
-
         if (c.EnrichDefaults)
         {
             newData = operation.GenerateDefaultValues(newData);
@@ -347,6 +342,11 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
         if (newData.Equals(Snapshot.EditingData))
         {
             return;
+        }
+
+        if (!c.DoNotScript)
+        {
+            newData = await operation.ExecuteUpdateScriptAsync(newData, ct);
         }
 
         if (!c.DoNotValidate)

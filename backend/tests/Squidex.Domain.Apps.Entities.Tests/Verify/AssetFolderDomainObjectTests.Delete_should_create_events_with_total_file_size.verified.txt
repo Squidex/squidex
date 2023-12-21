@@ -1,0 +1,32 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1--Guid_2,
+    Snapshot: {
+      FolderName: My Folder,
+      UniqueId: Guid_1--Guid_2,
+      AppId: Guid_1,my-app,
+      IsDeleted: true,
+      Id: Guid_2,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 1
+    },
+    Version: 1,
+    ObjectState: Deleted
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1--Guid_2,
+        EventId: Guid_3,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        AssetFolderId: Guid_2,
+        AppId: Guid_1,my-app,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}
