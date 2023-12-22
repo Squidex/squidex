@@ -790,4 +790,66 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
         Assert.Equal(2, content.Data.Number);
     }
+
+    [Theory]
+    [InlineData(ContentStrategies.EnrichDefaults.Normal)]
+    [InlineData(ContentStrategies.EnrichDefaults.Update)]
+    [InlineData(ContentStrategies.EnrichDefaults.UpdateBulk)]
+    [InlineData(ContentStrategies.EnrichDefaults.Upsert)]
+    [InlineData(ContentStrategies.EnrichDefaults.UpsertBulk)]
+    [InlineData(ContentStrategies.EnrichDefaults.Bulk)]
+    [InlineData(ContentStrategies.EnrichDefaults.BulkWithSchema)]
+    [InlineData(ContentStrategies.EnrichDefaults.BulkShared)]
+    public async Task Should_enrich_defaults(ContentStrategies.EnrichDefaults strategy)
+    {
+        var schemaName = $"schema-{Guid.NewGuid()}";
+
+        // STEP 0: Create initial schema.
+        var schemaRequest = new CreateSchemaDto
+        {
+            Name = schemaName,
+            Fields =
+            [
+                new UpsertSchemaFieldDto
+                {
+                    Name = TestEntityData.NumberField,
+                    Properties = new NumberFieldPropertiesDto()
+                },
+            ],
+            IsPublished = true
+        };
+
+        await _.Client.Schemas.PostSchemaAsync(schemaRequest);
+
+        var contents = _.Client.DynamicContents(schemaName);
+
+
+        // STEP 1: Create a new item.
+        var content_0 = await contents.CreateAsync(new DynamicData(), ContentCreateOptions.AsPublish);
+
+        Assert.Null(content_0.Data.GetValueOrDefault(TestEntityData.StringField));
+
+
+        // STEP 2: Add required field.
+        var fieldRequest = new AddFieldDto
+        {
+            Name = TestEntityData.StringField,
+            Properties = new StringFieldPropertiesDto
+            {
+                DefaultValue = "Hello Squidex"
+            }
+        };
+
+        await _.Client.Schemas.PostFieldAsync(schemaName, fieldRequest);
+
+
+        // STEP 3: Create required field.
+        await _.Client.EnrichDefaultsAsync(content_0, content_0.Data, strategy);
+
+
+        // STEP 4: Get content.
+        var content_1 = await contents.GetAsync(content_0.Id);
+
+        Assert.Equal("Hello Squidex", content_1.Data[TestEntityData.StringField]!["iv"]!.ToString());
+    }
 }

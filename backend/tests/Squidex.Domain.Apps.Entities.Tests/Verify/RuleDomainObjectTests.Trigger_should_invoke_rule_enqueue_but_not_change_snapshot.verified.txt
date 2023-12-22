@@ -1,0 +1,21 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1--Guid_2,
+    Snapshot: {
+      Trigger: {
+        HandleAll: false
+      },
+      Action: {
+        Value: 123
+      },
+      IsEnabled: true,
+      UniqueId: Guid_1--Guid_2,
+      AppId: Guid_1,my-app,
+      IsDeleted: false,
+      Id: Guid_2,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me
+    },
+    ObjectState: Created
+  }
+}

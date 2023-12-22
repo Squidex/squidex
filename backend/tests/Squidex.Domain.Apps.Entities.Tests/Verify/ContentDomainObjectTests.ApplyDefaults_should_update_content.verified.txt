@@ -1,0 +1,61 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1--Guid_2,
+    Snapshot: {
+      SchemaId: Guid_3,my-schema,
+      CurrentVersion: {
+        Status: Draft,
+        Data: {
+          defaults: {
+            iv: Default Value
+          },
+          my-field1: {
+            iv: 1.0
+          }
+        }
+      },
+      EditingData: {
+        defaults: {
+          iv: Default Value
+        },
+        my-field1: {
+          iv: 1.0
+        }
+      },
+      EditingStatus: Draft,
+      IsPublished: false,
+      AppId: Guid_1,my-app,
+      IsDeleted: false,
+      UniqueId: Guid_1--Guid_2,
+      Id: Guid_2,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me
+    },
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1--Guid_2,
+        EventId: Guid_4,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        Status: Draft,
+        Data: {
+          defaults: {
+            iv: Default Value
+          },
+          my-field1: {
+            iv: 1.0
+          }
+        },
+        ContentId: Guid_2,
+        SchemaId: Guid_3,my-schema,
+        AppId: Guid_1,my-app,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

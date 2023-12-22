@@ -1,0 +1,37 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1,
+    Snapshot: {
+      Name: My Team,
+      Contributors: {
+        me: Owner
+      },
+      Plan: {
+        Owner: subject:me,
+        PlanId: premium
+      },
+      Id: Guid_1,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 2,
+      UniqueId: Guid_1
+    },
+    Version: 2,
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1,
+        EventId: Guid_2,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        PlanId: premium,
+        TeamId: Guid_1,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

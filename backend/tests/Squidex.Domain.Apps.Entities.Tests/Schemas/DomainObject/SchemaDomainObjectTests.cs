@@ -10,13 +10,12 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 
+[UsesVerify]
 public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 {
     private readonly string fieldName = "age";
@@ -60,21 +59,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
             Properties = new SchemaProperties()
         };
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(AppId, sut.Snapshot.AppId);
-        Assert.Equal(SchemaId.Id, sut.Snapshot.Id);
-        Assert.Equal(SchemaId.Name, sut.Snapshot.Name);
-        Assert.Equal(SchemaType.Default, sut.Snapshot.Type);
-
-        var schema = new Schema { Name = command.Name, Properties = command.Properties };
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaCreated { Schema = schema })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -103,17 +90,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
             ]
         };
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        var @event = (SchemaCreated)LastEvents.Single().Payload;
-
-        Assert.Equal(AppId, sut.Snapshot.AppId);
-        Assert.Equal(SchemaId.Id, sut.Snapshot.Id);
-        Assert.Equal(SchemaId.Name, sut.Snapshot.Name);
-        Assert.Equal(SchemaType.Default, sut.Snapshot.Type);
-        Assert.Equal(3, @event.Schema.Fields.Count);
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -126,16 +105,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Properties, sut.Snapshot.Properties);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaUpdated { Properties = command.Properties })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -151,16 +123,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal("<query-script>", sut.Snapshot.Scripts.Query);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaScriptsConfigured { Scripts = command.Scripts })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -176,16 +141,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.NotEmpty(sut.Snapshot.FieldRules);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaFieldRulesConfigured { FieldRules = FieldRules.Create(FieldRule.Disable("field1")) })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -199,16 +157,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.FieldsInLists, sut.Snapshot.FieldsInLists);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaUIFieldsConfigured { FieldsInLists = command.FieldsInLists })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -222,16 +173,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.FieldsInReferences, sut.Snapshot.FieldsInReferences);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaUIFieldsConfigured { FieldsInReferences = command.FieldsInReferences })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -241,16 +185,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(sut.Snapshot.IsPublished);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaPublished())
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -261,16 +198,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteCreateAsync();
         await ExecutePublishAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(sut.Snapshot.IsPublished);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaUnpublished())
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -280,16 +210,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Name, sut.Snapshot.Category);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaCategoryChanged { Name = command.Name })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -305,16 +228,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.PreviewUrls, sut.Snapshot.PreviewUrls);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaPreviewUrlsConfigured { PreviewUrls = command.PreviewUrls })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -324,16 +240,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(None.Value);
-
-        Assert.True(sut.Snapshot.IsDeleted);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaDeleted())
-            );
+        await VerifySutAsync(actual, None.Value);
     }
 
     [Fact]
@@ -349,14 +258,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddFieldAsync("field1");
         await ExecuteAddFieldAsync("field2");
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaFieldsReordered { FieldIds = command.FieldIds })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -373,14 +277,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddFieldAsync("field1", 1);
         await ExecuteAddFieldAsync("field2", 1);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaFieldsReordered { ParentFieldId = arrayId, FieldIds = command.FieldIds })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -395,16 +294,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Properties, GetField(1).RawProperties);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldAdded { Name = fieldName, FieldId = fieldId, Properties = command.Properties })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -420,16 +312,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteCreateAsync();
         await ExecuteAddArrayFieldAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Same(command.Properties, GetNestedField(1, 2).RawProperties);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldAdded { ParentFieldId = arrayId, Name = fieldName, FieldId = nestedId, Properties = command.Properties })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -445,16 +330,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Properties, GetField(1).RawProperties);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldUpdated { FieldId = fieldId, Properties = command.Properties })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -471,16 +349,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddArrayFieldAsync();
         await ExecuteAddFieldAsync(fieldName, 1);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Same(command.Properties, GetNestedField(1, 2).RawProperties);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldUpdated { ParentFieldId = arrayId, FieldId = nestedId, Properties = command.Properties })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -495,16 +366,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(GetField(1).IsLocked);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldLocked { FieldId = fieldId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -520,16 +384,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddArrayFieldAsync();
         await ExecuteAddFieldAsync(fieldName, 1);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(GetNestedField(1, 2).IsLocked);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldLocked { ParentFieldId = arrayId, FieldId = nestedId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -544,16 +401,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(GetField(1).IsHidden);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldHidden { FieldId = fieldId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -569,16 +419,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddArrayFieldAsync();
         await ExecuteAddFieldAsync(fieldName, 1);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(GetNestedField(1, 2).IsHidden);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldHidden { ParentFieldId = arrayId, FieldId = nestedId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -594,16 +437,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddFieldAsync(fieldName);
         await ExecuteHideFieldAsync(1);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(GetField(1).IsHidden);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldShown { FieldId = fieldId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -620,16 +456,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddFieldAsync(fieldName, 1);
         await ExecuteHideFieldAsync(2, 1);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(GetNestedField(1, 2).IsHidden);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldShown { ParentFieldId = arrayId, FieldId = nestedId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -644,16 +473,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(GetField(1).IsDisabled);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldDisabled { FieldId = fieldId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -669,16 +491,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddArrayFieldAsync();
         await ExecuteAddFieldAsync(fieldName, 1);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(GetNestedField(1, 2).IsDisabled);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldDisabled { ParentFieldId = arrayId, FieldId = nestedId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -694,16 +509,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddFieldAsync(fieldName);
         await ExecuteDisableFieldAsync(1);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(GetField(1).IsDisabled);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldEnabled { FieldId = fieldId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -720,16 +528,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddFieldAsync(fieldName, 1);
         await ExecuteDisableFieldAsync(2, 1);
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(GetNestedField(1, 2).IsDisabled);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldEnabled { ParentFieldId = arrayId, FieldId = nestedId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -744,16 +545,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteCreateAsync();
         await ExecuteAddFieldAsync(fieldName);
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Null(GetField(1));
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldDeleted { FieldId = fieldId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -769,16 +563,9 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         await ExecuteAddArrayFieldAsync();
         await ExecuteAddFieldAsync(fieldName, 1);
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Null(GetNestedField(1, 2));
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new FieldDeleted { ParentFieldId = arrayId, FieldId = nestedId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -791,61 +578,44 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Category, sut.Snapshot.Category);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new SchemaCategoryChanged { Name = command.Category })
-            );
+        await VerifySutAsync(actual);
     }
 
     private Task ExecuteCreateAsync()
     {
-        return PublishAsync(new CreateSchema { Name = SchemaId.Name, SchemaId = SchemaId.Id });
+        return PublishAsync(sut, new CreateSchema { Name = SchemaId.Name, SchemaId = SchemaId.Id });
     }
 
     private Task ExecuteAddArrayFieldAsync()
     {
-        return PublishAsync(new AddField { Properties = new ArrayFieldProperties(), Name = arrayName });
+        return PublishAsync(sut, new AddField { Properties = new ArrayFieldProperties(), Name = arrayName });
     }
 
     private Task ExecuteAddFieldAsync(string name, long? parentId = null)
     {
-        return PublishAsync(new AddField { ParentFieldId = parentId, Properties = ValidProperties(), Name = name });
+        return PublishAsync(sut, new AddField { ParentFieldId = parentId, Properties = ValidProperties(), Name = name });
     }
 
     private Task ExecuteHideFieldAsync(long id, long? parentId = null)
     {
-        return PublishAsync(new HideField { ParentFieldId = parentId, FieldId = id });
+        return PublishAsync(sut, new HideField { ParentFieldId = parentId, FieldId = id });
     }
 
     private Task ExecuteDisableFieldAsync(long id, long? parentId = null)
     {
-        return PublishAsync(new DisableField { ParentFieldId = parentId, FieldId = id });
+        return PublishAsync(sut, new DisableField { ParentFieldId = parentId, FieldId = id });
     }
 
     private Task ExecutePublishAsync()
     {
-        return PublishAsync(new PublishSchema());
+        return PublishAsync(sut, new PublishSchema());
     }
 
     private Task ExecuteDeleteAsync()
     {
-        return PublishAsync(new DeleteSchema());
-    }
-
-    private IField GetField(int id)
-    {
-        return sut.Snapshot.FieldsById.GetValueOrDefault(id)!;
-    }
-
-    private IField GetNestedField(int parentId, int childId)
-    {
-        return ((IArrayField)sut.Snapshot.FieldsById[parentId]).FieldsById.GetValueOrDefault(childId)!;
+        return PublishAsync(sut, new DeleteSchema());
     }
 
     private static StringFieldProperties ValidProperties()
@@ -853,15 +623,19 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         return new StringFieldProperties { MinLength = 10, MaxLength = 20 };
     }
 
-    private Task<object> PublishIdempotentAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
+    private async Task VerifySutAsync(object? actual, object? expected = null)
     {
-        return PublishIdempotentAsync(sut, CreateCommand(command));
-    }
+        if (expected == null)
+        {
+            actual.Should().BeEquivalentTo(sut.Snapshot, o => o.IncludingProperties());
+        }
+        else
+        {
+            actual.Should().BeEquivalentTo(expected);
+        }
 
-    private async Task<object> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
-    {
-        var actual = await sut.ExecuteAsync(CreateCommand(command), CancellationToken);
+        Assert.Equal(AppId, sut.Snapshot.AppId);
 
-        return actual.Payload;
+        await Verify(new { sut, events = LastEvents });
     }
 }

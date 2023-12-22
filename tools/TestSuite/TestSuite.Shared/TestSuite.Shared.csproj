@@ -7,7 +7,7 @@
 	<Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.119">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.127">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -17,12 +17,12 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets" Version="6.2.0" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="17.2.0" />
-    <PackageReference Include="Squidex.ClientLibrary.ServiceExtensions" Version="17.2.0" />
+    <PackageReference Include="Squidex.Assets" Version="6.3.5" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="17.6.0" />
+    <PackageReference Include="Squidex.ClientLibrary.ServiceExtensions" Version="17.6.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="Verify" Version="22.8.0" />
-    <PackageReference Include="xunit" Version="2.6.2" />
+    <PackageReference Include="xunit" Version="2.6.3" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />

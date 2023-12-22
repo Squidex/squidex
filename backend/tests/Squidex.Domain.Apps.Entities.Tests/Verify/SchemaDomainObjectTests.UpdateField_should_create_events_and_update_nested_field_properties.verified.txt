@@ -1,0 +1,1167 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1--Guid_2,
+    Snapshot: {
+      Name: my-schema,
+      IsPublished: false,
+      FieldCollection: {
+        Ordered: [
+          {
+            Fields: [
+              {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            ],
+            FieldsById: {
+              2: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            },
+            FieldsByName: {
+              age: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            },
+            FieldCollection: {
+              Ordered: [
+                {
+                  Properties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  RawProperties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  Id: 2,
+                  Name: age,
+                  IsLocked: false,
+                  IsHidden: false,
+                  IsDisabled: false
+                }
+              ],
+              ById: {
+                2: {
+                  Properties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  RawProperties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  Id: 2,
+                  Name: age,
+                  IsLocked: false,
+                  IsHidden: false,
+                  IsDisabled: false
+                }
+              },
+              ByName: {
+                age: {
+                  Properties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  RawProperties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  Id: 2,
+                  Name: age,
+                  IsLocked: false,
+                  IsHidden: false,
+                  IsDisabled: false
+                }
+              }
+            },
+            Properties: {
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            RawProperties: {
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            Id: 1,
+            Name: array,
+            Partitioning: {
+              Key: invariant
+            },
+            IsLocked: false,
+            IsHidden: false,
+            IsDisabled: false
+          }
+        ],
+        ById: {
+          1: {
+            Fields: [
+              {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            ],
+            FieldsById: {
+              2: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            },
+            FieldsByName: {
+              age: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            },
+            FieldCollection: {
+              Ordered: [
+                {
+                  Properties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  RawProperties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  Id: 2,
+                  Name: age,
+                  IsLocked: false,
+                  IsHidden: false,
+                  IsDisabled: false
+                }
+              ],
+              ById: {
+                2: {
+                  Properties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  RawProperties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  Id: 2,
+                  Name: age,
+                  IsLocked: false,
+                  IsHidden: false,
+                  IsDisabled: false
+                }
+              },
+              ByName: {
+                age: {
+                  Properties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  RawProperties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  Id: 2,
+                  Name: age,
+                  IsLocked: false,
+                  IsHidden: false,
+                  IsDisabled: false
+                }
+              }
+            },
+            Properties: {
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            RawProperties: {
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            Id: 1,
+            Name: array,
+            Partitioning: {
+              Key: invariant
+            },
+            IsLocked: false,
+            IsHidden: false,
+            IsDisabled: false
+          }
+        },
+        ByName: {
+          array: {
+            Fields: [
+              {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            ],
+            FieldsById: {
+              2: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            },
+            FieldsByName: {
+              age: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            },
+            FieldCollection: {
+              Ordered: [
+                {
+                  Properties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  RawProperties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  Id: 2,
+                  Name: age,
+                  IsLocked: false,
+                  IsHidden: false,
+                  IsDisabled: false
+                }
+              ],
+              ById: {
+                2: {
+                  Properties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  RawProperties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  Id: 2,
+                  Name: age,
+                  IsLocked: false,
+                  IsHidden: false,
+                  IsDisabled: false
+                }
+              },
+              ByName: {
+                age: {
+                  Properties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  RawProperties: {
+                    IsUnique: false,
+                    IsEmbeddable: false,
+                    InlineEditable: false,
+                    CreateEnum: false,
+                    IsRequired: false,
+                    IsRequiredOnPublish: false,
+                    IsHalfWidth: false
+                  },
+                  Id: 2,
+                  Name: age,
+                  IsLocked: false,
+                  IsHidden: false,
+                  IsDisabled: false
+                }
+              }
+            },
+            Properties: {
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            RawProperties: {
+              IsRequired: false,
+              IsRequiredOnPublish: false,
+              IsHalfWidth: false
+            },
+            Id: 1,
+            Name: array,
+            Partitioning: {
+              Key: invariant
+            },
+            IsLocked: false,
+            IsHidden: false,
+            IsDisabled: false
+          }
+        }
+      },
+      Scripts: {},
+      Properties: {
+        ValidateOnPublish: false
+      },
+      SchemaFieldsTotal: 2,
+      Fields: [
+        {
+          Fields: [
+            {
+              Properties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              RawProperties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              Id: 2,
+              Name: age,
+              IsLocked: false,
+              IsHidden: false,
+              IsDisabled: false
+            }
+          ],
+          FieldsById: {
+            2: {
+              Properties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              RawProperties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              Id: 2,
+              Name: age,
+              IsLocked: false,
+              IsHidden: false,
+              IsDisabled: false
+            }
+          },
+          FieldsByName: {
+            age: {
+              Properties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              RawProperties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              Id: 2,
+              Name: age,
+              IsLocked: false,
+              IsHidden: false,
+              IsDisabled: false
+            }
+          },
+          FieldCollection: {
+            Ordered: [
+              {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            ],
+            ById: {
+              2: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            },
+            ByName: {
+              age: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            }
+          },
+          Properties: {
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          RawProperties: {
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          Id: 1,
+          Name: array,
+          Partitioning: {
+            Key: invariant
+          },
+          IsLocked: false,
+          IsHidden: false,
+          IsDisabled: false
+        }
+      ],
+      FieldsById: {
+        1: {
+          Fields: [
+            {
+              Properties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              RawProperties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              Id: 2,
+              Name: age,
+              IsLocked: false,
+              IsHidden: false,
+              IsDisabled: false
+            }
+          ],
+          FieldsById: {
+            2: {
+              Properties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              RawProperties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              Id: 2,
+              Name: age,
+              IsLocked: false,
+              IsHidden: false,
+              IsDisabled: false
+            }
+          },
+          FieldsByName: {
+            age: {
+              Properties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              RawProperties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              Id: 2,
+              Name: age,
+              IsLocked: false,
+              IsHidden: false,
+              IsDisabled: false
+            }
+          },
+          FieldCollection: {
+            Ordered: [
+              {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            ],
+            ById: {
+              2: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            },
+            ByName: {
+              age: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            }
+          },
+          Properties: {
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          RawProperties: {
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          Id: 1,
+          Name: array,
+          Partitioning: {
+            Key: invariant
+          },
+          IsLocked: false,
+          IsHidden: false,
+          IsDisabled: false
+        }
+      },
+      FieldsByName: {
+        array: {
+          Fields: [
+            {
+              Properties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              RawProperties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              Id: 2,
+              Name: age,
+              IsLocked: false,
+              IsHidden: false,
+              IsDisabled: false
+            }
+          ],
+          FieldsById: {
+            2: {
+              Properties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              RawProperties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              Id: 2,
+              Name: age,
+              IsLocked: false,
+              IsHidden: false,
+              IsDisabled: false
+            }
+          },
+          FieldsByName: {
+            age: {
+              Properties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              RawProperties: {
+                IsUnique: false,
+                IsEmbeddable: false,
+                InlineEditable: false,
+                CreateEnum: false,
+                IsRequired: false,
+                IsRequiredOnPublish: false,
+                IsHalfWidth: false
+              },
+              Id: 2,
+              Name: age,
+              IsLocked: false,
+              IsHidden: false,
+              IsDisabled: false
+            }
+          },
+          FieldCollection: {
+            Ordered: [
+              {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            ],
+            ById: {
+              2: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            },
+            ByName: {
+              age: {
+                Properties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                RawProperties: {
+                  IsUnique: false,
+                  IsEmbeddable: false,
+                  InlineEditable: false,
+                  CreateEnum: false,
+                  IsRequired: false,
+                  IsRequiredOnPublish: false,
+                  IsHalfWidth: false
+                },
+                Id: 2,
+                Name: age,
+                IsLocked: false,
+                IsHidden: false,
+                IsDisabled: false
+              }
+            }
+          },
+          Properties: {
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          RawProperties: {
+            IsRequired: false,
+            IsRequiredOnPublish: false,
+            IsHalfWidth: false
+          },
+          Id: 1,
+          Name: array,
+          Partitioning: {
+            Key: invariant
+          },
+          IsLocked: false,
+          IsHidden: false,
+          IsDisabled: false
+        }
+      },
+      AppId: Guid_1,my-app,
+      IsDeleted: false,
+      UniqueId: Guid_1--Guid_2,
+      Id: Guid_2,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 3
+    },
+    Version: 3,
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1--Guid_2,
+        EventId: Guid_3,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        Properties: {
+          IsUnique: false,
+          IsEmbeddable: false,
+          InlineEditable: false,
+          CreateEnum: false,
+          IsRequired: false,
+          IsRequiredOnPublish: false,
+          IsHalfWidth: false
+        },
+        FieldId: 2,age,
+        ParentFieldId: 1,array,
+        SchemaId: Guid_2,my-schema,
+        AppId: Guid_1,my-app,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

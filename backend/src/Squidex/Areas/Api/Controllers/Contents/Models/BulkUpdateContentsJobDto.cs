@@ -63,6 +63,11 @@ public class BulkUpdateContentsJobDto
     public bool Permanent { get; set; }
 
     /// <summary>
+    /// Enrich the data with the default values when updating a content item.
+    /// </summary>
+    public bool EnrichDefaults { get; set; }
+
+    /// <summary>
     /// The number of expected items. Set it to a higher number to update multiple items when a query is defined.
     /// </summary>
     public long ExpectedCount { get; set; } = 1;

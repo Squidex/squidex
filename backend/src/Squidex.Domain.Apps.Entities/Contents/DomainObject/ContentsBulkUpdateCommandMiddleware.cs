@@ -189,6 +189,10 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
                     return CreateTask<ValidateContent>(id, schemaId, bulkJob, bulk, jobIndex,
                         PermissionIds.AppContentsReadOwn);
 
+                case BulkUpdateContentType.EnrichDefaults:
+                    return CreateTask<EnrichContentDefaults>(id, schemaId, bulkJob, bulk, jobIndex,
+                        PermissionIds.AppContentsUpdateOwn);
+
                 case BulkUpdateContentType.ChangeStatus:
                     return CreateTask<ChangeContentStatus>(id, schemaId, bulkJob, bulk, jobIndex,
                         PermissionIds.AppContentsChangeStatusOwn);

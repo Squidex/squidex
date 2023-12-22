@@ -11,11 +11,12 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
+[UsesVerify]
 public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolder>
 {
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
@@ -63,16 +64,9 @@ public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolder>
     {
         var command = new CreateAssetFolder { FolderName = "New Name" };
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.FolderName, sut.Snapshot.FolderName);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetFolderEvent(new AssetFolderCreated { FolderName = command.FolderName })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -82,16 +76,9 @@ public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolder>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.FolderName, sut.Snapshot.FolderName);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetFolderEvent(new AssetFolderRenamed { FolderName = command.FolderName })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -101,16 +88,9 @@ public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolder>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(parentId, sut.Snapshot.ParentId);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetFolderEvent(new AssetFolderMoved { ParentId = parentId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -120,56 +100,46 @@ public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolder>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(None.Value);
-
-        Assert.True(sut.Snapshot.IsDeleted);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateAssetFolderEvent(new AssetFolderDeleted())
-            );
+        await VerifySutAsync(actual, None.Value);
     }
 
     private Task ExecuteCreateAsync()
     {
-        return PublishAsync(new CreateAssetFolder { FolderName = "My Folder" });
+        return PublishAsync(sut, new CreateAssetFolder { FolderName = "My Folder" });
     }
 
     private Task ExecuteUpdateAsync()
     {
-        return PublishAsync(new RenameAssetFolder { FolderName = "My Folder" });
+        return PublishAsync(sut, new RenameAssetFolder { FolderName = "My Folder" });
     }
 
     private Task ExecuteDeleteAsync()
     {
-        return PublishAsync(new DeleteAssetFolder());
+        return PublishAsync(sut, new DeleteAssetFolder());
     }
 
-    private T CreateAssetFolderEvent<T>(T @event) where T : AssetFolderEvent
+    protected override IAggregateCommand CreateCommand(IAggregateCommand command)
     {
-        @event.AssetFolderId = assetFolderId;
+        ((AssetFolderCommand)command).AssetFolderId = assetFolderId;
 
-        return CreateEvent(@event);
+        return base.CreateCommand(command);
     }
 
-    private T CreateAssetFolderCommand<T>(T command) where T : AssetFolderCommand
+    private async Task VerifySutAsync(object? actual, object? expected = null)
     {
-        command.AssetFolderId = assetFolderId;
+        if (expected == null)
+        {
+            actual.Should().BeEquivalentTo(sut.Snapshot, o => o.IncludingProperties());
+        }
+        else
+        {
+            actual.Should().BeEquivalentTo(expected);
+        }
 
-        return CreateCommand(command);
-    }
+        Assert.Equal(AppId, sut.Snapshot.AppId);
 
-    private Task<object> PublishIdempotentAsync(AssetFolderCommand command)
-    {
-        return PublishIdempotentAsync(sut, CreateAssetFolderCommand(command));
-    }
-
-    private async Task<object> PublishAsync(AssetFolderCommand command)
-    {
-        var actual = await sut.ExecuteAsync(CreateAssetFolderCommand(command), CancellationToken);
-
-        return actual.Payload;
+        await Verify(new { sut, events = LastEvents });
     }
 }

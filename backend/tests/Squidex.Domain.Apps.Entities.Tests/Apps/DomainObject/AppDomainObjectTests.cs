@@ -16,12 +16,12 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
+[UsesVerify]
 public class AppDomainObjectTests : HandlerTestBase<App>
 {
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
@@ -108,18 +108,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
     {
         var command = new CreateApp { Name = AppId.Name, AppId = AppId.Id };
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(AppId.Name, sut.Snapshot.Name);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppCreated { Name = AppId.Name }),
-                CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Role = Role.Owner }),
-                CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -127,17 +118,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
     {
         var command = new CreateApp { Name = AppId.Name, Actor = Client, AppId = AppId.Id };
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(AppId.Name, sut.Snapshot.Name);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppCreated { Name = AppId.Name }, true), // Must be with client actor.
-                CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings }, true)
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -147,17 +130,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Label, sut.Snapshot.Label);
-        Assert.Equal(command.Description, sut.Snapshot.Description);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppUpdated { Label = command.Label, Description = command.Description })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -173,16 +148,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Settings, sut.Snapshot.Settings);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppSettingsUpdated { Settings = command.Settings })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -192,16 +160,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.File.MimeType, sut.Snapshot.Image!.MimeType);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppImageUploaded { Image = sut.Snapshot.Image })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -212,16 +173,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteUploadImage();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Null(sut.Snapshot.Image);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppImageRemoved())
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -234,16 +188,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
-
-        Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
-            );
+        await VerifySutAsync(actual, new PlanChangedResult(planIdPaid));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, planIdPaid, CancellationToken))
             .MustHaveHappened();
@@ -259,16 +206,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
-
-        Assert.Equal(planIdPaid, sut.Snapshot.Plan!.PlanId);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppPlanChanged { PlanId = planIdPaid })
-            );
+        await VerifySutAsync(actual, new PlanChangedResult(planIdPaid));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<App>._, A<string?>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -285,16 +225,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteChangePlanAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
-
-        Assert.Null(sut.Snapshot.Plan);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppPlanReset())
-            );
+        await VerifySutAsync(actual, new PlanChangedResult(planIdFree, true));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._,  A<App>._, A<string?>._, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
@@ -311,16 +244,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteChangePlanAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planIdFree, true));
-
-        Assert.Null(sut.Snapshot.Plan);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppPlanReset())
-            );
+        await VerifySutAsync(actual, new PlanChangedResult(planIdFree, true));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, planIdPaid, CancellationToken))
             .MustHaveHappenedOnceExactly();
@@ -339,11 +265,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planIdPaid, false, new Uri("http://squidex.io")));
-
-        Assert.Null(sut.Snapshot.Plan);
+        await VerifySutAsync(actual, new PlanChangedResult(planIdPaid, false, new Uri("http://squidex.io")));
     }
 
     [Fact]
@@ -353,11 +277,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planIdPaid));
-
-        Assert.Equal(planIdPaid, sut.Snapshot.Plan?.PlanId);
+        await VerifySutAsync(actual, new PlanChangedResult(planIdPaid));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, planIdPaid, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -373,16 +295,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(Role.Editor, sut.Snapshot.Contributors[contributorId]);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Role = Role.Editor, IsAdded = true })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -393,16 +308,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAssignContributorAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(Role.Owner, sut.Snapshot.Contributors[contributorId]);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Role = Role.Owner })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -413,16 +321,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAssignContributorAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(sut.Snapshot.Contributors.ContainsKey(contributorId));
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppContributorRemoved { ContributorId = contributorId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -432,16 +333,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(TeamId, sut.Snapshot.TeamId);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppTransfered { TeamId = TeamId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -452,16 +346,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteTransferAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Null(sut.Snapshot.TeamId);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppTransfered { TeamId = null })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -471,16 +358,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(sut.Snapshot.Clients.ContainsKey(clientId));
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppClientAttached { Id = clientId, Secret = command.Secret })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -491,16 +371,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAttachClientAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(clientNewName, sut.Snapshot.Clients[clientId].Name);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppClientUpdated { Id = clientId, Name = clientNewName, Role = Role.Developer })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -511,16 +384,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAttachClientAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(sut.Snapshot.Clients.ContainsKey(clientId));
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppClientRevoked { Id = clientId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -530,16 +396,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.NotEmpty(sut.Snapshot.Workflows);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppWorkflowAdded { WorkflowId = workflowId, Name = "my-workflow" })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -550,16 +409,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAddWorkflowAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.NotEmpty(sut.Snapshot.Workflows);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppWorkflowUpdated { WorkflowId = workflowId, Workflow = Workflow.Default })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -570,16 +422,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAddWorkflowAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Empty(sut.Snapshot.Workflows);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppWorkflowDeleted { WorkflowId = workflowId })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -589,16 +434,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(sut.Snapshot.Languages.Contains(Language.DE));
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppLanguageAdded { Language = Language.DE })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -609,16 +447,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAddLanguageAsync(Language.DE);
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(sut.Snapshot.Languages.Contains(Language.DE));
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppLanguageRemoved { Language = Language.DE })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -629,16 +460,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAddLanguageAsync(Language.DE);
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(sut.Snapshot.Languages.Contains(Language.DE));
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppLanguageUpdated { Language = Language.DE, Fallback = [Language.EN] })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -648,16 +472,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(1, sut.Snapshot.Roles.CustomCount);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppRoleAdded { Name = roleName })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -668,16 +485,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAddRoleAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(0, sut.Snapshot.Roles.CustomCount);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppRoleDeleted { Name = roleName })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -688,14 +498,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         await ExecuteCreateAsync();
         await ExecuteAddRoleAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppRoleUpdated { Name = roleName, Permissions = command.Permissions, Properties = command.Properties })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -705,16 +510,9 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(None.Value);
-
-        Assert.True(sut.Snapshot.IsDeleted);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new AppDeleted())
-            );
+        await VerifySutAsync(actual, None.Value);
 
         A.CallTo(() => billingManager.UnsubscribeAsync(command.Actor.Identifier, A<App>._, default))
             .MustHaveHappened();
@@ -722,63 +520,65 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
     private Task ExecuteCreateAsync()
     {
-        return PublishAsync(new CreateApp { Name = AppId.Name, AppId = AppId.Id });
+        return PublishAsync(sut, new CreateApp { Name = AppId.Name, AppId = AppId.Id });
     }
 
     private Task ExecuteUploadImage()
     {
-        return PublishAsync(new UploadAppImage { File = new NoopAssetFile() });
+        return PublishAsync(sut, new UploadAppImage { File = new NoopAssetFile() });
     }
 
     private Task ExecuteAssignContributorAsync()
     {
-        return PublishAsync(new AssignContributor { ContributorId = contributorId, Role = Role.Editor });
+        return PublishAsync(sut, new AssignContributor { ContributorId = contributorId, Role = Role.Editor });
     }
 
     private Task ExecuteAttachClientAsync()
     {
-        return PublishAsync(new AttachClient { Id = clientId });
+        return PublishAsync(sut, new AttachClient { Id = clientId });
     }
 
     private Task ExecuteAddRoleAsync()
     {
-        return PublishAsync(new AddRole { Name = roleName });
+        return PublishAsync(sut, new AddRole { Name = roleName });
     }
 
     private Task ExecuteAddLanguageAsync(Language language)
     {
-        return PublishAsync(new AddLanguage { Language = language });
+        return PublishAsync(sut, new AddLanguage { Language = language });
     }
 
     private Task ExecuteAddWorkflowAsync()
     {
-        return PublishAsync(new AddWorkflow { WorkflowId = workflowId, Name = "my-workflow" });
+        return PublishAsync(sut, new AddWorkflow { WorkflowId = workflowId, Name = "my-workflow" });
     }
 
     private Task ExecuteChangePlanAsync()
     {
-        return PublishAsync(new ChangePlan { PlanId = planIdPaid });
+        return PublishAsync(sut, new ChangePlan { PlanId = planIdPaid });
     }
 
     private Task ExecuteTransferAsync()
     {
-        return PublishAsync(new TransferToTeam { TeamId = TeamId });
+        return PublishAsync(sut, new TransferToTeam { TeamId = TeamId });
     }
 
     private Task ExecuteArchiveAsync()
     {
-        return PublishAsync(new DeleteApp());
+        return PublishAsync(sut, new DeleteApp());
     }
 
-    private Task<object> PublishIdempotentAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
+    private async Task VerifySutAsync(object? actual, object? expected = null)
     {
-        return PublishIdempotentAsync(sut, CreateCommand(command));
-    }
+        if (expected == null)
+        {
+            actual.Should().BeEquivalentTo(sut.Snapshot, o => o.IncludingProperties());
+        }
+        else
+        {
+            actual.Should().BeEquivalentTo(expected);
+        }
 
-    private async Task<object> PublishAsync<T>(T command) where T : SquidexCommand, IAggregateCommand
-    {
-        var actual = await sut.ExecuteAsync(CreateCommand(command), CancellationToken);
-
-        return actual.Payload;
+        await Verify(new { sut, events = LastEvents });
     }
 }

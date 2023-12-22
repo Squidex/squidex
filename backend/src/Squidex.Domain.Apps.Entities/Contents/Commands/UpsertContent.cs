@@ -19,6 +19,8 @@ public sealed class UpsertContent : ContentDataCommand, ISchemaCommand
 
     public bool Patch { get;  set; }
 
+    public bool EnrichDefaults { get; set; }
+
     public UpsertContent()
     {
         ContentId = DomainId.NewGuid();

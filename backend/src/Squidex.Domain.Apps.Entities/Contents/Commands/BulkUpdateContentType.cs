@@ -15,5 +15,6 @@ public enum BulkUpdateContentType
     Delete,
     Patch,
     Update,
-    Validate
+    Validate,
+    EnrichDefaults
 }

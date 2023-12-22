@@ -1,0 +1,127 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1,
+    Snapshot: {
+      Name: my-app,
+      Contributors: {
+        me: Owner
+      },
+      Roles: {
+        All: [
+          {
+            Name: Owner,
+            Permissions: [
+              {
+                Id: *
+              }
+            ],
+            IsDefault: true
+          },
+          {
+            Name: Reader,
+            Properties: {
+              ui.api.hide: true
+            },
+            Permissions: [
+              {
+                Id: assets.read
+              },
+              {
+                Id: contents.*.read
+              }
+            ],
+            IsDefault: true
+          },
+          {
+            Name: Editor,
+            Properties: {
+              ui.api.hide: true
+            },
+            Permissions: [
+              {
+                Id: assets
+              },
+              {
+                Id: contents.*
+              },
+              {
+                Id: roles.read
+              },
+              {
+                Id: workflows.read
+              }
+            ],
+            IsDefault: true
+          },
+          {
+            Name: Developer,
+            Permissions: [
+              {
+                Id: assets
+              },
+              {
+                Id: contents.*
+              },
+              {
+                Id: roles.read
+              },
+              {
+                Id: rules
+              },
+              {
+                Id: schemas
+              },
+              {
+                Id: workflows
+              }
+            ],
+            IsDefault: true
+          }
+        ]
+      },
+      Plan: {
+        Owner: subject:me,
+        PlanId: premium
+      },
+      Settings: {
+        HideScheduler: true,
+        HideDateTimeModeButton: false
+      },
+      AssetScripts: {},
+      Languages: {
+        Master: en,
+        AllKeys: [
+          en
+        ],
+        Languages: {
+          en: {
+            IsOptional: false
+          }
+        }
+      },
+      IsDeleted: false,
+      Id: Guid_1,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 3,
+      UniqueId: Guid_1
+    },
+    Version: 3,
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1,
+        EventId: Guid_2,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        PlanId: premium,
+        AppId: Guid_1,my-app,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1--Guid_2,
+    Snapshot: {
+      SchemaId: Guid_3,my-schema,
+      CurrentVersion: {
+        Status: Draft,
+        Data: {
+          my-field1: {
+            iv: 1.0
+          }
+        }
+      },
+      EditingData: {
+        my-field1: {
+          iv: 1.0
+        }
+      },
+      EditingStatus: Draft,
+      IsPublished: false,
+      AppId: Guid_1,my-app,
+      IsDeleted: false,
+      UniqueId: Guid_1--Guid_2,
+      Id: Guid_2,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me
+    },
+    ObjectState: Created
+  }
+}

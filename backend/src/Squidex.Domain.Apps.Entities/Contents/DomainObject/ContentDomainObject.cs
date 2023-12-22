@@ -206,6 +206,21 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
                     return Snapshot;
                 }, ct);
 
+            case EnrichContentDefaults enrichContentDefaults:
+                return ApplyReturnAsync(enrichContentDefaults, async (c, ct) =>
+                {
+                    var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
+
+                    var newData = operation.GenerateDefaultValues(Snapshot.EditingData.Clone());
+
+                    if (!newData.Equals(Snapshot.EditingData))
+                    {
+                        Update(c, newData);
+                    }
+
+                    return Snapshot;
+                }, ct);
+
             case DeleteContent { Permanent: true } deleteContent:
                 return DeletePermanentAsync(deleteContent, async (c, ct) =>
                 {
@@ -318,6 +333,11 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
         }
 
         var newData = c.Data;
+
+        if (c.EnrichDefaults)
+        {
+            newData = operation.GenerateDefaultValues(newData);
+        }
 
         if (newData.Equals(Snapshot.EditingData))
         {

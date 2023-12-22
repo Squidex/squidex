@@ -1,0 +1,40 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1--Guid_2,
+    Snapshot: {
+      Name: my-schema,
+      IsPublished: false,
+      FieldCollection: {},
+      Scripts: {},
+      Properties: {
+        ValidateOnPublish: false
+      },
+      SchemaFieldsTotal: 1,
+      AppId: Guid_1,my-app,
+      IsDeleted: false,
+      UniqueId: Guid_1--Guid_2,
+      Id: Guid_2,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 2
+    },
+    Version: 2,
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1--Guid_2,
+        EventId: Guid_3,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        FieldId: 1,age,
+        SchemaId: Guid_2,my-schema,
+        AppId: Guid_1,my-app,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1,
+    Snapshot: {
+      FileName: image.png,
+      FileHash: 123,
+      MimeType: image/png,
+      Slug: image.png,
+      FileSize: 1024,
+      TotalSize: 1024,
+      IsProtected: false,
+      Metadata: {
+        pixelWidth: 800.0
+      },
+      UniqueId: Guid_2--Guid_1,
+      AppId: Guid_2,my-app,
+      IsDeleted: false,
+      Id: Guid_1,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 1
+    },
+    Version: 1,
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1,
+        EventId: Guid_3,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        Metadata: {
+          pixelWidth: 800.0
+        },
+        AssetId: Guid_1,
+        AppId: Guid_2,my-app,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

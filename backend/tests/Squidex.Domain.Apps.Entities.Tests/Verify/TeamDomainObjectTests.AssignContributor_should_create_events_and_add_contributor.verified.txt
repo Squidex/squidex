@@ -1,0 +1,12 @@
+﻿{
+  Name: My Team,
+  Contributors: {
+    Guid_1: Owner,
+    me: Owner
+  },
+  Id: Guid_2,
+  CreatedBy: subject:me,
+  LastModifiedBy: subject:me,
+  Version: 2,
+  UniqueId: Guid_2
+}

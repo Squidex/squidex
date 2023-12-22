@@ -175,6 +175,7 @@ public sealed class SchemasOpenApiGenerator
             .OperationSummary("Upsert a [schema] content item.")
             .HasQuery("patch", JsonObjectType.Boolean, FieldDescriptions.ContentRequestPatch)
             .HasQuery("publish", JsonObjectType.Boolean, FieldDescriptions.ContentRequestPublish)
+            .HasQuery("enrichDefaults", JsonObjectType.String, FieldDescriptions.ContentRequestApplyDefaults)
             .HasId()
             .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
             .Responds(200, "Content item created or updated.", builder.ContentSchema)
@@ -184,10 +185,18 @@ public sealed class SchemasOpenApiGenerator
             .RequirePermission(PermissionIds.AppContentsUpdateOwn)
             .Operation("Update")
             .OperationSummary("Update a [schema] content item.")
+            .HasQuery("enrichDefaults", JsonObjectType.String, FieldDescriptions.ContentRequestApplyDefaults)
             .HasId()
             .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
             .Responds(200, "Content item updated.", builder.ContentSchema)
             .Responds(400, "Content data not valid.");
+
+        builder.AddOperation(OpenApiOperationMethod.Put, "/{id}/defaults")
+            .RequirePermission(PermissionIds.AppContentsUpdateOwn)
+            .Operation("UpdateDefaults")
+            .OperationSummary("Apply a [schema] content item. defaults")
+            .HasId()
+            .Responds(200, "Content item updated.", builder.ContentSchema);
 
         builder.AddOperation(OpenApiOperationMethod.Patch, "/{id}")
             .RequirePermission(PermissionIds.AppContentsUpdateOwn)

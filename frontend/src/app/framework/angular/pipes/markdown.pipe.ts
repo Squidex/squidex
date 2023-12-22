@@ -14,8 +14,8 @@ import { renderMarkdown } from '@app/framework/internal';
     standalone: true,
 })
 export class MarkdownPipe implements PipeTransform {
-    public transform(text: string | undefined | null): string {
-        return renderMarkdown(text, false);
+    public transform(text: string | undefined | null, trusted = false): string {
+        return renderMarkdown(text, false, trusted);
     }
 }
 
@@ -25,7 +25,7 @@ export class MarkdownPipe implements PipeTransform {
     standalone: true,
 })
 export class MarkdownInlinePipe implements PipeTransform {
-    public transform(text: string | undefined | null): string {
-        return renderMarkdown(text, true);
+    public transform(text: string | undefined | null, trusted = false): string {
+        return renderMarkdown(text, true, trusted);
     }
 }

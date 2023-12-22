@@ -437,9 +437,36 @@ public sealed class ContentsController : ApiController
     [AcceptHeader.Unpublished]
     [AcceptHeader.Languages]
     [ApiCosts(1)]
-    public async Task<IActionResult> PutContent(string app, string schema, DomainId id, [FromBody] ContentData request)
+    public async Task<IActionResult> PutContent(string app, string schema, DomainId id, UpdateContentDto request)
     {
-        var command = new UpdateContent { ContentId = id, Data = request };
+        var command = request.ToCommand(id);
+
+        var response = await InvokeCommandAsync(command);
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Enrich a content item with defaults.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="schema">The name of the schema.</param>
+    /// <param name="id">The ID of the content item to update.</param>
+    /// <response code="200">Content updated.</response>
+    /// <response code="404">Content references, schema or app not found.</response>
+    /// <remarks>
+    /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+    /// </remarks>
+    [HttpPut]
+    [Route("content/{app}/{schema}/{id}/defaults")]
+    [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppContentsUpdateOwn)]
+    [AcceptHeader.Unpublished]
+    [AcceptHeader.Languages]
+    [ApiCosts(1)]
+    public async Task<IActionResult> PutContentDefaults(string app, string schema, DomainId id)
+    {
+        var command = new EnrichContentDefaults { ContentId = id };
 
         var response = await InvokeCommandAsync(command);
 

@@ -33,6 +33,8 @@ public sealed class BulkUpdateJob
 
     public bool Permanent { get; set; }
 
+    public bool EnrichDefaults { get; set; }
+
     public long ExpectedCount { get; set; } = 1;
 
     public long ExpectedVersion { get; set; } = EtagVersion.Any;

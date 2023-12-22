@@ -14,10 +14,12 @@ using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
+[UsesVerify]
 public class RuleDomainObjectTests : HandlerTestBase<Rule>
 {
     private readonly IRuleEnqueuer ruleEnqueuer = A.Fake<IRuleEnqueuer>();
@@ -64,19 +66,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
     {
         var command = MakeCreateCommand();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(AppId, sut.Snapshot.AppId);
-
-        Assert.Same(command.Trigger, sut.Snapshot.Trigger);
-        Assert.Same(command.Action, sut.Snapshot.Action);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateRuleEvent(new RuleCreated { Trigger = command.Trigger!, Action = command.Action! })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -86,21 +78,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(sut.Snapshot.IsEnabled);
-
-        Assert.Same(command.Trigger, sut.Snapshot.Trigger);
-        Assert.Same(command.Action, sut.Snapshot.Action);
-
-        Assert.Equal(command.Name, sut.Snapshot.Name);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateRuleEvent(new RuleUpdated { Trigger = command.Trigger, Action = command.Action, Name = command.Name })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -111,16 +91,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
         await ExecuteCreateAsync();
         await ExecuteDisableAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(sut.Snapshot.IsEnabled);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateRuleEvent(new RuleEnabled())
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -134,16 +107,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
         await ExecuteCreateAsync();
         await ExecuteDisableAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.True(sut.Snapshot.IsEnabled);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateRuleEvent(new RuleUpdated { IsEnabled = true })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -153,16 +119,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(sut.Snapshot.IsEnabled);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateRuleEvent(new RuleDisabled())
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -175,16 +134,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(sut.Snapshot.IsEnabled);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateRuleEvent(new RuleUpdated { IsEnabled = false })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -194,16 +146,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(None.Value);
-
-        Assert.True(sut.Snapshot.IsDeleted);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateRuleEvent(new RuleDeleted())
-            );
+        await VerifySutAsync(actual, None.Value);
     }
 
     [Fact]
@@ -213,9 +158,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
 
         await ExecuteCreateAsync();
 
-        await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        Assert.Equal(0, sut.Version);
+        await VerifySutAsync(actual, None.Value);
 
         A.CallTo(() => ruleEnqueuer.EnqueueAsync(sut.Snapshot.Id, sut.Snapshot,
                 A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered)))
@@ -224,17 +169,17 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
 
     private Task ExecuteCreateAsync()
     {
-        return PublishAsync(MakeCreateCommand());
+        return PublishAsync(sut, MakeCreateCommand());
     }
 
     private Task ExecuteDisableAsync()
     {
-        return PublishAsync(new DisableRule());
+        return PublishAsync(sut, new DisableRule());
     }
 
     private Task ExecuteDeleteAsync()
     {
-        return PublishAsync(new DeleteRule());
+        return PublishAsync(sut, new DeleteRule());
     }
 
     private static CreateRule MakeCreateCommand()
@@ -268,29 +213,26 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
         };
     }
 
-    private T CreateRuleEvent<T>(T @event) where T : RuleEvent
+    protected override IAggregateCommand CreateCommand(IAggregateCommand command)
     {
-        @event.RuleId = ruleId;
+        ((RuleCommand)command).RuleId = ruleId;
 
-        return CreateEvent(@event);
+        return base.CreateCommand(command);
     }
 
-    private T CreateRuleCommand<T>(T command) where T : RuleCommand
+    private async Task VerifySutAsync(object? actual, object? expected = null)
     {
-        command.RuleId = ruleId;
+        if (expected == null)
+        {
+            actual.Should().BeEquivalentTo(sut.Snapshot, o => o.IncludingProperties());
+        }
+        else
+        {
+            actual.Should().BeEquivalentTo(expected);
+        }
 
-        return CreateCommand(command);
-    }
+        Assert.Equal(AppId, sut.Snapshot.AppId);
 
-    private Task<object> PublishIdempotentAsync(RuleCommand command)
-    {
-        return PublishIdempotentAsync(sut, CreateRuleCommand(command));
-    }
-
-    private async Task<object?> PublishAsync(RuleCommand command)
-    {
-        var actual = await sut.ExecuteAsync(CreateRuleCommand(command), CancellationToken);
-
-        return actual.Payload;
+        await Verify(new { sut, events = LastEvents });
     }
 }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using Elasticsearch.Net.Specification.WatcherApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -25,6 +26,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
+[UsesVerify]
 public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 {
     private readonly DomainId contentId = DomainId.NewGuid();
@@ -140,15 +142,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -163,15 +157,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -186,16 +172,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Archived, sut.Snapshot.EditingStatus);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft }),
-                CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -240,15 +217,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Draft, sut.Snapshot.EditingStatus);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -263,15 +232,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Draft, sut.Snapshot.EditingStatus);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -286,16 +247,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(data, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Archived, sut.Snapshot.EditingStatus);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft }),
-                CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -312,14 +264,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentUpdated { Data = otherData })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -334,14 +279,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(patched, sut.Snapshot.CurrentVersion.Data);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentUpdated { Data = patched })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -356,14 +294,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentUpdated { Data = otherData })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -378,16 +309,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
-        Assert.Equal(Status.Archived, sut.Snapshot.EditingStatus);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentUpdated { Data = otherData }),
-                CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -404,11 +326,6 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         await ExecuteDeleteAsync();
 
         await PublishAsync(command);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
-            );
     }
 
     [Fact]
@@ -420,11 +337,6 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         await ExecuteDeleteAsync(true);
 
         await PublishAsync(command);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
-            );
     }
 
     [Fact]
@@ -436,14 +348,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentUpdated { Data = otherData })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -460,14 +365,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(otherData, sut.Snapshot.NewVersion?.Data);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentUpdated { Data = otherData })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -482,9 +380,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Single(LastEvents);
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
@@ -509,14 +405,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.NotEqual(data, sut.Snapshot.CurrentVersion.Data);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentUpdated { Data = patched })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -533,14 +422,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(patched, sut.Snapshot.NewVersion?.Data);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentUpdated { Data = patched })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -555,9 +437,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Single(LastEvents);
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
@@ -572,14 +452,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(Status.Archived, sut.Snapshot.CurrentVersion.Status);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -594,14 +467,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(Status.Archived, sut.Snapshot.CurrentVersion.Status);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -617,14 +483,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -643,16 +502,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
-        Assert.Equal(otherData, sut.Snapshot.CurrentVersion.Data);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentUpdated { Data = otherData }),
-                CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -669,14 +519,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(Status.Archived, sut.Snapshot.NewVersion?.Status);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Change, Status = Status.Archived })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -693,14 +536,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Null(sut.Snapshot.NewVersion?.Status);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Published, Status = Status.Published })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Published, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -717,17 +553,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(Status.Draft, sut.Snapshot.CurrentVersion.Status);
-        Assert.Equal(Status.Published, sut.Snapshot.ScheduleJob?.Status);
-
-        Assert.Equal(dueTime, sut.Snapshot.ScheduleJob?.DueTime);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentStatusScheduled { Status = Status.Published, DueTime = dueTime })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
@@ -748,14 +574,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Null(sut.Snapshot.ScheduleJob);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -776,14 +595,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Null(sut.Snapshot.ScheduleJob);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentSchedulingCancelled())
-            );
+        await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
@@ -818,7 +630,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     }
 
     [Fact]
-    public async Task CancelContentSchedule_create_events_and_unset_schedule()
+    public async Task CancelContentSchedule_should_create_events_and_unset_schedule()
     {
         var command = new CancelContentSchedule();
 
@@ -827,26 +639,46 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Null(sut.Snapshot.ScheduleJob);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentSchedulingCancelled())
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
     public async Task Validate_should_not_update_state()
     {
-        await ExecuteCreateAsync();
-
         var command = new ValidateContent();
 
+        await ExecuteCreateAsync();
         await PublishAsync(command);
 
         Assert.Equal(0, sut.Version);
+    }
+
+    [Fact]
+    public async Task EnrichContentDefaults_should_update_content()
+    {
+        await ExecuteCreateAsync();
+
+        Schema =
+            Schema.AddString(3, "defaults", Partitioning.Invariant,
+                new StringFieldProperties { DefaultValue = "Default Value" });
+
+        var command = new EnrichContentDefaults();
+
+        var actual = await PublishAsync(command);
+
+        await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task EnrichContentDefaults_should_not_update_content_if_all_fields_have_a_value()
+    {
+        await ExecuteCreateAsync();
+
+        var command = new EnrichContentDefaults();
+
+        var actual = await PublishAsync(command);
+
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -858,14 +690,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(None.Value);
-
-        Assert.True(sut.Snapshot.IsDeleted);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentDeleted())
-            );
+        await VerifySutAsync(actual, None.Value);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(DataScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
@@ -880,9 +705,6 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(None.Value);
-
-        Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
         Assert.Empty(LastEvents);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(DataScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), CancellationToken))
@@ -925,14 +747,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(Status.Draft, sut.Snapshot.NewVersion?.Status);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentDraftCreated { Status = Status.Draft })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -946,14 +761,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var actual = await PublishAsync(command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Null(sut.Snapshot.NewVersion);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateContentEvent(new ContentDraftDeleted())
-            );
+        await VerifySutAsync(actual);
     }
 
     private Task ExecuteCreateAsync()
@@ -1023,13 +831,27 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     {
         command.ContentId = contentId;
 
-        return CreateCommand(command);
+        return (T)CreateCommand(command);
     }
 
-    private async Task<object> PublishAsync(ContentCommand command)
+    private Task<object> PublishAsync(ContentCommand command)
     {
-        var actual = await sut.ExecuteAsync(CreateContentCommand(command), CancellationToken);
+        return PublishAsync(sut, CreateContentCommand(command));
+    }
 
-        return actual.Payload;
+    private async Task VerifySutAsync(object? actual, object? expected = null)
+    {
+        if (expected == null)
+        {
+            actual.Should().BeEquivalentTo(sut.Snapshot, o => o.IncludingProperties());
+        }
+        else
+        {
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        Assert.Equal(AppId, sut.Snapshot.AppId);
+
+        await Verify(new { sut, events = LastEvents });
     }
 }

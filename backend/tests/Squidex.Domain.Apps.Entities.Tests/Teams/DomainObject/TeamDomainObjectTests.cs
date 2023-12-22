@@ -7,18 +7,17 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
 
+[UsesVerify]
 public class TeamDomainObjectTests : HandlerTestBase<Team>
 {
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
@@ -74,17 +73,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
     {
         var command = new CreateTeam { Name = name, TeamId = TeamId };
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(name, sut.Snapshot.Name);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new TeamCreated { Name = name }),
-                CreateEvent(new TeamContributorAssigned { ContributorId = User.Identifier, Role = Role.Owner })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -92,16 +83,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
     {
         var command = new CreateTeam { Name = name, Actor = Client, TeamId = TeamId };
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(name, sut.Snapshot.Name);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new TeamCreated { Name = name }, true) // Must be with client User.
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -111,16 +95,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Name, sut.Snapshot.Name);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new TeamUpdated { Name = command.Name })
-            );
+        await VerifySutAsync(actual);
     }
 
     [Fact]
@@ -133,16 +110,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
-
-        Assert.Equal(planPaid.Id, sut.Snapshot.Plan!.PlanId);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new TeamPlanChanged { PlanId = planPaid.Id })
-            );
+        await VerifySutAsync(actual, new PlanChangedResult(planPaid.Id));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, planPaid.Id, CancellationToken))
             .MustHaveHappened();
@@ -158,16 +128,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
-
-        Assert.Equal(planPaid.Id, sut.Snapshot.Plan!.PlanId);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new TeamPlanChanged { PlanId = planPaid.Id })
-            );
+        await VerifySutAsync(actual, new PlanChangedResult(planPaid.Id));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<Team>._, A<string?>._, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -184,16 +147,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
         await ExecuteCreateAsync();
         await ExecuteChangePlanAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planFree.Id, true));
-
-        Assert.Null(sut.Snapshot.Plan);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new TeamPlanReset())
-            );
+        await VerifySutAsync(actual, new PlanChangedResult(planFree.Id, true));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<Team>._, A<string?>._, CancellationToken))
             .MustHaveHappenedOnceExactly();
@@ -210,16 +166,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
         await ExecuteCreateAsync();
         await ExecuteChangePlanAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planFree.Id, true));
-
-        Assert.Null(sut.Snapshot.Plan);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new TeamPlanReset())
-            );
+        await VerifySutAsync(actual, new PlanChangedResult(planFree.Id, true));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, planPaid.Id, CancellationToken))
             .MustHaveHappenedOnceExactly();
@@ -238,11 +187,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id, false, new Uri("http://squidex.io")));
-
-        Assert.Null(sut.Snapshot.Plan);
+        await VerifySutAsync(actual, new PlanChangedResult(planPaid.Id, false, new Uri("http://squidex.io")));
     }
 
     [Fact]
@@ -252,11 +199,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(new PlanChangedResult(planPaid.Id));
-
-        Assert.Equal(planPaid.Id, sut.Snapshot.Plan?.PlanId);
+        await VerifySutAsync(actual, new PlanChangedResult(planPaid.Id));
 
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, planPaid.Id, A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -272,16 +217,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
 
         await ExecuteCreateAsync();
 
-        var actual = await PublishIdempotentAsync(command);
+        var actual = await PublishIdempotentAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.Equal(command.Role, sut.Snapshot.Contributors[contributorId]);
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new TeamContributorAssigned { ContributorId = contributorId, Role = command.Role, IsAdded = true })
-            );
+        await Verify(actual);
     }
 
     [Fact]
@@ -292,42 +230,37 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
         await ExecuteCreateAsync();
         await ExecuteAssignContributorAsync();
 
-        var actual = await PublishAsync(command);
+        var actual = await PublishAsync(sut, command);
 
-        actual.ShouldBeEquivalent(sut.Snapshot);
-
-        Assert.False(sut.Snapshot.Contributors.ContainsKey(contributorId));
-
-        LastEvents
-            .ShouldHaveSameEvents(
-                CreateEvent(new TeamContributorRemoved { ContributorId = contributorId })
-            );
+        await Verify(actual);
     }
 
     private Task ExecuteCreateAsync()
     {
-        return PublishAsync(new CreateTeam { Name = name, TeamId = TeamId });
+        return PublishAsync(sut, new CreateTeam { Name = name, TeamId = TeamId });
     }
 
     private Task ExecuteAssignContributorAsync()
     {
-        return PublishAsync(new AssignContributor { ContributorId = contributorId });
+        return PublishAsync(sut, new AssignContributor { ContributorId = contributorId });
     }
 
     private Task ExecuteChangePlanAsync()
     {
-        return PublishAsync(new ChangePlan { PlanId = planPaid.Id });
+        return PublishAsync(sut, new ChangePlan { PlanId = planPaid.Id });
     }
 
-    private Task<object> PublishIdempotentAsync(TeamCommand command)
+    private async Task VerifySutAsync(object? actual, object? expected = null)
     {
-        return PublishIdempotentAsync(sut, CreateCommand(command));
-    }
+        if (expected == null)
+        {
+            actual.Should().BeEquivalentTo(sut.Snapshot, o => o.IncludingProperties());
+        }
+        else
+        {
+            actual.Should().BeEquivalentTo(expected);
+        }
 
-    private async Task<object> PublishAsync(TeamCommand command)
-    {
-        var actual = await sut.ExecuteAsync(CreateCommand(command), CancellationToken);
-
-        return actual.Payload;
+        await Verify(new { sut, events = LastEvents });
     }
 }
