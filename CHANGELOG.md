@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.11.0] - 2023-12-22
+
+### Fixed 
+
+* **UI**: Fixed the usage rule form.
+* **UI**: Fixed deserialization of schemas.
+
+### Added
+
+* **Contents**: New endpoint and methods to apply default values to existing content items.
+
 ## [7.10.0] - 2023-12-17
 
 This release will rebuild the text indexes for improved performance. Usually it will handle around 500 events per second, so depending on the number of changes in your system it can take from a few minutes up to several minutes. Other endpoints are not effected. If you have a dedicated worker, you can deploy this first and wait for the process to be finished before you deploy other nodes. This will not cause any downtimes in the full text search functionality.
