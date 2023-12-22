@@ -26,27 +26,5 @@
       LastModifiedBy: subject:me
     },
     ObjectState: Created
-  },
-  events: [
-    {
-      Headers: {
-        AggregateId: Guid_1--Guid_2,
-        EventId: Guid_4,
-        Timestamp: DateTimeOffset_1
-      },
-      Payload: {
-        Status: Draft,
-        Data: {
-          my-field1: {
-            iv: 1.0
-          }
-        },
-        ContentId: Guid_2,
-        SchemaId: Guid_3,my-schema,
-        AppId: Guid_1,my-app,
-        Actor: subject:me,
-        FromRule: false
-      }
-    }
-  ]
+  }
 }

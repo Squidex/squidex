@@ -17,26 +17,5 @@
       LastModifiedBy: subject:me
     },
     ObjectState: Created
-  },
-  events: [
-    {
-      Headers: {
-        AggregateId: Guid_1--Guid_2,
-        EventId: Guid_3,
-        Timestamp: DateTimeOffset_1
-      },
-      Payload: {
-        Trigger: {
-          HandleAll: false
-        },
-        Action: {
-          Value: 123
-        },
-        RuleId: Guid_2,
-        AppId: Guid_1,my-app,
-        Actor: subject:me,
-        FromRule: false
-      }
-    }
-  ]
+  }
 }

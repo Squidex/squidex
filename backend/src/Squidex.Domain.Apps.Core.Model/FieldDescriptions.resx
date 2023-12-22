@@ -249,6 +249,9 @@
   <data name="ContentPartitionField" xml:space="preserve">
     <value>{0} field ({1}).</value>
   </data>
+  <data name="ContentRequestApplyDefaults" xml:space="preserve">
+    <value>Enrich the content with defaults.</value>
+  </data>
   <data name="ContentRequestData" xml:space="preserve">
     <value>The data for the content.</value>
   </data>

@@ -62,24 +62,33 @@ public abstract class HandlerTestBase<TState> : GivenContext
 
     protected async Task<object> PublishAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : Entity, new()
     {
-        var actual = await domainObject.ExecuteAsync(CreateCommand(command), CancellationToken);
+        LastEvents = [];
 
-        return actual.Payload;
+        return await ExecuteCoreAsync(domainObject, command);
     }
 
     protected async Task<object> PublishIdempotentAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : Entity, new()
     {
-        var actual = await PublishAsync(domainObject, command);
+        LastEvents = [];
+
+        var actual = await ExecuteCoreAsync(domainObject, command);
 
         var previousSnapshot = domainObject.Snapshot;
         var previousVersion = domainObject.Snapshot.Version;
 
-        await PublishAsync(domainObject, command);
+        await ExecuteCoreAsync(domainObject, command);
 
         Assert.Same(previousSnapshot, domainObject.Snapshot);
         Assert.Equal(previousVersion, domainObject.Snapshot.Version);
 
         return actual;
+    }
+
+    private async Task<object> ExecuteCoreAsync<T>(DomainObject<T> domainObject, IAggregateCommand command) where T : Entity, new()
+    {
+        var actual = await domainObject.ExecuteAsync(CreateCommand(command), CancellationToken);
+
+        return actual.Payload;
     }
 
     protected virtual IAggregateCommand CreateCommand(IAggregateCommand command)

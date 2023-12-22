@@ -88,19 +88,6 @@ public static partial class ContentStrategies
                 return GetClient().UpdateAsync(content.Id, data);
             case Update.Upsert:
                 return GetClient().UpsertAsync(content.Id, data);
-            case Update.UpsertBulk:
-                return GetClient().BulkUpdateAsync(new BulkUpdate
-                {
-                    Jobs =
-                    [
-                        new BulkUpdateJob
-                        {
-                            Id = content.Id,
-                            Data = data,
-                            Type = BulkUpdateType.Upsert
-                        },
-                    ]
-                });
             case Update.Bulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
@@ -108,9 +95,22 @@ public static partial class ContentStrategies
                     [
                         new BulkUpdateJob
                         {
-                            Id = content.Id,
-                            Data = data,
                             Type = BulkUpdateType.Update,
+                            Id = content.Id,
+                            Data = data
+                        },
+                    ]
+                });
+            case Update.UpsertBulk:
+                return GetClient().BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs =
+                    [
+                        new BulkUpdateJob
+                        {
+                            Type = BulkUpdateType.Upsert,
+                            Id = content.Id,
+                            Data = data
                         },
                     ]
                 });
@@ -121,23 +121,23 @@ public static partial class ContentStrategies
                     [
                         new BulkUpdateJob
                         {
+                            Type = BulkUpdateType.Update,
                             Id = content.Id,
                             Data = data,
-                            Type = BulkUpdateType.Update,
                             Schema = content.SchemaName
                         },
                     ]
                 });
             case Update.BulkShared:
-                return client.SharedContents<MyContent, object>().BulkUpdateAsync(new BulkUpdate
+                return GetSharedClient(client).BulkUpdateAsync(new BulkUpdate
                 {
                     Jobs =
                     [
                         new BulkUpdateJob
                         {
+                            Type = BulkUpdateType.Update,
                             Id = content.Id,
                             Data = data,
-                            Type = BulkUpdateType.Update,
                             Schema = content.SchemaName
                         },
                     ]
@@ -151,10 +151,10 @@ public static partial class ContentStrategies
     {
         Normal,
         Upsert,
+        UpsertBulk,
         Bulk,
         BulkWithSchema,
-        BulkShared,
-        UpsertBulk
+        BulkShared
     }
 
     public static Task PatchAsync(this ISquidexClient client, ContentBase content, object data, Patch strategy)
@@ -177,9 +177,10 @@ public static partial class ContentStrategies
                     [
                         new BulkUpdateJob
                         {
+                            Type = BulkUpdateType.Upsert,
                             Id = content.Id,
                             Data = data,
-                            Patch = true,
+                            Patch = true
                         },
                     ]
                 });
@@ -190,9 +191,9 @@ public static partial class ContentStrategies
                     [
                         new BulkUpdateJob
                         {
+                            Type = BulkUpdateType.Patch,
                             Id = content.Id,
                             Data = data,
-                            Type = BulkUpdateType.Patch
                         },
                     ]
                 });
@@ -203,23 +204,23 @@ public static partial class ContentStrategies
                     [
                         new BulkUpdateJob
                         {
+                            Type = BulkUpdateType.Patch,
                             Id = content.Id,
                             Data = data,
-                            Type = BulkUpdateType.Patch,
                             Schema = content.SchemaName
                         },
                     ]
                 });
             case Patch.BulkShared:
-                return client.SharedContents<MyContent, object>().BulkUpdateAsync(new BulkUpdate
+                return GetSharedClient(client).BulkUpdateAsync(new BulkUpdate
                 {
                     Jobs =
                     [
                         new BulkUpdateJob
                         {
+                            Type = BulkUpdateType.Patch,
                             Id = content.Id,
                             Data = data,
-                            Type = BulkUpdateType.Patch,
                             Schema = content.SchemaName
                         },
                     ]
@@ -227,6 +228,109 @@ public static partial class ContentStrategies
             default:
                 return Task.CompletedTask;
         }
+    }
+
+    public enum EnrichDefaults
+    {
+        Normal,
+        Upsert,
+        Update,
+        Bulk,
+        BulkWithSchema,
+        BulkShared,
+        UpsertBulk,
+        UpdateBulk
+    }
+
+    public static Task EnrichDefaultsAsync(this ISquidexClient client, ContentBase content, object data, EnrichDefaults strategy)
+    {
+        IContentsClient<MyContent, object> GetClient()
+        {
+            return client.Contents<MyContent, object>(content.SchemaName);
+        }
+
+        switch (strategy)
+        {
+            case EnrichDefaults.Normal:
+                return GetClient().EnrichDefaultsAsync(content.Id);
+            case EnrichDefaults.Update:
+                return GetClient().UpdateAsync(content.Id, data, ContentUpdateOptions.AsEnrichDefaults);
+            case EnrichDefaults.Upsert:
+                return GetClient().UpsertAsync(content.Id, data, ContentUpsertOptions.AsEnrichDefaults);
+            case EnrichDefaults.Bulk:
+                return GetClient().BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs =
+                    [
+                        new BulkUpdateJob
+                        {
+                            Type = BulkUpdateType.EnrichDefaults,
+                            Id = content.Id
+                        },
+                    ]
+                });
+            case EnrichDefaults.UpdateBulk:
+                return GetClient().BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs =
+                    [
+                        new BulkUpdateJob
+                        {
+                            Type = BulkUpdateType.Update,
+                            Id = content.Id,
+                            Data = data,
+                            EnrichDefaults = true,
+                        },
+                    ]
+                });
+            case EnrichDefaults.UpsertBulk:
+                return GetClient().BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs =
+                    [
+                        new BulkUpdateJob
+                        {
+                            Type = BulkUpdateType.Upsert,
+                            Id = content.Id,
+                            Data = data,
+                            EnrichDefaults = true,
+                        },
+                    ]
+                });
+            case EnrichDefaults.BulkWithSchema:
+                return GetClient().BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs =
+                    [
+                        new BulkUpdateJob
+                        {
+                            Type = BulkUpdateType.EnrichDefaults,
+                            Id = content.Id,
+                            Schema = content.SchemaName
+                        },
+                    ]
+                });
+            case EnrichDefaults.BulkShared:
+                return GetSharedClient(client).BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs =
+                    [
+                        new BulkUpdateJob
+                        {
+                            Type = BulkUpdateType.EnrichDefaults,
+                            Id = content.Id,
+                            Schema = content.SchemaName
+                        },
+                    ]
+                });
+            default:
+                return Task.CompletedTask;
+        }
+    }
+
+    private static IContentsSharedClient<MyContent, object> GetSharedClient(ISquidexClient client)
+    {
+        return client.SharedContents<MyContent, object>();
     }
 
     private sealed class MyContent : Content<object>

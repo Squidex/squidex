@@ -457,6 +457,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enrich the content with defaults..
+        /// </summary>
+        public static string ContentRequestApplyDefaults {
+            get {
+                return ResourceManager.GetString("ContentRequestApplyDefaults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The data for the content..
         /// </summary>
         public static string ContentRequestData {

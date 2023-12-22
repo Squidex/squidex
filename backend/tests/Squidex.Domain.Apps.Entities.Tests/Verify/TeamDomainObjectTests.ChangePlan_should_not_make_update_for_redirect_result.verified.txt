@@ -14,36 +14,5 @@
     },
     Version: 1,
     ObjectState: Created
-  },
-  events: [
-    {
-      Headers: {
-        AggregateId: Guid_1,
-        EventId: Guid_2,
-        Timestamp: DateTimeOffset_1
-      },
-      Payload: {
-        Name: My Team,
-        TeamId: Guid_1,
-        Actor: subject:me,
-        FromRule: false
-      }
-    },
-    {
-      Headers: {
-        AggregateId: Guid_1,
-        EventId: Guid_3,
-        Timestamp: DateTimeOffset_1
-      },
-      Payload: {
-        ContributorId: me,
-        Role: Owner,
-        IsCreated: false,
-        IsAdded: false,
-        TeamId: Guid_1,
-        Actor: subject:me,
-        FromRule: false
-      }
-    }
-  ]
+  }
 }

@@ -23,8 +23,26 @@
       UniqueId: Guid_1--Guid_2,
       Id: Guid_2,
       CreatedBy: subject:me,
-      LastModifiedBy: subject:me
+      LastModifiedBy: subject:me,
+      Version: 2
     },
+    Version: 2,
     ObjectState: Created
-  }
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1--Guid_2,
+        EventId: Guid_4,
+        Timestamp: DateTimeOffset_1
+      },
+      Payload: {
+        ContentId: Guid_2,
+        SchemaId: Guid_3,my-schema,
+        AppId: Guid_1,my-app,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
 }

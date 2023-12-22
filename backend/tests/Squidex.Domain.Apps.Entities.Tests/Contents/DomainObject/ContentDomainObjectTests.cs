@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using Elasticsearch.Net.Specification.WatcherApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
@@ -629,7 +630,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     }
 
     [Fact]
-    public async Task CancelContentSchedule_create_events_and_unset_schedule()
+    public async Task CancelContentSchedule_should_create_events_and_unset_schedule()
     {
         var command = new CancelContentSchedule();
 
@@ -644,13 +645,40 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Validate_should_not_update_state()
     {
-        await ExecuteCreateAsync();
-
         var command = new ValidateContent();
 
+        await ExecuteCreateAsync();
         await PublishAsync(command);
 
         Assert.Equal(0, sut.Version);
+    }
+
+    [Fact]
+    public async Task EnrichContentDefaults_should_update_content()
+    {
+        await ExecuteCreateAsync();
+
+        Schema =
+            Schema.AddString(3, "defaults", Partitioning.Invariant,
+                new StringFieldProperties { DefaultValue = "Default Value" });
+
+        var command = new EnrichContentDefaults();
+
+        var actual = await PublishAsync(command);
+
+        await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task EnrichContentDefaults_should_not_update_content_if_all_fields_have_a_value()
+    {
+        await ExecuteCreateAsync();
+
+        var command = new EnrichContentDefaults();
+
+        var actual = await PublishAsync(command);
+
+        await VerifySutAsync(actual);
     }
 
     [Fact]

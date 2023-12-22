@@ -34,7 +34,7 @@
                 <h3>{{ 'clients.connectWizard.step1Title' | sqxTranslate }}</h3>
 
                 <sqx-form-hint>
-                    <span [innerHTML]="'clients.connectWizard.postManDocs' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span>
+                    <span [innerHTML]="'clients.connectWizard.postManDocs' | sqxTranslate | sqxMarkdownInline:true | sqxSafeHtml"></span>
                 </sqx-form-hint>
         
                 <div class="section">
@@ -105,7 +105,7 @@
                 <div class="section step">
                     <h5><span class="badge rounded-pill bg-dark">1</span> {{ 'clients.connectWizard.cliStep1' | sqxTranslate }}</h5>
 
-                    <div [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                    <div [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown:true | sqxSafeHtml"></div>
 
                     <sqx-form-hint>
                         {{ 'clients.connectWizard.cliStep1Hint' | sqxTranslate }}
@@ -113,7 +113,7 @@
                 </div>
                 
                 <div class="section step">
-                    <h5><span class="badge rounded-pill bg-dark">2</span> <span [innerHTML]="'clients.connectWizard.cliStep2' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span></h5>
+                    <h5><span class="badge rounded-pill bg-dark">2</span> <span [innerHTML]="'clients.connectWizard.cliStep2' | sqxTranslate | sqxMarkdownInline:true | sqxSafeHtml"></span></h5>
                 </div>
 
                 <div class="section step">

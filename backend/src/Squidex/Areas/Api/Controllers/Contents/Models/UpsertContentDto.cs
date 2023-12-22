@@ -37,6 +37,12 @@ public class UpsertContentDto
     public bool Patch { get; set; }
 
     /// <summary>
+    /// Enrich the content with defaults.
+    /// </summary>
+    [FromQuery(Name = "enrichDefaults")]
+    public bool EnrichDefaults { get; set; }
+
+    /// <summary>
     /// True to automatically publish the content.
     /// </summary>
     [FromQuery(Name = "publish")]

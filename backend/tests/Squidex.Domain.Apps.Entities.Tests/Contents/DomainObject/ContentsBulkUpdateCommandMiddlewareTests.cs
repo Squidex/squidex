@@ -316,6 +316,43 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_update_content_defaults()
+    {
+        SetupContext(PermissionIds.AppContentsUpdateOwn);
+
+        var (id, _, _) = CreateTestData(false);
+
+        var command = BulkCommand(BulkUpdateContentType.EnrichDefaults, new BulkUpdateJob(), id);
+
+        var actual = await PublishAsync(command);
+
+        Assert.Single(actual);
+        Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+
+        A.CallTo(() => commandBus.PublishAsync(
+                A<EnrichContentDefaults>.That.Matches(x => x.ContentId == id), A<CancellationToken>._))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_throw_security_exception_if_user_has_no_permission_for_defaults()
+    {
+        SetupContext(PermissionIds.AppContentsReadOwn);
+
+        var (id, _, _) = CreateTestData(false);
+
+        var command = BulkCommand(BulkUpdateContentType.EnrichDefaults, new BulkUpdateJob(), id);
+
+        var actual = await PublishAsync(command);
+
+        Assert.Single(actual);
+        Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+
+        A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_patch_content()
     {
         SetupContext(PermissionIds.AppContentsUpdateOwn);
