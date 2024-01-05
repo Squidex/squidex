@@ -73,7 +73,7 @@ public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
 
             cm.MapProperty(x => x.TotalSize)
                 .SetElementName("ts")
-                .SetIsRequired(true);
+                .SetIsRequired(false);
 
             cm.MapProperty(x => x.Type)
                 .SetElementName("at")
