@@ -46,8 +46,11 @@ public sealed class AppSettingsSearchSource : ISearchSource
         Search("Assets", PermissionIds.AppAssetsRead,
             a => urlGenerator.AssetsUI(a), SearchResultType.Asset);
 
-        Search("Backups", PermissionIds.AppBackupsRead,
-            urlGenerator.BackupsUI, SearchResultType.Setting);
+        Search("Backups", PermissionIds.AppJobsRead,
+            urlGenerator.JobsUI, SearchResultType.Setting);
+
+        Search("Jobs", PermissionIds.AppJobsRead,
+            urlGenerator.JobsUI, SearchResultType.Setting);
 
         Search("Clients", PermissionIds.AppClientsRead,
             urlGenerator.ClientsUI, SearchResultType.Setting);

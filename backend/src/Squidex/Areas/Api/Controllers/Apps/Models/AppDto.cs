@@ -7,7 +7,7 @@
 
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Assets;
-using Squidex.Areas.Api.Controllers.Backups;
+using Squidex.Areas.Api.Controllers.Jobs;
 using Squidex.Areas.Api.Controllers.Ping;
 using Squidex.Areas.Api.Controllers.Plans;
 using Squidex.Areas.Api.Controllers.Rules;
@@ -182,10 +182,10 @@ public sealed class AppDto : Resource
                 resources.Url<AssetsController>(x => nameof(x.GetAssets), values));
         }
 
-        if (resources.IsAllowed(PermissionIds.AppBackupsRead, Name, additional: permissions))
+        if (resources.IsAllowed(PermissionIds.AppJobsRead, Name, additional: permissions))
         {
-            AddGetLink("backups",
-                resources.Url<BackupsController>(x => nameof(x.GetBackups), values));
+            AddGetLink("jobs",
+                resources.Url<JobsController>(x => nameof(x.GetJobs), values));
         }
 
         if (resources.IsAllowed(PermissionIds.AppClientsRead, Name, additional: permissions))

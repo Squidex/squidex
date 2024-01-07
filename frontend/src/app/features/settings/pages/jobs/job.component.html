@@ -1,0 +1,52 @@
+<div class="table-items-row table-items-row-summary">
+    <div class="row align-items-center">
+        <div class="col-auto" [ngSwitch]="job.status">
+            <sqx-status-icon size="lg" [status]="job.status"></sqx-status-icon>
+        </div>
+        <div class="col">
+            <div>
+                <h4>{{job.taskName}}</h4>
+            </div>
+
+            <div class="row">
+                <div class="col-auto">
+                    <div>
+                        {{ 'jobs.startedLabel' | sqxTranslate }}:
+                    </div>
+                    <div>
+                        {{ 'jobs.jobDuration' | sqxTranslate }}:
+                    </div>
+                </div>
+                <div class="col align-self-end text-nowrap">
+                    <div>
+                        {{job.started | sqxFromNow}}
+                    </div>
+                    <div *ngIf="job.stopped">
+                        {{duration}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col align-self-end">
+            <div class="text-nowrap">
+                {{job.log[0]}}
+            </div>
+            <div *ngIf="job.canDownload && job.downloadUrl">
+                {{ 'jobs.jobDownload' | sqxTranslate }}:
+
+                <a href="{{apiUrl.buildUrl(job.downloadUrl)}}" sqxExternalLink="noicon">
+                    {{ 'jobs.jobDownloadLink' | sqxTranslate }} <i class="icon-external-link"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-text-danger mt-1" [disabled]="!job.canDelete"
+                (sqxConfirmClick)="delete()"
+                confirmTitle="i18n:jobs.deleteConfirmTitle"
+                confirmText="i18n:jobs.deleteConfirmText"
+                confirmRememberKey="deleteBackup">
+                <i class="icon-bin2"></i>
+            </button>
+        </div>
+    </div>
+</div>

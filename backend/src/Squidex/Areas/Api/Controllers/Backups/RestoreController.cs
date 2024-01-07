@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
@@ -22,12 +23,12 @@ namespace Squidex.Areas.Api.Controllers.Backups;
 [ApiModelValidation(true)]
 public class RestoreController : ApiController
 {
-    private readonly IBackupService backupService;
+    private readonly IJobService jobService;
 
-    public RestoreController(ICommandBus commandBus, IBackupService backupService)
+    public RestoreController(ICommandBus commandBus, IJobService jobService)
         : base(commandBus)
     {
-        this.backupService = backupService;
+        this.jobService = jobService;
     }
 
     /// <summary>
@@ -40,7 +41,8 @@ public class RestoreController : ApiController
     [ApiPermission(PermissionIds.AdminRestore)]
     public async Task<IActionResult> GetRestoreJob()
     {
-        var job = await backupService.GetRestoreAsync(HttpContext.RequestAborted);
+        var jobs = await jobService.GetJobsAsync(default, HttpContext.RequestAborted);
+        var job = jobs.Find(x => x.TaskName == RestoreJob.TaskName);
 
         if (job == null)
         {
@@ -63,7 +65,9 @@ public class RestoreController : ApiController
     [ApiPermission(PermissionIds.AdminRestore)]
     public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request)
     {
-        await backupService.StartRestoreAsync(User.Token()!, request.Url, request.Name, HttpContext.RequestAborted);
+        var (taskName, args) = RestoreJob.BuildArgs(request.Url, request.Name);
+
+        await jobService.StartAsync(default, User.Token()!, taskName, args, HttpContext.RequestAborted);
 
         return NoContent();
     }

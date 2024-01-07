@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models;
@@ -38,7 +38,7 @@ public sealed class RestoreJobDto
     /// </summary>
     public JobStatus Status { get; set; }
 
-    public static RestoreJobDto FromDomain(IRestoreJob job)
+    public static RestoreJobDto FromDomain(Job job)
     {
         return SimpleMapper.Map(job, new RestoreJobDto());
     }

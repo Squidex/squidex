@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
@@ -18,18 +18,16 @@ namespace Squidex.Areas.Api.Controllers.Backups;
 /// Update and query backups for app.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Backups))]
+[Obsolete("Use Jobs endpoint.")]
 public class BackupContentController : ApiController
 {
-    private readonly IBackupArchiveStore backupArchiveStore;
-    private readonly IBackupService backupservice;
+    private readonly IJobService jobService;
 
     public BackupContentController(ICommandBus commandBus,
-        IBackupArchiveStore backupArchiveStore,
-        IBackupService backupservice)
+        IJobService jobService)
         : base(commandBus)
     {
-        this.backupArchiveStore = backupArchiveStore;
-        this.backupservice = backupservice;
+        this.jobService = jobService;
     }
 
     /// <summary>
@@ -45,6 +43,7 @@ public class BackupContentController : ApiController
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ApiCosts(0)]
     [AllowAnonymous]
+    [Obsolete("Use Jobs endpoint.")]
     public Task<IActionResult> GetBackupContent(string app, DomainId id)
     {
         return GetBackupAsync(AppId, app, id);
@@ -64,6 +63,7 @@ public class BackupContentController : ApiController
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ApiCosts(0)]
     [AllowAnonymous]
+    [Obsolete("Use Jobs endpoint.")]
     public Task<IActionResult> GetBackupContentV2(DomainId id, [FromQuery] DomainId appId = default, [FromQuery] string app = "")
     {
         return GetBackupAsync(appId, app, id);
@@ -71,23 +71,22 @@ public class BackupContentController : ApiController
 
     private async Task<IActionResult> GetBackupAsync(DomainId appId, string app, DomainId id)
     {
-        var backup = await backupservice.GetBackupAsync(appId, id, HttpContext.RequestAborted);
+        var jobs = await jobService.GetJobsAsync(appId, HttpContext.RequestAborted);
+        var job = jobs.Find(x => x.Id == id);
 
-        if (backup is not { Status: JobStatus.Completed })
+        if (job is not { Status: JobStatus.Completed } || job.File == null)
         {
             return NotFound();
         }
 
-        var fileName = $"backup-{app}-{backup.Started:yyyy-MM-dd_HH-mm-ss}.zip";
-
         var callback = new FileCallback((body, range, ct) =>
         {
-            return backupArchiveStore.DownloadAsync(id, body, ct);
+            return jobService.DownloadAsync(job, body, ct);
         });
 
-        return new FileCallbackResult("application/zip", callback)
+        return new FileCallbackResult(job.File.MimeType, callback)
         {
-            FileDownloadName = fileName,
+            FileDownloadName = job.File.Name,
             FileSize = null,
             ErrorAs404 = true
         };

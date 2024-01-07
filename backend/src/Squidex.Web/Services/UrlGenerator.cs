@@ -82,11 +82,6 @@ public sealed class UrlGenerator : IUrlGenerator
         return urlGenerator.BuildUrl($"app/{appId.Name}/assets", false) + @ref != null ? $"?ref={@ref}" : string.Empty;
     }
 
-    public string BackupsUI(NamedId<DomainId> appId)
-    {
-        return urlGenerator.BuildUrl($"app/{appId.Name}/settings/backups", false);
-    }
-
     public string ClientsUI(NamedId<DomainId> appId)
     {
         return urlGenerator.BuildUrl($"app/{appId.Name}/settings/clients", false);
@@ -120,6 +115,11 @@ public sealed class UrlGenerator : IUrlGenerator
     public string DashboardUI(NamedId<DomainId> appId)
     {
         return urlGenerator.BuildUrl($"app/{appId.Name}", false);
+    }
+
+    public string JobsUI(NamedId<DomainId> appId)
+    {
+        return urlGenerator.BuildUrl($"app/{appId.Name}/settings/jobs", false);
     }
 
     public string LanguagesUI(NamedId<DomainId> appId)

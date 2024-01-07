@@ -1,6 +1,6 @@
-<sqx-title message="i18n:backups.restorePageTitle"></sqx-title>
+<sqx-title message="i18n:jobs.restorePageTitle"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:backups.restoreTitle" titleIcon="backup" innerWidth="70">
+<sqx-layout layout="main" titleText="i18n:jobs.restoreTitle" titleIcon="backup" innerWidth="70">
     <ng-container>
         <sqx-list-view innerWidth="70rem">
             <div class="card section" *ngIf="restoreJob | async; let job">
@@ -19,7 +19,7 @@
                         </div>
                             
                         <div class="col">
-                            <h3>{{ 'backups.restoreLastStatus' | sqxTranslate }}</h3>
+                            <h3>{{ 'jobs.restoreLastStatus' | sqxTranslate }}</h3>
                         </div>
 
                         <div class="col text-end restore-url">
@@ -35,10 +35,10 @@
                 <div class="card-footer small text-muted">
                     <div class="row">
                         <div class="col">
-                            {{ 'backups.restoreStartedLabel' | sqxTranslate }}: {{job.started | sqxISODate}}
+                            {{ 'jobs.restoreStartedLabel' | sqxTranslate }}: {{job.started | sqxISODate}}
                         </div>
                         <div class="col text-end" *ngIf="job.stopped">
-                            {{ 'backups.restoreStoppedLabel' | sqxTranslate }}: {{job.stopped | sqxISODate}}
+                            {{ 'jobs.restoreStoppedLabel' | sqxTranslate }}: {{job.stopped | sqxISODate}}
                         </div>
                     </div>
                 </div>
@@ -50,16 +50,16 @@
                         <div class="col">
                             <sqx-control-errors for="url"></sqx-control-errors>
 
-                            <input class="form-control" formControlName="url" placeholder="{{ 'backups.restoreLastUrl' | sqxTranslate }}">
+                            <input class="form-control" formControlName="url" placeholder="{{ 'jobs.restoreLastUrl' | sqxTranslate }}">
                         </div>
                         <div class="col">
                             <sqx-control-errors for="name"></sqx-control-errors>
 
-                            <input class="form-control" formControlName="name" placeholder="{{ 'backups.restoreNewAppName' | sqxTranslate }}">
+                            <input class="form-control" formControlName="name" placeholder="{{ 'jobs.restoreNewAppName' | sqxTranslate }}">
                         </div>
                         <div class="col-auto">
                             <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">
-                                {{ 'backups.restore' | sqxTranslate }}
+                                {{ 'jobs.restore' | sqxTranslate }}
                             </button>
                         </div>
                     </div>

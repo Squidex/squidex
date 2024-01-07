@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -33,9 +32,6 @@ public static class BackupsServices
         services.AddSingletonAs<DefaultBackupArchiveStore>()
             .As<IBackupArchiveStore>();
 
-        services.AddTransientAs<BackupService>()
-            .As<IBackupService>().As<IDeleter>();
-
         services.AddTransientAs<BackupApps>()
             .As<IBackupHandler>();
 
@@ -51,7 +47,7 @@ public static class BackupsServices
         services.AddTransientAs<BackupSchemas>()
             .As<IBackupHandler>();
 
-        services.AddTransientAs<RestoreProcessor>()
+        services.AddTransientAs<RestoreJob>()
             .AsSelf();
     }
 }

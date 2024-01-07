@@ -18,7 +18,7 @@ public interface IRuleRunnerService
     Task<List<SimulatedRuleEvent>> SimulateAsync(Rule rule,
         CancellationToken ct = default);
 
-    Task RunAsync(DomainId appId, DomainId ruleId, bool fromSnapshots = false,
+    Task RunAsync(RefToken actor, DomainId appId, DomainId ruleId, bool fromSnapshots = false,
         CancellationToken ct = default);
 
     Task CancelAsync(DomainId appId,

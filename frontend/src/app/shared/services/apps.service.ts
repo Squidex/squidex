@@ -19,9 +19,9 @@ export class AppDto {
     public readonly canLeave: boolean;
     public readonly canReadAssets: boolean;
     public readonly canReadAssetsScripts: boolean;
-    public readonly canReadBackups: boolean;
     public readonly canReadClients: boolean;
     public readonly canReadContributors: boolean;
+    public readonly canReadJobs: boolean;
     public readonly canReadLanguages: boolean;
     public readonly canReadPatterns: boolean;
     public readonly canReadPlans: boolean;
@@ -64,9 +64,9 @@ export class AppDto {
         this.canLeave = hasAnyLink(links, 'leave');
         this.canReadAssets = hasAnyLink(links, 'assets');
         this.canReadAssetsScripts = hasAnyLink(links, 'assets/scripts');
-        this.canReadBackups = hasAnyLink(links, 'backups');
         this.canReadClients = hasAnyLink(links, 'clients');
         this.canReadContributors = hasAnyLink(links, 'contributors');
+        this.canReadJobs = hasAnyLink(links, 'jobs');
         this.canReadLanguages = hasAnyLink(links, 'languages');
         this.canReadPatterns = hasAnyLink(links, 'patterns');
         this.canReadPlans = hasAnyLink(links, 'plans');
@@ -74,9 +74,9 @@ export class AppDto {
         this.canReadRules = hasAnyLink(links, 'rules');
         this.canReadSchemas = hasAnyLink(links, 'schemas');
         this.canReadWorkflows = hasAnyLink(links, 'workflows');
-        this.canUpdateTeam = hasAnyLink(links, 'transfer');
         this.canUpdateGeneral = hasAnyLink(links, 'update');
         this.canUpdateImage = hasAnyLink(links, 'image/upload');
+        this.canUpdateTeam = hasAnyLink(links, 'transfer');
         this.canUploadAssets = hasAnyLink(links, 'assets/create');
         this.image = getLinkUrl(links, 'image') as string;
     }

@@ -11,6 +11,18 @@ namespace Squidex.Translator.Processes;
 
 public static class Helper
 {
+    private static readonly string[][] AllowedPrefixCombos =
+    [
+        [
+            "apps",
+            "team"
+        ],
+        [
+            "chatBot",
+            "translate"
+        ]
+    ];
+
     public static string RelativeName(FileInfo file, DirectoryInfo folder)
     {
         return file.FullName[folder.FullName.Length..].Replace("\\", "/", StringComparison.Ordinal);
@@ -166,6 +178,16 @@ public static class Helper
 
     private static bool HasInvalidPrefixes(HashSet<string> prefixes)
     {
-        return prefixes.Count > 1;
+        if (prefixes.Count <= 1)
+        {
+            return false;
+        }
+
+        if (AllowedPrefixCombos.Any(x => prefixes.Count == x.Length && x.All(y => prefixes.Contains(y))))
+        {
+            return false;
+        }
+
+        return true;
     }
 }

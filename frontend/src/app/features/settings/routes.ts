@@ -8,9 +8,9 @@
 import { Routes } from '@angular/router';
 import { HelpComponent, HistoryComponent } from '@app/shared';
 import { AssetScriptsPageComponent } from './pages/asset-scripts/asset-scripts-page.component';
-import { BackupsPageComponent } from './pages/backups/backups-page.component';
 import { ClientsPageComponent } from './pages/clients/clients-page.component';
 import { ContributorsPageComponent } from './pages/contributors/contributors-page.component';
+import { JobsPageComponent } from './pages/jobs/jobs-page.component';
 import { LanguagesPageComponent } from './pages/languages/languages-page.component';
 import { MorePageComponent } from './pages/more/more-page.component';
 import { PlansPageComponent } from './pages/plans/plans-page.component';
@@ -47,13 +47,17 @@ export const SETTINGS_ROUTES: Routes = [
             },
             {
                 path: 'backups',
-                component: BackupsPageComponent,
+                redirectTo: 'jobs',
+            },
+            {
+                path: 'jobs',
+                component: JobsPageComponent,
                 children: [
                     {
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '05-integrated/backups',
+                            helpPage: '05-integrated/jobs',
                         },
                     },
                 ],
