@@ -292,20 +292,14 @@ public static class ClientExtensions
 
             while (!cts.IsCancellationRequested)
             {
-                try
-                {
-                    var result = await client.GetRestoreJobAsync(cts.Token);
+                var result = await client.GetRestoreJobAsync(cts.Token);
 
-                    if (predicate(result))
-                    {
-                        return result;
-                    }
-
-                    await Task.Delay(200, cts.Token);
-                }
-                catch (SquidexException ex) when (ex.StatusCode == 404)
+                if (predicate(result))
                 {
+                    return result;
                 }
+
+                await Task.Delay(200, cts.Token);
             }
         }
         catch (OperationCanceledException)
