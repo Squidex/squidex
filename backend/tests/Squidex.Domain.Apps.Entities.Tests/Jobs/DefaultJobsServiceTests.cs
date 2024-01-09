@@ -42,11 +42,11 @@ public class DefaultJobsServiceTests : GivenContext
     [Fact]
     public async Task Should_send_message_to_start_job()
     {
-        var arguments = new Dictionary<string, string>();
+        var request = JobRequest.Create(User, "job1");
 
-        await sut.StartAsync(AppId.Id, User, "job1", arguments, CancellationToken);
+        await sut.StartAsync(AppId.Id, request, CancellationToken);
 
-        A.CallTo(() => messaging.PublishAsync(new JobStart(AppId.Id, User, "job1", arguments), null, CancellationToken))
+        A.CallTo(() => messaging.PublishAsync(new JobStart(AppId.Id, request), null, CancellationToken))
             .MustHaveHappened();
     }
 
@@ -71,7 +71,9 @@ public class DefaultJobsServiceTests : GivenContext
     [Fact]
     public async Task Should_throw_exception_when_job_is_invalid()
     {
-        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartAsync(App.Id, User, "unknown", [], CancellationToken));
+        var request = JobRequest.Create(User, "unknown");
+
+        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartAsync(App.Id, request, CancellationToken));
     }
 
     [Fact]
@@ -79,7 +81,9 @@ public class DefaultJobsServiceTests : GivenContext
     {
         state.Snapshot.Jobs.Add(new Job { Status = JobStatus.Started });
 
-        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartAsync(App.Id, User, "job1", [], CancellationToken));
+        var request = JobRequest.Create(User, "job1");
+
+        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartAsync(App.Id, request, CancellationToken));
     }
 
     [Fact]
@@ -88,7 +92,9 @@ public class DefaultJobsServiceTests : GivenContext
         state.Snapshot.Jobs.Add(new Job { TaskName = "job1", File = new JobFile("file", "type") });
         state.Snapshot.Jobs.Add(new Job { TaskName = "job1", File = new JobFile("file", "type") });
 
-        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartAsync(App.Id, User, "job1", [], CancellationToken));
+        var request = JobRequest.Create(User, "job1");
+
+        await Assert.ThrowsAnyAsync<DomainException>(() => sut.StartAsync(App.Id, request, CancellationToken));
     }
 
     [Fact]
@@ -97,7 +103,9 @@ public class DefaultJobsServiceTests : GivenContext
         state.Snapshot.Jobs.Add(new Job { TaskName = "job1" });
         state.Snapshot.Jobs.Add(new Job { TaskName = "job1" });
 
-        await sut.StartAsync(App.Id, User, "job1", [], CancellationToken);
+        var request = JobRequest.Create(User, "job1");
+
+        await sut.StartAsync(App.Id, request, CancellationToken);
     }
 
     [Fact]

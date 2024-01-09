@@ -35,7 +35,7 @@ public sealed class JobWorker :
     {
         var processor = await GetJobProcessorAsync(message.OwnerId);
 
-        await processor.RunAsync(message.Actor, message.TaskName, message.Arguments, ct);
+        await processor.RunAsync(message.Request, ct);
     }
 
     public async Task HandleAsync(JobCancel message,

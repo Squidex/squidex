@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Jobs;
 
 public interface IJobService
 {
-    Task StartAsync(DomainId ownerId, RefToken actor, string taskName, Dictionary<string, string> arguments,
+    Task StartAsync(DomainId ownerId, JobRequest request,
         CancellationToken ct = default);
 
     Task<List<Job>> GetJobsAsync(DomainId ownerId,

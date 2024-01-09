@@ -23,9 +23,9 @@ public sealed class JobProcessor
     private readonly ILogger<JobProcessor> log;
     private readonly SimpleState<JobsState> state;
     private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
-    private JobRun? currentRun;
+    private JobRunContext? currentRun;
 
-    public IClock Clock { get; set; } = SystemClock.Instance;
+    public IClock Clock { get; init; } = SystemClock.Instance;
 
     public JobProcessor(DomainId ownerId,
         IEnumerable<IJobRunner> runners,
@@ -111,7 +111,7 @@ public sealed class JobProcessor
         });
     }
 
-    public Task RunAsync(RefToken actor, string taskName, Dictionary<string, string> arguments,
+    public Task RunAsync(JobRequest request,
         CancellationToken ct)
     {
         return scheduler.ScheduleAsync(async ct =>
@@ -121,32 +121,33 @@ public sealed class JobProcessor
                 throw new DomainException(T.Get("jobs.alreadyRunning"));
             }
 
-            var runner = runners.FirstOrDefault(x => x.Name == taskName) ??
+            var runner = runners.FirstOrDefault(x => x.Name == request.TaskName) ??
                 throw new DomainException(T.Get("jobs.invalidTaskName"));
 
             state.Value.EnsureCanStart(runner);
 
             // Set the current run first to indicate that we are running a rule at the moment.
-            var run = currentRun = new JobRun(state, ct)
+            var context = currentRun = new JobRunContext(state, Clock, ct)
             {
-                Actor = actor,
+                Actor = request.Actor,
                 Job = new Job
                 {
                     Id = DomainId.NewGuid(),
-                    Arguments = arguments,
+                    Arguments = request.Arguments,
+                    Description = request.TaskName,
                     Started = default,
                     Status = JobStatus.Created,
-                    TaskName = taskName
+                    TaskName = request.TaskName
                 },
                 OwnerId = ownerId
             };
 
-            log.LogInformation("Starting new backup with backup id '{backupId}' for owner {ownerId}.", run.Job.Id, ownerId);
+            log.LogInformation("Starting new backup with backup id '{backupId}' for owner {ownerId}.", context.Job.Id, ownerId);
 
-            state.Value.Jobs.Insert(0, run.Job);
+            state.Value.Jobs.Insert(0, context.Job);
             try
             {
-                await ProcessAsync(run, runner, run.CancellationToken);
+                await ProcessAsync(context, runner, context.CancellationToken);
             }
             finally
             {
@@ -157,47 +158,47 @@ public sealed class JobProcessor
         }, ct);
     }
 
-    private async Task ProcessAsync(JobRun run, IJobRunner runner,
+    private async Task ProcessAsync(JobRunContext context, IJobRunner runner,
         CancellationToken ct)
     {
         try
         {
-            await SetStatusAsync(run, JobStatus.Started);
+            await SetStatusAsync(context, JobStatus.Started);
 
             using (localCache.StartContext())
             {
-                await runner.RunAsync(run, ct);
+                await runner.RunAsync(context, ct);
             }
 
-            await SetStatusAsync(run, JobStatus.Completed);
+            await SetStatusAsync(context, JobStatus.Completed);
         }
         catch (OperationCanceledException)
         {
-            await SetStatusAsync(run, JobStatus.Cancelled);
+            await SetStatusAsync(context, JobStatus.Cancelled);
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to run job with ID {jobId}.", run.Job.Id);
+            log.LogError(ex, "Failed to run job with ID {jobId}.", context.Job.Id);
 
-            await SetStatusAsync(run, JobStatus.Failed);
+            await SetStatusAsync(context, JobStatus.Failed);
         }
     }
 
-    private Task SetStatusAsync(JobRun run, JobStatus status)
+    private Task SetStatusAsync(JobRunContext context, JobStatus status)
     {
         var now = Clock.GetCurrentInstant();
 
         return state.UpdateAsync(_ =>
         {
-            run.Job.Status = status;
+            context.Job.Status = status;
 
             if (status == JobStatus.Started)
             {
-                run.Job.Started = now;
+                context.Job.Started = now;
             }
             else if (status != JobStatus.Created)
             {
-                run.Job.Stopped = now;
+                context.Job.Stopped = now;
             }
 
             return true;

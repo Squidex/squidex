@@ -48,21 +48,17 @@ public sealed class DefaultJobService : IJobService, IDeleter
         await runner.DownloadAsync(job, stream, ct);
     }
 
-    public async Task StartAsync(DomainId ownerId, RefToken actor, string taskName, Dictionary<string, string> arguments,
+    public async Task StartAsync(DomainId ownerId, JobRequest request,
         CancellationToken ct = default)
     {
-        Guard.NotNull(actor);
-        Guard.NotNullOrEmpty(taskName);
-        Guard.NotNull(arguments);
-
-        var runner = runners.FirstOrDefault(x => x.Name == taskName) ??
+        var runner = runners.FirstOrDefault(x => x.Name == request.TaskName) ??
             throw new DomainException(T.Get("jobs.invalidTaskName"));
 
         var state = await GetStateAsync(ownerId, ct);
 
         state.EnsureCanStart(runner);
 
-        await messaging.PublishAsync(new JobStart(ownerId, actor, taskName, arguments), null, ct);
+        await messaging.PublishAsync(new JobStart(ownerId, request), null, ct);
     }
 
     public Task CancelAsync(DomainId ownerId, string? taskName = null,

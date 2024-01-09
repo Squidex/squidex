@@ -7,10 +7,12 @@
 
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner;
 
@@ -64,9 +66,11 @@ public sealed class RuleRunnerJob : IJobRunner
         return DomainId.Create(ruleId);
     }
 
-    public static (string, Dictionary<string, string>) BuildArgs(DomainId ruleId, bool snapshot)
+    public static JobRequest BuildRequest(RefToken actor, DomainId ruleId, bool snapshot)
     {
-        return (TaskName,
+        return JobRequest.Create(
+            actor,
+            TaskName,
             new Dictionary<string, string>
             {
                 [ArgRuleId] = ruleId.ToString(),
@@ -74,21 +78,24 @@ public sealed class RuleRunnerJob : IJobRunner
             });
     }
 
-    public async Task RunAsync(JobRun run,
+    public async Task RunAsync(JobRunContext context,
         CancellationToken ct)
     {
-        if (!run.Job.Arguments.TryGetValue(ArgRuleId, out var ruleId))
+        if (!context.Job.Arguments.TryGetValue(ArgRuleId, out var ruleId))
         {
             throw new DomainException("Argument missing.");
         }
 
-        var rule = await appProvider.GetRuleAsync(run.OwnerId, DomainId.Create(ruleId), ct)
+        var rule = await appProvider.GetRuleAsync(context.OwnerId, DomainId.Create(ruleId), ct)
             ?? throw new DomainObjectNotFoundException(ruleId);
 
-        var fromSnapshot = string.Equals(run.Job.Arguments.GetOrAddDefault(ArgSnapshot), "true", StringComparison.OrdinalIgnoreCase);
+        var fromSnapshot = string.Equals(context.Job.Arguments.GetValueOrDefault(ArgSnapshot), "true", StringComparison.OrdinalIgnoreCase);
+
+        // Use a readable name to describe the job.
+        SetDescription(context, rule, fromSnapshot);
 
         // Also run disabled rules, because we want to enable rules to be only used with manual trigger.
-        var context = new RuleContext
+        var ruleContext = new RuleContext
         {
             AppId = rule.AppId,
             IncludeStale = true,
@@ -98,11 +105,31 @@ public sealed class RuleRunnerJob : IJobRunner
 
         if (fromSnapshot && ruleService.CanCreateSnapshotEvents(rule))
         {
-            await EnqueueFromSnapshotsAsync(context, ct);
+            await EnqueueFromSnapshotsAsync(ruleContext, ct);
         }
         else
         {
-            await EnqueueFromEventsAsync(run, context, ct);
+            await EnqueueFromEventsAsync(context, ruleContext, ct);
+        }
+    }
+
+    private static void SetDescription(JobRunContext run, Rule rule, bool fromSnapshot)
+    {
+        if (!string.IsNullOrWhiteSpace(rule.Name))
+        {
+            var key = fromSnapshot ?
+                "job.ruleRunNamedSnapshot" :
+                "job.ruleRunName";
+
+            run.Job.Description = T.Get(key, new { name = rule.Name });
+        }
+        else
+        {
+            var key = fromSnapshot ?
+                "job.ruleRunSnapshot" :
+                "job.ruleRun";
+
+            run.Job.Description = T.Get(key);
         }
     }
 
@@ -134,7 +161,7 @@ public sealed class RuleRunnerJob : IJobRunner
         }
     }
 
-    private async Task EnqueueFromEventsAsync(JobRun run, RuleContext context,
+    private async Task EnqueueFromEventsAsync(JobRunContext run, RuleContext context,
         CancellationToken ct)
     {
         // We collect errors and allow a few erors before we throw an exception.

@@ -17,6 +17,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
@@ -76,9 +77,11 @@ public sealed class RestoreJob : IJobRunner
         this.log = log;
     }
 
-    public static (string, Dictionary<string, string>) BuildArgs(Uri url, string? appName)
+    public static JobRequest BuildRequest(RefToken actor, Uri url, string? appName)
     {
-        return (TaskName,
+        return JobRequest.Create(
+            actor,
+            TaskName,
             new Dictionary<string, string>
             {
                 [ArgUrl] = url.ToString(),
@@ -86,10 +89,10 @@ public sealed class RestoreJob : IJobRunner
             });
     }
 
-    public async Task RunAsync(JobRun run,
+    public async Task RunAsync(JobRunContext context,
         CancellationToken ct)
     {
-        if (!run.Job.Arguments.TryGetValue(ArgUrl, out var urlValue) || !Uri.TryCreate(urlValue, UriKind.Absolute, out var url))
+        if (!context.Job.Arguments.TryGetValue(ArgUrl, out var urlValue) || !Uri.TryCreate(urlValue, UriKind.Absolute, out var url))
         {
             throw new DomainException("Argument missing.");
         }
@@ -100,27 +103,30 @@ public sealed class RestoreJob : IJobRunner
             // Required argument.
             Url = url,
             // Optional argument.
-            NewAppName = run.Job.Arguments.GetValueOrDefault(ArgName)
+            NewAppName = context.Job.Arguments.GetValueOrDefault(ArgName)
         };
+
+        // Use a readable name to describe the job.
+        context.Job.Description = T.Get("job.restore");
 
         try
         {
-            await run.LogAsync("Started. The restore process has the following steps:");
-            await run.LogAsync("  * Download backup");
-            await run.LogAsync("  * Restore events and attachments.");
-            await run.LogAsync("  * Restore all objects like app, schemas and contents");
-            await run.LogAsync("  * Complete the restore operation for all objects");
-            await run.FlushAsync();
+            await context.LogAsync("Started. The restore process has the following steps:");
+            await context.LogAsync("  * Download backup");
+            await context.LogAsync("  * Restore events and attachments.");
+            await context.LogAsync("  * Restore all objects like app, schemas and contents");
+            await context.LogAsync("  * Complete the restore operation for all objects");
+            await context.FlushAsync();
 
-            log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.", run.Job.Id, state.Url);
+            log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.", context.Job.Id, state.Url);
 
-            state.Reader = await DownloadAsync(run, state, ct);
+            state.Reader = await DownloadAsync(context, state, ct);
 
             await state.Reader.CheckCompatibilityAsync();
 
             using (Telemetry.Activities.StartActivity("ReadEvents"))
             {
-                await ReadEventsAsync(run, state, ct);
+                await ReadEventsAsync(context, state, ct);
             }
 
             if (state.Context == null)
@@ -135,7 +141,7 @@ public sealed class RestoreJob : IJobRunner
                     await handler.RestoreAsync(state.Context, ct);
                 }
 
-                await run.LogAsync($"Restored {handler.Name}");
+                await context.LogAsync($"Restored {handler.Name}");
             }
 
             foreach (var handler in state.Handlers)
@@ -145,15 +151,15 @@ public sealed class RestoreJob : IJobRunner
                     await handler.CompleteRestoreAsync(state.Context, state.NewAppName!);
                 }
 
-                await run.LogAsync($"Completed {handler.Name}");
+                await context.LogAsync($"Completed {handler.Name}");
             }
 
             // Add the current user to the app, so that the admin can see it and verify integrity.
-            await AssignContributorAsync(run, state);
+            await AssignContributorAsync(context, state);
 
-            await run.LogAsync("Completed, Yeah!");
+            await context.LogAsync("Completed, Yeah!");
 
-            log.LogInformation("Backup with job id {backupId} from URL '{url}' completed.", run.Job.Id, state.Url);
+            log.LogInformation("Backup with job id {backupId} from URL '{url}' completed.", context.Job.Id, state.Url);
         }
         catch (Exception ex)
         {
@@ -172,14 +178,14 @@ public sealed class RestoreJob : IJobRunner
                     break;
             }
 
-            await run.LogAsync(message);
+            await context.LogAsync(message);
 
-            log.LogError(ex, "Backup with job id {backupId} from URL '{url}' failed.", run.Job.Id, state.Url);
+            log.LogError(ex, "Backup with job id {backupId} from URL '{url}' failed.", context.Job.Id, state.Url);
             throw;
         }
     }
 
-    private async Task AssignContributorAsync(JobRun run, State state)
+    private async Task AssignContributorAsync(JobRunContext run, State state)
     {
         if (run.Actor?.IsUser != true)
         {
@@ -206,7 +212,7 @@ public sealed class RestoreJob : IJobRunner
         }
     }
 
-    private Task<CommandContext> PublishAsync(JobRun run, State state, AppCommand command)
+    private Task<CommandContext> PublishAsync(JobRunContext run, State state, AppCommand command)
     {
         command.Actor = run.Actor;
 
@@ -238,7 +244,7 @@ public sealed class RestoreJob : IJobRunner
         }
     }
 
-    private async Task<IBackupReader> DownloadAsync(JobRun run, State state,
+    private async Task<IBackupReader> DownloadAsync(JobRunContext run, State state,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("Download"))
@@ -253,7 +259,7 @@ public sealed class RestoreJob : IJobRunner
         }
     }
 
-    private async Task ReadEventsAsync(JobRun run, State state,
+    private async Task ReadEventsAsync(JobRunContext run, State state,
         CancellationToken ct)
     {
         // Run batch first, because it is cheaper as it has less items.
@@ -286,7 +292,7 @@ public sealed class RestoreJob : IJobRunner
         });
     }
 
-    private async IAsyncEnumerable<(string Stream, long Offset, Envelope<IEvent> Event)> HandleEventsAsync(JobRun run, State state,
+    private async IAsyncEnumerable<(string Stream, long Offset, Envelope<IEvent> Event)> HandleEventsAsync(JobRunContext run, State state,
         [EnumeratorCancellation] CancellationToken ct)
     {
         var @events = state.Reader.ReadEventsAsync(eventStreamNames, eventFormatter, ct);
@@ -304,7 +310,7 @@ public sealed class RestoreJob : IJobRunner
         }
     }
 
-    private async Task<(string StreamName, bool Handled)> HandleEventAsync(JobRun run, State state, string stream, Envelope<IEvent> @event,
+    private async Task<(string StreamName, bool Handled)> HandleEventAsync(JobRunContext run, State state, string stream, Envelope<IEvent> @event,
         CancellationToken ct = default)
     {
         if (@event.Payload is AppCreated appCreated)
@@ -356,7 +362,7 @@ public sealed class RestoreJob : IJobRunner
         return (newStream, true);
     }
 
-    private async Task CreateContextAsync(JobRun run, State state, DomainId previousAppId,
+    private async Task CreateContextAsync(JobRunContext run, State state, DomainId previousAppId,
         CancellationToken ct)
     {
         var userMapping = new UserMapping(run.Actor);

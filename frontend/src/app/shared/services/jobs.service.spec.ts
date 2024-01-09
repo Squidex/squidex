@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, DateTime, JobDto, JobsDto, JobsService, Resource, ResourceLinks, RestoreDto } from '@app/shared/internal';
+import { ApiUrlConfig, DateTime, JobDto, JobLogMessageDto, JobsDto, JobsService, Resource, ResourceLinks, RestoreDto } from '@app/shared/internal';
 
 describe('JobsService', () => {
     beforeEach(() => {
@@ -175,13 +175,20 @@ describe('JobsService', () => {
     function jobResponse(id: number) {
         return {
             id: `id${id}`,
-            started: `${id % 1000 + 2000}-12-12T10:10:00Z`,
-            stopped: id % 2 === 0 ? `${id % 1000 + 2000}-11-11T10:10:00Z` : null,
+            started: buildDate(id, 10),
+            stopped: buildDate(id, 20),
             taskName: `task${id}`,
-            log: [
-                `log1_${id}`,
-                `log2_${id}`,
-            ],
+            taskArguments: {
+                [`arg${id}`]: '42',
+            },
+            description: `description${id}`,
+            log: [{
+                timestamp: buildDate(id, 30),
+                message:  `log1_${id}`,
+            }, {
+                timestamp: buildDate(id, 40),
+                message:  `log2_${id}`,
+            }],
             status: id % 2 === 0 ? 'Success' : 'Failed',
             _links: {
                 download: { method: 'GET', href: '/api/jobs/1' },
@@ -197,12 +204,20 @@ export function createJob(id: number) {
 
     return new JobDto(links,
         `id${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
-        id % 2 === 0 ? DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`) : null,
+        DateTime.parseISO(buildDate(id, 10)),
+        DateTime.parseISO(buildDate(id, 20)),
         `task${id}`,
+        {
+            [`arg${id}`]: '42',
+        },
+        `description${id}`,
         [
-            `log1_${id}`,
-            `log2_${id}`,
+            new JobLogMessageDto(DateTime.parseISO(buildDate(id, 30)), `log1_${id}`),
+            new JobLogMessageDto(DateTime.parseISO(buildDate(id, 40)), `log2_${id}`),
         ],
         id % 2 === 0 ? 'Success' : 'Failed');
+}
+
+function buildDate(id: number, add = 0) {
+    return `${id % 1000 + 2000 + add}-12-11T10:09:08Z`;
 }

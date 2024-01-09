@@ -202,6 +202,7 @@ public static class ClientExtensions
         return null;
     }
 
+    [Obsolete]
     public static async Task<BackupJobDto?> PollAsync(this IBackupsClient client, Func<BackupJobDto, bool> predicate,
         TimeSpan timeout = default)
     {
@@ -212,6 +213,33 @@ public static class ClientExtensions
             while (!cts.IsCancellationRequested)
             {
                 var results = await client.GetBackupsAsync(cts.Token);
+                var result = results.Items.FirstOrDefault(predicate);
+
+                if (result != null)
+                {
+                    return result;
+                }
+
+                await Task.Delay(200, cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+
+        return null;
+    }
+
+    public static async Task<JobDto?> PollAsync(this IJobsClient client, Func<JobDto, bool> predicate,
+        TimeSpan timeout = default)
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(GetTimeout(timeout));
+
+            while (!cts.IsCancellationRequested)
+            {
+                var results = await client.GetJobsAsync(cts.Token);
                 var result = results.Items.FirstOrDefault(predicate);
 
                 if (result != null)
@@ -273,6 +301,9 @@ public static class ClientExtensions
 
                 await Task.Delay(200, cts.Token);
             }
+        }
+        catch (SquidexException ex) when (ex.StatusCode == 404)
+        {
         }
         catch (OperationCanceledException)
         {

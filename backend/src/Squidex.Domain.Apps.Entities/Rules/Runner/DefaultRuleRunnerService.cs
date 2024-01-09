@@ -124,9 +124,9 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
     public Task RunAsync(RefToken actor, DomainId appId, DomainId ruleId, bool fromSnapshots = false,
         CancellationToken ct = default)
     {
-        var (taskName, args) = RuleRunnerJob.BuildArgs(ruleId, fromSnapshots);
+        var job = RuleRunnerJob.BuildRequest(actor, ruleId, fromSnapshots);
 
-        return jobService.StartAsync(appId, actor, taskName, args, ct);
+        return jobService.StartAsync(appId, job, ct);
     }
 
     public async Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,

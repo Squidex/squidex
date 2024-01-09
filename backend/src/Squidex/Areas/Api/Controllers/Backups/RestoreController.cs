@@ -65,9 +65,9 @@ public class RestoreController : ApiController
     [ApiPermission(PermissionIds.AdminRestore)]
     public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request)
     {
-        var (taskName, args) = RestoreJob.BuildArgs(request.Url, request.Name);
+        var job = RestoreJob.BuildRequest(User.Token()!, request.Url, request.Name);
 
-        await jobService.StartAsync(default, User.Token()!, taskName, args, HttpContext.RequestAborted);
+        await jobService.StartAsync(default, job, HttpContext.RequestAborted);
 
         return NoContent();
     }

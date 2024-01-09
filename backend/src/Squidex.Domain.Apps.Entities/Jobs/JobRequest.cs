@@ -6,18 +6,18 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
-#pragma warning disable MA0048 // File name must match type name
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Entities.Jobs;
 
-public sealed record JobStart(DomainId OwnerId, JobRequest Request) : JobMessage(OwnerId);
+public record struct JobRequest(RefToken Actor, string TaskName, ReadonlyDictionary<string, string> Arguments)
+{
+    public static JobRequest Create(RefToken actor, string taskName, Dictionary<string, string>? arguments = null)
+    {
+        var args = arguments?.ToReadonlyDictionary() ?? ReadonlyDictionary.Empty<string, string>();
 
-public sealed record JobCancel(DomainId OwnerId, string? TaskName) : JobMessage(OwnerId);
-
-public sealed record JobDelete(DomainId OwnerId, DomainId JobId) : JobMessage(OwnerId);
-
-public sealed record JobClear(DomainId OwnerId) : JobMessage(OwnerId);
-
-public abstract record JobMessage(DomainId OwnerId);
+        return new JobRequest(actor, taskName, args);
+    }
+}

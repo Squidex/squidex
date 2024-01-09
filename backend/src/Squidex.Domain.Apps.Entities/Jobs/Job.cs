@@ -7,6 +7,7 @@
 
 using NodaTime;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Jobs;
 
@@ -20,11 +21,13 @@ public sealed class Job
 
     public string TaskName { get; init; }
 
+    public string Description { get; set; }
+
     public JobFile? File { get; set; }
 
-    public Dictionary<string, string> Arguments { get; init; }
+    public ReadonlyDictionary<string, string> Arguments { get; init; }
 
-    public List<string> Log { get; set; } = [];
+    public List<JobLogMessage> Log { get; set; } = [];
 
     public JobStatus Status { get; set; }
 }

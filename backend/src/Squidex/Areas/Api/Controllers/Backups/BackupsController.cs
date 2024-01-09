@@ -66,9 +66,9 @@ public class BackupsController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> PostBackup(string app)
     {
-        var (taskName, args) = BackupJob.BuildArgs(App);
+        var job = BackupJob.BuildRequest(User.Token()!, App);
 
-        await jobService.StartAsync(App.Id, User.Token()!, taskName, args, default);
+        await jobService.StartAsync(App.Id, job, default);
 
         return NoContent();
     }

@@ -15,7 +15,7 @@ public interface IJobRunner
 
     int MaxJobs => 3;
 
-    Task RunAsync(JobRun run,
+    Task RunAsync(JobRunContext context,
         CancellationToken ct);
 
     Task DownloadAsync(Job job, Stream stream,

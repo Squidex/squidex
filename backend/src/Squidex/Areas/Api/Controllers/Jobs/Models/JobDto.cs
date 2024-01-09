@@ -8,6 +8,7 @@
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
@@ -38,17 +39,22 @@ public sealed class JobDto : Resource
     /// <summary>
     /// The name of the task.
     /// </summary>
-    public string TaskName { get; init; }
+    public string TaskName { get; set; }
+
+    /// <summary>
+    /// The description of the job.
+    /// </summary>
+    public string Description { get; set; }
 
     /// <summary>
     /// The arguments for the job.
     /// </summary>
-    public Dictionary<string, string> Arguments { get; init; }
+    public ReadonlyDictionary<string, string> TaskArguments { get; set; }
 
     /// <summary>
     /// The list of log items.
     /// </summary>
-    public List<string> Log { get; set; } = [];
+    public List<JobLogMessageDto> Log { get; set; } = [];
 
     /// <summary>
     /// Indicates whether the job can be downloaded.
@@ -58,6 +64,13 @@ public sealed class JobDto : Resource
     public static JobDto FromDomain(Job job, Resources resources)
     {
         var result = SimpleMapper.Map(job, new JobDto());
+
+        if (job.Log?.Count > 0)
+        {
+            result.Log = job.Log.Select(JobLogMessageDto.FromDomain).ToList();
+        }
+
+        result.TaskArguments = job.Arguments;
 
         return result.CreateLinks(job, resources);
     }

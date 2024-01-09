@@ -43,7 +43,7 @@ public sealed class BackupState
             },
             Log =
             [
-                $"Total events: {source.HandledEvents}, assets: {source.HandledAssets}"
+                new JobLogMessage(source.Stopped ?? source.Started, $"Total events: {source.HandledEvents}, assets: {source.HandledAssets}")
             ]
         };
     }

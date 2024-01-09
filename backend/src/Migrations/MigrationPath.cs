@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Migrations.Migrations;
+using Migrations.Migrations.Backup;
 using Migrations.Migrations.MongoDb;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
@@ -15,7 +16,7 @@ namespace Migrations;
 
 public sealed class MigrationPath : IMigrationPath
 {
-    private const int CurrentVersion = 26;
+    private const int CurrentVersion = 27;
     private readonly IServiceProvider serviceProvider;
 
     public MigrationPath(IServiceProvider serviceProvider)
@@ -120,10 +121,16 @@ public sealed class MigrationPath : IMigrationPath
             yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
         }
 
-        // Version 27: New rule statistics using normal usage collection.
+        // Version 26: New rule statistics using normal usage collection.
         if (version < 26)
         {
             yield return serviceProvider.GetRequiredService<CopyRuleStatistics>();
+        }
+
+        // Version 27: General jobs state.
+        if (version < 27)
+        {
+            yield return serviceProvider.GetRequiredService<ConvertBackup>();
         }
     }
 }

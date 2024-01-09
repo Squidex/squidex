@@ -428,9 +428,9 @@ describe('RulesService', () => {
 
         return {
             id: `id${id}`,
-            created: `${id % 1000 + 2000}-12-12T10:10`,
+            created: buildDate(id, 10),
             createdBy: `creator${id}`,
-            lastModified: `${id % 1000 + 2000}-11-11T10:10`,
+            lastModified: buildDate(id, 20),
             lastModifiedBy: `modifier${id}`,
             name: `rule-name${key}`,
             numSucceeded: id * 3,
@@ -458,12 +458,12 @@ describe('RulesService', () => {
 
         return {
             id: `id${id}`,
-            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
+            created: buildDate(id, 10),
             description: `event-url${key}`,
             eventName: `event-name${key}`,
             jobResult: `Failed${key}`,
             lastDump: `event-dump${key}`,
-            nextAttempt: `${id % 1000 + 2000}-11-11T10:10`,
+            nextAttempt: buildDate(id, 20),
             numCalls: id,
             result: `Failed${key}`,
             _links: {
@@ -499,8 +499,8 @@ export function createRule(id: number, suffix = '') {
 
     return new RuleDto(links,
         `id${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
+        DateTime.parseISO(buildDate(id, 10)), `creator${id}`,
+        DateTime.parseISO(buildDate(id, 20)), `modifier${id}`,
         new Version(key),
         id % 2 === 0,
         {
@@ -528,8 +528,8 @@ export function createRuleEvent(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
     return new RuleEventDto(links, `id${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
-        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`),
+        DateTime.parseISO(buildDate(id, 10)),
+        DateTime.parseISO(buildDate(id, 20)),
         `event-name${key}`,
         `event-url${key}`,
         `event-dump${key}`,
@@ -553,4 +553,8 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
             `reason${key}`,
         ],
         `unique-id${key}`);
+}
+
+function buildDate(id: number, add = 0) {
+    return `${id % 1000 + 2000 + add}-12-11T10:09:08Z`;
 }

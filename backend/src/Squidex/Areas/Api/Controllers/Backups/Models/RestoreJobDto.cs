@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure.Reflection;
 
@@ -40,6 +41,15 @@ public sealed class RestoreJobDto
 
     public static RestoreJobDto FromDomain(Job job)
     {
-        return SimpleMapper.Map(job, new RestoreJobDto());
+        var result = SimpleMapper.Map(job, new RestoreJobDto());
+
+        if (job.Arguments.TryGetValue(RestoreJob.ArgUrl, out var urlString) && Uri.TryCreate(urlString, UriKind.Absolute, out var url))
+        {
+            result.Url = url;
+        }
+
+        result.Log = job.Log.Select(x => $"{x.Timestamp}: {x.Message}").ToList();
+
+        return result;
     }
 }

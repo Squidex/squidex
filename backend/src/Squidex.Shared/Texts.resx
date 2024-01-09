@@ -871,6 +871,24 @@
   <data name="history.teams.updated" xml:space="preserve">
     <value>updated general settings and renamed name to {[Name]}.</value>
   </data>
+  <data name="job.backup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="job.restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="job.ruleRun" xml:space="preserve">
+    <value>Replay Rule.</value>
+  </data>
+  <data name="job.ruleRunNamed" xml:space="preserve">
+    <value>Replay Rule '{name}'.</value>
+  </data>
+  <data name="job.ruleRunNamedSnapshot" xml:space="preserve">
+    <value>Replay Rule '{name}' from states.</value>
+  </data>
+  <data name="job.ruleRunSnapshot" xml:space="preserve">
+    <value>Replay Rule from states</value>
+  </data>
   <data name="jobs.alreadyRunning" xml:space="preserve">
     <value>Another backup process is already running.</value>
   </data>

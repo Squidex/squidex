@@ -8,7 +8,9 @@
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
@@ -46,9 +48,11 @@ public sealed class BackupJob : IJobRunner
         this.userResolver = userResolver;
     }
 
-    public static (string, Dictionary<string, string>) BuildArgs(App app)
+    public static JobRequest BuildRequest(RefToken actor, App app)
     {
-        return (TaskName,
+        return JobRequest.Create(
+            actor,
+            TaskName,
             new Dictionary<string, string>
             {
                 [ArgAppId] = app.Id.ToString(),
@@ -67,24 +71,27 @@ public sealed class BackupJob : IJobRunner
         return backupArchiveStore.DeleteAsync(state.Id, default);
     }
 
-    public async Task RunAsync(JobRun run,
+    public async Task RunAsync(JobRunContext context,
         CancellationToken ct)
     {
-        var appId = run.OwnerId;
-        var appName = run.Job.Arguments.GetValueOrDefault(ArgAppName, "app");
+        var appId = context.OwnerId;
+        var appName = context.Job.Arguments.GetValueOrDefault(ArgAppName, "app");
 
         // We store the file in a the asset store and make the information available.
-        run.Job.File = new JobFile($"backup-{appName}-{run.Job.Started:yyyy-MM-dd_HH-mm-ss}.zip", "application/zip");
+        context.Job.File = new JobFile($"backup-{appName}-{context.Job.Started:yyyy-MM-dd_HH-mm-ss}.zip", "application/zip");
+
+        // Use a readable name to describe the job.
+        context.Job.Description = T.Get("job.backup");
 
         var handlers = backupHandlerFactory.CreateMany();
 
-        await using var stream = backupArchiveLocation.OpenStream(run.Job.Id);
+        await using var stream = backupArchiveLocation.OpenStream(context.Job.Id);
 
         using (var writer = await backupArchiveLocation.OpenWriterAsync(stream, ct))
         {
             await writer.WriteVersionAsync();
 
-            var backupUsers = new UserMapping(run.Actor);
+            var backupUsers = new UserMapping(context.Actor);
             var backupContext = new BackupContext(appId, backupUsers, writer);
 
             var streamFilter = StreamFilter.Prefix($"[^\\-]*-{appId}");
@@ -105,7 +112,7 @@ public sealed class BackupJob : IJobRunner
 
                 writer.WriteEvent(storedEvent, ct);
 
-                await run.LogAsync($"Total events: {writer.WrittenEvents}, assets: {writer.WrittenAttachments}", true);
+                await context.LogAsync($"Total events: {writer.WrittenEvents}, assets: {writer.WrittenAttachments}", true);
             }
 
             foreach (var handler in handlers)
@@ -129,6 +136,6 @@ public sealed class BackupJob : IJobRunner
 
         ct.ThrowIfCancellationRequested();
 
-        await backupArchiveStore.UploadAsync(run.Job.Id, stream, ct);
+        await backupArchiveStore.UploadAsync(context.Job.Id, stream, ct);
     }
 }

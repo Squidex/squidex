@@ -28,7 +28,9 @@ export class JobDto {
         public readonly started: DateTime,
         public readonly stopped: DateTime | null,
         public readonly taskName: string,
-        public readonly log: ReadonlyArray<string>,
+        public readonly taskArguments: Record<string, string>,
+        public readonly description: string,
+        public readonly log: ReadonlyArray<JobLogMessageDto>,
         public readonly status: 'Started' | 'Failed' | 'Success' | 'Completed' | 'Pending',
     ) {
         this._links = links;
@@ -37,6 +39,14 @@ export class JobDto {
         this.canDownload = hasAnyLink(links, 'download');
 
         this.downloadUrl = links['download']?.href;
+    }
+}
+
+export class JobLogMessageDto {
+    constructor(
+        public readonly timestamp: DateTime,
+        public readonly message: string,
+    ) {
     }
 }
 
@@ -149,11 +159,15 @@ function parseRestore(response: any) {
 }
 
 function parseJob(response: any & Resource) {
+    const log: any[] = response.log;
+
     return new JobDto(response._links,
         response.id,
         DateTime.parseISO(response.started),
         response.stopped ? DateTime.parseISO(response.stopped) : null,
         response.taskName,
-        response.log,
+        response.taskArguments,
+        response.description,
+        log.map(x => new JobLogMessageDto(DateTime.parseISO(x.timestamp), x.message)),
         response.status);
 }

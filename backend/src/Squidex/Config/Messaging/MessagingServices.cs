@@ -96,9 +96,9 @@ public static class MessagingServices
         services.AddMessagingTransport(config);
         services.AddMessaging(options =>
         {
-            options.Routing.Add(m => m is JobStart r && r.TaskName == BackupJob.TaskName, channelBackupStart);
-            options.Routing.Add(m => m is JobStart r && r.TaskName == RestoreJob.TaskName, channelBackupRestore);
-            options.Routing.Add(m => m is JobStart r && r.TaskName == RuleRunnerJob.TaskName, channelRules);
+            options.Routing.Add(m => m is JobStart r && r.Request.TaskName == BackupJob.TaskName, channelBackupStart);
+            options.Routing.Add(m => m is JobStart r && r.Request.TaskName == RestoreJob.TaskName, channelBackupRestore);
+            options.Routing.Add(m => m is JobStart r && r.Request.TaskName == RuleRunnerJob.TaskName, channelRules);
             options.Routing.AddFallback(channelFallback);
         });
 

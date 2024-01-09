@@ -10,6 +10,7 @@ using TestSuite.Fixtures;
 using TestSuite.Model;
 using TestSuite.Utils;
 
+#pragma warning disable CS0612 // Type or member is obsolete
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
@@ -45,12 +46,20 @@ public class BackupTests : IClassFixture<ClientFixture>
         // STEP 2: Create backup.
         await app.Backups.PostBackupAsync();
 
+
+        // STEP 3: Get obsolete backup.
         var backup = await app.Backups.PollAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, backup?.Status);
 
 
-        // STEP 3: Restore backup.
+        // STEP 4: Get obsolete backup.
+        var job = await app.Jobs.PollAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed);
+
+        Assert.Equal(JobStatus.Completed, job?.Status);
+
+
+        // STEP 5: Restore backup.
         var uri = new Uri(new Uri(backupUrl), backup?.Links["download"].Href);
 
         var restoreRequest = new RestoreRequestDto
@@ -63,7 +72,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         await _.Client.Backups.PostRestoreJobAsync(restoreRequest);
 
 
-        // STEP 4: Wait for the backup.
+        // STEP 6: Wait for the backup.
         var restore = await app.Backups.PollRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, restore?.Status);
@@ -86,16 +95,24 @@ public class BackupTests : IClassFixture<ClientFixture>
         // STEP 2: Create backup.
         await app.Backups.PostBackupAsync();
 
+
+        // STEP 3: Get obsolete backup.
         var backup = await app.Backups.PollAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, backup?.Status);
 
 
-        // STEP 3: Delete app.
+        // STEP 4: Get obsolete backup.
+        var job = await app.Jobs.PollAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed);
+
+        Assert.Equal(JobStatus.Completed, job?.Status);
+
+
+        // STEP 4: Delete app.
         await app.Apps.DeleteAppAsync();
 
 
-        // STEP 4: Restore backup.
+        // STEP 5: Restore backup.
         var uri = new Uri(new Uri(backupUrl), backup?.Links["download"].Href);
 
         var restoreRequest = new RestoreRequestDto
@@ -108,7 +125,7 @@ public class BackupTests : IClassFixture<ClientFixture>
         await app.Backups.PostRestoreJobAsync(restoreRequest);
 
 
-        // STEP 5: Wait for the backup.
+        // STEP 6: Wait for the backup.
         var restore = await app.Backups.PollRestoreAsync(x => x.Url == uri && x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, restore?.Status);
