@@ -890,7 +890,7 @@
     <value>Replay Rule from states</value>
   </data>
   <data name="jobs.alreadyRunning" xml:space="preserve">
-    <value>Another backup process is already running.</value>
+    <value>Another job is already running.</value>
   </data>
   <data name="jobs.invalidTaskName" xml:space="preserve">
     <value>Invalid task name</value>
