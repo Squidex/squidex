@@ -202,7 +202,7 @@ public static class ClientExtensions
         return null;
     }
 
-    [Obsolete]
+    [Obsolete("Replaced with jobs.")]
     public static async Task<BackupJobDto?> PollAsync(this IBackupsClient client, Func<BackupJobDto, bool> predicate,
         TimeSpan timeout = default)
     {

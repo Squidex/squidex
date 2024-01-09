@@ -268,7 +268,7 @@
   "job.ruleRunNamed": "Replay Rule '{name}'.",
   "job.ruleRunNamedSnapshot": "Replay Rule '{name}' from states.",
   "job.ruleRunSnapshot": "Replay Rule from states",
-  "jobs.alreadyRunning": "Another backup process is already running.",
+  "jobs.alreadyRunning": "Another job is already running.",
   "jobs.invalidTaskName": "Invalid task name",
   "jobs.maxReached": "You cannot have more than {max} backups.",
   "login.githubPrivateEmail": "Your email address is set to private in Github. Please set it to public to use Github login.",
