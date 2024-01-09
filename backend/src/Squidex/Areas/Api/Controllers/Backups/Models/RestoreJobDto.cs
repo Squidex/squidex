@@ -22,7 +22,7 @@ public sealed class RestoreJobDto
     /// <summary>
     /// The status log.
     /// </summary>
-    public List<string> Log { get; set; }
+    public List<string> Log { get; set; } = [];
 
     /// <summary>
     /// The time when the job has been started.

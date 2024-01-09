@@ -42,7 +42,12 @@ public class RestoreController : ApiController
     public async Task<IActionResult> GetRestoreJob()
     {
         var jobs = await jobService.GetJobsAsync(default, HttpContext.RequestAborted);
-        var job = jobs.Find(x => x.TaskName == RestoreJob.TaskName) ?? new Job();
+        var job = jobs.Find(x => x.TaskName == RestoreJob.TaskName);
+
+        if (job == null)
+        {
+            return Ok(new RestoreJobDto());
+        }
 
         var response = RestoreJobDto.FromDomain(job);
 
