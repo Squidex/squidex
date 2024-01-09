@@ -29,7 +29,7 @@
         </div>
 
         <div class="actions">
-            <button *ngIf="isEditable && canAnswer" type="button" class="btn btn-sm btn-text-secondary" (click)="startReply()">
+            <button *ngIf="canAnswer" type="button" class="btn btn-sm btn-text-secondary" (click)="startReply()">
                 <i class="icon-enter"></i>
             </button>
 
