@@ -32,19 +32,19 @@ public class JobsContentController : ApiController
     /// <summary>
     /// Get the job content.
     /// </summary>
-    /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the job.</param>
+    /// <param name="appId">The ID of the app.</param>
     /// <response code="200">Job found and content returned.</response>
     /// <response code="404">Job or app not found.</response>
     [HttpGet]
-    [Route("apps/{app}/jobs/{id}")]
+    [Route("apps/jobs/{id}")]
     [ResponseCache(Duration = 3600 * 24 * 30)]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ApiCosts(0)]
     [AllowAnonymous]
-    public async Task<IActionResult> GetJobContent(string app, DomainId id)
+    public async Task<IActionResult> GetJobContent(DomainId id, [FromQuery] DomainId appId = default)
     {
-        var jobs = await jobService.GetJobsAsync(App.Id, HttpContext.RequestAborted);
+        var jobs = await jobService.GetJobsAsync(appId, HttpContext.RequestAborted);
         var job = jobs.Find(x => x.Id == id);
 
         if (job is not { Status: JobStatus.Completed } || job.File == null)

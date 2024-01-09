@@ -66,7 +66,7 @@ public sealed class BackupJobDto : Resource
 
         if (resources.CanDownloadJob && Status == JobStatus.Completed && job.File != null)
         {
-            var values = new { app = resources.App, appId = resources.AppId, id = Id };
+            var values = new { appId = resources.AppId, id = Id };
 
             AddGetLink("download",
                 resources.Url<JobsContentController>(x => nameof(x.GetJobContent), values));
