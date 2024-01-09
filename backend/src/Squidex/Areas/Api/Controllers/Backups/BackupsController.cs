@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -22,12 +23,12 @@ namespace Squidex.Areas.Api.Controllers.Backups;
 [ApiExplorerSettings(GroupName = nameof(Backups))]
 public class BackupsController : ApiController
 {
-    private readonly IBackupService backupService;
+    private readonly IJobService jobService;
 
-    public BackupsController(ICommandBus commandBus, IBackupService backupService)
+    public BackupsController(ICommandBus commandBus, IJobService jobService)
         : base(commandBus)
     {
-        this.backupService = backupService;
+        this.jobService = jobService;
     }
 
     /// <summary>
@@ -39,15 +40,16 @@ public class BackupsController : ApiController
     [HttpGet]
     [Route("apps/{app}/backups/")]
     [ProducesResponseType(typeof(BackupJobsDto), StatusCodes.Status200OK)]
-    [ApiPermissionOrAnonymous(PermissionIds.AppBackupsRead)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppJobsRead)]
     [ApiCosts(0)]
+    [Obsolete("Use Jobs endpoint.")]
     public async Task<IActionResult> GetBackups(string app)
     {
-        var jobs = await backupService.GetBackupsAsync(AppId, HttpContext.RequestAborted);
+        var jobs = await jobService.GetJobsAsync(App.Id, HttpContext.RequestAborted);
 
-        var response = BackupJobsDto.FromDomain(jobs, Resources);
+        var result = BackupJobsDto.FromDomain(jobs.Where(x => x.TaskName == BackupJob.TaskName), Resources);
 
-        return Ok(response);
+        return Ok(result);
     }
 
     /// <summary>
@@ -60,11 +62,13 @@ public class BackupsController : ApiController
     [HttpPost]
     [Route("apps/{app}/backups/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ApiPermissionOrAnonymous(PermissionIds.AppBackupsCreate)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppJobsCreate)]
     [ApiCosts(0)]
     public async Task<IActionResult> PostBackup(string app)
     {
-        await backupService.StartBackupAsync(App.Id, User.Token()!, HttpContext.RequestAborted);
+        var job = BackupJob.BuildRequest(User.Token()!, App);
+
+        await jobService.StartAsync(App.Id, job, default);
 
         return NoContent();
     }
@@ -79,11 +83,12 @@ public class BackupsController : ApiController
     [HttpDelete]
     [Route("apps/{app}/backups/{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ApiPermissionOrAnonymous(PermissionIds.AppBackupsDelete)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppJobsDelete)]
     [ApiCosts(0)]
+    [Obsolete("Use Jobs endpoint.")]
     public async Task<IActionResult> DeleteBackup(string app, DomainId id)
     {
-        await backupService.DeleteBackupAsync(AppId, id, HttpContext.RequestAborted);
+        await jobService.DeleteJobAsync(App.Id, id, default);
 
         return NoContent();
     }

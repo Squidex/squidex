@@ -7,6 +7,7 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models;
@@ -21,7 +22,7 @@ public sealed class RestoreJobDto
     /// <summary>
     /// The status log.
     /// </summary>
-    public List<string> Log { get; set; }
+    public List<string> Log { get; set; } = [];
 
     /// <summary>
     /// The time when the job has been started.
@@ -38,8 +39,17 @@ public sealed class RestoreJobDto
     /// </summary>
     public JobStatus Status { get; set; }
 
-    public static RestoreJobDto FromDomain(IRestoreJob job)
+    public static RestoreJobDto FromDomain(Job job)
     {
-        return SimpleMapper.Map(job, new RestoreJobDto());
+        var result = SimpleMapper.Map(job, new RestoreJobDto());
+
+        if (job.Arguments.TryGetValue(RestoreJob.ArgUrl, out var urlString) && Uri.TryCreate(urlString, UriKind.Absolute, out var url))
+        {
+            result.Url = url;
+        }
+
+        result.Log = job.Log.Select(x => $"{x.Timestamp}: {x.Message}").ToList();
+
+        return result;
     }
 }

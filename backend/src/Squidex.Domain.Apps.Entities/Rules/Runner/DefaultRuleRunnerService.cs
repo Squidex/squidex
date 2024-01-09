@@ -9,36 +9,32 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.States;
-using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner;
 
 public sealed class DefaultRuleRunnerService : IRuleRunnerService
 {
     private const int MaxSimulatedEvents = 100;
-    private readonly IPersistenceFactory<RuleRunnerState> persistenceFactory;
+    private readonly IJobService jobService;
     private readonly IEventFormatter eventFormatter;
     private readonly IEventStore eventStore;
     private readonly IRuleService ruleService;
-    private readonly IMessageBus messaging;
 
     public DefaultRuleRunnerService(
-        IPersistenceFactory<RuleRunnerState> persistenceFactory,
+        IJobService jobService,
         IEventFormatter eventFormatter,
         IEventStore eventStore,
-        IRuleService ruleService,
-        IMessageBus messaging)
+        IRuleService ruleService)
     {
+        this.jobService = jobService;
         this.eventFormatter = eventFormatter;
-        this.persistenceFactory = persistenceFactory;
         this.eventStore = eventStore;
         this.ruleService = ruleService;
-        this.messaging = messaging;
     }
 
     public Task<List<SimulatedRuleEvent>> SimulateAsync(Rule rule,
@@ -120,30 +116,24 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
     public Task CancelAsync(DomainId appId,
         CancellationToken ct = default)
     {
-        return messaging.PublishAsync(new RuleRunnerCancel(appId), ct: ct);
+        var taskName = RuleRunnerJob.TaskName;
+
+        return jobService.CancelAsync(appId, taskName, ct);
     }
 
-    public Task RunAsync(DomainId appId, DomainId ruleId, bool fromSnapshots = false,
+    public Task RunAsync(RefToken actor, DomainId appId, DomainId ruleId, bool fromSnapshots = false,
         CancellationToken ct = default)
     {
-        return messaging.PublishAsync(new RuleRunnerRun(appId, ruleId, fromSnapshots), ct: ct);
+        var job = RuleRunnerJob.BuildRequest(actor, ruleId, fromSnapshots);
+
+        return jobService.StartAsync(appId, job, ct);
     }
 
     public async Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,
         CancellationToken ct = default)
     {
-        var state = await GetStateAsync(appId, ct);
+        var jobs = await jobService.GetJobsAsync(appId, ct);
 
-        return state.Value.RuleId;
-    }
-
-    private async Task<SimpleState<RuleRunnerState>> GetStateAsync(DomainId appId,
-        CancellationToken ct)
-    {
-        var state = new SimpleState<RuleRunnerState>(persistenceFactory, GetType(), appId);
-
-        await state.LoadAsync(ct);
-
-        return state;
+        return jobs.Select(RuleRunnerJob.GetRunningRuleId).FirstOrDefault(x => x != null);
     }
 }

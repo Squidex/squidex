@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -240,7 +241,7 @@ public sealed class RulesController : ApiController
     [ApiCosts(1)]
     public async Task<IActionResult> PutRuleRun(string app, DomainId id, [FromQuery] bool fromSnapshots = false)
     {
-        await ruleRunnerService.RunAsync(App.Id, id, fromSnapshots, HttpContext.RequestAborted);
+        await ruleRunnerService.RunAsync(User.Token()!, App.Id, id, fromSnapshots, HttpContext.RequestAborted);
 
         return NoContent();
     }

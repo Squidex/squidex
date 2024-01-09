@@ -139,11 +139,14 @@ public static class PermissionIds
     public const string AppWorkflowsDelete = "squidex.apps.{app}.workflows.delete";
 
     // App Backups
-    public const string AppBackups = "squidex.apps.{app}.backups";
-    public const string AppBackupsRead = "squidex.apps.{app}.backups.read";
     public const string AppBackupsCreate = "squidex.apps.{app}.backups.create";
-    public const string AppBackupsDelete = "squidex.apps.{app}.backups.delete";
-    public const string AppBackupsDownload = "squidex.apps.{app}.backups.download";
+
+    // App Jobs
+    public const string AppJobs = "squidex.apps.{app}.jobs";
+    public const string AppJobsRead = "squidex.apps.{app}.jobs.read";
+    public const string AppJobsCreate = "squidex.apps.{app}.jobs.create";
+    public const string AppJobsDelete = "squidex.apps.{app}.jobs.delete";
+    public const string AppJobsDownload = "squidex.apps.{app}.jobs.download";
 
     // App Plans
     public const string AppPlans = "squidex.apps.{app}.plans";

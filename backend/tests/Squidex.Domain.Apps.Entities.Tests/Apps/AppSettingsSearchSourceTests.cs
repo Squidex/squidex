@@ -125,16 +125,31 @@ public sealed class AppSettingsSearchSourceTests : GivenContext
     [Fact]
     public async Task Should_return_backups_result_if_matching_and_permission_given()
     {
-        var requestContext = SetupContext(PermissionIds.AppBackupsRead);
+        var requestContext = SetupContext(PermissionIds.AppJobsRead);
 
-        A.CallTo(() => urlGenerator.BackupsUI(AppId))
-            .Returns("backups-url");
+        A.CallTo(() => urlGenerator.JobsUI(AppId))
+            .Returns("jobs-url");
 
         var actual = await sut.SearchAsync("backups", requestContext, CancellationToken);
 
         actual.Should().BeEquivalentTo(
             new SearchResults()
-                .Add("Backups", SearchResultType.Setting, "backups-url"));
+                .Add("Backups", SearchResultType.Setting, "jobs-url"));
+    }
+
+    [Fact]
+    public async Task Should_return_jobs_result_if_matching_and_permission_given()
+    {
+        var requestContext = SetupContext(PermissionIds.AppJobsRead);
+
+        A.CallTo(() => urlGenerator.JobsUI(AppId))
+            .Returns("jobs-url");
+
+        var actual = await sut.SearchAsync("jobs", requestContext, CancellationToken);
+
+        actual.Should().BeEquivalentTo(
+            new SearchResults()
+                .Add("Jobs", SearchResultType.Setting, "jobs-url"));
     }
 
     [Fact]

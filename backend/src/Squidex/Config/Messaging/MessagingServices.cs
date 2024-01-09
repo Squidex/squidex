@@ -7,10 +7,12 @@
 
 using System.Text.Json;
 using Squidex.Domain.Apps.Core.Subscriptions;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
@@ -49,10 +51,7 @@ public static class MessagingServices
             services.AddSingletonAs<EventConsumerWorker>()
                 .AsSelf().As<IMessageHandler>();
 
-            services.AddSingletonAs<RuleRunnerWorker>()
-                .AsSelf().As<IMessageHandler>();
-
-            services.AddSingletonAs<BackupWorker>()
+            services.AddSingletonAs<JobWorker>()
                 .AsSelf().As<IMessageHandler>();
 
             services.AddSingletonAs<UsageNotifierWorker>()
@@ -60,6 +59,15 @@ public static class MessagingServices
 
             services.AddSingletonAs<UsageTrackerWorker>()
                 .AsSelf().As<IMessageHandler>();
+
+            services.AddSingletonAs<BackupJob>()
+                .As<IJobRunner>();
+
+            services.AddSingletonAs<RestoreJob>()
+                .As<IJobRunner>();
+
+            services.AddSingletonAs<RuleRunnerJob>()
+                .As<IJobRunner>();
         }
 
         services.AddSingleton<IMessagingSerializer>(c =>
@@ -70,6 +78,9 @@ public static class MessagingServices
 
         services.AddSingletonAs<EventMessageEvaluator>()
             .As<IMessageEvaluator>();
+
+        services.AddSingletonAs<DefaultJobService>()
+            .As<IJobService>().As<IDeleter>();
 
         services.AddReplicatedCacheMessaging(isCaching, options =>
         {
@@ -85,9 +96,9 @@ public static class MessagingServices
         services.AddMessagingTransport(config);
         services.AddMessaging(options =>
         {
-            options.Routing.Add(m => m is RuleRunnerRun, channelRules);
-            options.Routing.Add(m => m is BackupStart, channelBackupStart);
-            options.Routing.Add(m => m is BackupRestore, channelBackupRestore);
+            options.Routing.Add(m => m is JobStart r && r.Request.TaskName == BackupJob.TaskName, channelBackupStart);
+            options.Routing.Add(m => m is JobStart r && r.Request.TaskName == RestoreJob.TaskName, channelBackupRestore);
+            options.Routing.Add(m => m is JobStart r && r.Request.TaskName == RuleRunnerJob.TaskName, channelRules);
             options.Routing.AddFallback(channelFallback);
         });
 

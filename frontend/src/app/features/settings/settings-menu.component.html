@@ -50,9 +50,9 @@
             <i class="icon-download"></i> {{ 'common.templates' | sqxTranslate }}
         </a>
     </li>
-    <li class="nav-item" *ngIf="app.canReadBackups" sqxTourStep="backups">
-        <a class="nav-link" routerLink="backups" routerLinkActive="active">
-            <i class="icon-backups"></i> {{ 'common.backups' | sqxTranslate }}
+    <li class="nav-item" *ngIf="app.canReadJobs" sqxTourStep="jobs">
+        <a class="nav-link" routerLink="jobs" routerLinkActive="active">
+            <i class="icon-backups"></i> {{ 'common.jobsBackups' | sqxTranslate }}
         </a>
     </li>
     <li class="nav-item" *ngIf="app.canReadPlans" sqxTourStep="plans">

@@ -6,13 +6,15 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Areas.Api.Controllers.Jobs;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models;
 
+[Obsolete("Use Jobs endpoint.")]
 public sealed class BackupJobDto : Resource
 {
     /// <summary>
@@ -45,16 +47,16 @@ public sealed class BackupJobDto : Resource
     /// </summary>
     public JobStatus Status { get; set; }
 
-    public static BackupJobDto FromDomain(IBackupJob backup, Resources resources)
+    public static BackupJobDto FromDomain(Job job, Resources resources)
     {
-        var result = SimpleMapper.Map(backup, new BackupJobDto());
+        var result = SimpleMapper.Map(job, new BackupJobDto());
 
-        return result.CreateLinks(resources);
+        return result.CreateLinks(job, resources);
     }
 
-    private BackupJobDto CreateLinks(Resources resources)
+    private BackupJobDto CreateLinks(Job job, Resources resources)
     {
-        if (resources.CanDeleteBackup)
+        if (resources.CanDeleteJob)
         {
             var values = new { app = resources.App, id = Id };
 
@@ -62,12 +64,12 @@ public sealed class BackupJobDto : Resource
                 resources.Url<BackupsController>(x => nameof(x.DeleteBackup), values));
         }
 
-        if (resources.CanDownloadBackup)
+        if (resources.CanDownloadJob && Status == JobStatus.Completed && job.File != null)
         {
-            var values = new { app = resources.App, appId = resources.AppId, id = Id };
+            var values = new { appId = resources.AppId, id = Id };
 
             AddGetLink("download",
-                resources.Url<BackupContentController>(x => nameof(x.GetBackupContentV2), values));
+                resources.Url<JobsContentController>(x => nameof(x.GetJobContent), values));
         }
 
         return this;

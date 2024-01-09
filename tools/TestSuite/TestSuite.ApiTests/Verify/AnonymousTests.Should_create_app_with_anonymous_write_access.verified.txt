@@ -13,9 +13,6 @@
     assets/scripts: {
       Method: DELETE
     },
-    backups: {
-      Method: GET
-    },
     clients: {
       Method: GET
     },
@@ -30,6 +27,9 @@
     },
     image/upload: {
       Method: POST
+    },
+    jobs: {
+      Method: GET
     },
     languages: {
       Method: GET

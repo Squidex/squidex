@@ -668,9 +668,9 @@ describe('SchemasService', () => {
 
         return {
             id: `id${id}`,
-            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
+            created: buildDate(id, 10),
             createdBy: `creator${id}`,
-            lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
+            lastModified: buildDate(id, 20),
             lastModifiedBy: `modifier${id}`,
             version: key,
             name: `schema-name${key}`,
@@ -897,8 +897,8 @@ export function createSchema(id: number, suffix = '') {
 
     return new SchemaDto(links,
         `id${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
+        DateTime.parseISO(buildDate(id, 10)), `creator${id}`,
+        DateTime.parseISO(buildDate(id, 20)), `modifier${id}`,
         new Version(key),
         `schema-name${key}`,
         `schema-category${key}`,
@@ -937,4 +937,8 @@ export function createSchema(id: number, suffix = '') {
             delete: '<script-delete>',
             update: '<script-update>',
         });
+}
+
+function buildDate(id: number, add = 0) {
+    return `${id % 1000 + 2000 + add}-12-11T10:09:08Z`;
 }

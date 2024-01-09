@@ -19,6 +19,12 @@
     logs: {
       Method: GET
     },
+    run: {
+      Method: PUT
+    },
+    run/snapshots: {
+      Method: PUT
+    },
     trigger: {
       Method: PUT
     },

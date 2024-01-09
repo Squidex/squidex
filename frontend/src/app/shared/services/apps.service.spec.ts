@@ -364,9 +364,9 @@ describe('AppsService', () => {
 
         return {
             id: `id${id}`,
-            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
+            created: buildDate(id, 10),
             createdBy: `creator${id}`,
-            lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
+            lastModified: buildDate(id, 20),
             lastModifiedBy: `modifier${id}`,
             version: key,
             name: `app-name${key}`,
@@ -427,8 +427,8 @@ export function createApp(id: number, suffix = '') {
 
     return new AppDto(links,
         `id${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
+        DateTime.parseISO(buildDate(id, 10)), `creator${id}`,
+        DateTime.parseISO(buildDate(id, 20)), `modifier${id}`,
         new Version(key),
         `app-name${key}`,
         `app-label${key}`,
@@ -479,4 +479,8 @@ function createProperties(id: number) {
     result[`property${id}`] = true;
 
     return result;
+}
+
+function buildDate(id: number, add = 0) {
+    return `${id % 1000 + 2000 + add}-12-11T10:09:08Z`;
 }

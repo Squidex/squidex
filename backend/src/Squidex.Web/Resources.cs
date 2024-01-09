@@ -140,12 +140,14 @@ public sealed class Resources
     // Backups
     public bool CanRestoreBackup => Can(PermissionIds.AdminRestore);
 
-    public bool CanCreateBackup => Can(PermissionIds.AppBackupsCreate);
+    public bool CanCreateBackup => Can(PermissionIds.AppJobs);
 
-    public bool CanDeleteBackup => Can(PermissionIds.AppBackupsDelete);
+    // Jobs
+    public bool CanDeleteJob => Can(PermissionIds.AppJobsCreate);
 
-    public bool CanDownloadBackup => Can(PermissionIds.AppBackupsDownload);
+    public bool CanDownloadJob => Can(PermissionIds.AppJobsDownload);
 
+    // Context
     public Context Context { get; set; }
 
     public string? App => GetAppName();

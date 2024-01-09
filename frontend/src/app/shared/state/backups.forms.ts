@@ -9,7 +9,7 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
-import { StartRestoreDto } from '../services/backups.service';
+import { StartRestoreDto } from '../services/jobs.service';
 
 export class RestoreForm extends Form<ExtendedFormGroup, StartRestoreDto> {
     public get url() {

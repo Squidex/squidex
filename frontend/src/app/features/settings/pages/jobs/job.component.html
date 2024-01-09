@@ -1,0 +1,60 @@
+<div class="table-items-row table-items-row-expandable">
+    <div class="table-items-row-summary">
+        <div class="row align-items-center">
+            <div class="col-auto pe-4" [ngSwitch]="job.status">
+                <sqx-status-icon size="lg" [status]="job.status"></sqx-status-icon>
+            </div>
+            <div class="col">
+                <div>
+                    <h4>{{job.description}}</h4>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        {{ 'jobs.startedLabel' | sqxTranslate }}:
+                        
+                        <span>
+                            {{job.started | sqxFromNow}}
+                        </span>
+                    </div>
+                    <div class="col">
+                        {{ 'jobs.jobDuration' | sqxTranslate }}:
+
+                        <span *ngIf="job.stopped">
+                            {{duration}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-options text-right">
+                <a class="btn btn-text-secondary" href="{{apiUrl.buildUrl(job.downloadUrl || '')}}" [class.invisible]="!job.downloadUrl" sqxExternalLink="noicon">
+                    <i class="icon-download"></i>
+                </a>
+
+                <button type="button" class="btn btn-outline-secondary btn-expand  ms-1" [class.expanded]="expanded" (click)="toggleExpanded()">
+                    <span class="hidden">{{ 'common.settings' | sqxTranslate }}</span>
+                    <i class="icon-settings"></i>
+                </button>
+
+                <button type="button" class="btn btn-text-danger ms-1" [disabled]="!job.canDelete"
+                    (sqxConfirmClick)="delete()"
+                    confirmTitle="i18n:jobs.deleteConfirmTitle"
+                    confirmText="i18n:jobs.deleteConfirmText"
+                    confirmRememberKey="deleteBackup">
+                    <i class="icon-bin2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-items-row-details" *ngIf="expanded">
+        <div class="job-header">
+            <h4>{{ 'common.details' | sqxTranslate }}</h4>
+        </div>
+        <div class="row job-dump">
+            <div class="col-12">
+                <sqx-code-editor [ngModel]="details" disabled="true" wordWrap="true" height="auto" mode="ace/mode/text"></sqx-code-editor>
+            </div>
+        </div>
+    </div>
+</div>

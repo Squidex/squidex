@@ -70,11 +70,6 @@ public sealed class FakeUrlGenerator : IUrlGenerator
         throw new NotSupportedException();
     }
 
-    public string BackupsUI(NamedId<DomainId> appId)
-    {
-        throw new NotSupportedException();
-    }
-
     public string ClientsUI(NamedId<DomainId> appId)
     {
         throw new NotSupportedException();
@@ -96,6 +91,11 @@ public sealed class FakeUrlGenerator : IUrlGenerator
     }
 
     public string LanguagesUI(NamedId<DomainId> appId)
+    {
+        throw new NotSupportedException();
+    }
+
+    public string JobsUI(NamedId<DomainId> appId)
     {
         throw new NotSupportedException();
     }

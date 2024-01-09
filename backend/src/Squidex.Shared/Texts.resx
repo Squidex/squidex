@@ -184,21 +184,6 @@
   <data name="assets.referenced" xml:space="preserve">
     <value>Assets is referenced by a content and cannot be deleted.</value>
   </data>
-  <data name="backups.alreadyRunning" xml:space="preserve">
-    <value>Another backup process is already running.</value>
-  </data>
-  <data name="backups.maxReached" xml:space="preserve">
-    <value>You cannot have more than {max} backups.</value>
-  </data>
-  <data name="backups.restoreRunning" xml:space="preserve">
-    <value>A restore operation is already running.</value>
-  </data>
-  <data name="comments.noPermissions" xml:space="preserve">
-    <value>You can only access your notifications.</value>
-  </data>
-  <data name="comments.notUserComment" xml:space="preserve">
-    <value>Comment is created by another user.</value>
-  </data>
   <data name="common.action" xml:space="preserve">
     <value>Action</value>
   </data>
@@ -886,11 +871,35 @@
   <data name="history.teams.updated" xml:space="preserve">
     <value>updated general settings and renamed name to {[Name]}.</value>
   </data>
+  <data name="job.backup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="job.restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="job.ruleRun" xml:space="preserve">
+    <value>Replay Rule.</value>
+  </data>
+  <data name="job.ruleRunNamed" xml:space="preserve">
+    <value>Replay Rule '{name}'.</value>
+  </data>
+  <data name="job.ruleRunNamedSnapshot" xml:space="preserve">
+    <value>Replay Rule '{name}' from states.</value>
+  </data>
+  <data name="job.ruleRunSnapshot" xml:space="preserve">
+    <value>Replay Rule from states</value>
+  </data>
+  <data name="jobs.alreadyRunning" xml:space="preserve">
+    <value>Another job is already running.</value>
+  </data>
+  <data name="jobs.invalidTaskName" xml:space="preserve">
+    <value>Invalid task name</value>
+  </data>
+  <data name="jobs.maxReached" xml:space="preserve">
+    <value>You cannot have more than {max} backups.</value>
+  </data>
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Your email address is set to private in Github. Please set it to public to use Github login.</value>
-  </data>
-  <data name="rules.ruleAlreadyRunning" xml:space="preserve">
-    <value>Another rule is already running.</value>
   </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Calculated default value and default value cannot be used together.</value>

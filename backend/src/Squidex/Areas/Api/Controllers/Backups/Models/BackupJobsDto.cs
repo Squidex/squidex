@@ -5,11 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models;
 
+[Obsolete("Use Jobs endpoint.")]
 public sealed class BackupJobsDto : Resource
 {
     /// <summary>
@@ -17,11 +18,11 @@ public sealed class BackupJobsDto : Resource
     /// </summary>
     public BackupJobDto[] Items { get; set; }
 
-    public static BackupJobsDto FromDomain(IEnumerable<IBackupJob> backups, Resources resources)
+    public static BackupJobsDto FromDomain(IEnumerable<Job> jobs, Resources resources)
     {
         var result = new BackupJobsDto
         {
-            Items = backups.Select(x => BackupJobDto.FromDomain(x, resources)).ToArray()
+            Items = jobs.Select(x => BackupJobDto.FromDomain(x, resources)).ToArray()
         };
 
         return result.CreateLinks(resources);

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using Elasticsearch.Net.Specification.WatcherApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;

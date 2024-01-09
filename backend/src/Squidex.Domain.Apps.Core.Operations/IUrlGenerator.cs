@@ -28,8 +28,6 @@ public interface IUrlGenerator
 
     string AssetContentBase(string appName);
 
-    string BackupsUI(NamedId<DomainId> appId);
-
     string ClientsUI(NamedId<DomainId> appId);
 
     string ContentCDNBase();
@@ -45,6 +43,8 @@ public interface IUrlGenerator
     string DashboardUI(NamedId<DomainId> appId);
 
     string LanguagesUI(NamedId<DomainId> appId);
+
+    string JobsUI(NamedId<DomainId> appId);
 
     string PatternsUI(NamedId<DomainId> appId);
 
