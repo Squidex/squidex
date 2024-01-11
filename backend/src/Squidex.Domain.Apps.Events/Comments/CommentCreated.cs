@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Events.Comments;
 [EventType(nameof(CommentCreated))]
 public sealed class CommentCreated : AppEvent
 {
+    public static readonly NamedId<DomainId> NoApp = NamedId.Of(DomainId.NewGuid(), "no-app");
+
     public DomainId CommentsId { get; set; }
 
     public DomainId CommentId { get; set; }

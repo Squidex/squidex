@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Entities.Jobs;
 
 public record struct JobRequest(RefToken Actor, string TaskName, ReadonlyDictionary<string, string> Arguments)
 {
+    public NamedId<DomainId>? AppId { get; set; }
+
     public static JobRequest Create(RefToken actor, string taskName, Dictionary<string, string>? arguments = null)
     {
         var args = arguments?.ToReadonlyDictionary() ?? ReadonlyDictionary.Empty<string, string>();

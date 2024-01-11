@@ -28,7 +28,7 @@ export class NotificationsMenuComponent {
     constructor(authService: AuthService, uiOptions: UIOptions,
     ) {
         const notifoApiKey = authService.user?.notifoToken;
-        const notifoApiUrl = uiOptions.value.notifoAPi;
+        const notifoApiUrl = uiOptions.value.notifoApi;
 
         this.isNotifoConfigured = !!notifoApiKey && !!notifoApiUrl;
     }

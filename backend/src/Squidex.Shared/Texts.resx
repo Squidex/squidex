@@ -871,32 +871,38 @@
   <data name="history.teams.updated" xml:space="preserve">
     <value>updated general settings and renamed name to {[Name]}.</value>
   </data>
-  <data name="job.backup" xml:space="preserve">
-    <value>Backup</value>
-  </data>
-  <data name="job.restore" xml:space="preserve">
-    <value>Restore</value>
-  </data>
-  <data name="job.ruleRun" xml:space="preserve">
-    <value>Replay Rule.</value>
-  </data>
-  <data name="job.ruleRunNamed" xml:space="preserve">
-    <value>Replay Rule '{name}'.</value>
-  </data>
-  <data name="job.ruleRunNamedSnapshot" xml:space="preserve">
-    <value>Replay Rule '{name}' from states.</value>
-  </data>
-  <data name="job.ruleRunSnapshot" xml:space="preserve">
-    <value>Replay Rule from states</value>
-  </data>
   <data name="jobs.alreadyRunning" xml:space="preserve">
     <value>Another job is already running.</value>
+  </data>
+  <data name="jobs.backup" xml:space="preserve">
+    <value>Backup</value>
   </data>
   <data name="jobs.invalidTaskName" xml:space="preserve">
     <value>Invalid task name</value>
   </data>
   <data name="jobs.maxReached" xml:space="preserve">
     <value>You cannot have more than {max} backups.</value>
+  </data>
+  <data name="jobs.notifyFailed" xml:space="preserve">
+    <value>Your job '{job}' failed to completed.</value>
+  </data>
+  <data name="jobs.notifySuccess" xml:space="preserve">
+    <value>Your job '{job}' has been completed successfully.</value>
+  </data>
+  <data name="jobs.restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="jobs.ruleRun" xml:space="preserve">
+    <value>Replay Rule.</value>
+  </data>
+  <data name="jobs.ruleRunNamed" xml:space="preserve">
+    <value>Replay Rule '{name}'.</value>
+  </data>
+  <data name="jobs.ruleRunNamedSnapshot" xml:space="preserve">
+    <value>Replay Rule '{name}' from states.</value>
+  </data>
+  <data name="jobs.ruleRunSnapshot" xml:space="preserve">
+    <value>Replay Rule from states</value>
   </data>
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Your email address is set to private in Github. Please set it to public to use Github login.</value>

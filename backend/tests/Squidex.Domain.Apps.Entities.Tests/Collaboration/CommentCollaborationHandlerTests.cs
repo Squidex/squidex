@@ -137,6 +137,28 @@ public class CommentCollaborationHandlerTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_publish_event_for_notification()
+    {
+        var text = "My Comment";
+
+        var commentsId = DomainId.Create("user42");
+        var commentItem = new Comment(clock.GetCurrentInstant(), User, text);
+
+        var storedEvent = await CreateNotificationAsync(commentsId, commentItem);
+
+        storedEvent?.Payload.Should().BeEquivalentTo(
+            new CommentCreated
+            {
+                Actor = User,
+                AppId = CommentCreated.NoApp,
+                CommentId = default,
+                CommentsId = commentsId,
+                Text = commentItem.Text,
+                Mentions = null,
+            }, opts => opts.Excluding(x => x.CommentId));
+    }
+
+    [Fact]
     public async Task Should_not_enrich_comment_with_mentioned_users_if_users_not_found()
     {
         var text = "Hi @mail1@squidex.io, @mail2@squidex.io and @notfound@squidex.io";
@@ -245,6 +267,50 @@ public class CommentCollaborationHandlerTests : GivenContext
         await sut.LastTask;
 
         var streamName = $"comments-{DomainId.Combine(AppId.Id, commentsId)}";
+
+        A.CallTo(() => eventStore.AppendAsync(A<Guid>._, streamName, EtagVersion.Any, A<ICollection<EventData>>._, A<CancellationToken>._))
+            .MustHaveHappened();
+
+        return storedEvent;
+    }
+
+    private async Task<Envelope<IEvent>?> CreateNotificationAsync(DomainId commentsId, Comment comment)
+    {
+        var document = new Doc();
+        var docName = sut.UserDocument(commentsId.ToString());
+
+        documentManager.Doc = document;
+
+        var stream = document.Array("stream");
+
+        await sut.OnDocumentLoadedAsync(new DocumentLoadEvent
+        {
+            Context = new DocumentContext(docName, 0),
+            Document = document,
+            Source = documentManager,
+        });
+
+        var commentJson = TestUtils.DefaultSerializer.Serialize(comment);
+
+        Envelope<IEvent>? storedEvent = null;
+
+        A.CallTo(() => eventFormatter.ToEventData(A<Envelope<IEvent>>._, A<Guid>._, true))
+            .Invokes(c =>
+            {
+                storedEvent = c.GetArgument<Envelope<IEvent>>(0);
+            });
+
+        await documentManager.UpdateDocAsync(null!, doc =>
+        {
+            using (var transaction = doc.WriteTransaction())
+            {
+                stream.InsertRange(transaction, 0, InputFactory.FromJson(commentJson));
+            }
+        }, default);
+
+        await sut.LastTask;
+
+        var streamName = $"comments-{DomainId.Combine(CommentCreated.NoApp, commentsId)}";
 
         A.CallTo(() => eventStore.AppendAsync(A<Guid>._, streamName, EtagVersion.Any, A<ICollection<EventData>>._, A<CancellationToken>._))
             .MustHaveHappened();

@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -64,6 +65,10 @@ public sealed class HistoryService : IHistoryService, IEventConsumer
         {
             switch (@event.Payload)
             {
+                case CommentCreated:
+                    targets.Add((@event, null));
+                    break;
+
                 case AppEvent appEvent:
                     {
                         var historyEvent = await CreateEvent(appEvent.AppId.Id, appEvent.Actor, @event);

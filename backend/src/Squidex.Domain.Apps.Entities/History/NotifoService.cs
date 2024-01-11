@@ -237,12 +237,16 @@ public class NotifoService : IUserEvents
 
     private IEnumerable<PublishDto> CreateRequests(Envelope<IEvent> @event, HistoryEvent? historyEvent)
     {
-        if (@event.Payload is CommentCreated { Mentions.Length: > 0 } comment)
+        if (@event.Payload is CommentCreated { Mentions.Length: > 0, AppId: not null } comment)
         {
             foreach (var userId in comment.Mentions)
             {
                 yield return CreateMentionRequest(comment, userId);
             }
+        }
+        else if (@event.Payload is CommentCreated notification && notification.AppId == CommentCreated.NoApp)
+        {
+            yield return CreateMentionRequest(notification, notification.CommentsId.ToString());
         }
         else if (historyEvent != null && @event.Payload is AppEvent appEvent)
         {
@@ -262,25 +266,17 @@ public class NotifoService : IUserEvents
             publishRequest.Properties.Add(key, value);
         }
 
-        if (payload is AppEvent appEvent)
-        {
-            publishRequest.Properties["SquidexApp"] = appEvent.AppId.Name;
-        }
-
         if (payload is SquidexEvent squidexEvent)
         {
             SetUser(squidexEvent, publishRequest);
         }
 
-        if (payload is AppEvent appEvent2)
+        if (payload is AppEvent appEvent)
         {
-            publishRequest.Topic = BuildTopic(GetAppPrefix(appEvent2), historyEvent);
+            publishRequest.Properties["SquidexApp"] = appEvent.AppId.Name;
         }
 
-        if (payload is TeamEvent teamEvent)
-        {
-            publishRequest.Topic = BuildTopic(GetTeamPrefix(teamEvent), historyEvent);
-        }
+        SetTopic(historyEvent, payload, publishRequest);
 
         if (payload is ContentEvent @event and not ContentDeleted)
         {
@@ -294,26 +290,46 @@ public class NotifoService : IUserEvents
         return publishRequest;
     }
 
+    private static void SetTopic(HistoryEvent historyEvent, IEvent payload, PublishDto publishRequest)
+    {
+        if (payload is AppEvent appEvent)
+        {
+            publishRequest.Topic = BuildTopic(GetAppPrefix(appEvent), historyEvent);
+        }
+        else if (payload is TeamEvent teamEvent)
+        {
+            publishRequest.Topic = BuildTopic(GetTeamPrefix(teamEvent), historyEvent);
+        }
+    }
+
     private static PublishDto CreateMentionRequest(CommentCreated comment, string userId)
     {
         var publishRequest = new PublishDto
         {
-            Topic = $"users/{userId}"
-        };
-
-        publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
-
-        publishRequest.Preformatted = new NotificationFormattingDto
-        {
-            Subject =
+            Topic = $"users/{userId}",
+            Preformatted = new NotificationFormattingDto
             {
-                ["en"] = comment.Text
+                Subject =
+                {
+                    ["en"] = comment.Text
+                }
             }
         };
 
+        if (comment.AppId != null)
+        {
+            publishRequest.Properties = new NotificationProperties
+            {
+                ["SquidexApp"] = comment.AppId.Name
+            };
+        }
+
         if (comment.Url?.IsAbsoluteUri == true)
         {
-            publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
+            publishRequest.Preformatted.LinkUrl = new LocalizedText()
+            {
+                ["en"] = comment.Url.ToString()
+            };
         }
 
         SetUser(comment, publishRequest);

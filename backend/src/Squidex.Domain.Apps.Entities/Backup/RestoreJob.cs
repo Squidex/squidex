@@ -107,7 +107,7 @@ public sealed class RestoreJob : IJobRunner
         };
 
         // Use a readable name to describe the job.
-        context.Job.Description = T.Get("job.restore");
+        context.Job.Description = T.Get("jobs.restore");
 
         try
         {

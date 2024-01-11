@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Jobs;
@@ -66,7 +67,7 @@ public sealed class RuleRunnerJob : IJobRunner
         return DomainId.Create(ruleId);
     }
 
-    public static JobRequest BuildRequest(RefToken actor, DomainId ruleId, bool snapshot)
+    public static JobRequest BuildRequest(RefToken actor, App app, DomainId ruleId, bool snapshot)
     {
         return JobRequest.Create(
             actor,
@@ -75,7 +76,10 @@ public sealed class RuleRunnerJob : IJobRunner
             {
                 [ArgRuleId] = ruleId.ToString(),
                 [ArgSnapshot] = snapshot.ToString()
-            });
+            }) with
+        {
+            AppId = app.NamedId()
+        };
     }
 
     public async Task RunAsync(JobRunContext context,
@@ -118,16 +122,16 @@ public sealed class RuleRunnerJob : IJobRunner
         if (!string.IsNullOrWhiteSpace(rule.Name))
         {
             var key = fromSnapshot ?
-                "job.ruleRunNamedSnapshot" :
-                "job.ruleRunName";
+                "jobs.ruleRunNamedSnapshot" :
+                "jobs.ruleRunName";
 
             run.Job.Description = T.Get(key, new { name = rule.Name });
         }
         else
         {
             var key = fromSnapshot ?
-                "job.ruleRunSnapshot" :
-                "job.ruleRun";
+                "jobs.ruleRunSnapshot" :
+                "jobs.ruleRun";
 
             run.Job.Description = T.Get(key);
         }

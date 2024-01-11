@@ -8,6 +8,8 @@
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Caching;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
@@ -20,6 +22,8 @@ public sealed class JobProcessor
     private readonly DomainId ownerId;
     private readonly IEnumerable<IJobRunner> runners;
     private readonly ILocalCache localCache;
+    private readonly ICollaborationService collaboration;
+    private readonly IUrlGenerator urlGenerator;
     private readonly ILogger<JobProcessor> log;
     private readonly SimpleState<JobsState> state;
     private readonly ReentrantScheduler scheduler = new ReentrantScheduler(1);
@@ -30,12 +34,16 @@ public sealed class JobProcessor
     public JobProcessor(DomainId ownerId,
         IEnumerable<IJobRunner> runners,
         ILocalCache localCache,
+        ICollaborationService collaboration,
         IPersistenceFactory<JobsState> persistenceFactory,
+        IUrlGenerator urlGenerator,
         ILogger<JobProcessor> log)
     {
         this.ownerId = ownerId;
         this.runners = runners;
         this.localCache = localCache;
+        this.collaboration = collaboration;
+        this.urlGenerator = urlGenerator;
         this.log = log;
 
         state = new SimpleState<JobsState>(persistenceFactory, GetType(), ownerId);
@@ -148,6 +156,13 @@ public sealed class JobProcessor
             try
             {
                 await ProcessAsync(context, runner, context.CancellationToken);
+
+                await NotifyAsync(request, context, "jobs.notifySuccess");
+            }
+            catch
+            {
+                await NotifyAsync(request, context, "jobs.notifyFailed");
+                throw;
             }
             finally
             {
@@ -156,6 +171,19 @@ public sealed class JobProcessor
                 currentRun = null;
             }
         }, ct);
+    }
+
+    private async Task NotifyAsync(JobRequest request, JobRunContext context, string text)
+    {
+        if (request.AppId == null || request.Actor.IsClient)
+        {
+            return;
+        }
+
+        var notificationText = T.Get(text, new { job = context.Job.Description });
+        var notificationUrl = new Uri(urlGenerator.JobsUI(request.AppId));
+
+        await collaboration.NotifyAsync(request.Actor.Identifier, notificationText, request.Actor, notificationUrl, false, default);
     }
 
     private async Task ProcessAsync(JobRunContext context, IJobRunner runner,

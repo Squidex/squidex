@@ -241,7 +241,7 @@ public sealed class RulesController : ApiController
     [ApiCosts(1)]
     public async Task<IActionResult> PutRuleRun(string app, DomainId id, [FromQuery] bool fromSnapshots = false)
     {
-        await ruleRunnerService.RunAsync(User.Token()!, App.Id, id, fromSnapshots, HttpContext.RequestAborted);
+        await ruleRunnerService.RunAsync(User.Token()!, App, id, fromSnapshots, HttpContext.RequestAborted);
 
         return NoContent();
     }
