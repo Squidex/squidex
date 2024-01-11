@@ -96,7 +96,7 @@ public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICo
 
     public ValueTask OnDocumentLoadedAsync(DocumentLoadEvent @event)
     {
-        if (!IsResourceDocument(@event.Context.DocumentName, out var appId, out var resourceId))
+        if (!IsResourceOrUserDocument(@event.Context.DocumentName, out var appId, out var resourceId))
         {
             return default;
         }
@@ -239,26 +239,55 @@ public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICo
         return $"apps/{appId}/{resourceId}";
     }
 
-    private static bool IsResourceDocument(string name, out NamedId<DomainId> appId, out DomainId resourceId)
+    private static bool IsResourceOrUserDocument(string name, out NamedId<DomainId> appId, out DomainId resourceId)
     {
         resourceId = default;
 
-        if (!name.StartsWith("apps", StringComparison.Ordinal))
+        // Result can be null, if the method returns null.
+        appId = default!;
+
+        static bool IsResourceDocument(string name, ref NamedId<DomainId> appId, ref DomainId resourceId)
         {
-            appId = default!;
-            return false;
+            var parts = name.Split('/');
+
+            if (parts.Length < 3 || !NamedId<DomainId>.TryParse(parts[1], DomainId.TryParse, out appId!))
+            {
+                return false;
+            }
+
+            // Assume tha tour ID could also have slashes.
+            resourceId = DomainId.Create(string.Join('/', parts.Skip(2)));
+            return true;
         }
 
-        var parts = name.Split('/');
-
-        if (parts.Length < 3 || !NamedId<DomainId>.TryParse(parts[1], DomainId.TryParse, out appId!))
+        static bool IsUserDocument(string name, ref NamedId<DomainId> appId, ref DomainId resourceId)
         {
-            appId = default!;
-            return false;
+            var parts = name.Split('/');
+
+            if (parts.Length < 2)
+            {
+                return false;
+            }
+
+            // Use a dummy value for the app ID.
+            appId = CommentCreated.NoApp;
+
+            // Assume tha tour ID could also have slashes.
+            resourceId = DomainId.Create(string.Join('/', parts.Skip(1)));
+            return true;
         }
 
-        resourceId = DomainId.Create(string.Join('/', parts.Skip(2)));
-        return true;
+        if (name.StartsWith("apps/", StringComparison.Ordinal))
+        {
+            return IsResourceDocument(name, ref appId, ref resourceId);
+        }
+
+        if (name.StartsWith("users/", StringComparison.Ordinal))
+        {
+            return IsUserDocument(name, ref appId, ref resourceId);
+        }
+
+        return false;
     }
 
     [GeneratedRegex(@"@(?=.{1,64}@)[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+\/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*", RegexOptions.Compiled | RegexOptions.ExplicitCapture, matchTimeoutMilliseconds: 100)]

@@ -57,7 +57,10 @@ public sealed class BackupJob : IJobRunner
             {
                 [ArgAppId] = app.Id.ToString(),
                 [ArgAppName] = app.Name
-            });
+            }) with
+        {
+            AppId = app.NamedId()
+        };
     }
 
     public Task DownloadAsync(Job state, Stream stream,
@@ -81,7 +84,7 @@ public sealed class BackupJob : IJobRunner
         context.Job.File = new JobFile($"backup-{appName}-{context.Job.Started:yyyy-MM-dd_HH-mm-ss}.zip", "application/zip");
 
         // Use a readable name to describe the job.
-        context.Job.Description = T.Get("job.backup");
+        context.Job.Description = T.Get("jobs.backup");
 
         var handlers = backupHandlerFactory.CreateMany();
 

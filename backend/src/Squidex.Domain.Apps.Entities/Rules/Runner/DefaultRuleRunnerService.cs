@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -121,12 +122,12 @@ public sealed class DefaultRuleRunnerService : IRuleRunnerService
         return jobService.CancelAsync(appId, taskName, ct);
     }
 
-    public Task RunAsync(RefToken actor, DomainId appId, DomainId ruleId, bool fromSnapshots = false,
+    public Task RunAsync(RefToken actor, App app, DomainId ruleId, bool fromSnapshots = false,
         CancellationToken ct = default)
     {
-        var job = RuleRunnerJob.BuildRequest(actor, ruleId, fromSnapshots);
+        var job = RuleRunnerJob.BuildRequest(actor, app, ruleId, fromSnapshots);
 
-        return jobService.StartAsync(appId, job, ct);
+        return jobService.StartAsync(app.Id, job, ct);
     }
 
     public async Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,
