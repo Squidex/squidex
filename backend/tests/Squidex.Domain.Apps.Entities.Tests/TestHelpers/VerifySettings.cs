@@ -8,6 +8,7 @@
 using System.Runtime.CompilerServices;
 using Argon;
 using NodaTime;
+using NodaTime.Text;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -142,6 +143,7 @@ public static partial class VerifySettings
 
         VerifierSettings.ScrubInlineGuids();
         VerifierSettings.IgnoreMembersWithType<Instant>();
+        VerifierSettings.IgnoreInstance<JsonValue>(x => x.Type == JsonValueType.String && InstantPattern.ExtendedIso.Parse(x.ToString()).Success);
         VerifierSettings.IgnoreMember("Secret");
     }
 }

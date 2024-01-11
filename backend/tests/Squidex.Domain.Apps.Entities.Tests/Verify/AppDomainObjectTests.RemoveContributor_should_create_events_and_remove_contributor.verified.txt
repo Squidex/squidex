@@ -109,8 +109,7 @@
     {
       Headers: {
         AggregateId: Guid_1,
-        EventId: Guid_2,
-        Timestamp: DateTimeOffset_1
+        EventId: Guid_2
       },
       Payload: {
         ContributorId: Guid_3,

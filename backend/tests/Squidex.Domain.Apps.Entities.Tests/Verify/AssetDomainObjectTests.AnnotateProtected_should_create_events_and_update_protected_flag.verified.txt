@@ -24,8 +24,7 @@
     {
       Headers: {
         AggregateId: Guid_1,
-        EventId: Guid_3,
-        Timestamp: DateTimeOffset_1
+        EventId: Guid_3
       },
       Payload: {
         IsProtected: true,

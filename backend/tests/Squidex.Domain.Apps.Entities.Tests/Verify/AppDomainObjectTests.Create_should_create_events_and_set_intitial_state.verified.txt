@@ -109,8 +109,7 @@
     {
       Headers: {
         AggregateId: Guid_1,
-        EventId: Guid_2,
-        Timestamp: DateTimeOffset_1
+        EventId: Guid_2
       },
       Payload: {
         Name: my-app,
@@ -122,8 +121,7 @@
     {
       Headers: {
         AggregateId: Guid_1,
-        EventId: Guid_3,
-        Timestamp: DateTimeOffset_1
+        EventId: Guid_3
       },
       Payload: {
         ContributorId: me,
@@ -138,8 +136,7 @@
     {
       Headers: {
         AggregateId: Guid_1,
-        EventId: Guid_4,
-        Timestamp: DateTimeOffset_1
+        EventId: Guid_4
       },
       Payload: {
         Settings: {

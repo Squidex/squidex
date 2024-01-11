@@ -38,8 +38,7 @@
     {
       Headers: {
         AggregateId: Guid_1--Guid_2,
-        EventId: Guid_5,
-        Timestamp: DateTimeOffset_1
+        EventId: Guid_5
       },
       Payload: {
         Status: Published,

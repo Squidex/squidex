@@ -15,6 +15,8 @@ using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace Squidex.Areas.Api.Controllers.Backups;
 
 /// <summary>

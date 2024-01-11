@@ -33,8 +33,7 @@
     {
       Headers: {
         AggregateId: Guid_1--Guid_2,
-        EventId: Guid_4,
-        Timestamp: DateTimeOffset_1
+        EventId: Guid_4
       },
       Payload: {
         Status: Archived,
