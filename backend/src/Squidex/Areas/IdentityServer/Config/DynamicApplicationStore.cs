@@ -168,7 +168,7 @@ public class DynamicApplicationStore : InMemoryApplicationStore
                 Permissions.Prefixes.Scope + Constants.ScopeApi,
                 Permissions.Prefixes.Scope + Constants.ScopePermissions
             },
-            Type = ClientTypes.Public
+            ClientType = ClientTypes.Public
         });
 
         var internalClientId = Constants.ClientInternalId;
@@ -197,7 +197,7 @@ public class DynamicApplicationStore : InMemoryApplicationStore
                 Permissions.Prefixes.Scope + Constants.ScopeApi,
                 Permissions.Prefixes.Scope + Constants.ScopePermissions
             },
-            Type = ClientTypes.Public
+            ClientType = ClientTypes.Public
         });
 
         var identityOptions = serviceProvider.GetRequiredService<IOptions<MyIdentityOptions>>().Value;

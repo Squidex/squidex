@@ -19,7 +19,7 @@ public class EventJsonSchemaGeneratorTests
     {
         var jsonSchemaGenerator =
             new JsonSchemaGenerator(
-                new JsonSchemaGeneratorSettings());
+                new SystemTextJsonSchemaGeneratorSettings());
 
         sut = new EventJsonSchemaGenerator(jsonSchemaGenerator);
     }

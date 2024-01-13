@@ -65,11 +65,11 @@ public sealed class TokenStoreInitializer : IInitializable, IBackgroundProcess
         {
             var database = await scope.ServiceProvider.GetRequiredService<IOpenIddictMongoDbContext>().GetDatabaseAsync(ct);
 
-            var collection = database.GetCollection<OpenIddictMongoDbToken<string>>(options.TokensCollectionName);
+            var collection = database.GetCollection<OpenIddictMongoDbToken>(options.TokensCollectionName);
 
             await collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<OpenIddictMongoDbToken<string>>(
-                    Builders<OpenIddictMongoDbToken<string>>.IndexKeys
+                new CreateIndexModel<OpenIddictMongoDbToken>(
+                    Builders<OpenIddictMongoDbToken>.IndexKeys
                         .Ascending(x => x.ReferenceId)),
                 cancellationToken: ct);
         }

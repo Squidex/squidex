@@ -55,9 +55,9 @@ public static class OpenApiServices
         services.AddSingletonAs<OpenApiSchemaGenerator>()
             .AsSelf();
 
-        services.AddSingleton(c =>
+        services.AddSingleton<JsonSchemaGeneratorSettings>(c =>
         {
-            var settings = new JsonSchemaGeneratorSettings();
+            var settings = new SystemTextJsonSchemaGeneratorSettings();
 
             ConfigureSchemaSettings(settings, c.GetRequiredService<TypeRegistry>(), true);
 
@@ -68,13 +68,10 @@ public static class OpenApiServices
         {
             var settings = new OpenApiDocumentGeneratorSettings
             {
-                SerializerSettings = new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                }
+                SchemaSettings = new SystemTextJsonSchemaGeneratorSettings()
             };
 
-            ConfigureSchemaSettings(settings, c.GetRequiredService<TypeRegistry>(), true);
+            ConfigureSchemaSettings(settings.SchemaSettings, c.GetRequiredService<TypeRegistry>(), true);
 
             foreach (var processor in c.GetRequiredService<IEnumerable<IDocumentProcessor>>())
             {
@@ -86,7 +83,7 @@ public static class OpenApiServices
 
         services.AddOpenApiDocument((settings, services) =>
         {
-            ConfigureSchemaSettings(settings, services.GetRequiredService<TypeRegistry>(), false);
+            ConfigureSchemaSettings(settings.SchemaSettings, services.GetRequiredService<TypeRegistry>(), false);
         });
     }
 

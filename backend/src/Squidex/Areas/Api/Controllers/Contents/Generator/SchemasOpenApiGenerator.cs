@@ -24,22 +24,22 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator;
 public sealed class SchemasOpenApiGenerator
 {
     private readonly IAppProvider appProvider;
-    private readonly OpenApiDocumentGeneratorSettings schemaSettings;
-    private readonly OpenApiSchemaGenerator schemaGenerator;
+    private readonly OpenApiDocumentGeneratorSettings openApiSettings;
+    private readonly OpenApiSchemaGenerator openApiGenerator;
     private readonly IRequestUrlGenerator urlGenerator;
     private readonly IRequestCache requestCache;
 
     public SchemasOpenApiGenerator(
         IAppProvider appProvider,
-        OpenApiDocumentGeneratorSettings schemaSettings,
-        OpenApiSchemaGenerator schemaGenerator,
+        OpenApiDocumentGeneratorSettings openApiSettings,
+        OpenApiSchemaGenerator openApiGenerator,
         IRequestUrlGenerator urlGenerator,
         IRequestCache requestCache)
     {
         this.appProvider = appProvider;
         this.urlGenerator = urlGenerator;
-        this.schemaSettings = schemaSettings;
-        this.schemaGenerator = schemaGenerator;
+        this.openApiSettings = openApiSettings;
+        this.openApiGenerator = openApiGenerator;
         this.requestCache = requestCache;
     }
 
@@ -47,7 +47,7 @@ public sealed class SchemasOpenApiGenerator
     {
         var document = CreateApiDocument(httpContext, app);
 
-        var schemaResolver = new OpenApiSchemaResolver(document, schemaSettings);
+        var schemaResolver = new OpenApiSchemaResolver(document, openApiSettings.SchemaSettings);
 
         requestCache.AddDependency(app.UniqueId, app.Version);
 
@@ -56,7 +56,7 @@ public sealed class SchemasOpenApiGenerator
             requestCache.AddDependency(schema.UniqueId, schema.Version);
         }
 
-        var builder = new Builder(app, document, schemaResolver, schemaGenerator);
+        var builder = new Builder(app, document, schemaResolver, openApiGenerator);
 
         var partitionResolver = app.PartitionResolver();
 
@@ -77,10 +77,10 @@ public sealed class SchemasOpenApiGenerator
                 Enumerable.Empty<Type>(),
                 Enumerable.Empty<Type>(),
                 schemaResolver,
-                schemaGenerator,
-                schemaSettings);
+                openApiGenerator,
+                openApiSettings);
 
-        foreach (var processor in schemaSettings.DocumentProcessors)
+        foreach (var processor in openApiSettings.DocumentProcessors)
         {
             processor.Process(context);
         }
