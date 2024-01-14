@@ -12,13 +12,8 @@ namespace Squidex.Infrastructure;
 
 public class HashExtensionsTests
 {
-    public static IEnumerable<object[]> InputLengths()
-    {
-        yield return new object[] { 1 };
-        yield return new object[] { 20 };
-        yield return new object[] { 50 };
-        yield return new object[] { 500 };
-    }
+    public static readonly TheoryData<int> InputLengths =
+        new TheoryData<int>(1, 20, 50, 500);
 
     [Fact]
     public void Should_calculate_hex_code_from_empty_array()
@@ -197,14 +192,11 @@ public class HashExtensionsTests
 
     private static string WebhookHash(string value)
     {
-        using (var sha = SHA256.Create())
-        {
-            var bytesArray = Encoding.UTF8.GetBytes(value);
-            var bytesHash = sha.ComputeHash(bytesArray);
+        var bytesArray = Encoding.UTF8.GetBytes(value);
+        var bytesHash = SHA256.HashData(bytesArray);
 
-            var result = Convert.ToBase64String(bytesHash);
+        var result = Convert.ToBase64String(bytesHash);
 
-            return result;
-        }
+        return result;
     }
 }

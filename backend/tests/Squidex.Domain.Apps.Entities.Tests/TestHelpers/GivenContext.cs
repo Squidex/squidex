@@ -115,7 +115,7 @@ public abstract class GivenContext
         };
     }
 
-    public Instant Timestamp()
+    public static Instant Timestamp()
     {
         return SystemClock.Instance.GetCurrentInstant();
     }

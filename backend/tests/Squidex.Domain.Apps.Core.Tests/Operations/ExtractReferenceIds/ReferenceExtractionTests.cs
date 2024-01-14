@@ -19,6 +19,18 @@ public class ReferenceExtractionTests
     private readonly Schema schema;
     private readonly ResolvedComponents components;
 
+    public static readonly TheoryData<NestedField> ReferencingNestedFields = new TheoryData<NestedField>
+    {
+        { Fields.References(1, "myRefs") },
+        { Fields.Assets(1, "myAssets") },
+    };
+
+    public static readonly TheoryData<RootField> ReferencingFields = new TheoryData<RootField>
+    {
+        { Fields.References(1, "myRefs", Partitioning.Invariant) },
+        { Fields.Assets(1, "myAssets", Partitioning.Invariant) },
+    };
+
     public ReferenceExtractionTests()
     {
         schema =
@@ -297,18 +309,6 @@ public class ReferenceExtractionTests
         var (_, actual) = new ValueReferencesConverter(HashSet.Of(id1)).ConvertValue(field, value, null);
 
         Assert.Equal(CreateValue(id1), actual);
-    }
-
-    public static IEnumerable<object[]> ReferencingNestedFields()
-    {
-        yield return new object[] { Fields.References(1, "myRefs") };
-        yield return new object[] { Fields.Assets(1, "myAssets") };
-    }
-
-    public static IEnumerable<object[]> ReferencingFields()
-    {
-        yield return new object[] { Fields.References(1, "myRefs", Partitioning.Invariant) };
-        yield return new object[] { Fields.Assets(1, "myAssets", Partitioning.Invariant) };
     }
 
     private static HashSet<DomainId> RandomIds()

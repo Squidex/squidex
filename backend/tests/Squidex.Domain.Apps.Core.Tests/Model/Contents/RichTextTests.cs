@@ -56,6 +56,6 @@ public class RichTextTests
 
     private static string Sanitize(string source)
     {
-        return source.Replace("\r\n", "\n").Trim();
+        return source.Replace("\r\n", "\n", StringComparison.Ordinal).Trim();
     }
 }

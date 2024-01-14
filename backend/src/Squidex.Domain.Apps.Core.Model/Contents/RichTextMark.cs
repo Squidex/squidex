@@ -10,7 +10,7 @@ using Squidex.Text.RichText.Model;
 
 namespace Squidex.Domain.Apps.Core.Contents;
 
-internal class RichTextMark : IMark
+internal sealed class RichTextMark : IMark
 {
     private JsonObject? attrs;
 

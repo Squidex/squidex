@@ -26,6 +26,9 @@ public class AssetsFluidExtensionTests : GivenContext
     private readonly IAssetThumbnailGenerator assetGenerator = A.Fake<IAssetThumbnailGenerator>();
     private readonly FluidTemplateEngine sut;
 
+    public static readonly TheoryData<string> Encodings =
+        new TheoryData<string>("ascii", "unicode", "utf8", "base64");
+
     public AssetsFluidExtensionTests()
     {
         var serviceProvider =
@@ -43,14 +46,6 @@ public class AssetsFluidExtensionTests : GivenContext
         };
 
         sut = new FluidTemplateEngine(extensions);
-    }
-
-    public static IEnumerable<object[]> Encodings()
-    {
-        yield return new object[] { "ascii" };
-        yield return new object[] { "unicode" };
-        yield return new object[] { "utf8" };
-        yield return new object[] { "base64" };
     }
 
     public static byte[] Encode(string encoding, string text)

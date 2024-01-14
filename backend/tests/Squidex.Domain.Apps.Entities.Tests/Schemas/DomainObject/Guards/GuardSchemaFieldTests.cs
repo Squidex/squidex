@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -21,6 +22,17 @@ public class GuardSchemaFieldTests : GivenContext, IClassFixture<TranslationsFix
 {
     private readonly StringFieldProperties validProperties = new StringFieldProperties();
     private readonly StringFieldProperties invalidProperties = new StringFieldProperties { MinLength = 10, MaxLength = 5 };
+
+    public static IEnumerable<object[]> FieldCommandData()
+    {
+        yield return new object[] { A<EnableField>(GuardSchemaField.CanEnable) };
+        yield return new object[] { A<DeleteField>(GuardSchemaField.CanDelete) };
+        yield return new object[] { A<DisableField>(GuardSchemaField.CanDisable) };
+        yield return new object[] { A<HideField>(GuardSchemaField.CanHide) };
+        yield return new object[] { A<LockField>(GuardSchemaField.CanLock) };
+        yield return new object[] { A<ShowField>(GuardSchemaField.CanShow) };
+        yield return new object[] { A<UpdateField>(GuardSchemaField.CanUpdate) };
+    }
 
     public GuardSchemaFieldTests()
     {
@@ -35,17 +47,6 @@ public class GuardSchemaFieldTests : GivenContext, IClassFixture<TranslationsFix
     private static Action<T, Schema> A<T>(Action<T, Schema> method) where T : FieldCommand
     {
         return method;
-    }
-
-    public static IEnumerable<object[]> FieldCommandData()
-    {
-        yield return new object[] { A<EnableField>(GuardSchemaField.CanEnable) };
-        yield return new object[] { A<DeleteField>(GuardSchemaField.CanDelete) };
-        yield return new object[] { A<DisableField>(GuardSchemaField.CanDisable) };
-        yield return new object[] { A<HideField>(GuardSchemaField.CanHide) };
-        yield return new object[] { A<LockField>(GuardSchemaField.CanLock) };
-        yield return new object[] { A<ShowField>(GuardSchemaField.CanShow) };
-        yield return new object[] { A<UpdateField>(GuardSchemaField.CanUpdate) };
     }
 
     [Theory]

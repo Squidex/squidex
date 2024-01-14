@@ -96,13 +96,9 @@ public sealed class AccountController : IdentityServerController
             return View(vm);
         }
 
-        var user = await userService.GetAsync(User, HttpContext.RequestAborted);
-
         // There is almost no case where this could have happened.
-        if (user == null)
-        {
-            throw new DomainException(T.Get("users.userNotFound"));
-        }
+        var user = await userService.GetAsync(User, HttpContext.RequestAborted)
+            ?? throw new DomainException(T.Get("users.userNotFound"));
 
         var update = new UserValues
         {

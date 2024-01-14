@@ -68,12 +68,9 @@ public sealed class AssetContentController : ApiController
     {
         var requestContext = Context.Clone(b => b.WithNoAssetEnrichment());
 
-        var asset = await assetQuery.FindAsync(requestContext, DomainId.Create(idOrSlug), request.Deleted, ct: HttpContext.RequestAborted);
-
-        if (asset == null)
-        {
-            asset = await assetQuery.FindBySlugAsync(requestContext, idOrSlug, request.Deleted, HttpContext.RequestAborted);
-        }
+        var asset =
+            await assetQuery.FindAsync(requestContext, DomainId.Create(idOrSlug), request.Deleted, ct: HttpContext.RequestAborted) ??
+            await assetQuery.FindBySlugAsync(requestContext, idOrSlug, request.Deleted, HttpContext.RequestAborted);
 
         return await DeliverAssetAsync(requestContext, asset, request);
     }
