@@ -20,6 +20,12 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
 {
     private readonly ProfilerCollection profiler;
 
+    public static readonly TheoryData<DomainId?> ParentIds = new TheoryData<DomainId?>
+    {
+        { null },
+        { DomainId.Empty }
+    };
+
     public AssetsQueryFixture _ { get; }
 
     public AssetsQueryIntegrationTests(AssetsQueryFixture fixture)
@@ -170,12 +176,6 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
 
         // The filter is a random value from the expected result set.
         Assert.NotEmpty(assets);
-    }
-
-    public static IEnumerable<object?[]> ParentIds()
-    {
-        yield return new object?[] { null };
-        yield return new object?[] { DomainId.Empty };
     }
 
     private async Task<IResultList<Asset>> QueryAsync(DomainId? parentId, ClrQuery clrQuery,

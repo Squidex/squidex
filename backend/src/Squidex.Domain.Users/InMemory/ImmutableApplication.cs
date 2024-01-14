@@ -8,6 +8,7 @@
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 
 namespace Squidex.Domain.Users.InMemory;
@@ -20,11 +21,15 @@ public sealed class ImmutableApplication
 
     public string? ClientSecret { get; }
 
+    public string? ClientType { get; }
+
     public string? ConsentType { get; }
 
     public string? DisplayName { get; }
 
-    public string? Type { get; }
+    public string? ApplicationType { get; }
+
+    public JsonWebKeySet? JsonWebKeySet { get; }
 
     public ImmutableDictionary<CultureInfo, string> DisplayNames { get; }
 
@@ -38,19 +43,24 @@ public sealed class ImmutableApplication
 
     public ImmutableDictionary<string, JsonElement> Properties { get; }
 
+    public ImmutableDictionary<string, string> Settings { get; }
+
     public ImmutableApplication(string id, OpenIddictApplicationDescriptor descriptor)
     {
         Id = id;
+        ApplicationType = descriptor.ApplicationType;
         ClientId = descriptor.ClientId;
         ClientSecret = descriptor.ClientSecret;
+        ClientType = descriptor.ClientType;
         ConsentType = descriptor.ConsentType;
         DisplayName = descriptor.DisplayName;
         DisplayNames = descriptor.DisplayNames.ToImmutableDictionary();
+        JsonWebKeySet = descriptor.JsonWebKeySet;
         Permissions = descriptor.Permissions.ToImmutableArray();
         PostLogoutRedirectUris = descriptor.PostLogoutRedirectUris.Select(x => x.ToString()).ToImmutableArray();
         Properties = descriptor.Properties.ToImmutableDictionary();
         RedirectUris = descriptor.RedirectUris.Select(x => x.ToString()).ToImmutableArray();
         Requirements = descriptor.Requirements.ToImmutableArray();
-        Type = descriptor.Type;
+        Settings = descriptor.Settings.ToImmutableDictionary();
     }
 }

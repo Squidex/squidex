@@ -39,7 +39,7 @@ internal sealed class StackdriverExceptionHandler : ILogAppender
 
         public string GetUserAgent()
         {
-            return httpContextAccessor.HttpContext?.Request?.Headers["User-Agent"].ToString() ?? string.Empty;
+            return httpContextAccessor.HttpContext?.Request?.Headers.UserAgent.ToString() ?? string.Empty;
         }
     }
 

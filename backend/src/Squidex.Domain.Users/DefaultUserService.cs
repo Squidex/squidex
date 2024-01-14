@@ -365,12 +365,7 @@ public sealed class DefaultUserService : IUserService
 
         var user = await userManager.FindByIdAsync(id);
 
-        if (user == null)
-        {
-            throw new DomainObjectNotFoundException(id);
-        }
-
-        return user;
+        return user ?? throw new DomainObjectNotFoundException(id);
     }
 
     private Task<IUser[]> ResolveAsync(IEnumerable<IdentityUser> users)

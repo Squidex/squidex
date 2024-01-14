@@ -19,7 +19,7 @@ public class EventJsonSchemaGeneratorTests
     {
         var jsonSchemaGenerator =
             new JsonSchemaGenerator(
-                new JsonSchemaGeneratorSettings());
+                new SystemTextJsonSchemaGeneratorSettings());
 
         sut = new EventJsonSchemaGenerator(jsonSchemaGenerator);
     }
@@ -34,10 +34,8 @@ public class EventJsonSchemaGeneratorTests
         yield return nameof(EnrichedUsageExceededEvent);
     }
 
-    public static IEnumerable<object[]> AllTypesData()
-    {
-        return AllTypes().Select(x => new object[] { x });
-    }
+    public static readonly TheoryData<string> AllTypesData =
+        new TheoryData<string>(AllTypes());
 
     [Fact]
     public void Should_return_null_for_unknown_type_name()

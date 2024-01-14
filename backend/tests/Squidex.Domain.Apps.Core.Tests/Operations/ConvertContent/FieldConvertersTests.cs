@@ -19,11 +19,11 @@ public class FieldConvertersTests
 {
     private readonly LanguagesConfig languages = LanguagesConfig.English.Set(Language.DE);
 
-    public static IEnumerable<object?[]> InvalidValues()
+    public static readonly TheoryData<JsonValue> InvalidValues = new TheoryData<JsonValue>
     {
-        yield return new object?[] { JsonValue.Null };
-        yield return new object?[] { JsonValue.Create(false) }; // Undefined
-    }
+        { JsonValue.Null },
+        { JsonValue.Create(false) },
+    };
 
     [Fact]
     public void Should_not_change_data_if_all_field_values_have_correct_type()

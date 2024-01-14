@@ -173,7 +173,7 @@ public static class StoreServices
                 services.AddOpenIddict()
                     .AddCore(builder =>
                     {
-                        builder.UseMongoDb<string>()
+                        builder.UseMongoDb()
                             .SetScopesCollectionName("Identity_Scopes")
                             .SetTokensCollectionName("Identity_Tokens");
 

@@ -24,6 +24,15 @@ public class SchemaChangedTriggerHandlerTests : GivenContext
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
     private readonly IRuleTriggerHandler sut;
 
+    public static readonly TheoryData<SchemaEvent, EnrichedSchemaEventType> TestEvents = new ()
+    {
+        { TestUtils.CreateEvent<SchemaCreated>(), EnrichedSchemaEventType.Created },
+        { TestUtils.CreateEvent<SchemaUpdated>(), EnrichedSchemaEventType.Updated },
+        { TestUtils.CreateEvent<SchemaDeleted>(), EnrichedSchemaEventType.Deleted },
+        { TestUtils.CreateEvent<SchemaPublished>(), EnrichedSchemaEventType.Published },
+        { TestUtils.CreateEvent<SchemaUnpublished>(), EnrichedSchemaEventType.Unpublished },
+    };
+
     public SchemaChangedTriggerHandlerTests()
     {
         A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
@@ -33,15 +42,6 @@ public class SchemaChangedTriggerHandlerTests : GivenContext
             .Returns(false);
 
         sut = new SchemaChangedTriggerHandler(scriptEngine);
-    }
-
-    public static IEnumerable<object[]> TestEvents()
-    {
-        yield return new object[] { TestUtils.CreateEvent<SchemaCreated>(), EnrichedSchemaEventType.Created };
-        yield return new object[] { TestUtils.CreateEvent<SchemaUpdated>(), EnrichedSchemaEventType.Updated };
-        yield return new object[] { TestUtils.CreateEvent<SchemaDeleted>(), EnrichedSchemaEventType.Deleted };
-        yield return new object[] { TestUtils.CreateEvent<SchemaPublished>(), EnrichedSchemaEventType.Published };
-        yield return new object[] { TestUtils.CreateEvent<SchemaUnpublished>(), EnrichedSchemaEventType.Unpublished };
     }
 
     [Fact]

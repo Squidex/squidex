@@ -108,7 +108,7 @@ public class SetupController : IdentityServerController
             IsValidHttps = HttpContext.Request.IsHttps,
             IsAssetStoreFile = assetStore is FolderAssetStore,
             IsAssetStoreFtp = assetStore is FTPAssetStore,
-            HasExternalLogin = externalProviders.Any(),
+            HasExternalLogin = externalProviders.Count != 0,
             HasPasswordAuth = identityOptions.AllowPasswordAuth
         };
 

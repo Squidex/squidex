@@ -33,6 +33,16 @@ public class ContentChangedTriggerHandlerTests : GivenContext
     private readonly NamedId<DomainId> schemaNotMatching = NamedId.Of(DomainId.NewGuid(), "my-schema2");
     private readonly IRuleTriggerHandler sut;
 
+    public static readonly TheoryData<ContentEvent, EnrichedContentEventType> TestEvents = new TheoryData<ContentEvent, EnrichedContentEventType>()
+    {
+        { TestUtils.CreateEvent<ContentCreated>(), EnrichedContentEventType.Created },
+        { TestUtils.CreateEvent<ContentUpdated>(), EnrichedContentEventType.Updated },
+        { TestUtils.CreateEvent<ContentDeleted>(), EnrichedContentEventType.Deleted },
+        { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Change), EnrichedContentEventType.StatusChanged },
+        { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Published), EnrichedContentEventType.Published },
+        { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Unpublished), EnrichedContentEventType.Unpublished }
+    };
+
     public ContentChangedTriggerHandlerTests()
     {
         A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
@@ -42,16 +52,6 @@ public class ContentChangedTriggerHandlerTests : GivenContext
             .Returns(false);
 
         sut = new ContentChangedTriggerHandler(scriptEngine, contentLoader, contentRepository);
-    }
-
-    public static IEnumerable<object[]> TestEvents()
-    {
-        yield return new object[] { TestUtils.CreateEvent<ContentCreated>(), EnrichedContentEventType.Created };
-        yield return new object[] { TestUtils.CreateEvent<ContentUpdated>(), EnrichedContentEventType.Updated };
-        yield return new object[] { TestUtils.CreateEvent<ContentDeleted>(), EnrichedContentEventType.Deleted };
-        yield return new object[] { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Change), EnrichedContentEventType.StatusChanged };
-        yield return new object[] { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Published), EnrichedContentEventType.Published };
-        yield return new object[] { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Unpublished), EnrichedContentEventType.Unpublished };
     }
 
     [Fact]

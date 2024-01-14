@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
 
-public class ReflectionServices : DefaultReflectionService
+public class ReflectionServices : SystemTextJsonReflectionService
 {
     protected override bool IsArrayType(ContextualType contextualType)
     {

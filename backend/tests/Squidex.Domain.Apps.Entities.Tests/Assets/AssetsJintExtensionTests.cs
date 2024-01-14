@@ -32,6 +32,9 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
     private readonly IAssetThumbnailGenerator assetGenerator = A.Fake<IAssetThumbnailGenerator>();
     private readonly JintScriptEngine sut;
 
+    public static readonly TheoryData<string> Encodings =
+        new TheoryData<string>("ascii", "unicode", "utf8", "base64");
+
     public AssetsJintExtensionTests()
     {
         var serviceProvider =
@@ -55,14 +58,6 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
                 TimeoutExecution = TimeSpan.FromSeconds(10)
             }),
             extensions);
-    }
-
-    public static IEnumerable<object[]> Encodings()
-    {
-        yield return new object[] { "ascii" };
-        yield return new object[] { "unicode" };
-        yield return new object[] { "utf8" };
-        yield return new object[] { "base64" };
     }
 
     public static byte[] Encode(string encoding, string text)

@@ -36,7 +36,7 @@ public sealed class ScopesProcessor : IOperationProcessor
                 context.MethodInfo.DeclaringType!.GetCustomAttributes<AuthorizeAttribute>(true))
                     .ToArray();
 
-            if (authorizeAttributes.Any())
+            if (authorizeAttributes.Length != 0)
             {
                 var scopes = authorizeAttributes.Where(a => a.Roles != null).SelectMany(a => a.Roles!.Split(',')).Distinct().ToList();
 

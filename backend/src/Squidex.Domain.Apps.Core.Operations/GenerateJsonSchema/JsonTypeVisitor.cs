@@ -199,7 +199,7 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
             property.MaxItems = field.Properties.MaxItems.Value;
         }
 
-        property.ExtensionData = new Dictionary<string, object>
+        property.ExtensionData = new Dictionary<string, object?>
         {
             ["schemaIds"] = field.Properties.SchemaIds ?? []
         };

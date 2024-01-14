@@ -23,23 +23,23 @@ public class DefaultAssetFileStoreTests : GivenContext
     private readonly AssetOptions options = new AssetOptions();
     private readonly DefaultAssetFileStore sut;
 
+    public static readonly TheoryData<bool, string, string> PathCases = new TheoryData<bool, string, string>
+    {
+        { true, "resize=100", "{appId}/{assetId}_{assetFileVersion}_resize=100" },
+        { true, string.Empty, "{appId}/{assetId}_{assetFileVersion}" },
+        { false, "resize=100", "{appId}_{assetId}_{assetFileVersion}_resize=100" },
+        { false, string.Empty, "{appId}_{assetId}_{assetFileVersion}" }
+    };
+
+    public static readonly TheoryData<string, string> PathCasesOld = new TheoryData<string, string>
+    {
+        { "resize=100", "{assetId}_{assetFileVersion}_resize=100" },
+        { string.Empty, "{assetId}_{assetFileVersion}" }
+    };
+
     public DefaultAssetFileStoreTests()
     {
         sut = new DefaultAssetFileStore(assetStore, assetRepository, Options.Create(options));
-    }
-
-    public static IEnumerable<object[]> PathCases()
-    {
-        yield return new object[] { true, "resize=100", "{appId}/{assetId}_{assetFileVersion}_resize=100" };
-        yield return new object[] { true, string.Empty, "{appId}/{assetId}_{assetFileVersion}" };
-        yield return new object[] { false, "resize=100", "{appId}_{assetId}_{assetFileVersion}_resize=100" };
-        yield return new object[] { false, string.Empty, "{appId}_{assetId}_{assetFileVersion}" };
-    }
-
-    public static IEnumerable<object?[]> PathCasesOld()
-    {
-        yield return new object?[] { "resize=100", "{assetId}_{assetFileVersion}_resize=100" };
-        yield return new object?[] { string.Empty, "{assetId}_{assetFileVersion}" };
     }
 
     [Theory]

@@ -24,11 +24,11 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     private static readonly Asset ImageSvg = TestAssets.Svg(DomainId.NewGuid());
     private static readonly Asset Video = TestAssets.Video(DomainId.NewGuid());
 
-    public static IEnumerable<object[]> AssetsWithDimensions()
+    public static readonly TheoryData<DomainId> AssetsWithDimensions = new TheoryData<DomainId>
     {
-        yield return new object[] { Image1.Id };
-        yield return new object[] { Video.Id };
-    }
+        { Image1.Id },
+        { Video.Id }
+    };
 
     [Fact]
     public async Task Should_not_add_error_if_assets_are_valid()

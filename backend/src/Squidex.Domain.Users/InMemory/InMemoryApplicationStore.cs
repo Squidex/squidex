@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 
 namespace Squidex.Domain.Users.InMemory;
@@ -128,7 +129,7 @@ public class InMemoryApplicationStore : IOpenIddictApplicationStore<ImmutableApp
     public virtual ValueTask<string?> GetClientTypeAsync(ImmutableApplication application,
         CancellationToken cancellationToken)
     {
-        return application.Type.AsValueTask();
+        return application.ClientType.AsValueTask();
     }
 
     public virtual ValueTask<string?> GetConsentTypeAsync(ImmutableApplication application,
@@ -177,6 +178,24 @@ public class InMemoryApplicationStore : IOpenIddictApplicationStore<ImmutableApp
         CancellationToken cancellationToken)
     {
         return application.Properties.AsValueTask();
+    }
+
+    public ValueTask<string?> GetApplicationTypeAsync(ImmutableApplication application,
+        CancellationToken cancellationToken)
+    {
+        return application.ApplicationType.AsValueTask();
+    }
+
+    public ValueTask<JsonWebKeySet?> GetJsonWebKeySetAsync(ImmutableApplication application,
+        CancellationToken cancellationToken)
+    {
+        return application.JsonWebKeySet.AsValueTask();
+    }
+
+    public ValueTask<ImmutableDictionary<string, string>> GetSettingsAsync(ImmutableApplication application,
+        CancellationToken cancellationToken)
+    {
+        return application.Settings.AsValueTask();
     }
 
     public virtual ValueTask CreateAsync(ImmutableApplication application,
@@ -264,6 +283,24 @@ public class InMemoryApplicationStore : IOpenIddictApplicationStore<ImmutableApp
     }
 
     public virtual ValueTask SetRequirementsAsync(ImmutableApplication application, ImmutableArray<string> requirements,
+        CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException();
+    }
+
+    public ValueTask SetApplicationTypeAsync(ImmutableApplication application, string? type,
+        CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException();
+    }
+
+    public ValueTask SetJsonWebKeySetAsync(ImmutableApplication application, JsonWebKeySet? set,
+        CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException();
+    }
+
+    public ValueTask SetSettingsAsync(ImmutableApplication application, ImmutableDictionary<string, string> settings,
         CancellationToken cancellationToken)
     {
         throw new NotSupportedException();

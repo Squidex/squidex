@@ -42,12 +42,8 @@ internal sealed class QueryReferences : OperationBase
                 .Find(Filter.Eq(x => x.DocumentId, DomainId.Combine(app.Id, q.Referencing)))
                 .Project<ReferencedIdsOnly>(Projection.Include(x => x.ReferencedIds));
 
-        var contentEntity = await find.FirstOrDefaultAsync(ct);
-
-        if (contentEntity == null)
-        {
-            throw new DomainObjectNotFoundException(q.Referencing.ToString());
-        }
+        var contentEntity = await find.FirstOrDefaultAsync(ct)
+            ?? throw new DomainObjectNotFoundException(q.Referencing.ToString());
 
         if (contentEntity.ReferencedIds is not { Count: > 0 })
         {

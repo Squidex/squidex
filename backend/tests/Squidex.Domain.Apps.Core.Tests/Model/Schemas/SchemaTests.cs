@@ -17,13 +17,11 @@ public class SchemaTests
 {
     private readonly Schema schema_0 = new Schema { Name = "my-schema" };
 
-    public static IEnumerable<object[]> FieldProperyTypes()
-    {
-        return typeof(Schema).Assembly.GetTypes().Where(x => x.BaseType == typeof(FieldProperties)).Select(x => new object[] { x });
-    }
+    public static readonly TheoryData<Type> FieldPropertyTypes =
+        new TheoryData<Type>(typeof(Schema).Assembly.GetTypes().Where(x => x.BaseType == typeof(FieldProperties)));
 
     [Theory]
-    [MemberData(nameof(FieldProperyTypes))]
+    [MemberData(nameof(FieldPropertyTypes))]
     public void Should_make_deep_equal_test(Type type)
     {
         var lhs = (FieldProperties)Activator.CreateInstance(type)!;

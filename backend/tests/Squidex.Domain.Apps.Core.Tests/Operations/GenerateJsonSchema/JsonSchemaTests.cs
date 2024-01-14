@@ -86,7 +86,7 @@ public class JsonSchemaTests
     {
         var actual = new HashSet<string>();
 
-        void AddProperties(JsonSchema current)
+        void AddProperties(JsonSchema? current)
         {
             if (current == null)
             {

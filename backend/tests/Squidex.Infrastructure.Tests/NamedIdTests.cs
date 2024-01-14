@@ -20,11 +20,11 @@ public class NamedIdTests
         public NamedId<long> Value { get; set; }
     }
 
-    public static IEnumerable<object[]> Serializers()
+    public static readonly TheoryData<SerializerMode> Serializers = new TheoryData<SerializerMode>
     {
-        yield return new object[] { SerializerMode.Json };
-        yield return new object[] { SerializerMode.Bson };
-    }
+        { SerializerMode.Json },
+        { SerializerMode.Bson }
+    };
 
     private static T Serialize<T>(T input, SerializerMode mode)
     {

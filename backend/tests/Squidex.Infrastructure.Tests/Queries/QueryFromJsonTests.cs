@@ -9,6 +9,7 @@ using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.TestHelpers;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.Queries;
@@ -71,7 +72,7 @@ public sealed class QueryFromJsonTests
 
     public class DateTime
     {
-        public static IEnumerable<object[]> ValidTests()
+        public static TheoryData<string, string, string, string> ValidTests()
         {
             const string value = "2012-11-10T09:08:07Z";
 
@@ -122,7 +123,7 @@ public sealed class QueryFromJsonTests
 
     public class Guid
     {
-        public static IEnumerable<object[]> ValidTests()
+        public static TheoryData<string, string, string, string> ValidTests()
         {
             const string value = "bf57d32c-d4dd-4217-8c16-6dcb16975cf3";
 
@@ -173,14 +174,14 @@ public sealed class QueryFromJsonTests
 
     public class String
     {
-        public static IEnumerable<object[]> ValidTests()
+        public static TheoryData<string, string, string, string> ValidTests()
         {
             const string value = "Hello";
 
             return BuildTests("string", x => true, value, $"'{value}'");
         }
 
-        public static IEnumerable<object[]> ValidInTests()
+        public static TheoryData<string, string, string> ValidInTests()
         {
             const string value = "Hello";
 
@@ -253,18 +254,18 @@ public sealed class QueryFromJsonTests
             return op is "lt" or "exists";
         }
 
-        public static IEnumerable<object[]> ValidTests()
+        public static TheoryData<string, string, object, string> ValidTests()
         {
             var value = new { longitude = 10, latitude = 20, distance = 30 };
 
-            return BuildFlatTests("geo", ValidOperator, value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
+            return BuildFlatTests<object>("geo", ValidOperator, value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
         }
 
-        public static IEnumerable<object[]> InvalidTests()
+        public static TheoryData<string, string, object, string> InvalidTests()
         {
             var value = new { longitude = 10, latitude = 20, distance = 30 };
 
-            return BuildInvalidOperatorTests("geo", ValidOperator, value);
+            return BuildInvalidOperatorTests<object>("geo", ValidOperator, value);
         }
 
         [Theory]
@@ -309,21 +310,21 @@ public sealed class QueryFromJsonTests
             return op.Length == 2 || op == "exists";
         }
 
-        public static IEnumerable<object[]> ValidTests()
+        public static TheoryData<string, string, int, string> ValidTests()
         {
             const int value = 12;
 
             return BuildTests("number", ValidOperator, value, $"{value}");
         }
 
-        public static IEnumerable<object[]> InvalidTests()
+        public static TheoryData<string, string, int, string> InvalidTests()
         {
             const int value = 12;
 
-            return BuildInvalidOperatorTests("number", ValidOperator, $"{value}");
+            return BuildInvalidOperatorTests("number", ValidOperator, value);
         }
 
-        public static IEnumerable<object[]> ValidInTests()
+        public static TheoryData<string, int, string> ValidInTests()
         {
             const int value = 12;
 
@@ -389,21 +390,21 @@ public sealed class QueryFromJsonTests
             return op is "eq" or "ne" or "exists";
         }
 
-        public static IEnumerable<object[]> ValidTests()
+        public static TheoryData<string, string, bool, string> ValidTests()
         {
             const bool value = true;
 
             return BuildTests("boolean", ValidOperator, value, $"{value}");
         }
 
-        public static IEnumerable<object[]> InvalidTests()
+        public static TheoryData<string, string, bool, string> InvalidTests()
         {
             const bool value = true;
 
             return BuildInvalidOperatorTests("boolean", ValidOperator, value);
         }
 
-        public static IEnumerable<object[]> ValidInTests()
+        public static TheoryData<string, bool, string> ValidInTests()
         {
             const bool value = true;
 
@@ -469,14 +470,14 @@ public sealed class QueryFromJsonTests
             return op is "eq" or "ne" or "empty" or "exists";
         }
 
-        public static IEnumerable<object[]> ValidTests()
+        public static TheoryData<string, string, string, string> ValidTests()
         {
             const string value = "Hello";
 
             return BuildTests("stringArray", ValidOperator, value, $"'{value}'");
         }
 
-        public static IEnumerable<object[]> ValidInTests()
+        public static TheoryData<string, string, string> ValidInTests()
         {
             const string value = "Hello";
 
@@ -694,35 +695,14 @@ public sealed class QueryFromJsonTests
         return jsonFilter.ToString();
     }
 
-    public static IEnumerable<object[]> BuildFlatTests(string field, Predicate<string> opFilter, object value, string valueString)
+    public static TheoryData<string, string, T, string> BuildFlatTests<T>(string field, Predicate<string> opFilter, T value, string valueString)
     {
         var fields = new[]
         {
             $"{field}"
         };
 
-        foreach (var fieldName in fields)
-        {
-            foreach (var (_, op, output) in AllOps.Where(x => opFilter(x.Operator)))
-            {
-                var expected =
-                    output
-                        .Replace("$FIELD", fieldName, StringComparison.Ordinal)
-                        .Replace("$VALUE", valueString, StringComparison.Ordinal);
-
-                yield return new[] { fieldName, op, value, expected };
-            }
-        }
-    }
-
-    public static IEnumerable<object[]> BuildTests(string field, Predicate<string> opFilter, object value, string valueString)
-    {
-        var fields = new[]
-        {
-            $"{field}",
-            $"json.{field}",
-            $"json.nested.{field}"
-        };
+        var data = new TheoryData<string, string, T, string>();
 
         foreach (var fieldName in fields)
         {
@@ -733,12 +713,14 @@ public sealed class QueryFromJsonTests
                         .Replace("$FIELD", fieldName, StringComparison.Ordinal)
                         .Replace("$VALUE", valueString, StringComparison.Ordinal);
 
-                yield return new[] { fieldName, op, value, expected };
+                data.Add(fieldName, op, value, expected);
             }
         }
+
+        return data;
     }
 
-    public static IEnumerable<object[]> BuildInTests(string field, object value, string valueString)
+    public static TheoryData<string, string, T, string> BuildTests<T>(string field, Predicate<string> opFilter, T value, string valueString)
     {
         var fields = new[]
         {
@@ -747,19 +729,54 @@ public sealed class QueryFromJsonTests
             $"json.nested.{field}"
         };
 
-        foreach (var f in fields)
-        {
-            var expected = $"{f} in [{valueString}]";
+        var data = new TheoryData<string, string, T, string>();
 
-            yield return new[] { f, value, expected };
+        foreach (var fieldName in fields)
+        {
+            foreach (var (_, op, output) in AllOps.Where(x => opFilter(x.Operator)))
+            {
+                var expected =
+                    output
+                        .Replace("$FIELD", fieldName, StringComparison.Ordinal)
+                        .Replace("$VALUE", valueString, StringComparison.Ordinal);
+
+                data.Add(fieldName, op, value, expected);
+            }
         }
+
+        return data;
     }
 
-    public static IEnumerable<object[]> BuildInvalidOperatorTests(string field, Predicate<string> opFilter, object value)
+    public static TheoryData<string, T, string> BuildInTests<T>(string field, T value, string valueString)
     {
+        var fields = new[]
+        {
+            $"{field}",
+            $"json.{field}",
+            $"json.nested.{field}"
+        };
+
+        var data = new TheoryData<string, T, string>();
+
+        foreach (var fieldName in fields)
+        {
+            var expected = $"{fieldName} in [{valueString}]";
+
+            data.Add(fieldName, value, expected);
+        }
+
+        return data;
+    }
+
+    public static TheoryData<string, string, T, string> BuildInvalidOperatorTests<T>(string field, Predicate<string> opFilter, T value)
+    {
+        var data = new TheoryData<string, string, T, string>();
+
         foreach (var (name, op, _) in AllOps.Where(x => !opFilter(x.Operator)))
         {
-            yield return new[] { field, op, value, name };
+            data.Add(field, op, value, name);
         }
+
+        return data;
     }
 }

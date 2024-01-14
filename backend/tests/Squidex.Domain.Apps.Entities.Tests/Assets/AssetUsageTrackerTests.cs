@@ -25,6 +25,13 @@ public class AssetUsageTrackerTests : GivenContext
     private readonly DomainId assetKey;
     private readonly AssetUsageTracker sut;
 
+    public static readonly TheoryData<AssetEvent, long, long> EventData = new TheoryData<AssetEvent, long, long>
+    {
+        { new AssetCreated { FileSize = 128 }, 128, 1 },
+        { new AssetUpdated { FileSize = 512 }, 512, 0 },
+        { new AssetDeleted { DeletedSize = 512 }, -512, -1 }
+    };
+
     public AssetUsageTrackerTests()
     {
         assetKey = DomainId.Combine(AppId, assetId);
@@ -54,24 +61,6 @@ public class AssetUsageTrackerTests : GivenContext
     public void Should_process_in_batches()
     {
         Assert.True(sut.BatchSize > 1);
-    }
-
-    public static IEnumerable<object[]> EventData()
-    {
-        yield return new object[]
-        {
-            new AssetCreated { FileSize = 128 }, 128, 1
-        };
-
-        yield return new object[]
-        {
-            new AssetUpdated { FileSize = 512 }, 512, 0
-        };
-
-        yield return new object[]
-        {
-            new AssetDeleted { DeletedSize = 512 }, -512, -1
-        };
     }
 
     [Theory]

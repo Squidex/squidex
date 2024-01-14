@@ -22,7 +22,7 @@ public class WritingBenchmarks : IClassFixture<WritingFixture>
         _ = fixture;
     }
 
-    public static IEnumerable<object[]> Loads()
+    public static TheoryData<int, int> Loads()
     {
         int[] users =
         {
@@ -43,15 +43,19 @@ public class WritingBenchmarks : IClassFixture<WritingFixture>
             100
         };
 
+        var data = new TheoryData<int, int>();
+
         foreach (var user in users)
         {
             foreach (var load in loads)
             {
-                yield return new object[] { user, load };
+                data.Add(user, load);
             }
         }
 
-        yield return new object[] { 1, 50000 };
+        data.Add(1, 50_0000);
+
+        return data;
     }
 
     [Theory]

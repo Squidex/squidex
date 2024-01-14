@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure.EventSourcing;
+using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
@@ -28,6 +29,14 @@ public class AssetChangedTriggerHandlerTests : GivenContext
     private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
     private readonly IRuleTriggerHandler sut;
 
+    public static readonly TheoryData<AssetEvent, EnrichedAssetEventType> TestEvents = new TheoryData<AssetEvent, EnrichedAssetEventType>
+    {
+        { TestUtils.CreateEvent<AssetCreated>(), EnrichedAssetEventType.Created },
+        { TestUtils.CreateEvent<AssetUpdated>(), EnrichedAssetEventType.Updated },
+        { TestUtils.CreateEvent<AssetAnnotated>(), EnrichedAssetEventType.Annotated },
+        { TestUtils.CreateEvent<AssetDeleted>(), EnrichedAssetEventType.Deleted }
+    };
+
     public AssetChangedTriggerHandlerTests()
     {
         A.CallTo(() => scriptEngine.Evaluate(A<ScriptVars>._, "true", default))
@@ -37,14 +46,6 @@ public class AssetChangedTriggerHandlerTests : GivenContext
             .Returns(false);
 
         sut = new AssetChangedTriggerHandler(scriptEngine, assetLoader, assetRepository);
-    }
-
-    public static IEnumerable<object[]> TestEvents()
-    {
-        yield return new object[] { TestUtils.CreateEvent<AssetCreated>(), EnrichedAssetEventType.Created };
-        yield return new object[] { TestUtils.CreateEvent<AssetUpdated>(), EnrichedAssetEventType.Updated };
-        yield return new object[] { TestUtils.CreateEvent<AssetAnnotated>(), EnrichedAssetEventType.Annotated };
-        yield return new object[] { TestUtils.CreateEvent<AssetDeleted>(), EnrichedAssetEventType.Deleted };
     }
 
     [Fact]

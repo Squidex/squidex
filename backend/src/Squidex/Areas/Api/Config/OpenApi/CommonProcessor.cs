@@ -33,7 +33,7 @@ public sealed class CommonProcessor : IDocumentProcessor
     {
         context.Document.Info.Title = "Squidex API";
         context.Document.Info.Version = version;
-        context.Document.Info.ExtensionData = new Dictionary<string, object>
+        context.Document.Info.ExtensionData = new Dictionary<string, object?>
         {
             ["x-logo"] = new
             {

@@ -323,12 +323,7 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
 
         var app = await appProvider.GetAppAsync(appId, false, ct);
 
-        if (app == null)
-        {
-            throw new JavaScriptException("App does not exist.");
-        }
-
-        return app;
+        return app ?? throw new JavaScriptException("App does not exist.");
     }
 
     public void Describe(AddDescription describe, ScriptScope scope)

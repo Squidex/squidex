@@ -27,7 +27,7 @@ public class ReadingBenchmarks : IClassFixture<CreatedAppFixture>
         _ = fixture;
     }
 
-    public static IEnumerable<object[]> Loads()
+    public static TheoryData<int, int> Loads()
     {
         int[] users =
         {
@@ -50,15 +50,19 @@ public class ReadingBenchmarks : IClassFixture<CreatedAppFixture>
             1000
         };
 
+        var data = new TheoryData<int, int>();
+
         foreach (var user in users)
         {
             foreach (var load in loads)
             {
-                yield return new object[] { user, load };
+                data.Add(user, load);
             }
         }
 
-        yield return new object[] { 1, 20000 };
+        data.Add(1, 20_0000);
+
+        return data;
     }
 
     [Theory]
