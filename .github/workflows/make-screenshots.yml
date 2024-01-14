@@ -18,7 +18,7 @@ jobs:
         uses: docker/setup-buildx-action@v3.0.0
 
       - name: Prepare - Setup Node
-        uses: actions/setup-node@v4.0.0
+        uses: actions/setup-node@v4.0.1
         with:
           node-version: 18
 
@@ -50,7 +50,7 @@ jobs:
 
       - name: Test - Upload Playwright Artifacts
         if: always()
-        uses: actions/upload-artifact@v4.0.0
+        uses: actions/upload-artifact@v4.1.0
         with:
           name: snapshots
           path: tools/e2e/snapshots/
