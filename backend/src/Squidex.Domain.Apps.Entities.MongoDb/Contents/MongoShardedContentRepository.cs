@@ -18,7 +18,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
 
-public sealed class MongoShardedContentRepository : ShardedSnapshotStore<MongoContentRepository, WriteContent>, IContentRepository
+public sealed class MongoShardedContentRepository : ShardedSnapshotStore<MongoContentRepository, WriteContent>, IContentRepository, IDeleter
 {
     public MongoShardedContentRepository(IShardingStrategy sharding, Func<string, MongoContentRepository> factory)
         : base(sharding, factory)

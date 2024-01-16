@@ -13,7 +13,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public sealed class MongoShardedTextIndex<T> : ShardedService<MongoTextIndexBase<T>>, ITextIndex where T : class
+public sealed class MongoShardedTextIndex<T> : ShardedService<MongoTextIndexBase<T>>, ITextIndex, IDeleter where T : class
 {
     public MongoShardedTextIndex(IShardingStrategy sharding, Func<string, MongoTextIndexBase<T>> factory)
         : base(sharding, factory)
@@ -51,5 +51,16 @@ public sealed class MongoShardedTextIndex<T> : ShardedService<MongoTextIndexBase
         CancellationToken ct = default)
     {
         return Shard(app.Id).SearchAsync(app, query, scope, ct);
+    }
+
+    public async Task DeleteAppAsync(App app,
+        CancellationToken ct)
+    {
+        var shard = Shard(app.Id) as IDeleter;
+
+        if (shard != null)
+        {
+            await shard.DeleteAppAsync(app, ct);
+        }
     }
 }
