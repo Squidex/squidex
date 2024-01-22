@@ -18,6 +18,14 @@ public class BsonUniqueContentIdSerializerTests
         BsonUniqueContentIdSerializer.Register();
     }
 
+    public static readonly TheoryData<string> CustomIds = new TheoryData<string>
+    {
+        "id",
+        "id-short",
+        "id-with-very-long-text",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    };
+
     [Fact]
     public void Should_serialize_and_deserialize_guid_guid()
     {
@@ -29,9 +37,20 @@ public class BsonUniqueContentIdSerializerTests
     }
 
     [Fact]
-    public void Should_serialize_and_deserialize_guid_custom()
+    public void Should_serialize_and_deserialize_guid_guid2()
     {
-        var source = new UniqueContentId(DomainId.NewGuid(), DomainId.Create("id42"));
+        var source = new UniqueContentId(DomainId.Create("97432068-10f9-4b98-81ba-ef93a96cc466"), DomainId.Create("1586987c-9540-421a-9cc9-3381c3f4109f"));
+
+        var deserialized = source.SerializeAndDeserializeBson();
+
+        Assert.Equal(source, deserialized);
+    }
+
+    [Theory]
+    [MemberData(nameof(CustomIds))]
+    public void Should_serialize_and_deserialize_guid_custom(string id)
+    {
+        var source = new UniqueContentId(DomainId.NewGuid(), DomainId.Create(id));
 
         var deserialized = source.SerializeAndDeserializeBson();
 
@@ -48,20 +67,22 @@ public class BsonUniqueContentIdSerializerTests
         Assert.Equal(source, deserialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_custom_custom()
+    [Theory]
+    [MemberData(nameof(CustomIds))]
+    public void Should_serialize_and_deserialize_custom_custom(string id)
     {
-        var source = new UniqueContentId(DomainId.Create("id41"), DomainId.Create("id42"));
+        var source = new UniqueContentId(DomainId.Create(id), DomainId.Create(id));
 
         var deserialized = source.SerializeAndDeserializeBson();
 
         Assert.Equal(source, deserialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_custom_guid()
+    [Theory]
+    [MemberData(nameof(CustomIds))]
+    public void Should_serialize_and_deserialize_custom_guid(string id)
     {
-        var source = new UniqueContentId(DomainId.Create("id42"), DomainId.NewGuid());
+        var source = new UniqueContentId(DomainId.Create(id), DomainId.NewGuid());
 
         var deserialized = source.SerializeAndDeserializeBson();
 
