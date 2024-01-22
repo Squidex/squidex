@@ -127,6 +127,8 @@ public sealed class RichTextNode : INode
             }
         }
 
+        currentState = state;
+
         return isValid;
     }
 

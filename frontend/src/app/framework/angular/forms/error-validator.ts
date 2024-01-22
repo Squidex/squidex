@@ -11,10 +11,10 @@ import { getControlPath } from './forms-helper';
 
 export class ErrorValidator {
     private errorsCache: { [path: string]: { value: any } } = {};
-    private error: ErrorDto | undefined | null;
+    private errorSource: ErrorDto | undefined | null;
 
     public validator: ValidatorFn = control => {
-        if (!this.error) {
+        if (!this.errorSource) {
             return null;
         }
 
@@ -35,8 +35,8 @@ export class ErrorValidator {
 
         const errors: string[] = [];
 
-        if (this.error.details) {
-            for (const details of this.error.details) {
+        if (this.errorSource.details) {
+            for (const details of this.errorSource.details) {
                 for (const property of details.properties) {
                     if (property.startsWith(path)) {
                         const subProperty = property.substring(path.length);
@@ -73,6 +73,6 @@ export class ErrorValidator {
 
     public setError(error: ErrorDto | undefined | null) {
         this.errorsCache = {};
-        this.error = error;
+        this.errorSource = error;
     }
 }

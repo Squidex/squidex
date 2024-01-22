@@ -164,48 +164,16 @@ public static class ApiExceptionConverter
 
     public static IEnumerable<string> ToErrors(IEnumerable<ValidationError> errors)
     {
-        static string FixPropertyName(string property)
-        {
-            property = property.Trim();
-
-            if (property.Length == 0)
-            {
-                return property;
-            }
-
-            var prevChar = 0;
-
-            var builder = new StringBuilder(property.Length);
-
-            builder.Append(char.ToLowerInvariant(property[0]));
-
-            foreach (var character in property.Skip(1))
-            {
-                if (prevChar == '.')
-                {
-                    builder.Append(char.ToLowerInvariant(character));
-                }
-                else
-                {
-                    builder.Append(character);
-                }
-
-                prevChar = character;
-            }
-
-            return builder.ToString();
-        }
-
         return errors.Select(e =>
         {
+            var message = e.Message;
+
             if (e.PropertyNames?.Any() == true)
             {
-                return $"{string.Join(", ", e.PropertyNames.Select(FixPropertyName))}: {e.Message}";
+                message = $"{string.Join(", ", e.PropertyNames)}: {message}";
             }
-            else
-            {
-                return e.Message;
-            }
+
+            return message;
         });
     }
 }
