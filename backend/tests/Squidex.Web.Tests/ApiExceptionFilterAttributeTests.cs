@@ -16,8 +16,6 @@ using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
-#pragma warning disable MA0015 // Specify the parameter name in ArgumentException
-
 namespace Squidex.Web;
 
 public class ApiExceptionFilterAttributeTests
@@ -31,8 +29,8 @@ public class ApiExceptionFilterAttributeTests
         var errors = new List<ValidationError>
         {
             new ValidationError("Error1"),
-            new ValidationError("Error2", "Property0"),
-            new ValidationError("Error3", "Property1", "Property2"),
+            new ValidationError("Error2", "property0"),
+            new ValidationError("Error3", "property1", "property2"),
             new ValidationError("Error4", "Property3.Property4"),
             new ValidationError("Error5", "Property5[0].Property6")
         };
@@ -53,8 +51,8 @@ public class ApiExceptionFilterAttributeTests
             "Error1",
             "property0: Error2",
             "property1, property2: Error3",
-            "property3.property4: Error4",
-            "property5[0].property6: Error5"
+            "Property3.Property4: Error4",
+            "Property5[0].Property6: Error5"
         }, ((ErrorDto)actual.Value!).Details);
 
         A.CallTo(log)
