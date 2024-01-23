@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb;
 using Squidex.Infrastructure;
@@ -30,16 +31,6 @@ public class BsonUniqueContentIdSerializerTests
     public void Should_serialize_and_deserialize_guid_guid()
     {
         var source = new UniqueContentId(DomainId.NewGuid(), DomainId.NewGuid());
-
-        var deserialized = source.SerializeAndDeserializeBson();
-
-        Assert.Equal(source, deserialized);
-    }
-
-    [Fact]
-    public void Should_serialize_and_deserialize_guid_guid2()
-    {
-        var source = new UniqueContentId(DomainId.Create("97432068-10f9-4b98-81ba-ef93a96cc466"), DomainId.Create("1586987c-9540-421a-9cc9-3381c3f4109f"));
 
         var deserialized = source.SerializeAndDeserializeBson();
 
@@ -87,6 +78,36 @@ public class BsonUniqueContentIdSerializerTests
         var deserialized = source.SerializeAndDeserializeBson();
 
         Assert.Equal(source, deserialized);
+    }
+
+    [Fact]
+    public void Should_serialize_very_long_content_id()
+    {
+        var source = new UniqueContentId(DomainId.NewGuid(), DomainId.Create(new string('x', 512)));
+
+        var deserialized = source.SerializeAndDeserializeBson();
+
+        Assert.Equal(source, deserialized);
+    }
+
+    [Fact]
+    public void Should_not_serialize_very_long_app_id()
+    {
+        var source = new UniqueContentId(DomainId.Create(new string('x', 512)), DomainId.NewGuid());
+
+        var exception = Assert.ThrowsAny<Exception>(() => source.SerializeAndDeserializeBson());
+
+        Assert.Contains("App ID cannot be longer than 253 bytes.", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Should_not_serialize_long_app_id()
+    {
+        var source = new UniqueContentId(DomainId.Create(new string('x', 512)), DomainId.NewGuid());
+
+        var exception = Assert.ThrowsAny<Exception>(() => source.SerializeAndDeserializeBson());
+
+        Assert.Contains("App ID cannot be longer than 253 bytes.", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
