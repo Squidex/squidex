@@ -331,6 +331,28 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     }
 
     [Theory]
+    [InlineData("e5f7c399-6024-4367-9538-b7de4bced0f9' UNION ALL SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL-- vIGQ")]
+    [InlineData("e5f7c399-6024-4367-9538-b7de4bced0f9') UNION ALL SELECT 59,59,59,'qkjvq'||'FWUHnOHbQqCmewsQoKRPxqUXmHZMTtqHmyYoRhwu'||'qvpkq',59-- dLuxn")]
+    public async Task Should_create_and_delete_content_with_strange_id(string id)
+    {
+        // STEP 1: Upsert a new item with a custom id.
+        var content_0 = await _.Contents.UpsertAsync(id, new TestEntityData(), ContentUpsertOptions.AsPublish);
+
+        Assert.Equal(id, content_0.Id);
+
+        // STEP 2: Find content
+        var content_1 = await _.Contents.GetAsync(id);
+
+        Assert.Equal(id, content_1.Id);
+
+
+        // STEP 3: Delete content.
+        await _.Contents.DeleteAsync(id);
+
+        await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.GetAsync(id));
+    }
+
+    [Theory]
     [InlineData(ContentStrategies.Update.Normal)]
     [InlineData(ContentStrategies.Update.Upsert)]
     [InlineData(ContentStrategies.Update.UpsertBulk)]

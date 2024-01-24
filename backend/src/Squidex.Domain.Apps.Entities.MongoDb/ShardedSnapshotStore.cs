@@ -91,7 +91,7 @@ public abstract class ShardedSnapshotStore<T, TState> : ShardedService<T>, ISnap
         // This is a leaky abstraction, but the only option to implement that in a fast way.
         var parts = key.ToString().Split(DomainId.IdSeparator);
 
-        if (parts.Length != 2)
+        if (parts.Length < 2)
         {
             throw new InvalidOperationException("The key does not contain an app id.");
         }
