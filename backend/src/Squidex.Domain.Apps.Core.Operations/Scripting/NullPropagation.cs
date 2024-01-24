@@ -7,8 +7,8 @@
 
 using Jint;
 using Jint.Native;
+using Jint.Runtime;
 using Jint.Runtime.Interop;
-using Jint.Runtime.References;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
@@ -24,7 +24,7 @@ public sealed class NullPropagation : IReferenceResolver
 
     public bool TryGetCallable(Engine engine, object reference, out JsValue value)
     {
-        value = new ClrFunctionInstance(engine, "anonymous", (thisObj, _) => thisObj);
+        value = new ClrFunction(engine, "anonymous", (thisObj, _) => thisObj);
         return true;
     }
 

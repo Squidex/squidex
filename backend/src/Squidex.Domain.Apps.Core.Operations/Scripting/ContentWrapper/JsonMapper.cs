@@ -59,7 +59,7 @@ public static class JsonMapper
             target[i] = Map(arr[i], engine);
         }
 
-        return engine.Realm.Intrinsics.Array.Construct(target);
+        return engine.Intrinsics.Array.Construct(target);
     }
 
     private static JsonObjectInstance FromObject(JsonObject obj, Engine engine)
@@ -136,7 +136,7 @@ public static class JsonMapper
         {
             var obj = value.AsObject();
 
-            var result = new JsonObject((int)obj.Length);
+            var result = new JsonObject();
 
             foreach (var (key, propertyDescriptor) in obj.GetOwnProperties())
             {

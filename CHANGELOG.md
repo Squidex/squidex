@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.13.0] - 2024-01-24
+
+### Fixed
+
+* **API**: Do not normalize field names in error response.
+* **Apps**: Fix registration of app deleter when permanent app deleteion is enabled.
+* **Contents**: Fix full text handling for large content IDs.
+* **Contents**: Rich Editor. Allow overlapping class names.
+* **Contents**: Rich Editor. Correctly calculate the word and character count.
+
+### Changed
+
+* **API**: Update NSwag
+* **API**: Update OpenIdDict.
+
+### Added
+
+* **Jobs**: Notification when jobs are completed.
+
 ## [7.12.0] - 2024-01-09
 
 ### Fixed

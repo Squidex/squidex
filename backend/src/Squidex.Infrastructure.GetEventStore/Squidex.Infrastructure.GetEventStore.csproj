@@ -15,7 +15,7 @@
     <PackageReference Include="EventStore.Client.Grpc.ProjectionManagement" Version="23.1.0" />
     <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.1.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.60.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.136">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.138">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

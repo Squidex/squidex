@@ -16,7 +16,7 @@
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="8.1.0" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.136">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.138">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -28,7 +28,7 @@
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.1.2" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="xunit" Version="2.6.5" />
+    <PackageReference Include="xunit" Version="2.6.6" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

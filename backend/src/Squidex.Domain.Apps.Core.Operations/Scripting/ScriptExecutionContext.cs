@@ -112,7 +112,7 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         {
             lock (Engine)
             {
-                Engine.ResetConstraints();
+                Engine.Constraints.Reset();
                 action();
             }
 
@@ -136,7 +136,7 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         {
             lock (Engine)
             {
-                Engine.ResetConstraints();
+                Engine.Constraints.Reset();
                 action(argument);
             }
 

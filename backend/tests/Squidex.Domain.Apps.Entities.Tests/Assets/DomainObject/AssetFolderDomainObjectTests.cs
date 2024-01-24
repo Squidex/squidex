@@ -16,7 +16,6 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-[UsesVerify]
 public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolder>
 {
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();

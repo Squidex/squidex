@@ -15,7 +15,6 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 
-[UsesVerify]
 public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 {
     private readonly string fieldName = "age";

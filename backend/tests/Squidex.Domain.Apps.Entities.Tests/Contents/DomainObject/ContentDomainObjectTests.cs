@@ -25,7 +25,6 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-[UsesVerify]
 public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 {
     private readonly DomainId contentId = DomainId.NewGuid();

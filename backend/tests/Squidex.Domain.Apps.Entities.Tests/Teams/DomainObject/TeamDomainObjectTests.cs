@@ -17,7 +17,6 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
 
-[UsesVerify]
 public class TeamDomainObjectTests : HandlerTestBase<Team>
 {
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();

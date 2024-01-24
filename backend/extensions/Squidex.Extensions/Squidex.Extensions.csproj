@@ -19,12 +19,12 @@
     <PackageReference Include="Google.Cloud.Diagnostics.Common" Version="5.1.0" />
     <PackageReference Include="Google.Cloud.Logging.V2" Version="4.1.0" />
     <PackageReference Include="Google.Cloud.Monitoring.V3" Version="3.5.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.136">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.138">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
-    <PackageReference Include="Microsoft.Azure.SignalR.Management" Version="1.23.0" />
+    <PackageReference Include="Microsoft.Azure.SignalR.Management" Version="1.24.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.20.0" />

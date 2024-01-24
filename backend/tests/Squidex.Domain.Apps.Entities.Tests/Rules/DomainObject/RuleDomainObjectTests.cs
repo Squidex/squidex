@@ -19,7 +19,6 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
-[UsesVerify]
 public class RuleDomainObjectTests : HandlerTestBase<Rule>
 {
     private readonly IRuleEnqueuer ruleEnqueuer = A.Fake<IRuleEnqueuer>();

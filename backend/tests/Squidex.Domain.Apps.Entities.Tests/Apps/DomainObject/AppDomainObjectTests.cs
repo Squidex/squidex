@@ -20,7 +20,6 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
-[UsesVerify]
 public class AppDomainObjectTests : HandlerTestBase<App>
 {
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
