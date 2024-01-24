@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb;
 using Squidex.Infrastructure;
@@ -18,6 +19,14 @@ public class BsonUniqueContentIdSerializerTests
         BsonUniqueContentIdSerializer.Register();
     }
 
+    public static readonly TheoryData<string> CustomIds = new TheoryData<string>
+    {
+        "id",
+        "id-short",
+        "id-and-guid-size",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    };
+
     [Fact]
     public void Should_serialize_and_deserialize_guid_guid()
     {
@@ -28,10 +37,11 @@ public class BsonUniqueContentIdSerializerTests
         Assert.Equal(source, deserialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_guid_custom()
+    [Theory]
+    [MemberData(nameof(CustomIds))]
+    public void Should_serialize_and_deserialize_guid_custom(string id)
     {
-        var source = new UniqueContentId(DomainId.NewGuid(), DomainId.Create("id42"));
+        var source = new UniqueContentId(DomainId.NewGuid(), DomainId.Create(id));
 
         var deserialized = source.SerializeAndDeserializeBson();
 
@@ -48,10 +58,22 @@ public class BsonUniqueContentIdSerializerTests
         Assert.Equal(source, deserialized);
     }
 
-    [Fact]
-    public void Should_serialize_and_deserialize_custom_custom()
+    [Theory]
+    [MemberData(nameof(CustomIds))]
+    public void Should_serialize_and_deserialize_custom_custom(string id)
     {
-        var source = new UniqueContentId(DomainId.Create("id41"), DomainId.Create("id42"));
+        var source = new UniqueContentId(DomainId.Create(id), DomainId.Create(id));
+
+        var deserialized = source.SerializeAndDeserializeBson();
+
+        Assert.Equal(source, deserialized);
+    }
+
+    [Theory]
+    [MemberData(nameof(CustomIds))]
+    public void Should_serialize_and_deserialize_custom_guid(string id)
+    {
+        var source = new UniqueContentId(DomainId.Create(id), DomainId.NewGuid());
 
         var deserialized = source.SerializeAndDeserializeBson();
 
@@ -59,13 +81,33 @@ public class BsonUniqueContentIdSerializerTests
     }
 
     [Fact]
-    public void Should_serialize_and_deserialize_custom_guid()
+    public void Should_serialize_very_long_content_id()
     {
-        var source = new UniqueContentId(DomainId.Create("id42"), DomainId.NewGuid());
+        var source = new UniqueContentId(DomainId.NewGuid(), DomainId.Create(new string('x', 512)));
 
         var deserialized = source.SerializeAndDeserializeBson();
 
         Assert.Equal(source, deserialized);
+    }
+
+    [Fact]
+    public void Should_not_serialize_very_long_app_id()
+    {
+        var source = new UniqueContentId(DomainId.Create(new string('x', 512)), DomainId.NewGuid());
+
+        var exception = Assert.ThrowsAny<Exception>(() => source.SerializeAndDeserializeBson());
+
+        Assert.Contains("App ID cannot be longer than 253 bytes.", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Should_not_serialize_long_app_id()
+    {
+        var source = new UniqueContentId(DomainId.Create(new string('x', 512)), DomainId.NewGuid());
+
+        var exception = Assert.ThrowsAny<Exception>(() => source.SerializeAndDeserializeBson());
+
+        Assert.Contains("App ID cannot be longer than 253 bytes.", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

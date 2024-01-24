@@ -13,18 +13,13 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb;
 
-public sealed class BsonUniqueContentIdSerializer : SerializerBase<UniqueContentId>
+public partial class BsonUniqueContentIdSerializer : SerializerBase<UniqueContentId>
 {
-    private const byte GuidLength = 16;
     private static readonly BsonUniqueContentIdSerializer Instance = new BsonUniqueContentIdSerializer();
 
     public static void Register()
     {
         BsonSerializer.TryRegisterSerializer(Instance);
-    }
-
-    private BsonUniqueContentIdSerializer()
-    {
     }
 
     public static UniqueContentId NextAppId(DomainId appId)
@@ -63,121 +58,37 @@ public sealed class BsonUniqueContentIdSerializer : SerializerBase<UniqueContent
 
     public override UniqueContentId Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
     {
-        var buffer = context.Reader.ReadBytes()!;
-        var offset = 0;
+        var buffer = context.Reader.ReadBytes()!.AsSpan();
 
-        static DomainId ReadId(byte[] buffer, ref int offset)
-        {
-            DomainId id;
+        var (appId, read) = IdInfo.Read(buffer);
 
-            // If we have reached the end of the buffer then
-            if (offset >= buffer.Length)
-            {
-                return default;
-            }
-
-            var length = buffer[offset++];
-            // Special length indicator for all guids.
-            if (length == 0xFF)
-            {
-                id = DomainId.Create(new Guid(buffer.AsSpan(offset, GuidLength)));
-                offset += GuidLength;
-            }
-            else
-            {
-                id = DomainId.Create(Encoding.UTF8.GetString(buffer.AsSpan(offset, length)));
-                offset += length;
-            }
-
-            return id;
-        }
-
-        return new UniqueContentId(ReadId(buffer, ref offset), ReadId(buffer, ref offset));
+        return new UniqueContentId(appId, IdInfo.Read(buffer[read..]).Id);
     }
 
     public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, UniqueContentId value)
     {
-        var appId = CheckId(value.AppId);
+        var appId = IdInfo.Create(value.AppId);
 
-        var contentId = CheckId(value.ContentId);
-
-        var isEmptyContentId =
-            contentId.IsGuid &&
-            contentId.Guid == default;
-
-        // Do not write empty Ids to the buffer to allow prefix searches.
-        var contentLength = !isEmptyContentId ? contentId.Length + 1 : 0;
-
-        var bufferLength = appId.Length + 1 + contentLength;
-        var bufferArray = new byte[bufferLength];
-
-        var offset = Write(bufferArray, 0,
-            appId.IsGuid,
-            appId.Guid,
-            appId.Source,
-            appId.Length);
-
-        if (!isEmptyContentId)
+        if (appId.Length >= IdInfo.LongIdIndicator)
         {
-            // Do not write the empty content id, so we can search for app as well.
-            Write(bufferArray, offset,
-                contentId.IsGuid,
-                contentId.Guid,
-                contentId.Source,
-                contentId.Length);
+            ThrowHelper.InvalidOperationException("App ID cannot be longer than 253 bytes.");
         }
 
-        static int Write(byte[] buffer, int offset, bool isGuid, Guid guid, string id, int idLength)
+        var contentId = IdInfo.Create(value.ContentId);
+
+        var size = appId.Size(true) + contentId.Size(false);
+
+        var bufferArray = new byte[size];
+        var bufferSpan = bufferArray.AsSpan();
+
+        var written = appId.Write(bufferSpan);
+
+        if (!contentId.IsEmpty)
         {
-            if (isGuid)
-            {
-                // Special length indicator for all guids.
-                buffer[offset++] = 0xFF;
-                WriteGuid(buffer.AsSpan(offset), guid);
-
-                return offset + GuidLength;
-            }
-            else
-            {
-                // We assume that we use relatively small IDs, not longer than 254 bytes.
-                buffer[offset++] = (byte)idLength;
-                WriteString(buffer.AsSpan(offset), id);
-
-                return offset + idLength;
-            }
+            // Do not write empty Ids to the buffer to allow prefix searches.
+            contentId.Write(bufferSpan[written..]);
         }
 
         context.Writer.WriteBytes(bufferArray);
-    }
-
-    private static (int Length, bool IsGuid, Guid Guid, string Source) CheckId(DomainId id)
-    {
-        var source = id.ToString();
-
-        var idIsGuid = Guid.TryParse(source, out var idGuid);
-        var idLength = GuidLength;
-
-        if (!idIsGuid)
-        {
-            idLength = (byte)Encoding.UTF8.GetByteCount(source);
-
-            // We only use a single byte to write the length, therefore we do not allow large strings.
-            if (idLength > 254)
-            {
-                ThrowHelper.InvalidOperationException("Cannot write long IDs.");
-            }
-        }
-
-        return (idLength, idIsGuid, idGuid, source);
-    }
-
-    private static void WriteString(Span<byte> span, string id)
-    {
-        Encoding.UTF8.GetBytes(id, span);
-    }
-
-    private static void WriteGuid(Span<byte> span, Guid guid)
-    {
-        guid.TryWriteBytes(span);
     }
 }
