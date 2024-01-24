@@ -17,6 +17,12 @@ public partial class BsonUniqueContentIdSerializer
 {
     private readonly record struct IdInfo(int Length, bool IsGuid, Guid AsGuid, string Source)
     {
+        public const byte GuidLength = 16;
+        public const byte GuidIndicator = byte.MaxValue;
+        public const byte LongIdIndicator = byte.MaxValue - 1;
+        public const byte SizeOfInt = 4;
+        public const byte SizeOfByte = 1;
+
         public bool IsEmpty => IsGuid && AsGuid == default;
 
         public static IdInfo Create(DomainId id)
@@ -31,34 +37,35 @@ public partial class BsonUniqueContentIdSerializer
             return new IdInfo(Encoding.UTF8.GetByteCount(source), false, default, source);
         }
 
-        public int SizeWithIntLength(bool writeEmpty)
-        {
-            return Size(writeEmpty, SizeOfInt);
-        }
-
-        public int SizeWithByteLength(bool writeEmpty)
-        {
-            return Size(writeEmpty, SizeOfByte);
-        }
-
-        private int Size(bool writeEmpty, int lengthSize)
+        public int Size(bool writeEmpty)
         {
             if (IsEmpty && !writeEmpty)
             {
                 return 0;
             }
 
-            return lengthSize + Length;
+            if (Length >= LongIdIndicator)
+            {
+                return SizeOfByte + SizeOfInt + Length;
+            }
+
+            return SizeOfByte + Length;
         }
 
-        public int WriteWithIntLength(Span<byte> buffer)
+        public int Write(Span<byte> buffer)
         {
-            return Write(buffer, WriteLengthAsInt);
-        }
+            if (Length >= LongIdIndicator)
+            {
+                buffer[0] = LongIdIndicator;
 
-        public int WriteWithByteLength(Span<byte> buffer)
-        {
-            return Write(buffer, WriteLengthAsByte);
+                Write(buffer[1..], WriteLengthAsInt);
+            }
+            else
+            {
+                Write(buffer, WriteLengthAsByte);
+            }
+
+            return Size(false);
         }
 
         private int Write(Span<byte> buffer, WriteLength writeLength)
@@ -82,39 +89,43 @@ public partial class BsonUniqueContentIdSerializer
             return lengthSize + Length;
         }
 
-        public static (DomainId Id, int Length) ReadWithIntLength(ReadOnlySpan<byte> buffer)
+        public static (DomainId Id, int Length) Read(ReadOnlySpan<byte> buffer)
         {
-            return Read(buffer, ReadLengthAsInt);
-        }
-
-        public static (DomainId Id, int Length) ReadWithByteLength(ReadOnlySpan<byte> buffer)
-        {
-            return Read(buffer, ReadLengthAsByte);
-        }
-
-        private static (DomainId Id, int Length) Read(ReadOnlySpan<byte> buffer, ReadLength readLength)
-        {
-            // If we have reached the end of the buffer then there is no ID.
             if (buffer.Length == 0)
             {
                 return default;
             }
 
+            if (buffer[0] == LongIdIndicator)
+            {
+                var (id, read) = Read(buffer[1..], ReadLengthAsInt);
+
+                return (id, read + 1);
+            }
+            else
+            {
+                return Read(buffer, ReadLengthAsByte);
+            }
+        }
+
+        private static (DomainId Id, int Length) Read(ReadOnlySpan<byte> buffer, ReadLength readLength)
+        {
             var (length, offset) = readLength(buffer);
 
             if (length == GuidIndicator)
             {
-                length = GuidLength;
+                // For guids the size is just an indicator and we use a hardcoded size.
+                buffer = buffer.Slice(offset, GuidLength);
+
+                return (DomainId.Create(new Guid(buffer)), offset + GuidLength);
             }
+            else
+            {
+                // For strings the size is correct.
+                buffer = buffer.Slice(offset, length);
 
-            // Advance by the size of the prefix offset and the length.
-            buffer = buffer.Slice(offset, length);
-
-            var id = length == GuidLength ?
-                DomainId.Create(new Guid(buffer)) :
-                DomainId.Create(Encoding.UTF8.GetString(buffer));
-
-            return (id, offset + length);
+                return (DomainId.Create(Encoding.UTF8.GetString(buffer)), offset + length);
+            }
         }
 
         private static int WriteLengthAsByte(Span<byte> buffer, int length)
@@ -145,5 +156,4 @@ public partial class BsonUniqueContentIdSerializer
 
         private delegate (int, int) ReadLength(ReadOnlySpan<byte> buffer);
     }
-#pragma warning restore
 }

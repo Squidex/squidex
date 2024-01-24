@@ -23,7 +23,7 @@ public class BsonUniqueContentIdSerializerTests
     {
         "id",
         "id-short",
-        "id-with-very-long-text",
+        "id-and-guid-size",
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     };
 
