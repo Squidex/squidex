@@ -9,6 +9,7 @@ using System.Net;
 using System.Security.Claims;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
@@ -679,5 +680,22 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         await sut.ExecuteAsync(vars, script, new ScriptOptions { AsContext = true });
 
         Assert.Equal(113.0, vars["shared"]);
+    }
+
+    [Fact]
+    public async Task Should_set_metadata()
+    {
+        var vars = new DataScriptVars
+        {
+            ["metadata"] = new AssetMetadata()
+        };
+
+        var script = @$"
+            ctx.metadata['pixelWidth'] = 100;
+        ";
+
+        await sut.ExecuteAsync(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(100, ((AssetMetadata)vars["metadata"]!).GetInt32(KnownMetadataKeys.PixelWidth));
     }
 }

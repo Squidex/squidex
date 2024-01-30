@@ -13,7 +13,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public class RuleTests : IClassFixture<ClientFixture>
 {
     private readonly string ruleName = Guid.NewGuid().ToString();

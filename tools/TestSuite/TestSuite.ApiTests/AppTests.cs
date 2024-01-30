@@ -13,7 +13,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public sealed class AppTests : IClassFixture<CreatedAppFixture>
 {
     public CreatedAppFixture _ { get; }

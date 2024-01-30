@@ -176,8 +176,8 @@ public sealed class AssetContentQueryDto
             return (FocusX.Value, FocusY.Value);
         }
 
-        var focusX = asset.Metadata.GetFocusX();
-        var focusY = asset.Metadata.GetFocusY();
+        var focusX = asset.Metadata.GetSingle(KnownMetadataKeys.FocusX);
+        var focusY = asset.Metadata.GetSingle(KnownMetadataKeys.FocusY);
 
         if (focusX != null && focusY != null)
         {

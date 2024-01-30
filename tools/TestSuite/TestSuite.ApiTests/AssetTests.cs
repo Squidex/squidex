@@ -15,7 +15,6 @@ using TestSuite.Utils;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public class AssetTests : IClassFixture<CreatedAppFixture>
 {
     private ProgressHandler progress = new ProgressHandler();

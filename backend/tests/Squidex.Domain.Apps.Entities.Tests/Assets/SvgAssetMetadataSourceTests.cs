@@ -5,17 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Properties;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public class SvgAssetMetadataSourceTests
+public class SvgAssetMetadataSourceTests : GivenContext
 {
-    private readonly MemoryStream stream = new MemoryStream();
     private readonly SvgAssetMetadataSource sut = new SvgAssetMetadataSource();
 
     public SvgAssetMetadataSourceTests()
@@ -26,9 +25,7 @@ public class SvgAssetMetadataSourceTests
     [Fact]
     public async Task Should_add_image_tag_if_svg_mime()
     {
-        var svg = new DelegateAssetFile("MyImage.png", "image/svg+xml", 1024, () => stream);
-
-        var command = new CreateAsset { File = svg };
+        var command = FakeCommand("image.svg");
 
         await sut.EnhanceAsync(command, default);
 
@@ -38,9 +35,7 @@ public class SvgAssetMetadataSourceTests
     [Fact]
     public async Task Should_add_image_tag_if_svg_extension()
     {
-        var svg = new DelegateAssetFile("MyImage.svg", "other", 1024, () => stream);
-
-        var command = new CreateAsset { File = svg };
+        var command = FakeCommand("image.svg");
 
         await sut.EnhanceAsync(command, default);
 
@@ -50,30 +45,63 @@ public class SvgAssetMetadataSourceTests
     [Fact]
     public async Task Should_throw_exception_if_svg_is_malicious()
     {
-        var bytes = Encoding.UTF8.GetBytes(Resources.SvgInvalid);
-
-        stream.Write(bytes);
-        stream.Seek(0, SeekOrigin.Begin);
-
-        var svg = new DelegateAssetFile("MyImage.svg", "other", 1024, () => stream);
-
-        var command = new CreateAsset { File = svg };
+        var command = Command("SvgInvalid.svg");
 
         await Assert.ThrowsAsync<ValidationException>(() => sut.EnhanceAsync(command, default));
+
+        Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.PixelWidth));
+        Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.PixelHeight));
+        Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.ViewBox));
     }
 
     [Fact]
     public async Task Should_not_throw_exception_if_svg_is_not_malicious()
     {
-        var bytes = Encoding.UTF8.GetBytes(Resources.SvgValid);
-
-        stream.Write(bytes);
-        stream.Seek(0, SeekOrigin.Begin);
-
-        var svg = new DelegateAssetFile("MyImage.svg", "other", 1024, () => stream);
-
-        var command = new CreateAsset { File = svg };
+        var command = Command("SvgValid.svg");
 
         await sut.EnhanceAsync(command, default);
+
+        Assert.Equal("20", command.Metadata[KnownMetadataKeys.PixelWidth].AsString);
+        Assert.Equal("30", command.Metadata[KnownMetadataKeys.PixelHeight].AsString);
+
+        Assert.Equal("0 0 100 100", command.Metadata[KnownMetadataKeys.ViewBox].AsString);
+    }
+
+    [Fact]
+    public void Should_describe_metadata()
+    {
+        var source = CreateAsset() with
+        {
+            Metadata = new AssetMetadata
+            {
+                [KnownMetadataKeys.PixelWidth] = "128",
+                [KnownMetadataKeys.PixelHeight] = "55"
+            },
+            MimeType = "image/svg+xml"
+        };
+
+        var formatted = sut.Format(source);
+
+        Assert.Equal(new[] { "128x55" }, formatted);
+    }
+
+    private static UploadAssetCommand Command(string path)
+    {
+        var file = new FileInfo(Path.Combine("Assets", "TestFiles", path));
+
+        return new CreateAsset
+        {
+            File = new DelegateAssetFile(file.Name, "mime", file.Length, file.OpenRead)
+        };
+    }
+
+    private static UploadAssetCommand FakeCommand(string name)
+    {
+        var stream = new MemoryStream();
+
+        return new CreateAsset
+        {
+            File = new DelegateAssetFile(name, "mime", stream.Length, () => stream)
+        };
     }
 }

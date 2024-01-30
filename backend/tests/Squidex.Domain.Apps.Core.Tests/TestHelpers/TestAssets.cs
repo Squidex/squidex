@@ -31,10 +31,11 @@ public static class TestAssets
             FileName = "MyImage.png",
             FileSize = 1024 * 8,
             Type = AssetType.Image,
-            Metadata =
-                new AssetMetadata()
-                    .SetPixelWidth(800)
-                    .SetPixelHeight(600)
+            Metadata = new AssetMetadata
+            {
+                [KnownMetadataKeys.PixelWidth] = 800,
+                [KnownMetadataKeys.PixelHeight] = 600,
+            }
         };
     }
 
@@ -46,10 +47,11 @@ public static class TestAssets
             FileName = "MyImage.png",
             FileSize = 1024 * 8,
             Type = AssetType.Video,
-            Metadata =
-                new AssetMetadata()
-                    .SetVideoWidth(800)
-                    .SetVideoHeight(600)
+            Metadata = new AssetMetadata
+            {
+                [KnownMetadataKeys.VideoWidth] = 800,
+                [KnownMetadataKeys.VideoHeight] = 600,
+            }
         };
     }
 

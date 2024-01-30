@@ -138,7 +138,7 @@ public sealed class AssetDto : Resource
     [Obsolete("Use 'metadata' field now.")]
     public int? PixelWidth
     {
-        get => Metadata.GetPixelWidth();
+        get => Metadata.GetInt32(KnownMetadataKeys.PixelWidth);
     }
 
     /// <summary>
@@ -147,7 +147,7 @@ public sealed class AssetDto : Resource
     [Obsolete("Use 'metadata' field now.")]
     public int? PixelHeight
     {
-        get => Metadata.GetPixelHeight();
+        get => Metadata.GetInt32(KnownMetadataKeys.PixelHeight);
     }
 
     public static AssetDto FromDomain(EnrichedAsset asset, Resources resources, bool isDuplicate = false)

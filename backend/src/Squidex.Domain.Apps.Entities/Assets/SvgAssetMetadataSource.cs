@@ -24,38 +24,68 @@ public sealed class SvgAssetMetadataSource : IAssetMetadataSource
             command.File.MimeType == "image/svg+xml" ||
             command.File.FileName.EndsWith(".svg", StringComparison.OrdinalIgnoreCase);
 
-        if (isSvg)
+        if (!isSvg)
         {
-            command.Tags.Add("image");
+            return;
+        }
 
-            if (command.File.FileSize < FileSizeLimit)
+        command.Tags.Add("image");
+
+        if (command.File.FileSize >= FileSizeLimit)
+        {
+            return;
+        }
+
+        try
+        {
+            using (var reader = new StreamReader(command.File.OpenRead()))
             {
-                try
-                {
-                    using (var reader = new StreamReader(command.File.OpenRead()))
-                    {
-                        var text = await reader.ReadToEndAsync();
+                var text = await reader.ReadToEndAsync(ct);
 
-                        if (!text.IsValidSvg())
-                        {
-                            throw new ValidationException(T.Get("validation.notAnValidSvg"));
-                        }
-                    }
-                }
-                catch (ValidationException)
+                if (!text.IsValidSvg())
                 {
-                    throw;
+                    throw new ValidationException(T.Get("validation.notAnValidSvg"));
                 }
-                catch
+
+                var (width, height, viewBox) = text.GetSvgMetadata();
+
+                if (!string.IsNullOrWhiteSpace(width) && !string.IsNullOrWhiteSpace(height))
                 {
-                    return;
+                    command.Metadata[KnownMetadataKeys.PixelWidth] = width;
+                    command.Metadata[KnownMetadataKeys.PixelHeight] = height;
+                }
+
+                if (!string.IsNullOrWhiteSpace(viewBox))
+                {
+                    command.Metadata[KnownMetadataKeys.ViewBox] = viewBox;
                 }
             }
+        }
+        catch (ValidationException)
+        {
+            throw;
+        }
+        catch
+        {
+            return;
         }
     }
 
     public IEnumerable<string> Format(Asset asset)
     {
-        yield break;
+        var isSvg =
+            asset.MimeType == "image/svg+xml" ||
+            asset.FileName.EndsWith(".svg", StringComparison.OrdinalIgnoreCase);
+
+        if (!isSvg)
+        {
+            yield break;
+        }
+
+        if (asset.Metadata.TryGetString(KnownMetadataKeys.PixelWidth, out var w) &&
+            asset.Metadata.TryGetString(KnownMetadataKeys.PixelHeight, out var h))
+        {
+            yield return $"{w}x{h}";
+        }
     }
 }

@@ -13,7 +13,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public class AssetFoldersTests : IClassFixture<CreatedAppFixture>
 {
     public CreatedAppFixture _ { get; }

@@ -66,8 +66,8 @@ public sealed class ImageAssetMetadataSource : IAssetMetadataSource
                 {
                     command.Type = AssetType.Image;
 
-                    command.Metadata.SetPixelWidth(imageInfo.PixelWidth);
-                    command.Metadata.SetPixelHeight(imageInfo.PixelHeight);
+                    command.Metadata[KnownMetadataKeys.PixelWidth] = imageInfo.PixelWidth;
+                    command.Metadata[KnownMetadataKeys.PixelHeight] = imageInfo.PixelHeight;
                 }
             }
         }
@@ -81,7 +81,7 @@ public sealed class ImageAssetMetadataSource : IAssetMetadataSource
         {
             command.Tags.Add("image");
 
-            var wh = command.Metadata.GetPixelWidth() + command.Metadata.GetPixelWidth();
+            var wh = command.Metadata.GetInt32(KnownMetadataKeys.PixelWidth) + command.Metadata.GetInt32(KnownMetadataKeys.PixelWidth);
 
             if (wh > 2000)
             {
@@ -100,15 +100,15 @@ public sealed class ImageAssetMetadataSource : IAssetMetadataSource
 
     public IEnumerable<string> Format(Asset asset)
     {
-        if (asset.Type == AssetType.Image)
+        if (asset.Type != AssetType.Image)
         {
-            var w = asset.Metadata.GetPixelWidth();
-            var h = asset.Metadata.GetPixelHeight();
+            yield break;
+        }
 
-            if (w != null && h != null)
-            {
-                yield return $"{w}x{h}px";
-            }
+        if (asset.Metadata.TryGetNumber(KnownMetadataKeys.PixelWidth, out var w) &&
+            asset.Metadata.TryGetNumber(KnownMetadataKeys.PixelHeight, out var h))
+        {
+            yield return $"{w}x{h}px";
         }
     }
 }

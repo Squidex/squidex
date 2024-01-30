@@ -13,7 +13,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
 {
     private readonly string roleName = Guid.NewGuid().ToString();

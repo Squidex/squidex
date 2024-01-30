@@ -50,8 +50,8 @@ public sealed class AssetCreated : AssetEvent, IMigrated<IEvent>
         {
             result.Type = AssetType.Image;
 
-            result.Metadata.SetPixelWidth(PixelWidth.Value);
-            result.Metadata.SetPixelHeight(PixelHeight.Value);
+            result.Metadata[KnownMetadataKeys.PixelWidth] = PixelWidth.Value;
+            result.Metadata[KnownMetadataKeys.PixelHeight] = PixelHeight.Value;
         }
 
         return result;

@@ -61,8 +61,8 @@ public class ImageAssetMetadataSourceTests : GivenContext
 
         await sut.EnhanceAsync(command, CancellationToken);
 
-        Assert.Equal(800, command.Metadata.GetPixelWidth());
-        Assert.Equal(600, command.Metadata.GetPixelHeight());
+        Assert.Equal(800, command.Metadata.GetInt32(KnownMetadataKeys.PixelWidth));
+        Assert.Equal(600, command.Metadata.GetInt32(KnownMetadataKeys.PixelHeight));
         Assert.Equal(AssetType.Image, command.Type);
 
         A.CallTo(() => assetGenerator.FixAsync(stream, file.MimeType, A<Stream>._, A<CancellationToken>._))
@@ -82,8 +82,8 @@ public class ImageAssetMetadataSourceTests : GivenContext
 
         await sut.EnhanceAsync(command, CancellationToken);
 
-        Assert.Equal(800, command.Metadata.GetPixelWidth());
-        Assert.Equal(600, command.Metadata.GetPixelHeight());
+        Assert.Equal(800, command.Metadata.GetInt32(KnownMetadataKeys.PixelWidth));
+        Assert.Equal(600, command.Metadata.GetInt32(KnownMetadataKeys.PixelHeight));
         Assert.Equal(AssetType.Image, command.Type);
 
         A.CallTo(() => assetGenerator.FixAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
@@ -103,8 +103,8 @@ public class ImageAssetMetadataSourceTests : GivenContext
 
         await sut.EnhanceAsync(command, CancellationToken);
 
-        Assert.Equal(800, command.Metadata.GetPixelWidth());
-        Assert.Equal(600, command.Metadata.GetPixelHeight());
+        Assert.Equal(800, command.Metadata.GetInt32(KnownMetadataKeys.PixelWidth));
+        Assert.Equal(600, command.Metadata.GetInt32(KnownMetadataKeys.PixelHeight));
         Assert.Equal(AssetType.Image, command.Type);
 
         A.CallTo(() => assetGenerator.FixAsync(stream, file.MimeType, A<Stream>._, CancellationToken))
@@ -116,8 +116,8 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset { File = file, Type = AssetType.Image };
 
-        command.Metadata.SetPixelWidth(100);
-        command.Metadata.SetPixelWidth(100);
+        command.Metadata[KnownMetadataKeys.PixelWidth] = 100;
+        command.Metadata[KnownMetadataKeys.PixelHeight] = 50;
 
         await sut.EnhanceAsync(command, CancellationToken);
 
@@ -130,8 +130,8 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset { File = file, Type = AssetType.Image };
 
-        command.Metadata.SetPixelWidth(800);
-        command.Metadata.SetPixelWidth(600);
+        command.Metadata[KnownMetadataKeys.PixelWidth] = 800;
+        command.Metadata[KnownMetadataKeys.PixelHeight] = 600;
 
         await sut.EnhanceAsync(command, CancellationToken);
 
@@ -144,8 +144,8 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset { File = file, Type = AssetType.Image };
 
-        command.Metadata.SetPixelWidth(1200);
-        command.Metadata.SetPixelWidth(1400);
+        command.Metadata[KnownMetadataKeys.PixelWidth] = 1400;
+        command.Metadata[KnownMetadataKeys.PixelHeight] = 1200;
 
         await sut.EnhanceAsync(command, CancellationToken);
 
@@ -160,8 +160,8 @@ public class ImageAssetMetadataSourceTests : GivenContext
         {
             Metadata = new AssetMetadata
             {
-                ["pixelWidth"] = JsonValue.Create(128),
-                ["pixelHeight"] = JsonValue.Create(55)
+                [KnownMetadataKeys.PixelWidth] = 128,
+                [KnownMetadataKeys.PixelHeight] = 55
             },
             Type = AssetType.Image
         };

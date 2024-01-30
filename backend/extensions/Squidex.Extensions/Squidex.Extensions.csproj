@@ -11,7 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Algolia.Search" Version="6.16.0" />
-    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.1.0" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.2.0" />
     <PackageReference Include="Azure.Search.Documents" Version="11.5.1" />
     <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.3.0" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
@@ -19,7 +19,7 @@
     <PackageReference Include="Google.Cloud.Diagnostics.Common" Version="5.1.0" />
     <PackageReference Include="Google.Cloud.Logging.V2" Version="4.1.0" />
     <PackageReference Include="Google.Cloud.Monitoring.V3" Version="3.5.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.138">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.139">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

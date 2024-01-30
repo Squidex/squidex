@@ -13,7 +13,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
 {
     private readonly string workflowName = Guid.NewGuid().ToString();
