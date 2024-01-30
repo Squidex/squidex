@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Translations;
@@ -51,13 +52,20 @@ public sealed class SvgAssetMetadataSource : IAssetMetadataSource
 
                 if (!string.IsNullOrWhiteSpace(width) && !string.IsNullOrWhiteSpace(height))
                 {
-                    command.Metadata[KnownMetadataKeys.PixelWidth] = width;
-                    command.Metadata[KnownMetadataKeys.PixelHeight] = height;
+                    command.Metadata[KnownMetadataKeys.SvgWidth] = width;
+                    command.Metadata[KnownMetadataKeys.SvgHeight] = height;
+
+                    if (int.TryParse(width, NumberStyles.Integer, CultureInfo.InvariantCulture, out var w) &&
+                        int.TryParse(height, NumberStyles.Integer, CultureInfo.InvariantCulture, out var h))
+                    {
+                        command.Metadata[KnownMetadataKeys.PixelWidth] = w;
+                        command.Metadata[KnownMetadataKeys.PixelHeight] = h;
+                    }
                 }
 
                 if (!string.IsNullOrWhiteSpace(viewBox))
                 {
-                    command.Metadata[KnownMetadataKeys.ViewBox] = viewBox;
+                    command.Metadata[KnownMetadataKeys.SvgViewBox] = viewBox;
                 }
             }
         }
@@ -82,8 +90,8 @@ public sealed class SvgAssetMetadataSource : IAssetMetadataSource
             yield break;
         }
 
-        if (asset.Metadata.TryGetString(KnownMetadataKeys.PixelWidth, out var w) &&
-            asset.Metadata.TryGetString(KnownMetadataKeys.PixelHeight, out var h))
+        if (asset.Metadata.TryGetString(KnownMetadataKeys.SvgWidth, out var w) &&
+            asset.Metadata.TryGetString(KnownMetadataKeys.SvgHeight, out var h))
         {
             yield return $"{w}x{h}";
         }

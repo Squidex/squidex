@@ -23,7 +23,9 @@ public static class KnownMetadataKeys
     public const string Longitude = "longitude";
     public const string PixelHeight = "pixelHeight";
     public const string PixelWidth = "pixelWidth";
+    public const string SvgHeight = "svgHeight";
+    public const string SvgViewBox = "viewBox";
+    public const string SvgWidth = "svgWidth";
     public const string VideoHeight = "videoHeight";
     public const string VideoWidth = "videoWidth";
-    public const string ViewBox = "viewBox";
 }

@@ -51,7 +51,9 @@ public class SvgAssetMetadataSourceTests : GivenContext
 
         Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.PixelWidth));
         Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.PixelHeight));
-        Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.ViewBox));
+        Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.SvgWidth));
+        Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.SvgHeight));
+        Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.SvgViewBox));
     }
 
     [Fact]
@@ -61,10 +63,29 @@ public class SvgAssetMetadataSourceTests : GivenContext
 
         await sut.EnhanceAsync(command, default);
 
-        Assert.Equal("20", command.Metadata[KnownMetadataKeys.PixelWidth].AsString);
-        Assert.Equal("30", command.Metadata[KnownMetadataKeys.PixelHeight].AsString);
+        Assert.Equal(20, command.Metadata[KnownMetadataKeys.PixelWidth].AsNumber);
+        Assert.Equal(30, command.Metadata[KnownMetadataKeys.PixelHeight].AsNumber);
 
-        Assert.Equal("0 0 100 100", command.Metadata[KnownMetadataKeys.ViewBox].AsString);
+        Assert.Equal("20", command.Metadata[KnownMetadataKeys.SvgWidth].AsString);
+        Assert.Equal("30", command.Metadata[KnownMetadataKeys.SvgHeight].AsString);
+
+        Assert.Equal("0 0 100 100", command.Metadata[KnownMetadataKeys.SvgViewBox].AsString);
+    }
+
+    [Fact]
+    public async Task Should_extract_metadata_if_not_pixel_dimensions()
+    {
+        var command = Command("SvgNonPixelDimensions.svg");
+
+        await sut.EnhanceAsync(command, default);
+
+        Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.PixelWidth));
+        Assert.False(command.Metadata.ContainsKey(KnownMetadataKeys.PixelHeight));
+
+        Assert.Equal("2rem", command.Metadata[KnownMetadataKeys.SvgWidth].AsString);
+        Assert.Equal("3rem", command.Metadata[KnownMetadataKeys.SvgHeight].AsString);
+
+        Assert.Equal("0 0 100 100", command.Metadata[KnownMetadataKeys.SvgViewBox].AsString);
     }
 
     [Fact]
@@ -74,8 +95,8 @@ public class SvgAssetMetadataSourceTests : GivenContext
         {
             Metadata = new AssetMetadata
             {
-                [KnownMetadataKeys.PixelWidth] = "128",
-                [KnownMetadataKeys.PixelHeight] = "55"
+                [KnownMetadataKeys.SvgWidth] = "128",
+                [KnownMetadataKeys.SvgHeight] = "55"
             },
             MimeType = "image/svg+xml"
         };
