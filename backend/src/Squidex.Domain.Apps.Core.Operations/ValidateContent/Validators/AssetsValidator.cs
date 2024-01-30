@@ -63,9 +63,9 @@ public sealed class AssetsValidator : IValidator
             foreach (var assetId in assetIds)
             {
                 var assetPath = context.Path.Enqueue($"[{index}]");
-                var assetItem = assets.FirstOrDefault(x => x.Id == assetId);
+                var assetFound = assets.FirstOrDefault(x => x.Id == assetId);
 
-                if (assetItem == null)
+                if (assetFound == null)
                 {
                     if (context.Action == ValidationAction.Upsert)
                     {
@@ -75,29 +75,25 @@ public sealed class AssetsValidator : IValidator
                     continue;
                 }
 
-                foundIds.Add(assetItem.Id);
+                foundIds.Add(assetFound.Id);
 
-                ValidateCommon(assetItem, assetPath, context);
-                ValidateType(assetItem, assetPath, context);
+                ValidateCommon(assetFound, assetPath, context);
+                ValidateType(assetFound, assetPath, context);
 
-                if (assetItem.Type == AssetType.Image)
+                if (assetFound.Type == AssetType.Image)
                 {
-                    var w = assetItem.Metadata.GetPixelWidth();
-                    var h = assetItem.Metadata.GetPixelHeight();
-
-                    if (w != null && h != null)
+                    if (assetFound.Metadata.TryGetNumber(KnownMetadataKeys.PixelWidth, out var w) &&
+                        assetFound.Metadata.TryGetNumber(KnownMetadataKeys.PixelHeight, out var h))
                     {
-                        ValidateDimensions(w.Value, h.Value, assetPath, context);
+                        ValidateDimensions((int)w, (int)h, assetPath, context);
                     }
                 }
-                else if (assetItem.Type == AssetType.Video)
+                else if (assetFound.Type == AssetType.Video)
                 {
-                    var w = assetItem.Metadata.GetVideoWidth();
-                    var h = assetItem.Metadata.GetVideoHeight();
-
-                    if (w != null && h != null)
+                    if (assetFound.Metadata.TryGetNumber(KnownMetadataKeys.VideoWidth, out var w) &&
+                        assetFound.Metadata.TryGetNumber(KnownMetadataKeys.VideoHeight, out var h))
                     {
-                        ValidateDimensions(w.Value, h.Value, assetPath, context);
+                        ValidateDimensions((int)w, (int)h, assetPath, context);
                     }
                 }
 

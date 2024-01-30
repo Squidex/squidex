@@ -13,7 +13,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public class TeamTests : IClassFixture<CreatedTeamFixture>
 {
     public CreatedTeamFixture _ { get; }

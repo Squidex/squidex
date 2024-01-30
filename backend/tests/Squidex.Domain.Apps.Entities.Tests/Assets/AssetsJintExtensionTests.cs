@@ -354,8 +354,8 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
             FileSize = 100,
             Metadata = new AssetMetadata
             {
-                [AssetMetadata.PixelWidth] = 100,
-                [AssetMetadata.PixelHeight] = 50,
+                [KnownMetadataKeys.PixelWidth] = 100,
+                [KnownMetadataKeys.PixelHeight] = 50,
             },
             AppId = AppId
         };

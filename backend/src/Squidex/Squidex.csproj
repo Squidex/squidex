@@ -37,7 +37,7 @@
     <PackageReference Include="GraphQL" Version="7.7.2" />
     <PackageReference Include="GraphQL.MicrosoftDI" Version="7.7.2" />
     <PackageReference Include="GraphQL.SystemTextJson" Version="7.7.2" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.138">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.139">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -63,18 +63,18 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.7.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="5.2.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="6.3.6" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.3.6" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="6.3.6" />
-    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.3.6" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.3.6" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="6.3.6" />
-    <PackageReference Include="Squidex.Assets.S3" Version="6.3.6" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.3.6" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="19.0.0" />
-    <PackageReference Include="Squidex.Hosting" Version="6.3.6" />
-    <PackageReference Include="Squidex.Messaging.All" Version="6.3.6" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.3.6" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="6.3.7" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.3.7" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="6.3.7" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.3.7" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.3.7" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="6.3.7" />
+    <PackageReference Include="Squidex.Assets.S3" Version="6.3.7" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.3.7" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="19.1.0" />
+    <PackageReference Include="Squidex.Hosting" Version="6.3.7" />
+    <PackageReference Include="Squidex.Messaging.All" Version="6.3.7" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.3.7" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="5.1.0" />
     <PackageReference Include="Squidex.YDotNet" Version="0.2.9" />
     <PackageReference Include="Squidex.YDotNet.Native" Version="0.2.9" />

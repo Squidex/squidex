@@ -14,7 +14,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public class AnonymousTests : IClassFixture<ClientFixture>
 {
     private readonly string appName = Guid.NewGuid().ToString();

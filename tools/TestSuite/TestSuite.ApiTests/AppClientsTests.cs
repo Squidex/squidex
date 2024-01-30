@@ -13,7 +13,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public sealed class AppClientsTests : IClassFixture<ClientFixture>
 {
     private readonly string id = Guid.NewGuid().ToString();

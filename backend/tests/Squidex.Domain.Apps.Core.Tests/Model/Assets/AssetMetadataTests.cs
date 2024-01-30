@@ -16,12 +16,14 @@ public class AssetMetadataTests
     public void Should_return_focus_infos_if_found()
     {
         var sut =
-            new AssetMetadata()
-                .SetFocusX(.5f)
-                .SetFocusY(.2f);
+            new AssetMetadata
+            {
+                [KnownMetadataKeys.FocusX] = .5f,
+                [KnownMetadataKeys.FocusY] = .2f,
+            };
 
-        Assert.Equal(.5f, sut.GetFocusX());
-        Assert.Equal(.2f, sut.GetFocusY());
+        Assert.Equal(.5f, sut.GetSingle(KnownMetadataKeys.FocusX));
+        Assert.Equal(.2f, sut.GetSingle(KnownMetadataKeys.FocusY));
     }
 
     [Fact]
@@ -29,20 +31,22 @@ public class AssetMetadataTests
     {
         var sut = new AssetMetadata();
 
-        Assert.Null(sut.GetFocusX());
-        Assert.Null(sut.GetFocusY());
+        Assert.Null(sut.GetSingle(KnownMetadataKeys.FocusX));
+        Assert.Null(sut.GetSingle(KnownMetadataKeys.FocusY));
     }
 
     [Fact]
     public void Should_return_pixel_infos_if_found()
     {
         var sut =
-            new AssetMetadata()
-                .SetPixelWidth(800)
-                .SetPixelHeight(600);
+            new AssetMetadata
+            {
+                [KnownMetadataKeys.PixelWidth] = 800,
+                [KnownMetadataKeys.PixelHeight] = 600,
+            };
 
-        Assert.Equal(800, sut.GetPixelWidth());
-        Assert.Equal(600, sut.GetPixelHeight());
+        Assert.Equal(800, sut.GetInt32(KnownMetadataKeys.PixelWidth));
+        Assert.Equal(600, sut.GetInt32(KnownMetadataKeys.PixelHeight));
     }
 
     [Fact]
@@ -50,8 +54,8 @@ public class AssetMetadataTests
     {
         var sut = new AssetMetadata();
 
-        Assert.Null(sut.GetPixelWidth());
-        Assert.Null(sut.GetPixelHeight());
+        Assert.Null(sut.GetInt32(KnownMetadataKeys.PixelWidth));
+        Assert.Null(sut.GetInt32(KnownMetadataKeys.PixelHeight));
     }
 
     [Fact]

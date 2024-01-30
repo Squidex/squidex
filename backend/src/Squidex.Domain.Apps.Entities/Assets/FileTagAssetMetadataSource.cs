@@ -79,8 +79,8 @@ public sealed class FileTagAssetMetadataSource : IAssetMetadataSource
 
                 if (pw > 0 && ph > 0)
                 {
-                    command.Metadata.SetPixelWidth(pw);
-                    command.Metadata.SetPixelHeight(ph);
+                    command.Metadata[KnownMetadataKeys.PixelWidth] = pw;
+                    command.Metadata[KnownMetadataKeys.PixelHeight] = ph;
                 }
 
                 void TryAddString(string name, string? value)
@@ -117,24 +117,24 @@ public sealed class FileTagAssetMetadataSource : IAssetMetadataSource
 
                 if (file.Tag is ImageTag imageTag)
                 {
-                    TryAddDouble("latitude", imageTag.Latitude);
-                    TryAddDouble("longitude", imageTag.Longitude);
+                    TryAddDouble(KnownMetadataKeys.Latitude, imageTag.Latitude);
+                    TryAddDouble(KnownMetadataKeys.Longitude, imageTag.Longitude);
 
-                    TryAddString("created", imageTag.DateTime?.ToIso8601());
+                    TryAddString(KnownMetadataKeys.Created, imageTag.DateTime?.ToIso8601());
                 }
 
-                TryAddTimeSpan("duration", file.Properties.Duration);
+                TryAddTimeSpan(KnownMetadataKeys.Duration, file.Properties.Duration);
 
-                TryAddInt("bitsPerSample", file.Properties.BitsPerSample);
-                TryAddInt("audioBitrate", file.Properties.AudioBitrate);
-                TryAddInt("audioChannels", file.Properties.AudioChannels);
-                TryAddInt("audioSampleRate", file.Properties.AudioSampleRate);
-                TryAddInt("imageQuality", file.Properties.PhotoQuality);
+                TryAddInt(KnownMetadataKeys.BitsPerSample, file.Properties.BitsPerSample);
+                TryAddInt(KnownMetadataKeys.AudioBitrate, file.Properties.AudioBitrate);
+                TryAddInt(KnownMetadataKeys.AudioChannels, file.Properties.AudioChannels);
+                TryAddInt(KnownMetadataKeys.AudioSampleRate, file.Properties.AudioSampleRate);
+                TryAddInt(KnownMetadataKeys.ImageQuality, file.Properties.PhotoQuality);
 
-                TryAddInt(AssetMetadata.VideoWidth, file.Properties.VideoWidth);
-                TryAddInt(AssetMetadata.VideoHeight, file.Properties.VideoHeight);
+                TryAddInt(KnownMetadataKeys.VideoWidth, file.Properties.VideoWidth);
+                TryAddInt(KnownMetadataKeys.VideoHeight, file.Properties.VideoHeight);
 
-                TryAddString("description", file.Properties.Description);
+                TryAddString(KnownMetadataKeys.Description, file.Properties.Description);
             }
 
             return Task.CompletedTask;
@@ -149,22 +149,20 @@ public sealed class FileTagAssetMetadataSource : IAssetMetadataSource
     {
         if (asset.Type == AssetType.Video)
         {
-            var w = asset.Metadata.GetVideoWidth();
-            var h = asset.Metadata.GetVideoHeight();
-
-            if (w != null && h != null)
+            if (asset.Metadata.TryGetNumber(KnownMetadataKeys.VideoWidth, out var w) &&
+                asset.Metadata.TryGetNumber(KnownMetadataKeys.VideoHeight, out var h))
             {
                 yield return $"{w}x{h}pt";
             }
 
-            if (asset.Metadata.TryGetString("duration", out var duration))
+            if (asset.Metadata.TryGetString(KnownMetadataKeys.Duration, out var duration))
             {
                 yield return duration;
             }
         }
         else if (asset.Type == AssetType.Audio)
         {
-            if (asset.Metadata.TryGetString("duration", out var duration))
+            if (asset.Metadata.TryGetString(KnownMetadataKeys.Duration, out var duration))
             {
                 yield return duration;
             }

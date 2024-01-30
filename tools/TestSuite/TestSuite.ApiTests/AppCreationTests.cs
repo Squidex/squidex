@@ -13,7 +13,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public class AppCreationTests : IClassFixture<ClientFixture>
 {
     private readonly string appName = Guid.NewGuid().ToString();

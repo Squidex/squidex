@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -58,8 +59,8 @@ public sealed class AssetChangedTriggerHandler : IRuleTriggerHandler, ISubscript
             SimpleMapper.Map(asset, result);
 
             result.Actor = asset.LastModifiedBy;
-            result.PixelHeight = asset.Metadata?.GetPixelHeight();
-            result.PixelWidth = asset.Metadata?.GetPixelWidth();
+            result.PixelHeight = asset.Metadata?.GetInt32(KnownMetadataKeys.PixelHeight);
+            result.PixelWidth = asset.Metadata?.GetInt32(KnownMetadataKeys.PixelWidth);
             result.Name = "AssetQueried";
 
             yield return result;
@@ -95,8 +96,8 @@ public sealed class AssetChangedTriggerHandler : IRuleTriggerHandler, ISubscript
         {
             SimpleMapper.Map(asset, result);
 
-            result.PixelHeight = asset.Metadata?.GetPixelHeight();
-            result.PixelWidth = asset.Metadata?.GetPixelWidth();
+            result.PixelHeight = asset.Metadata?.GetInt32(KnownMetadataKeys.PixelHeight);
+            result.PixelWidth = asset.Metadata?.GetInt32(KnownMetadataKeys.PixelWidth);
             result.AssetType = asset.Type;
         }
 

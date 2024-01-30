@@ -131,8 +131,8 @@ public class AssetTests
     [Fact]
     public void Should_annotate_with_metadata()
     {
-        var newMetadata1 = new AssetMetadata().SetPixelWidth(1024);
-        var newMetadata2 = new AssetMetadata().SetPixelWidth(1024);
+        var newMetadata1 = new AssetMetadata { [KnownMetadataKeys.PixelWidth] = 1024 };
+        var newMetadata2 = new AssetMetadata { [KnownMetadataKeys.PixelWidth] = 1024 };
 
         var asset_1 = asset_0.Annotate(metadata: newMetadata1);
         var asset_2 = asset_1.Annotate(metadata: newMetadata2);

@@ -195,7 +195,7 @@ internal sealed class EnrichedAssetEventGraphType : SharedObjectGraphType<Enrich
         {
             Name = "pixelWidth",
             ResolvedType = Scalars.Int,
-            Resolver = Resolve(x => x.Metadata.GetPixelWidth()),
+            Resolver = Resolve(x => x.Metadata.GetInt32(KnownMetadataKeys.PixelWidth)),
             Description = FieldDescriptions.AssetPixelWidth,
             DeprecationReason = "Use 'metadata' field instead."
         });
@@ -204,7 +204,7 @@ internal sealed class EnrichedAssetEventGraphType : SharedObjectGraphType<Enrich
         {
             Name = "pixelHeight",
             ResolvedType = Scalars.Int,
-            Resolver = Resolve(x => x.Metadata.GetPixelHeight()),
+            Resolver = Resolve(x => x.Metadata.GetInt32(KnownMetadataKeys.PixelHeight)),
             Description = FieldDescriptions.AssetPixelHeight,
             DeprecationReason = "Use 'metadata' field instead."
         });

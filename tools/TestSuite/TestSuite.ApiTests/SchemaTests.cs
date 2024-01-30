@@ -14,7 +14,6 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public class SchemaTests : IClassFixture<CreatedAppFixture>
 {
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";

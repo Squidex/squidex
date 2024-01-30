@@ -76,10 +76,11 @@ public static class TestAsset
             MimeType = "image/png",
             Type = AssetType.Image,
             MetadataText = "metadata-text",
-            Metadata =
-                new AssetMetadata()
-                    .SetPixelWidth(800)
-                    .SetPixelHeight(600),
+            Metadata =new AssetMetadata
+            {
+                [KnownMetadataKeys.PixelWidth] = 800,
+                [KnownMetadataKeys.PixelHeight] = 600,
+            },
             TagNames = new[]
             {
                 "tag1",
@@ -123,8 +124,8 @@ public static class TestAsset
             fileVersion = asset.FileVersion,
             isImage = true,
             isProtected = asset.IsProtected,
-            pixelWidth = asset.Metadata.GetPixelWidth(),
-            pixelHeight = asset.Metadata.GetPixelHeight(),
+            pixelWidth = asset.Metadata.GetInt32(KnownMetadataKeys.PixelWidth),
+            pixelHeight = asset.Metadata.GetInt32(KnownMetadataKeys.PixelHeight),
             parentId = asset.Id,
             tags = asset.TagNames,
             type = "IMAGE",
@@ -133,8 +134,8 @@ public static class TestAsset
             metadataUnknown = (string?)null,
             metadata = new
             {
-                pixelWidth = asset.Metadata.GetPixelWidth(),
-                pixelHeight = asset.Metadata.GetPixelHeight()
+                pixelWidth = asset.Metadata.GetInt32(KnownMetadataKeys.PixelWidth),
+                pixelHeight = asset.Metadata.GetInt32(KnownMetadataKeys.PixelHeight)
             },
             slug = asset.Slug
         };

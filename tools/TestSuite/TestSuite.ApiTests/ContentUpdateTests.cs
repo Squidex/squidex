@@ -16,7 +16,6 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-[UsesVerify]
 public class ContentUpdateTests : IClassFixture<ContentFixture>
 {
     public ContentFixture _ { get; }

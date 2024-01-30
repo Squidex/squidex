@@ -208,7 +208,7 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
     [Fact]
     public async Task AnnotateMetadata_should_create_events_and_update_metadata()
     {
-        var command = new AnnotateAsset { Metadata = new AssetMetadata().SetPixelWidth(800) };
+        var command = new AnnotateAsset { Metadata = new AssetMetadata { [KnownMetadataKeys.PixelWidth] = 800 } };
 
         await ExecuteCreateAsync();
 
