@@ -41,7 +41,7 @@ public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
 
             cm.MapProperty(x => x.FileHash)
                 .SetElementName("fh")
-                .SetIsRequired(true);
+                .SetIsRequired(false);
 
             cm.MapProperty(x => x.FileSize)
                 .SetElementName("fs")
