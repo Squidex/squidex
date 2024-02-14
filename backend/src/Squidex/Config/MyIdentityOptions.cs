@@ -45,6 +45,8 @@ public sealed class MyIdentityOptions
 
     public string OidcSecret { get; set; }
 
+    public string OidcPrompt { get; set; }
+
     public string OidcAuthority { get; set; }
 
     public string OidcMetadataAddress { get; set; }

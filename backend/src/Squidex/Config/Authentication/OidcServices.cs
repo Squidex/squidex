@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Squidex.Infrastructure;
 
 namespace Squidex.Config.Authentication;
 
@@ -20,11 +21,12 @@ public static class OidcServices
 
             authBuilder.AddOpenIdConnect("ExternalOidc", displayName, options =>
             {
+                options.Events = new OidcHandler(identityOptions);
                 options.Authority = identityOptions.OidcAuthority;
+                options.Prompt = identityOptions.OidcPrompt;
                 options.ClientId = identityOptions.OidcClient;
                 options.ClientSecret = identityOptions.OidcSecret;
                 options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                options.Events = new OidcHandler(identityOptions);
 
                 if (!string.IsNullOrEmpty(identityOptions.OidcMetadataAddress))
                 {
@@ -40,10 +42,7 @@ public static class OidcServices
 
                 if (identityOptions.OidcScopes != null)
                 {
-                    foreach (var scope in identityOptions.OidcScopes)
-                    {
-                        options.Scope.Add(scope);
-                    }
+                    options.Scope.AddRange(identityOptions.OidcScopes);
                 }
             });
         }
