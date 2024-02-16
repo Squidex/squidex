@@ -274,7 +274,7 @@ export class SchemasState extends State<Snapshot> {
     public update(schema: SchemaDto, request: UpdateSchemaDto): Observable<SchemaDto> {
         return this.schemasService.putSchema(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
+                this.replaceSchema(updated, schema.version);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -290,7 +290,7 @@ export class SchemasState extends State<Snapshot> {
     public configureUIFields(schema: SchemaDto, request: UpdateUIFields): Observable<SchemaDto> {
         return this.schemasService.putUIFields(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
+                this.replaceSchema(updated, schema.version);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -298,7 +298,7 @@ export class SchemasState extends State<Snapshot> {
     public orderFields(schema: SchemaDto, fields: ReadonlyArray<FieldDto>, parent?: RootFieldDto): Observable<SchemaDto> {
         return this.schemasService.putFieldOrdering(this.appName, parent || schema, fields.map(t => t.fieldId), schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
+                this.replaceSchema(updated, schema.version);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -346,7 +346,7 @@ export class SchemasState extends State<Snapshot> {
     public updateField<T extends FieldDto>(schema: SchemaDto, field: T, request: UpdateFieldDto): Observable<SchemaDto> {
         return this.schemasService.putField(this.appName, field, request, schema.version).pipe(
             tap(updated => {
-                this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
+                this.replaceSchema(updated, schema.version);
             }),
             shareSubscribed(this.dialogs));
     }

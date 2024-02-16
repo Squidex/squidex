@@ -67,7 +67,7 @@ public class SetupController : IdentityServerController
 
         if (!ModelState.IsValid)
         {
-            return View(nameof(Profile), await GetVM(model));
+            return View(nameof(Setup), await GetVM(model));
         }
 
         string errorMessage;

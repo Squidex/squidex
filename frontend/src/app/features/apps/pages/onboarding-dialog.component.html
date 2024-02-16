@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container content>
-        <a class="header-right modal-close force" (click)="dialogClose.emit()">{{ 'tour.skip' | sqxTranslate }}</a>
+        <a class="header-right modal-close force" (click)="cancel()">{{ 'tour.skip' | sqxTranslate }}</a>
 
         <div class="onboarding-step " *ngIf="step === 0">
             <img @fade class="header-left" src="./images/logo-white-small.png">

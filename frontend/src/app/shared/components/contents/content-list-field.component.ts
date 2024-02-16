@@ -88,7 +88,7 @@ export class ContentListFieldComponent extends StatefulComponent<State> {
             const { value, formatted } = getContentValue(this.content, this.language, this.field.rootField);
 
             if (this.patchForm) {
-                const formControl = this.patchForm.controls[this.field.name];
+                const formControl = this.patchForm.controls[this.field.rootField.name];
 
                 if (formControl) {
                     formControl.setValue(value);
