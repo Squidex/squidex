@@ -9,7 +9,7 @@ namespace Squidex.Translator.State.Old;
 
 public class OldTranslatedText
 {
-    public SortedDictionary<string, string> Texts { get; set; } = new SortedDictionary<string, string>();
+    public SortedDictionary<string, string> Texts { get; set; } = [];
 
-    public SortedSet<TextOrigin> Origins { get; set; } = new SortedSet<TextOrigin>();
+    public SortedSet<TextOrigin> Origins { get; set; } = [];
 }

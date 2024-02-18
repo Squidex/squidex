@@ -218,9 +218,9 @@ public static class SimpleMapper
     {
         private static readonly MethodInfo CreateMethod =
             typeof(TypeConverterPropertyMapper)
-                    .GetMethod(nameof(CreateCore),
-                        BindingFlags.Static |
-                        BindingFlags.NonPublic)!;
+                .GetMethod(nameof(CreateCore),
+                    BindingFlags.Static |
+                    BindingFlags.NonPublic)!;
 
         public static IPropertyMapper<TSource, TTarget> Create<TSource, TTarget>(Type sourceType, PropertyInfo sourceProperty, Type targetType, PropertyInfo targetProperty, TypeConverter typeConverter)
         {

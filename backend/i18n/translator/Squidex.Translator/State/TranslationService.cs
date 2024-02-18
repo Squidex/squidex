@@ -10,7 +10,6 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Squidex.Translator.State.Old;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Squidex.Translator.State;
 
@@ -25,7 +24,7 @@ public sealed class TranslationService
         WriteIndented = true
     };
 
-    private readonly Dictionary<string, TranslatedTexts> translations = new Dictionary<string, TranslatedTexts>();
+    private readonly Dictionary<string, TranslatedTexts> translations = [];
     private readonly TranslationTodos translationsTodo;
     private readonly TranslationsToIgnore translationToIgnore;
     private readonly DirectoryInfo sourceDirectory;
@@ -320,7 +319,7 @@ public sealed class TranslationService
     {
         if (!translationToIgnore.TryGetValue(name, out var ignores))
         {
-            ignores = new SortedSet<string>();
+            ignores = [];
 
             translationToIgnore[name] = ignores;
         }
@@ -332,7 +331,7 @@ public sealed class TranslationService
     {
         if (!translationsTodo.TryGetValue(name, out var todos))
         {
-            todos = new SortedSet<string>();
+            todos = [];
 
             translationsTodo[name] = todos;
         }

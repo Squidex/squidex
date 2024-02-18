@@ -157,11 +157,11 @@ public sealed class JobProcessor
             {
                 await ProcessAsync(context, runner, context.CancellationToken);
 
-                await NotifyAsync(request, context, "jobs.notifySuccess");
+                await NotifyAsync(request, T.Get("jobs.notifySuccess", new { job = context.Job.Description }));
             }
             catch
             {
-                await NotifyAsync(request, context, "jobs.notifyFailed");
+                await NotifyAsync(request, T.Get("jobs.notifyFailed", new { job = context.Job.Description }));
                 throw;
             }
             finally
@@ -173,14 +173,14 @@ public sealed class JobProcessor
         }, ct);
     }
 
-    private async Task NotifyAsync(JobRequest request, JobRunContext context, string text)
+    private async Task NotifyAsync(JobRequest request, string text)
     {
         if (request.AppId == null || request.Actor.IsClient)
         {
             return;
         }
 
-        var notificationText = T.Get(text, new { job = context.Job.Description });
+        var notificationText = text;
         var notificationUrl = new Uri(urlGenerator.JobsUI(request.AppId));
 
         await collaboration.NotifyAsync(request.Actor.Identifier, notificationText, request.Actor, notificationUrl, false, default);

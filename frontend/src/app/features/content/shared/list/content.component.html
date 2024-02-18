@@ -27,6 +27,10 @@
         </button>
 
         <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true" position="bottom-start">
+            <a class="dropdown-item" [routerLink]="link" target="_blank" sqxExternalLink>
+                {{ 'common.editInNewTab' | sqxTranslate }}
+            </a>
+
             <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
                 {{ 'common.statusChangeTo' | sqxTranslate }} 
 

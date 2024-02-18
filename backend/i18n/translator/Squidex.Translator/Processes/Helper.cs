@@ -25,7 +25,7 @@ public static class Helper
 
     public static string RelativeName(FileInfo file, DirectoryInfo folder)
     {
-        return file.FullName[folder.FullName.Length..].Replace("\\", "/", StringComparison.Ordinal);
+        return file.FullName[folder.FullName.Length..].Replace('\\', '/');
     }
 
     public static void CheckOtherLocales(TranslationService service)
@@ -157,14 +157,14 @@ public static class Helper
 
                 if (HasInvalidPrefixes(prefixes))
                 {
-                    Console.WriteLine(" > Multiple prefixes found: {0}", string.Join(",", prefixes));
+                    Console.WriteLine(" * Multiple prefixes found: {0}", string.Join(',', prefixes));
                 }
 
                 if (translations.Count > 0)
                 {
                     foreach (var key in translations)
                     {
-                        Console.Write(" * ");
+                        Console.Write(" * Missing: ");
                         Console.WriteLine(key);
                     }
                 }

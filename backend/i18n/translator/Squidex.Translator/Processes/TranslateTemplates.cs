@@ -13,13 +13,13 @@ namespace Squidex.Translator.Processes;
 
 public partial class TranslateTemplates
 {
-    private static readonly HashSet<string> TagsToIgnore = new HashSet<string>
-    {
+    private static readonly HashSet<string> TagsToIgnore =
+    [
         "code",
         "script",
         "sqx-code",
         "style"
-    };
+    ];
 
     private static readonly HashSet<string> AttributesToTranslate = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {

@@ -91,7 +91,7 @@ public class CheckFrontend
         {
             var matches = Regex.Matches(content, regex, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
-            foreach (Match match in matches)
+            foreach (Match match in matches.OfType<Match>())
             {
                 translations.Add(match.Groups["Key"].Value);
             }
@@ -115,7 +115,7 @@ public class CheckFrontend
         {
             var matches = Regex.Matches(content, regex, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
 
-            foreach (Match match in matches)
+            foreach (Match match in matches.OfType<Match>())
             {
                 translations.Add(match.Groups["Key"].Value);
             }

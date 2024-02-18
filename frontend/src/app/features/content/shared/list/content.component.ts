@@ -11,7 +11,8 @@
 import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { RouterLink } from '@angular/router';
+import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -26,11 +27,13 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
         ContentListFieldComponent,
         ContentStatusComponent,
         DropdownMenuComponent,
+        ExternalLinkDirective,
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
         NgFor,
         NgIf,
+        RouterLink,
         StopClickDirective,
         TabRouterlinkDirective,
         TranslatePipe,

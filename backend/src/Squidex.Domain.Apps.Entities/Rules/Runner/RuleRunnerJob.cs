@@ -121,19 +121,25 @@ public sealed class RuleRunnerJob : IJobRunner
     {
         if (!string.IsNullOrWhiteSpace(rule.Name))
         {
-            var key = fromSnapshot ?
-                "jobs.ruleRunNamedSnapshot" :
-                "jobs.ruleRunName";
-
-            run.Job.Description = T.Get(key, new { name = rule.Name });
+            if (fromSnapshot)
+            {
+                run.Job.Description = T.Get("jobs.ruleRunNamedSnapshot", new { name = rule.Name });
+            }
+            else
+            {
+                run.Job.Description = T.Get("jobs.ruleRunNamed", new { name = rule.Name });
+            }
         }
         else
         {
-            var key = fromSnapshot ?
-                "jobs.ruleRunSnapshot" :
-                "jobs.ruleRun";
-
-            run.Job.Description = T.Get(key);
+            if (fromSnapshot)
+            {
+                run.Job.Description = T.Get("jobs.ruleRunSnapshot");
+            }
+            else
+            {
+                run.Job.Description = T.Get("jobs.ruleRun");
+            }
         }
     }
 

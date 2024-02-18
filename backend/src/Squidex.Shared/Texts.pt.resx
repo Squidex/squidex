@@ -226,6 +226,9 @@
   <data name="common.documentation" xml:space="preserve">
     <value>Documentação</value>
   </data>
+  <data name="common.editInNewTab" xml:space="preserve">
+    <value>Open in new tab</value>
+  </data>
   <data name="common.editor" xml:space="preserve">
     <value>Editor</value>
   </data>
