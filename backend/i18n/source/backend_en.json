@@ -47,7 +47,6 @@
   "common.defaultValue": "Default value",
   "common.displayName": "Display name",
   "common.documentation": "Documentation",
-  "common.editInNewTab": "Open in new tab",
   "common.editor": "Editor",
   "common.email": "Email",
   "common.errorNoPermission": "You do not have the necessary permission.",

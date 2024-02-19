@@ -1,5 +1,5 @@
 <div class="d-flex root" (sqxResized)="setSize($event)" [class.mini]="size === 'Mini'" [class.compact]="size === 'Compact'">
-    <div class="form-group flex-grow me-1">
+    <div class="form-group flex-grow me-1 mb-0">
         <div *ngIf="isDateTimeMode && shouldShowDateTimeModeButton">
             <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(false)" *ngIf="snapshot.isLocal">
                 {{ 'common.dateTimeEditor.local' | sqxTranslate }}

@@ -88,7 +88,7 @@
 
         <div class="panel2-slice menu" *ngIf="!hideSidebar">
             <div class="panel2-header menu">
-                <a class="btn panel2-collapse" [routerLink]="['./']" [queryParamsHandling]="closeQueryParamsHandling" [relativeTo]="route" *ngIf="firstChild | async">
+                <a class="btn panel2-collapse" [routerLink]="['./']" [queryParamsHandling]="closeQueryParamsHandling" [relativeTo]="route" replaceUrl="true" *ngIf="firstChild | async">
                     <i class="icon-angle-right"></i>
                 </a>
             </div>
