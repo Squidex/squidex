@@ -13,12 +13,10 @@
 
     <ng-container>
         <sqx-list-view innerWidth="54rem" [isLoading]="rulesState.isLoading | async">
-            <div class="alert alert-danger mb-4" *ngIf="rulesState.runningRule | async; let runningRule">
-                <div class="float-end">
-                    <a (click)="cancelRun()">{{ 'common.cancel' | sqxTranslate }}</a>
-                </div>
-
+            <div class="alert alert-danger d-flex justify-content-between mb-4" *ngIf="rulesState.runningRule | async; let runningRule">
                 {{ 'rules.runningRule' | sqxTranslate: { name: runningRule.name || 'Unnamed Rule' } }}
+
+                <a class="btn" (click)="cancelRun()">{{ 'common.cancel' | sqxTranslate }}</a>
             </div>
 
             <ng-container *ngIf="supportedActions && supportedTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">

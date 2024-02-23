@@ -1,4 +1,4 @@
-<sqx-layout titleText="i18n:common.filters" width="20" white="true" padding="true" overflow="true">
+<sqx-layout layout="right" titleText="i18n:common.filters" width="20" white="true" padding="true" overflow="true">
     <ng-container *ngIf="schemaQueries | async; let queries">
         <sqx-query-list
             [types]="'common.contents' | sqxTranslate"

@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-internal sealed class RuleQueueWriter : IAsyncDisposable
+public sealed class RuleQueueWriter : IAsyncDisposable
 {
     private readonly List<RuleEventWrite> writes = [];
     private readonly IRuleEventRepository ruleEventRepository;
@@ -38,9 +38,13 @@ internal sealed class RuleQueueWriter : IAsyncDisposable
         {
             writes.Add(new RuleEventWrite(result.Job, Error: result.EnrichmentError));
         }
-        else
+        else if (result.SkipReason is SkipReason.None or SkipReason.Disabled)
         {
             writes.Add(new RuleEventWrite(result.Job, result.Job.Created));
+        }
+        else
+        {
+            return false;
         }
 
         if (result.Rule != null)
