@@ -30,7 +30,7 @@ public class ReferenceFormattingTests
                 .AddString(2, "ref2", Partitioning.Invariant,
                     new StringFieldProperties())
                 .AddString(3, "non-ref", Partitioning.Invariant)
-                .SetFieldsInReferences(FieldNames.Create("ref1", "ref2"));
+                .SetFieldsInReferences(FieldNames.Create("data.ref1", "data.ref2"));
 
         var formatted = data.FormatReferences(schema, languages);
 

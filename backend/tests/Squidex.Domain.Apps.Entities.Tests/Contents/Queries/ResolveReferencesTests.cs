@@ -34,7 +34,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                     new StringFieldProperties())
                 .AddNumber(2, "number", Partitioning.Invariant,
                     new NumberFieldProperties())
-                .SetFieldsInReferences(FieldNames.Create("name", "number"));
+                .SetFieldsInReferences(FieldNames.Create("data.name", "data.number"));
 
         var refSchema2 =
             Schema.WithId(referenceSchemaId2)
@@ -42,7 +42,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                     new StringFieldProperties())
                 .AddNumber(2, "number", Partitioning.Invariant,
                     new NumberFieldProperties())
-                .SetFieldsInReferences(FieldNames.Create("name", "number"));
+                .SetFieldsInReferences(FieldNames.Create("data.name", "data.number"));
 
         Schema = Schema
             .AddReferences(1, "ref1", Partitioning.Invariant, new ReferencesFieldProperties
