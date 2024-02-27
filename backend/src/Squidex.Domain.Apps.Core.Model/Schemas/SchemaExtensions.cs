@@ -62,18 +62,18 @@ public static class SchemaExtensions
         return schema.RootFields(schema.FieldsInReferences);
     }
 
-    public static IEnumerable<RootField> ListFields(this Schema schema)
-    {
-        return schema.RootFields(schema.FieldsInLists);
-    }
-
     public static IEnumerable<RootField> RootFields(this Schema schema, FieldNames names)
     {
         var hasField = false;
 
         foreach (var name in names)
         {
-            if (schema.FieldsByName.TryGetValue(name, out var field))
+            if (!FieldNames.IsDataField(name, out var dataField))
+            {
+                continue;
+            }
+
+            if (schema.FieldsByName.TryGetValue(dataField, out var field))
             {
                 hasField = true;
 

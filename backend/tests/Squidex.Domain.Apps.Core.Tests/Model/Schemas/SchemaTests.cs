@@ -481,6 +481,36 @@ public class SchemaTests
     }
 
     [Fact]
+    public void Should_get_reference_fields()
+    {
+        var field1 = CreateField(1);
+        var field2 = CreateField(2);
+
+        var schema_1 = schema_0.AddField(field1);
+        var schema_2 = schema_1.AddField(field2);
+        var schema_3 = schema_2.SetFieldsInReferences(FieldNames.Create($"data.{field1.Name}", $"data.{field2.Name}"));
+
+        var referenceFields = schema_3.ReferenceFields();
+
+        Assert.Equal(new RootField[] { field1, field2 }, referenceFields.ToArray());
+    }
+
+    [Fact]
+    public void Should_get_reference_fields_with_fallback()
+    {
+        var field1 = CreateField(1);
+        var field2 = CreateField(2);
+
+        var schema_1 = schema_0.AddField(field1);
+        var schema_2 = schema_1.AddField(field2);
+        var schema_3 = schema_2.SetFieldsInReferences(FieldNames.Create("data.invalid"));
+
+        var referenceFields = schema_3.ReferenceFields();
+
+        Assert.Equal(new RootField[] { field1 }, referenceFields.ToArray());
+    }
+
+    [Fact]
     public void Should_deserialize_state()
     {
         var json = File.ReadAllText("Model/Schemas/Schema.json");
