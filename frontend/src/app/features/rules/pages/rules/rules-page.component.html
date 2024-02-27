@@ -13,7 +13,7 @@
 
     <ng-container>
         <sqx-list-view innerWidth="54rem" [isLoading]="rulesState.isLoading | async">
-            <div class="alert alert-danger d-flex justify-content-between mb-4" *ngIf="rulesState.runningRule | async; let runningRule">
+            <div class="alert alert-danger d-flex justify-content-between align-items-center p-2 ps-4 mb-4" *ngIf="rulesState.runningRule | async; let runningRule">
                 {{ 'rules.runningRule' | sqxTranslate: { name: runningRule.name || 'Unnamed Rule' } }}
 
                 <a class="btn" (click)="cancelRun()">{{ 'common.cancel' | sqxTranslate }}</a>

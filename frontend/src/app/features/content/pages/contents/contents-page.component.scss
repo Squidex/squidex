@@ -67,7 +67,7 @@
     }
 
     &-button {
-        @include absolute(null, 1rem, -2.375rem);
+        @include absolute(null, 1.5rem, -2.375rem);
         background-color: $color-background;
         border: 0;
         border-radius: 4px;

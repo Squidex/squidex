@@ -1,6 +1,10 @@
 @import 'mixins';
 @import 'vars';
 
+.nav-item {
+    height: 3rem;
+}
+
 .icon-upload-3 {
     font-size: 1.4rem;
     font-weight: lighter;
@@ -9,17 +13,14 @@
 }
 
 .dropdown-menu {
-    @include absolute(2.6rem, 0, auto, auto);
-    display: block;
-    max-width: 60%;
-    min-height: 4rem;
-    min-width: 30rem;
+    @include force-width(30rem);
     padding: 1rem;
 }
 
 .uploads {
     background: none;
     border: 2px solid transparent;
+    border-radius: 0;
     min-height: 2rem;
 
     &-empty {

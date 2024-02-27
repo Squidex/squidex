@@ -1,4 +1,4 @@
-<li class="nav-item nav-icon dropdown position-relative" #button>
+<li class="nav-item nav-icon dropdown d-flex align-items-center position-relative" #button>
     <span class="nav-link dropdown-toggle" (click)="modalMenu.show()">
         <i class="icon-comments"></i>
 
@@ -6,7 +6,7 @@
     </span>
 </li>
 
-<sqx-dropdown-menu *sqxModal="modalMenu;onRoot:false" [sqxAnchoredTo]="button" [scrollTop]="scrollMe.nativeElement.scrollHeight" offset="10" #scrollMe>
+<sqx-dropdown-menu *sqxModal="modalMenu;onRoot:false" [sqxAnchoredTo]="button" scrollY="true" offset="8" [scrollTop]="scrollMe.nativeElement.scrollHeight" #scrollMe>
     <ng-container *ngIf="commentItems | async; let items">
         <small class="text-muted" *ngIf="items.length === 0">
             {{ 'notifications.empty' | sqxTranslate}}

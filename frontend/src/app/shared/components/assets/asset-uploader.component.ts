@@ -7,7 +7,7 @@
 
 import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DropdownMenuComponent, FileDropDirective, ModalDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
+import { DropdownMenuComponent, FileDropDirective, ModalDirective, ModalPlacementDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
 
 @Component({
@@ -21,6 +21,7 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
         DropdownMenuComponent,
         FileDropDirective,
         ModalDirective,
+        ModalPlacementDirective,
         NgFor,
         NgIf,
         NgSwitch,

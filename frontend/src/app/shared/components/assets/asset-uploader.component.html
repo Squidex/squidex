@@ -1,14 +1,14 @@
 <ng-container *ngIf="appsState.selectedApp | async; let app">
     <ng-container *ngIf="app.canUploadAssets">
         <ul class="nav navbar-nav align-items-center" *ngIf="assetUploader.uploads | async; let uploads" (sqxDropFile)="addFiles($event)">
-            <li class="nav-item nav-icon dropdown">
+            <li class="nav-item nav-icon dropdown d-flex align-items-center" #button>
                 <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
                     <i class="icon-upload-3"></i>
 
                     <span>{{uploads.length}}</span>
                 </span>
 
-                <sqx-dropdown-menu *sqxModal="modalMenu;onRoot:false" (sqxDropFile)="addFiles($event)" class="container">
+                <sqx-dropdown-menu *sqxModal="modalMenu;onRoot:false" [sqxAnchoredTo]="button" scrollY="true" offset="8" (sqxDropFile)="addFiles($event)" class="container">
                     <div class="uploads">
                         <small class="uploads-empty text-muted" *ngIf="uploads.length === 0">
                             {{ 'assets.uploaderUploadHere' | sqxTranslate }}

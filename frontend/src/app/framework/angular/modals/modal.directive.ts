@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/no-input-rename */
 
-import { booleanAttribute, ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
+import { booleanAttribute, ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, RendererFactory2, TemplateRef, ViewContainerRef } from '@angular/core';
 import { DialogModel, ModalModel, Subscriptions, Types } from '@app/framework/internal';
 import { RootViewComponent } from './root-view.component';
 
@@ -53,6 +53,7 @@ export class ModalDirective<T = unknown> implements OnDestroy {
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,
+        private readonly rendererFactory: RendererFactory2,
         private readonly rootView: RootViewComponent,
         private readonly templateRef: TemplateRef<ModalContext<T>>,
         private readonly viewContainer: ViewContainerRef,
@@ -86,13 +87,16 @@ export class ModalDirective<T = unknown> implements OnDestroy {
                 this.changeDetector.detectChanges();
             }
         } else if (this.renderedView) {
-            this.renderedView.destroy();
-            this.renderedView = null;
-            this.renderRoots = null;
+            this.rendererFactory.begin?.();
+            try {
+                this.renderedView.destroy();
+                this.renderedView = null;
+                this.renderRoots = null;
+            } finally {
+                this.rendererFactory.end?.();
+            }
 
             remove(this.renderer, ModalDirective.backdrop);
-
-            this.changeDetector.detectChanges();
         }
 
         this.isOpen = isOpen;

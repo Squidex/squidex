@@ -17,10 +17,6 @@ body {
     }
 }
 
-* {
-    @include scrollbars(8px, darken($color-border, 15%), transparent);
-}
-
 hr {
     border-color: $color-border;
 }
