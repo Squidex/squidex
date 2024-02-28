@@ -10,7 +10,7 @@
     </div>
     
     <div class="list-content normal" [class.loading-indicator]="isLoading" #contentElement sqxCompensateScrollbar>
-        <div class="inner normal" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth" [class.tabled]="table">
+        <div class="inner normal" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth" [class.tabled]="table" [class.tabled2]="noPadding">
             <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
         </div>
     </div>

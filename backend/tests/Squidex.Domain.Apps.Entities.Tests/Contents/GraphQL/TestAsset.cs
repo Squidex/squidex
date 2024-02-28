@@ -76,16 +76,16 @@ public static class TestAsset
             MimeType = "image/png",
             Type = AssetType.Image,
             MetadataText = "metadata-text",
-            Metadata =new AssetMetadata
+            Metadata = new AssetMetadata
             {
                 [KnownMetadataKeys.PixelWidth] = 800,
                 [KnownMetadataKeys.PixelHeight] = 600,
             },
-            TagNames = new[]
-            {
+            TagNames =
+            [
                 "tag1",
-                "tag2"
-            }.ToHashSet()
+                "tag2",
+            ]
         };
 
         return asset;

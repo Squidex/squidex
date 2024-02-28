@@ -59,6 +59,9 @@ export class ListViewComponent extends StatefulComponent<State> implements After
     public tableNoPadding?: boolean | null;
 
     @Input({ transform: booleanAttribute })
+    public noPadding?: boolean | null;
+
+    @Input({ transform: booleanAttribute })
     public isLoaded: boolean | undefined | null = true;
 
     @Input({ transform: booleanAttribute })

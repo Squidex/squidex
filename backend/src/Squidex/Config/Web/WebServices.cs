@@ -76,6 +76,7 @@ public static class WebServices
         services.AddLocalization();
 
         services.AddYDotNet()
+            .AutoCleanup()
             .AddWebSockets();
 
         services.AddMvc(options =>
