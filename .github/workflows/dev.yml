@@ -25,7 +25,7 @@ jobs:
         uses: docker/setup-qemu-action@v3.0.0
 
       - name: Prepare - Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3.0.0
+        uses: docker/setup-buildx-action@v3.1.0
 
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.0.2
@@ -46,7 +46,7 @@ jobs:
         working-directory: tools/TestSuite
 
       - name: Test - RUN
-        uses: kohlerdominik/docker-run-action@v1.1.0
+        uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: squidex/build:8
           environment: |
@@ -60,7 +60,7 @@ jobs:
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - RUN on path
-        uses: kohlerdominik/docker-run-action@v1.1.0
+        uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: squidex/build:8
           environment: |
@@ -74,7 +74,7 @@ jobs:
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - RUN with dedicated collections
-        uses: kohlerdominik/docker-run-action@v1.1.0
+        uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: squidex/build:8
           environment: |
