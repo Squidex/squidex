@@ -5,7 +5,7 @@
   FileHash: WwD409RVswvccG2YopnFqJzpWrCveLrd0Zj6Buw8Vao=,
   IsProtected: false,
   Slug: sampleimage-100kb.webp,
-  MimeType: image/jpg,
+  MimeType: image/jpeg,
   FileType: webp,
   MetadataText: 600x400px, 109.5 kB,
   Metadata: {

@@ -5,7 +5,7 @@
   FileHash: TLNAlI4UM3i8O4IF/O7ZuH3PrI3+bsz4AsBt9NrEydI=,
   IsProtected: false,
   Slug: logo-wide-rotated.jpg,
-  MimeType: image/jpg,
+  MimeType: image/jpeg,
   FileType: jpg,
   MetadataText: 600x135px, 15.1 kB,
   Metadata: {

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Concurrent;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
@@ -15,6 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Jobs;
 
 public sealed class DefaultJobService : IJobService, IDeleter
 {
+    private readonly ConcurrentDictionary<DomainId, bool> wokenUp = [];
     private readonly IMessageBus messaging;
     private readonly IEnumerable<IJobRunner> runners;
     private readonly IPersistenceFactory<JobsState> persistence;
@@ -42,6 +44,7 @@ public sealed class DefaultJobService : IJobService, IDeleter
             throw new InvalidOperationException("Invalid job.");
         }
 
+        // This should never happen, but just in case we remove a task, it is there to get a proper error.
         var runner = runners.FirstOrDefault(x => x.Name == job.TaskName) ??
             throw new InvalidOperationException("Invalid job.");
 
@@ -51,12 +54,13 @@ public sealed class DefaultJobService : IJobService, IDeleter
     public async Task StartAsync(DomainId ownerId, JobRequest request,
         CancellationToken ct = default)
     {
+        // This should never happen, but just in case we remove a task, it is there to get a proper error.
         var runner = runners.FirstOrDefault(x => x.Name == request.TaskName) ??
             throw new DomainException(T.Get("jobs.invalidTaskName"));
 
-        var state = await GetStateAsync(ownerId, ct);
-
-        state.EnsureCanStart(runner);
+        // Wakeup the job handler to clear cancelled runs from previous incarnations of the service.
+        await EnsureWakeupAsync(ownerId, ct);
+        await EnsureCanRunAsync(ownerId, runner, ct);
 
         await messaging.PublishAsync(new JobStart(ownerId, request), null, ct);
     }
@@ -76,6 +80,9 @@ public sealed class DefaultJobService : IJobService, IDeleter
     public async Task<List<Job>> GetJobsAsync(DomainId ownerId,
         CancellationToken ct = default)
     {
+        // Wakeup the job handler to clear cancelled runs from previous incarnations of the service.
+        await EnsureWakeupAsync(ownerId, default);
+
         var state = await GetStateAsync(ownerId, ct);
 
         return state.Jobs;
@@ -89,5 +96,21 @@ public sealed class DefaultJobService : IJobService, IDeleter
         await state.LoadAsync(ct);
 
         return state.Value;
+    }
+
+    private async Task EnsureCanRunAsync(DomainId ownerId, IJobRunner runner, CancellationToken ct)
+    {
+        var state = await GetStateAsync(ownerId, ct);
+
+        state.EnsureCanStart(runner);
+    }
+
+    private async Task EnsureWakeupAsync(DomainId ownerId,
+        CancellationToken ct)
+    {
+        if (wokenUp.TryAdd(ownerId, true))
+        {
+            await messaging.PublishAsync(new JobWakeup(ownerId), null, ct);
+        }
     }
 }

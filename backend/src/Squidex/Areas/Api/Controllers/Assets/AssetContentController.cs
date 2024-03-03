@@ -211,8 +211,8 @@ public sealed class AssetContentController : ApiController
         activity?.SetTag("fileType", asset.MimeType);
         activity?.SetTag("fileSize", asset.FileSize);
 
-        await using var assetOriginal = new TempAssetFile(asset.FileName, asset.MimeType, 0);
-        await using var assetResized = new TempAssetFile(asset.FileName, asset.MimeType, 0);
+        await using var assetOriginal = new TempAssetFile(asset.FileName, asset.MimeType);
+        await using var assetResized = new TempAssetFile(asset.FileName, asset.MimeType);
 
         using (Telemetry.Activities.StartActivity("Read"))
         {

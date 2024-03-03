@@ -24,15 +24,15 @@
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="30.1.0" />
-    <PackageReference Include="GraphQL" Version="7.7.2" />
-    <PackageReference Include="GraphQL.DataLoader" Version="7.7.2" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.139">
+    <PackageReference Include="CsvHelper" Version="31.0.2" />
+    <PackageReference Include="GraphQL" Version="7.8.0" />
+    <PackageReference Include="GraphQL.DataLoader" Version="7.8.0" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.145">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
-    <PackageReference Include="Notifo.SDK" Version="1.7.4" />
+    <PackageReference Include="Notifo.SDK" Version="1.7.5" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="Squidex.CLI.Core" Version="13.0.0" />
     <PackageReference Include="Squidex.YDotNet.Extensions" Version="0.2.9" />
@@ -41,7 +41,7 @@
     <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
-    <PackageReference Include="tusdotnet" Version="2.7.2" />
+    <PackageReference Include="tusdotnet" Version="2.8.0" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />

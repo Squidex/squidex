@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 using Squidex.Messaging;
 
@@ -15,7 +16,8 @@ public sealed class JobWorker :
     IMessageHandler<JobStart>,
     IMessageHandler<JobDelete>,
     IMessageHandler<JobCancel>,
-    IMessageHandler<JobClear>
+    IMessageHandler<JobClear>,
+    IMessageHandler<JobWakeup>
 {
     private readonly Dictionary<DomainId, Task<JobProcessor>> processors = [];
     private readonly Func<DomainId, JobProcessor> processorFactory;
@@ -60,6 +62,11 @@ public sealed class JobWorker :
         var processor = await GetJobProcessorAsync(message.OwnerId);
 
         await processor.ClearAsync();
+    }
+
+    public Task HandleAsync(JobWakeup message, CancellationToken ct)
+    {
+        return GetJobProcessorAsync(message.OwnerId);
     }
 
     private Task<JobProcessor> GetJobProcessorAsync(DomainId appId)

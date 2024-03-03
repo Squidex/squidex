@@ -342,12 +342,13 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var httpClient = _.Client.CreateHttpClient();
+        var url = _.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch");
 
         // Create the request manually to check the content type.
-        var response = await httpClient.PostAsync(_.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent(_.Client.Options));
+        var httpClient = _.Client.CreateHttpClient();
+        var httpResponse = await httpClient.PostAsync(url, query.ToContent(_.Client.Options));
 
-        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
+        Assert.Equal("application/json", httpResponse.Content.Headers.ContentType?.MediaType);
     }
 
     [Fact]
@@ -445,10 +446,9 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var httpClient = _.Client.CreateHttpClient();
-
         // Create the request manually to check the headers.
-        var response = await httpClient.PostAsJsonAsync($"api/content/{_.AppName}/graphql", query);
+        var httpClient = _.Client.CreateHttpClient();
+        var httpResponse = await httpClient.PostAsJsonAsync($"api/content/{_.AppName}/graphql", query);
 
         Assert.Equal(new[]
         {
@@ -462,6 +462,6 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
             "X-ResolveFlow",
             "X-ResolveUrls",
             "X-Unpublished"
-        }, response.Headers.Vary.Order().ToArray());
+        }, httpResponse.Headers.Vary.Order().ToArray());
     }
 }

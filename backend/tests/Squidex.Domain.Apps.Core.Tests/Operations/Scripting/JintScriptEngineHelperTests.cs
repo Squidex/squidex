@@ -24,7 +24,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 {
     private readonly IHttpClientFactory httpClientFactory = A.Fake<IHttpClientFactory>();
     private readonly ITranslator translator = A.Fake<ITranslator>();
-    private readonly IChatBot chatBot = A.Fake<IChatBot>();
+    private readonly IChatAgent chatAgent = A.Fake<IChatAgent>();
     private readonly JintScriptEngine sut;
 
     public JintScriptEngineHelperTests()
@@ -35,7 +35,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
             new HttpJintExtension(httpClientFactory),
             new StringJintExtension(),
             new StringWordsJintExtension(),
-            new StringAsyncJintExtension(translator, chatBot)
+            new StringAsyncJintExtension(translator, chatAgent)
         };
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
@@ -619,8 +619,8 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     [Fact]
     public async Task Should_generate_content()
     {
-        A.CallTo(() => chatBot.AskQuestionAsync("prompt", A<CancellationToken>._))
-            .Returns(new ChatBotResult { Choices = new List<string> { "Generated" } });
+        A.CallTo(() => chatAgent.PromptAsync(A<string>._, "prompt", A<CancellationToken>._))
+            .Returns(ChatBotResponse.Success("Generated"));
 
         var vars = new ScriptVars
         {
@@ -635,6 +635,9 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         var actual = await sut.ExecuteAsync(vars, script);
 
         Assert.Equal("Generated", actual.ToString());
+
+        A.CallTo(() => chatAgent.StopConversationAsync(A<string>._, A<CancellationToken>._))
+            .MustHaveHappened();
     }
 
     [Theory]
@@ -657,8 +660,11 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
         Assert.Equal(JsonValue.Null, actual);
 
-        A.CallTo(() => chatBot.AskQuestionAsync(A<string>._, A<CancellationToken>._))
+        A.CallTo(() => chatAgent.PromptAsync(A<string>._, A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
+
+        A.CallTo(() => chatAgent.StopConversationAsync(A<string>._, A<CancellationToken>._))
+            .MustHaveHappened();
     }
 
     [Fact]

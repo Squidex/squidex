@@ -20,4 +20,6 @@ public sealed record JobDelete(DomainId OwnerId, DomainId JobId) : JobMessage(Ow
 
 public sealed record JobClear(DomainId OwnerId) : JobMessage(OwnerId);
 
+public sealed record JobWakeup(DomainId OwnerId) : JobMessage(OwnerId);
+
 public abstract record JobMessage(DomainId OwnerId);

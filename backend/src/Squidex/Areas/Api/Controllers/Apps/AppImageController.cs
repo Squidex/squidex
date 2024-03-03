@@ -87,8 +87,8 @@ public sealed class AppImageController : ApiController
 
         activity?.SetTag("fileType", mimeType);
 
-        await using var assetOriginal = new TempAssetFile(resizedAsset, mimeType, 0);
-        await using var assetResized = new TempAssetFile(resizedAsset, mimeType, 0);
+        await using var assetOriginal = new TempAssetFile(resizedAsset, mimeType);
+        await using var assetResized = new TempAssetFile(resizedAsset, mimeType);
 
         var resizeOptions = new ResizeOptions
         {

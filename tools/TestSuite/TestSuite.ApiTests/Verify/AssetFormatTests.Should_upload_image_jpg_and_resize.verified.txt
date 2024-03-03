@@ -5,7 +5,7 @@
   FileHash: hmGXmHleJqbU37bbPExix+Jbu36GNq6ZPf09Uw63t8w=,
   IsProtected: false,
   Slug: sampleimage-62kb.jpg,
-  MimeType: image/jpg,
+  MimeType: image/jpeg,
   FileType: jpg,
   MetadataText: 600x400px, 62 kB,
   Metadata: {

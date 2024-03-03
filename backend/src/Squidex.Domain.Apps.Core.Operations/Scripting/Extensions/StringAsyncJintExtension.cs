@@ -20,12 +20,12 @@ public sealed class StringAsyncJintExtension : IJintExtension, IScriptDescriptor
     private delegate void TextGenerateDelegate(string prompt, Action<JsValue> callback);
     private delegate void TextTranslateDelegate(string text, string language, Action<JsValue> callback, string sourceLanguage);
     private readonly ITranslator translator;
-    private readonly IChatBot chatBot;
+    private readonly IChatAgent chatAgent;
 
-    public StringAsyncJintExtension(ITranslator translator, IChatBot chatBot)
+    public StringAsyncJintExtension(ITranslator translator, IChatAgent chatAgent)
     {
         this.translator = translator;
-        this.chatBot = chatBot;
+        this.chatAgent = chatAgent;
     }
 
     public void ExtendAsync(ScriptExecutionContext context)
@@ -61,9 +61,17 @@ public sealed class StringAsyncJintExtension : IJintExtension, IScriptDescriptor
                     return;
                 }
 
-                var result = await chatBot.AskQuestionAsync(prompt, ct);
+                var conversationId = Guid.NewGuid().ToString();
+                try
+                {
+                    var result = await chatAgent.PromptAsync(conversationId, prompt, ct);
 
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, result.Choices.FirstOrDefault()));
+                    scheduler.Run(callback, JsValue.FromObject(context.Engine, result.Text));
+                }
+                finally
+                {
+                    await chatAgent.StopConversationAsync(conversationId);
+                }
             }
             catch (Exception ex)
             {

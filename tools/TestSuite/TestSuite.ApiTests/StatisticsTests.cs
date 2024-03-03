@@ -31,11 +31,10 @@ public class StatisticsTests : IClassFixture<CreatedAppFixture>
 
         // STEP 2: Download log.
         var httpClient = _.Client.CreateHttpClient();
+        var httpResponse = await httpClient.GetAsync(log.DownloadUrl);
 
-        var response = await httpClient.GetAsync(log.DownloadUrl);
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal("text/csv", response.Content.Headers.GetValues("Content-Type").First());
+        Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+        Assert.Equal("text/csv", httpResponse.Content.Headers.GetValues("Content-Type").First());
     }
 
     [Fact]
