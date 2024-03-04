@@ -7,6 +7,7 @@
 
 using System.Net.Http.Json;
 using FluentAssertions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Utils;
@@ -24,6 +25,64 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
     public GraphQLTests(GraphQLFixture fixture)
     {
         _ = fixture;
+    }
+
+    [Fact]
+    public async Task Should_query_assets()
+    {
+        var query = new
+        {
+            query = @"
+                query {
+                    queryAssets(filter: ""fileName eq 'logo-squared.png'"", top: 1) {
+                        id
+                        version
+                        created
+                        createdBy
+                        createdByUser {
+                          id
+                          email
+                          displayName
+                        }
+                        editToken
+                        lastModified
+                        lastModifiedBy
+                        lastModifiedByUser {
+                          id
+                          email
+                          displayName
+                        }
+                        url
+                        thumbnailUrl
+                        mimeType
+                        fileName
+                        fileHash
+                        fileSize
+                        fileVersion
+                        isImage
+                        isProtected
+                        pixelWidth
+                        pixelHeight
+                        parentId
+                        tags
+                        type
+                        metadataText
+                        metadataPixelWidth: metadata(path: ""pixelWidth"")
+                        metadataUnknown: metadata(path: ""unknown"")
+                        metadata
+                        slug  
+                    }
+                }"
+        };
+
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
+
+        var settings = new VerifySettings();
+        settings.IgnoreMember("editToken");
+        settings.IgnoreMember("thumbnailUrl");
+        settings.IgnoreMember("url");
+
+        await VerifyJson(JsonConvert.SerializeObject(result), settings);
     }
 
     [Fact]
