@@ -664,7 +664,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
             .MustNotHaveHappened();
 
         A.CallTo(() => chatAgent.StopConversationAsync(A<string>._, A<CancellationToken>._))
-            .MustHaveHappened();
+            .MustNotHaveHappened();
     }
 
     [Fact]
