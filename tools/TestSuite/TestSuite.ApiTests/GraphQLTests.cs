@@ -30,11 +30,13 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
     [Fact]
     public async Task Should_query_assets()
     {
+        var asset = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
         var query = new
         {
             query = @"
-                query {
-                    queryAssets(filter: ""fileName eq 'logo-squared.png'"", top: 1) {
+                query FindAsset($id: String!) {
+                    findAsset(id: $id) {
                         id
                         version
                         created
@@ -72,7 +74,11 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                         metadata
                         slug  
                     }
-                }"
+                }",
+            variables = new
+            {
+                id = asset.Id,
+            }
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);

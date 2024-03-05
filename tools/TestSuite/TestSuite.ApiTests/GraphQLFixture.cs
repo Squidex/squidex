@@ -38,7 +38,6 @@ public sealed class GraphQLFixture : ContentFixture
 
         await CreateSchemasAsync();
         await CreateContentsAsync();
-        await CreateAssetAsync();
     }
 
     private async Task CreateSchemasAsync()
@@ -261,20 +260,5 @@ public sealed class GraphQLFixture : ContentFixture
         };
 
         await Countries.CreateAsync(countryData, ContentCreateOptions.AsPublish);
-    }
-
-    private async Task CreateAssetAsync()
-    {
-        var assets = await Client.Assets.GetAssetsAsync(new AssetQuery
-        {
-            Filter = "fileName eq 'logo-squared.png'"
-        });
-
-        if (assets.Total > 0)
-        {
-            return;
-        }
-
-        await Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
     }
 }
