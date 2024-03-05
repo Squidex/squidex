@@ -75,6 +75,7 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
 
         try
         {
+            await EnrichWithMetadataAsync(command, ct);
             await EnrichWithHashAndUploadAsync(command, command.FileId, ct);
 
             if (!duplicate)
@@ -95,8 +96,6 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
                 }
             }
 
-            await EnrichWithMetadataAsync(command, ct);
-
             await base.HandleAsync(context, next, ct);
         }
         finally
@@ -113,8 +112,8 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
 
         try
         {
-            await EnrichWithHashAndUploadAsync(command, command.FileId, ct);
             await EnrichWithMetadataAsync(command, ct);
+            await EnrichWithHashAndUploadAsync(command, command.FileId, ct);
 
             await base.HandleAsync(context, next, ct);
         }

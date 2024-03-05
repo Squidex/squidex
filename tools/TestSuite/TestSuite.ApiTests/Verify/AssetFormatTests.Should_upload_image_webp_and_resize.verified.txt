@@ -2,12 +2,12 @@
   Id: Guid_1,
   ParentId: Guid_Empty,
   FileName: SampleImage_100kb.webp,
-  FileHash: WwD409RVswvccG2YopnFqJzpWrCveLrd0Zj6Buw8Vao=,
+  FileHash: fH0g7j4+h2vR6q0/E3BabgDqtFk0FnDfxT/AkuHKkf8=,
   IsProtected: false,
   Slug: sampleimage-100kb.webp,
-  MimeType: image/jpg,
+  MimeType: image/jpeg,
   FileType: webp,
-  MetadataText: 600x400px, 109.5 kB,
+  MetadataText: 600x400px, 37.7 kB,
   Metadata: {
     pixelHeight: 400,
     pixelWidth: 600
@@ -17,7 +17,7 @@
     image,
     image/medium
   ],
-  FileSize: 112138,
+  FileSize: 38580,
   Type: Image,
   Links: {
     content: {

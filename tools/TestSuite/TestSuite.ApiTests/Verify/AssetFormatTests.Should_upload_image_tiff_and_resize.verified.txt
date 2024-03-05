@@ -5,7 +5,7 @@
   FileHash: f+ZdTDOoK23jmThbfPhWhXL8Q9+KIQajHeFfT/MtWFU=,
   IsProtected: false,
   Slug: sampleimage-400kb.tiff,
-  MimeType: image/jpg,
+  MimeType: image/jpeg,
   FileType: tiff,
   MetadataText: 600x400px, 473.6 kB,
   Metadata: {

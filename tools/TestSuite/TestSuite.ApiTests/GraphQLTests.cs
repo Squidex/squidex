@@ -7,6 +7,7 @@
 
 using System.Net.Http.Json;
 using FluentAssertions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Utils;
@@ -24,6 +25,71 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
     public GraphQLTests(GraphQLFixture fixture)
     {
         _ = fixture;
+    }
+
+    [Fact]
+    public async Task Should_query_assets()
+    {
+        var asset = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+        var query = new
+        {
+            query = @"
+                query FindAsset($id: String!) {
+                    findAsset(id: $id) {
+                        id
+                        version
+                        created
+                        createdBy
+                        createdByUser {
+                          id
+                          email
+                          displayName
+                        }
+                        editToken
+                        lastModified
+                        lastModifiedBy
+                        lastModifiedByUser {
+                          id
+                          email
+                          displayName
+                        }
+                        url
+                        thumbnailUrl
+                        mimeType
+                        fileName
+                        fileHash
+                        fileSize
+                        fileVersion
+                        isImage
+                        isProtected
+                        pixelWidth
+                        pixelHeight
+                        parentId
+                        tags
+                        type
+                        metadataText
+                        metadataPixelWidth: metadata(path: ""pixelWidth"")
+                        metadataUnknown: metadata(path: ""unknown"")
+                        metadata
+                        slug  
+                    }
+                }",
+            variables = new
+            {
+                id = asset.Id,
+            }
+        };
+
+        var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
+
+        var settings = new VerifySettings();
+        settings.IgnoreMember("editToken");
+        settings.IgnoreMember("thumbnailUrl");
+        settings.IgnoreMember("url");
+        settings.IgnoreMember("version");
+
+        await VerifyJson(JsonConvert.SerializeObject(result), settings);
     }
 
     [Fact]
@@ -342,12 +408,13 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var httpClient = _.Client.CreateHttpClient();
+        var url = _.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch");
 
         // Create the request manually to check the content type.
-        var response = await httpClient.PostAsync(_.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch"), query.ToContent(_.Client.Options));
+        var httpClient = _.Client.CreateHttpClient();
+        var httpResponse = await httpClient.PostAsync(url, query.ToContent(_.Client.Options));
 
-        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
+        Assert.Equal("application/json", httpResponse.Content.Headers.ContentType?.MediaType);
     }
 
     [Fact]
@@ -445,10 +512,9 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 }"
         };
 
-        var httpClient = _.Client.CreateHttpClient();
-
         // Create the request manually to check the headers.
-        var response = await httpClient.PostAsJsonAsync($"api/content/{_.AppName}/graphql", query);
+        var httpClient = _.Client.CreateHttpClient();
+        var httpResponse = await httpClient.PostAsJsonAsync($"api/content/{_.AppName}/graphql", query);
 
         Assert.Equal(new[]
         {
@@ -462,6 +528,6 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
             "X-ResolveFlow",
             "X-ResolveUrls",
             "X-Unpublished"
-        }, response.Headers.Vary.Order().ToArray());
+        }, httpResponse.Headers.Vary.Order().ToArray());
     }
 }

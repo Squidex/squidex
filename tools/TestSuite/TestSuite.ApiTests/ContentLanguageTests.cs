@@ -122,8 +122,8 @@ public class ContentLanguageTests : IClassFixture<ContentFixture>
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation(key, value);
         }
 
-        var response = await httpClient.GetAsync(url);
+        var httpResponse = await httpClient.GetAsync(url);
 
-        return (response.Headers.GetValues("ETag").FirstOrDefault(), response.Headers.Vary.ToString());
+        return (httpResponse.Headers.GetValues("ETag").FirstOrDefault(), httpResponse.Headers.Vary.ToString());
     }
 }

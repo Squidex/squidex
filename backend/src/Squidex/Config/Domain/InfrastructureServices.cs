@@ -135,7 +135,7 @@ public static class InfrastructureServices
 
         services.AddDeepLTranslations(config);
         services.AddGoogleCloudTranslations(config);
-        services.AddOpenAIChatBot(config);
+        services.AddOpenAIChatAgent(config);
     }
 
     public static void AddSquidexLocalization(this IServiceCollection services)

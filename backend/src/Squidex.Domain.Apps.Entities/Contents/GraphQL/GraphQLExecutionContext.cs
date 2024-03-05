@@ -43,8 +43,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         Context = context.Clone(b => b
             .WithResolveSchemaNames()
             .WithNoCleanup()
-            .WithNoEnrichment()
-            .WithNoAssetEnrichment());
+            .WithNoEnrichment());
 
         this.options = options.Value;
 

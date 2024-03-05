@@ -2,12 +2,12 @@
   Id: Guid_1,
   ParentId: Guid_Empty,
   FileName: SampleImage_62kb.jpg,
-  FileHash: hmGXmHleJqbU37bbPExix+Jbu36GNq6ZPf09Uw63t8w=,
+  FileHash: ss/g3yq5dO3jYbWzJ9j2psJo1Nrk5TjSi78LJfCma38=,
   IsProtected: false,
   Slug: sampleimage-62kb.jpg,
-  MimeType: image/jpg,
+  MimeType: image/jpeg,
   FileType: jpg,
-  MetadataText: 600x400px, 62 kB,
+  MetadataText: 600x400px, 59.2 kB,
   Metadata: {
     description: JFIF File,
     imageQuality: 79,
@@ -19,7 +19,7 @@
     image,
     image/medium
   ],
-  FileSize: 63507,
+  FileSize: 60603,
   Type: Image,
   Links: {
     content: {

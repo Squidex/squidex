@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Assets;
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 
@@ -60,7 +61,7 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_upload_image_jpg_and_resize()
     {
-        var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleImage_62kb.jpg", "image/jpg");
+        var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleImage_62kb.jpg", "image/jpeg");
 
         await AssertImageAsync(asset);
 
@@ -70,7 +71,7 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_upload_image_webp_and_resize()
     {
-        var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleImage_100kb.webp", "image/jpg");
+        var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleImage_100kb.webp", "image/jpeg");
 
         await AssertImageAsync(asset);
     }
@@ -78,7 +79,7 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_upload_image_tiff_and_resize()
     {
-        var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleImage_400kb.tiff", "image/jpg");
+        var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleImage_400kb.tiff", "image/jpeg");
 
         await AssertImageAsync(asset);
     }
@@ -112,6 +113,25 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
         await Verify(asset);
     }
 
+    [Fact]
+    public async Task Should_upload_image_and_remove_location()
+    {
+        var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleImage_WithLocation.jpg", "image/jpeg");
+
+        var url = _.Client.GenerateImageUrl(asset.Id);
+
+        var httpClient = _.Client.CreateHttpClient();
+        var httpResonse = await httpClient.GetAsync(url);
+
+        await using (var stream = await httpResonse.Content.ReadAsStreamAsync())
+        {
+            var imageLoader = new ImageSharpThumbnailGenerator();
+            var imageInfo = await imageLoader.GetImageInfoAsync(stream, "image/jpeg");
+
+            Assert.False(imageInfo?.HasSensitiveMetadata);
+        }
+    }
+
     private async Task AssertImageAsync(AssetDto asset)
     {
         await Verify(asset);
@@ -132,7 +152,7 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
     [Fact]
     public async Task Should_fix_orientation()
     {
-        var asset = await _.Client.Assets.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpg");
+        var asset = await _.Client.Assets.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpeg");
 
         // Should parse image metadata and fix orientation.
         Assert.True(asset.IsImage);
@@ -218,10 +238,9 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
         var url = $"{_.Client.GenerateImageUrl(imageId)}?width={width}&height={height}";
 
         var httpClient = _.Client.CreateHttpClient();
+        var httpResponse = await httpClient.GetAsync(url);
 
-        var response = await httpClient.GetAsync(url);
-
-        await using (var stream = await response.Content.ReadAsStreamAsync())
+        await using (var stream = await httpResponse.Content.ReadAsStreamAsync())
         {
             var buffer = new MemoryStream();
 
@@ -236,16 +255,15 @@ public class AssetFormatTests : IClassFixture<CreatedAppFixture>
         var url = $"{_.Client.GenerateImageUrl(imageId)}?format={format}";
 
         var httpClient = _.Client.CreateHttpClient();
+        var httpResponse = await httpClient.GetAsync(url);
 
-        var response = await httpClient.GetAsync(url);
-
-        await using (var stream = await response.Content.ReadAsStreamAsync())
+        await using (var stream = await httpResponse.Content.ReadAsStreamAsync())
         {
             var buffer = new MemoryStream();
 
             await stream.CopyToAsync(buffer);
 
-            return (buffer.Length, response.Content.Headers.ContentType?.ToString());
+            return (buffer.Length, httpResponse.Content.Headers.ContentType?.ToString());
         }
     }
 }

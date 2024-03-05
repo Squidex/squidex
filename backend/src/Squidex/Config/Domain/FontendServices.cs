@@ -51,9 +51,9 @@ public static class FontendServices
 
         services.Configure<MyUIOptions>((services, options) =>
         {
-            var chatBot = services.GetRequiredService<IChatBot>();
+            var chatAgent = services.GetRequiredService<IChatAgent>();
 
-            options.More["canUseChatBot"] = chatBot.IsConfigured;
+            options.More["canUseChatBot"] = chatAgent.IsConfigured;
         });
 
         services.Configure<MyUIOptions>((services, options) =>

@@ -23,13 +23,13 @@ namespace Squidex.Areas.Api.Controllers.Translations;
 public sealed class TranslationsController : ApiController
 {
     private readonly ITranslator translator;
-    private readonly IChatBot chatBot;
+    private readonly IChatAgent chatAgent;
 
-    public TranslationsController(ICommandBus commandBus, ITranslator translator, IChatBot chatBot)
+    public TranslationsController(ICommandBus commandBus, ITranslator translator, IChatAgent chatAgent)
         : base(commandBus)
     {
         this.translator = translator;
-        this.chatBot = chatBot;
+        this.chatAgent = chatAgent;
     }
 
     /// <summary>
@@ -64,9 +64,17 @@ public sealed class TranslationsController : ApiController
     [ApiCosts(10)]
     public async Task<IActionResult> PostQuestion(string app, [FromBody] AskDto request)
     {
-        var result = await chatBot.AskQuestionAsync(request.Prompt, HttpContext.RequestAborted);
-        var response = result.Choices;
+        var conversationId = Guid.NewGuid().ToString();
+        try
+        {
+            var result = await chatAgent.PromptAsync(conversationId, request.Prompt, HttpContext.RequestAborted);
+            var response = new string[] { result.Text };
 
-        return Ok(response);
+            return Ok(response);
+        }
+        finally
+        {
+            await chatAgent.StopConversationAsync(conversationId, default);
+        }
     }
 }

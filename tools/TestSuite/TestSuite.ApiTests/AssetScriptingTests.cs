@@ -31,7 +31,7 @@ public class AssetScriptingTests : IClassFixture<ClientFixture>
         var scriptRequest = new UpdateAssetScriptsDto
         {
             Create = @"
-                if (ctx.command.mimeType == 'image/jpg') {
+                if (ctx.command.mimeType == 'image/jpeg') {
                     disallow('We do not use jpeg anymore.');
                 }"
         };
@@ -40,7 +40,7 @@ public class AssetScriptingTests : IClassFixture<ClientFixture>
 
 
         // STEP 1: Upload jpeg.
-        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() => client.Assets.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpg"));
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() => client.Assets.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpeg"));
 
         Assert.Contains("We do not use jpeg anymore.", ex.ToString(), StringComparison.Ordinal);
     }
@@ -64,7 +64,7 @@ public class AssetScriptingTests : IClassFixture<ClientFixture>
 
 
         // STEP 1: Upload jpeg.
-        var asset = await client.Assets.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpg");
+        var asset = await client.Assets.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpeg");
 
         Assert.Equal("value1", asset.Metadata["key1"]);
         Assert.Equal("value2", asset.Metadata["key2"]);
@@ -81,7 +81,7 @@ public class AssetScriptingTests : IClassFixture<ClientFixture>
         var scriptRequest = new UpdateAssetScriptsDto
         {
             Update = @"
-                if (ctx.command.mimeType == 'image/jpg') {
+                if (ctx.command.mimeType == 'image/jpeg') {
                     disallow('We do not use jpeg anymore.');
                 }"
         };
@@ -94,7 +94,7 @@ public class AssetScriptingTests : IClassFixture<ClientFixture>
 
 
         // STEP 2: Upload jpeg.
-        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() => client.Assets.ReplaceFileAsync(asset_0.Id, "Assets/logo-wide-rotated.jpg", "image/jpg"));
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() => client.Assets.ReplaceFileAsync(asset_0.Id, "Assets/logo-wide-rotated.jpg", "image/jpeg"));
 
         Assert.Contains("We do not use jpeg anymore.", ex.ToString(), StringComparison.Ordinal);
     }
@@ -120,7 +120,7 @@ public class AssetScriptingTests : IClassFixture<ClientFixture>
 
 
         // STEP 2: Upload jpeg.
-        var asset = await client.Assets.ReplaceFileAsync(asset_0.Id, "Assets/logo-wide-rotated.jpg", "image/jpg");
+        var asset = await client.Assets.ReplaceFileAsync(asset_0.Id, "Assets/logo-wide-rotated.jpg", "image/jpeg");
 
         Assert.Equal("value1", asset.Metadata["key1"]);
         Assert.Equal("value2", asset.Metadata["key2"]);
@@ -135,7 +135,7 @@ public class AssetScriptingTests : IClassFixture<ClientFixture>
         var scriptRequest = new UpdateAssetScriptsDto
         {
             Query = @"
-                if (ctx.asset.mimeType == 'image/jpg') {
+                if (ctx.asset.mimeType == 'image/jpeg') {
                     disallow('We do not use jpeg anymore.');
                 }"
         };
@@ -144,7 +144,7 @@ public class AssetScriptingTests : IClassFixture<ClientFixture>
 
 
         // STEP 1. Upload initial jpg.
-        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() => client.Assets.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpg"));
+        var ex = await Assert.ThrowsAnyAsync<SquidexException>(() => client.Assets.UploadFileAsync("Assets/logo-wide-rotated.jpg", "image/jpeg"));
 
         Assert.Contains("We do not use jpeg anymore.", ex.ToString(), StringComparison.Ordinal);
     }

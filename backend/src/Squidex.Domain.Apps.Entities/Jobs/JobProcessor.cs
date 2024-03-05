@@ -54,10 +54,24 @@ public sealed class JobProcessor
     {
         await state.LoadAsync(ct);
 
-        if (state.Value.Jobs.RemoveAll(x => x.Stopped == null) > 0)
+        var pending = state.Value.Jobs.Where(x => x.Stopped == null);
+
+        if (pending.Any())
         {
             // This should actually never happen, so we log with warning.
-            log.LogWarning("Removed unfinished backups for owner {ownerId} after start.", ownerId);
+            log.LogWarning("Removed unfinished jobs for owner {ownerId} after start.", ownerId);
+
+            foreach (var job in pending.ToList())
+            {
+                var runner = runners.FirstOrDefault(x => x.Name == job.TaskName);
+
+                if (runner != null)
+                {
+                    await runner.CleanupAsync(job);
+                }
+
+                state.Value.Jobs.Remove(job);
+            }
 
             await state.WriteAsync(ct);
         }

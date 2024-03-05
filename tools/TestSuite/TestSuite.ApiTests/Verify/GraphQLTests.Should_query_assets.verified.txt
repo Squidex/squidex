@@ -1,0 +1,44 @@
+﻿{
+  findAsset: {
+    id: Guid_1,
+    created: DateTimeOffset_1,
+    createdBy: client:root,
+    createdByUser: {
+      id: root,
+      email: client:root,
+      displayName: root
+    },
+    lastModified: DateTimeOffset_1,
+    lastModifiedBy: client:root,
+    lastModifiedByUser: {
+      id: root,
+      email: client:root,
+      displayName: root
+    },
+    mimeType: image/png,
+    fileName: logo-squared.png,
+    fileHash: pAp0RDvipkoNCCTgey1HTJekRKKEWT6Ft5JdRLuAfAc=,
+    fileSize: 19430,
+    fileVersion: 0,
+    isImage: true,
+    isProtected: false,
+    pixelWidth: 600,
+    pixelHeight: 600,
+    parentId: Guid_Empty,
+    tags: [
+      type/png,
+      image,
+      image/medium
+    ],
+    type: IMAGE,
+    metadataText: 600x600px, 19 kB,
+    metadataPixelWidth: 600,
+    metadataUnknown: null,
+    metadata: {
+      pixelWidth: 600,
+      pixelHeight: 600,
+      description: PNG File
+    },
+    slug: logo-squared.png
+  }
+}

@@ -10,26 +10,26 @@
     <ProjectReference Include="..\..\src\Squidex.Web\Squidex.Web.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="6.16.0" />
+    <PackageReference Include="Algolia.Search" Version="6.17.0" />
     <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.2.0" />
     <PackageReference Include="Azure.Search.Documents" Version="11.5.1" />
     <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.3.0" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
     <PackageReference Include="Elasticsearch.Net" Version="7.17.5" />
     <PackageReference Include="Google.Cloud.Diagnostics.Common" Version="5.1.0" />
-    <PackageReference Include="Google.Cloud.Logging.V2" Version="4.1.0" />
-    <PackageReference Include="Google.Cloud.Monitoring.V3" Version="3.5.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.139">
+    <PackageReference Include="Google.Cloud.Logging.V2" Version="4.2.0" />
+    <PackageReference Include="Google.Cloud.Monitoring.V3" Version="3.6.0" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.145">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
-    <PackageReference Include="Microsoft.Azure.SignalR.Management" Version="1.24.0" />
+    <PackageReference Include="Microsoft.Azure.SignalR.Management" Version="1.25.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.20.0" />
-    <PackageReference Include="NodaTime" Version="3.1.10" />
-    <PackageReference Include="OpenSearch.Net" Version="1.6.0" />
+    <PackageReference Include="NodaTime" Version="3.1.11" />
+    <PackageReference Include="OpenSearch.Net" Version="1.7.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.7.0" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.7.0" />
