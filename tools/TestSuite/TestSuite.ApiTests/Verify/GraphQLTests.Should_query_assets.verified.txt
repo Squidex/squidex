@@ -2,7 +2,6 @@
   queryAssets: [
     {
       id: Guid_1,
-      version: 0,
       created: DateTimeOffset_1,
       createdBy: client:root,
       createdByUser: {

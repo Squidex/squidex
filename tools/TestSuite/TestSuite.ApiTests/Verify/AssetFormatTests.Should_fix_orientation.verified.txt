@@ -2,12 +2,12 @@
   Id: Guid_1,
   ParentId: Guid_Empty,
   FileName: logo-wide-rotated.jpg,
-  FileHash: TLNAlI4UM3i8O4IF/O7ZuH3PrI3+bsz4AsBt9NrEydI=,
+  FileHash: XFoH3mp4QW9EIWjF50vJkm8IwnrjjO+ZiqV2GnH1GGw=,
   IsProtected: false,
   Slug: logo-wide-rotated.jpg,
   MimeType: image/jpeg,
   FileType: jpg,
-  MetadataText: 600x135px, 15.1 kB,
+  MetadataText: 600x135px, 15.2 kB,
   Metadata: {
     description: JFIF File,
     imageQuality: 79,
@@ -19,7 +19,7 @@
     image,
     image/medium
   ],
-  FileSize: 15425,
+  FileSize: 15598,
   Type: Image,
   Links: {
     content: {

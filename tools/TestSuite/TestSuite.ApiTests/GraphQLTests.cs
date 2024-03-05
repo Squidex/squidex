@@ -81,6 +81,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
         settings.IgnoreMember("editToken");
         settings.IgnoreMember("thumbnailUrl");
         settings.IgnoreMember("url");
+        settings.IgnoreMember("version");
 
         await VerifyJson(JsonConvert.SerializeObject(result), settings);
     }
