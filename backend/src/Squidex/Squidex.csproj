@@ -34,6 +34,7 @@
   
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="8.0.0" />
+    <PackageReference Include="Google.Cloud.Trace.V2" Version="3.4.0" />
     <PackageReference Include="GraphQL" Version="7.8.0" />
     <PackageReference Include="GraphQL.MicrosoftDI" Version="7.8.0" />
     <PackageReference Include="GraphQL.SystemTextJson" Version="7.8.0" />
