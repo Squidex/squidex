@@ -20,7 +20,11 @@ export abstract class StatefulComponent<T extends {} = object> extends State<T> 
 
         this.subscription =
             this.changes.pipe(skip(1)).subscribe(() => {
-                this.changeDetector.detectChanges();
+                try {
+                    this.changeDetector.detectChanges();
+                } catch {
+                    return;
+                }
             });
     }
 

@@ -17,6 +17,5 @@ export class SidebarMenuDirective {
     constructor(
         public readonly templateRef: TemplateRef<unknown>,
     ) {
-        console.log('FAsd');
     }
 }

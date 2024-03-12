@@ -8,8 +8,7 @@
 }
 
 .job {
-    &-header,
-    &-dump {
+    &-header {
         padding: .75rem 1.25rem;
     }
 
@@ -24,6 +23,14 @@
             font-weight: 500;
             margin: 0;
         }
+    }
+}
+
+:host ::ng-deep { 
+    .ace_editor {
+        background: none !important;
+        border: 0 !important;
+        border-radius: 0 !important;
     }
 }
 

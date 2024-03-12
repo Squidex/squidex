@@ -51,6 +51,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
     @Input({ transform: numberAttribute })
     public maxLines: number | undefined;
 
+    @Input({ transform: numberAttribute })
+    public minLines: number | undefined;
+
     @Input({ transform: booleanAttribute })
     public singleLine = false;
 
@@ -71,7 +74,11 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
     @Input()
     public set completion(value: ScriptCompletions | undefined | null) {
         if (value) {
-            this.completions = value.map(({ path, description, type, ...other }) => ({ value: path, name: path, description, meta: type?.toLowerCase(), path, ...other }));
+            this.completions = value.map(source => {
+                const { path, description, type, ...other } = source;
+
+                return { value: path, name: path, description, meta: type?.toLowerCase(), path, ...other };
+            });
         } else {
             this.completions = [];
         }
@@ -88,7 +95,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
             this.setMode();
         }
 
-        if (changes.height || changes.maxLines || changes.singleLine || changes.snippets) {
+        if (changes.height || changes.maxLines || changes.minLines || changes.singleLine || changes.snippets) {
             this.setOptions();
         }
 
@@ -279,7 +286,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
                 minLines = lines;
             } else if (this.height === 'auto') {
                 maxLines = this.maxLines || 500;
-                minLines = Math.min(3, maxLines);
+                minLines = Math.max(this.minLines || 0, Math.min(3, maxLines));
             }
         } else {
             maxLines = 1;

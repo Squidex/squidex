@@ -27,7 +27,5 @@ export class GlobalErrorHandler implements ErrorHandler {
                     });
             });
         }
-
-        console.error(error);
     }
 }
