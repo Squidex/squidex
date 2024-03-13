@@ -66,7 +66,9 @@ public sealed class EnrichWithWorkflows : IContentEnricherStep
 
     private async Task EnrichCanUpdateAsync(EnrichedContent content, Context context)
     {
-        content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, content.Status, context.UserPrincipal);
+        var editingStatus = content.NewStatus ?? content.Status;
+
+        content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, editingStatus, context.UserPrincipal);
     }
 
     private async Task EnrichColorAsync(EnrichedContent content, Dictionary<(DomainId, Status), StatusInfo> cache)
