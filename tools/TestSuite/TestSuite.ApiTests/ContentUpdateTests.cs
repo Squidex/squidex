@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.EnrichedEvents;
+using System.Runtime.InteropServices;
 using TestSuite.Model;
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -872,5 +874,126 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         var content_1 = await contents.GetAsync(content_0.Id);
 
         Assert.Equal("Hello Squidex", content_1.Data[TestEntityData.StringField]!["iv"]!.ToString());
+    }
+
+    [Fact]
+    public async Task Should_update_as_bulk()
+    {
+        var prefix = Guid.NewGuid().ToString();
+
+        // STEP 1: Create contents.
+        var result_0 = await _.Contents.BulkUpdateAsync(new BulkUpdate
+        {
+            Jobs =
+            [
+                new BulkUpdateJob
+                {
+                    Data = new Dictionary<string, object>
+                    {
+                        [TestEntityData.StringField] = new
+                        {
+                            iv = $"{prefix}_1"
+                        },
+                        [TestEntityData.NumberField] = new
+                        {
+                            iv = 1
+                        }
+                    }
+                },
+                new BulkUpdateJob
+                {
+                    Data = new Dictionary<string, object>
+                    {
+                        [TestEntityData.StringField] = new
+                        {
+                            iv = $"{prefix}_2"
+                        },
+                        [TestEntityData.NumberField] = new
+                        {
+                            iv = 2
+                        }
+                    }
+                },
+            ],
+            Publish = true
+        });
+
+        result_0 = result_0.OrderBy(x => x.JobIndex).ToList();
+
+
+        // STEP 2: Update contents by filter.
+        var result_1 = await _.Contents.BulkUpdateAsync(new BulkUpdate
+        {
+            Jobs =
+            [
+                new BulkUpdateJob
+                {
+                    Query = new
+                    {
+                        Filter = new
+                        {
+                            path = $"data.{TestEntityData.StringField}.iv",
+                            op = "eq",
+                            value = $"{prefix}_1"
+                        }
+                    },
+                    Data = new Dictionary<string, object>
+                    {
+                        [TestEntityData.StringField] = new
+                        {
+                            iv = $"{prefix}_1_x"
+                        }
+                    },
+                    Type = BulkUpdateType.Patch
+                },
+                new BulkUpdateJob
+                {
+                    Query = new
+                    {
+                        Filter = new
+                        {
+                            path = $"data.{TestEntityData.StringField}.iv",
+                            op = "eq",
+                            value = $"{prefix}_2"
+                        }
+                    },
+                    Data = new Dictionary<string, object>
+                    {
+                        [TestEntityData.StringField] = new
+                        {
+                            iv = $"{prefix}_2_y"
+                        }
+                    },
+                    Type = BulkUpdateType.Patch
+                },
+            ]
+        });
+
+        result_1.OrderBy(x => x.JobIndex).Should().BeEquivalentTo(new List<BulkResult>
+        {
+            new BulkResult
+            {
+                ContentId = result_0[0].ContentId,
+                JobIndex = 0
+            },
+            new BulkResult
+            {
+                ContentId = result_0[1].ContentId,
+                JobIndex = 1
+            }
+        });
+
+
+        // STEP 2: Get contents.
+        var contents = await _.Contents.GetAsync(new ContentQuery
+        {
+            Ids = result_0.Select(x => x.ContentId).ToHashSet()
+        });
+
+        var content0 = contents.Items.Find(x => x.Id == result_0[0].ContentId);
+        var content1 = contents.Items.Find(x => x.Id == result_0[1].ContentId);
+
+        Assert.Equal($"{prefix}_1_x", content0?.Data.String);
+        Assert.Equal($"{prefix}_2_y", content1?.Data.String);
     }
 }
