@@ -33,7 +33,7 @@ jobs:
           node-version: 18
 
       - name: Build - BUILD
-        uses: docker/build-push-action@v5.1.0
+        uses: docker/build-push-action@v5.2.0
         with:
           load: true
           build-args: "SQUIDEX__RUNTIME__VERSION=7.0.0-dev-${{ env.BUILD_NUMBER }}"
