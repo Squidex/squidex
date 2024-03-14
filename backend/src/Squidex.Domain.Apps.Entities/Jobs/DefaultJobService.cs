@@ -39,14 +39,19 @@ public sealed class DefaultJobService : IJobService, IDeleter
         Guard.NotNull(job);
         Guard.NotNull(stream);
 
-        if (job.File == null || job.Status != JobStatus.Completed)
+        if (job.File == null)
         {
-            throw new InvalidOperationException("Invalid job.");
+            throw new InvalidOperationException("Cannot download job. No file attached.");
+        }
+
+        if (job.Status != JobStatus.Completed)
+        {
+            throw new InvalidOperationException($"Cannot download job. Invalid status '{job.Status}'.");
         }
 
         // This should never happen, but just in case we remove a task, it is there to get a proper error.
         var runner = runners.FirstOrDefault(x => x.Name == job.TaskName) ??
-            throw new InvalidOperationException("Invalid job.");
+            throw new InvalidOperationException($"Cannot find job with name '{job.TaskName}'.");
 
         await runner.DownloadAsync(job, stream, ct);
     }
