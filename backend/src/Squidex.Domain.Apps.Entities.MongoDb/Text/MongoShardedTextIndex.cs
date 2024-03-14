@@ -13,7 +13,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public sealed class MongoShardedTextIndex<T> : ShardedService<MongoTextIndexBase<T>>, ITextIndex, IDeleter where T : class
+public sealed class MongoShardedTextIndex<T> : ShardedService<DomainId, MongoTextIndexBase<T>>, ITextIndex, IDeleter where T : class
 {
     public MongoShardedTextIndex(IShardingStrategy sharding, Func<string, MongoTextIndexBase<T>> factory)
         : base(sharding, factory)
@@ -32,12 +32,10 @@ public sealed class MongoShardedTextIndex<T> : ShardedService<MongoTextIndexBase
     public async Task ExecuteAsync(IndexCommand[] commands,
         CancellationToken ct = default)
     {
-        // Some commands might share a shared, therefore we don't group by app id.
-        foreach (var byShard in commands.GroupBy(c => GetShardKey(c.UniqueContentId.AppId)))
+        // Reduce the number of writes by grouping by shard.
+        foreach (var byShard in commands.GroupBy(c => Shard(c.UniqueContentId.AppId)))
         {
-            var shard = Shard(byShard.Key);
-
-            await shard.ExecuteAsync(byShard.ToArray(), ct);
+            await byShard.Key.ExecuteAsync(byShard.ToArray(), ct);
         }
     }
 
@@ -56,9 +54,7 @@ public sealed class MongoShardedTextIndex<T> : ShardedService<MongoTextIndexBase
     public async Task DeleteAppAsync(App app,
         CancellationToken ct)
     {
-        var shard = Shard(app.Id) as IDeleter;
-
-        if (shard != null)
+        if (Shard(app.Id) is IDeleter shard)
         {
             await shard.DeleteAppAsync(app, ct);
         }

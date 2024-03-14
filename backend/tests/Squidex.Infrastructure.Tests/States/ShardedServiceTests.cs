@@ -19,14 +19,14 @@ public class ShardedServiceTests
     {
     }
 
-    private class TestSut : ShardedService<IInner>
+    private class TestSut : ShardedService<int, IInner>
     {
         public TestSut(IShardingStrategy sharding, Func<string, IInner> factory)
             : base(sharding, factory)
         {
         }
 
-        public IInner ExposeShard<TKey>(TKey key) where TKey : notnull
+        public IInner ExposeShard(int key)
         {
             return Shard(key);
         }

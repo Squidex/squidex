@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
 public sealed class MongoShardedContentRepository : ShardedSnapshotStore<MongoContentRepository, WriteContent>, IContentRepository, IDeleter
 {
     public MongoShardedContentRepository(IShardingStrategy sharding, Func<string, MongoContentRepository> factory)
-        : base(sharding, factory)
+        : base(sharding, factory, x => x.AppId.Id)
     {
     }
 
@@ -89,10 +89,5 @@ public sealed class MongoShardedContentRepository : ShardedSnapshotStore<MongoCo
                 yield return content;
             }
         }
-    }
-
-    protected override string GetShardKey(WriteContent state)
-    {
-        return GetShardKey(state.AppId.Id);
     }
 }

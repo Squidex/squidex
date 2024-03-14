@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 public sealed class MongoShardedAssetRepository : ShardedSnapshotStore<MongoAssetRepository, Asset>, IAssetRepository, IDeleter
 {
     public MongoShardedAssetRepository(IShardingStrategy sharding, Func<string, MongoAssetRepository> factory)
-        : base(sharding, factory)
+        : base(sharding, factory, x => x.AppId.Id)
     {
     }
 
@@ -81,10 +81,5 @@ public sealed class MongoShardedAssetRepository : ShardedSnapshotStore<MongoAsse
         CancellationToken ct = default)
     {
         return Shard(appId).StreamAll(appId, ct);
-    }
-
-    protected override string GetShardKey(Asset state)
-    {
-        return GetShardKey(state.AppId.Id);
     }
 }

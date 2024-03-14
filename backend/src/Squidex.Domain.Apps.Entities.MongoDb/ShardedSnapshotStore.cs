@@ -12,19 +12,20 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb;
 
-public abstract class ShardedSnapshotStore<T, TState> : ShardedService<T>, ISnapshotStore<TState>, IDeleter where T : ISnapshotStore<TState>, IDeleter
+public abstract class ShardedSnapshotStore<TStore, TState> : ShardedService<DomainId, TStore>, ISnapshotStore<TState>, IDeleter where TStore : ISnapshotStore<TState>, IDeleter
 {
-    protected ShardedSnapshotStore(IShardingStrategy sharding, Func<string, T> factory)
+    private readonly Func<TState, DomainId> getShardKey;
+
+    protected ShardedSnapshotStore(IShardingStrategy sharding, Func<string, TStore> factory, Func<TState, DomainId> getShardKey)
         : base(sharding, factory)
     {
+        this.getShardKey = getShardKey;
     }
-
-    protected abstract string GetShardKey(TState state);
 
     public Task WriteAsync(SnapshotWriteJob<TState> job,
         CancellationToken ct = default)
     {
-        var shard = Shard(GetShardKey(job.Value));
+        var shard = Shard(getShardKey(job.Value));
 
         return shard.WriteAsync(job, ct);
     }
@@ -77,12 +78,10 @@ public abstract class ShardedSnapshotStore<T, TState> : ShardedService<T>, ISnap
     public async Task WriteManyAsync(IEnumerable<SnapshotWriteJob<TState>> jobs,
         CancellationToken ct = default)
     {
-        // Some commands might share a shared, therefore we don't group by app id.
-        foreach (var byShard in jobs.GroupBy(c => GetShardKey(c.Value)))
+        // Reduce the number of writes by grouping by shard.
+        foreach (var byShard in jobs.GroupBy(c => Shard(getShardKey(c.Value))))
         {
-            var shard = Shard(byShard.Key);
-
-            await shard.WriteManyAsync(byShard.ToArray(), ct);
+            await byShard.Key.WriteManyAsync(byShard.ToArray(), ct);
         }
     }
 

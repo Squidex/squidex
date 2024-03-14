@@ -9,15 +9,15 @@ using Squidex.Hosting;
 
 namespace Squidex.Infrastructure.States;
 
-public abstract class ShardedService<T> : IInitializable
+public abstract class ShardedService<TKey, TService> : IInitializable where TKey : notnull
 {
-    private readonly Dictionary<string, T> shards = new Dictionary<string, T>();
+    private readonly Dictionary<string, TService> shards = [];
     private readonly IShardingStrategy sharding;
-    private readonly Func<string, T> factory;
+    private readonly Func<string, TService> factory;
 
-    protected IEnumerable<T> Shards => shards.Values;
+    protected IEnumerable<TService> Shards => shards.Values;
 
-    protected ShardedService(IShardingStrategy sharding, Func<string, T> factory)
+    protected ShardedService(IShardingStrategy sharding, Func<string, TService> factory)
     {
         this.sharding = sharding;
         this.factory = factory;
@@ -51,18 +51,10 @@ public abstract class ShardedService<T> : IInitializable
         }
     }
 
-    protected string GetShardKey<TKey>(TKey key) where TKey : notnull
+    protected TService Shard(TKey key)
     {
-        return sharding.GetShardKey(key);
-    }
+        var shardKey = sharding.GetShardKey(key);
 
-    protected T Shard<TKey>(TKey key) where TKey : notnull
-    {
-        return shards[GetShardKey(key)];
-    }
-
-    protected string GetShardKey(DomainId appId)
-    {
-        return sharding.GetShardKey(appId);
+        return shards[shardKey];
     }
 }
