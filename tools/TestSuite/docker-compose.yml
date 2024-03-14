@@ -51,15 +51,18 @@ services:
       - RULES__RULESCACHEDURATION=00:00:00
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
+      - STORE__MONGODB__ASSETSHARDCOUNT=20
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
       - STORE__MONGODB__CONTENTDATABASE=squidex2_content
+      - STORE__MONGODB__CONTENTSHARDCOUNT=20
       - STORE__MONGODB__DATABASE=squidex2
+      - STORE__MONGODB__TEXTHARDCOUNT=20
       - STORE__TYPE=MongoDB
       - TEMPLATES__LOCALURL=http://localhost:5000
       - UI__HIDENEWS=true
       - UI__HIDEONBOARDING=true
-      - URLS__BASEURL=http://localhost:8081/squidex/
       - URLS__BASEPATH=squidex/
+      - URLS__BASEURL=http://localhost:8081/squidex/
     networks:
       - internal
     depends_on:
