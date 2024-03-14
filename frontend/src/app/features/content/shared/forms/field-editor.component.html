@@ -1,7 +1,7 @@
 <div class="field" [class.expanded]="isExpanded" *ngIf="formModel">
-    <div class="buttons-container" *ngIf="!(isDisabled | async)">
+    <fieldset class="buttons-container" [disabled]="isDisabled | async">
         <div class="buttons">
-            <button *ngIf="hasChatBot" type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" tabindex="-1">
+            <button type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" [disabled]="!hasChatBot" tabindex="-1">
                 AI
             </button>
 
@@ -18,7 +18,7 @@
                 <i class="icon-close"></i>
             </button>
         </div>
-    </div>
+    </fieldset>
 
     <label>
         {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
