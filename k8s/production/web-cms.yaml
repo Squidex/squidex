@@ -1,0 +1,4 @@
+adminEmail: web-cms-v1@homerlearning.com
+S3Bucket: homer-squidex-web-cms
+secretName: web-cms-squidex
+useTransactions: false

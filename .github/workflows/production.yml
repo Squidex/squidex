@@ -9,6 +9,7 @@ on:
         options:
         - content-v1
         - content-v2
+        - web-cms
       tag:
         description: The tag of Squidex to pull
 
@@ -74,68 +75,23 @@ jobs:
         manifests: |
             ./manifest.yaml
             ./Dockerfile
-        
 
-################################ NOTIFY SLACK #######################################################
-#############################NEEDS HOMER TOKENS ADDED##################################################################
+  slack-notify-success:
+    if: ${{ success() }}
+    needs: [build_and_deploy]
+    uses: LearnWithHomer/infrastructure-public/.github/workflows/slack-notify-success.yml@main
+    with:
+      app_env: ${{ github.event.inputs.choice }}
+      slack_channel: homer-production-status
+    secrets:
+      slack_bot_token: ${{ secrets.CODESPARK_SLACK_BOT_TOKEN }}
 
-    # - name: Notify Slack Staging Success
-    #   if: ${{ success() }}
-    #   uses: wearerequired/slack-messaging-action@v1
-    #   with:
-    #     bot_token: ${{ secrets.HOMER_SLACK_BOT_TOKEN }}
-    #     channel: codespark-staging-status # <--- Enter the right channel name here
-    #     payload: >-
-    #       {
-    #           "icon_emoji": ":rocket:",
-    #           "username": "Deployer",
-    #           "attachments": [
-    #               {
-    #                   "author_name": "${{ github.event.sender.login }}",
-    #                   "author_link": "${{ github.event.sender.html_url }}",
-    #                   "author_icon": "${{ github.event.sender.avatar_url }}",
-    #                   "color": "good",
-    #                   "fallback": "Deployment Finished",
-    #                   "pretext": "SUCCESS: ${{ github.ref_name }} to ${{ env.APP_ENVIRONMENT }} for ${{ github.event.repository.name }}.",
-    #                   "fields": [
-    #                       {
-    #                         "title": "Revision",
-    #                         "value": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}@${{ github.ref }}>",
-    #                         "short": true
-    #                       }
-    #                     ],
-    #                   "footer": "<https://github.com/${{ github.repository }}|${{ github.repository }}>"
-    #               }
-    #           ]
-    #       }
-
-    # - name: Notify Slack Staging Failure
-    #   if: ${{ failure() }}
-    #   uses: wearerequired/slack-messaging-action@v1
-    #   with:
-    #     bot_token: ${{ secrets.HOMER_SLACK_BOT_TOKEN }}
-    #     channel: codespark-staging-status # <--- Enter the right channel name here
-    #     payload: >-
-    #       {
-    #           "icon_emoji": ":boom:",
-    #           "username": "Deployer",
-    #           "attachments": [
-    #               {
-    #                   "author_name": "${{ github.event.sender.login }}",
-    #                   "author_link": "${{ github.event.sender.html_url }}",
-    #                   "author_icon": "${{ github.event.sender.avatar_url }}",
-    #                   "color": "danger",
-    #                   "fallback": "Failed",
-    #                   "pretext": "FAILURE: ${{ github.ref_name }} to ${{ env.APP_ENVIRONMENT }} for ${{ github.event.repository.name }}.",
-    #                   "fields": [
-    #                       {
-    #                         "title": "Revision",
-    #                         "value": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}@${{ github.ref }}>",
-    #                         "short": true
-    #                       }
-    #                     ],
-    #                   "footer": "<https://github.com/${{ github.repository }}|${{ github.repository }}>"
-    #               }
-    #           ]
-    #       }
-
+  slack-notify-failure:
+    if: ${{ failure() }}
+    needs: [build_and_deploy]
+    uses: LearnWithHomer/infrastructure-public/.github/workflows/slack-notify-failure.yml@main
+    with:
+      app_env: ${{ github.event.inputs.choice }}
+      slack_channel: homer-production-status
+    secrets:
+      slack_bot_token: ${{ secrets.CODESPARK_SLACK_BOT_TOKEN }}
