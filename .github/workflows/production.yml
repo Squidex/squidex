@@ -16,7 +16,7 @@ on:
 jobs:
   build_and_deploy:
     name: Deploy
-    runs-on: ubuntu-latest # Using a linux runner
+    runs-on: self-hosted # Using a linux runner
 
     # Setting environment variables
     env:
