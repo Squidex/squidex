@@ -9,51 +9,53 @@ services:
 
   # Base configuration
   squidex1:
-    image: squidex-local
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
     environment:
-      - ASPNETCORE_URLS=http://+:5000
-      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
       - EVENTSTORE__MONGODB__DATABASE=squidex1
-      - GRAPHQL__CACHEDURATION=00:00:00
-      - IDENTITY__ADMINCLIENTID=root
-      - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
-      - IDENTITY__ADMINEMAIL=hello@squidex.io
-      - IDENTITY__ADMINPASSWORD=1q2w3e$$R
-      - IDENTITY__MULTIPLEDOMAINS=true
-      - RULES__RULESCACHEDURATION=00:00:00
-      - SCRIPTING__TIMEOUTEXECUTION=00:00:10
-      - SCRIPTING__TIMEOUTSCRIPT=00:00:10
-      - STORE__MONGODB__CONFIGURATION=mongodb://mongo
       - STORE__MONGODB__CONTENTDATABASE=squidex1_content
       - STORE__MONGODB__DATABASE=squidex1
-      - TEMPLATES__LOCALURL=http://localhost:5000
-      - UI__HIDENEWS=true
-      - UI__HIDEONBOARDING=true
       - URLS__BASEURL=http://localhost:8080
-    networks:
-      - internal
     depends_on:
       - mongo
 
   # Hosted on path and separate worker
-  squidex2:
-    extends: squidex2_worker
-    environment:
-      - CLUSTING_WORKER=false
-
   squidex2_worker:
-    extends: squidex1
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
     environment:
+      - CLUSTERING__WORKER=true
       - EVENTSTORE__MONGODB__DATABASE=squidex2
       - STORE__MONGODB__CONTENTDATABASE=squidex2_content
       - STORE__MONGODB__DATABASE=squidex2
       - STORE__MONGODB__TEXTHARDCOUNT=20
       - URLS__BASEPATH=squidex/
       - URLS__BASEURL=http://localhost:8081/squidex/
+    depends_on:
+      - mongo
+      
+  squidex2:
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
+    environment:
+      - CLUSTERING__WORKER=false
+      - EVENTSTORE__MONGODB__DATABASE=squidex2
+      - STORE__MONGODB__CONTENTDATABASE=squidex2_content
+      - STORE__MONGODB__DATABASE=squidex2
+      - STORE__MONGODB__TEXTHARDCOUNT=20
+      - URLS__BASEPATH=squidex/
+      - URLS__BASEURL=http://localhost:8081/squidex/
+    depends_on:
+      - mongo
 
   # Separate datbases
   squidex3:
-    extends: squidex1
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
     environment:
       - ASSETS__RESIZERURL=http://resizer
       - CONTENTS__OPTIMIZEFORSELFHOSTING=true
@@ -61,6 +63,8 @@ services:
       - STORE__MONGODB__CONTENTDATABASE=squidex3_content
       - STORE__MONGODB__DATABASE=squidex3
       - URLS__BASEURL=http://localhost:8082
+    depends_on:
+      - mongo
 
   resizer:
     image: squidex/resizer:1.3.0
