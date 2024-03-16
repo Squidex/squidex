@@ -1,0 +1,46 @@
+@import 'mixins';
+@import 'vars';
+
+.image {
+    background: $color-black;
+    padding: 0;
+    padding-top: 100%;
+    position: relative;
+
+    &-container {
+        @include absolute(0, 0, 0, 0);
+        display: flex;
+    }
+}
+
+.preview {
+    border: 1px solid $color-border;
+
+    &-wide {
+        padding-top: 20%;
+    }
+
+    &-line2 {
+        margin-top: 1rem;
+        max-height: 20rem;
+        min-height: 20rem;
+        position: relative;
+    }
+
+    &-normal {
+        @include absolute(0, 9rem, 0, 0);
+    }
+
+    &-small {
+        @include absolute(0, 0, 0, null);
+        width: 8rem;
+    }
+}
+
+.absolute {
+    position: absolute !important;
+}
+
+img {
+    background-image: $asset-background;
+}

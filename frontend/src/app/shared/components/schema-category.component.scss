@@ -1,0 +1,107 @@
+@import 'mixins';
+@import 'vars';
+
+$drag-margin: -8px;
+
+.col {
+    overflow: hidden;
+}
+
+.btn {
+    width: 2rem;
+
+    &-toggle {
+        margin-bottom: -.125rem;
+    }
+
+    &:focus {
+        border-color: transparent;
+    }
+}
+
+.droppable {
+    position: relative;
+
+    .drop-indicator {
+        @include absolute($drag-margin, $drag-margin, $drag-margin, $drag-margin);
+        background: none;
+        border: 2px dashed $color-border;
+        border-radius: 4px;
+        display: none;
+        pointer-events: none;
+    }
+
+    &.cdk-drop-list-dragging {
+        border: 0;
+
+        .drop-indicator {
+            display: block;
+        }
+    }
+}
+
+.cdk-drag-preview {
+    background: $color-white !important;
+
+    a {
+        color: $color-black !important;
+    }
+}
+
+.cdk-drag-placeholder {
+    display: none;
+}
+
+.cdk-drag-animating {
+    transition: none;
+}
+
+.nav-heading {
+    margin-left: -1rem;
+    margin-top: 0;
+}
+
+.nav-collapsed {
+    max-width: 100%;
+}
+
+.nav-light {
+    margin-top: 1rem;
+}
+
+.nav-item {
+    align-items: center;
+
+    .drag-handle {
+        margin-right: .5rem;
+    }
+}
+
+.item-published {
+    margin-bottom: 1px;
+}
+
+.nav-category,
+.nav-panel,
+sqx-schema-category {
+    max-width: 100%;
+}
+
+.categories {
+    padding: 0;
+    padding-left: 1rem;
+    font-size: 1rem;
+
+    .nav-light {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+:host {
+    &:first-child {
+        .nav-light {
+            margin-top: 0;
+        }
+    }
+}

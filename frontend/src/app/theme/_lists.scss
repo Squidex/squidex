@@ -1,0 +1,285 @@
+@import 'mixins';
+@import 'vars';
+
+/* stylelint-disable */
+
+//
+// Custom list that can either be used with a table or divs.
+//
+.table-items {
+    & {
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 0;
+    }
+
+    th,
+    td {
+        // Unified padding for all table cells.
+        & {
+            padding: .75rem;
+        }
+
+        // Additional padding for the first column.
+        &:first-child {
+            padding-left: 1.25rem !important;
+        }
+
+        // Additional padding for the last. column.
+        &:last-child {
+            padding-right: 1.25rem !important;
+        }
+    }
+
+    td {
+        border-top: 0;
+    }
+
+    thead {
+        // Small font size for the table header, content is more important!
+        th {
+            border: 0;
+            color: $color-text-decent;
+            font-size: .8rem;
+            font-weight: normal;
+            padding-top: 0;
+            text-decoration: none;
+            text-transform: uppercase;
+            vertical-align: middle;
+
+            // Auto truncate all header elements.
+            & > span {
+                @include truncate;
+            }
+        }
+    }
+
+    //
+    // Use the list style with a table.
+    //
+    tbody {
+        td {
+            background: $color-white;
+            border-bottom: 1px solid $color-border;
+            border-top: 1px solid $color-border;
+            margin: 0;
+            margin-bottom: 10px;
+            vertical-align: middle;
+
+            &:first-child {
+                border-bottom-left-radius: $border-radius;
+                border-left: 1px solid $color-border;
+                border-top-left-radius: $border-radius;
+            }
+
+            &:last-child {
+                border-bottom-right-radius: $border-radius;
+                border-right: 1px solid $color-border;
+                border-top-right-radius: $border-radius;
+            }
+        }
+
+        tr {
+            &:focus {
+                outline: none;
+            }
+
+            // Blue background and white text when active.
+            &.active {
+                td {
+                    border-color: $color-theme-brand;
+                }
+            }
+        }
+    }
+
+    //
+    // Use the list style with divs.
+    //
+    &-row {
+        & {
+            background: $color-white;
+            border: 1px solid $color-border;
+            border-radius: $border-radius;
+            margin-bottom: .25rem;
+        }
+
+        // Summary row for expandable rows.
+        &-summary {
+            padding: .75rem 1.25rem;
+        }
+
+        &-empty {
+            color: $color-text-decent;
+        }
+
+        .btn-expand {
+            position: relative;
+
+            &.expanded {
+                background-color: $color-theme-brand-light;
+                border-color: $color-theme-brand-light;
+                color: $color-theme-brand;
+                font-size: inherit;
+                font-weight: 500;
+
+                // Caret that is placed next to the expand button.
+                &::before {
+                    @include caret-top($color-border-light, 10px);
+                    @include absolute(null, null, -1.1rem, 50%);
+                    margin-left: -10px;
+                }
+            }
+        }
+
+        // Detail row for expandable rows.
+        &-details {
+            & {
+                position: relative;
+            }
+
+            &-tab {
+                padding: 1.5rem;
+            }
+
+            &-tabs {
+                background: $color-border-light;
+                border: 0;
+                border-bottom: 2px solid $color-border;
+                height: 3.75rem;
+                padding: .75rem 1.25rem;
+                position: relative;
+
+                .nav-tabs2 {
+                    @include absolute(auto, auto, -2px, 1.25rem);
+                }
+            }
+        }
+    }
+
+    &-header {
+        background: $color-theme-secondary;
+        border-bottom: 1px solid $color-border-darker;
+        margin-bottom: .75rem;
+        padding: .75rem 1.25rem;
+    }
+
+    // Spacer item between two normal items, because table rows cannot have margins.
+    .spacer {
+        border: 0;
+        box-shadow: none;
+        height: .25rem;
+    }
+}
+
+tbody {
+    &:last-child {
+        .spacer {
+            display: none;
+        }
+    }
+}
+
+//
+// Cell styles
+//
+.cell {
+    &-40 {
+        @include force-width(40%);
+    }
+
+    &-60 {
+        @include force-width(60%);
+    }
+
+    &-select {
+        @include force-width(50px);
+    }
+
+    &-label {
+        @include force-width(100px);
+    }
+
+    &-separator {
+        @include force-width(60px);
+    }
+
+    &-user {
+        @include force-width(55px);
+    }
+
+    &-time {
+        @include force-width(180px);
+    }
+
+    &-actions {
+        @include force-width(70px);
+    }
+
+    &-actions-lg {
+        @include force-width(150px);
+    }
+
+    &-content {
+        min-width: 200px;
+    }
+
+    &-separator,
+    &-select {
+        text-align: center;
+    }
+
+    &-auto-right,
+    &-actions,
+    &-actions-lg {
+        text-align: right;
+    }
+
+    &-actions-left {
+        text-align: left;
+    }
+}
+
+.cell-select {
+    font-size: 1rem !important;
+    font-weight: normal;
+    text-transform: none;
+
+    .form-check {
+        margin: 0;
+    }
+}
+
+//
+// Table cell with truncated content.
+//
+.table-cell {
+    @include truncate;
+}
+
+//
+// Lightweight pagination controls.
+//
+.pagination {
+    & {
+        margin-top: 1rem;
+    }
+
+    &-text {
+        line-height: 2.2rem;
+    }
+
+    &-button {
+        & {
+            color: $color-text;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-left: .4rem;
+        }
+
+        &:hover,
+        &.active {
+            color: darken($color-text, 20%);
+        }
+    }
+}

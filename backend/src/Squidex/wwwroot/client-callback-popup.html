@@ -1,0 +1,15 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <base href="/">
+</head>
+<body>
+    <script src="scripts/oidc-client.min.js"></script>
+    <script>
+        Oidc.Log.logger = console;
+        Oidc.Log.logLevel = Oidc.Log.INFO;
+
+        new Oidc.UserManager().signinPopupCallback();
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+
+<form [formGroup]="fieldForm.form" (ngSubmit)="saveSchema()">
+    <h5>{{ 'common.generalSettings' | sqxTranslate }}</h5>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="name">{{ 'common.name' | sqxTranslate }}</label>
+        
+                <input type="text" class="form-control" id="name" readonly [ngModel]="schema.name" [ngModelOptions]="{ standalone: true }">
+            </div>
+
+            <div class="form-group">
+                <label for="label">{{ 'common.label' | sqxTranslate }}</label>
+                
+                <sqx-control-errors for="label"></sqx-control-errors>
+        
+                <input type="text" class="form-control" id="label" formControlName="label">
+
+                <sqx-form-hint>{{ 'schemas.schemaLabelHint' | sqxTranslate }}</sqx-form-hint>
+            </div>
+        
+            <div class="form-group">
+                <label for="hints">{{ 'common.hints' | sqxTranslate }}</label>
+                
+                <sqx-control-errors for="hints"></sqx-control-errors>
+        
+                <textarea type="text" class="form-control" id="hints" formControlName="hints" rows="4"></textarea>
+
+                <sqx-form-hint>{{ 'schemas.schemaHintsHint' | sqxTranslate }}</sqx-form-hint>
+            </div>
+        
+            <div class="form-group">
+                <label for="hints">{{ 'schemas.contentsSidebarUrl' | sqxTranslate }}</label>
+                
+                <sqx-control-errors for="contentsSidebarUrl"></sqx-control-errors>
+        
+                <input type="url" class="form-control" id="contentsSidebarUrl" formControlName="contentsSidebarUrl">
+
+                <sqx-form-hint>{{ 'schemas.contentsSidebarUrlHint' | sqxTranslate }}</sqx-form-hint>
+            </div>
+        
+            <div class="form-group">
+                <label for="hints">{{ 'schemas.contentSidebarUrl' | sqxTranslate }}</label>
+                
+                <sqx-control-errors for="contentSidebarUrl"></sqx-control-errors>
+        
+                <input type="url" class="form-control" id="contentSidebarUrl" formControlName="contentSidebarUrl">
+
+                <sqx-form-hint>{{ 'schemas.contentSidebarUrlHint' | sqxTranslate }}</sqx-form-hint>
+            </div>
+        
+            <div class="form-group">
+                <label for="hints">{{ 'schemas.contentEditorUrl' | sqxTranslate }}</label>
+                
+                <sqx-control-errors for="contentEditorUrl"></sqx-control-errors>
+        
+                <input type="url" class="form-control" id="contentEditorUrl" formControlName="contentEditorUrl">
+
+                <sqx-form-hint>{{ 'schemas.contentEditorUrl' | sqxTranslate }}</sqx-form-hint>
+            </div>
+        
+            <div class="form-group">
+                <label for="tags">{{ 'common.tags' | sqxTranslate }}</label>
+                
+                <sqx-control-errors for="tags"></sqx-control-errors>
+        
+                <sqx-tag-editor id="tags" formControlName="tags"></sqx-tag-editor>
+        
+                <sqx-form-hint>{{ 'schemas.schemaTagsHint' | sqxTranslate }}</sqx-form-hint>
+            </div>
+
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="validateOnPublish" formControlName="validateOnPublish">
+                    <label class="form-check-label" for="validateOnPublish">
+                        {{ 'schemas.validateOnPublish' | sqxTranslate }}
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="float-end btn btn-primary" *ngIf="isEditable">
+                {{ 'common.save' | sqxTranslate }}
+            </button>
+        </div>
+    </div>
+</form>

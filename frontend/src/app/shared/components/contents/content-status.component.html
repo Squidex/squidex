@@ -1,0 +1,45 @@
+<ng-container *ngIf="isMultiline; else simple">
+    <div class="content-status-summary">
+        <span class="content-status default me-1" [style.color]="statusColor" title="{{tooltipText}}">
+            <i class="icon-circle icon-sm"></i>
+        </span>
+
+        <span class="label">{{status}}</span>
+    </div>
+
+    <div class="content-status-scheduled mt-2" *ngIf="scheduled">
+        <div>
+            <span class="label">{{ 'contents.scheduledTo' | sqxTranslate }}&nbsp;</span>
+
+            <span class="content-status default me-1" [style.color]="scheduled?.color" title="{{tooltipText}}">
+                <i class="icon-circle icon-sm"></i>
+            </span>
+
+            <span>{{scheduled?.status}}</span>
+        </div>
+
+        <div class="truncate">
+            <span class="label">{{ 'contents.scheduledAt' | sqxTranslate }}&nbsp;</span>
+    
+            <span>{{scheduled?.dueTime | sqxFullDateTime}}</span>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #simple>
+    <span [class.truncate]="truncate">
+        <ng-container *ngIf="scheduled; else noSchedule">
+            <span class="content-status pending" [style.color]="scheduled?.color" title="{{tooltipText}}">
+                <i class="icon-clock" [class.icon-sm]="small"></i>
+            </span>
+        </ng-container>
+        
+        <ng-template #noSchedule>
+            <span class="content-status default" [style.color]="statusColor" title="{{tooltipText}}">
+                <i class="icon-circle" [class.icon-sm]="small"></i>
+            </span>
+        </ng-template>
+        
+        <span class="content-status-label ms-1" *ngIf="isText">{{status}}</span>
+    </span>
+</ng-template>

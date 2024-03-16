@@ -1,0 +1,22 @@
+<ng-container *ngIf="queries && queries.length > 0; else noQuery">
+    <div class="nav nav-light flex-column">
+        <div class="nav-item">
+            <a class="nav-link" *ngFor="let saved of queries; trackBy: trackByQuery" (click)="search.emit(saved.query)" [class.active]="isSelectedQuery(saved)">
+                <div class="row g-0">
+                    <div class="col truncate">
+                        <i class="icon-circle" [style.color]="saved.color" [class.hidden]="!saved.color"></i> {{saved.name | sqxTranslate}}
+                    </div>
+                    <div class="col-auto">
+                        <a class="btn-sm btn-text-danger btn-remove" (click)="remove.emit(saved)" *ngIf="canRemove" sqxStopClick>
+                            <i class="icon-close"></i>
+                        </a>
+                    </div>
+                </div>     
+            </a>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #noQuery>
+    <div class="text-muted small" *ngIf="canRemove" [innerHTML]="'search.queriesEmpty' | sqxTranslate: { types: types }"></div>
+</ng-template>

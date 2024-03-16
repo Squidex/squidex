@@ -1,0 +1,119 @@
+<div class="table-items-row table-items-row-expandable language"> 
+    <div class="table-items-row-summary row gx-2 align-items-center">
+        <div class="col-2" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+            {{language.iso2Code}}
+        </div>
+        <div class="col" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+            {{language.englishName}}
+        </div>
+        <div class="col-auto">
+            <div class="float-end">
+                <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()" *ngIf="!language.isMaster">
+                    <i class="icon-settings"></i>
+                </button>
+
+                <button type="button" class="btn btn-text-danger" [disabled]="!language.canDelete"
+                    (sqxConfirmClick)="remove()"
+                    confirmTitle="i18n:languages.deleteConfirmTitle"
+                    confirmText="i18n:languages.deleteConfirmText"
+                    confirmRememberKey="removeLanguage">
+                    <i class="icon-bin2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-items-row-details" *ngIf="isEditing">
+        <form [formGroup]="editForm.form" (ngSubmit)="save()">
+            <div class="table-items-row-details-tabs clearfix">
+                <div class="float-end">
+                    <button type="reset" class="btn btn-text-secondary" (click)="toggleEditing()">
+                        {{ 'common.cancel' | sqxTranslate }}
+                    </button>
+                    
+                    <button type="submit" class="btn btn-primary ms-1" *ngIf="isEditable">
+                        {{ 'common.save' | sqxTranslate }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-items-row-details-tab">
+                <div class="form-group row" *ngIf="isEditable || fallbackLanguages.length > 0">
+                    <label class="col-3 col-form-label fallback-label">{{ 'common.fallback' | sqxTranslate }}</label>
+
+                    <div class="col-9">
+                        <div class="fallback-languages"
+                            cdkDropList
+                            [cdkDropListData]="$any(fallbackLanguages)"
+                            [cdkDropListDisabled]="!isEditable"
+                            (cdkDropListDropped)="sort($event)"
+                            *ngIf="fallbackLanguages.length > 0">
+                            <div class="fallback-language table-drag" *ngFor="let language of fallbackLanguages" cdkDrag cdkDragLockAxis="y">
+                                <div class="row g-0">
+                                    <div class="col-auto" *ngIf="isEditable">
+                                        <i cdkDragHandle class="icon-drag2 drag-handle me-1"></i>
+                                    </div>
+                                    <div class="col">
+                                        {{language.englishName}}
+                                    </div>
+                                    <div class="col-auto" *ngIf="isEditable">
+                                        <button type="button" class="btn btn-text-secondary btn-sm" (click)="removeFallbackLanguage(language)">
+                                            <i class="icon-close"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form class="form fallback-form" (ngSubmit)="addFallbackLanguage()" *ngIf="otherLanguage && isEditable">
+                            <div class="row gx-2">
+                                <div class="col">
+                                    <select class="form-select fallback-select" [(ngModel)]="otherLanguage" name="otherLanguage">
+                                        <option *ngFor="let otherLanguage of fallbackLanguagesNew; trackBy: trackByLanguage" [ngValue]="otherLanguage">
+                                            {{otherLanguage.englishName}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-success">
+                                        {{ 'languages.add' | sqxTranslate }}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="form-group row" *ngIf="!language.isMaster">
+                    <div class="col offset-3 col-9">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isMaster" formControlName="isMaster">
+                            <label class="form-check-label" for="{{language.iso2Code}}_isMaster">
+                                {{ 'languages.master' | sqxTranslate }}
+                            </label>
+                        </div>
+    
+                        <sqx-form-hint>
+                            {{ 'languages.masterHint' | sqxTranslate }}
+                        </sqx-form-hint>
+                    </div>
+                </div>
+
+                <div class="form-group row" *ngIf="!language.isMaster">
+                    <div class="col offset-3 col-9">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isOptional" formControlName="isOptional">
+                            <label class="form-check-label" for="{{language.iso2Code}}_isOptional">
+                                {{ 'languages.optional' | sqxTranslate }}
+                            </label> 
+                        </div>
+
+                        <sqx-form-hint>
+                            {{ 'languages.optionalHint' | sqxTranslate }}
+                        </sqx-form-hint>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

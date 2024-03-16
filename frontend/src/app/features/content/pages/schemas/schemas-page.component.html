@@ -1,0 +1,30 @@
+<sqx-title message="i18n:contents.schemasPageTitle"></sqx-title>
+
+<sqx-layout layout="left" titleCollapsed="i18n:common.schemas" [width]="18" [white]="true" [padding]="true" [overflow]="true" *ngIf="!isEmbedded">
+    <ng-container menu>
+        <div class="search-form">
+            <input class="form-control" [formControl]="schemasFilter" placeholder="{{ 'contents.searchSchemasPlaceholder' | sqxTranslate }}">
+
+            <i class="icon-search"></i>
+        </div>
+    </ng-container>
+
+    <ng-container>
+        <ul class="nav nav-light mb-2 flex-column">
+            <li class="nav-item">
+                <a class="nav-link" routerLink="__calendar" routerLinkActive="active">
+                    {{ 'contents.calendar' | sqxTranslate }}
+                </a>
+            </li>
+        </ul>
+    
+        <ng-container>
+            <sqx-schema-category *ngFor="let category of categories | async; trackBy: trackByCategory"
+                [schemaCategory]="category" 
+                [schemaTarget]="'Contents'">
+            </sqx-schema-category>
+        </ng-container>
+    </ng-container>
+</sqx-layout>
+
+<router-outlet></router-outlet>

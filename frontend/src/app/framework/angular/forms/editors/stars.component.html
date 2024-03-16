@@ -1,0 +1,17 @@
+<div class="stars-container">
+    <ng-container *ngIf="maximumStars > 0 && maximumStars <= 15; else noStars">
+        <span class="stars" (mouseleave)="stopPreview()" [class.disabled]="snapshot.isDisabled">
+            <span class="star" *ngFor="let star of snapshot.starsArray" (mouseenter)="setPreview(star)" (click)="setValue(star)" [class.selected]="star <= snapshot.stars"></span>
+        </span>
+
+        <button type="button" class="btn btn-text-secondary" [class.hidden]="!snapshot.value" (click)="reset()">
+            {{ 'common.clear' | sqxTranslate }}
+        </button>
+    </ng-container>
+
+    <ng-template #noStars>
+        <div class="many-stars">
+            {{ 'common.stars.max' | sqxTranslate }}
+        </div>
+    </ng-template>
+</div>

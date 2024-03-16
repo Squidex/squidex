@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@rjsf/core/dist/react-jsonschema-form.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="https://cloud.squidex.io/build/styles.css">
+
+    <style>
+        body {
+            background: none;
+        }
+
+        #root__title {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editor"></div>
+
+    <script>
+        const Form = JSONSchemaForm.default;
+        
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
+        const field = new SquidexFormField();
+
+        function Editor() {
+            var stateDisabled = React.useState(false); // Use ES5 language features only.
+            var stateValue = React.useState(undefined);
+            var stateSchema = React.useState(undefined);
+
+            React.useEffect(function () {
+                field.onDisabled(function (disabled) {
+                    stateDisabled[1](disabled);
+                });
+                
+                field.onValueChanged(function (value) {
+                    stateValue[1](value);
+                });
+
+                if (window.location.hash && window.location.hash.length > 1) {
+                    fetch(window.location.hash.substr(1))
+                        .then(x => x.json())
+                        .then(x => stateSchema[1](x));
+                }
+            }, []);
+
+            const doBlur = React.useCallback(function () {
+                field.touched();
+            }, []);
+
+            const doChange = React.useCallback(function (editor) {
+                if (editor.errors.length === 0) {
+                    field.valueChanged(editor.formData);
+                }
+            }, []);
+
+            if (!stateSchema[0]) {
+                return null;
+            }
+        
+            return (
+                React.createElement(Form, {
+                    formData: stateValue[0],
+                    disabled: stateDisabled[0],
+                    onChange: doChange,
+                    onBlur: doBlur,
+                    schema: stateSchema[0],
+                    children: [] // Hide submit button
+                })
+            );
+        }
+
+        ReactDOM.render(React.createElement(Editor), document.getElementById("editor"));
+    </script>
+</body>
+
+</html>

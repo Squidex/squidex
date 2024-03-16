@@ -1,0 +1,70 @@
+@import 'mixins';
+@import 'vars';
+
+.app {
+    &-image {
+        min-height: 150px;
+        min-width: 150px;
+        position: relative;
+    }
+
+    &-image-remove {
+        @include absolute(auto, .5rem, .5rem, auto);
+    }
+
+    &-progress {
+        @include absolute(1rem, 1rem, 1rem, 1rem);
+    }
+}
+
+.card-header,
+.card-footer {
+    padding: 1.25rem;
+}
+
+@mixin overlay {
+    @include absolute(0, 0, 0, 0);
+    color: $color-white;
+    display: flex;
+    opacity: 0;
+    transition: opacity .4s ease;
+
+    &-background {
+        @include absolute(0, 0, 0, 0);
+        background: $color-black;
+        opacity: .7;
+    }
+}
+
+.upload-button {
+    margin-top: 1rem;
+
+    input {
+        @include hidden;
+    }
+}
+
+.drop-overlay {
+    @include overlay;
+    pointer-events: none;
+
+    &-text {
+        font-size: 1.25rem;
+        font-weight: normal;
+        position: absolute;
+    }
+}
+
+.drag {
+    .drop-overlay {
+        opacity: 1;
+    }
+
+    .app-image-remove {
+        display: none;
+    }
+}
+
+.disabled {
+    pointer-events: none;
+}

@@ -1,0 +1,63 @@
+@import 'mixins';
+@import 'vars';
+
+.disabled {
+    pointer-events: none;
+}
+
+.assets {
+    &-container {
+        background: $color-background;
+        height: $asset-height + 2rem;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        padding: 1rem;
+        padding-bottom: 0;
+    }
+}
+
+.list-view {
+    margin-bottom: 1rem;
+}
+
+.body {
+    margin-bottom: -.25rem;
+    margin-top: 1rem;
+    min-height: 1px;
+}
+
+.unrow {
+    display: block;
+}
+
+.drop-area {
+    @include truncate-nowidth;
+    border: 2px dashed darken($color-border, 10%);
+    border-radius: $border-radius;
+    color: darken($color-border, 30%);
+    cursor: pointer;
+    padding: 5px .5rem;
+    text-align: center;
+    text-decoration: none;
+    transition: border-color .4s ease;
+
+    &:hover {
+        text-decoration: underline;
+    }
+
+    &-container {
+        padding-bottom: 1rem;
+    }
+
+    &.drag {
+        border-color: darken($color-border, 15%);
+        color: darken($color-border, 40%);
+        cursor: copy;
+        text-decoration: none;
+    }
+}
+
+.col-4 {
+    padding-left: .5rem;
+    padding-right: .5rem;
+}

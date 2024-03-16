@@ -1,0 +1,29 @@
+<div class="menu">
+    <button type="button" class="btn" (click)="rotate(-90)" title="i18n:assets.editor.rotateLeft">
+        <i class="icon-rotate_left"></i>
+    </button>
+
+    <button type="button" class="btn" (click)="rotate(90)" title="i18n:assets.editor.rotateRight">
+        <i class="icon-rotate_right"></i>
+    </button>
+
+    <span class="separator"></span>
+
+    <button type="button" class="btn" (click)="flip(false)" title="i18n:assets.editor.flipVertically">
+        <i class="icon-flip"></i>
+    </button>
+
+    <button type="button" class="btn rotate 90" (click)="flip(true)" title="i18n:assets.editor.flipHorizontally">
+        <i class="icon-flip"></i>
+    </button>
+
+    <span class="separator"></span>
+
+    <button type="button" class="btn" (click)="reset()" title="i18n:common.reset">
+        <i class="icon-close"></i>
+    </button>
+</div>
+
+<div class="editor">
+    <canvas #editor></canvas>
+</div>

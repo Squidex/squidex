@@ -1,0 +1,54 @@
+<ng-container *ngIf="appsState.selectedApp | async; let app">
+    <ng-container *ngIf="app.canUploadAssets">
+        <ul class="nav navbar-nav align-items-center" *ngIf="assetUploader.uploads | async; let uploads" (sqxDropFile)="addFiles($event)">
+            <li class="nav-item nav-icon dropdown">
+                <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
+                    <i class="icon-upload-3"></i>
+
+                    <span>{{uploads.length}}</span>
+                </span>
+
+                <ng-container *sqxModal="modalMenu;onRoot:false">
+                    <sqx-dropdown-menu class="container" (sqxDropFile)="addFiles($event)">
+                        <div class="uploads">
+                            <small class="uploads-empty text-muted" *ngIf="uploads.length === 0">
+                                {{ 'assets.uploaderUploadHere' | sqxTranslate }}
+                            </small>
+                
+                            <div class="upload row g-0" *ngFor="let upload of uploads; trackBy: trackByUpload">
+                                <div class="col-auto" [ngSwitch]="upload.status">
+                                    <div *ngSwitchCase="'Failed'" class="upload-status upload-status-failed">
+                                        <i class="icon-exclamation"></i>
+                                    </div>
+                                    <div *ngSwitchCase="'Completed'" class="upload-status upload-status-success">
+                                        <i class="icon-checkmark"></i>
+                                    </div>
+                                    <div *ngSwitchDefault class="upload-status upload-status-running">
+                                        <i class="icon-hour-glass"></i>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="upload-name">{{upload.name}}</div>
+                                </div>
+                                <div class="col">
+                                    <sqx-progress-bar 
+                                        [value]="upload.progress" 
+                                        [trailWidth]="1.5"
+                                        [strokeWidth]="1.5" 
+                                        [showText]="false"
+                                        [animated]="false">
+                                    </sqx-progress-bar>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-text-secondary" (click)="stopUpload(upload)">
+                                        <i class="icon-close"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </sqx-dropdown-menu>
+                </ng-container>
+            </li>
+        </ul>
+    </ng-container>
+</ng-container>

@@ -1,0 +1,102 @@
+@import 'mixins';
+@import 'vars';
+
+.apps {
+    &-section {
+        @include clearfix;
+        padding: 2rem 1.25rem 0 $size-sidebar-width + .25rem;
+    }
+}
+
+.page {
+    left: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+%no-decoration {
+    text-decoration: none;
+}
+
+:host ::ng-deep {
+    .card {
+        @include hover-visible('.deeplinks', inline);
+        display: inline-block;
+        margin-bottom: 1rem;
+        margin-right: 1rem;
+        vertical-align: top;
+        width: 20rem;
+
+        &-links {
+            margin-top: .5rem;
+        }
+
+        &-left {
+            padding-right: .75rem;
+        }
+
+        &-right {
+            overflow: hidden;
+        }
+
+        &-image {
+            text-align: center;
+
+            img {
+                height: 6rem;
+            }
+        }
+
+        &-text {
+            font-size: $font-small;
+
+            a {
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        &-title {
+            @include truncate;
+            color: $color-title;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+
+        &-template {
+            .card-body {
+                min-height: 15.5rem;
+            }
+
+            .card-title {
+                margin-bottom: .75rem;
+                margin-top: 1rem;
+            }
+        }
+
+        &-href {
+            cursor: pointer;
+
+            &:hover {
+                @extend %no-decoration;
+                @include box-shadow-outer(0, 3px, 16px, .2);
+            }
+
+            &:focus {
+                @extend %no-decoration;
+                outline: none;
+            }
+
+            &:active {
+                @extend %no-decoration;
+            }
+        }
+    }
+}
+
+.info {
+    color: $color-border-dark;
+}

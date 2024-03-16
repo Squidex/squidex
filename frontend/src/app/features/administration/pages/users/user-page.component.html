@@ -1,0 +1,79 @@
+
+<form [formGroup]="userForm.form" (ngSubmit)="save()">
+    <input style="display: none;" type="password" name="foilautofill">
+
+    <sqx-layout layout="simple" [width]="30" [white]="true" [padding]="true" [overflow]="true">
+        <ng-container title>
+            <ng-container *ngIf="usersState.selectedUser | async; else noUserTitle">
+                <sqx-title message="i18n:users.editPageTitle"></sqx-title>
+
+                <h3>{{ 'users.editTitle' | sqxTranslate }}</h3>
+            </ng-container>
+
+            <ng-template #noUserTitle>
+                <sqx-title message="i18n:users.createPageTitle"></sqx-title>
+
+                <h3>{{ 'users.createTitle' | sqxTranslate }}</h3>
+            </ng-template>
+        </ng-container>
+
+        <ng-container menu>
+            <ng-container *ngIf="usersState.selectedUser | async; let user; else noUserMenu">
+                <button type="submit" class="btn btn-primary" shortcut="CTRL + SHIFT + S" *ngIf="isEditable">
+                    {{ 'common.save' | sqxTranslate }}
+                </button>
+            </ng-container>
+
+            <ng-template #noUserMenu>
+                <button type="submit" class="btn btn-primary" shortcut="CTRL + SHIFT + S">
+                    {{ 'common.save' | sqxTranslate }}
+                </button>
+            </ng-template>
+        </ng-container>
+
+        <ng-container >
+            <sqx-form-error [error]="userForm.error | async"></sqx-form-error>
+
+            <div class="form-group">
+                <label for="email">{{ 'common.email' | sqxTranslate }} <small class="hint">({{ 'common.requiredHint' | sqxTranslate }})</small></label>
+
+                <sqx-control-errors for="email"></sqx-control-errors>
+
+                <input type="email" class="form-control" id="email" maxlength="100" formControlName="email" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="displayName">{{ 'common.displayName' | sqxTranslate }} <small class="hint">({{ 'common.requiredHint' | sqxTranslate }})</small></label>
+
+                <sqx-control-errors for="displayName"></sqx-control-errors>
+
+                <input type="text" class="form-control" id="displayName" maxlength="100" formControlName="displayName" autocomplete="off" spellcheck="false">
+            </div>
+
+            <div class="form-group form-group-section">
+                <div class="form-group">
+                    <label for="password">{{ 'common.password' | sqxTranslate }}</label>
+
+                    <sqx-control-errors for="password"></sqx-control-errors>
+
+                    <input type="password" class="form-control" id="password" maxlength="100" formControlName="password" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">{{ 'common.passwordConfirm' | sqxTranslate }}</label>
+
+                    <sqx-control-errors for="passwordConfirm"></sqx-control-errors>
+
+                    <input type="password" class="form-control" id="passwordConfirm" maxlength="100" formControlName="passwordConfirm" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="form-group form-group-section">
+                <label for="permissions">{{ 'common.permissions' | sqxTranslate }}</label>
+
+                <sqx-control-errors for="permissions"></sqx-control-errors>
+
+                <textarea class="form-control" id="permissions" formControlName="permissions" placeholder="{{ 'common.separateByLine' | sqxTranslate }}" autocomplete="off" spellcheck="false"></textarea>
+            </div>
+        </ng-container>
+    </sqx-layout>
+</form>

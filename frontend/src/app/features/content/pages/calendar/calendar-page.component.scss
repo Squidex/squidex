@@ -1,0 +1,59 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .tui-full-calendar-weekday-schedule-bullet {
+        top: 10px !important;
+    }
+
+    .tui-full-calendar-time-schedule {
+        min-height: 22px;
+    }
+
+    .tui-full-calendar-time-schedule-content {
+        min-height: 22px !important;
+    }
+
+    .tui-full-calendar-dayname {
+        cursor: pointer;
+    }
+
+    .tui-full-calendar-weekday-grid-date {
+        cursor: pointer;
+
+        &:hover {
+            background-color: $color-border-light;
+            border: 0;
+            border-radius: 20px;
+        }
+    }
+
+    .tui-full-calendar-today {
+        .tui-full-calendar-weekday-grid-date {
+            background-color: $color-theme-brand !important;
+
+            &:hover {
+                background-color: $color-theme-brand-darker !important;
+            }
+        }
+    }
+}
+
+.calendar {
+    @include absolute(-1px, 0, 0, 0);
+}
+
+.form-select {
+    display: inline-block;
+    white-space: normal;
+    width: auto;
+}
+
+.form-group-aligned {
+    align-items: center;
+
+    .col-form-label {
+        padding-bottom: 0;
+        padding-top: 0;
+    }
+}

@@ -1,0 +1,130 @@
+<sqx-title message="i18n:contents.calendar"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:contents.calendar" [hideSidebar]="true">
+    <ng-container menu>
+        {{title}}
+
+        <select class="form-select ms-4" [ngModel]="view" (ngModelChange)="changeView($event)" [disabled]="isLoading">
+            <option ngValue="day">{{ 'common.daily' | sqxTranslate }}</option>
+            <option ngValue="week">{{ 'common.weekly' | sqxTranslate }}</option>
+            <option ngValue="month">{{ 'common.monthly' | sqxTranslate }}</option>
+        </select>
+
+        <button type="button" class="btn btn-text-secondary btn-navigate ms-2" (click)="goPrev()" [disabled]="isLoading">
+            <i class="icon-caret-left"></i>
+        </button>
+        <button type="button" class="btn btn-text-secondary btn-navigate ms-2" (click)="goNext()" [disabled]="isLoading">
+            <i class="icon-caret-right"></i>
+        </button>
+    </ng-container>
+
+    <ng-container content>
+        <div class="calendar" #calendarContainer></div>
+    </ng-container>
+</sqx-layout>
+
+<ng-container *sqxModal="contentDialog">
+    <sqx-modal-dialog (close)="contentDialog.hide()">
+        <ng-container title>
+            {{ 'common.content' | sqxTranslate }}
+        </ng-container>
+
+        <ng-container content>
+            <div *ngIf="content && content.scheduleJob">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">{{ 'common.id' | sqxTranslate }}</label>
+            
+                    <div class="col-8">
+                        <div class="input-group">
+                            <input readonly class="form-control" name="id" id="id" value="{{content.id}}" #inputId>
+        
+                            <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputId">
+                                <i class="icon-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ 'common.content' | sqxTranslate }}</label>
+            
+                    <div class="col-8">
+                        <a class="truncate" [routerLink]="['../', content.schemaName, content.id]">
+                            {{createContentName(content)}}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ 'common.schema' | sqxTranslate }}</label>
+            
+                    <div class="col-8">
+                        <a class="truncate" [routerLink]="['../', content.schemaName]">
+                            {{content.schemaDisplayName}}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ 'common.status' | sqxTranslate }}</label>
+            
+                    <div class="col-8">
+                        <sqx-content-status
+                            layout="text"
+                            [status]="content.status"
+                            [statusColor]="content.statusColor"
+                            [small]="true">
+                        </sqx-content-status>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ 'contents.scheduledToLabel' | sqxTranslate }}</label>
+            
+                    <div class="col-8">
+                        <sqx-content-status
+                            layout="text"
+                            [status]="content.scheduleJob.status"
+                            [statusColor]="content.scheduleJob.color"
+                            [small]="true">
+                        </sqx-content-status>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ 'contents.scheduledAt' | sqxTranslate }}</label>
+            
+                    <div class="col-8">
+                        {{content.scheduleJob.dueTime | sqxFullDateTime}}
+                    </div>
+                </div>
+
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ 'contents.scheduledBy' | sqxTranslate }}</label>
+            
+                    <div class="col-8">
+                        <img class="user-picture" [src]="content.scheduleJob.scheduledBy | sqxUserPictureRef"> {{content.scheduleJob.scheduledBy | sqxUserNameRef}}
+                    </div>
+                </div>
+
+                <ng-container *ngIf="content.canCancelStatus">
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-8 offset-4">
+                            <button type="button" class="btn btn-outline-danger" [class.disabled]="!content.canCancelStatus"
+                                (sqxConfirmClick)="cancelStatus()"
+                                confirmTitle="i18n:contents.cancelStatusConfirmTitle"
+                                confirmText="i18n:contents.cancelStatusConfirmText"
+                                confirmRememberKey="cancelStatus">
+                                {{ 'contents.cancelStatus' | sqxTranslate }}
+                            </button>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>

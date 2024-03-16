@@ -1,0 +1,22 @@
+@import 'mixins';
+@import 'vars';
+
+.card {
+    margin-bottom: .5rem;
+
+    &-footer {
+        font-size: $font-small;
+    }
+}
+
+.btn-run {
+    color: $color-theme-brand !important;
+}
+
+a {
+    text-decoration: none;
+}
+
+.col-last {
+    @include force-width(80px);
+}

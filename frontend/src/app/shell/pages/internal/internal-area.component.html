@@ -1,0 +1,20 @@
+<nav class="navbar navbar-light navbar-expand fixed-top bg-white align-items-center" *ngIf="!isEmbedded">
+    <span class="navbar-brand align-items-center justify-content-center d-flex" routerLink="/app">
+        <sqx-logo [isLoading]="loadingService.loading | async"></sqx-logo>
+    </span>
+
+    <div class="navbar-nav">
+        <sqx-apps-menu></sqx-apps-menu>
+    </div>
+
+    <div class="navbar-nav align-items-center ms-auto">
+        <sqx-search-menu></sqx-search-menu>
+        <sqx-asset-uploader></sqx-asset-uploader>
+        <sqx-notifications-menu></sqx-notifications-menu>
+        <sqx-profile-menu></sqx-profile-menu>
+    </div>
+</nav>
+
+<div class="main" [class.top]="isEmbedded">
+    <router-outlet></router-outlet>
+</div>

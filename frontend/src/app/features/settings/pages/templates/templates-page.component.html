@@ -1,0 +1,25 @@
+<sqx-title message="i18n:common.templates"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:common.templates" titleIcon="templates" [innerWidth]="50" [hideSidebar]="true">
+    <ng-container menu>
+        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:templates.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        </button>
+    </ng-container>
+
+    <ng-container>
+        <sqx-list-view innerWidth="50rem" [isLoading]="templatesState.isLoading | async">
+            <sqx-form-alert [light]="true">
+                <div class="help" [innerHTML]="'templates.cliHint' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></div>
+            </sqx-form-alert>
+
+            <ng-container *ngIf="(templatesState.isLoaded | async) && (templatesState.templates | async); let templates">    
+                <sqx-template *ngFor="let template of templates; trackBy: trackByTemplate"
+                    [template]="template">
+                </sqx-template>
+            </ng-container>
+        </sqx-list-view>
+    </ng-container>
+</sqx-layout>
+
+<router-outlet></router-outlet>

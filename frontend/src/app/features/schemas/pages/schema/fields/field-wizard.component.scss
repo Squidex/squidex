@@ -1,0 +1,19 @@
+@import 'mixins';
+@import 'vars';
+
+$icon-size: 4.5rem;
+
+:host ::ng-deep {
+    .table-items-row-details-tab {
+        padding: 1.5rem 1.75rem;
+        padding-bottom: 0;
+    }
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.edit-form {
+    margin: -1.75rem -1.75rem 0;
+}

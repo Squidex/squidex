@@ -1,0 +1,32 @@
+<sqx-form-error [bubble]="true" [closeable]="true" [error]="(contentForm.error | async)"></sqx-form-error>
+
+<sqx-list-view>
+    <ng-container topHeader>
+        <div class="alert alert-danger" *ngIf="contentVersion">
+            <div class="float-end">
+                <a (click)="loadLatest.emit()">{{ 'contents.viewLatest' | sqxTranslate }}</a>
+            </div>
+
+            <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline | sqxSafeHtml"></div>
+        </div>
+        
+        <div *ngIf="isNew">
+            <input class="form-control" placeholder="{{ 'contents.idPlaceholder' | sqxTranslate }}" 
+                [ngModel]="contentId"    
+                (ngModelChange)="contentIdChange.emit($event)" />
+        </div>
+    </ng-container>
+
+    <ng-container>
+        <sqx-content-section *ngFor="let section of contentForm.sections; trackBy: trackBySection"
+            [(language)]="language"
+            [form]="contentForm"
+            [formCompare]="contentFormCompare"
+            [formContext]="formContext"
+            [formLevel]="0"
+            [formSection]="section"
+            [languages]="languages"
+            [schema]="schema">
+        </sqx-content-section>
+    </ng-container>
+</sqx-list-view>

@@ -1,0 +1,69 @@
+---
+- name: "Build Squidex Image"
+  hosts: default
+  become: true
+
+  tasks:
+    - name: "Install Requirements"
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - python3-pip
+          - python3-setuptools
+          - software-properties-common
+        state: latest
+        update_cache: true
+
+    - name: "Add Docker GPG Key"
+      apt_key:
+        url: "https://download.docker.com/linux/ubuntu/gpg"
+        state: "present"
+
+    - name: "Add Docker Repository"
+      apt_repository:
+        repo: "deb https://download.docker.com/linux/ubuntu bionic stable"
+        state: present
+        mode: 0644
+
+    - name: "Install Docker"
+      apt:
+        name:
+          - containerd.io
+          - docker-ce
+          - docker-ce-cli
+          - docker-compose
+        state: latest
+        update_cache: true
+
+    - name: "Install Docker Python Package"
+      pip:
+        name:
+          - docker
+
+    - name: "Copy docker-compose.yml"
+      template:
+        src: "docker-compose.yml"
+        dest: "/opt/squidex/"
+        mode: 0644
+
+    - name: "Copy setup-squidex.sh"
+      template:
+        src: "setup-squidex.sh"
+        dest: "/opt/squidex/"
+        mode: 0755
+
+    - name: "Create /etc/squidex"
+      file:
+        path: "/etc/squidex"
+        state: "directory"
+        mode: 0755
+
+    - name: "Create MOTD"
+      template:
+        src: "99-squidex"
+        dest: "/etc/update-motd.d/"
+        mode: 0755

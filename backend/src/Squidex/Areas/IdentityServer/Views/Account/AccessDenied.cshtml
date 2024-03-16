@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = T.Get("users.accessDenied.title");
+}
+
+<img class="splash-image" src="@Url.RootContentUrl("~/squid.svg?title=STOP%20HERE&text=You%20shall%20not%20pass!")" />
+
+<h1 class="splash-h1">@T.Get("users.accessDenied.title")</h1>
+
+<p class="splash-text">
+    @T.Get("users.accessDenied.text")
+</p>
+
+<p class="splash-text">
+    <a href="~/account/logout-redirect">@T.Get("common.logout")</a>
+</p>

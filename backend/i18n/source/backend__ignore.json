@@ -1,0 +1,468 @@
+{
+  "/Migrations/OldTriggers/AssetChangedTrigger.cs": [
+    "*"
+  ],
+  "/Migrations/OldTriggers/ContentChangedTriggerSchema.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Model/Apps/AppClients.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Model/Contents/Json/ContentFieldDataConverter.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Model/Freezable.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Model/InvariantPartitioning.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Model/Rules/Rule.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Model/Schemas/FieldCollection.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Model/Schemas/NestedField{T}.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Model/Schemas/RootField{T}.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/ConvertContent/StringFormatter.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/DefaultValues/DefaultValueFactory.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/GenerateJsonSchema/ContentSchemaBuilder.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/GenerateJsonSchema/JsonSchemaExtensions.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/HandleRules/Result.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/HandleRules/RuleService.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/Scripting/ContentWrapper/ContentDataProperty.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/Scripting/ContentWrapper/JsonMapper.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/Scripting/Extensions/HttpJintExtension.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/Scripting/ScriptOptions.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/Templates/TemplateParseException.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/ValidateContent/Validators/CollectionValidator.cs": [
+    "Min length must be greater than max length."
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/ValidateContent/Validators/RangeValidator.cs": [
+    "Min value must be greater than max value."
+  ],
+  "/Squidex.Domain.Apps.Core.Operations/ValidateContent/Validators/StringLengthValidator.cs": [
+    "Min length must be greater than max length."
+  ],
+  "/Squidex.Domain.Apps.Entities/Apps/AppUISettingsGrain.cs": [
+    "Path does not lead to an object."
+  ],
+  "/Squidex.Domain.Apps.Entities/Apps/BackupApps.cs": [
+    "The app id or name is not available."
+  ],
+  "/Squidex.Domain.Apps.Entities/Apps/Diagnostics/OrleansAppsHealthCheck.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Apps/Invitation/InvitationEventConsumer.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Apps/Templates/CreateBlogCommandMiddleware.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Apps/Templates/CreateIdentityCommandMiddleware.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Apps/Templates/CreateProfileCommandMiddleware.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Apps/Templates/DefaultScripts.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Backup/BackupReader.cs": [
+    "Cannot find attachment."
+  ],
+  "/Squidex.Domain.Apps.Entities/Backup/RestoreGrain.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Backup/TempFolderBackupArchiveLocation.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/ContentOperationContext.cs": [
+    "Cannot resolve app with id {appId}.",
+    "Cannot resolve schema with id id {schemaId}."
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/AllTypes.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/AppQueriesGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/AssetGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/AssetsResultGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentDataFlatGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentDataGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentInterfaceGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/ContentsResultGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/NestedGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/Utils/GuidGraphType2.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/GraphQL/Types/Utils/JsonGraphType.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/Text/Elastic/ElasticSearchTextIndex.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/Text/Lucene/IndexManager_Impl.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Contents/Text/Lucene/IndexManager.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Notifications/NotificationEmailSender.cs": [
+    "*"
+  ],
+  "/Squidex.Domain.Apps.Entities/Rules/Runner/RuleRunnerGrain.cs": [
+    "Cannot find rule."
+  ],
+  "/Squidex.Domain.Apps.Entities/Rules/UsageTracking/UsageTriggerHandler.cs": [
+    "Usage exceeded"
+  ],
+  "/Squidex.Domain.Users.MongoDb/MongoKeyStore.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.Amazon/Assets/AmazonS3AssetStore.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.Amazon/Assets/SeekFakerStream.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.Azure/Assets/AzureBlobAssetStore.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.Azure/Diagnostics/CosmosDbHealthCheck.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.Azure/EventSourcing/CosmosDbEventStore_Writer.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.Azure/EventSourcing/CosmosDbSubscription.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.Azure/EventSourcing/FilterBuilder.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.GetEventStore/Diagnostics/GetEventStoreHealthCheck.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.GetEventStore/EventSourcing/GetEventStore.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.GetEventStore/EventSourcing/GetEventStoreSubscription.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.GetEventStore/EventSourcing/ProjectionClient.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.GoogleCloud/Assets/GoogleCloudAssetStore.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.MongoDb/Assets/MongoGridFsAssetStore.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.MongoDb/Diagnostics/MongoDBHealthCheck.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.MongoDb/EventSourcing/MongoEventStore_Writer.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.MongoDb/MongoDb/MongoRepositoryBase.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.RabbitMq/CQRS/Events/RabbitMqEventConsumer.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure.Redis/RedisPubSub.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Assets/AssetAlreadyExistsException.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Assets/AssetNotFoundException.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Assets/FolderAssetStore.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Assets/HasherStream.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Configuration/ConfigurationExtensions.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Diagnostics/GCHealthCheck.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Diagnostics/OrleansHealthCheck.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Email/SmtpEmailSender.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/EventSourcing/DefaultEventDataFormatter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/EventSourcing/EventConsumersHealthCheck.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/EventSourcing/WrongEventVersionException.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/FileExtensions.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Guard.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Http/DumpFormatter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Json/Newtonsoft/InstantConverter.cs": [
+    "Not a valid date time, expected String or Date, but got {reader.TokenType}."
+  ],
+  "/Squidex.Infrastructure/Json/Newtonsoft/JsonValueConverter.cs": [
+    "Unexpected end when reading Object."
+  ],
+  "/Squidex.Infrastructure/Json/Newtonsoft/NamedGuidIdConverter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Json/Newtonsoft/NamedLongIdConverter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Json/Newtonsoft/NamedStringIdConverter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Json/Newtonsoft/RefTokenConverter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Json/Objects/JsonArray.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Json/Objects/JsonObject.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Json/Objects/JsonValue.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Language.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Languages.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Log/Internal/ConsoleLogProcessor.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Log/Internal/FileLogProcessor.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Log/SemanticLog.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Migrations/MigrationFailedException.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Migrations/Migrator.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/NamedId{T}.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Orleans/OrleansWrapperException.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Plugins/PluginManager.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/ClrValue.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/CompareFilter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/Json/FilterConverter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/Json/JsonFilterVisitor.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/Json/PropertyPathValidator.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/Json/ValueConverter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/LogicalFilter.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/OData/ConstantWithTypeVisitor.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/PropertyPath.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/Query.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Queries/SortNode.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/Reflection/TypeNameRegistry.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/RefToken.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/States/DefaultStreamNameResolver.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/States/InconsistentStateException.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/States/Persistence{TSnapshot,TKey}.cs": [
+    "*"
+  ],
+  "/Squidex.Infrastructure/StringExtensions.cs": [
+    "*"
+  ],
+  "/Squidex.Web/ApiController.cs": [
+    "*"
+  ],
+  "/Squidex.Web/ApiExceptionConverter.cs": [
+    ", e.PropertyNames.Select(FixPropertyName))}: {e.Message}"
+  ],
+  "/Squidex.Web/ApiExceptionFilterAttribute.cs": [
+    "An unexpected exception has occurred."
+  ],
+  "/Squidex.Web/CommandMiddlewares/EnrichWithActorCommandMiddleware.cs": [
+    "*"
+  ],
+  "/Squidex.Web/CommandMiddlewares/EnrichWithAppIdCommandMiddleware.cs": [
+    "*"
+  ],
+  "/Squidex.Web/CommandMiddlewares/EnrichWithSchemaIdCommandMiddleware.cs": [
+    "*"
+  ],
+  "/Squidex.Web/EntityCreatedDto.cs": [
+    "*"
+  ],
+  "/Squidex.Web/ErrorDto.cs": [
+    "*"
+  ],
+  "/Squidex.Web/Json/TypedJsonInheritanceConverter.cs": [
+    "*"
+  ],
+  "/Squidex.Web/Pipeline/FileCallbackResultExecutor.cs": [
+    "*"
+  ],
+  "/Squidex.Web/Pipeline/RequestExceptionMiddleware.cs": [
+    "An unexpected exception has occurred."
+  ],
+  "/Squidex.Web/Pipeline/SameSiteCookiesServiceCollectionExtensions.cs": [
+    "*"
+  ],
+  "/Squidex.Web/Resource.cs": [
+    "*"
+  ],
+  "/Squidex.Web/ResourceLink.cs": [
+    "*"
+  ],
+  "/Squidex.Web/UrlsOptions.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/Api/Config/OpenApi/ErrorDtoProcessor.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/Api/Config/OpenApi/ODataExtensions.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/Api/Config/OpenApi/OpenApiServices.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/Api/Config/OpenApi/SecurityProcessor.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/Api/Config/OpenApi/XmlResponseTypesProcessor.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/Api/Controllers/Contents/Generator/SchemaOpenApiGenerator.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/Api/Controllers/News/Service/FeaturesService.cs": [
+    "data/version/iv ge {FeatureVersion}"
+  ],
+  "/Squidex/Areas/Api/Controllers/Schemas/Models/Fields/AssetsFieldPropertiesDto.cs": [
+    "Use ResolveFirst now"
+  ],
+  "/Squidex/Areas/Frontend/Middlewares/IndexExtensions.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/IdentityServer/Config/LazyClientStore.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/IdentityServer/Controllers/Extensions.cs": [
+    "*"
+  ],
+  "/Squidex/Areas/IdentityServer/Controllers/Profile/RemoveLoginModel.cs": [
+    "Provider key."
+  ],
+  "/Squidex/Config/Domain/EventPublishersServices.cs": [
+    "*"
+  ],
+  "/Squidex/Config/Orleans/Helper.cs": [
+    "*"
+  ],
+  "/Squidex/Config/Startup/LogConfigurationHost.cs": [
+    "*"
+  ],
+  "/Squidex/Pipeline/OpenApi/NSwagHelper.cs": [
+    "*"
+  ],
+  "/Squidex/Pipeline/Squid/SquidMiddleware.cs": [
+    "*"
+  ]
+}

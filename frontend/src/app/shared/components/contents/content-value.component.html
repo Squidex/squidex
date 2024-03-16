@@ -1,0 +1,12 @@
+<ng-container *ngIf="isPlain; else html">
+    <div class="value-container">
+        <div #valueElement [class.truncate]="!wrapping">{{value}}</div>
+    </div>
+
+    <button class="btn btn-icon" *ngIf="isString && fields" (click)="toggle()" sqxStopClick>
+        <i class="icon-wrap_text"></i>
+    </button>
+</ng-container>
+<ng-template #html>
+    <div class="html-value" [innerHTML]="value.html"></div>
+</ng-template>

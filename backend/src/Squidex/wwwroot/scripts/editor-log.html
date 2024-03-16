@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Load the editor sdk from the local folder or https://cloud.squidex.io/scripts/editor-sdk.js -->
+    <script src="editor-sdk.js"></script>
+
+    <style>
+        #textarea {
+            box-sizing: border-box;
+            min-width: 100%;
+            min-height: 200px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <button id="button">Generate New Value</button>
+    </div>
+
+    <textarea id="textarea"></textarea>
+
+    <script>
+        var numberGenerator = 1;
+
+        var button = document.getElementById('button');
+
+        var textarea = document.getElementById('textarea');
+
+        // When the field is instantiated it notifies the UI that it has been loaded.
+        // 
+        // Furthermore it sends the current size to the parent.
+        var field = new SquidexFormField();
+
+        function logState(message) {
+            var text = '';
+
+            function append(value) {
+                text += value;
+            }
+
+            function appendLine(value) {
+                if (value !== undefined) {
+                    append(value);
+                }
+
+                text += '\n';
+            }
+
+            appendLine(message);
+            appendLine();
+
+            append('Language: ');
+            appendLine(field.getLanguage());
+            appendLine();
+
+            append('Disabled: ');
+            appendLine(field.isDisabled());
+            appendLine();
+
+            append('FullScreen: ');
+            appendLine(field.isFullscreen());
+            appendLine();
+
+            append('Index: ');
+            appendLine(field.getIndex());
+            appendLine();
+
+            appendLine('Value');
+            appendLine(`<${JSON.stringify(field.getValue(), 2)}>`);
+            appendLine();
+
+            appendLine('Form Value');
+            appendLine(`<${JSON.stringify(field.getFormValue(), 2)}>`);
+            appendLine();
+
+            console.log(text);
+
+            textarea.value = text;
+        }
+
+        logState('Setup');
+
+        if (button) {
+            button.addEventListener('click', function () {
+                numberGenerator++;
+
+                field.valueChanged(numberGenerator);
+
+                logState('Click');
+            });
+        }
+
+        field.onInit(function () {
+            logState('Init');
+        });
+
+        field.onValueChanged(function () {
+            logState('Value changed');
+        });
+
+        field.onFormValueChanged(function () {
+            logState('Form value changed');
+        });
+
+        field.onMoved(function (index) {
+            logState('Form value moved');
+        })
+
+        field.onLanguageChanged(function () {
+            logState('Field language changed');
+        });
+
+        field.onDisabled(function (disabled) {
+            logState(`Disabled: <${JSON.stringify(disabled, 2)}>`);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+@import 'mixins';
+@import 'vars';
+
+$circle-size: 2rem;
+
+h3 {
+    margin: 0;
+}
+
+.section {
+    margin-bottom: .8rem;
+}
+
+.card {
+    &-header {
+        padding-bottom: 1rem;
+        padding-top: 1rem;
+    }
+
+    &-body {
+        background: $color-border;
+        font-family: monospace;
+        font-size: .9rem;
+        max-height: 400px;
+        min-height: 300px;
+        overflow-y: scroll;
+    }
+}
+
+%default-color {
+    color: $color-white;
+}
+
+.restore {
+    &-status {
+        @include circle-icon($circle-size);
+        background: $color-border;
+
+        &-failed {
+            @extend %default-color;
+            background: $color-theme-error;
+        }
+
+        &-success {
+            @extend %default-color;
+            background: $color-theme-success;
+        }
+    }
+
+    &-url {
+        @include truncate;
+        line-height: $circle-size;
+    }
+}

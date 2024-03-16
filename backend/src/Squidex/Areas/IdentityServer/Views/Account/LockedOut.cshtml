@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = T.Get("users.lockedOutTitle");
+}
+
+<img class="splash-image" src="@Url.RootContentUrl("~/squid.svg?title=STOP HERE&text=You%20shall%20not%20pass!")" />
+
+<h1 class="splash-h1">@T.Get("users.lockedOutTitle")</h1>
+
+<p class="splash-text">
+    @T.Get("users.lockedOutText")
+</p>
+
+<p class="splash-text">
+    <a asp-controller="Account" asp-action="LogoutRedirect">@T.Get("common.logout")</a>
+</p>

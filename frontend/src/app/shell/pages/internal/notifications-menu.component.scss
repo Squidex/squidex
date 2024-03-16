@@ -1,0 +1,16 @@
+@import 'mixins';
+@import 'vars';
+
+.dropdown-menu {
+    max-height: 500px;
+    min-height: 4rem;
+    overflow-y: scroll;
+    padding: 1.25rem;
+    padding-bottom: 1rem;
+    width: 300px;
+}
+
+.badge {
+    @include absolute(-.5rem, 0, null, null);
+    font-size: 80%;
+}

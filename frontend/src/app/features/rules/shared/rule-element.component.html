@@ -1,0 +1,31 @@
+<ng-container *ngIf="isSmall; else large">
+    <div class="small root" [class.disabled]="disabled" [style.background]="element.iconColor" [sqxHoverBackground]="element.iconColor | sqxDarken:5">
+        <div class="small-icon" [style.background]="element.iconColor | sqxDarken:5">
+            <sqx-rule-icon size="md" [element]="element"></sqx-rule-icon>
+        </div>
+        <div class="small-text">
+            {{element.display}}
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #large>
+    <div class="row g-0 large root" [class.disabled]="disabled">
+        <div class="col-auto">
+            <div class="large-icon" [style.background]="element.iconColor | sqxDarken:5">
+                <sqx-rule-icon size="lg" [element]="element"></sqx-rule-icon>
+            </div>
+        </div>
+        <div class="col">
+            <div class="large-title">{{element.title || type}}</div>
+
+            <div class="large-text text-muted">
+                {{element.description}}
+            </div>
+
+            <div class="large-link" *ngIf="element.readMore">
+                <a [href]="element.readMore" sqxStopClick sqxExternalLink>{{ 'rules.readMore' | sqxTranslate }}</a>
+            </div>
+        </div>
+    </div>
+</ng-template>

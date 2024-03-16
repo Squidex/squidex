@@ -1,0 +1,41 @@
+<sqx-title message="i18n:common.schemas"></sqx-title>
+
+<sqx-layout layout="left" titleCollapsed="i18n:common.schemas" [width]="18" [white]="true" [padding]="true" [overflow]="true">    
+    <ng-container menu>
+        <div class="row g-0">
+            <div class="col-auto" *ngIf="schemasState.canCreate | async">    
+                <button type="button" class="btn btn-success me-2" (click)="createSchema()" title="i18n:schemas.createSchemaTooltip" titlePosition="top-left" shortcut="CTRL + U">
+                    <i class="icon-plus"></i>          
+                </button>
+            </div>
+            
+            <div class="col search-form">
+                <input class="form-control" [formControl]="schemasFilter" placeholder="{{ 'schemas.searchPlaceholder' | sqxTranslate }}"
+                    shortcut="CTRL + I"
+                    shortcutAction="focus">
+    
+                <i class="icon-search"></i>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container>
+        <div cdkDropListGroup>
+            <sqx-schema-category *ngFor="let category of categories | async; trackBy: trackByCategory"
+                [schemaCategory]="category" (remove)="removeCategory($event)">
+            </sqx-schema-category>
+        </div>
+
+        <form class="mt-4" [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">
+            <input class="form-control" formControlName="name" placeholder="{{ 'schemas.createCategory' | sqxTranslate }}">
+        </form>
+    </ng-container>
+</sqx-layout>
+
+<ng-container *sqxModal="addSchemaDialog">
+    <sqx-schema-form [import]="import" 
+        (cancel)="addSchemaDialog.hide()" (complete)="redirectSchema($event)">
+    </sqx-schema-form>
+</ng-container>
+
+<router-outlet></router-outlet>

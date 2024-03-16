@@ -1,0 +1,12 @@
+<a *ngIf="sortable; else notSortable" (click)="sort()" class="pointer truncate">
+    <span class="truncate">
+        <i *ngIf="order === 'ascending'" class="icon-caret-up"></i>
+        <i *ngIf="order === 'descending'" class="icon-caret-down"></i>
+
+        {{text | sqxTranslate}}
+    </span>
+</a>
+
+<ng-template #notSortable>
+    <span class="truncate">{{text | sqxTranslate}}</span>
+</ng-template>

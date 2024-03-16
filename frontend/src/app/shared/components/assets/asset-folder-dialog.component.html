@@ -1,0 +1,45 @@
+<form [formGroup]="editForm.form" (ngSubmit)="createAssetFolder()">
+    <sqx-modal-dialog (close)="emitComplete()">
+        <ng-container title>
+            <ng-container *ngIf="assetFolder; else noAssetFolder">
+                {{ 'assets.renameFolder' | sqxTranslate }}
+            </ng-container>
+            <ng-template #noAssetFolder>
+                {{ 'assets.createFolder' | sqxTranslate }}
+            </ng-template>
+        </ng-container>
+
+        <ng-container content>
+            <sqx-form-error [error]="editForm.error | async"></sqx-form-error>
+        
+            <div class="form-group">
+                <label for="folderName">{{ 'assets.folderName' | sqxTranslate }} <small class="hint">({{ 'common.requiredHint' | sqxTranslate }})</small></label>
+                
+                <sqx-control-errors for="folderName"></sqx-control-errors>
+        
+                <input type="text" class="form-control" id="folderName" formControlName="folderName" autocomplete="off" sqxFocusOnInit>
+            </div>
+
+            <div class="form-group">
+                <sqx-form-alert marginTop="2" marginBottom="0">
+                    {{ 'assets.folderNameHint' | sqxTranslate }}
+                </sqx-form-alert>
+            </div>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="button" class="btn btn-text-secondary" (click)="emitComplete()">
+                {{ 'common.cancel' | sqxTranslate }}
+            </button>
+            
+            <button type="submit" class="btn btn-success">
+                <ng-container *ngIf="assetFolder; else noAssetFolderButton">
+                    {{ 'common.rename' | sqxTranslate }}
+                </ng-container>
+                <ng-template #noAssetFolderButton>
+                    {{ 'common.create' | sqxTranslate }}
+                </ng-template>
+            </button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

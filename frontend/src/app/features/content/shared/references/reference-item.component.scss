@@ -1,0 +1,38 @@
+@import 'mixins';
+@import 'vars';
+
+.reference-edit {
+    @include hover-visible('.reference-menu');
+    position: relative;
+
+    .reference-menu {
+        @include absolute(0, -.25rem, auto, auto);
+        background: $color-white;
+        border: 0;
+        border-left: 1px solid $color-border;
+        padding-left: 1rem;
+        white-space: nowrap;
+    }
+}
+
+.cell-valid {
+    width: 100px;
+}
+
+.badge {
+    @include truncate;
+}
+
+.cell-label {
+    position: relative;
+
+    .badge-container {
+        @include absolute(0, 0, 0, 0);
+    }
+
+    &:hover {
+        .badge-container {
+            left: auto;
+        }
+    }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "Squidex",
+  "description": "Headless CMS and Content Managment Hub",
+  "website": "https://squidex.io/",
+  "repository": "https://github.com/Squidex/squidex",
+  "logo": "https://avatars.githubusercontent.com/u/25371797?s=200&v=4",
+  "success_url": "/",
+  "env": {
+    "DOMAIN": {
+      "description": "The domain name under which your instance is available",
+      "value": "https://[YOUR-HEROKU-APPNAME].herokuapp.com"
+    },
+    "MONGO_USERNAME": {
+      "description": "Mongo Username, follow https://devcenter.heroku.com/articles/ormongo#open-the-dashboard to create a database named Squidex and then edit the deployment to reflect the credentials you used",
+      "value": "Squidex"
+    },
+    "MONGO_PASSWORD": {
+      "description": "Mongo Password (see MONGO_USERNAME)",
+      "value": "Squidex123"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "standard-1x"
+    }
+  },
+  "addons": [
+    {
+      "plan": "ormongo:2-mmap",
+      "as": "MONGO"
+    }
+  ],
+  "stack": "container"
+}

@@ -1,0 +1,28 @@
+<ng-container *ngIf="mentionUsers | async; let users">
+    <div class="comments-list" #commentsList>
+        <div (sqxResized)="scrollDown()">
+            <sqx-comment *ngFor="let comment of commentsState.comments | async; trackBy: trackByComment"
+                [comment]="comment"
+                [commentsState]="commentsState"
+                [mentionUsers]="users"
+                [canEdit]="true"
+                [canFollow]="false"
+                [userToken]="userToken">
+            </sqx-comment>
+        </div>
+    </div>
+    
+    <div class="comments-footer">                
+        <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
+            <input class="form-control" name="text" formControlName="text" placeholder="{{ 'comments.create' | sqxTranslate }}"
+                [mention]="$any(users)"
+                [mentionConfig]="mentionConfig"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off">
+        </form>
+    </div>
+</ng-container>
+
+
+

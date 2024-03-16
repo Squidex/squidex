@@ -1,0 +1,27 @@
+@import 'mixins';
+@import 'vars';
+
+.control-container {
+    position: relative;
+}
+
+.form-icon {
+    padding-left: 2.25rem;
+}
+
+.icon {
+    @include absolute(.5rem, null, null, .75rem);
+    color: $color-input;
+    font-size: 1.1rem;
+    font-weight: normal;
+}
+
+.btn {
+    @include absolute(.25rem, 0, null, null);
+    border: 0;
+    cursor: pointer;
+    font-size: $font-small;
+    font-weight: normal;
+    padding-left: 5px;
+    padding-right: 5px;
+}

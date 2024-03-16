@@ -1,0 +1,60 @@
+<div class="row mb-1">
+    <div class="col">
+        <sqx-language-selector size="sm" 
+            (languageChange)="setLanguage($event)"
+            [language]="snapshot.language"
+            [languages]="languages">
+        </sqx-language-selector>
+    </div>
+    <div class="col-auto">
+        <button type="button" class="btn btn-sm btn-secondary" [disabled]="isEmpty" (click)="unset()">
+            <i class="icon-close"></i>
+        </button>
+    </div>
+</div>
+
+<ng-container [ngSwitch]="type">
+    <ng-container *ngSwitchCase="'text'">
+        <input class="form-control" [attr.type]="type" [attr.id]="id" [attr.name]="name"
+            [ngModel]="currentValue"
+            (ngModelChange)="setValue($event)"
+            (blur)="callTouched()" />
+    </ng-container>
+    <ng-container *ngSwitchCase="'number'">
+        <input class="form-control" [attr.type]="type" [attr.id]="id" [attr.name]="name"
+            [ngModel]="currentValue"
+            (ngModelChange)="setValue($event)"
+            (blur)="callTouched()" />
+    </ng-container>
+    <ng-container *ngSwitchCase="'tags'">
+        <sqx-tag-editor
+            [ngModel]="currentValue"
+            (ngModelChange)="setValue($event)"
+            (blur)="callTouched()">
+        </sqx-tag-editor>
+    </ng-container>
+    <ng-container *ngSwitchCase="'datetime'">
+        <sqx-date-time-editor mode="DateTime"
+            [ngModel]="currentValue"
+            (ngModelChange)="setValue($event)"
+            (blur)="callTouched()">
+        </sqx-date-time-editor>
+    </ng-container>
+    <ng-container *ngSwitchCase="'date'">
+        <sqx-date-time-editor mode="Date"
+            [ngModel]="currentValue"
+            (ngModelChange)="setValue($event)"
+            (blur)="callTouched()">
+        </sqx-date-time-editor>
+    </ng-container>
+    <ng-container *ngSwitchCase="'boolean'">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" [attr.id]="id"
+                [ngModel]="currentValue" 
+                (ngModelChange)="setValue($event)"
+                (blur)="callTouched()">
+
+            <label class="form-check-label" [attr.for]="id"></label>
+        </div>
+    </ng-container>
+</ng-container>

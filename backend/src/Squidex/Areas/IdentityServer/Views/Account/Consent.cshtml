@@ -1,0 +1,71 @@
+﻿@model Squidex.Areas.IdentityServer.Controllers.Account.ConsentVM
+
+@{
+    ViewBag.Title = T.Get("users.consent.title");
+}
+
+@functions {
+    public string ErrorClass(string error)
+    {
+        return ViewData.ModelState[error]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid ? "border-danger" : "";
+    }
+}
+
+<form asp-controller="Account" asp-action="Consent" asp-route-returnurl="@Model!.ReturnUrl" method="post">
+    <h2>@T.Get("users.consent.headline")</h2>
+        
+    <label for="consentToAutomatedEmails">
+        <div class="card card-consent @ErrorClass("ConsentToAutomatedEmails")">
+            <div class="card-body">
+                <h4 class="card-title">@T.Get("users.consent.emailHeadline")</h4>
+
+                <div class="card-text row">
+                    <div class="col col-auto">
+                        <input type="checkbox" id="consentToAutomatedEmails" name="consentToAutomatedEmails" value="True" />
+                    </div>
+                    <div class="col">
+                        @Html.Raw(T.Get("users.consent.emailText"))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </label>
+
+    <label for="consentToCookies">
+        <div class="card card-consent @ErrorClass("ConsentToCookies")">
+            <div class="card-body">
+                <h4 class="card-title">@T.Get("users.consent.cookiesHeadline")</h4>
+
+                <div class="card-text row">
+                    <div class="col col-auto">
+                        <input type="checkbox" id="consentToCookies" name="consentToCookies" value="True" />
+                    </div>
+                    <div class="col">
+                        @Html.Raw(T.Get("users.consent.cookiesText", new { privacyUrl = Model!.PrivacyUrl }))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </label>
+
+    <label for="consentToPersonalInformation">
+        <div class="card card-consent @ErrorClass("ConsentToPersonalInformation")">
+            <div class="card-body">
+                <h4 class="card-title">@T.Get("users.consent.piiHeadline")</h4>
+
+                <div class="card-text row">
+                    <div class="col col-auto">
+                        <input type="checkbox" id="consentToPersonalInformation" name="consentToPersonalInformation" value="True" />
+                    </div>
+                    <div class="col">
+                        @Html.Raw(T.Get("users.consent.piiText"))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </label>
+
+    <div class="profile-section-sm text-right">
+        <button type="submit" class="btn btn-success">@T.Get("users.consent.agree")</button>
+    </div>
+</form>

@@ -1,0 +1,42 @@
+<div class="container">
+    <div class="header">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="resetDefault()">
+            {{ 'contents.viewReset' | sqxTranslate }}
+        </button>
+    </div>
+    
+    <hr>
+
+    <div
+        cdkDropList
+        [cdkDropListData]="listFields"
+        (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let field of listFields" cdkDrag>
+            <i class="icon-drag2 drag-handle"></i> 
+            
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" checked (click)="removeField(field)" id="field_{{field}}" [disabled]="!field">
+                <label class="form-check-label" for="field_{{field}}">
+                    {{field || '--'}}
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <ng-container *ngIf="fieldsNotAdded.length > 0">
+        <hr>
+        
+        <div >
+            <div *ngFor="let field of fieldsNotAdded">    
+                <i class="icon-drag2 drag-handle invisible"></i> 
+    
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" (click)="addField(field)" id="field_{{field}}">
+                    <label class="form-check-label" for="field_{{field}}">
+                        {{field}}
+                    </label>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>

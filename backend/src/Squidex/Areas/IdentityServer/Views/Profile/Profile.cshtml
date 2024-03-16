@@ -1,0 +1,336 @@
+﻿@model Squidex.Areas.IdentityServer.Controllers.Profile.ProfileVM
+
+@{
+    ViewBag.Title = T.Get("users.profile.title");
+
+    void RenderValidation(string field)
+    {
+        @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+        {
+            <div class="errors-container">
+                <span class="errors">@Html.ValidationMessage(field)</span>
+            </div>
+        }
+    }
+}
+
+<h1>@T.Get("users.profile.headline")</h1>
+
+<h2>@T.Get("users.profile.pii")</h2>
+
+@if (!string.IsNullOrWhiteSpace(Model!.SuccessMessage))
+{
+    <div class="form-alert form-alert-success" id="success">
+        @Model!.SuccessMessage
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model!.ErrorMessage))
+{
+    <div class="form-alert form-alert-error">
+        @Model!.ErrorMessage
+    </div>
+}
+
+<div class="row profile-section-sm">
+    <div class="col profile-picture-col">
+        <img class="profile-picture" src="@Url.RootContentUrl($"~/api/users/{Model!.Id}/picture/?q={Guid.NewGuid()}")" />
+    </div>
+    <div class="col">
+        <form id="pictureForm" class="profile-picture-form" asp-controller="Profile" asp-action="UploadPicture" method="post" enctype="multipart/form-data">
+            <span class="btn btn-secondary" id="pictureButton">
+                <span>@T.Get("users.profile.uploadPicture")</span>
+
+                <input class="profile-picture-input" name="file" type="file" id="pictureInput" />
+            </span>
+        </form>
+    </div>
+</div>
+
+<form class="profile-form profile-section" asp-controller="Profile" asp-action="UpdateProfile" method="post">
+    <div class="form-group">
+        <label for="email">@T.Get("common.email")</label>
+
+        @{ RenderValidation("Email"); }
+
+        <input type="email" class="form-control" asp-for="Email" />
+    </div>
+
+    <div class="form-group">
+        <label for="displayName">@T.Get("common.displayName")</label>
+
+        @{ RenderValidation("DisplayName"); }
+
+        <input type="text" class="form-control" asp-for="DisplayName" />
+    </div>
+
+    <div class="form-group">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" asp-for="IsHidden" />
+
+            <label class="form-check-label" asp-for="IsHidden">@T.Get("users.profile.hideProfile")</label>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">@T.Get("common.save")</button>
+</form>
+
+@if (Model!.ExternalProviders.Any())
+{
+    <hr />
+
+    <div class="profile-section">
+        <h2>@T.Get("users.profile.loginsTitle")</h2>
+
+        <table class="table table-fixed table-lesspadding">
+            <colgroup>
+                <col style="width: 100px;" />
+                <col style="width: 100%;" />
+                <col style="width: 100px;" />
+            </colgroup>
+            @foreach (var login in Model!.ExternalLogins)
+            {
+                <tr>
+                    <td>
+                        <span>@login.LoginProvider</span>
+                    </td>
+                    <td>
+                        <span class="truncate">@login.ProviderDisplayName</span>
+                    </td>
+                    <td class="text-right">
+                        @if (Model!.ExternalLogins.Count > 1 || Model!.HasPassword)
+                        {
+                            <form asp-controller="Profile" asp-action="RemoveLogin" method="post">
+                                <input type="hidden" value="@login.LoginProvider" name="LoginProvider" />
+                                <input type="hidden" value="@login.ProviderKey" name="ProviderKey" />
+
+                                <button type="submit" class="btn btn-text-danger btn-sm">
+                                    @T.Get("common.remove")
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+
+        <form asp-controller="Profile" asp-action="AddLogin" method="post">
+            @foreach (var provider in Model!.ExternalProviders.Where(x => Model!.ExternalLogins.All(y => x.AuthenticationScheme != y.LoginProvider)))
+            {
+                var schema = provider.AuthenticationScheme.ToLowerInvariant();
+
+                <button class="btn external-button-small btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
+                    <i class="icon-@schema external-icon"></i>
+                </button>
+            }
+        </form>
+    </div>
+}
+
+@if (Model!.HasPasswordAuth)
+{
+    <hr />
+
+    <div class="profile-section">
+        <h2>@T.Get("users.profile.passwordTitle")</h2>
+
+        @if (Model!.HasPassword)
+        {
+            <form class="profile-form" asp-controller="Profile" asp-action="ChangePassword" method="post">
+                <div class="form-group">
+                    <label for="oldPassword">@T.Get("common.oldPassword")</label>
+
+                    @{ RenderValidation("OldPassword"); }
+
+                    <input type="password" class="form-control" name="oldPassword" id="oldPassword" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">@T.Get("common.password")</label>
+
+                    @{ RenderValidation("Password"); }
+
+                    <input type="password" class="form-control" name="password" id="password" />
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordConfirm">@T.Get("users.profile.confirmPassword")</label>
+
+                    @{ RenderValidation("PasswordConfirm"); }
+
+                    <input type="password" class="form-control" name="passwordConfirm" id="passwordConfirm" />
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">@T.Get("users.profile.changePassword")</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <form class="profile-form" asp-controller="Profile" asp-action="SetPassword" method="post">
+                <div class="form-group">
+                    <label for="password">@T.Get("common.password")</label>
+
+                    @{ RenderValidation("Password"); }
+
+                    <input type="password" class="form-control" name="password" id="password" />
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordConfirm">@T.Get("users.profile.confirmPassword")</label>
+
+                    @{ RenderValidation("PasswordConfirm"); }
+
+                    <input type="password" class="form-control" name="passwordConfirm" id="passwordConfirm" />
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">@T.Get("users.profile.setPassword")</button>
+                </div>
+            </form>
+        }
+    </div>
+}
+
+<hr />
+
+<div class="profile-section">
+    <h2>@T.Get("users.profile.clientTitle")</h2>
+
+    <small class="form-text text-muted mt-2 mb-2">@T.Get("users.profile.clientHint")</small>
+
+    <div class="row g-2 form-group">
+        <div class="col-8">
+            <label for="clientId">@T.Get("common.clientId")</label>
+
+            <input class="form-control" name="clientId" id="clientId" readonly value="@Model!.Id" />
+        </div>
+    </div>
+    <div class="row g-2 form-group">
+        <div class="col-8">
+            <label for="clientSecret">@T.Get("common.clientSecret")</label>
+
+            <input class="form-control" name="clientSecret" id="clientSecret" readonly value="@Model!.ClientSecret" />
+        </div>
+        <div class="col-4 pl-2">
+            <label for="generate">&nbsp;</label>
+
+            <form class="profile-form" asp-controller="Profile" asp-action="GenerateClientSecret" method="post">
+                <button type="submit" class="btn btn-success btn-block" id="generate">@T.Get("users.profile.generateClient")</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="profile-section">
+    <h2>@T.Get("users.profile.propertiesTitle")</h2>
+
+    <small class="form-text text-muted mt-2 mb-2">@T.Get("users.profile.propertiesHint")</small>
+
+    <form class="profile-form" asp-controller="Profile" asp-action="UpdateProperties" method="post">
+        <div class="mb-2" id="properties">
+            @for (var i = 0; i < Model!.Properties.Count; i++)
+            {
+                <div class="row g-2 form-group">
+                    <div class="col-5 pr-2">
+
+                        @{ RenderValidation($"Properties[{i}].Name"); }
+
+                        <input type="text" class="form-control" asp-for="Properties[i].Name" />
+                    </div>
+                    <div class="col pr-2">
+
+                        @{ RenderValidation($"Properties[{i}].Value"); }
+
+                        <input type="text" class="form-control" asp-for="Properties[i].Value" />
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-text-danger remove-item">
+                            <i class="icon-bin2"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="form-group">
+            <button type="button" class="btn btn-outline-success" id="propertyAdd">
+                <i class="icon-plus"></i> @T.Get("users.profile.propertyAdd")
+            </button>
+        </div>
+
+        <button type="submit" class="btn btn-primary">@T.Get("common.save")</button>
+    </form>
+</div>
+
+<script>
+    var propertyPlusButton = document.getElementById('propertyAdd');
+    var propertiesDiv = document.getElementById('properties');
+    var pictureButton = document.getElementById('pictureButton');
+    var pictureInput = document.getElementById('pictureInput');
+    var pictureForm = document.getElementById('pictureForm');
+
+    function updateNames() {
+        for (var i = 0; i < propertiesDiv.children.length; i++) {
+            var child = propertiesDiv.children[i];
+
+            const inputs = child.getElementsByTagName('input');
+            inputs[0].name = `Properties[${i}].Name`;
+            inputs[1].name = `Properties[${i}].Value`;
+        }
+    }
+
+    document.addEventListener('click',
+        function (event) {
+            if (event.target.className.indexOf('remove-item') >= 0) {
+                event.target.parentNode.parentNode.remove();
+
+                updateNames();
+            }
+        });
+
+    pictureButton.addEventListener('click',
+        function () {
+            pictureInput.click();
+        });
+
+    pictureInput.addEventListener('change',
+        function () {
+            pictureForm.submit();
+        });
+
+    propertyPlusButton.addEventListener('click',
+        function () {
+            var template = document.createElement('template');
+
+            template.innerHTML =
+                `<div class="row g-2 form-group">
+                    <div class="col-5 pr-2">
+                        <input class="form-control" />
+                    </div>
+                    <div class="col pr-2">
+                        <input class="form-control" />
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-danger">
+                            <i class="icon-bin"></i>
+                        </button>
+                    </div>
+                </div>`;
+
+            propertiesDiv.append(template.content.firstChild);
+
+            updateNames();
+        });
+
+    var successMessage = document.getElementById('success');
+
+    if (successMessage) {
+        setTimeout(function () {
+            successMessage.remove();
+        }, 5000);
+    }
+</script>

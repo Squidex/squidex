@@ -1,0 +1,33 @@
+@import 'mixins';
+@import 'vars';
+
+.minmax {
+    text-align: center;
+    text-decoration: none;
+    width: 2rem;
+}
+
+.control-dropdown {
+    max-width: 285px;
+    min-height: 0;
+    min-width: 200px;
+
+    h4 {
+        padding: .5rem 0 0 .5rem;
+    }
+
+    &-item {
+        font-size: $font-smallest;
+        font-weight: normal;
+
+        &:hover {
+            .text-muted {
+                color: $color-white !important;
+            }
+        }
+    }
+}
+
+.truncate {
+    @include truncate;
+}

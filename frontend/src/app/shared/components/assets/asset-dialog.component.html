@@ -1,0 +1,234 @@
+<form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
+    <sqx-modal-dialog (close)="emitComplete()" size="xl" [fullHeight]="true" [showFooter]="false" [hasTabs]="true">
+        <ng-container title>
+            {{ 'assets.edit' | sqxTranslate }}
+        </ng-container>
+
+        <ng-container tabs>
+            <div class="row align-items-center">
+                <div class="col">
+                    <ul class="nav nav-tabs2">
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">
+                                {{ 'assets.tabMetadata' | sqxTranslate }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1" *ngIf="isImage">
+                                {{ 'assets.tabImage' | sqxTranslate }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2" *ngIf="isImage">
+                                {{ 'assets.tabFocusPoint' | sqxTranslate }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="selectTab(3)" [class.active]="selectedTab === 3" *ngIf="isDocumentLikely">
+                                {{ 'assets.tabTextEditor' | sqxTranslate }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="selectTab(4)" [class.active]="selectedTab === 4" *ngIf="isVideo || (asset | sqxPreviewable)">
+                                {{ 'assets.tabPreview' | sqxTranslate }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="selectTab(5)" [class.active]="selectedTab === 5">
+                                {{ 'assets.tabHistory' | sqxTranslate }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-auto">
+                    <ng-container [ngSwitch]="selectedTab">
+                        <ng-container *ngSwitchCase="0">
+                            <button type="submit" class="btn btn-primary" [class.invisible]="!isEditable">
+                                {{ 'common.save' | sqxTranslate }}
+                            </button>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="1">
+                            <button type="button" class="btn btn-primary" (click)="cropImage()" [class.invisible]="!isUploadable" [disabled]="progress > 0">
+                                {{ 'common.upload' | sqxTranslate }}
+                            </button>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="2">
+                            <button type="button" class="btn btn-primary" (click)="setFocusPoint()" [class.invisible]="!isEditable">
+                                {{ 'common.save' | sqxTranslate }}
+                            </button>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="3">
+                            <button type="button" class="btn btn-primary" (click)="saveText()" [class.invisible]="!isUploadable">
+                                {{ 'common.upload' | sqxTranslate }}
+                            </button>
+                        </ng-container>
+                    </ng-container>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container content>
+            <ng-container [ngSwitch]="selectedTab">
+                <ng-container *ngSwitchCase="0">
+                    <div class="metadata">
+                        <sqx-form-error [error]="annotateForm.error | async"></sqx-form-error>
+
+                        <div class="form-group g-0">
+                            <label for="id">{{ 'common.folder' | sqxTranslate }}</label>
+
+                            <div class="path">
+                                <sqx-asset-path [path]="path | async" [all]="true" (navigate)="navigate($event.id)"></sqx-asset-path>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id">{{ 'common.id' | sqxTranslate }}</label>
+
+                            <div class="input-group">
+                                <input readonly class="form-control" name="id" id="id" value="{{asset.id}}" #inputId>
+
+                                <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputId">
+                                    <i class="icon-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="url">{{ 'common.url' | sqxTranslate }}</label>
+
+                            <div class="input-group">
+                                <input readonly class="form-control" name="url" id="url" value="{{asset | sqxAssetUrl:asset.version:false}}" #inputUrl>
+
+                                <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputUrl">
+                                    <i class="icon-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+            
+                        <div class="form-group">
+                            <label for="fileName">{{ 'common.name' | sqxTranslate }}</label>
+                            
+                            <sqx-control-errors for="fileName"></sqx-control-errors>
+                    
+                            <input type="text" class="form-control" id="fileName" formControlName="fileName" spellcheck="false">
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="slug">{{ 'common.slug' | sqxTranslate }}</label>
+                            
+                            <sqx-control-errors for="slug"></sqx-control-errors>
+                    
+                            <input type="text" class="form-control slug" id="slug" formControlName="slug" sqxTransformInput="Slugify" spellcheck="false">
+            
+                            <button type="button" class="btn btn-text-secondary btn-sm slug-generate" (click)="generateSlug()">
+                                {{ 'common.generate' | sqxTranslate }}
+                            </button>
+                        </div>
+                    
+                        <div class="form-group">
+                            <label>{{ 'common.tags' | sqxTranslate }}</label>
+                            
+                            <sqx-control-errors for="tags"></sqx-control-errors>
+            
+                            <sqx-tag-editor [suggestions]="allTags" [allowDuplicates]="false" [undefinedWhenEmpty]="false" formControlName="tags"></sqx-tag-editor>
+                        </div>
+            
+                        <div class="form-group">
+                            <label>{{ 'assets.metadata' | sqxTranslate }}</label>
+            
+                            <div class="form-group row g-0" *ngFor="let form of annotateForm.metadataControls; let i = index" [formGroup]="form">
+                                <div class="col col-name pe-1">
+                                    <sqx-control-errors for="name" fieldName="Name"></sqx-control-errors>
+                
+                                    <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="{{ 'common.name' | sqxTranslate }}" spellcheck="false">
+                                </div>
+                
+                                <div class="col pe-1">
+                                    <sqx-control-errors for="value" fieldName="Value"></sqx-control-errors>
+                
+                                    <input type="text" class="form-control" formControlName="value" placeholder="{{ 'common.value' | sqxTranslate }}">
+                                </div>
+            
+                                <div class="col-auto col-options">
+                                    <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
+                                        (sqxConfirmClick)="annotateForm.metadata.removeAt(i)"
+                                        confirmTitle="i18n:assets.deleteMetadataConfirmTitle"
+                                        confirmText="i18n:assets.deleteMetadataConfirmText"
+                                        confirmRememberKey="removeAssetMetadata">
+                                        <i class="icon-bin2"></i>
+                                    </button>
+                                </div>
+                            </div>
+            
+                            <div class="form-group">
+                                <button type="button" class="btn btn-success" (click)="annotateForm.metadata.add()" [disabled]="!isEditable">
+                                    {{ 'assets.metadataAdd' | sqxTranslate }}
+                                </button>
+                            </div>
+                        </div>
+                    
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="isProtected" formControlName="isProtected">
+            
+                            <label class="form-check-label" for="isProtected">{{ 'assets.protected' | sqxTranslate }}</label>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="1">
+                    <div class="editor">
+                        <sqx-image-editor [imageSource]="asset | sqxAssetPreviewUrl"></sqx-image-editor>
+                        
+                        <div class="editor-progress" *ngIf="progress > 0">
+                            <sqx-progress-bar
+                                [value]="progress"
+                                [strokeWidth]="2" 
+                                [trailColor]="'transparent'"
+                                [trailWidth]="0">
+                            </sqx-progress-bar>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="2">
+                    <div>
+                        <sqx-image-focus-point [imageSource]="asset | sqxAssetPreviewUrl" [focusPoint]="asset.metadata"></sqx-image-focus-point>
+                        
+                        <div class="editor-progress" *ngIf="progress > 0">
+                            <sqx-progress-bar
+                                [value]="progress"
+                                [strokeWidth]="2" 
+                                [trailColor]="'transparent'"
+                                [trailWidth]="0">
+                            </sqx-progress-bar>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="3">
+                    <div class="editor">
+                        <sqx-asset-text-editor [fileSource]="asset | sqxAssetPreviewUrl" [fileName]="asset.fileName" [mimeType]="asset.mimeType"></sqx-asset-text-editor>
+                        
+                        <div class="editor-progress" *ngIf="progress > 0">
+                            <sqx-progress-bar
+                                [value]="progress"
+                                [strokeWidth]="2" 
+                                [trailColor]="'transparent'"
+                                [trailWidth]="0">
+                            </sqx-progress-bar>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngSwitchCase="4">
+                    <ng-container *ngIf="asset | sqxPreviewable; else video">
+                        <ngx-doc-viewer [url]="asset | sqxAssetPreviewUrl" [style]="{}" viewer="google" style="width: 100%; height: 50vh;"></ngx-doc-viewer>
+                    </ng-container>
+
+                    <ng-template #video>
+                        <sqx-video-player [source]="asset | sqxAssetPreviewUrl" [mimeType]="asset.mimeType"></sqx-video-player>
+                    </ng-template>
+                </ng-container>
+                <ng-container *ngSwitchCase="5">
+                    <sqx-asset-history [asset]="asset"></sqx-asset-history>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

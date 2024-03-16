@@ -1,0 +1,145 @@
+<ng-container *ngIf="enableShortcut">
+    <sqx-shortcut keys="CTRL + I" (trigger)="inputFind.focus()"></sqx-shortcut>
+</ng-container>
+
+<form [class]="formClass" (ngSubmit)="search()">
+    <div class="input-group">
+        <input class="form-control" #inputFind 
+            [ngModel]="query?.fullText" 
+            (ngModelChange)="changeQueryFullText($event)" 
+            [ngModelOptions]="{ standalone: true }" 
+            [placeholder]="placeholder"
+            shortcut="CTRL + I"
+            shortcutAction="none">
+
+        <ng-container *ngIf="queries">
+            <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
+                <button type="button" class="btn btn-outline-secondary" (click)="queries.remove(key)">
+                    <i class="icon-star-full"></i>
+                </button>
+            </ng-container>
+        
+            <ng-template #notBookmarked>
+                <button type="button" class="btn btn-outline-secondary" (click)="saveQuery()">
+                    <i class="icon-star-empty"></i>
+                </button>
+            </ng-template>
+        </ng-container>
+
+        <ng-container *ngIf="queryModel">
+            <sqx-onboarding-tooltip helpId="contentArchive" [for]="expand" position="bottom-right" [after]="60000">
+                {{ 'search.advancedTour' | sqxTranslate }}
+            </sqx-onboarding-tooltip>
+
+            <button type="button" class="btn btn-outline-secondary" (click)="searchDialog.toggle()" #expand>
+                <i [class.icon-filter]="!hasFilter" [class.icon-filter-filled]="hasFilter"></i>
+            </button>
+        </ng-container>
+    </div>
+</form>
+
+<sqx-onboarding-tooltip helpId="contentFind" [for]="inputFind" position="bottom-right" [after]="120000">
+    {{ 'search.fullTextTour' | sqxTranslate }}
+</sqx-onboarding-tooltip>
+
+<ng-container *sqxModal="searchDialog">
+    <sqx-modal-dialog (close)="searchDialog.hide()" size="lg">
+        <ng-container title>
+            {{ 'search.customQuery' | sqxTranslate }}
+        </ng-container>
+        
+        <ng-container content>
+            <div class="buttons2" *ngIf="queries && queriesTypes">
+                <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
+                    <a class="btn" (click)="queries.remove(key)">
+                        <i class="icon-star-full"></i>
+                    </a>
+                </ng-container>
+            
+                <ng-template #notBookmarked>
+                    <a class="btn" (click)="saveQuery()">
+                        <i class="icon-star-empty"></i>
+                    </a>
+                </ng-template>
+                
+                <div class="btn-group ms-2">
+                    <button type="button" class="btn btn-sm btn-secondary btn-toggle" [class.btn-primary]="!showQueries" [disabled]="!showQueries" (click)="changeView(false)">
+                        {{ 'common.designer' | sqxTranslate }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary btn-toggle" [class.btn-primary]="showQueries" [disabled]="showQueries" (click)="changeView(true)">
+                        {{ 'common.bookmarks' | sqxTranslate }}
+                    </button>
+                </div>
+            </div>
+
+            <ng-container *ngIf="!showQueries; else savedQueries">
+                <div class="form-horizontal" *ngIf="queryModel && statuses">
+                    <sqx-query 
+                        [language]="language"
+                        [languages]="languages"
+                        [model]="queryModel" 
+                        [query]="query" 
+                        (queryChange)="changeQuery($event)"
+                        [statuses]="statuses">
+                    </sqx-query>
+    
+                    <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                </div>
+            </ng-container>
+
+            <ng-template #savedQueries>
+                <div class="mt-4" *ngIf="queries && queriesTypes">
+                    <sqx-shared-queries
+                        [types]="queriesTypes"
+                        [queryUsed]="query"
+                        [queries]="queries"
+                        (search)="changeQuery($event)">
+                    </sqx-shared-queries>
+                </div>
+            </ng-template>
+        </ng-container>
+        
+        <ng-container footer>
+            <span></span>
+
+            <button type="button" class="btn btn-primary" (click)="search(true)">
+                {{ 'common.submit' | sqxTranslate }}
+            </button>
+        </ng-container>
+    </sqx-modal-dialog>        
+</ng-container>
+
+<ng-container *sqxModal="saveQueryDialog">
+    <form [formGroup]="saveQueryForm.form" (ngSubmit)="saveQueryComplete()">
+        <sqx-modal-dialog (close)="saveQueryDialog.hide()">
+            <ng-container title>
+                {{ 'search.nameQuery' | sqxTranslate }}
+            </ng-container>
+        
+            <ng-container content>    
+                <div class="form-group mt-2">            
+                    <sqx-control-errors for="name"></sqx-control-errors>
+            
+                    <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxFocusOnInit>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" formControlName="user" id="user">
+                    <label class="form-check-label" for="user">
+                        {{ 'search.saveQueryMyself' | sqxTranslate }}
+                    </label>
+                </div>
+            </ng-container>
+        
+            <ng-container footer>
+                <button type="button" class="btn btn-text-secondary" (click)="saveQueryDialog.hide()">
+                    {{ 'common.cancel' | sqxTranslate }}
+                </button>
+               
+                <button type="submit" class="btn btn-success">
+                    {{ 'common.create' | sqxTranslate }}
+                </button>
+            </ng-container>
+        </sqx-modal-dialog>
+    </form>
+</ng-container>

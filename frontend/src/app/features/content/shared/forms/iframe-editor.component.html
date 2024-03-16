@@ -1,0 +1,11 @@
+<div #container>
+    <div #inner [class.fullscreen]="snapshot.isFullscreen">
+        <iframe #iframe scrolling="no" width="100%" [style.height]="0" [attr.src]="computedUrl | sqxSafeResourceUrl"></iframe>
+    </div>
+</div>
+
+<ng-container *sqxModal="assetsDialog">
+    <sqx-assets-selector
+        (select)="pickAssets($event)">
+    </sqx-assets-selector>
+</ng-container>

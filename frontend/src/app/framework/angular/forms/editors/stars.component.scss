@@ -1,0 +1,41 @@
+@import 'mixins';
+@import 'vars';
+
+$color-gold: #ffd700;
+
+.many-stars {
+    color: $color-text-decent;
+}
+
+.stars {
+    line-height: 2.4rem;
+
+    &.disabled {
+        cursor: not-allowed;
+    }
+
+    &-container {
+        height: 2.4rem;
+    }
+}
+
+.star {
+    line-height: 1px;
+    list-style: none;
+    vertical-align: middle;
+
+    &::before {
+        color: $color-gold;
+        content: '☆';
+        display: inline-block;
+        font-size: 1.8rem;
+        font-weight: normal;
+        line-height: 1px;
+    }
+
+    &.selected {
+        &::before {
+            content: '★';
+        }
+    }
+}

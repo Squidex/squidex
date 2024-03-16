@@ -1,0 +1,112 @@
+<div class="table-items-row table-items-row-expandable workflow"> 
+    <div class="table-items-row-summary row g-0 align-items-center">
+        <div class="col col-name">
+            <span class="workflow-name">{{workflow.displayName}}</span>
+        </div>
+        <div class="col col-tags">
+            <sqx-tag-editor [converter]="(schemasSource.converter | async)!" [ngModel]="workflow.schemaIds" 
+                [styleBlank]="true" 
+                [singleLine]="true" 
+                [readonly]="true">
+            </sqx-tag-editor>
+        </div>
+        <div class="col-options">
+            <div class="float-end">
+                <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()">
+                    <i class="icon-settings"></i>
+                </button>
+
+                <button type="button" class="btn btn-text-danger" [disabled]="!workflow.canDelete"
+                    (sqxConfirmClick)="remove()"
+                    confirmTitle="i18n:workflows.deleteConfirmTitle"
+                    confirmText="i18n:workflows.deleteConfirmText"
+                    confirmRememberKey="deleteWorkflow">
+                    <i class="icon-bin2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-items-row-details" *ngIf="isEditing">
+        <div class="table-items-row-details-tabs clearfix">
+            <ul class="nav nav-tabs2">
+                <li class="nav-item">
+                    <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">
+                        {{ 'workflows.tabEdit' | sqxTranslate }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">
+                        {{ 'workflows.tabVisualize' | sqxTranslate }}
+                    </a>
+                </li>
+            </ul>
+
+            <div class="float-end">
+                <button type="reset" class="btn btn-text-secondary" (click)="toggleEditing()">
+                    {{ 'common.cancel' | sqxTranslate }}
+                </button>
+
+                <button type="submit" class="btn btn-primary ms-1" *ngIf="isEditable" (click)="save()">
+                    {{ 'common.save' | sqxTranslate }}
+                </button>
+            </div>
+        </div>
+
+        <div class="table-items-row-details-tab">
+            <ng-container *ngIf="selectedTab === 0; else visualize">
+                <sqx-form-error [error]="error"></sqx-form-error>
+    
+                <div class="form-group row">
+                    <label class="col-form-label" for="{{workflow.id}}_name">{{ 'common.name' | sqxTranslate }}</label>
+            
+                    <div class="col">
+                        <input class="form-control" id="{{workflow.id}}_name" 
+                            [ngModelOptions]="onBlur" 
+                            [ngModel]="workflow.name"
+                            (ngModelChange)="rename($event)">
+            
+                        <sqx-form-hint>
+                            {{ 'workflows.workflowNameHint' | sqxTranslate }}
+                        </sqx-form-hint>
+                    </div>
+                </div>
+    
+                <div class="form-group row">
+                    <label class="col-form-label" for="{{workflow.id}}_schemas">{{ 'common.schemas' | sqxTranslate }}</label>
+            
+                    <div class="col">
+                        <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" [converter]="(schemasSource.converter | async)!" 
+                            [ngModel]="workflow.schemaIds" 
+                            (ngModelChange)="changeSchemaIds($event)" 
+                            [suggestions]="(schemasSource.converter | async)?.suggestions">
+                        </sqx-tag-editor>
+            
+                        <sqx-form-hint>
+                            {{ 'workflows.schemasHint' | sqxTranslate }}
+                        </sqx-form-hint>
+                    </div>
+                </div>
+    
+                <sqx-workflow-step *ngFor="let step of workflow.steps; trackBy: trackByStep" [step]="step" [workflow]="workflow"
+                    [disabled]="!workflow.canUpdate"
+                    (makeInitial)="setInitial(step)" 
+                    (rename)="renameStep(step, $event)" 
+                    (remove)="removeStep(step)" 
+                    (transitionAdd)="addTransiton(step, $event)" 
+                    (transitionRemove)="removeTransition(step, $event)"
+                    (transitionUpdate)="updateTransition($event)"
+                    (update)="updateStep(step, $event)" [roles]="roles">
+                </sqx-workflow-step>
+    
+                <button class="btn btn-success" (click)="addStep()" *ngIf="workflow.canUpdate">
+                    {{ 'workflows.addStep' | sqxTranslate }}
+                </button>
+            </ng-container>
+
+            <ng-template #visualize>
+                <sqx-workflow-diagram [workflow]="workflow"></sqx-workflow-diagram>
+            </ng-template>
+        </div>
+    </div>
+</div>

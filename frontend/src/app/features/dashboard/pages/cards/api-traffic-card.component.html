@@ -1,0 +1,18 @@
+<div class="card card-lg">
+    <div class="card-header">
+        {{ 'dashboard.trafficHeader' | sqxTranslate }}: {{chartSummary | sqxFileSize}}
+
+        <div class="float-end">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="stacked" [ngModel]="isStacked" (ngModelChange)="isStackedChange.emit($event)">
+
+                <label class="form-check-label" for="stacked">
+                    {{ 'dashboard.stackedChart' | sqxTranslate }}
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <chart type="bar" [data]="chartData" [options]="chartOptions"></chart>
+    </div>
+</div>

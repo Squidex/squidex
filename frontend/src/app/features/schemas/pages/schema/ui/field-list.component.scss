@@ -1,0 +1,33 @@
+@import 'mixins';
+@import 'vars';
+
+.field-list {
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: $panel-padding;
+    padding-top: 1rem;
+
+    &-assigned {
+        @include absolute(0, 50%, 0, 0);
+        border-right: 1px solid darken($color-input, 2%);
+    }
+
+    &-available {
+        @include absolute(0, 0, 0, 50%);
+        border: 0;
+    }
+}
+
+.cdk-drop-list-dragging {
+    .empty-hint {
+        display: none;
+    }
+}
+
+.drag-handle {
+    margin-right: 1rem;
+}
+
+label {
+    margin-bottom: 1rem;
+}

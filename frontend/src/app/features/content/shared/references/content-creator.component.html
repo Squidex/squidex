@@ -1,0 +1,48 @@
+<sqx-modal-dialog (close)="emitComplete()" size="lg" [showFooter]="false">
+    <ng-container title>
+        <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
+            <option *ngFor="let schema of schemas" [ngValue]="schema">
+                {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
+            </option>
+        </select>
+    </ng-container>
+
+    <ng-container tabs>
+        <div class="row gx-2 mt-3 mb-3">
+            <div class="col-auto">          
+                <div *ngIf="schema && languages.length > 1">
+                    <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages"></sqx-language-selector>
+                </div>
+            </div>
+
+            <div class="col text-end">
+                <button type="button" class="btn btn-outline-success" (click)="save()">
+                    {{ 'common.create' | sqxTranslate }}
+                </button>
+
+                <button type="button" class="btn btn-success ms-2" (click)="saveAndPublish()" *ngIf="schema?.canContentsCreateAndPublish">
+                    {{ 'contents.referencesCreatePublish' | sqxTranslate }}
+                </button>
+
+                <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm?.error | async"></sqx-form-error>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="schema && contentForm">
+            <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
+                <sqx-content-section *ngFor="let section of contentForm.sections"
+                    [(language)]="language"
+                    [form]="contentForm"
+                    [formContext]="formContext"
+                    [formLevel]="0"
+                    [formSection]="section"
+                    [isCompact]="true"
+                    [languages]="languages"
+                    [schema]="schema">
+                </sqx-content-section>
+            </form>
+        </ng-container>
+    </ng-container>
+</sqx-modal-dialog>

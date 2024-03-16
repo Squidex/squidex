@@ -1,0 +1,30 @@
+<span class="color-container" #input>
+    <ng-container *ngIf="mode === 'Input'; else circle">
+        <input class="form-control" type="text"
+            (blur)="blur()"
+            [style.background]="snapshot.value"
+            [style.color]="snapshot.foreground"
+            [placeholder]="placeholder"
+            [ngModel]="snapshot.value"
+            (ngModelChange)="updateValue($event)"
+            (focus)="focus()" />
+    </ng-container>
+
+    <ng-template #circle>
+        <div class="circle" [style.background]="snapshot.value" (click)="focus()"></div> 
+    </ng-template>
+</span>
+
+<ng-container *sqxModal="modal">
+    <div [sqxAnchoredTo]="input" position="bottom-left"
+        [style.height]="'280px'"
+        [style.width]="'230px'">
+        <div [style.background]="snapshot.value" 
+            [cpToggle]="true"
+            [cpDialogDisplay]="'inline'"
+            [cpCancelButton]="false"
+            [colorPicker]="snapshot.value"
+            (colorPickerChange)="updateValue($event)">
+        </div>
+    </div>
+</ng-container>

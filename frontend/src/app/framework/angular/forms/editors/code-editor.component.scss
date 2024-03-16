@@ -1,0 +1,35 @@
+@import 'mixins';
+@import 'vars';
+
+/* stylelint-disable selector-class-pattern */
+
+:host ::ng-deep {
+    .ace_editor {
+        background: $color-white;
+        border: 1px solid $color-input;
+        border-radius: 0;
+
+        &.no-border {
+            border: 0;
+        }
+    }
+
+    .ace_tooltip {
+        background: $color-white;
+        border: 1px solid $color-input;
+        border-radius: 0;
+    }
+
+    .ace_active-line,
+    .ace_gutter-active-line {
+        background: none !important;
+    }
+
+    .ace_gutter-active-line {
+        background: darken($color-border, 5%) !important;
+    }
+
+    .ace_gutter {
+        background: $color-border !important;
+    }
+}

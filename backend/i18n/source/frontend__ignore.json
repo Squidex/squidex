@@ -1,0 +1,233 @@
+{
+  "/_theme.html": [
+    "*"
+  ],
+  "/app.module.ts": [
+    "Application element not found"
+  ],
+  "/features/apps/pages/app.component.html": [
+    "&middot;",
+    "|"
+  ],
+  "/features/apps/pages/apps-page.component.html": [
+    "&middot;",
+    "|"
+  ],
+  "/features/content/pages/content/content-event.component.html": [
+    "&middot;"
+  ],
+  "/features/content/pages/content/content-page.component.html": [
+    "."
+  ],
+  "/features/content/shared/forms/array-item.component.html": [
+    "#{{index + 1}}"
+  ],
+  "/features/content/shared/forms/field-editor.component.html": [
+    "{{field.displayName}} {{displaySuffix}}",
+    "*"
+  ],
+  "/features/content/shared/references/reference-item.component.html": [
+    "INVALID",
+    "VALID"
+  ],
+  "/features/content/shared/references/references-editor.component.html": [
+    "&middot;"
+  ],
+  "/features/rules/pages/rule/rule-page.component.html": [
+    "...",
+    "#"
+  ],
+  "/features/rules/pages/rules/actions/generic-action.component.html": [
+    "*"
+  ],
+  "/features/rules/shared/actions/generic-action.component.html": [
+    "*"
+  ],
+  "/features/schemas/pages/schema/fields/types/array-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/assets-validation.component.html": [
+    "-",
+    "3",
+    "4",
+    "Audio",
+    "px",
+    "Unknown",
+    "Video"
+  ],
+  "/features/schemas/pages/schema/fields/types/boolean-ui.component.html": [
+    "Checkbox",
+    "Toggle"
+  ],
+  "/features/schemas/pages/schema/fields/types/components-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/date-time-ui.component.html": [
+    "DateTime"
+  ],
+  "/features/schemas/pages/schema/fields/types/geolocation-ui.component.html": [
+    "Map"
+  ],
+  "/features/schemas/pages/schema/fields/types/number-ui.component.html": [
+    "Dropdown",
+    "Input",
+    "Radio",
+    "Stars"
+  ],
+  "/features/schemas/pages/schema/fields/types/number-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/references-ui.component.html": [
+    "Checkboxes",
+    "Dropdown",
+    "List",
+    "Resolve reference"
+  ],
+  "/features/schemas/pages/schema/fields/types/references-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/string-ui.component.html": [
+    "Color",
+    "Dropdown",
+    "HTML",
+    "Input",
+    "Markdown",
+    "Radio",
+    "RichText",
+    "StockPhoto",
+    "TextArea"
+  ],
+  "/features/schemas/pages/schema/fields/types/string-validation.component.html": [
+    "-"
+  ],
+  "/features/schemas/pages/schema/fields/types/tags-ui.component.html": [
+    "Checkboxes",
+    "Dropdown"
+  ],
+  "/features/schemas/pages/schema/fields/types/tags-validation.component.html": [
+    "-"
+  ],
+  "/features/settings/pages/backups/backup.component.html": [
+    ","
+  ],
+  "/features/settings/pages/clients/client-connect-form.component.html": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "nuget"
+  ],
+  "/features/settings/pages/clients/client-connect-form.component.ts": [
+    "Content-Type: application/x-www-form-urlencoded",
+    "grant_type=client_credentials&\r\n        client_id=${app}:${client.id}&\r\n        client_secret=${client.secret}&\r\n        scope=squidex-api"
+  ],
+  "/features/settings/pages/contributors/import-contributors-dialog.component.html": [
+    "user1@squidex.io;user2@squidex.io"
+  ],
+  "/features/settings/pages/languages/language-add-form.component.html": [
+    "{{language.iso2Code}} ({{language.englishName}}"
+  ],
+  "/framework/angular/forms/validators.ts": [
+    "matchValidator(): other control is not found in parent group"
+  ],
+  "/framework/angular/modals/dialog-renderer.component.html": [
+    "({{tooltip.shortcut}}",
+    "&times;"
+  ],
+  "/framework/angular/pager.component.html": [
+    "10",
+    "20",
+    "30",
+    "50"
+  ],
+  "/framework/angular/pipes/date-time.pipes.ts": [
+    "dd. LLL yyyy",
+    "dd. MMM"
+  ],
+  "/framework/angular/pipes/money.pipe.ts": [
+    "<span class=\"decimal\">"
+  ],
+  "/framework/angular/pipes/numbers.pipes.ts": [
+    " kMGTPEZY"
+  ],
+  "/index.html": [
+    "*"
+  ],
+  "/shared/components/app-form.component.html": [
+    "appName"
+  ],
+  "/shared/components/assets/assets-selector.component.html": [
+    "[query]=\"assetsState.query | async\""
+  ],
+  "/shared/components/forms/geolocation-editor.component.ts": [
+    "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
+  ],
+  "/shared/components/forms/markdown-editor.component.ts": [
+    "*",
+    "fa fa-bold",
+    "fa fa-header",
+    "fa fa-italic",
+    "fa fa-list-ul",
+    "fa fa-quote-left",
+    "Generic List"
+  ],
+  "/shared/components/forms/rich-editor.component.ts": [
+    "code image media link lists advlist paste",
+    "undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets"
+  ],
+  "/shared/components/search/queries/filter-logical.component.html": [
+    "AND",
+    "OR"
+  ],
+  "/shared/components/search/queries/sorting.component.html": [
+    "ascending",
+    "descending"
+  ],
+  "/shared/components/search/search-form.component.ts": [
+    "form-inline search-form"
+  ],
+  "/shared/components/watching-users.component.html": [
+    "+{{currentUsers.length - 5}}"
+  ],
+  "/shared/services/auth.service.ts": [
+    "*"
+  ],
+  "/shared/services/rules.service.ts": [
+    "Asset changed",
+    "Content changed",
+    "For asset changes like uploaded, updated (reuploaded), renamed, deleted...",
+    "For content changes like created, updated, published, unpublished...",
+    "Manually triggered",
+    "Schema changed",
+    "To invoke processes manually, for example to update your static site...",
+    "Usage exceeded",
+    "User mentioned",
+    "When a schema definition has been created, updated, published or deleted...",
+    "When a user is mentioned in any comment...",
+    "When monthly API calls exceed a specified limit for one time a month..."
+  ],
+  "/shared/services/schemas.types.ts": [
+    "Invalid properties type"
+  ],
+  "/shared/state/appSettings.patterns.forms.ts": [
+    "[A-z0-9]+[A-z0-9\\- ]*[A-z0-9]"
+  ],
+  "/shared/state/contents.forms.visitors.ts": [
+    "<Json />",
+    "yyyy-MM-dd HH:mm:ss"
+  ],
+  "/shared/state/query.ts": [
+    "ends with",
+    "is empty",
+    "is equals to",
+    "is greater than",
+    "is greater than or equals to",
+    "is less than",
+    "is less than or equals to",
+    "is not equals to",
+    "starts with"
+  ],
+  "/theme/icomoon/demo.html": [
+    "*"
+  ]
+}

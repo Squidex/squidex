@@ -1,0 +1,14 @@
+<ng-container [ngSwitch]="status">
+    <div *ngSwitchCase="'Failed'" class="status-icon status-icon-failed status-icon-{{size}}" [title]="statusText">
+        <i class="icon-exclamation"></i>
+    </div>
+    <div *ngSwitchCase="'Success'" class="status-icon status-icon-success status-icon-{{size}}" [title]="statusText">
+        <i class="icon-checkmark"></i>
+    </div>
+    <div *ngSwitchCase="'Completed'" class="status-icon status-icon-success status-icon-{{size}}" [title]="statusText">
+        <i class="icon-checkmark"></i>
+    </div>
+    <div *ngSwitchDefault class="status status-icon-status-icon status-icon-{{size}} spin" [title]="statusText">
+        <i class="icon-hour-glass"></i>
+    </div>
+</ng-container>

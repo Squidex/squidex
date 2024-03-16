@@ -1,0 +1,27 @@
+<div class="card card-href">
+    <div class="card-body">
+        <div class="card-image">
+            <img src="./images/dashboard-schema.svg">
+        </div>
+
+        <ng-container *ngIf="app.canReadSchemas; else noPermission">
+            <h4 class="card-title">
+                <a [routerLink]="['schemas', { showDialog: true }]">{{ 'dashboard.schemaNewCard' | sqxTranslate }}</a>
+            </h4>
+
+            <div class="card-text">
+                {{ 'dashboard.schemaNewCardDescription' | sqxTranslate }}
+            </div>
+        </ng-container>
+
+        <ng-template #noPermission>
+            <h4 class="card-title">
+                <a [routerLink]="['schemas']">{{ 'dashboard.schemasCard' | sqxTranslate }}</a>
+            </h4>
+
+            <div class="card-text">
+                {{ 'dashboard.schemasCardDescription' | sqxTranslate }}
+            </div>
+        </ng-template>
+    </div>
+</div>

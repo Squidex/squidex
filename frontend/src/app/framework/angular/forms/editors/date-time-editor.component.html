@@ -1,0 +1,37 @@
+<div class="d-flex" (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="500" [sqxResizeMaxWidth]="0">
+    <div class="d-flex">
+        <div class="form-group me-1">
+            <div *ngIf="!isCompact && isDateTimeMode && shouldShowDateTimeModeButton">
+                <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(false)" *ngIf="snapshot.isLocal">
+                    {{ 'common.dateTimeEditor.local' | sqxTranslate }}
+                </button>
+                <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(true)" *ngIf="!snapshot.isLocal">
+                    {{ 'common.dateTimeEditor.utc' | sqxTranslate }}
+                </button>
+            </div>
+            <div class="input-group">
+                <input type="text" class="form-control form-date" [formControl]="dateControl" placeholder="{{ 'common.date' | sqxTranslate }}" 
+                    [class.form-date-only]="!isDateTimeMode" 
+                    [class.form-date-time-only]="!isCompact && isDateTimeMode && shouldShowDateTimeModeButton" 
+                    (blur)="callTouched()" maxlength="10" #dateInput>
+
+                <input type="text" class="form-control form-time" [formControl]="timeControl" placeholder="{{ 'common.time' | sqxTranslate }}" (blur)="callTouched()" *ngIf="isDateTimeMode">
+            </div>
+
+            <button type="button" class="btn btn-text-secondary btn-sm btn-clear" [class.hidden]="!hasValue"
+                [disabled]="snapshot.isDisabled" (click)="reset()" *ngIf="!hideClear">
+                <i class="icon-close"></i>
+            </button>
+        </div>
+        <div class="form-group" *ngIf="isDateTimeMode && shouldShowDateButtons">
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="i18n:common.dateTimeEditor.nowTooltip">
+                {{ 'common.dateTimeEditor.now' | sqxTranslate }}
+            </button>
+        </div>
+        <div class="form-group" *ngIf="!isDateTimeMode && shouldShowDateButtons">
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeToday()" title="i18n:common.dateTimeEditor.todayTooltip">
+                {{ 'common.dateTimeEditor.today' | sqxTranslate }}
+            </button>
+        </div>
+    </div>
+</div>

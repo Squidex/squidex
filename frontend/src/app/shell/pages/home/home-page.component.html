@@ -1,0 +1,25 @@
+<div class="login-area">
+    <div class="card">
+        <div class="card-body text-center">
+            <img alt="Logo" class="login-icon login-element" src="./images/logo.svg">
+
+            <div>
+                <button type="button" class="btn btn-success btn-lg login-button login-element" (click)="login()">
+                    {{ 'start.login' | sqxTranslate }}
+                </button>
+            </div>
+
+            <div class="login-info login-element" *ngIf="!isIE()">
+                {{ 'start.loginHint' | sqxTranslate }}
+            </div>
+        </div>
+        
+        <div class="login-arms"></div>
+    </div>
+
+    <div class="proudly-made text-center mt-4 mb-4">
+        <sqx-form-hint>
+            {{ 'start.madeBy' | sqxTranslate }}<br> {{ 'start.madeByCopyright' | sqxTranslate }}
+        </sqx-form-hint>
+    </div>
+</div>

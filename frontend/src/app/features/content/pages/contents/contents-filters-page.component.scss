@@ -1,0 +1,11 @@
+@import 'mixins';
+@import 'vars';
+
+.status {
+    @include truncate;
+}
+
+hr {
+    margin-left: 0;
+    margin-right: 0;
+}

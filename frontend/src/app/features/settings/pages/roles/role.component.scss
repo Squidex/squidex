@@ -1,0 +1,60 @@
+@import 'mixins';
+@import 'vars';
+
+.form-group {
+    margin-bottom: .375rem;
+
+    &:last-child {
+        margin: 0;
+    }
+}
+
+.prefix {
+    border: 0;
+    border-bottom: 1px solid $color-input;
+    color: $color-text-decent;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.form-control-empty {
+    background: 0;
+    border: 0;
+}
+
+.rule-name {
+    @include truncate;
+}
+
+.rule-section {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.col-name {
+    overflow: visible;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+}
+
+.col-action {
+    overflow: visible;
+    padding-left: 0;
+    padding-right: 0;
+    width: 42px;
+}
+
+.form-check-label {
+    max-width: 100%;
+}
+
+.built {
+    font-weight: bold;
+}
+
+.table-items-row-details {
+    &::before {
+        right: 4.55rem;
+    }
+}

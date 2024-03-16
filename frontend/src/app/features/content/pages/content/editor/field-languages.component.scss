@@ -1,0 +1,13 @@
+@import 'mixins';
+@import 'vars';
+
+.button-container {
+    display: inline-block;
+    max-width: none;
+    min-width: 5rem;
+    text-align: right;
+}
+
+sqx-language-selector {
+    text-align: right;
+}

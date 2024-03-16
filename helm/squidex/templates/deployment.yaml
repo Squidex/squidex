@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "squidex.fullname" . }}
+  labels:
+    {{- include "squidex.labels" . | indent 4 }}
+    orleans/serviceId: "squidex-{{ default .Chart.AppVersion .Values.image.tag }}"
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "squidex.selectors" . | indent 6 }}
+      orleans/serviceId: "squidex-{{ default .Chart.AppVersion .Values.image.tag }}"
+      orleans/clusterId: "squidex"
+  template:
+    metadata:
+      labels:
+        {{- include "squidex.selectors" . | indent 8 }}
+        orleans/serviceId: "squidex-{{ default .Chart.AppVersion .Values.image.tag }}"
+        orleans/clusterId: "squidex"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: orleans
+              containerPort: 11111
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 300
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          {{- range $key, $val := .Values.env }}
+            {{- if (eq $key "URLS__BASEURL") }}
+            - name: {{ $key | quote }}
+              value: {{ required (printf "The value .Values.env.%s is required" $key) $val | quote }}
+            {{- else }}
+            - name: {{ $key | quote }}
+              value: {{ $val | quote }}
+            {{- end }}
+          {{- end }}
+          
+          {{- $mongoDefaultConnectionString := printf "mongodb://%s" (include "squidex.mongoDefaultHostname" .) }}
+          {{- if (not .Values.env.EVENTSTORE__MONGODB__CONFIGURATION) }}
+            - name: "EVENTSTORE__MONGODB__CONFIGURATION"
+              value: {{ $mongoDefaultConnectionString | quote }}
+          {{- end }}
+
+          {{- if (not .Values.env.STORE__MONGODB__CONFIGURATION) }}
+            - name: "STORE__MONGODB__CONFIGURATION"
+              value: {{ $mongoDefaultConnectionString | quote }}
+          {{- end }}
+
+          {{- if (not .Values.env.ASSETSTORE__MONGODB__CONFIGURATION) }}
+            - name: "ASSETSTORE__MONGODB__CONFIGURATION"
+              value: {{ $mongoDefaultConnectionString | quote }}
+          {{- end }}
+
+            - name: ORLEANS_SERVICE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['orleans/serviceId']
+            - name: ORLEANS_CLUSTER_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['orleans/clusterId']
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- if (.Values.deployment.serviceAccountName) }}
+      serviceAccountName: {{ .Values.deployment.serviceAccountName}}
+      {{- end }}

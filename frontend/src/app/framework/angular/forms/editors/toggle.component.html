@@ -1,0 +1,6 @@
+<div class="toggle-container" (click)="changeState()"
+    [class.disabled]="snapshot.isDisabled"
+    [class.checked]="snapshot.isChecked === true" 
+    [class.unchecked]="snapshot.isChecked === false">
+    <div class="toggle-button"></div>
+</div>

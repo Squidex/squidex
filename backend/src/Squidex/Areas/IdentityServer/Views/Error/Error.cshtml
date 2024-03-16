@@ -1,0 +1,20 @@
+﻿@model Squidex.Areas.IdentityServer.Controllers.Error.ErrorVM
+
+@{
+    ViewBag.Title = T.Get("users.error.title");
+}
+
+<img class="splash-image" src="@Url.RootContentUrl("~/squid.svg?title=OH%20DAMN&text=I%20am%20sorry%2C%20that%20something%20went%20wrong")" />
+
+<h1 class="splash-h1">@T.Get("users.error.headline")</h1>
+
+<p class="splash-text">
+    @if (Model!.ErrorMessage != null)
+    {
+        @Model!.ErrorMessage
+    }
+    else
+    {
+        <span>@T.Get("users.error.text")</span>
+    }
+</p>

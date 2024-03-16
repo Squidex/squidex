@@ -1,0 +1,29 @@
+<sqx-title message="i18n:api.pageTitle"></sqx-title>
+
+<sqx-layout layout="left" titleText="i18n:api.title" titleIcon="api" [width]="16" [white]="true" [overflow]="true" [padding]="true">
+    <ng-container>
+        <ul class="nav nav-light flex-column">
+            <li class="nav-item">
+                <a class="nav-link" routerLink="graphql" routerLinkActive="active">
+                    {{ 'api.graphql' | sqxTranslate }}
+                </a>
+            </li>
+
+            <li class="nav-item nav-heading">
+                {{ 'common.openAPI' | sqxTranslate }}
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/api/content/{{appsState.appName}}/docs" sqxExternalLink>
+                    {{ 'api.contentApi' | sqxTranslate }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/api/docs" sqxExternalLink>
+                    {{ 'api.generalApi' | sqxTranslate }}
+                </a>
+            </li>
+        </ul>
+    </ng-container>
+</sqx-layout>
+
+<router-outlet></router-outlet>

@@ -1,0 +1,80 @@
+<form (ngSubmit)="saveSchema()">
+    <h5>{{ 'schemas.rules.title' | sqxTranslate }}</h5>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="content">
+                <div class="mt-4" *ngIf="!isEditable && editForm.rulesControls.length === 0">
+                    {{ 'schemas.rules.empty' | sqxTranslate }}
+                </div>
+
+                <div class="form-group row gx-2" *ngFor="let form of editForm.rulesControls; let i = index" [formGroup]="form">
+                    <div class="col col-action">
+                        <sqx-control-errors for="action"></sqx-control-errors>
+
+                        <select class="form-select" formControlName="action">
+                            <option *ngFor="let fieldAction of fieldActions" [ngValue]="fieldAction">{{fieldAction}}</option>
+                        </select>
+                    </div>
+
+                    <div class="col-3">
+                        <sqx-control-errors for="field"></sqx-control-errors>
+
+                        <select class="form-select" formControlName="field">
+                            <option *ngFor="let field of fieldNames" [ngValue]="field">{{field}}</option>
+                        </select>
+                    </div>
+
+                    <div class="col-auto">
+                        <div class="label text-muted">{{ 'schemas.rules.when' | sqxTranslate }}</div>
+                    </div>
+
+                    <div class="col">
+                        <sqx-control-errors for="condition"></sqx-control-errors>
+
+                        <input type="text" class="form-control" formControlName="condition" placeholder="{{ 'schemas.rules.condition' | sqxTranslate }}">
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
+                            (sqxConfirmClick)="editForm.remove(i)"
+                            confirmTitle="i18n:schemas.deleteRuleConfirmTitle"
+                            confirmText="i18n:schemas.deleteRuleConfirmText"
+                            confirmRememberKey="deleteFieldRule">
+                            <i class="icon-bin2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group row gx-2" *ngIf="isEditable">
+                    <div class="col col-action">
+                        <div class="form-control preview">{{ 'schemas.rules.action' | sqxTranslate }}</div>
+                    </div>
+
+                    <div class="col-3">
+                        <div class="form-control preview">{{ 'common.field' | sqxTranslate }}</div>
+                    </div>
+
+                    <div class="col-auto">
+                        <div class="label text-muted">{{ 'schemas.rules.when' | sqxTranslate }}</div>
+                    </div>
+
+                    <div class="col">
+                        <div class="form-control preview">{{ 'schemas.rules.condition' | sqxTranslate }}</div>
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-success" (click)="add()">
+                            <i class="icon-add"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer" *ngIf="isEditable">
+            <button type="submit" class="float-end btn btn-primary">
+                {{ 'common.save' | sqxTranslate }}
+            </button>
+        </div>
+    </div>
+</form>

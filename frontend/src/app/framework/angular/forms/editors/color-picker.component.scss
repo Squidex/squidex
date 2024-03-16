@@ -1,0 +1,27 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .color-picker {
+        border-color: $color-border;
+
+        .hex-text {
+            .box {
+                input {
+                    border-color: $color-input;
+                }
+            }
+        }
+    }
+}
+
+.color-container {
+    display: inline-block;
+}
+
+.circle {
+    @include circle(16px);
+    border: 1px solid $color-border-dark;
+    margin: 0;
+    margin-bottom: .125rem;
+}

@@ -1,18 +1,19 @@
 # User-specific files
+*.log
 *.suo
 *.user
 *.vs
-*.log
 
+.angular
 .awCache
-
+.idea
 .vscode
-.awcache
 
 # Build results
 bin/
 build/
 obj/
+object/
 out/
 publish/
 

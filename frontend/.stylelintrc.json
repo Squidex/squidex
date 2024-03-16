@@ -1,0 +1,37 @@
+{
+    "extends": "stylelint-config-standard-scss",
+    "plugins": [
+        "stylelint-scss"
+    ],
+    "rules": {
+        "at-rule-empty-line-before": null,
+        "at-rule-no-unknown": null,
+        "color-function-notation": null,
+        "declaration-block-no-redundant-longhand-properties": null,
+        "declaration-empty-line-before": null,
+        "indentation": 4,
+        "no-duplicate-selectors": null,
+        "no-empty-source": null,
+        "no-invalid-position-at-import-rule": null,
+        "no-missing-end-of-source-newline": null,
+        "number-leading-zero": "never",
+        "scss/at-rule-no-unknown": true,
+        "scss/comment-no-empty": null,
+        "scss/no-global-function-names": null,
+        "selector-class-pattern": "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$",
+        "selector-pseudo-element-no-unknown": [
+            true,
+            {
+                "ignorePseudoElements": [
+                    "ng-deep"
+                ]
+            }
+        ],
+        "string-quotes": "single"
+    },
+    "ignoreFiles": [
+        "**/*.cs",
+        "build/**/*.*",
+        "node_modules/**/*.*"
+    ]
+}

@@ -1,0 +1,31 @@
+@import 'mixins';
+@import 'vars';
+
+.content-status {
+    &.default {
+        color: $color-text-decent;
+    }
+
+    &.pending {
+        color: $color-black;
+    }
+
+    &-summary {
+        font-size: 1.3rem;
+        font-weight: normal;
+    }
+
+    &-scheduled {
+        color: $color-text !important;
+        font-size: $font-small;
+        font-weight: normal;
+    }
+
+    &-label {
+        color: $color-text;
+    }
+}
+
+.label {
+    color: $color-text !important;
+}
