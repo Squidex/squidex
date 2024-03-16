@@ -42,7 +42,7 @@ services:
       - CLUSTING_WORKER=false
 
   squidex2_worker:
-    extends: squidex2_worker
+    extends: squidex1
     environment:
       - EVENTSTORE__MONGODB__DATABASE=squidex2
       - STORE__MONGODB__CONTENTDATABASE=squidex2_content
@@ -53,7 +53,7 @@ services:
 
   # Separate datbases
   squidex3:
-    image: squidex-local
+    extends: squidex1
     environment:
       - ASSETS__RESIZERURL=http://resizer
       - CONTENTS__OPTIMIZEFORSELFHOSTING=true
