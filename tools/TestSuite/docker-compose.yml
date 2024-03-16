@@ -41,7 +41,7 @@ services:
     environment:
       - CLUSTING_WORKER=false
 
-  squidex2:
+  squidex2_worker:
     extends: squidex2_worker
     environment:
       - EVENTSTORE__MONGODB__DATABASE=squidex2
