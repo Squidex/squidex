@@ -59,16 +59,16 @@ public static class MessagingServices
 
             services.AddSingletonAs<UsageTrackerWorker>()
                 .AsSelf().As<IMessageHandler>();
-
-            services.AddSingletonAs<BackupJob>()
-                .As<IJobRunner>();
-
-            services.AddSingletonAs<RestoreJob>()
-                .As<IJobRunner>();
-
-            services.AddSingletonAs<RuleRunnerJob>()
-                .As<IJobRunner>();
         }
+
+        services.AddSingletonAs<BackupJob>()
+            .As<IJobRunner>();
+
+        services.AddSingletonAs<RestoreJob>()
+            .As<IJobRunner>();
+
+        services.AddSingletonAs<RuleRunnerJob>()
+            .As<IJobRunner>();
 
         services.AddSingleton<IMessagingSerializer>(c =>
             new SystemTextJsonMessagingSerializer(c.GetRequiredService<JsonSerializerOptions>()));
