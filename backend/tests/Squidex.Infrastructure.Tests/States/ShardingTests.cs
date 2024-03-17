@@ -16,7 +16,7 @@ public class ShardingTests
 
         for (var i = 0; i < 1000; i++)
         {
-            var shardKey = strategy.GetShardKey(Guid.NewGuid());
+            var shardKey = strategy.GetShardKey(DomainId.NewGuid());
 
             Assert.Equal(string.Empty, shardKey);
         }
@@ -39,7 +39,7 @@ public class ShardingTests
 
         for (var i = 0; i < 1000; i++)
         {
-            var shardKey = strategy.GetShardKey(Guid.NewGuid());
+            var shardKey = strategy.GetShardKey(DomainId.NewGuid());
 
             Assert.True(shardKey is "_0" or "_1" or "_2");
         }

@@ -10,7 +10,7 @@ using System.ComponentModel;
 namespace Squidex.Infrastructure;
 
 [TypeConverter(typeof(DomainIdTypeConverter))]
-public readonly struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
+public readonly struct DomainId : IEquatable<DomainId>, IComparable<DomainId>, IDeterministicHashCode
 {
     private static readonly string EmptyString = Guid.Empty.ToString();
 
@@ -72,6 +72,32 @@ public readonly struct DomainId : IEquatable<DomainId>, IComparable<DomainId>
     public override string ToString()
     {
         return id ?? EmptyString;
+    }
+
+    public int GetDeterministicHashCode()
+    {
+        unchecked
+        {
+            int hash1 = (5381 << 16) + 5381;
+            int hash2 = hash1;
+
+            if (id != null)
+            {
+                for (int i = 0; i < id.Length; i += 2)
+                {
+                    hash1 = ((hash1 << 5) + hash1) ^ id[i];
+
+                    if (i == id.Length - 1)
+                    {
+                        break;
+                    }
+
+                    hash2 = ((hash2 << 5) + hash2) ^ id[i + 1];
+                }
+            }
+
+            return hash1 + (hash2 * 1566083941);
+        }
     }
 
     public int CompareTo(DomainId other)

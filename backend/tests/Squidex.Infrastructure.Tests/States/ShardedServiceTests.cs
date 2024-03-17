@@ -19,14 +19,14 @@ public class ShardedServiceTests
     {
     }
 
-    private class TestSut : ShardedService<int, IInner>
+    private class TestSut : ShardedService<DomainId, IInner>
     {
         public TestSut(IShardingStrategy sharding, Func<string, IInner> factory)
             : base(sharding, factory)
         {
         }
 
-        public IInner ExposeShard(int key)
+        public IInner ExposeShard(DomainId key)
         {
             return Shard(key);
         }
@@ -76,7 +76,7 @@ public class ShardedServiceTests
     [Fact]
     public void Should_provide_shards()
     {
-        Assert.Equal(inner1, sut.ExposeShard(0));
-        Assert.Equal(inner2, sut.ExposeShard(1));
+        Assert.Equal(inner1, sut.ExposeShard(DomainId.Create("2")));
+        Assert.Equal(inner2, sut.ExposeShard(DomainId.Create("3")));
     }
 }

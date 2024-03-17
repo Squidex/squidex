@@ -9,6 +9,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities;
 
@@ -16,6 +17,15 @@ public class AppProviderExtensionsTests : GivenContext
 {
     private readonly NamedId<DomainId> componentId1 = NamedId.Of(DomainId.NewGuid(), "my-schema");
     private readonly NamedId<DomainId> componentId2 = NamedId.Of(DomainId.NewGuid(), "my-schema");
+
+    [Fact]
+    public void X()
+    {
+        var y = DomainId.Create("c3750ec4-baf1-44af-85f0-1495ab4f9f1a");
+
+        var x = new PartitionedSharding(20).GetShardKey(y);
+    }
+
 
     [Fact]
     public async Task Should_do_nothing_if_no_component_found()
