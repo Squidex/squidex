@@ -28,6 +28,7 @@ public class AppsIndexTests : GivenContext
     private readonly TestState<NameReservationState.State> state;
     private readonly IAppRepository appRepository = A.Fake<IAppRepository>();
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
+    private readonly AppCacheOptions options = new AppCacheOptions();
     private readonly AppsIndex sut;
 
     public AppsIndexTests()
@@ -37,7 +38,7 @@ public class AppsIndexTests : GivenContext
         var replicatedCache =
             new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), A.Fake<IMessageBus>());
 
-        sut = new AppsIndex(appRepository, replicatedCache, state.PersistenceFactory);
+        sut = new AppsIndex(appRepository, replicatedCache, state.PersistenceFactory, Options.Create(options));
     }
 
     [Fact]

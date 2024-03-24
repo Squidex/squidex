@@ -37,7 +37,6 @@ public sealed class SetupMiddleware
         else
         {
             isUserFound = true;
-
             await next(context);
         }
     }

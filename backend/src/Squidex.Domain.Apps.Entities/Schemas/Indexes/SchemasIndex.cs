@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Options;
+using Squidex.Assets;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -19,17 +21,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes;
 
 public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
 {
-    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
     private readonly ISchemaRepository schemaRepository;
     private readonly IReplicatedCache schemaCache;
     private readonly IPersistenceFactory<NameReservationState.State> persistenceFactory;
+    private readonly TimeSpan cacheDuration;
 
     public SchemasIndex(ISchemaRepository schemaRepository, IReplicatedCache schemaCache,
-        IPersistenceFactory<NameReservationState.State> persistenceFactory)
+        IPersistenceFactory<NameReservationState.State> persistenceFactory,
+        IOptions<SchemaCacheOptions> options)
     {
         this.schemaRepository = schemaRepository;
         this.schemaCache = schemaCache;
         this.persistenceFactory = persistenceFactory;
+        this.cacheDuration = options.Value.CacheDuration;
     }
 
     public async Task<List<Schema>> GetSchemasAsync(DomainId appId,
@@ -209,18 +213,28 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         // Run some fallback migrations.
         schema = FieldNames.Migrate(schema);
 
+        if (cacheDuration <= TimeSpan.Zero)
+        {
+            return schema;
+        }
+
         // Do not use cancellation here as we already so far.
         await schemaCache.AddAsync(new[]
         {
             new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Id), schema),
             new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Name), schema),
-        }, CacheDuration);
+        }, cacheDuration);
 
         return schema;
     }
 
     private Task InvalidateItAsync(DomainId appId, DomainId id, string name)
     {
+        if (cacheDuration <= TimeSpan.Zero)
+        {
+            return Task.CompletedTask;
+        }
+
         // Do not use cancellation here as we already so far.
         return schemaCache.RemoveAsync(new[]
         {

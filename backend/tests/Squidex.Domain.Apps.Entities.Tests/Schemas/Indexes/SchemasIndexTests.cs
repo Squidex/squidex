@@ -26,6 +26,7 @@ public class SchemasIndexTests : GivenContext
     private readonly TestState<NameReservationState.State> state;
     private readonly ISchemaRepository schemaRepository = A.Fake<ISchemaRepository>();
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
+    private readonly SchemaCacheOptions options = new SchemaCacheOptions();
     private readonly SchemasIndex sut;
 
     public SchemasIndexTests()
@@ -35,7 +36,7 @@ public class SchemasIndexTests : GivenContext
         var replicatedCache =
             new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), A.Fake<IMessageBus>());
 
-        sut = new SchemasIndex(schemaRepository, replicatedCache, state.PersistenceFactory);
+        sut = new SchemasIndex(schemaRepository, replicatedCache, state.PersistenceFactory, Options.Create(options));
     }
 
     [Fact]
