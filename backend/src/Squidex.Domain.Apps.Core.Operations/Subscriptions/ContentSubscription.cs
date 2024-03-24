@@ -7,17 +7,21 @@
 
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Infrastructure.Security;
+using Squidex.Messaging.Subscriptions;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions;
 
-public sealed class ContentSubscription : AppSubscription
+public sealed class ContentSubscription : ISubscription
 {
+    public PermissionSet Permissions { get; set; }
+
     public string? SchemaName { get; set; }
 
     public EnrichedContentEventType? Type { get; set; }
 
-    public override ValueTask<bool> ShouldHandle(object message)
+    public ValueTask<bool> ShouldHandle(object message)
     {
         return new ValueTask<bool>(ShouldHandleCore(message));
     }

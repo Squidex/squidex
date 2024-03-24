@@ -7,15 +7,15 @@
 
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Shared;
+using Squidex.Messaging.Subscriptions;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions;
 
-public sealed class AssetSubscription : AppSubscription
+public sealed class AssetSubscription : ISubscription
 {
-    public EnrichedAssetEventType? Type { get; set; }
+    public EnrichedAssetEventType? Type { get; init; }
 
-    public override ValueTask<bool> ShouldHandle(object message)
+    public ValueTask<bool> ShouldHandle(object message)
     {
         return new ValueTask<bool>(ShouldHandleCore(message));
     }
@@ -25,22 +25,12 @@ public sealed class AssetSubscription : AppSubscription
         switch (message)
         {
             case EnrichedAssetEvent enrichedAssetEvent:
-                return ShouldHandle(enrichedAssetEvent);
+                return CheckType(enrichedAssetEvent);
             case AssetEvent assetEvent:
-                return ShouldHandle(assetEvent);
+                return CheckType(assetEvent);
             default:
                 return false;
         }
-    }
-
-    private bool ShouldHandle(EnrichedAssetEvent @event)
-    {
-        return CheckType(@event) && CheckPermission(@event.AppId.Name);
-    }
-
-    private bool ShouldHandle(AssetEvent @event)
-    {
-        return CheckType(@event) && CheckPermission(@event.AppId.Name);
     }
 
     private bool CheckType(EnrichedAssetEvent @event)
@@ -63,12 +53,5 @@ public sealed class AssetSubscription : AppSubscription
             default:
                 return true;
         }
-    }
-
-    private bool CheckPermission(string appName)
-    {
-        var permission = PermissionIds.ForApp(PermissionIds.AppAssetsRead, appName);
-
-        return Permissions.Includes(permission);
     }
 }

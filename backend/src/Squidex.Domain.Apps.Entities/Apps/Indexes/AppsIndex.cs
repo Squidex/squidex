@@ -180,12 +180,8 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
     private async Task<string?> CheckAppAsync(CreateApp command,
         CancellationToken ct)
     {
-        var token = await ReserveAsync(command.AppId, command.Name, ct);
-
-        if (token == null)
-        {
-            throw new ValidationException(T.Get("apps.nameAlreadyExists"));
-        }
+        var token = await ReserveAsync(command.AppId, command.Name, ct)
+            ?? throw new ValidationException(T.Get("apps.nameAlreadyExists"));
 
         return token;
     }

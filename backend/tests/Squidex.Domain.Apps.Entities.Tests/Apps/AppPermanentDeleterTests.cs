@@ -45,7 +45,7 @@ public class AppPermanentDeleterTests : GivenContext
     }
 
     [Fact]
-    public void Should_handle_delete_event()
+    public async Task Should_handle_delete_event()
     {
         var eventType = TestUtils.TypeRegistry.GetName<IEvent, AppDeleted>();
 
@@ -53,11 +53,11 @@ public class AppPermanentDeleterTests : GivenContext
             new StoredEvent("stream", "1", 1,
                 new EventData(eventType, [], "payload"));
 
-        Assert.True(sut.Handles(storedEvent));
+        Assert.True(await sut.HandlesAsync(storedEvent));
     }
 
     [Fact]
-    public void Should_handle_contributor_event()
+    public async Task Should_handle_contributor_event()
     {
         var eventType = TestUtils.TypeRegistry.GetName<IEvent, AppContributorRemoved>();
 
@@ -65,11 +65,11 @@ public class AppPermanentDeleterTests : GivenContext
             new StoredEvent("stream", "1", 1,
                 new EventData(eventType, [], "payload"));
 
-        Assert.True(sut.Handles(storedEvent));
+        Assert.True(await sut.HandlesAsync(storedEvent));
     }
 
     [Fact]
-    public void Should_not_handle_creation_event()
+    public async Task Should_not_handle_creation_event()
     {
         var eventType = TestUtils.TypeRegistry.GetName<IEvent, AppCreated>();
 
@@ -77,7 +77,7 @@ public class AppPermanentDeleterTests : GivenContext
             new StoredEvent("stream", "1", 1,
                 new EventData(eventType, [], "payload"));
 
-        Assert.False(sut.Handles(storedEvent));
+        Assert.False(await sut.HandlesAsync(storedEvent));
     }
 
     [Fact]

@@ -11,11 +11,11 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="EventStore.Client.Grpc.PersistentSubscriptions" Version="23.2.0" />
-    <PackageReference Include="EventStore.Client.Grpc.ProjectionManagement" Version="23.2.0" />
-    <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.2.0" />
+    <PackageReference Include="EventStore.Client.Grpc.PersistentSubscriptions" Version="23.2.1" />
+    <PackageReference Include="EventStore.Client.Grpc.ProjectionManagement" Version="23.2.1" />
+    <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.2.1" />
     <PackageReference Include="Grpc.Net.Client" Version="2.61.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.145">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.146">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

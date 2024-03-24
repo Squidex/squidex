@@ -43,7 +43,7 @@ public class AssetPermanentDeleterTests : GivenContext
     }
 
     [Fact]
-    public void Should_handle_deletion_event()
+    public async Task Should_handle_deletion_event()
     {
         var eventType = TestUtils.TypeRegistry.GetName<IEvent, AssetDeleted>();
 
@@ -51,11 +51,11 @@ public class AssetPermanentDeleterTests : GivenContext
             new StoredEvent("stream", "1", 1,
                 new EventData(eventType, [], "payload"));
 
-        Assert.True(sut.Handles(storedEvent));
+        Assert.True(await sut.HandlesAsync(storedEvent));
     }
 
     [Fact]
-    public void Should_not_handle_creation_event()
+    public async Task Should_not_handle_creation_event()
     {
         var eventType = TestUtils.TypeRegistry.GetName<IEvent, AssetCreated>();
 
@@ -63,7 +63,7 @@ public class AssetPermanentDeleterTests : GivenContext
             new StoredEvent("stream", "1", 1,
                 new EventData(eventType, [], "payload"));
 
-        Assert.False(sut.Handles(storedEvent));
+        Assert.False(await sut.HandlesAsync(storedEvent));
     }
 
     [Fact]

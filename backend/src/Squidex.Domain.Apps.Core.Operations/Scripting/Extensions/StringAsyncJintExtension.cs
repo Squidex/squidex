@@ -7,8 +7,8 @@
 
 using Jint.Native;
 using Jint.Runtime;
+using Squidex.AI;
 using Squidex.Domain.Apps.Core.Properties;
-using Squidex.Text.ChatBots;
 using Squidex.Text.Translations;
 
 #pragma warning disable CA1826 // Do not use Enumerable methods on indexable collections
@@ -61,17 +61,9 @@ public sealed class StringAsyncJintExtension : IJintExtension, IScriptDescriptor
                     return;
                 }
 
-                var conversationId = Guid.NewGuid().ToString();
-                try
-                {
-                    var result = await chatAgent.PromptAsync(conversationId, prompt, ct);
+                var result = await chatAgent.PromptAsync(prompt, ct: ct);
 
-                    scheduler.Run(callback, JsValue.FromObject(context.Engine, result.Text));
-                }
-                finally
-                {
-                    await chatAgent.StopConversationAsync(conversationId);
-                }
+                scheduler.Run(callback, JsValue.FromObject(context.Engine, result.Text));
             }
             catch (Exception ex)
             {

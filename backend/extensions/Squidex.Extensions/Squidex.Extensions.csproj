@@ -16,10 +16,10 @@
     <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.3.0" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
     <PackageReference Include="Elasticsearch.Net" Version="7.17.5" />
-    <PackageReference Include="Google.Cloud.Diagnostics.Common" Version="5.1.0" />
+    <PackageReference Include="Google.Cloud.Diagnostics.Common" Version="5.2.0" />
     <PackageReference Include="Google.Cloud.Logging.V2" Version="4.2.0" />
     <PackageReference Include="Google.Cloud.Monitoring.V3" Version="3.6.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.145">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.146">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

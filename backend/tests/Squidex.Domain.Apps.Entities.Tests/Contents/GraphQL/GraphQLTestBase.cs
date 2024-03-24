@@ -95,7 +95,7 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
 
         var actual = await new DocumentExecuter().ExecuteAsync(options);
 
-        if (actual.Streams?.Count > 0 && actual.Errors?.Any() != true)
+        if (actual.Streams is { Count: > 0 } && actual.Errors is not { Count: > 0 })
         {
             // Resolve the first stream actual with a timeout.
             var stream = actual.Streams.First();

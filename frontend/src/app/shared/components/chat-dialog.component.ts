@@ -9,7 +9,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { delay } from 'rxjs/operators';
-import { FocusOnInitDirective, ModalDialogComponent, ResizedDirective, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { FocusOnInitDirective, MarkdownDirective, MathHelper, ModalDialogComponent, ResizedDirective, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppsState, AuthService, StatefulComponent, TranslationsService } from '@app/shared/internal';
 import { UserIdPicturePipe } from './pipes';
 
@@ -32,6 +32,7 @@ interface State {
     imports: [
         FocusOnInitDirective,
         FormsModule,
+        MarkdownDirective,
         ModalDialogComponent,
         NgFor,
         NgIf,
@@ -43,6 +44,8 @@ interface State {
     ],
 })
 export class ChatDialogComponent extends StatefulComponent<State> {
+    private readonly conversationId = MathHelper.guid();
+
     @Output()
     public textSelect = new EventEmitter<string | undefined | null>();
 
@@ -87,7 +90,7 @@ export class ChatDialogComponent extends StatefulComponent<State> {
             isRunning: true,
         }));
 
-        this.translator.ask(this.appsState.appName, { prompt }).pipe(delay(500))
+        this.translator.ask(this.appsState.appName, { prompt, conversationId: this.conversationId }).pipe(delay(500))
             .subscribe({
                 next: chatAnswers => {
                     if (chatAnswers.length === 0) {

@@ -8,13 +8,10 @@
 using GraphQL;
 using GraphQL.Execution;
 using GraphQL.Resolvers;
-using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
-using Squidex.Messaging.Subscriptions;
-using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
@@ -86,29 +83,6 @@ public static class Resolvers
                     fieldContext.CancellationToken);
 
             return commandContext.PlainResult!;
-        });
-    }
-
-    public static ISourceStreamResolver Stream(string permissionId, Func<IResolveFieldContext, AppSubscription> action)
-    {
-        return new SourceStreamResolver<object>(fieldContext =>
-        {
-            var context = (GraphQLExecutionContext)fieldContext.UserContext;
-
-            if (!context.Context.UserPermissions.Includes(PermissionIds.ForApp(permissionId, context.Context.App.Name)))
-            {
-                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
-            }
-
-            var subscription = action(fieldContext);
-
-            // The app id is taken from the URL so we cannot get events from other apps.
-            subscription.AppId = context.Context.App.Id;
-
-            // We also check the subscriptions on the source server.
-            subscription.Permissions = context.Context.UserPermissions;
-
-            return context.Resolve<ISubscriptionService>().Subscribe<object>(subscription);
         });
     }
 }

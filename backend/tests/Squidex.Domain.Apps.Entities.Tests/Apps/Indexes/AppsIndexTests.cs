@@ -35,8 +35,7 @@ public class AppsIndexTests : GivenContext
         state = new TestState<NameReservationState.State>("Apps");
 
         var replicatedCache =
-            new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), A.Fake<IMessageBus>(),
-                Options.Create(new ReplicatedCacheOptions { Enable = true }));
+            new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), A.Fake<IMessageBus>());
 
         sut = new AppsIndex(appRepository, replicatedCache, state.PersistenceFactory);
     }

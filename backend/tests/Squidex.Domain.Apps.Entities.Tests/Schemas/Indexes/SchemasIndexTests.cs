@@ -33,8 +33,7 @@ public class SchemasIndexTests : GivenContext
         state = new TestState<NameReservationState.State>($"{AppId.Id}_Schemas");
 
         var replicatedCache =
-            new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), A.Fake<IMessageBus>(),
-                Options.Create(new ReplicatedCacheOptions { Enable = true }));
+            new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), A.Fake<IMessageBus>());
 
         sut = new SchemasIndex(schemaRepository, replicatedCache, state.PersistenceFactory);
     }

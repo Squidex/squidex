@@ -14,6 +14,11 @@ namespace Squidex.Areas.Api.Controllers.Translations.Models;
 public sealed class AskDto
 {
     /// <summary>
+    /// Optional conversation ID.
+    /// </summary>
+    public string? ConversationId { get; set; }
+
+    /// <summary>
     /// The text to ask.
     /// </summary>
     [LocalizedRequired]
