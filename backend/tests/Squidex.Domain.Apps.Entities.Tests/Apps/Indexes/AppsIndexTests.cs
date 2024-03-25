@@ -33,6 +33,8 @@ public class AppsIndexTests : GivenContext
 
     public AppsIndexTests()
     {
+        options.CacheDuration = TimeSpan.FromMinutes(5);
+
         state = new TestState<NameReservationState.State>("Apps");
 
         var replicatedCache =
@@ -61,18 +63,36 @@ public class AppsIndexTests : GivenContext
     public async Task Should_resolve_app_by_name_and_id_if_cached_before()
     {
         A.CallTo(() => appRepository.FindAsync(AppId.Name, CancellationToken))
-            .Returns(App);
+            .ReturnsLazily(() => App with { Version = 3 });
 
         var actual1 = await sut.GetAppAsync(AppId.Name, true, CancellationToken);
         var actual2 = await sut.GetAppAsync(AppId.Name, true, CancellationToken);
         var actual3 = await sut.GetAppAsync(AppId.Id, true, CancellationToken);
 
-        Assert.Same(App, actual1);
-        Assert.Same(App, actual2);
-        Assert.Same(App, actual3);
+        Assert.Same(actual1, actual2);
+        Assert.Same(actual1, actual3);
 
         A.CallTo(() => appRepository.FindAsync(AppId.Name, CancellationToken))
             .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_resolve_app_by_name_and_id_if_cache_before_but_disabled()
+    {
+        options.CacheDuration = default;
+
+        A.CallTo(() => appRepository.FindAsync(AppId.Name, CancellationToken))
+            .ReturnsLazily(() => App with { Version = 3 });
+
+        var actual1 = await sut.GetAppAsync(AppId.Name, true, CancellationToken);
+        var actual2 = await sut.GetAppAsync(AppId.Name, true, CancellationToken);
+        var actual3 = await sut.GetAppAsync(AppId.Id, true, CancellationToken);
+
+        Assert.NotSame(actual1, actual2);
+        Assert.NotSame(actual1, actual3);
+
+        A.CallTo(() => appRepository.FindAsync(AppId.Name, CancellationToken))
+            .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]
@@ -84,8 +104,8 @@ public class AppsIndexTests : GivenContext
         var actual1 = await sut.GetAppAsync(AppId.Id, false, CancellationToken);
         var actual2 = await sut.GetAppAsync(AppId.Id, false, CancellationToken);
 
-        Assert.Same(App, actual1);
-        Assert.Same(App, actual2);
+        Assert.Equal(App, actual1);
+        Assert.Equal(App, actual2);
 
         A.CallTo(() => appRepository.FindAsync(AppId.Id, CancellationToken))
             .MustHaveHappenedTwiceExactly();
@@ -94,19 +114,39 @@ public class AppsIndexTests : GivenContext
     [Fact]
     public async Task Should_resolve_app_by_id_and_name_if_cached_before()
     {
+        options.CacheDuration = TimeSpan.FromMinutes(5);
+
         A.CallTo(() => appRepository.FindAsync(AppId.Id, CancellationToken))
-            .Returns(App);
+            .ReturnsLazily(() => App with { Version = 3 });
 
         var actual1 = await sut.GetAppAsync(AppId.Id, true, CancellationToken);
         var actual2 = await sut.GetAppAsync(AppId.Id, true, CancellationToken);
         var actual3 = await sut.GetAppAsync(AppId.Name, true, CancellationToken);
 
-        Assert.Same(App, actual1);
-        Assert.Same(App, actual2);
-        Assert.Same(App, actual3);
+        Assert.Same(actual1, actual2);
+        Assert.Same(actual1, actual3);
 
         A.CallTo(() => appRepository.FindAsync(AppId.Id, CancellationToken))
             .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_resolve_app_by_id_and_name_if_cached_before_but_disabled()
+    {
+        options.CacheDuration = default;
+
+        A.CallTo(() => appRepository.FindAsync(AppId.Id, CancellationToken))
+            .ReturnsLazily(() => App with { Version = 3 });
+
+        var actual1 = await sut.GetAppAsync(AppId.Id, true, CancellationToken);
+        var actual2 = await sut.GetAppAsync(AppId.Id, true, CancellationToken);
+        var actual3 = await sut.GetAppAsync(AppId.Name, true, CancellationToken);
+
+        Assert.NotSame(actual1, actual2);
+        Assert.NotSame(actual1, actual3);
+
+        A.CallTo(() => appRepository.FindAsync(AppId.Id, CancellationToken))
+            .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]

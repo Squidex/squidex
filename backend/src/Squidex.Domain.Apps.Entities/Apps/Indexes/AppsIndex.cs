@@ -25,7 +25,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 {
     private readonly IAppRepository appRepository;
     private readonly IReplicatedCache appCache;
-    private readonly TimeSpan cacheDuration;
+    private readonly AppCacheOptions options;
     private readonly NameReservationState namesState;
 
     public AppsIndex(IAppRepository appRepository, IReplicatedCache appCache,
@@ -34,7 +34,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
     {
         this.appRepository = appRepository;
         this.appCache = appCache;
-        this.cacheDuration = options.Value.CacheDuration;
+        this.options = options.Value;
 
         namesState = new NameReservationState(persistenceFactory, "Apps");
     }
@@ -221,7 +221,7 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
     private async Task<App> PrepareAsync(App app)
     {
-        if (cacheDuration <= TimeSpan.Zero)
+        if (options.CacheDuration <= TimeSpan.Zero)
         {
             return app;
         }
@@ -231,14 +231,14 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         {
             new KeyValuePair<string, object?>(GetCacheKey(app.Id), app),
             new KeyValuePair<string, object?>(GetCacheKey(app.Name), app),
-        }, cacheDuration);
+        }, options.CacheDuration);
 
         return app;
     }
 
     private Task InvalidateItAsync(DomainId id, string name)
     {
-        if (cacheDuration <= TimeSpan.Zero)
+        if (options.CacheDuration <= TimeSpan.Zero)
         {
             return Task.CompletedTask;
         }

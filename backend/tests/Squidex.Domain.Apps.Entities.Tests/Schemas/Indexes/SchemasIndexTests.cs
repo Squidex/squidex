@@ -31,6 +31,8 @@ public class SchemasIndexTests : GivenContext
 
     public SchemasIndexTests()
     {
+        options.CacheDuration = TimeSpan.FromMinutes(5);
+
         state = new TestState<NameReservationState.State>($"{AppId.Id}_Schemas");
 
         var replicatedCache =
@@ -59,18 +61,36 @@ public class SchemasIndexTests : GivenContext
     public async Task Should_resolve_schema_by_name_and_id_if_cached_before()
     {
         A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
-            .Returns(Schema);
+            .ReturnsLazily(() => Schema with { Version = 3 });
 
         var actual1 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, true, CancellationToken);
         var actual2 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, true, CancellationToken);
         var actual3 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, true, CancellationToken);
 
-        Assert.Same(Schema, actual1);
-        Assert.Same(Schema, actual2);
-        Assert.Same(Schema, actual3);
+        Assert.Same(actual1, actual2);
+        Assert.Same(actual1, actual3);
 
         A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
             .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_resolve_schema_by_name_and_id_if_cached_before_but_disabled()
+    {
+        options.CacheDuration = default;
+
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
+            .ReturnsLazily(() => Schema with { Version = 3 });
+
+        var actual1 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, true, CancellationToken);
+        var actual2 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, true, CancellationToken);
+        var actual3 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, true, CancellationToken);
+
+        Assert.NotSame(actual1, actual2);
+        Assert.NotSame(actual1, actual3);
+
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Name, CancellationToken))
+            .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]
@@ -93,18 +113,36 @@ public class SchemasIndexTests : GivenContext
     public async Task Should_resolve_schema_by_id_and_name_if_cached_before()
     {
         A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Id, CancellationToken))
-            .Returns(Schema);
+            .ReturnsLazily(() => Schema with { Version = 3 });
 
         var actual1 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, true, CancellationToken);
         var actual2 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, true, CancellationToken);
         var actual3 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, true, CancellationToken);
 
-        Assert.Same(Schema, actual1);
-        Assert.Same(Schema, actual2);
-        Assert.Same(Schema, actual3);
+        Assert.Same(actual1, actual2);
+        Assert.Same(actual1, actual3);
 
         A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Id, CancellationToken))
             .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_resolve_schema_by_id_and_name_if_cached_before_but_disabled()
+    {
+        options.CacheDuration = default;
+
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Id, CancellationToken))
+            .ReturnsLazily(() => Schema with { Version = 3 });
+
+        var actual1 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, true, CancellationToken);
+        var actual2 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Id, true, CancellationToken);
+        var actual3 = await sut.GetSchemaAsync(AppId.Id, SchemaId.Name, true, CancellationToken);
+
+        Assert.NotSame(actual1, actual2);
+        Assert.NotSame(actual1, actual3);
+
+        A.CallTo(() => schemaRepository.FindAsync(AppId.Id, SchemaId.Id, CancellationToken))
+            .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]

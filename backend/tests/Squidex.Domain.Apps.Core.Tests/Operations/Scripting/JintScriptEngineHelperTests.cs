@@ -619,7 +619,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     [Fact]
     public async Task Should_generate_content()
     {
-        A.CallTo(() => chatAgent.PromptAsync(A<string>._, "prompt", A<CancellationToken>._))
+        A.CallTo(() => chatAgent.PromptAsync("prompt", A<string>._, A<CancellationToken>._))
             .Returns(ChatBotResponse.Success("Generated"));
 
         var vars = new ScriptVars

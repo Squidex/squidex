@@ -24,7 +24,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
     private readonly ISchemaRepository schemaRepository;
     private readonly IReplicatedCache schemaCache;
     private readonly IPersistenceFactory<NameReservationState.State> persistenceFactory;
-    private readonly TimeSpan cacheDuration;
+    private readonly SchemaCacheOptions options;
 
     public SchemasIndex(ISchemaRepository schemaRepository, IReplicatedCache schemaCache,
         IPersistenceFactory<NameReservationState.State> persistenceFactory,
@@ -33,7 +33,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         this.schemaRepository = schemaRepository;
         this.schemaCache = schemaCache;
         this.persistenceFactory = persistenceFactory;
-        this.cacheDuration = options.Value.CacheDuration;
+        this.options = options.Value;
     }
 
     public async Task<List<Schema>> GetSchemasAsync(DomainId appId,
@@ -213,7 +213,7 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         // Run some fallback migrations.
         schema = FieldNames.Migrate(schema);
 
-        if (cacheDuration <= TimeSpan.Zero)
+        if (options.CacheDuration <= TimeSpan.Zero)
         {
             return schema;
         }
@@ -223,14 +223,14 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         {
             new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Id), schema),
             new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Name), schema),
-        }, cacheDuration);
+        }, options.CacheDuration);
 
         return schema;
     }
 
     private Task InvalidateItAsync(DomainId appId, DomainId id, string name)
     {
-        if (cacheDuration <= TimeSpan.Zero)
+        if (options.CacheDuration <= TimeSpan.Zero)
         {
             return Task.CompletedTask;
         }
