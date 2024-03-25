@@ -33,6 +33,7 @@ public static class MessagingServices
         var channelBackupStart = new ChannelName("backup.start");
         var channelFallback = new ChannelName("default");
         var channelRules = new ChannelName("rules.run");
+        var isRandomName = config.GetValue<bool>("clustering:randomName");
         var isWorker = config.GetValue<bool>("clustering:worker");
 
         if (isWorker)
@@ -57,6 +58,12 @@ public static class MessagingServices
 
             services.AddSingletonAs<UsageTrackerWorker>()
                 .AsSelf().As<IMessageHandler>();
+        }
+
+        if (isRandomName)
+        {
+            services.AddSingletonAs<RandomInstanceNameProvider>()
+                .As<IInstanceNameProvider>();
         }
 
         services.AddSingletonAs<BackupJob>()

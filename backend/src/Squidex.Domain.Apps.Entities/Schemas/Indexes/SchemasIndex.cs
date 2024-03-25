@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
-using Squidex.Assets;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;

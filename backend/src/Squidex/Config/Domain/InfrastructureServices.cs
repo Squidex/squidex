@@ -12,7 +12,6 @@ using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Areas.Api.Controllers.UI;
-using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Domain.Apps.Core.Tags;

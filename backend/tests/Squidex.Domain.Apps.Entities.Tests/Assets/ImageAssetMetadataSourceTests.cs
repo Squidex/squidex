@@ -9,7 +9,6 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 

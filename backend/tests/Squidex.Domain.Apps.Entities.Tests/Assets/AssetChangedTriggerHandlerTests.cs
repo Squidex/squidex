@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure.EventSourcing;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 

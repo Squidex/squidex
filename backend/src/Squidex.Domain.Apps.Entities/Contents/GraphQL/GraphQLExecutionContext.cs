@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Cache;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure;
-using Squidex.Messaging.Subscriptions;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
