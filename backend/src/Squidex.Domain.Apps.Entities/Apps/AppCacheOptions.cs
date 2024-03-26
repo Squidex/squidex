@@ -5,17 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
-using Squidex.Messaging.Subscriptions;
+namespace Squidex.Domain.Apps.Entities.Apps;
 
-namespace Squidex.Domain.Apps.Core.Subscriptions;
-
-public abstract class AppSubscription : ISubscription
+public sealed class AppCacheOptions
 {
-    public DomainId AppId { get; set; }
-
-    public PermissionSet Permissions { get; set; }
-
-    public abstract ValueTask<bool> ShouldHandle(object message);
+    public TimeSpan CacheDuration { get; set; }
 }

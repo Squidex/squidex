@@ -31,6 +31,9 @@ export type TranslateDto = Readonly<{
  }>;
 
  export type AskDto = Readonly<{
+    // Optional conversation ID.
+    conversationId?: string;
+
     // The question to ask.
     prompt: string;
  }>;

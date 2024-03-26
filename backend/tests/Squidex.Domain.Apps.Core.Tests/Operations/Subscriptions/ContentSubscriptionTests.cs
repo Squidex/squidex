@@ -13,6 +13,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
+#pragma warning disable CA1859 // Use concrete types when possible for improved performance
+
 namespace Squidex.Domain.Apps.Core.Operations.Subscriptions;
 
 public class ContentSubscriptionTests
@@ -104,7 +106,6 @@ public class ContentSubscriptionTests
     {
         source.AppId = appId;
         source.SchemaId = schemaId;
-
         return source;
     }
 
@@ -112,14 +113,11 @@ public class ContentSubscriptionTests
     {
         source.AppId = appId;
         source.SchemaId = schemaId;
-
         return source;
     }
 
     private ContentSubscription WithPermission(ContentSubscription subscription, string? permissionId = null)
     {
-        subscription.AppId = appId.Id;
-
         permissionId ??= PermissionIds.AppContentsRead;
 
         var permission = PermissionIds.ForApp(permissionId, appId.Name, schemaId.Name);

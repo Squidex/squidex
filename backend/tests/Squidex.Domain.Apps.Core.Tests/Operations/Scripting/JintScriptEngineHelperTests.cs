@@ -9,13 +9,13 @@ using System.Net;
 using System.Text;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Squidex.AI;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
-using Squidex.Text.ChatBots;
 using Squidex.Text.Translations;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting;
@@ -619,7 +619,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     [Fact]
     public async Task Should_generate_content()
     {
-        A.CallTo(() => chatAgent.PromptAsync(A<string>._, "prompt", A<CancellationToken>._))
+        A.CallTo(() => chatAgent.PromptAsync("prompt", A<string>._, A<CancellationToken>._))
             .Returns(ChatBotResponse.Success("Generated"));
 
         var vars = new ScriptVars
@@ -637,7 +637,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         Assert.Equal("Generated", actual.ToString());
 
         A.CallTo(() => chatAgent.StopConversationAsync(A<string>._, A<CancellationToken>._))
-            .MustHaveHappened();
+            .MustNotHaveHappened();
     }
 
     [Theory]

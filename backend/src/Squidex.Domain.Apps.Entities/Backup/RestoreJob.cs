@@ -286,7 +286,7 @@ public sealed class RestoreJob : IJobRunner
             await eventStore.AppendUnsafeAsync(commits, ct);
 
             // Just in case we use parallel inserts later.
-            Interlocked.Increment(ref handled);
+            Interlocked.Add(ref handled, batch.Count);
 
             await run.LogAsync($"Reading {state.Reader.ReadEvents}/{handled} events and {state.Reader.ReadAttachments} attachments completed.", true);
         });

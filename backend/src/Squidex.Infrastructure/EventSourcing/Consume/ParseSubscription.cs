@@ -53,7 +53,7 @@ internal sealed class ParseSubscription : IEventSubscriber<StoredEvent>, IEventS
                             {
                                 Envelope<IEvent>? @event = null;
 
-                                if (eventConsumer.Handles(storedEvent))
+                                if (await eventConsumer.HandlesAsync(storedEvent))
                                 {
                                     @event = eventFormatter.ParseIfKnown(storedEvent);
                                 }

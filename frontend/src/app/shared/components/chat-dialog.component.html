@@ -57,18 +57,16 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="bubble bubble-right">
+                            <div class="bubble bubble-right use-container">
                                 <div class="mb-2">
                                     {{ 'chat.answer' | sqxTranslate}}
                                 </div>
 
-                                <textarea class="form-control" readonly [ngModel]="item.text"></textarea>
+                                <span [sqxMarkdown]="item.text" optional="true" inline="false"></span>
 
-                                <div class="mt-2">
-                                    <button type="button" class="btn btn-primary" (click)="textSelect.emit(item.text)">
-                                        {{ 'chat.use' | sqxTranslate }}
-                                    </button>
-                                </div>
+                                <button type="button" class="btn btn-secondary" (click)="textSelect.emit(item.text)">
+                                    {{ 'chat.use' | sqxTranslate }}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -110,7 +108,7 @@
                         [disabled]="snapshot.isRunning" />
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-secondary" [disabled]="snapshot.isRunning">
+                    <button type="submit" class="btn btn-primary" [disabled]="snapshot.isRunning">
                         {{ 'chat.ask' | sqxTranslate }}
                     </button>
                 </div>

@@ -112,9 +112,6 @@ public class GraphQLSubscriptionTests : IClassFixture<ContentFixture>
             subscriptionStream.Where(x => x.Data.AssetChanges.Id == assetId).Timeout(TimeSpan.FromSeconds(30))
                 .FirstOrDefaultAsync();
 
-        // Wait a little bit for the subscription to propagate.
-        await Task.Delay(2000);
-
 
         // STEP 2: Create asset.
         var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");

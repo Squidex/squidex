@@ -71,7 +71,7 @@ public class EventConsumerProcessorTests
         A.CallTo(() => eventConsumer.CanClear)
             .Returns(true);
 
-        A.CallTo(() => eventConsumer.Handles(A<StoredEvent>._))
+        A.CallTo(() => eventConsumer.HandlesAsync(A<StoredEvent>._))
             .Returns(true);
 
         A.CallTo(() => eventConsumer.On(A<IEnumerable<Envelope<IEvent>>>._))
@@ -324,7 +324,7 @@ public class EventConsumerProcessorTests
     [Fact]
     public async Task Should_not_invoke_but_update_position_if_consumer_does_not_want_to_handle()
     {
-        A.CallTo(() => eventConsumer.Handles(storedEvent))
+        A.CallTo(() => eventConsumer.HandlesAsync(storedEvent))
             .Returns(false);
 
         await sut.InitializeAsync(default);

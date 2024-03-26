@@ -7,10 +7,10 @@
 
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using Squidex.AI;
 using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Hosting;
-using Squidex.Text.ChatBots;
 using Squidex.Text.Translations;
 using Squidex.Web;
 

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Reactive.Linq;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -13,6 +14,8 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
+using Squidex.Messaging.Subscriptions;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets;
@@ -129,13 +132,29 @@ internal static class AssetActions
             },
         ];
 
-        public static readonly ISourceStreamResolver Resolver = Resolvers.Stream(PermissionIds.AppAssetsRead, c =>
+        public static readonly ISourceStreamResolver Resolver = new SourceStreamResolver<object>(async fieldContext =>
         {
-            return new AssetSubscription
+            var context = (GraphQLExecutionContext)fieldContext.UserContext;
+
+            var app = context.Context.App;
+
+            if (!context.Context.UserPermissions.Includes(PermissionIds.ForApp(PermissionIds.AppAssetsRead, app.Name)))
             {
-                // Primary filter for the event types.
-                Type = c.GetArgument<EnrichedAssetEventType?>("type")
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+            }
+
+            var key = $"asset-{app.Id}";
+
+            var subscription = new AssetSubscription
+            {
+                Type = fieldContext.GetArgument<EnrichedAssetEventType?>("type")
             };
+
+            var observable =
+                await context.Resolve<ISubscriptionService>()
+                    .SubscribeAsync(key, subscription, fieldContext.CancellationToken);
+
+            return observable.OfType<EnrichedAssetEvent>();
         });
     }
 }

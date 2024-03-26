@@ -52,6 +52,21 @@ textarea {
     }
 }
 
+.use-container {
+    position: relative;
+
+    .btn {
+        @include absolute(1rem, 1rem);
+        visibility: hidden;
+    }
+
+    &:hover {
+        .btn {
+            visibility: visible;
+        }
+    }
+}
+
 @keyframes blink { 
     50% { 
         fill: transparent

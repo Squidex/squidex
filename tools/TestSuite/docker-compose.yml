@@ -26,6 +26,22 @@ services:
       file: docker-compose-base.yml
       service: squidex_base
     environment:
+      - CLUSTERING__WORKER=false
+      - EVENTSTORE__MONGODB__DATABASE=squidex2
+      - STORE__MONGODB__CONTENTDATABASE=squidex2_content
+      - STORE__MONGODB__DATABASE=squidex2
+      - STORE__MONGODB__TEXTHARDCOUNT=20
+      - URLS__BASEPATH=squidex/
+      - URLS__BASEURL=http://localhost:8081/squidex/
+    depends_on:
+      - mongo
+
+  # Hosted on path and separate worker
+  squidex2_worker:
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
+    environment:
       - CLUSTERING__WORKER=true
       - EVENTSTORE__MONGODB__DATABASE=squidex2
       - STORE__MONGODB__CONTENTDATABASE=squidex2_content

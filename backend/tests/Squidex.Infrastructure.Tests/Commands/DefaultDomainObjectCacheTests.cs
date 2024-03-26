@@ -32,6 +32,36 @@ public class DefaultDomainObjectCacheTests
     }
 
     [Fact]
+    public async Task Should_use_instance_with_zero_cache_duration()
+    {
+        var options = Options.Create(new DomainObjectCacheOptions
+        {
+            CacheDuration = default
+        });
+
+        var sut2 = new DefaultDomainObjectCache(cache, serializer, distributedCache, options);
+
+        await sut2.SetAsync(id, 10, 20, ct);
+
+        Assert.Equal(0, await sut2.GetAsync<int>(id, 10, ct));
+    }
+
+    [Fact]
+    public async Task Should_use_instance_with_negative_cache_duration()
+    {
+        var options = Options.Create(new DomainObjectCacheOptions
+        {
+            CacheDuration = TimeSpan.FromMinutes(-10)
+        });
+
+        var sut2 = new DefaultDomainObjectCache(cache, serializer, distributedCache, options);
+
+        await sut2.SetAsync(id, 10, 20, ct);
+
+        Assert.Equal(0, await sut2.GetAsync<int>(id, 10, ct));
+    }
+
+    [Fact]
     public async Task Should_add_to_cache_and_memory_cache_on_set()
     {
         await sut.SetAsync(id, 10, 20, ct);
