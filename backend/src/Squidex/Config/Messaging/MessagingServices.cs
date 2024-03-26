@@ -29,6 +29,9 @@ public static class MessagingServices
 {
     public static void AddSquidexMessaging(this IServiceCollection services, IConfiguration config)
     {
+        services.Configure<MessagingOptions>(config,
+            "messaging");
+
         var channelBackupRestore = new ChannelName("backup.restore");
         var channelBackupStart = new ChannelName("backup.start");
         var channelFallback = new ChannelName("default");
