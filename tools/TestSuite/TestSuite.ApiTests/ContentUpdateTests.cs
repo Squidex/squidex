@@ -9,7 +9,6 @@ using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.EnrichedEvents;
-using System.Runtime.InteropServices;
 using TestSuite.Model;
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -383,6 +382,37 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         Assert.Null(updated.Data.String);
     }
 
+    [Fact]
+    public async Task Should_update_content_with_script()
+    {
+        // STEP 1: Create a new item.
+        var content = await _.Contents.CreateAsync(new TestEntityData
+        {
+            Number = 100
+        }, ContentCreateOptions.AsPublish);
+
+
+        // STEP 2: Update content with script.
+        await _.Client.DynamicContents(_.SchemaName).UpdateAsync(content.Id,
+            new DynamicData
+            {
+                [TestEntityData.NumberField] = new JObject
+                {
+                    ["iv"] = new JObject
+                    {
+                        ["$update"] = "$data.number.iv + 42"
+                    }
+                }
+            });
+
+        var updated = await _.Contents.GetAsync(content.Id);
+
+        Assert.Equal(142, updated.Data.Number);
+
+        // Other data fields are overwritten.
+        Assert.Null(updated.Data.String);
+    }
+
     [Theory]
     [InlineData(ContentStrategies.Update.Normal)]
     [InlineData(ContentStrategies.Update.Upsert)]
@@ -438,6 +468,37 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
         // Other data fields cannot be changed.
         Assert.Equal("initial", updated.Data.String);
+    }
+
+    [Fact]
+    public async Task Should_patch_content_with_script()
+    {
+        // STEP 1: Create a new item.
+        var content = await _.Contents.CreateAsync(new TestEntityData
+        {
+            Number = 100
+        }, ContentCreateOptions.AsPublish);
+
+
+        // STEP 2: Patch content with script.
+        await _.Client.DynamicContents(_.SchemaName).PatchAsync(content.Id,
+            new DynamicData
+            {
+                [TestEntityData.NumberField] = new JObject
+                {
+                    ["iv"] = new JObject
+                    {
+                        ["$update"] = "$data.number.iv + 42"
+                    }
+                }
+            });
+
+        var updated = await _.Contents.GetAsync(content.Id);
+
+        Assert.Equal(142, updated.Data.Number);
+
+        // Other data fields are overwritten.
+        Assert.Null(updated.Data.String);
     }
 
     [Theory]

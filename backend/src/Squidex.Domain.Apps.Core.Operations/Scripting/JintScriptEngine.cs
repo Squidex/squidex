@@ -152,8 +152,9 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 
         var engine = new Engine(engineOptions =>
         {
-            engineOptions.SetTypeConverter(engine => new CustomClrConverter(engine));
             engineOptions.AddObjectConverter(JintObjectConverter.Instance);
+            engineOptions.AllowClrWrite(!options.Readonly);
+            engineOptions.SetTypeConverter(engine => new CustomClrConverter(engine));
             engineOptions.SetReferencesResolver(NullPropagation.Instance);
             engineOptions.Strict();
 

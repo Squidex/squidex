@@ -7,6 +7,7 @@
 
 using System.Diagnostics;
 using Jint.Native;
+using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
