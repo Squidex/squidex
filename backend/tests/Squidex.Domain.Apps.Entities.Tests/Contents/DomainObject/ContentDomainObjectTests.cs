@@ -45,6 +45,18 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
             .AddField("my-field1",
                 new ContentFieldData()
                     .AddInvariant(1));
+    private readonly ContentData update =
+        new ContentData()
+            .AddField("my-field1",
+                new ContentFieldData()
+                    .AddInvariant(
+                        JsonValue.Object()
+                            .Add("$update", "$data['my-field1'].iv + 42")));
+    private readonly ContentData updated =
+        new ContentData()
+            .AddField("my-field1",
+                new ContentFieldData()
+                    .AddInvariant(43));
     private readonly ContentData patch =
         new ContentData()
             .AddField("my-field2",
@@ -84,6 +96,9 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), CancellationToken))
             .ReturnsLazily(x => Task.FromResult(x.GetArgument<DataScriptVars>(0)!.Data!));
+
+        A.CallTo(() => scriptEngine.Execute(A<ScriptVars>._, A<string>._, A<ScriptOptions>._))
+            .Returns(JsonValue.Create(43));
 
         A.CallTo(() => contentWorkflow.GetInitialStatusAsync(Schema))
             .Returns(Status.Draft);
@@ -353,6 +368,21 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     }
 
     [Fact]
+    public async Task Update_should_invoke_scripts()
+    {
+        var command = new UpdateContent { Data = update };
+
+        await ExecuteCreateAsync();
+
+        var actual = await PublishAsync(command);
+
+        await VerifySutAsync(actual);
+
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(updated, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
+            .MustHaveHappened();
+    }
+
+    [Fact]
     public async Task Update_should_create_events_and_update_new_version_if_draft_available()
     {
         var command = new UpdateContent { Data = otherData };
@@ -406,6 +436,21 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         await VerifySutAsync(actual);
 
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Path_should_invoke_scripts()
+    {
+        var command = new PatchContent { Data = update };
+
+        await ExecuteCreateAsync();
+
+        var actual = await PublishAsync(command);
+
+        await VerifySutAsync(actual);
+
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(updated, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 

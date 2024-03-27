@@ -9,6 +9,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
@@ -93,6 +94,17 @@ public static class ValidationExtensions
                 operation.Components,
                 operation.Schema);
         converter.Add(new AddDefaultValues(operation.Partition()) { IgnoreRequiredFields = true });
+
+        return converter.Convert(data);
+    }
+
+    public static ContentData InvokeUpdates(this ContentOperation operation, ContentData data, ContentData currentData)
+    {
+        var converter =
+            new ContentConverter(
+                operation.Components,
+                operation.Schema);
+        converter.Add(new UpdateValues(currentData, operation.Resolve<IScriptEngine>()));
 
         return converter.Convert(data);
     }

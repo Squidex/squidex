@@ -14,4 +14,6 @@ public record struct ScriptOptions
     public bool CanDisallow { get; set; }
 
     public bool AsContext { get; set; }
+
+    public bool Readonly { get; set; }
 }

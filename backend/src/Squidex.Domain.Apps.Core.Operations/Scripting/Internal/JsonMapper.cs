@@ -14,7 +14,7 @@ using Jint.Runtime.Interop;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
+namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
 public static class JsonMapper
 {
