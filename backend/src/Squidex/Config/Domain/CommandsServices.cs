@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Invitation;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
@@ -112,6 +113,9 @@ public static class CommandsServices
             .As<ICommandMiddleware>();
 
         services.AddSingletonAs<RuleCommandMiddleware>()
+            .As<ICommandMiddleware>();
+
+        services.AddSingletonAs<MigrateFieldNamesCommandMiddleware>()
             .As<ICommandMiddleware>();
 
         services.AddSingletonAs<AggregateCommandMiddleware<AssetFolderCommandBase, AssetFolderDomainObject>>()

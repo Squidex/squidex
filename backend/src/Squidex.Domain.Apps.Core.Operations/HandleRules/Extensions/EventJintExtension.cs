@@ -45,26 +45,6 @@ public sealed class EventJintExtension : IJintExtension, IScriptDescriptor
             return JsValue.Null;
         }));
 
-        context.Engine.SetValue("assetContentUrl", new EventDelegate(() =>
-        {
-            if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
-            {
-                return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id.ToString());
-            }
-
-            return JsValue.Null;
-        }));
-
-        context.Engine.SetValue("assetContentAppUrl", new EventDelegate(() =>
-        {
-            if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
-            {
-                return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id.ToString());
-            }
-
-            return JsValue.Null;
-        }));
-
         context.Engine.SetValue("assetContentSlugUrl", new EventDelegate(() =>
         {
             if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
@@ -74,6 +54,19 @@ public sealed class EventJintExtension : IJintExtension, IScriptDescriptor
 
             return JsValue.Null;
         }));
+
+        var assetUrl = new EventDelegate(() =>
+        {
+            if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
+            {
+                return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id.ToString());
+            }
+
+            return JsValue.Null;
+        });
+
+        context.Engine.SetValue("assetContentUrl", assetUrl);
+        context.Engine.SetValue("assetContentAppUrl", assetUrl);
     }
 
     public void Describe(AddDescription describe, ScriptScope scope)
