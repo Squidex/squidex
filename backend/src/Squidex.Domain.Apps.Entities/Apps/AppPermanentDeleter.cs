@@ -35,9 +35,9 @@ public sealed class AppPermanentDeleter : IEventConsumer
         ];
     }
 
-    public bool Handles(StoredEvent @event)
+    public ValueTask<bool> HandlesAsync(StoredEvent @event)
     {
-        return consumingTypes.Contains(@event.Data.Type);
+        return new ValueTask<bool>(consumingTypes.Contains(@event.Data.Type));
     }
 
     public async Task On(Envelope<IEvent> @event)

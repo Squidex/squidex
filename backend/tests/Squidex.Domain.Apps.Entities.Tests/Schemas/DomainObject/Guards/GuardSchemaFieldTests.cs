@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 #pragma warning disable SA1310 // Field names must not contain underscore

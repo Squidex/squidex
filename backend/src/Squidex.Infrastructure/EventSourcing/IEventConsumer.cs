@@ -21,9 +21,9 @@ public interface IEventConsumer
 
     bool CanClear => true;
 
-    bool Handles(StoredEvent @event)
+    ValueTask<bool> HandlesAsync(StoredEvent @event)
     {
-        return true;
+        return new ValueTask<bool>(true);
     }
 
     Task ClearAsync()

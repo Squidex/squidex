@@ -5,17 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
-using Squidex.Messaging.Subscriptions;
+namespace Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Subscriptions;
-
-public abstract class AppSubscription : ISubscription
+public interface IDeterministicHashCode
 {
-    public DomainId AppId { get; set; }
-
-    public PermissionSet Permissions { get; set; }
-
-    public abstract ValueTask<bool> ShouldHandle(object message);
+    int GetDeterministicHashCode();
 }

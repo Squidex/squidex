@@ -9,7 +9,7 @@ using Squidex.Hosting;
 
 namespace Squidex.Infrastructure.States;
 
-public abstract class ShardedService<TKey, TService> : IInitializable where TKey : notnull
+public abstract class ShardedService<TKey, TService> : IInitializable where TKey : notnull, IDeterministicHashCode
 {
     private readonly Dictionary<string, TService> shards = [];
     private readonly IShardingStrategy sharding;

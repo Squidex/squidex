@@ -40,8 +40,16 @@ public static class CommandsServices
         services.Configure<RestrictAppsOptions>(config,
             "usage");
 
+        services.Configure<AppCacheOptions>(config,
+            "caching:apps");
+
         services.Configure<DomainObjectCacheOptions>(config,
             "caching:domainObjects");
+
+        services.Configure<SchemaCacheOptions>(config,
+            "caching:schemas");
+
+        services.ConfigureForObsoleteReplicatedCacheSetting(config);
 
         services.AddSingletonAs<InMemoryCommandBus>()
             .As<ICommandBus>();
@@ -138,5 +146,26 @@ public static class CommandsServices
 
         services.AddSingletonAs<DefaultDomainObjectCache>()
             .As<IDomainObjectCache>();
+    }
+
+    private static void ConfigureForObsoleteReplicatedCacheSetting(this IServiceCollection services, IConfiguration config)
+    {
+        var isCaching = config.GetValue<bool>("caching:replicated:enable");
+
+        services.Configure<AppCacheOptions>(options =>
+        {
+            if (options.CacheDuration == default && isCaching)
+            {
+                options.CacheDuration = TimeSpan.FromMinutes(5);
+            }
+        });
+
+        services.Configure<SchemaCacheOptions>(options =>
+        {
+            if (options.CacheDuration == default && isCaching)
+            {
+                options.CacheDuration = TimeSpan.FromMinutes(5);
+            }
+        });
     }
 }

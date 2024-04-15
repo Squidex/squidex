@@ -30,9 +30,9 @@
     }
 
     &-buttons {
-        @include absolute(100%, 0);
+        @include absolute(100%, 7rem);
         margin: 0;
-        margin-top: -8px;
+        margin-top: -9px;
         overflow: hidden;
     }
 

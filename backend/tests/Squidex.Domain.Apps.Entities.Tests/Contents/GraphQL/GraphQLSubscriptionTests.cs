@@ -30,7 +30,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     FileSize = 1024
                 });
 
-        A.CallTo(() => subscriptionService.Subscribe<object>(A<AssetSubscription>._))
+        A.CallTo(() => subscriptionService.SubscribeAsync($"asset-{TestApp.Default.Id}", A<AssetSubscription>._, default))
             .Returns(stream);
 
         var actual = await ExecuteAsync(new TestQuery
@@ -128,7 +128,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                                 .AddInvariant(42))
                 });
 
-        A.CallTo(() => subscriptionService.Subscribe<object>(A<ContentSubscription>._))
+        A.CallTo(() => subscriptionService.SubscribeAsync($"content-{TestApp.Default.Id}", A<ContentSubscription>._, default))
             .Returns(stream);
 
         var actual = await ExecuteAsync(new TestQuery

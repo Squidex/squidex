@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.States;
 
 public interface IShardingStrategy
 {
-    string GetShardKey<T>(T key) where T : notnull;
+    string GetShardKey<T>(T key) where T : notnull, IDeterministicHashCode;
 
     IEnumerable<string> GetShardKeys();
 }
@@ -24,7 +24,7 @@ public sealed class SingleSharding : IShardingStrategy
     {
     }
 
-    public string GetShardKey<T>(T key) where T : notnull
+    public string GetShardKey<T>(T key) where T : notnull, IDeterministicHashCode
     {
         return string.Empty;
     }
@@ -44,9 +44,9 @@ public sealed class PartitionedSharding : IShardingStrategy
         this.numPartitions = numPartitions;
     }
 
-    public string GetShardKey<T>(T key) where T : notnull
+    public string GetShardKey<T>(T key) where T : notnull, IDeterministicHashCode
     {
-        var partition = Math.Abs(key.GetHashCode()) % numPartitions;
+        var partition = Math.Abs(key.GetDeterministicHashCode()) % numPartitions;
 
         return GetShardKey(partition);
     }

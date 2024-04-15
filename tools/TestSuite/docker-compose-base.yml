@@ -1,0 +1,25 @@
+version: '3'
+services:
+  # Base configuration
+  squidex_base:
+    image: squidex-local
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+      - CLUSTERING__RANDOMNAME=true
+      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - GRAPHQL__CACHEDURATION=00:00:00
+      - IDENTITY__ADMINCLIENTID=root
+      - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
+      - IDENTITY__ADMINEMAIL=hello@squidex.io
+      - IDENTITY__ADMINPASSWORD=1q2w3e$$R
+      - IDENTITY__MULTIPLEDOMAINS=true
+      - MESSAGING__DATACACHEDURATION=00:00:00
+      - RULES__RULESCACHEDURATION=00:00:00
+      - SCRIPTING__TIMEOUTEXECUTION=00:00:10
+      - SCRIPTING__TIMEOUTSCRIPT=00:00:10
+      - STORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - TEMPLATES__LOCALURL=http://localhost:5000
+      - UI__HIDENEWS=true
+      - UI__HIDEONBOARDING=true
+    networks:
+      - internal

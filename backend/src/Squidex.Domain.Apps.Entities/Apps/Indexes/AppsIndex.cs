@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Options;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -22,16 +23,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes;
 
 public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 {
-    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
     private readonly IAppRepository appRepository;
     private readonly IReplicatedCache appCache;
+    private readonly AppCacheOptions options;
     private readonly NameReservationState namesState;
 
     public AppsIndex(IAppRepository appRepository, IReplicatedCache appCache,
-        IPersistenceFactory<NameReservationState.State> persistenceFactory)
+        IPersistenceFactory<NameReservationState.State> persistenceFactory,
+        IOptions<AppCacheOptions> options)
     {
         this.appRepository = appRepository;
         this.appCache = appCache;
+        this.options = options.Value;
 
         namesState = new NameReservationState(persistenceFactory, "Apps");
     }
@@ -180,12 +183,8 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
     private async Task<string?> CheckAppAsync(CreateApp command,
         CancellationToken ct)
     {
-        var token = await ReserveAsync(command.AppId, command.Name, ct);
-
-        if (token == null)
-        {
-            throw new ValidationException(T.Get("apps.nameAlreadyExists"));
-        }
+        var token = await ReserveAsync(command.AppId, command.Name, ct)
+            ?? throw new ValidationException(T.Get("apps.nameAlreadyExists"));
 
         return token;
     }
@@ -222,18 +221,28 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
 
     private async Task<App> PrepareAsync(App app)
     {
+        if (options.CacheDuration <= TimeSpan.Zero)
+        {
+            return app;
+        }
+
         // Do not use cancellation here as we already so far.
         await appCache.AddAsync(new[]
         {
             new KeyValuePair<string, object?>(GetCacheKey(app.Id), app),
             new KeyValuePair<string, object?>(GetCacheKey(app.Name), app),
-        }, CacheDuration);
+        }, options.CacheDuration);
 
         return app;
     }
 
     private Task InvalidateItAsync(DomainId id, string name)
     {
+        if (options.CacheDuration <= TimeSpan.Zero)
+        {
+            return Task.CompletedTask;
+        }
+
         // Do not use cancellation here as we already so far.
         return appCache.RemoveAsync(new[]
         {

@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Messaging.Subscriptions;
 
@@ -14,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Subscriptions;
 public sealed class SubscriptionPublisher : IEventConsumer
 {
     private readonly ISubscriptionService subscriptionService;
-    private readonly IEnumerable<ISubscriptionEventCreator> subscriptionEventCreators;
+    private readonly IEnumerable<ISubscriptionEventCreator> subscriptionCreators;
 
     public string Name => "Subscriptions";
 
@@ -24,26 +27,36 @@ public sealed class SubscriptionPublisher : IEventConsumer
 
     public bool CanClear => false;
 
-    public SubscriptionPublisher(ISubscriptionService subscriptionService, IEnumerable<ISubscriptionEventCreator> subscriptionEventCreators)
+    public SubscriptionPublisher(ISubscriptionService subscriptionService,
+        IEnumerable<ISubscriptionEventCreator> subscriptionCreators)
     {
         this.subscriptionService = subscriptionService;
-        this.subscriptionEventCreators = subscriptionEventCreators;
+        this.subscriptionCreators = subscriptionCreators;
     }
 
-    public bool Handles(StoredEvent @event)
+    public async ValueTask<bool> HandlesAsync(StoredEvent @event)
     {
-        return subscriptionService.HasSubscriptions;
+        var key = @event.StreamName.Split(DomainId.IdSeparator)[0];
+
+        return await subscriptionService.HasSubscriptionsAsync(key);
     }
 
     public Task On(Envelope<IEvent> @event)
     {
-        if (@event.Payload is not AppEvent)
+        if (@event.Payload is AssetEvent assetEvent)
         {
-            return Task.CompletedTask;
+            var wrapper = new EventMessageWrapper(@event.To<AppEvent>(), subscriptionCreators);
+
+            return subscriptionService.PublishAsync($"asset-{assetEvent.AppId.Id}", wrapper);
         }
 
-        var wrapper = new EventMessageWrapper(@event.To<AppEvent>(), subscriptionEventCreators);
+        if (@event.Payload is ContentEvent contentEvent)
+        {
+            var wrapper = new EventMessageWrapper(@event.To<AppEvent>(), subscriptionCreators);
 
-        return subscriptionService.PublishAsync(wrapper);
+            return subscriptionService.PublishAsync($"content-{contentEvent.AppId.Id}", wrapper);
+        }
+
+        return Task.CompletedTask;
     }
 }

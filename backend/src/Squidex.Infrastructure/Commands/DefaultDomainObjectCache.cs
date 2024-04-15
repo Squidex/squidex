@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Commands;
 
 public sealed class DefaultDomainObjectCache : IDomainObjectCache
 {
-    private readonly DistributedCacheEntryOptions cacheOptions;
+    private readonly DistributedCacheEntryOptions cacheOptions = new DistributedCacheEntryOptions();
     private readonly IMemoryCache cache;
     private readonly IJsonSerializer serializer;
     private readonly IDistributedCache distributedCache;
@@ -27,15 +27,20 @@ public sealed class DefaultDomainObjectCache : IDomainObjectCache
         this.serializer = serializer;
         this.distributedCache = distributedCache;
 
-        cacheOptions = new DistributedCacheEntryOptions
+        if (options.Value.CacheDuration > TimeSpan.Zero)
         {
-            AbsoluteExpirationRelativeToNow = options.Value.CacheDuration
-        };
+            cacheOptions.AbsoluteExpirationRelativeToNow = options.Value.CacheDuration;
+        }
     }
 
     public async Task<T> GetAsync<T>(DomainId id, long version,
         CancellationToken ct = default)
     {
+        if (cacheOptions.AbsoluteExpirationRelativeToNow == null)
+        {
+            return default!;
+        }
+
         var cacheKey = CacheKey(id, version);
 
         if (cache.TryGetValue(cacheKey, out var found) && found is T typed)
@@ -68,10 +73,14 @@ public sealed class DefaultDomainObjectCache : IDomainObjectCache
     public async Task SetAsync<T>(DomainId id, long version, T snapshot,
         CancellationToken ct = default)
     {
+        if (cacheOptions.AbsoluteExpirationRelativeToNow == null)
+        {
+            return;
+        }
+
         var cacheKey = CacheKey(id, version);
 
         cache.Set(cacheKey, snapshot, cacheOptions.AbsoluteExpirationRelativeToNow!.Value);
-
         try
         {
             using (var stream = DefaultPools.MemoryStream.GetStream())

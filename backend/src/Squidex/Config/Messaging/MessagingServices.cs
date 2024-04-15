@@ -22,7 +22,6 @@ using Squidex.Messaging;
 using Squidex.Messaging.Implementation;
 using Squidex.Messaging.Implementation.Null;
 using Squidex.Messaging.Implementation.Scheduler;
-using Squidex.Messaging.Subscriptions;
 
 namespace Squidex.Config.Messaging;
 
@@ -30,11 +29,14 @@ public static class MessagingServices
 {
     public static void AddSquidexMessaging(this IServiceCollection services, IConfiguration config)
     {
+        services.Configure<MessagingOptions>(config,
+            "messaging");
+
         var channelBackupRestore = new ChannelName("backup.restore");
         var channelBackupStart = new ChannelName("backup.start");
         var channelFallback = new ChannelName("default");
         var channelRules = new ChannelName("rules.run");
-        var isCaching = config.GetValue<bool>("caching:replicated:enable");
+        var isRandomName = config.GetValue<bool>("clustering:randomName");
         var isWorker = config.GetValue<bool>("clustering:worker");
 
         if (isWorker)
@@ -59,16 +61,22 @@ public static class MessagingServices
 
             services.AddSingletonAs<UsageTrackerWorker>()
                 .AsSelf().As<IMessageHandler>();
-
-            services.AddSingletonAs<BackupJob>()
-                .As<IJobRunner>();
-
-            services.AddSingletonAs<RestoreJob>()
-                .As<IJobRunner>();
-
-            services.AddSingletonAs<RuleRunnerJob>()
-                .As<IJobRunner>();
         }
+
+        if (isRandomName)
+        {
+            services.AddSingletonAs<RandomInstanceNameProvider>()
+                .As<IInstanceNameProvider>();
+        }
+
+        services.AddSingletonAs<BackupJob>()
+            .As<IJobRunner>();
+
+        services.AddSingletonAs<RestoreJob>()
+            .As<IJobRunner>();
+
+        services.AddSingletonAs<RuleRunnerJob>()
+            .As<IJobRunner>();
 
         services.AddSingleton<IMessagingSerializer>(c =>
             new SystemTextJsonMessagingSerializer(c.GetRequiredService<JsonSerializerOptions>()));
@@ -76,55 +84,43 @@ public static class MessagingServices
         services.AddSingletonAs<SubscriptionPublisher>()
             .As<IEventConsumer>();
 
-        services.AddSingletonAs<EventMessageEvaluator>()
-            .As<IMessageEvaluator>();
-
         services.AddSingletonAs<DefaultJobService>()
             .As<IJobService>().As<IDeleter>();
 
-        services.AddReplicatedCacheMessaging(isCaching, options =>
-        {
-            options.TransportSelector = (transport, _) => transport.First(x => x is NullTransport != isCaching);
-        });
-
-        services.Configure<SubscriptionOptions>(options =>
-        {
-            options.SendMessagesToSelf = false;
-        });
-
-        services.AddMessagingSubscriptions();
-        services.AddMessagingTransport(config);
-        services.AddMessaging(options =>
-        {
-            options.Routing.Add(m => m is JobStart r && r.Request.TaskName == BackupJob.TaskName, channelBackupStart);
-            options.Routing.Add(m => m is JobStart r && r.Request.TaskName == RestoreJob.TaskName, channelBackupRestore);
-            options.Routing.Add(m => m is JobStart r && r.Request.TaskName == RuleRunnerJob.TaskName, channelRules);
-            options.Routing.AddFallback(channelFallback);
-        });
-
-        services.AddMessaging(channelBackupStart, isWorker, options =>
-        {
-            options.Timeout = TimeSpan.FromHours(4);
-            options.Scheduler = new ParallelScheduler(4);
-            options.LogMessage = x => true;
-        });
-
-        services.AddMessaging(channelBackupRestore, isWorker, options =>
-        {
-            options.Timeout = TimeSpan.FromHours(24);
-            options.Scheduler = InlineScheduler.Instance;
-            options.LogMessage = x => true;
-        });
-
-        services.AddMessaging(channelRules, isWorker, options =>
-        {
-            options.Scheduler = new ParallelScheduler(4);
-            options.LogMessage = x => true;
-        });
-
-        services.AddMessaging(channelFallback, isWorker, options =>
-        {
-            options.Scheduler = InlineScheduler.Instance;
-        });
+        services.AddMessaging()
+            .AddTransport(config)
+            .AddSubscriptions(!isWorker)
+            .AddReplicatedCache(true, options =>
+            {
+                options.TransportSelector = (transport, _) => transport.First(x => x is not NullTransport);
+            })
+            .Configure(options =>
+            {
+                options.Routing.Add(m => m is JobStart r && r.Request.TaskName == BackupJob.TaskName, channelBackupStart);
+                options.Routing.Add(m => m is JobStart r && r.Request.TaskName == RestoreJob.TaskName, channelBackupRestore);
+                options.Routing.Add(m => m is JobStart r && r.Request.TaskName == RuleRunnerJob.TaskName, channelRules);
+                options.Routing.AddFallback(channelFallback);
+            })
+            .AddChannel(channelBackupStart, isWorker, options =>
+            {
+                options.Timeout = TimeSpan.FromHours(4);
+                options.Scheduler = new ParallelScheduler(4);
+                options.LogMessage = x => true;
+            })
+            .AddChannel(channelBackupRestore, isWorker, options =>
+            {
+                options.Timeout = TimeSpan.FromHours(24);
+                options.Scheduler = InlineScheduler.Instance;
+                options.LogMessage = x => true;
+            })
+            .AddChannel(channelRules, isWorker, options =>
+            {
+                options.Scheduler = new ParallelScheduler(4);
+                options.LogMessage = x => true;
+            })
+            .AddChannel(channelFallback, isWorker, options =>
+            {
+                options.Scheduler = InlineScheduler.Instance;
+            });
     }
 }

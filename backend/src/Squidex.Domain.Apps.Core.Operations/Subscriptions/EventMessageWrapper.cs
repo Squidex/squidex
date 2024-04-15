@@ -13,31 +13,29 @@ namespace Squidex.Domain.Apps.Core.Subscriptions;
 
 public sealed class EventMessageWrapper : IPayloadWrapper
 {
-    private readonly IEnumerable<ISubscriptionEventCreator> subscriptionEventCreators;
+    private readonly IEnumerable<ISubscriptionEventCreator> creators;
 
     public Envelope<AppEvent> Event { get; }
 
     object IPayloadWrapper.Message => Event.Payload;
 
-    public EventMessageWrapper(Envelope<AppEvent> @event, IEnumerable<ISubscriptionEventCreator> subscriptionEventCreators)
+    public EventMessageWrapper(Envelope<AppEvent> @event, IEnumerable<ISubscriptionEventCreator> creators)
     {
         Event = @event;
 
-        this.subscriptionEventCreators = subscriptionEventCreators;
+        this.creators = creators;
     }
 
     public async ValueTask<object> CreatePayloadAsync()
     {
-        foreach (var creator in subscriptionEventCreators)
+        foreach (var creator in creators)
         {
             if (!creator.Handles(Event.Payload))
             {
                 continue;
             }
 
-            var result = await creator.CreateEnrichedEventsAsync(Event, default);
-
-            if (result != null)
+            if (await creator.CreateEnrichedEventsAsync(Event, default) is object result)
             {
                 return result;
             }

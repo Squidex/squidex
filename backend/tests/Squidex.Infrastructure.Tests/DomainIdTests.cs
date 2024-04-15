@@ -138,10 +138,12 @@ public class DomainIdTests
 
         Assert.Equal(domainId_1_a, domainId_1_b);
         Assert.Equal(domainId_1_a.GetHashCode(), domainId_1_b.GetHashCode());
+        Assert.Equal(domainId_1_a.GetDeterministicHashCode(), domainId_1_b.GetDeterministicHashCode());
         Assert.True(domainId_1_a.Equals((object)domainId_1_b));
 
         Assert.NotEqual(domainId_1_a, domainId_2_a);
         Assert.NotEqual(domainId_1_a.GetHashCode(), domainId_2_a.GetHashCode());
+        Assert.NotEqual(domainId_1_a.GetDeterministicHashCode(), domainId_2_a.GetDeterministicHashCode());
         Assert.False(domainId_1_a.Equals((object)domainId_2_a));
 
         Assert.True(domainId_1_a == domainId_1_b);

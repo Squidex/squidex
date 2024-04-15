@@ -14,6 +14,6 @@
 }
 
 .badge {
-    @include absolute(-.5rem, 0, null, null);
+    @include absolute(-.375rem, 0, null, null);
     font-size: 80%;
 }

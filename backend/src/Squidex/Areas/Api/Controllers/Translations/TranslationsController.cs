@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
+using Squidex.AI;
 using Squidex.Areas.Api.Controllers.Translations.Models;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
-using Squidex.Text.ChatBots;
 using Squidex.Text.Translations;
 using Squidex.Web;
 
@@ -64,17 +64,9 @@ public sealed class TranslationsController : ApiController
     [ApiCosts(10)]
     public async Task<IActionResult> PostQuestion(string app, [FromBody] AskDto request)
     {
-        var conversationId = Guid.NewGuid().ToString();
-        try
-        {
-            var result = await chatAgent.PromptAsync(conversationId, request.Prompt, HttpContext.RequestAborted);
-            var response = new string[] { result.Text };
+        var result = await chatAgent.PromptAsync(request.Prompt, request.ConversationId, HttpContext.RequestAborted);
+        var response = new string[] { result.Text };
 
-            return Ok(response);
-        }
-        finally
-        {
-            await chatAgent.StopConversationAsync(conversationId, default);
-        }
+        return Ok(response);
     }
 }

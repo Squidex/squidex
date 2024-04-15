@@ -5,15 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Scripting;
+namespace Squidex.Domain.Apps.Entities.Apps;
 
-public record struct ScriptOptions
+public sealed class AppCacheOptions
 {
-    public bool CanReject { get; set; }
-
-    public bool CanDisallow { get; set; }
-
-    public bool AsContext { get; set; }
-
-    public bool Readonly { get; set; }
+    public TimeSpan CacheDuration { get; set; }
 }

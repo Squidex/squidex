@@ -322,17 +322,17 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
         operation.MustHavePermission(PermissionIds.AppContentsUpdate);
         operation.MustHaveData(c.Data);
 
+        var newData = operation.InvokeUpdates(c.Data, Snapshot.EditingData);
+
         if (!c.DoNotValidate)
         {
-            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished, ct);
+            await operation.ValidateInputAsync(newData, c.OptimizeValidation, Snapshot.IsPublished, ct);
         }
 
         if (!c.DoNotValidateWorkflow)
         {
             await operation.CheckUpdateAsync();
         }
-
-        var newData = c.Data;
 
         if (c.EnrichDefaults)
         {
@@ -362,6 +362,8 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
     {
         operation.MustHavePermission(PermissionIds.AppContentsUpdate);
         operation.MustHaveData(c.Data);
+
+        c.Data = operation.InvokeUpdates(c.Data, Snapshot.EditingData);
 
         if (!c.DoNotValidate)
         {

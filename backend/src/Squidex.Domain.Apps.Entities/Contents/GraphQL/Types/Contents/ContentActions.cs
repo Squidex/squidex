@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Reactive.Linq;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -15,6 +16,8 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
+using Squidex.Messaging.Subscriptions;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
@@ -550,16 +553,35 @@ internal static class ContentActions
             },
         ];
 
-        public static readonly ISourceStreamResolver Resolver = Resolvers.Stream(PermissionIds.AppContentsRead, c =>
+        public static readonly ISourceStreamResolver Resolver = new SourceStreamResolver<object>(async fieldContext =>
         {
-            return new ContentSubscription
+            var context = (GraphQLExecutionContext)fieldContext.UserContext;
+
+            var app = context.Context.App;
+
+            if (!context.Context.UserPermissions.Includes(PermissionIds.ForApp(PermissionIds.AppContentsRead, app.Name)))
             {
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+            }
+
+            var key = $"content-{app.Id}";
+
+            var subscription = new ContentSubscription
+            {
+                Permissions = context.Context.UserPermissions,
+
                 // Primary filter for the event types.
-                Type = c.GetArgument<EnrichedContentEventType?>("type"),
+                Type = fieldContext.GetArgument<EnrichedContentEventType?>("type"),
 
                 // The name of the schema is used instead of the ID for a simpler API.
-                SchemaName = c.GetArgument<string?>("schemaName")
+                SchemaName = fieldContext.GetArgument<string?>("schemaName"),
             };
+
+            var observable =
+                await context.Resolve<ISubscriptionService>()
+                    .SubscribeAsync(key, subscription, fieldContext.CancellationToken);
+
+            return observable.OfType<EnrichedContentEvent>();
         });
     }
 

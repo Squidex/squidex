@@ -14,6 +14,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Internal;
@@ -43,6 +44,9 @@ public sealed class JintObjectConverter : IObjectConverter
                 return true;
             case ClaimsPrincipal principal:
                 result = JintUser.Create(engine, principal);
+                return true;
+            case JsonValue jsonValue:
+                result = JsonMapper.Map(jsonValue, engine);
                 return true;
             case DomainId domainId:
                 result = domainId.ToString();
