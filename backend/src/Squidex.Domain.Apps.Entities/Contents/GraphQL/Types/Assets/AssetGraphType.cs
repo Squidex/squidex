@@ -246,7 +246,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
         AddField(new FieldType
         {
             Name = "sourceUrl",
-            ResolvedType = Scalars.NonNullString,
+            ResolvedType = Scalars.String,
             Resolver = SourceUrl,
             Description = FieldDescriptions.AssetSourceUrl
         });
