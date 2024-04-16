@@ -2,6 +2,12 @@
 @import 'vars';
 
 .focus-container {
+    border: 2px solid transparent;
+    border-radius: 4px;
+    margin: -2px;
+}
+
+.focused {
     position: relative;
 }
 
@@ -9,6 +15,7 @@
     @include absolute(-2px, -2px, -2px, -2px);
     border: 2px solid transparent;
     border-radius: 6px;
+    pointer-events: none;
 }
 
 .focus-user {
@@ -19,5 +26,6 @@
     margin-right: 0;
     margin-bottom: 2px;
     padding: .125rem .25rem;
+    pointer-events: none;
     white-space: nowrap;
 }

@@ -46,7 +46,11 @@ export class LightenPipe implements PipeTransform {
     standalone: true,
 })
 export class StringColorPipe implements PipeTransform {
-    public transform(value: string) {
+    public transform(value?: string) {
+        if (!value) {
+            return 'transparent';
+        }
+
         return ColorHelper.fromStringHash(value);
     }
 }
