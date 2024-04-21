@@ -191,6 +191,7 @@ const DEFAULT_OPTIONS: GridsterConfig = {
     margin: 10,
     maxItemCols: 3,
     maxItemRows: 2,
+    mobileBreakpoint: 0,
     outerMargin: true,
     outerMarginBottom: 16,
     outerMarginLeft: 16,
