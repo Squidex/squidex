@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using NJsonSchema.Generation.TypeMappers;
@@ -67,6 +68,9 @@ public static class OpenApiServices
             var settings = new OpenApiDocumentGeneratorSettings
             {
                 SchemaSettings = new SystemTextJsonSchemaGeneratorSettings()
+                {
+                    SerializerOptions = c.GetRequiredService<JsonSerializerOptions>()
+                }
             };
 
             ConfigureSchemaSettings(settings.SchemaSettings, c.GetRequiredService<TypeRegistry>(), true);
@@ -114,6 +118,7 @@ public static class OpenApiServices
             CreateStringMap<NamedId<DomainId>>(),
             CreateStringMap<NamedId<Guid>>(),
             CreateStringMap<NamedId<string>>(),
+            CreateStringMap<PropertyPath>(),
             CreateStringMap<RefToken>(),
             CreateStringMap<Status>(),
         };
