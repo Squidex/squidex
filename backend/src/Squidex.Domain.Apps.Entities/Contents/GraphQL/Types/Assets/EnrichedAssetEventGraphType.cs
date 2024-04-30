@@ -213,7 +213,7 @@ internal sealed class EnrichedAssetEventGraphType : SharedObjectGraphType<Enrich
         {
             Name = "metadata",
             Arguments = AssetActions.Metadata.Arguments,
-            ResolvedType = Scalars.JsonNoop,
+            ResolvedType = Scalars.Json,
             Resolver = AssetActions.Metadata.Resolver,
             Description = FieldDescriptions.AssetMetadata
         });

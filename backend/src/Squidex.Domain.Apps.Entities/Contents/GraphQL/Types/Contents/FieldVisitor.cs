@@ -24,7 +24,7 @@ public delegate Task<T> AsyncValueResolver<T>(JsonValue value, IResolveFieldCont
 
 internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
 {
-    public static readonly IFieldResolver JsonNoop = CreateValueResolver((value, fieldContext, contex) => value.Value);
+    public static readonly IFieldResolver JsonScalar = CreateValueResolver((value, fieldContext, contex) => value.Value);
     public static readonly IFieldResolver JsonPath = CreateValueResolver(ContentActions.Json.Resolver);
 
     private static readonly IFieldResolver JsonBoolean = CreateValueResolver((value, fieldContext, contex) =>
@@ -171,7 +171,7 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
             return default;
         }
 
-        return new (type, JsonNoop, null);
+        return new (type, JsonScalar, null);
     }
 
     public FieldGraphSchema Visit(IField<ComponentsFieldProperties> field, FieldInfo args)
@@ -197,7 +197,7 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
 
         if (schema.Length > 0)
         {
-            return new (schema[0], JsonNoop, null);
+            return new (schema[0], JsonScalar, null);
         }
 
         return new (Scalars.Json, JsonPath, ContentActions.Json.Arguments);

@@ -31,8 +31,5 @@ public static class QueryServices
 
         services.AddSingletonAs<JsonGraphType>()
             .AsSelf();
-
-        services.AddSingletonAs<JsonNoopGraphType>()
-            .AsSelf();
     }
 }

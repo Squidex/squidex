@@ -215,7 +215,7 @@ internal static class ContentFields
     public static readonly FieldType DataDynamic = new FieldType
     {
         Name = "data__dynamic",
-        ResolvedType = Scalars.JsonNoop,
+        ResolvedType = Scalars.Json,
         Resolver = Resolve(x => x.Data),
         Description = FieldDescriptions.ContentData
     };
@@ -241,7 +241,7 @@ internal static class ContentFields
     public static readonly FieldType RichTextFieldValue = new FieldType
     {
         Name = "value",
-        ResolvedType = Scalars.JsonNoop,
+        ResolvedType = Scalars.Json,
         Resolver = Resolvers.Sync<RichTextNode, JsonObject?>(x => x.Root),
         Description = FieldDescriptions.RichTextFieldValue
     };
