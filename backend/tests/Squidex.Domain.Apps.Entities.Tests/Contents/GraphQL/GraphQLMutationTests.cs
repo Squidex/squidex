@@ -128,6 +128,59 @@ public class GraphQLMutationTests : GraphQLTestBase
     }
 
     [Fact]
+    public async Task Should_create_content_with_variable()
+    {
+        commandContext.Complete(content);
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                mutation MyMutation($location: JsonScalar) {
+                  createMySchemaContent(data: {
+                    myGeolocation: {
+                     iv: $location
+                    }
+                  }) {
+                    id
+                  }
+                }",
+            Args = new
+            {
+                fields = TestContent.AllFields
+            },
+            Variables = new
+            {
+                location = new
+                {
+                    latitude = 42,
+                    longitude = 13
+                }
+            },
+            Permission = PermissionIds.AppContentsCreate
+        });
+
+        var expected = new
+        {
+            data = new
+            {
+                createMySchemaContent = new
+                {
+                    id = content.Id,
+                }
+            }
+        };
+
+        AssertResult(expected, actual);
+
+        A.CallTo(() => commandBus.PublishAsync(
+                A<CreateContent>.That.Matches(x =>
+                    x.ExpectedVersion == EtagVersion.Any &&
+                    x.SchemaId.Equals(TestSchemas.Default.NamedId())),
+                A<CancellationToken>._))
+            .MustHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_return_single_content_if_creating_content_with_custom_id()
     {
         commandContext.Complete(content);

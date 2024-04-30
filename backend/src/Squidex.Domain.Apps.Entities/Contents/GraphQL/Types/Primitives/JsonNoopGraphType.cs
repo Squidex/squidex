@@ -10,12 +10,12 @@ using GraphQLParser.AST;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
-public class JsonNoopGraphType : ScalarGraphType
+public sealed class JsonNoopGraphType : ScalarGraphType
 {
     public JsonNoopGraphType()
     {
         // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-        Name = "JsonScalar";
+        Name = "JsonNoopScalar";
 
         Description = "Unstructured Json object";
     }

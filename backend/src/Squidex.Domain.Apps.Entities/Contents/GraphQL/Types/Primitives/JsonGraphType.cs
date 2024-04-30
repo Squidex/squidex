@@ -6,13 +6,22 @@
 // ==========================================================================
 
 using System.Globalization;
+using GraphQL.Types;
 using GraphQLParser.AST;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
-public sealed class JsonGraphType : JsonNoopGraphType
+public sealed class JsonGraphType : ScalarGraphType
 {
+    public JsonGraphType()
+    {
+        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+        Name = "JsonScalar";
+
+        Description = "Unstructured Json object";
+    }
+
     public override object? Serialize(object? value)
     {
         return value;
