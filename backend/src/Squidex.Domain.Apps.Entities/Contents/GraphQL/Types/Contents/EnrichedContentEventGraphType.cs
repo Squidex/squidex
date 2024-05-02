@@ -110,7 +110,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
         AddField(new FieldType
         {
             Name = "data",
-            ResolvedType = Scalars.JsonNoop,
+            ResolvedType = Scalars.Json,
             Resolver = Resolve(x => x.Data),
             Description = FieldDescriptions.ContentData
         });
@@ -118,7 +118,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
         AddField(new FieldType
         {
             Name = "dataOld",
-            ResolvedType = Scalars.JsonNoop,
+            ResolvedType = Scalars.Json,
             Resolver = Resolve(x => x.DataOld),
             Description = FieldDescriptions.ContentDataOld
         });

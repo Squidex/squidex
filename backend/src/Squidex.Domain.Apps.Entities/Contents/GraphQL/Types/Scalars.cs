@@ -20,8 +20,6 @@ public static class Scalars
 
     public static readonly IGraphType Json = new JsonGraphType();
 
-    public static readonly IGraphType JsonNoop = new JsonNoopGraphType();
-
     public static readonly IGraphType Float = new FloatGraphType();
 
     public static readonly IGraphType String = new StringGraphType();
