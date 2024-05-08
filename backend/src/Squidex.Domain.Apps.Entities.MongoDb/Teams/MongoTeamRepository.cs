@@ -61,4 +61,17 @@ public sealed class MongoTeamRepository : MongoSnapshotStoreBase<Team, MongoTeam
             return entity?.Document;
         }
     }
+
+    public async Task<Team?> FindByAuthDomainAsync(string authDomain,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoTeamRepository/FindByAuthDomainAsync"))
+        {
+            var entity =
+                await Collection.Find(x => x.IndexedAuthDomain == authDomain)
+                    .FirstOrDefaultAsync(ct);
+
+            return entity?.Document;
+        }
+    }
 }

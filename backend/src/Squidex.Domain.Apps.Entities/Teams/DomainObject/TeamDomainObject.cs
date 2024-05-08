@@ -105,6 +105,16 @@ public partial class TeamDomainObject : DomainObject<Team>
                     return Snapshot;
                 }, ct);
 
+            case UpsertAuth upsertauth:
+                return ApplyReturnAsync(upsertauth, async (c, ct) =>
+                {
+                    await GuardTeam.CanUpsertAuth(c, AppProvider, ct);
+
+                    UpsertAuth(c);
+
+                    return Snapshot;
+                }, ct);
+
             case ChangePlan changePlan:
                 return ApplyReturnAsync(changePlan, async (c, ct) =>
                 {
@@ -179,6 +189,11 @@ public partial class TeamDomainObject : DomainObject<Team>
         Raise(command, new TeamUpdated());
     }
 
+    private void UpsertAuth(UpsertAuth command)
+    {
+        Raise(command, new TeamAuthChanged());
+    }
+
     private void AssignContributor(AssignContributor command, bool isAdded)
     {
         Raise(command, new TeamContributorAssigned { IsAdded = isAdded });
@@ -196,6 +211,11 @@ public partial class TeamDomainObject : DomainObject<Team>
         @event.TeamId = id ?? Snapshot.Id;
 
         RaiseEvent(Envelope.Create(@event));
+    }
+
+    private IAppProvider AppProvider
+    {
+        get => serviceProvider.GetRequiredService<IAppProvider>();
     }
 
     private IBillingPlans BillingPlans

@@ -91,6 +91,12 @@ public sealed class TeamDto : Resource
                 resources.Url<TeamPlansController>(x => nameof(x.GetTeamPlans), values));
         }
 
+        if (resources.IsAllowed(PermissionIds.TeamAuthRead, team: values.team, additional: permissions))
+        {
+            AddGetLink("auth",
+                resources.Url<TeamsController>(x => nameof(x.GetTeamAuth), values));
+        }
+
         return this;
     }
 }

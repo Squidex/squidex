@@ -22,6 +22,9 @@ public interface IAppProvider
     Task<Team?> GetTeamAsync(DomainId teamId,
         CancellationToken ct = default);
 
+    Task<Team?> GetTeamByAuthDomainAsync(string authDomain,
+        CancellationToken ct = default);
+
     Task<List<Team>> GetUserTeamsAsync(string userId,
         CancellationToken ct = default);
 

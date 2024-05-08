@@ -19,6 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
 
 public class TeamDomainObjectTests : HandlerTestBase<Team>
 {
+    private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly IBillingManager billingManager = A.Fake<IBillingManager>();
     private readonly IUser user;
@@ -27,6 +28,7 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
     private readonly Plan planFree = new Plan { Id = "free" };
     private readonly string contributorId = DomainId.NewGuid().ToString();
     private readonly string name = "My Team";
+    private readonly AuthScheme scheme;
     private readonly TeamDomainObject sut;
 
     protected override DomainId Id
@@ -37,6 +39,9 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
     public TeamDomainObjectTests()
     {
         user = UserMocks.User(contributorId);
+
+        A.CallTo(() => appProvider.GetTeamByAuthDomainAsync(A<string>._, A<CancellationToken>._))
+            .Returns(Task.FromResult<Team?>(null));
 
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, default))
             .Returns(user);
@@ -53,8 +58,18 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<Team>._, A<string>._, CancellationToken))
             .Returns(Task.FromResult<Uri?>(null));
 
+        scheme = new AuthScheme
+        {
+            Domain = "squidex.io",
+            DisplayName = "Squidex",
+            Authority = "https://identity.squidex.io",
+            ClientId = "clientId",
+            ClientSecret = "clientSecret"
+        };
+
         var serviceProvider =
             new ServiceCollection()
+                .AddSingleton(appProvider)
                 .AddSingleton(billingPlans)
                 .AddSingleton(billingManager)
                 .AddSingleton(userResolver)
@@ -93,6 +108,31 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
         var command = new UpdateTeam { Name = "Changed Name" };
 
         await ExecuteCreateAsync();
+
+        var actual = await PublishIdempotentAsync(sut, command);
+
+        await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task UpsertAuth_should_create_events_and_update_scheme()
+    {
+        var command = new UpsertAuth { Scheme = scheme };
+
+        await ExecuteCreateAsync();
+
+        var actual = await PublishIdempotentAsync(sut, command);
+
+        await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task UpsertAuth_should_create_events_and_remove_scheme()
+    {
+        var command = new UpsertAuth { Scheme = null };
+
+        await ExecuteCreateAsync();
+        await ExecuteUpsertAuthAsync();
 
         var actual = await PublishIdempotentAsync(sut, command);
 
@@ -247,6 +287,11 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
     private Task ExecuteChangePlanAsync()
     {
         return PublishAsync(sut, new ChangePlan { PlanId = planPaid.Id });
+    }
+
+    private Task ExecuteUpsertAuthAsync()
+    {
+        return PublishAsync(sut, new UpsertAuth { Scheme = scheme });
     }
 
     private async Task VerifySutAsync(object? actual, object? expected = null)

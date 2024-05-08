@@ -137,6 +137,9 @@ public sealed class Resources
 
     public bool CanChangeTeamPlan => Can(PermissionIds.TeamPlansChange);
 
+    // Team Auth
+    public bool CanChangeTeamAuth => Can(PermissionIds.TeamAuthChange);
+
     // Backups
     public bool CanRestoreBackup => Can(PermissionIds.AdminRestore);
 

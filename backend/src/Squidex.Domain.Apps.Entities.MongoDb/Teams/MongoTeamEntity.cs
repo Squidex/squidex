@@ -23,6 +23,10 @@ public sealed class MongoTeamEntity : MongoState<Team>
     [BsonElement("_ct")]
     public Instant IndexedCreated { get; set; }
 
+    [BsonIgnoreIfDefault]
+    [BsonElement("_ad")]
+    public string? IndexedAuthDomain { get; set; }
+
     public override void Prepare()
     {
         var users = new HashSet<string>
@@ -33,5 +37,6 @@ public sealed class MongoTeamEntity : MongoState<Team>
         users.AddRange(Document.Contributors.Keys);
 
         IndexedUserIds = users.ToArray();
+        IndexedAuthDomain = Document.AuthScheme?.Domain;
     }
 }

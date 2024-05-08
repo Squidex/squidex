@@ -196,9 +196,6 @@
   <data name="common.calculatedDefaultValue" xml:space="preserve">
     <value>Calculado o valor por defeito</value>
   </data>
-  <data name="common.clientd" xml:space="preserve">
-    <value>ID do cliente</value>
-  </data>
   <data name="common.clientId" xml:space="preserve">
     <value>ID do cliente</value>
   </data>
@@ -225,9 +222,6 @@
   </data>
   <data name="common.documentation" xml:space="preserve">
     <value>Documentação</value>
-  </data>
-  <data name="common.editInNewTab" xml:space="preserve">
-    <value>Open in new tab</value>
   </data>
   <data name="common.editor" xml:space="preserve">
     <value>Editor</value>
@@ -420,6 +414,9 @@
   </data>
   <data name="common.schemaId" xml:space="preserve">
     <value>ID Esquema</value>
+  </data>
+  <data name="common.signoutRedirectUrl" xml:space="preserve">
+    <value>Signout Redirect URL</value>
   </data>
   <data name="common.signup" xml:space="preserve">
     <value>Registar</value>
@@ -1054,6 +1051,9 @@
   <data name="setup.title" xml:space="preserve">
     <value>Instalação</value>
   </data>
+  <data name="teams.domainInUse" xml:space="preserve">
+    <value>Domain is already used for another team.</value>
+  </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>Operação não permitida, a sua conta pode estár bloqueada.</value>
   </data>
@@ -1117,6 +1117,9 @@
   <data name="users.login.askAdmin" xml:space="preserve">
     <value />
   </data>
+  <data name="users.login.custom" xml:space="preserve">
+    <value>Enter your E-Mail Address to login with your Company Account and single sign on (SSO).</value>
+  </data>
   <data name="users.login.emailPlaceholder" xml:space="preserve">
     <value>Introduzir Email</value>
   </data>
@@ -1152,6 +1155,9 @@
   </data>
   <data name="users.logout.title" xml:space="preserve">
     <value>Sair</value>
+  </data>
+  <data name="users.noCustomDomain" xml:space="preserve">
+    <value>No authentication server registered.</value>
   </data>
   <data name="users.noEmailAddress" xml:space="preserve">
     <value>Não podemos obter o endereço de e-mail do provedor de autenticação.</value>
@@ -1344,6 +1350,9 @@
   </data>
   <data name="validation.slug" xml:space="preserve">
     <value>{property|upper} não é um slug válido.</value>
+  </data>
+  <data name="validation.url" xml:space="preserve">
+    <value>{property|upper} is not a valid URL.</value>
   </data>
   <data name="validation.valid" xml:space="preserve">
     <value>{property|upper} não é um valor válido.</value>

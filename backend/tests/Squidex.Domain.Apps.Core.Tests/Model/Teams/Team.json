@@ -12,5 +12,13 @@
         "owner": "subject:63761585e06d5466c71521b3",
         "planId": "Premium"
     },
+    "authScheme": {
+        "domain": "squidex.io",
+        "displayName": "Squidex",
+        "clientId": "CLIENT ID",
+        "clientSecret": "CLIENT SECRET",
+        "authority": "Authorty",
+        "signoutRedirectUrl": "URL"
+    },
     "version": 0
 }

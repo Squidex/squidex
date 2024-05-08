@@ -44,6 +44,10 @@ public partial class TeamDomainObject
             case TeamContributorRemoved e:
                 newSnapshot = snapshot.UpdateContributors(e, (e, c) => c.Remove(e.ContributorId));
                 break;
+
+            case TeamAuthChanged e:
+                newSnapshot = snapshot.ChangeAuthScheme(e.Scheme);
+                break;
         }
 
         if (ReferenceEquals(newSnapshot, snapshot))

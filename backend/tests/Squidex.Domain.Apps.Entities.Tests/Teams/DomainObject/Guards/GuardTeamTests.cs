@@ -5,11 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Domain.Apps.Entities.Teams.DomainObject.Guards;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 
@@ -21,6 +23,7 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
     private readonly IBillingPlans billingPlans = A.Fake<IBillingPlans>();
     private readonly Plan planBasic = new Plan();
     private readonly Plan planFree = new Plan();
+    private readonly AuthScheme scheme;
 
     public GuardTeamTests()
     {
@@ -35,6 +38,15 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
 
         A.CallTo(() => billingPlans.GetPlan("free"))
             .Returns(planFree);
+
+        scheme = new AuthScheme
+        {
+            Domain = "squidex.io",
+            DisplayName = "Squidex",
+            Authority = "https://identity.squidex.io",
+            ClientId = "clientId",
+            ClientSecret = "clientSecret"
+        };
     }
 
     [Fact]
@@ -78,5 +90,90 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new ChangePlan { PlanId = "basic", Actor = User };
 
         GuardTeam.CanChangePlan(command, billingPlans);
+    }
+
+    [Fact]
+    public async Task CanUpsertAuth_should_not_throw_exception_if_scheme_is_null()
+    {
+        var command = new UpsertAuth();
+
+        await GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken);
+    }
+
+    [Fact]
+    public async Task CanUpsertAuth_should_throw_exception_if_domain_not_defined()
+    {
+        var command = new UpsertAuth { Scheme = scheme with { Domain = null! } };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
+            new ValidationError("Domain is required.", "AuthScheme.Domain"));
+    }
+
+    [Fact]
+    public async Task CanUpsertAuth_should_throw_exception_if_display_name_not_defined()
+    {
+        var command = new UpsertAuth { Scheme = scheme with { DisplayName = null! } };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
+            new ValidationError("Display name is required.", "AuthScheme.DisplayName"));
+    }
+
+    [Fact]
+    public async Task CanUpsertAuth_should_throw_exception_if_client_id_not_defined()
+    {
+        var command = new UpsertAuth { Scheme = scheme with { ClientId = null! } };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
+            new ValidationError("Client ID is required.", "AuthScheme.ClientId"));
+    }
+
+    [Fact]
+    public async Task CanUpsertAuth_should_throw_exception_if_client_secret_not_defined()
+    {
+        var command = new UpsertAuth { Scheme = scheme with { ClientSecret = null! } };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
+            new ValidationError("Client Secret is required.", "AuthScheme.ClientSecret"));
+    }
+
+    [Fact]
+    public async Task CanUpsertAuth_should_throw_exception_if_authority_not_defined()
+    {
+        var command = new UpsertAuth { Scheme = scheme with { Authority = null! } };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
+            new ValidationError("Authority is required.", "AuthScheme.Authority"));
+    }
+
+    [Fact]
+    public async Task CanUpsertAuth_should_throw_exception_if_authority_not_valid()
+    {
+        var command = new UpsertAuth { Scheme = scheme with { Authority = "invalid" } };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
+            new ValidationError("Authority is not a valid URL.", "AuthScheme.Authority"));
+    }
+
+    [Fact]
+    public async Task CanUpsertAuth_should_throw_exception_if_domain_is_already_taken()
+    {
+        A.CallTo(() => AppProvider.GetTeamByAuthDomainAsync("squidex.io", CancellationToken))
+            .Returns(Team);
+
+        var command = new UpsertAuth { Scheme = scheme, TeamId = DomainId.NewGuid() };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
+            new ValidationError("Domain is already used for another team."));
+    }
+
+    [Fact]
+    public async Task CanUpsertAuth_should_not_throw_exception_if_command_is_valid()
+    {
+        A.CallTo(() => AppProvider.GetTeamByAuthDomainAsync("squidex.io", CancellationToken))
+            .Returns(Team);
+
+        var command = new UpsertAuth { Scheme = scheme, TeamId = Team.Id };
+
+        await GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken);
     }
 }

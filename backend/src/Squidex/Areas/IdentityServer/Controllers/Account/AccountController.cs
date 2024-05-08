@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Squidex.Areas.IdentityServer.Config;
 using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
@@ -21,14 +22,17 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account;
 [AutoValidateAntiforgeryToken]
 public sealed class AccountController : IdentityServerController
 {
+    private readonly DynamicSchemeProvider schemes;
     private readonly IUserService userService;
     private readonly MyIdentityOptions identityOptions;
 
     public AccountController(
+        DynamicSchemeProvider schemes,
         IUserService userService,
         IOptions<MyIdentityOptions> identityOptions)
     {
         this.identityOptions = identityOptions.Value;
+        this.schemes = schemes;
         this.userService = userService;
     }
 
@@ -130,26 +134,19 @@ public sealed class AccountController : IdentityServerController
     }
 
     [HttpGet]
-    [Route("account/signup/")]
-    public Task<IActionResult> Signup(string? returnUrl = null)
-    {
-        return LoginViewAsync(returnUrl, false, false);
-    }
-
-    [HttpGet]
     [Route("account/login/")]
-    public Task<IActionResult> Login(string? returnUrl = null)
+    public Task<IActionResult> Login()
     {
-        return LoginViewAsync(returnUrl, true, false);
+        return LoginViewAsync(RequestType.Get);
     }
 
     [HttpPost]
     [Route("account/login/")]
-    public async Task<IActionResult> Login(LoginModel model, string? returnUrl = null)
+    public async Task<IActionResult> Login(LoginModel model, string? returnUrl)
     {
         if (!ModelState.IsValid)
         {
-            return await LoginViewAsync(returnUrl, true, true);
+            return await LoginViewAsync(RequestType.Login);
         }
 
         var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, true, true);
@@ -160,7 +157,7 @@ public sealed class AccountController : IdentityServerController
         }
         else if (!result.Succeeded)
         {
-            return await LoginViewAsync(returnUrl, true, true);
+            return await LoginViewAsync(RequestType.Login);
         }
         else
         {
@@ -168,15 +165,44 @@ public sealed class AccountController : IdentityServerController
         }
     }
 
-    private async Task<IActionResult> LoginViewAsync(string? returnUrl, bool isLogin, bool isFailed)
+    [HttpPost]
+    [Route("account/login-dynamic/")]
+    public async Task<IActionResult> LoginDynamic(LoginDynamicModel model, string? returnUrl = null)
     {
+        if (!ModelState.IsValid)
+        {
+            return await LoginViewAsync(RequestType.LoginCustom);
+        }
+
+        var scheme = await schemes.GetSchemaByEmailAddressAsync(model.Email);
+
+        if (scheme != null)
+        {
+            var provider = scheme.Name;
+
+            var challengeRedirectUrl = Url.Action(nameof(ExternalCallback), new { returnUrl });
+            var challengeProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, challengeRedirectUrl);
+
+            return Challenge(challengeProperties, provider);
+        }
+
+        ModelState.AddModelError(string.Empty, T.Get("users.noCustomDomain")!);
+
+        return await LoginViewAsync(RequestType.LoginCustom);
+    }
+
+    private async Task<IActionResult> LoginViewAsync(RequestType requestType)
+    {
+        string? returnUrl = HttpContext.Request.Query["returnUrl"];
+
         // If password authentication is enabled we always show the page.
         var allowPasswordAuth = identityOptions.AllowPasswordAuth;
+        var allowCustomDomains = identityOptions.AllowCustomDomains;
 
         var externalProviders = await SignInManager.GetExternalProvidersAsync();
 
         // If there is only one external authentication provider, we can redirect just directly.
-        if (externalProviders.Count == 1 && !allowPasswordAuth)
+        if (externalProviders.Count == 1 && !allowPasswordAuth && !allowCustomDomains)
         {
             var provider = externalProviders[0].AuthenticationScheme;
 
@@ -190,9 +216,10 @@ public sealed class AccountController : IdentityServerController
         var vm = new LoginVM
         {
             ExternalProviders = externalProviders,
-            IsFailed = isFailed,
-            IsLogin = isLogin,
+            IsLogin = HttpContext.Request.Query["signup"] != "true",
             HasPasswordAuth = allowPasswordAuth,
+            HasCustomAuth = allowCustomDomains,
+            RequestType = requestType,
             ReturnUrl = returnUrl
         };
 

@@ -59,6 +59,11 @@ public static class PermissionIds
     public const string TeamPlansRead = "squidex.teams.{team}.plans.read";
     public const string TeamPlansChange = "squidex.teams.{team}.plans.change";
 
+    // Team Auth
+    public const string TeamAuth = "squidex.teams.{team}.auth";
+    public const string TeamAuthRead = "squidex.teams.{team}.auth.read";
+    public const string TeamAuthChange = "squidex.teams.{team}.auth.change";
+
     // Team Usage
     public const string TeamUsage = "squidex.teams.{team}.usage";
 

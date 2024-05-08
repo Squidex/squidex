@@ -70,7 +70,9 @@
                                 </div>
                             </div>
                             <div class="col align-self-center">
-                                <sqx-form-hint>{{ 'apps.uploadImage' | sqxTranslate }}</sqx-form-hint>
+                                <sqx-form-hint>
+                                    {{ 'apps.uploadImage' | sqxTranslate }}
+                                </sqx-form-hint>
         
                                 <span class="btn btn-success upload-button" [class.disabled]="!isEditableImage" (click)="fileInput.click()">
                                     <span>{{ 'apps.uploadImageButton' | sqxTranslate }}</span>
@@ -90,7 +92,9 @@
                             <div class="col-6">
                                 <h5>{{ 'apps.transferTitle' | sqxTranslate }}</h5>
             
-                                <sqx-form-hint>{{ 'apps.transferWarning' | sqxTranslate }}</sqx-form-hint>
+                                <sqx-form-hint>
+                                    {{ 'apps.transferWarning' | sqxTranslate }}
+                                </sqx-form-hint>
                             </div>
                             <div class="col">
                                 <select class="form-select" formControlName="teamId">
@@ -112,7 +116,9 @@
                         <div class="col">
                             <h5>{{ 'apps.delete' | sqxTranslate }}</h5>
         
-                            <sqx-form-hint>{{ 'apps.deleteWarning' | sqxTranslate }}</sqx-form-hint>
+                            <sqx-form-hint>
+                                {{ 'apps.deleteWarning' | sqxTranslate }}
+                            </sqx-form-hint>
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn btn-danger" [disabled]="!isDeletable"

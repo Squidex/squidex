@@ -22,7 +22,7 @@ public class TeamsIndexTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_resolve_teams_by_id()
+    public async Task Should_resolve_teams_by_user()
     {
         A.CallTo(() => teamRepository.QueryAllAsync("user1", CancellationToken))
             .Returns([Team]);
@@ -65,5 +65,16 @@ public class TeamsIndexTests : GivenContext
         var actual = await sut.GetTeamAsync(Team.Id, CancellationToken);
 
         Assert.Null(actual);
+    }
+
+    [Fact]
+    public async Task Should_resolve_team_by_domain()
+    {
+        A.CallTo(() => teamRepository.FindByAuthDomainAsync("squidex.io", CancellationToken))
+            .Returns(Team);
+
+        var actual = await sut.GetTeamByAuthDomainAsync("squidex.io", CancellationToken);
+
+        Assert.Same(actual, Team);
     }
 }

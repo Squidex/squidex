@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -42,6 +42,14 @@ public static class Not
         var property = T.Get($"common.{propertyName.ToCamelCase()}", propertyName);
 
         return T.Get("validation.slug", new { property });
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ValidUrl(string propertyName)
+    {
+        var property = T.Get($"common.{propertyName.ToCamelCase()}", propertyName);
+
+        return T.Get("validation.url", new { property });
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

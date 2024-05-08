@@ -58,9 +58,9 @@ public sealed class TeamsController : ApiController
     }
 
     /// <summary>
-    /// Get an team by name.
+    /// Get an team by ID.
     /// </summary>
-    /// <param name="team">The name of the team.</param>
+    /// <param name="team">The ID of the team.</param>
     /// <response code="200">Teams returned.</response>
     /// <response code="404">Team not found.</response>
     [HttpGet]
@@ -86,7 +86,6 @@ public sealed class TeamsController : ApiController
     /// <param name="request">The team object that needs to be added to Squidex.</param>
     /// <response code="201">Team created.</response>
     /// <response code="400">Team request not valid.</response>
-    /// <response code="409">Team name is already in use.</response>
     /// <remarks>
     /// You can only create an team when you are authenticated as a user (OpenID implicit flow).
     /// You will be assigned as owner of the new team automatically.
@@ -106,7 +105,7 @@ public sealed class TeamsController : ApiController
     /// <summary>
     /// Update the team.
     /// </summary>
-    /// <param name="team">The name of the team to update.</param>
+    /// <param name="team">The ID of the team to update.</param>
     /// <param name="request">The values to update.</param>
     /// <response code="200">Team updated.</response>
     /// <response code="400">Team request not valid.</response>
@@ -119,6 +118,54 @@ public sealed class TeamsController : ApiController
     public async Task<IActionResult> PutTeam(string team, [FromBody] UpdateTeamDto request)
     {
         var response = await InvokeCommandAsync(request.ToCommand());
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get the team auth settings.
+    /// </summary>
+    /// <param name="team">The ID of the team.</param>
+    /// <response code="200">Teams returned.</response>
+    /// <response code="404">Team not found.</response>
+    [HttpGet]
+    [Route("teams/{team}/auth")]
+    [ProducesResponseType(typeof(AuthSchemeResponseDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.TeamAuthRead)]
+    [ApiCosts(0)]
+    public IActionResult GetTeamAuth(string team)
+    {
+        var response = Deferred.Response(() =>
+        {
+            return AuthSchemeResponseDto.FromDomain(Team, Resources);
+        });
+
+        Response.Headers[HeaderNames.ETag] = Team.ToEtag();
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Update the team auth.
+    /// </summary>
+    /// <param name="team">The ID of the team to update.</param>
+    /// <param name="request">The values to update.</param>
+    /// <response code="200">Team updated.</response>
+    /// <response code="400">Team request not valid.</response>
+    /// <response code="404">Team not found.</response>
+    [HttpPut]
+    [Route("teams/{team}/auth")]
+    [ProducesResponseType(typeof(AuthSchemeResponseDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.TeamAuthChange)]
+    [ApiCosts(0)]
+    public async Task<IActionResult> PutTeamAuth(string team, [FromBody] AuthSchemeValueDto request)
+    {
+        var command = request.ToCommand();
+
+        var response = await InvokeCommandAsync(command, x =>
+        {
+            return AuthSchemeResponseDto.FromDomain(x, Resources);
+        });
 
         return Ok(response);
     }
