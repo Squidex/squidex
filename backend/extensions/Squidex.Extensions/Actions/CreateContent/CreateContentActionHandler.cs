@@ -39,12 +39,8 @@ public sealed class CreateContentActionHandler : RuleActionHandler<CreateContent
             AppId = @event.AppId
         };
 
-        var schema = await appProvider.GetSchemaAsync(@event.AppId.Id, action.Schema, true);
-
-        if (schema == null)
-        {
-            throw new InvalidOperationException($"Cannot find schema '{action.Schema}'");
-        }
+        var schema = await appProvider.GetSchemaAsync(@event.AppId.Id, action.Schema, true)
+            ?? throw new InvalidOperationException($"Cannot find schema '{action.Schema}'");
 
         ruleJob.SchemaId = schema.NamedId();
         ruleJob.FromRule = true;

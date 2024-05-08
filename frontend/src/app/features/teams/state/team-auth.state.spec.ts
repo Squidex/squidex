@@ -92,6 +92,8 @@ describe('TeamAuthState', () => {
             authService.setup(x => x.putTeamAuth(team, It.isAny(), version))
                 .returns(() => of(versioned(newVersion, { scheme: newScheme, canUpdate: true })));
 
+            authState.update(newScheme);
+
             expect(authState.snapshot.scheme).toEqual(newScheme);
             expect(authState.snapshot.canUpdate).toBeTruthy();
             expect(authState.snapshot.version).toEqual(newVersion);
@@ -102,6 +104,8 @@ describe('TeamAuthState', () => {
 
             authService.setup(x => x.putTeamAuth(team, It.isAny(), version))
                 .returns(() => of(versioned(newVersion, { scheme: newScheme, canUpdate: true })));
+
+            authState.update(newScheme);
 
             expect(authState.snapshot.scheme).toEqual(newScheme);
             expect(authState.snapshot.canUpdate).toBeTruthy();

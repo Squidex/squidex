@@ -29,7 +29,7 @@
         EventId: Guid_2
       },
       Payload: {
-        AuthScheme: {
+        Scheme: {
           Domain: squidex.io,
           DisplayName: Squidex,
           ClientId: clientId,

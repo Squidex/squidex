@@ -37,7 +37,7 @@ public sealed class PropertyPathVisitor : QueryNodeVisitor<ImmutableList<string>
         }
         else
         {
-            return ImmutableList.Create(UnescapeEdmField(nodeIn.Property));
+            return [UnescapeEdmField(nodeIn.Property)];
         }
     }
 
@@ -49,7 +49,7 @@ public sealed class PropertyPathVisitor : QueryNodeVisitor<ImmutableList<string>
         }
         else
         {
-            return ImmutableList.Create(UnescapeEdmField(nodeIn.Property));
+            return [UnescapeEdmField(nodeIn.Property)];
         }
     }
 

@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Esprima;
 using Esprima.Ast;
+using Jint;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Internal;
@@ -22,7 +22,7 @@ internal sealed class Parser
         this.cache = cache;
     }
 
-    public Script Parse(string script)
+    public Prepared<Script> Parse(string script)
     {
         var cacheKey = $"{typeof(Parser)}_Script_{script}";
 
@@ -30,7 +30,7 @@ internal sealed class Parser
         {
             entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
-            return new JavaScriptParser().ParseScript(script);
+            return Engine.PrepareScript(script);
         })!;
     }
 }

@@ -130,7 +130,7 @@ describe('TeamsService', () => {
                 },
             });
 
-            expect(auth!).toEqual({ payload: { canUpdate: true }, version: new Version('2') });
+            expect(auth!).toEqual({ payload: { scheme: null, canUpdate: true }, version: new Version('2') });
         }));
 
     it('should make put request to update auth',
@@ -152,7 +152,7 @@ describe('TeamsService', () => {
                 },
             });
 
-            expect(auth!).toEqual({ payload: { canUpdate: true }, version: new Version('2') });
+            expect(auth!).toEqual({ payload: { scheme: null, canUpdate: true }, version: new Version('2') });
         }));
 
     it('should make delete request to leave team',
@@ -195,6 +195,7 @@ describe('TeamsService', () => {
     function teamAuthResponse(id: number) {
 
         return {
+            scheme: null,
             _links: {
                 update: { method: 'PUT', href: `teams/${id}/auth` },
             },

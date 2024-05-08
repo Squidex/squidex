@@ -23,7 +23,7 @@ public class MigrateFieldNamesCommandMiddlewareTests : GivenContext
     }
 
     [Fact]
-    public async void Should_migrate_synchronize_command()
+    public async Task Should_migrate_synchronize_command()
     {
         var command = new SynchronizeSchema
         {
@@ -51,7 +51,7 @@ public class MigrateFieldNamesCommandMiddlewareTests : GivenContext
     }
 
     [Fact]
-    public async void Should_migrate_synchronize_command_with_null_fields()
+    public async Task Should_migrate_synchronize_command_with_null_fields()
     {
         var command = new SynchronizeSchema();
 
@@ -64,7 +64,7 @@ public class MigrateFieldNamesCommandMiddlewareTests : GivenContext
     }
 
     [Fact]
-    public async void Should_migrate_configure_command()
+    public async Task Should_migrate_configure_command()
     {
         var command = new ConfigureUIFields
         {
@@ -92,7 +92,7 @@ public class MigrateFieldNamesCommandMiddlewareTests : GivenContext
     }
 
     [Fact]
-    public async void Should_migrate_configure_command_with_null_fields()
+    public async Task Should_migrate_configure_command_with_null_fields()
     {
         var command = new ConfigureUIFields();
 

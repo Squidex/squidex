@@ -106,7 +106,7 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new UpsertAuth { Scheme = scheme with { Domain = null! } };
 
         await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
-            new ValidationError("Domain is required.", "AuthScheme.Domain"));
+            new ValidationError("Domain is required.", "Scheme.Domain"));
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new UpsertAuth { Scheme = scheme with { DisplayName = null! } };
 
         await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
-            new ValidationError("Display name is required.", "AuthScheme.DisplayName"));
+            new ValidationError("Display name is required.", "Scheme.DisplayName"));
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new UpsertAuth { Scheme = scheme with { ClientId = null! } };
 
         await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
-            new ValidationError("Client ID is required.", "AuthScheme.ClientId"));
+            new ValidationError("Client ID is required.", "Scheme.ClientId"));
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new UpsertAuth { Scheme = scheme with { ClientSecret = null! } };
 
         await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
-            new ValidationError("Client Secret is required.", "AuthScheme.ClientSecret"));
+            new ValidationError("Client Secret is required.", "Scheme.ClientSecret"));
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new UpsertAuth { Scheme = scheme with { Authority = null! } };
 
         await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
-            new ValidationError("Authority is required.", "AuthScheme.Authority"));
+            new ValidationError("Authority is required.", "Scheme.Authority"));
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new UpsertAuth { Scheme = scheme with { Authority = "invalid" } };
 
         await ValidationAssert.ThrowsAsync(() => GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken),
-            new ValidationError("Authority is not a valid URL.", "AuthScheme.Authority"));
+            new ValidationError("Authority is not a valid URL.", "Scheme.Authority"));
     }
 
     [Fact]

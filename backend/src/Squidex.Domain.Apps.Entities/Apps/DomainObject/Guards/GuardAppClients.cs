@@ -59,7 +59,7 @@ public static class GuardAppClients
         {
             if (string.IsNullOrWhiteSpace(command.Id))
             {
-                e(Not.Defined("Clientd"), nameof(command.Id));
+                e(Not.Defined("ClientId"), nameof(command.Id));
             }
 
             if (command.Role != null && !app.Roles.Contains(command.Role))
