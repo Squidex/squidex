@@ -177,13 +177,13 @@ describe('TeamsService', () => {
     inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    delete: { method: 'DELETE', href: '/api/delete/my-app' },
+                    delete: { method: 'DELETE', href: '/api/teams/my-team' },
                 },
             };
 
             teamsService.deleteTeam('my-team', resource).subscribe();
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app');
+            const req = httpMock.expectOne('http://service/p/api/teams/my-team');
 
             expect(req.request.method).toEqual('DELETE');
             expect(req.request.headers.get('If-Match')).toBeNull();
