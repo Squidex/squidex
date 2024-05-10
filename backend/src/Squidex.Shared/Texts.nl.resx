@@ -1022,7 +1022,7 @@
     <value>Proudly made by</value>
   </data>
   <data name="setup.madeByCopyright" xml:space="preserve">
-    <value>Sebastian Stehle and Contributors, 2016-2021</value>
+    <value>Sebastian Stehle and Contributors, 2016-2024</value>
   </data>
   <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
     <value>With your setup, only admins can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=false&lt;/code&gt; as environment variable.</value>

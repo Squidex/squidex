@@ -1022,7 +1022,7 @@
     <value>Fièrement fabriqué par</value>
   </data>
   <data name="setup.madeByCopyright" xml:space="preserve">
-    <value>Sebastian Stehle et contributeurs, 2016-2021</value>
+    <value>Sebastian Stehle et contributeurs, 2016-2024</value>
   </data>
   <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
     <value>Avec votre configuration, seuls les administrateurs peuvent créer de nouvelles applications. Si vous souhaitez modifier cela, définissez &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=false&lt;/code&gt; comme variable d'environnement.</value>

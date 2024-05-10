@@ -312,7 +312,7 @@
   "setup.headline": "Installation",
   "setup.hint": "You see this screen because no user exists yet. After a user is created, you are not able to use this setup page again.",
   "setup.madeBy": "Proudly made by",
-  "setup.madeByCopyright": "Sebastian Stehle and Contributors, 2016-2021",
+  "setup.madeByCopyright": "Sebastian Stehle and Contributors, 2016-2024",
   "setup.ruleAppCreation.warningAdmins": "With your setup, only admins can create new apps. If you want to change this set <code>UI__ONLYADMINSCANCREATEAPPS=false</code> as environment variable.",
   "setup.ruleAppCreation.warningAll": "With your setup, every user can create new apps. If you want to change this set <code>UI__ONLYADMINSCANCREATEAPPS=true</code> as environment variable.",
   "setup.ruleFolder.warning": "You are using the <strong>folder asset store</strong> where all assets are stored in the file system. Please remember to include the asset folder into your backup strategy and map it to a volume, if you are using docker.",

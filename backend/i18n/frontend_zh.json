@@ -1039,7 +1039,7 @@
   "start.login": "登录 Squidex",
   "start.loginHint": "登录按钮将打开一个新的弹出窗口。一旦您登录成功，我们会将您重定向到 Squidex 管理门户。",
   "start.madeBy": "自豪地制作",
-  "start.madeByCopyright": "Sebastian Stehle 和贡献者，2016-2021",
+  "start.madeByCopyright": "Sebastian Stehle 和贡献者，2016-2024",
   "teams.archiveFailed": "Failed to archive Team.",
   "teams.auth.authority": "Authority",
   "teams.auth.authorityHint": "The URL to your authority server.",

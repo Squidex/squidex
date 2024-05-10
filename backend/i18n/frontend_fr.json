@@ -1039,7 +1039,7 @@
   "start.login": "Connectez-vous à Squidex",
   "start.loginHint": "Le bouton de connexion ouvrira une nouvelle fenêtre contextuelle. Une fois que vous êtes connecté avec succès, nous vous redirigerons vers le portail de gestion Squidex.",
   "start.madeBy": "Fièrement fabriqué par",
-  "start.madeByCopyright": "Sebastian Stehle et contributeurs, 2016-2021",
+  "start.madeByCopyright": "Sebastian Stehle et contributeurs, 2016-2024",
   "teams.archiveFailed": "Failed to archive Team.",
   "teams.auth.authority": "Authority",
   "teams.auth.authorityHint": "The URL to your authority server.",

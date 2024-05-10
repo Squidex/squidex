@@ -273,7 +273,7 @@
   "setup.headline": "Installazione",
   "setup.hint": "Vedi questa schermata perché non esiste ancora alcun utente. Dopo aver creato un utente, non sarà più possibile visualizzare questa schermata.",
   "setup.madeBy": "Orgogliosamente realizzato da",
-  "setup.madeByCopyright": "Sebastian Stehle e Collaboratori, 2016-2021",
+  "setup.madeByCopyright": "Sebastian Stehle e Collaboratori, 2016-2024",
   "setup.ruleAppCreation.warningAdmins": "Con questa impostazione solamente gli amministratori possono creare nuove app. Se volessi cambiare questa impostazione utilizza <code>UI__ONLYADMINSCANCREATEAPPS=false</code> come variabile d'ambiente.",
   "setup.ruleAppCreation.warningAll": "Con questa impostazione, ogni utente può creare nuove app. Se volessi cambiare questa impostazione utilizza <code>UI__ONLYADMINSCANCREATEAPPS=true</code> come variabile d'ambiente.",
   "setup.ruleFolder.warning": "Stai usando <strong>la cartella delle risorse</strong> dove tutte le risorse sono salvate all'interno del file system. Ricordati per favore di includere la cartella delle risorse all'interno della gestione dei backup e mappalo in un volume, se stai usando Docker.",

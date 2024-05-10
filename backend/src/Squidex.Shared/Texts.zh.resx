@@ -1022,7 +1022,7 @@
     <value>制作</value>
   </data>
   <data name="setup.madeByCopyright" xml:space="preserve">
-    <value>Sebastian Stehle 和贡献者，2016-2021</value>
+    <value>Sebastian Stehle 和贡献者，2016-2024</value>
   </data>
   <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
     <value>通过你的设置，只有管理员可以创建新的应用程序。如果你想改变这个设置 &lt;code&gt;UI__ONLYADMINCANCREATEAPPS=false&lt;/code&gt; 作为环境变量。</value>
