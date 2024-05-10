@@ -46,6 +46,7 @@ public static class PermissionIds
 
     // Team General
     public const string TeamAdmin = "squidex.teams.{team}.*";
+    public const string TeamDelete = "squidex.teams.{team}.delete";
     public const string TeamUpdate = "squidex.teams.{team}.update";
 
     // Team Contributors

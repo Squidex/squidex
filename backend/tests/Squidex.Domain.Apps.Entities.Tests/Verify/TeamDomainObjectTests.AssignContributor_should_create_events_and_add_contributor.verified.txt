@@ -4,6 +4,7 @@
     Guid_1: Owner,
     me: Owner
   },
+  IsDeleted: false,
   Id: Guid_2,
   CreatedBy: subject:me,
   LastModifiedBy: subject:me,

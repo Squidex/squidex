@@ -115,6 +115,16 @@ public partial class TeamDomainObject : DomainObject<Team>
                     return Snapshot;
                 }, ct);
 
+            case DeleteTeam delete:
+                return ApplyAsync(delete, async (c, ct) =>
+                {
+                    await GuardTeam.CanDelete(c, AppProvider, ct);
+
+                    await BillingManager.UnsubscribeAsync(c.Actor.Identifier, Snapshot, default);
+
+                    DeleteTeam(c);
+                }, ct);
+
             case ChangePlan changePlan:
                 return ApplyReturnAsync(changePlan, async (c, ct) =>
                 {
@@ -202,6 +212,11 @@ public partial class TeamDomainObject : DomainObject<Team>
     private void RemoveContributor(RemoveContributor command)
     {
         Raise(command, new TeamContributorRemoved());
+    }
+
+    private void DeleteTeam(DeleteTeam command)
+    {
+        Raise(command, new TeamDeleted());
     }
 
     private void Raise<T, TEvent>(T command, TEvent @event, DomainId? id = null) where T : class where TEvent : TeamEvent

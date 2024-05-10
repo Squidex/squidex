@@ -502,7 +502,7 @@ public class AppDomainObjectTests : HandlerTestBase<App>
     }
 
     [Fact]
-    public async Task ArchiveApp_should_create_events_and_update_deleted_flag()
+    public async Task DeleteApp_should_create_events_and_update_deleted_flag()
     {
         var command = new DeleteApp();
 

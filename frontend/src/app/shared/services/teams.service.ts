@@ -14,6 +14,7 @@ import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, mapVersioned, pretifyError, R
 export class TeamDto {
     public readonly _links: ResourceLinks;
 
+    public readonly canDelete: boolean;
     public readonly canReadAuth: boolean;
     public readonly canReadContributors: boolean;
     public readonly canReadPlans: boolean;
@@ -32,6 +33,7 @@ export class TeamDto {
     ) {
         this._links = links;
 
+        this.canDelete = hasAnyLink(links, 'delete');
         this.canReadAuth = hasAnyLink(links, 'auth');
         this.canReadContributors = hasAnyLink(links, 'contributors');
         this.canReadPlans = hasAnyLink(links, 'plans');
@@ -167,6 +169,15 @@ export class TeamsService {
 
         return this.http.request(link.method, url).pipe(
             pretifyError('i18n:teams.leaveFailed'));
+    }
+
+    public deleteTeam(teamId: string, resource: Resource): Observable<any> {
+        const link = resource._links['delete'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
+            pretifyError('i18n:teams.archiveFailed'));
     }
 }
 

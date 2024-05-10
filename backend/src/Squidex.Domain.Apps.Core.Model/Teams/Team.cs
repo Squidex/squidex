@@ -21,6 +21,8 @@ public record Team : Entity
 
     public AuthScheme? AuthScheme { get; init; }
 
+    public bool IsDeleted { get; init; }
+
     [Pure]
     public Team Rename(string name)
     {

@@ -121,4 +121,18 @@ public static class GuardTeam
             }
         });
     }
+
+    public static Task CanDelete(DeleteTeam command, IAppProvider appProvider,
+        CancellationToken ct)
+    {
+        return Validate.It(async e =>
+        {
+            var assignedApps = await appProvider.GetTeamAppsAsync(command.TeamId, ct);
+
+            if (assignedApps.Count != 0)
+            {
+                e(T.Get("teams.appsAssigned"));
+            }
+        });
+    }
 }

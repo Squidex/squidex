@@ -20,6 +20,10 @@ public sealed class MongoTeamEntity : MongoState<Team>
     public string[] IndexedUserIds { get; set; }
 
     [BsonIgnoreIfDefault]
+    [BsonElement("_dl")]
+    public bool IndexedDeleted { get; set; }
+
+    [BsonIgnoreIfDefault]
     [BsonElement("_ct")]
     public Instant IndexedCreated { get; set; }
 
@@ -36,7 +40,9 @@ public sealed class MongoTeamEntity : MongoState<Team>
 
         users.AddRange(Document.Contributors.Keys);
 
-        IndexedUserIds = users.ToArray();
         IndexedAuthDomain = Document.AuthScheme?.Domain;
+        IndexedCreated = Document.Created;
+        IndexedDeleted = Document.IsDeleted;
+        IndexedUserIds = users.ToArray();
     }
 }

@@ -1,4 +1,4 @@
-<sqx-layout layout="main" titleText="i18n:common.settings" titleIcon="settings" innerWidth="50">
+<sqx-layout layout="main" titleText="i18n:common.auth" titleIcon="shield" innerWidth="50">
     <ng-container>
         <sqx-list-view innerWidth="50rem">
             <ng-container content>
@@ -13,10 +13,10 @@
                             </div>
 
                             <div class="col">
-                                <h5>{{ 'team.auth.use' | sqxTranslate }}</h5>
+                                <h5>{{ 'teams.auth.use' | sqxTranslate }}</h5>
 
                                 <sqx-form-hint marginTop="2">
-                                    {{ 'team.auth.useHint' | sqxTranslate }}
+                                    {{ 'teams.auth.useHint' | sqxTranslate }}
                                 </sqx-form-hint>
                             </div>
                         </div>
@@ -27,7 +27,7 @@
                             <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
 
                             <div class="form-group row">
-                                <label class="col-3 col-form-label" for="domain">{{ 'team.auth.domain' | sqxTranslate }}</label>
+                                <label class="col-3 col-form-label" for="domain">{{ 'teams.auth.domain' | sqxTranslate }}</label>
                         
                                 <div class="col-9">
                                     <sqx-control-errors for="domain"></sqx-control-errors>
@@ -35,17 +35,17 @@
                                     <input class="form-control" id="domain" formControlName="domain">
                         
                                     <sqx-form-hint>
-                                        {{ 'team.auth.domainHint' | sqxTranslate }}
+                                        {{ 'teams.auth.domainHint' | sqxTranslate }}
                                     </sqx-form-hint>
                         
                                     <sqx-form-hint>
-                                        {{ 'team.auth.domainHintEmail' | sqxTranslate }}: <strong>user&commat;{{ updateForm.domainValue$ | async }}</strong>
+                                        {{ 'teams.auth.domainHintEmail' | sqxTranslate }}: <strong>user&commat;{{ updateForm.domainValue$ | async }}</strong>
                                     </sqx-form-hint>
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label class="col-3 col-form-label" for="displayName">{{ 'team.auth.displayName' | sqxTranslate }}</label>
+                                <label class="col-3 col-form-label" for="displayName">{{ 'teams.auth.displayName' | sqxTranslate }}</label>
                         
                                 <div class="col-9">
                                     <sqx-control-errors for="displayName"></sqx-control-errors>
@@ -53,13 +53,13 @@
                                     <input class="form-control" id="displayName" formControlName="displayName">
                         
                                     <sqx-form-hint>
-                                        {{ 'team.auth.displayNameHint' | sqxTranslate }}
+                                        {{ 'teams.auth.displayNameHint' | sqxTranslate }}
                                     </sqx-form-hint>
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label class="col-3 col-form-label" for="clientId">{{ 'team.auth.clientId' | sqxTranslate }}</label>
+                                <label class="col-3 col-form-label" for="clientId">{{ 'teams.auth.clientId' | sqxTranslate }}</label>
                         
                                 <div class="col-9">
                                     <sqx-control-errors for="clientId"></sqx-control-errors>
@@ -69,7 +69,7 @@
                             </div>
 
                             <div class="form-group row">
-                                <label class="col-3 col-form-label" for="clientSecret">{{ 'team.auth.clientSecret' | sqxTranslate }}</label>
+                                <label class="col-3 col-form-label" for="clientSecret">{{ 'teams.auth.clientSecret' | sqxTranslate }}</label>
                         
                                 <div class="col-9">
                                     <sqx-control-errors for="clientSecret"></sqx-control-errors>
@@ -79,7 +79,7 @@
                             </div>
 
                             <div class="form-group row">
-                                <label class="col-3 col-form-label" for="authority">{{ 'team.auth.authority' | sqxTranslate }}</label>
+                                <label class="col-3 col-form-label" for="authority">{{ 'teams.auth.authority' | sqxTranslate }}</label>
                         
                                 <div class="col-9">
                                     <sqx-control-errors for="authority"></sqx-control-errors>
@@ -87,13 +87,13 @@
                                     <input class="form-control" id="authority" formControlName="authority">
                         
                                     <sqx-form-hint>
-                                        {{ 'team.auth.authorityHint' | sqxTranslate }}
+                                        {{ 'teams.auth.authorityHint' | sqxTranslate }}
                                     </sqx-form-hint>
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label class="col-3 col-form-label" for="signoutRedirectUrl">{{ 'team.auth.signoutRedirectUrl' | sqxTranslate }}</label>
+                                <label class="col-3 col-form-label" for="signoutRedirectUrl">{{ 'teams.auth.signoutRedirectUrl' | sqxTranslate }}</label>
                         
                                 <div class="col-9">
                                     <sqx-control-errors for="signoutRedirectUrl"></sqx-control-errors>
@@ -103,7 +103,7 @@
                             </div>
 
                             <div class="form-group row">
-                                <label class="col-3 col-form-label" for="redirectUrl">{{ 'team.auth.redirectUrl' | sqxTranslate }}</label>
+                                <label class="col-3 col-form-label" for="redirectUrl">{{ 'teams.auth.redirectUrl' | sqxTranslate }}</label>
                         
                                 <div class="col-9">
                                     <div class="input-group">
@@ -115,7 +115,7 @@
                                     </div>
 
                                     <sqx-form-hint>
-                                        {{ 'team.auth.redirectUrlHint' | sqxTranslate }}
+                                        {{ 'teams.auth.redirectUrlHint' | sqxTranslate }}
                                     </sqx-form-hint>
                                 </div>
                             </div>
@@ -124,7 +124,7 @@
                         <div class="card-footer">
                             <div class="d-flex justify-content-between">
                                 <a type="type" class="float-end btn btn-success" target="_blank" href="{{urlToTest}}?{{updateForm.url | async}}">
-                                    {{ 'team.auth.testLogin' | sqxTranslate }}
+                                    {{ 'teams.auth.testLogin' | sqxTranslate }}
                                 </a>
 
                                 <button type="submit" class="float-end btn btn-primary" [disabled]="!isEditable">

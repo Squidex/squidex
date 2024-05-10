@@ -62,7 +62,7 @@ export class TeamAuthState extends State<Snapshot> {
         return this.teamService.getTeamAuth(this.teamId).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('i18n:teamsAuth.reloaded');
+                    this.dialogs.notifyInfo('i18n:teams.auth.reloaded');
                 }
 
                 this.next({

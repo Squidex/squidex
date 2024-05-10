@@ -157,6 +157,8 @@ public sealed class AccountController : IdentityServerController
         }
         else if (!result.Succeeded)
         {
+            ModelState.AddModelError(string.Empty, T.Get("users.login.error"));
+
             return await LoginViewAsync(RequestType.Login);
         }
         else

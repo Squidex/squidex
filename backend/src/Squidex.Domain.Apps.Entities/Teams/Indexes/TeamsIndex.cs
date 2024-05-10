@@ -59,8 +59,8 @@ public sealed class TeamsIndex : ITeamsIndex
         }
     }
 
-    private static bool IsValid(Team? rule)
+    private static bool IsValid(Team? team)
     {
-        return rule is { Version: > EtagVersion.Empty };
+        return team is { Version: > EtagVersion.Empty, IsDeleted: false };
     }
 }

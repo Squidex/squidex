@@ -109,6 +109,15 @@ describe('TeamsState', () => {
         expect(teamsState.snapshot.teams).toEqual([team1]);
     });
 
+    it('should remove team from snapshot if deleted', () => {
+        teamsService.setup(x => x.deleteTeam(team2.name, team2))
+            .returns(() => of({})).verifiable();
+
+        teamsState.delete(team2).subscribe();
+
+        expect(teamsState.snapshot.teams).toEqual([team1]);
+    });
+
     describe('Selection', () => {
         beforeEach(() => {
             teamsState.select(team1.name).subscribe();

@@ -907,6 +907,15 @@
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Your email address is set to private in Github. Please set it to public to use Github login.</value>
   </data>
+  <data name="login.test.headline" xml:space="preserve">
+    <value>Successful Test</value>
+  </data>
+  <data name="login.test.text" xml:space="preserve">
+    <value>Login Test was successful. You can save the settings now. It is recommended to make a final test with the actual login flow.</value>
+  </data>
+  <data name="login.test.title" xml:space="preserve">
+    <value>Login Test</value>
+  </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Calculated default value and default value cannot be used together.</value>
   </data>
@@ -1050,6 +1059,9 @@
   </data>
   <data name="setup.title" xml:space="preserve">
     <value>Installation</value>
+  </data>
+  <data name="teams.appsAssigned" xml:space="preserve">
+    <value>Cannot delete team, when apps are assigned.</value>
   </data>
   <data name="teams.domainInUse" xml:space="preserve">
     <value>Domain is already used for another team.</value>

@@ -42,10 +42,7 @@ public sealed class FrontendTests : IClassFixture<ClientFixture>
                 IsMobile = false,
                 Width = 1000
             },
-            Args = new string[]
-            {
-                "--no-sandbox"
-            }
+            Args = ["--no-sandbox"]
         });
 
         await using var page = await browser.NewPageAsync();

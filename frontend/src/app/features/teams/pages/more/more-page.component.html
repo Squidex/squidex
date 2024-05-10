@@ -15,6 +15,10 @@
                                 <sqx-control-errors for="name"></sqx-control-errors>
                 
                                 <input class="form-control" id="name" maxlength="100" formControlName="name">
+                                
+                                <sqx-form-hint>
+                                    {{ 'teams.teamNameHint' | sqxTranslate }}
+                                </sqx-form-hint>
                             </div>
                         </div>
         
@@ -25,6 +29,28 @@
                         </div>
                     </div>
                 </form>
+
+                <h5>{{ 'apps.generalSettingsDangerZone' | sqxTranslate }}</h5>
+        
+                <div class="card card-body">
+                    <div class="row">
+                        <div class="col">
+                            <h5>{{ 'teams.delete' | sqxTranslate }}</h5>
+        
+                            <sqx-form-hint>
+                                {{ 'teams.deleteWarning' | sqxTranslate }}
+                            </sqx-form-hint>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-danger" [disabled]="!isDeletable"
+                                (sqxConfirmClick)="deleteTeam()"
+                                confirmTitle="i18n:teams.deleteConfirmTitle"
+                                confirmText="i18n:teams.deleteConfirmText">
+                                {{ 'teams.delete' | sqxTranslate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </ng-container>
         </sqx-list-view>
     </ng-container>

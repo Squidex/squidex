@@ -13,6 +13,7 @@
         ClientSecret: clientSecret,
         Authority: https://identity.squidex.io
       },
+      IsDeleted: false,
       Id: Guid_1,
       CreatedBy: subject:me,
       LastModifiedBy: subject:me,

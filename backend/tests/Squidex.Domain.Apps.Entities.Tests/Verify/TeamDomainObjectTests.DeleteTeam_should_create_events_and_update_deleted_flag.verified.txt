@@ -6,14 +6,14 @@
       Contributors: {
         me: Owner
       },
-      IsDeleted: false,
+      IsDeleted: true,
       Id: Guid_1,
       CreatedBy: subject:me,
       LastModifiedBy: subject:me,
-      Version: 3,
+      Version: 2,
       UniqueId: Guid_1
     },
-    Version: 3,
+    Version: 2,
     ObjectState: Created
   },
   events: [

@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -47,6 +48,10 @@ public partial class TeamDomainObject
 
             case TeamAuthChanged e:
                 newSnapshot = snapshot.ChangeAuthScheme(e.Scheme);
+                break;
+
+            case TeamDeleted:
+                newSnapshot = snapshot with { Plan = null, IsDeleted = true };
                 break;
         }
 

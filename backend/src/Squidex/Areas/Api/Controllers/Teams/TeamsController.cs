@@ -10,6 +10,7 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Teams.Models;
 using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Teams.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -168,6 +169,26 @@ public sealed class TeamsController : ApiController
         });
 
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Delete the team.
+    /// </summary>
+    /// <param name="team">The ID of the team to delete.</param>
+    /// <response code="204">Team deleted.</response>
+    /// <response code="404">Team not found.</response>
+    [HttpDelete]
+    [Route("teams/{team}/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ApiPermission(PermissionIds.TeamDelete)]
+    [ApiCosts(0)]
+    public async Task<IActionResult> DeleteTeam(string team)
+    {
+        var command = new DeleteTeam();
+
+        await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
+
+        return NoContent();
     }
 
     private Task<TeamDto> InvokeCommandAsync(ICommand command)

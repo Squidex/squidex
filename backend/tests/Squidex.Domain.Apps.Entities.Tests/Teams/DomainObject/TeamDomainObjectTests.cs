@@ -274,6 +274,21 @@ public class TeamDomainObjectTests : HandlerTestBase<Team>
         await Verify(actual);
     }
 
+    [Fact]
+    public async Task DeleteTeam_should_create_events_and_update_deleted_flag()
+    {
+        var command = new DeleteTeam();
+
+        await ExecuteCreateAsync();
+
+        var actual = await PublishAsync(sut, command);
+
+        await VerifySutAsync(actual, None.Value);
+
+        A.CallTo(() => billingManager.UnsubscribeAsync(command.Actor.Identifier, A<Team>._, default))
+            .MustHaveHappened();
+    }
+
     private Task ExecuteCreateAsync()
     {
         return PublishAsync(sut, new CreateTeam { Name = name, TeamId = TeamId });

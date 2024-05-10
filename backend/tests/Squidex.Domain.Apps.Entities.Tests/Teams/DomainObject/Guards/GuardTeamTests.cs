@@ -176,4 +176,27 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
 
         await GuardTeam.CanUpsertAuth(command, AppProvider, CancellationToken);
     }
+
+    [Fact]
+    public async Task CanDelete_should_throw_exception_if_app_is_assigned()
+    {
+        A.CallTo(() => AppProvider.GetTeamAppsAsync(TeamId, CancellationToken))
+            .Returns([App]);
+
+        var command = new DeleteTeam { TeamId = Team.Id };
+
+        await ValidationAssert.ThrowsAsync(() => GuardTeam.CanDelete(command, AppProvider, CancellationToken),
+            new ValidationError("Cannot delete team, when apps are assigned."));
+    }
+
+    [Fact]
+    public async Task CanDelete_should_not_throw_exception_if_no_app_is_assigned()
+    {
+        A.CallTo(() => AppProvider.GetTeamAppsAsync(TeamId, CancellationToken))
+            .Returns([]);
+
+        var command = new DeleteTeam { TeamId = Team.Id };
+
+        await GuardTeam.CanDelete(command, AppProvider, CancellationToken);
+    }
 }

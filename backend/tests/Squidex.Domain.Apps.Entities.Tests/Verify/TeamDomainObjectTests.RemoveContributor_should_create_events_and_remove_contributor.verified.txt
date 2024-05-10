@@ -3,6 +3,7 @@
   Contributors: {
     me: Owner
   },
+  IsDeleted: false,
   Id: Guid_1,
   CreatedBy: subject:me,
   LastModifiedBy: subject:me,
