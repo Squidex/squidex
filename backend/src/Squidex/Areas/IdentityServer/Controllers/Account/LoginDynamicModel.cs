@@ -12,5 +12,5 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account;
 public sealed class LoginDynamicModel
 {
     [LocalizedRequired]
-    public string Email { get; set; }
+    public string DynamicEmail { get; set; }
 }

@@ -101,8 +101,8 @@
             @Html.AntiForgeryToken()
 
             <div class="form-group">
-                <div error-for="Email"></div>
-                <input asp-for="Email" type="email" class="form-control" placeholder="@T.Get("users.login.emailPlaceholder")" />
+                <div error-for="DynamicEmail"></div>
+                <input asp-for="DynamicEmail" type="email" class="form-control" placeholder="@T.Get("users.login.emailPlaceholder")" />
             </div>
 
             <button type="submit" data-testid="login-button" class="btn btn-block btn-primary">@action</button>

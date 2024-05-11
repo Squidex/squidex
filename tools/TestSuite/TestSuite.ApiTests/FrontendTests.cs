@@ -6,20 +6,24 @@
 // ==========================================================================
 
 using Codeuctivity.ImageSharpCompare;
-using PuppeteerSharp;
+using Microsoft.Playwright;
 using TestSuite.Fixtures;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
 namespace TestSuite.ApiTests;
 
-public sealed class FrontendTests : IClassFixture<ClientFixture>
+public sealed class FrontendTests : IClassFixture<ClientFixture>, IClassFixture<PlaywrightFixture>
 {
     public ClientFixture _ { get; }
 
-    public FrontendTests(ClientFixture fixture)
+    public IBrowser Browser { get; }
+
+    public FrontendTests(ClientFixture fixture, PlaywrightFixture playwright)
     {
         _ = fixture;
+
+        Browser = playwright.Browser;
     }
 
     [Theory]
@@ -27,32 +31,18 @@ public sealed class FrontendTests : IClassFixture<ClientFixture>
     [InlineData("Frontend_Login", "identity-server/account/login")]
     public async Task Should_render_properly(string name, string url)
     {
-        using (var browserFetcher = new BrowserFetcher())
-        {
-            await browserFetcher.DownloadAsync();
-        }
+        var page = await Browser.NewPageAsync();
 
-        await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-        {
-            Headless = true,
-            DefaultViewport = new ViewPortOptions
-            {
-                Height = 800,
-                IsLandscape = true,
-                IsMobile = false,
-                Width = 1000
-            },
-            Args = ["--no-sandbox"]
-        });
+        await page.GotoAsync(_.Client.Options.Url + url + "?skip-setup");
+        await page.WaitForLoadStateAsync();
 
-        await using var page = await browser.NewPageAsync();
+        var screenshot = await page.ScreenshotAsync();
 
         Directory.CreateDirectory("screenshots");
 
-        var path = $"screenshots/__{name}.jpg";
+        var path = $"screenshots/{name}.jpg";
 
-        await page.GoToAsync(_.Client.Options.Url + url + "?skip-setup");
-        await page.ScreenshotAsync(path);
+        await File.WriteAllBytesAsync(path, screenshot);
 
         var diff = ImageSharpCompare.CalcDiff(path, $"Assets/{name}.jpg");
 

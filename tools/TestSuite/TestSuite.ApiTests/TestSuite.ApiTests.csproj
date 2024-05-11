@@ -16,6 +16,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.43.0" />
     <PackageReference Include="NSwag.Core" Version="14.0.7" />
     <PackageReference Include="PuppeteerSharp" Version="17.0.0" />
     <PackageReference Include="Squidex.Assets" Version="6.6.4" />

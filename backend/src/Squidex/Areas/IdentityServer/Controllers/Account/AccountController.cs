@@ -176,7 +176,7 @@ public sealed class AccountController : IdentityServerController
             return await LoginViewAsync(RequestType.LoginCustom);
         }
 
-        var scheme = await schemes.GetSchemaByEmailAddressAsync(model.Email);
+        var scheme = await schemes.GetSchemaByEmailAddressAsync(model.DynamicEmail);
 
         if (scheme != null)
         {
