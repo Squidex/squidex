@@ -49,7 +49,7 @@ public sealed class FrontendTests : IClassFixture<ClientFixture>
 
         Directory.CreateDirectory("screenshots");
 
-        var path = $"screenshots/__{{name}}.jpg";
+        var path = $"screenshots/__{name}.jpg";
 
         await page.GoToAsync(_.Client.Options.Url + url + "?skip-setup");
         await page.ScreenshotAsync(path);
