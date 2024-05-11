@@ -89,7 +89,7 @@ jobs:
 
       - name: Test - Install Playwright Dependencies
         run: ls -R
-        working-directory: './tools/TestSuite/TestSuite.ApiTests
+        working-directory: './tools/TestSuite/TestSuite.ApiTests'
 
       - name: Test - Install Playwright Dependencies
         run: npm ci
