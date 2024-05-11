@@ -57,7 +57,7 @@ jobs:
           default_network: host
           options: --name test1
           volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+          run: dotnet test tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - RUN on path
         uses: kohlerdominik/docker-run-action@v2.0.0
@@ -71,7 +71,7 @@ jobs:
           default_network: host
           options: --name test2
           volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+          run: dotnet test tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - RUN with dedicated collections
         uses: kohlerdominik/docker-run-action@v2.0.0
@@ -85,7 +85,7 @@ jobs:
           default_network: host
           options: --name test3
           volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+          run: dotnet test tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - Install Playwright Dependencies
         run: npm ci
@@ -114,7 +114,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: |
-            /src/tools/TestSuite/TestSuite.ApiTests/bin/Debug/net8.0/screenshots/*.*
+            tools/TestSuite/TestSuite.ApiTests/bin/Debug/net8.0/screenshots/
        
       - name: Test - Dump docker logs on failure
         if: failure()
