@@ -1132,6 +1132,9 @@
   <data name="users.login.custom" xml:space="preserve">
     <value>Enter your E-Mail Address to login with your Company Account and single sign on (SSO).</value>
   </data>
+  <data name="users.login.emailBusinessPlaceholder" xml:space="preserve">
+    <value>Enter Business Email</value>
+  </data>
   <data name="users.login.emailPlaceholder" xml:space="preserve">
     <value>Inserisci l'email</value>
   </data>

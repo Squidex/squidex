@@ -349,6 +349,7 @@
   "users.lockYourselfError": "You cannot lock yourself.",
   "users.login.askAdmin": "",
   "users.login.custom": "Enter your E-Mail Address to login with your Company Account and single sign on (SSO).",
+  "users.login.emailBusinessPlaceholder": "Enter Business Email",
   "users.login.emailPlaceholder": "Enter Email",
   "users.login.error": "Email or password not correct",
   "users.login.loginWith": "{action} with <strong>{provider}</strong>",
