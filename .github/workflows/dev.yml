@@ -109,6 +109,13 @@ jobs:
           path: tools/e2e/playwright-report/
           retention-days: 30
        
+      - name: Test - Dump screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          path: |
+            /src/tools/TestSuite/TestSuite.ApiTests/bin/Debug/net8.0/screenshots/*.*
+       
       - name: Test - Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2.2.2

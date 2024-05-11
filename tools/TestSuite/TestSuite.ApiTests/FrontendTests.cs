@@ -47,10 +47,14 @@ public sealed class FrontendTests : IClassFixture<ClientFixture>
 
         await using var page = await browser.NewPageAsync();
 
-        await page.GoToAsync(_.Client.Options.Url + url + "?skip-setup");
-        await page.ScreenshotAsync($"__{name}.jpg");
+        Directory.CreateDirectory("screenshots");
 
-        var diff = ImageSharpCompare.CalcDiff($"__{name}.jpg", $"Assets/{name}.jpg");
+        var path = $"screenshots/__{{name}}.jpg";
+
+        await page.GoToAsync(_.Client.Options.Url + url + "?skip-setup");
+        await page.ScreenshotAsync(path);
+
+        var diff = ImageSharpCompare.CalcDiff(path, $"Assets/{name}.jpg");
 
         Assert.InRange(diff.MeanError, 0, 10);
     }
