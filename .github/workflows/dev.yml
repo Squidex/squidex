@@ -88,6 +88,10 @@ jobs:
           run: dotnet test tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - Install Playwright Dependencies
+        run: ls -R
+        working-directory: './tools/TestSuite/TestSuite.ApiTests
+
+      - name: Test - Install Playwright Dependencies
         run: npm ci
         working-directory: './tools/e2e'
 
