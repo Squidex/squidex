@@ -48,7 +48,7 @@ jobs:
       - name: Test - RUN
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
-          image: squidex/build:9
+          image: mcr.microsoft.com/dotnet/sdk:8.0
           environment: |
             CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
@@ -62,7 +62,7 @@ jobs:
       - name: Test - RUN on path
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
-          image: squidex/build:9
+          image: mcr.microsoft.com/dotnet/sdk:8.0
           environment: |
             CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60
@@ -76,7 +76,7 @@ jobs:
       - name: Test - RUN with dedicated collections
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
-          image: squidex/build:9
+          image: mcr.microsoft.com/dotnet/sdk:8.0
           environment: |
             CONFIG__BACKUPURL=http://localhost:5000
             CONFIG__WAIT=60

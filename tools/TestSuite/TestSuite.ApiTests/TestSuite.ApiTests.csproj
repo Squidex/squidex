@@ -7,7 +7,6 @@
 	<Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Codeuctivity.ImageSharpCompare" Version="4.0.234" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="GraphQL.Client" Version="6.0.5" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.0.5" />
@@ -16,7 +15,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="Microsoft.Playwright" Version="1.43.0" />
     <PackageReference Include="NSwag.Core" Version="14.0.7" />
     <PackageReference Include="Squidex.Assets" Version="6.6.4" />
     <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.6.4" />
@@ -35,12 +33,6 @@
     <ProjectReference Include="..\TestSuite.Shared\TestSuite.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Assets\Frontend_Home.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Frontend_Login.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Assets\logo-squared.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
