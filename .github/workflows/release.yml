@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v4.1.4
+        uses: actions/checkout@v4.1.5
 
       - name: Prepare - Inject short Variables
         uses: rlespinasse/github-slug-action@v4.5.0
