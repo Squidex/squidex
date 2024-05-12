@@ -100,6 +100,17 @@ public class AppProviderTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_get_team_by_domain_from_index()
+    {
+        A.CallTo(() => indexForTeams.GetTeamByAuthDomainAsync("squidex.io", CancellationToken))
+            .Returns(Team);
+
+        var actual = await sut.GetTeamByAuthDomainAsync("squidex.io", CancellationToken);
+
+        Assert.Equal(Team, actual);
+    }
+
+    [Fact]
     public async Task Should_get_teams_from_index()
     {
         A.CallTo(() => indexForTeams.GetTeamsAsync("user1", CancellationToken))

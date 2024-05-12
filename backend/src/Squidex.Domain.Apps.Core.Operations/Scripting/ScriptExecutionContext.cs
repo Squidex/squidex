@@ -21,7 +21,7 @@ public abstract class ScriptExecutionContext : ScriptVars
         Engine = engine;
     }
 
-    public abstract JsValue Evaluate(Script script);
+    public abstract JsValue Evaluate(Prepared<Script> script);
 
     public abstract void Schedule(Func<IScheduler, CancellationToken, Task> action);
 }
@@ -67,7 +67,7 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         tcs.TrySetResult(new CompletedValue { Value = value });
     }
 
-    public override JsValue Evaluate(Script script)
+    public override JsValue Evaluate(Prepared<Script> script)
     {
         lock (Engine)
         {

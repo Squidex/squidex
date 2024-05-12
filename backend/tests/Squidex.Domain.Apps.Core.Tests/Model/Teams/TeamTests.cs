@@ -54,6 +54,21 @@ public class TeamTests
     }
 
     [Fact]
+    public void Should_update_auth_scheme()
+    {
+        var scheme1 = new AuthScheme { Authority = "authority1" };
+        var scheme2 = new AuthScheme { Authority = "authority1" };
+
+        var team_1 = team_0.ChangeAuthScheme(scheme1);
+        var team_2 = team_1.ChangeAuthScheme(scheme2);
+
+        Assert.NotSame(team_0, team_1);
+        Assert.Equal(scheme1, team_1.AuthScheme);
+        Assert.Equal(scheme1, team_2.AuthScheme);
+        Assert.Same(team_1, team_2);
+    }
+
+    [Fact]
     public void Should_update_contributors()
     {
         var team_1 = team_0.UpdateContributors(true, (_, c) => c.Assign("me", Role.Owner));

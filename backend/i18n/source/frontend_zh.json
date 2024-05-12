@@ -817,7 +817,7 @@
   "start.login": "登录 Squidex",
   "start.loginHint": "登录按钮将打开一个新的弹出窗口。一旦您登录成功，我们会将您重定向到 Squidex 管理门户。",
   "start.madeBy": "自豪地制作",
-  "start.madeByCopyright": "Sebastian Stehle 和贡献者，2016-2021",
+  "start.madeByCopyright": "Sebastian Stehle 和贡献者，2016-2024",
   "tour.skip": "跳过游览",
   "tour.stepAppNext": "继续",
   "tour.stepAppText": "应用程序是您项目的存储库，例如（博客、网上商店或移动应用程序）。您可以为您的应用程序分配贡献者以协同工作。\n\n您可以在其中创建无限数量的应用程序Squidex 同时管理多个项目。",

@@ -8,8 +8,8 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ControlErrorsComponent, defined, FormErrorComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamDto, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ConfirmClickDirective, ControlErrorsComponent, defined, FormErrorComponent, FormHintComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamDto, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -18,8 +18,10 @@ import { ControlErrorsComponent, defined, FormErrorComponent, LayoutComponent, L
     templateUrl: './more-page.component.html',
     imports: [
         AsyncPipe,
+        ConfirmClickDirective,
         ControlErrorsComponent,
         FormErrorComponent,
+        FormHintComponent,
         FormsModule,
         LayoutComponent,
         ListViewComponent,
@@ -39,10 +41,12 @@ export class MorePageComponent implements OnInit {
     public team!: TeamDto;
 
     public isEditable = false;
+    public isDeletable = false;
 
     public updateForm = new UpdateTeamForm();
 
     constructor(
+        private readonly router: Router,
         private readonly teamsState: TeamsState,
     ) {
     }
@@ -54,6 +58,7 @@ export class MorePageComponent implements OnInit {
                     this.team = team;
 
                     this.isEditable = team.canUpdateGeneral;
+                    this.isDeletable = team.canDelete;
 
                     this.updateForm.load(team);
                     this.updateForm.setEnabled(this.isEditable);
@@ -80,5 +85,16 @@ export class MorePageComponent implements OnInit {
                     },
                 });
         }
+    }
+
+    public deleteTeam() {
+        if (!this.isDeletable) {
+            return;
+        }
+
+        this.teamsState.delete(this.team)
+            .subscribe(() => {
+                this.router.navigate(['/app']);
+            });
     }
 }

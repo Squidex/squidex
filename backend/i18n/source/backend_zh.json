@@ -274,7 +274,7 @@
   "setup.headline": "安装",
   "setup.hint": "您看到此屏幕是因为尚无用户存在。创建用户后，您将无法再次使用此屏幕。",
   "setup.madeBy": "制作",
-  "setup.madeByCopyright": "Sebastian Stehle 和贡献者，2016-2021",
+  "setup.madeByCopyright": "Sebastian Stehle 和贡献者，2016-2024",
   "setup.ruleAppCreation.warningAdmins": "通过你的设置，只有管理员可以创建新的应用程序。如果你想改变这个设置 <code>UI__ONLYADMINCANCREATEAPPS=false</code> 作为环境变量。",
   "setup.ruleAppCreation.warningAll": "通过你的设置，每个用户都可以创建新的应用程序。如果你想改变这个设置 <code>UI__ONLYADMINCANCREATEAPPS=true</code> 作为环境变量。",
   "setup.ruleFolder.warning": "您正在使用<strong>文件夹资源存储</strong>，其中所有资源都存储在文件系统中。请记住将资源文件夹包含在您的备份策略中并将其映射到卷, 如果您使用的是 Docker。",

@@ -303,7 +303,7 @@
   "setup.headline": "Installation",
   "setup.hint": "Cet écran s'affiche car aucun utilisateur n'existe encore. Une fois qu'un utilisateur est créé, vous ne pouvez plus utiliser cette page de configuration.",
   "setup.madeBy": "Fièrement fabriqué par",
-  "setup.madeByCopyright": "Sebastian Stehle et contributeurs, 2016-2021",
+  "setup.madeByCopyright": "Sebastian Stehle et contributeurs, 2016-2024",
   "setup.ruleAppCreation.warningAdmins": "Avec votre configuration, seuls les administrateurs peuvent créer de nouvelles applications. Si vous souhaitez modifier cela, définissez <code>UI__ONLYADMINSCANCREATEAPPS=false</code> comme variable d'environnement.",
   "setup.ruleAppCreation.warningAll": "Avec votre configuration, chaque utilisateur peut créer de nouvelles applications. Si vous souhaitez modifier cela, définissez <code>UI__ONLYADMINSCANCREATEAPPS=true</code> comme variable d'environnement.",
   "setup.ruleFolder.warning": "Vous utilisez le <strong>magasin d'actifs de dossier</strong> où tous les actifs sont stockés dans le système de fichiers. N'oubliez pas d'inclure le dossier d'actifs dans votre stratégie de sauvegarde et de le mapper sur un volume, si vous utilisez docker.",

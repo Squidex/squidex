@@ -196,9 +196,6 @@
   <data name="common.calculatedDefaultValue" xml:space="preserve">
     <value>Berekende standaardwaarde</value>
   </data>
-  <data name="common.clientd" xml:space="preserve">
-    <value>Client-ID</value>
-  </data>
   <data name="common.clientId" xml:space="preserve">
     <value>Client-ID</value>
   </data>
@@ -225,9 +222,6 @@
   </data>
   <data name="common.documentation" xml:space="preserve">
     <value>Documentatie</value>
-  </data>
-  <data name="common.editInNewTab" xml:space="preserve">
-    <value>Open in new tab</value>
   </data>
   <data name="common.editor" xml:space="preserve">
     <value>Editor</value>
@@ -420,6 +414,9 @@
   </data>
   <data name="common.schemaId" xml:space="preserve">
     <value>Schema-ID</value>
+  </data>
+  <data name="common.signoutRedirectUrl" xml:space="preserve">
+    <value>Signout Redirect URL</value>
   </data>
   <data name="common.signup" xml:space="preserve">
     <value>Aanmelden</value>
@@ -910,6 +907,15 @@
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Jouw e-mailadres is ingesteld op privé in Github. Stel het in op openbaar om Github-login te gebruiken.</value>
   </data>
+  <data name="login.test.headline" xml:space="preserve">
+    <value>Successful Test</value>
+  </data>
+  <data name="login.test.text" xml:space="preserve">
+    <value>Login Test was successful. You can save the settings now. It is recommended to make a final test with the actual login flow.</value>
+  </data>
+  <data name="login.test.title" xml:space="preserve">
+    <value>Login Test</value>
+  </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Berekende standaardwaarde en standaardwaarde kunnen niet samen worden gebruikt.</value>
   </data>
@@ -1016,7 +1022,7 @@
     <value>Proudly made by</value>
   </data>
   <data name="setup.madeByCopyright" xml:space="preserve">
-    <value>Sebastian Stehle and Contributors, 2016-2021</value>
+    <value>Sebastian Stehle and Contributors, 2016-2024</value>
   </data>
   <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
     <value>With your setup, only admins can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=false&lt;/code&gt; as environment variable.</value>
@@ -1053,6 +1059,12 @@
   </data>
   <data name="setup.title" xml:space="preserve">
     <value>Installation</value>
+  </data>
+  <data name="teams.appsAssigned" xml:space="preserve">
+    <value>Cannot delete team, when apps are assigned.</value>
+  </data>
+  <data name="teams.domainInUse" xml:space="preserve">
+    <value>Domain is already used for another team.</value>
   </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>Deze bewerking is niet toegestaan, je account is mogelijk vergrendeld.</value>
@@ -1117,6 +1129,12 @@
   <data name="users.login.askAdmin" xml:space="preserve">
     <value />
   </data>
+  <data name="users.login.custom" xml:space="preserve">
+    <value>Enter your E-Mail Address to login with your Company Account and single sign on (SSO).</value>
+  </data>
+  <data name="users.login.emailBusinessPlaceholder" xml:space="preserve">
+    <value>Enter Business Email</value>
+  </data>
   <data name="users.login.emailPlaceholder" xml:space="preserve">
     <value>E-mailadres invoeren</value>
   </data>
@@ -1152,6 +1170,9 @@
   </data>
   <data name="users.logout.title" xml:space="preserve">
     <value>Uitloggen</value>
+  </data>
+  <data name="users.noCustomDomain" xml:space="preserve">
+    <value>No authentication server registered.</value>
   </data>
   <data name="users.noEmailAddress" xml:space="preserve">
     <value>We cannot get the email address from authentication provider.</value>
@@ -1344,6 +1365,9 @@
   </data>
   <data name="validation.slug" xml:space="preserve">
     <value>{property|upper} is geen geldige slug.</value>
+  </data>
+  <data name="validation.url" xml:space="preserve">
+    <value>{property|upper} is not a valid URL.</value>
   </data>
   <data name="validation.valid" xml:space="preserve">
     <value>{property|upper} is geen geldige waarde.</value>

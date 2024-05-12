@@ -909,7 +909,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 1: Create a new item.
-        var content_0 = await contents.CreateAsync(new DynamicData(), ContentCreateOptions.AsPublish);
+        var content_0 = await contents.CreateAsync([], ContentCreateOptions.AsPublish);
 
         Assert.Null(content_0.Data.GetValueOrDefault(TestEntityData.StringField));
 

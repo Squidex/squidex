@@ -91,6 +91,18 @@ public sealed class TeamDto : Resource
                 resources.Url<TeamPlansController>(x => nameof(x.GetTeamPlans), values));
         }
 
+        if (resources.IsAllowed(PermissionIds.TeamAuthRead, team: values.team, additional: permissions))
+        {
+            AddGetLink("auth",
+                resources.Url<TeamsController>(x => nameof(x.GetTeamAuth), values));
+        }
+
+        if (resources.IsAllowed(PermissionIds.TeamDelete, team: values.team, additional: permissions))
+        {
+            AddDeleteLink("delete",
+                resources.Url<TeamsController>(x => nameof(x.DeleteTeam), values));
+        }
+
         return this;
     }
 }

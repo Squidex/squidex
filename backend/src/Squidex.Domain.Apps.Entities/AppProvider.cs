@@ -106,6 +106,19 @@ public sealed class AppProvider : IAppProvider
         return team;
     }
 
+    public async Task<Team?> GetTeamByAuthDomainAsync(string authDomain,
+        CancellationToken ct = default)
+    {
+        var cacheKey = TeamCacheKey(authDomain);
+
+        var team = await GetOrCreate(cacheKey, () =>
+        {
+            return indexForTeams.GetTeamByAuthDomainAsync(authDomain, ct);
+        });
+
+        return team;
+    }
+
     public async Task<Schema?> GetSchemaAsync(DomainId appId, string name, bool canCache = false,
         CancellationToken ct = default)
     {
@@ -252,7 +265,12 @@ public sealed class AppProvider : IAppProvider
 
     private static string TeamCacheKey(DomainId teamId)
     {
-        return $"TEAMS_ID{teamId}";
+        return $"TEAMS_ID_{teamId}";
+    }
+
+    private static string TeamCacheKey(string authDomain)
+    {
+        return $"TEAMS_DOMAIN_{authDomain}";
     }
 
     private static string SchemaCacheKey(DomainId appId, DomainId id)

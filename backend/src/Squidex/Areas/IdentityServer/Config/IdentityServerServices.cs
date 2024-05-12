@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
@@ -58,6 +59,12 @@ public static class IdentityServerServices
 
         services.AddSingletonAs<CreateAdminInitializer>()
             .AsSelf();
+
+        services.AddSingletonAs<OpenIdConnectPostConfigureOptions>()
+            .AsSelf();
+
+        services.AddSingletonAs<DynamicSchemeProvider>()
+            .AsSelf().As<IAuthenticationSchemeProvider>().As<IOptionsMonitor<DynamicOpenIdConnectOptions>>();
 
         services.ConfigureOptions<DefaultKeyStore>();
 

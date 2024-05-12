@@ -55,7 +55,7 @@ public sealed class MyIdentityOptions
 
     public string OidcResponseType { get; set; }
 
-    public string OidcOnSignoutRedirectUrl { get; set; }
+    public string? OidcOnSignoutRedirectUrl { get; set; }
 
     public string[] OidcScopes { get; set; }
 
@@ -66,6 +66,8 @@ public sealed class MyIdentityOptions
     public bool AdminRecreate { get; set; }
 
     public bool AllowPasswordAuth { get; set; }
+
+    public bool AllowCustomDomains { get; set; }
 
     public bool LockAutomatically { get; set; }
 

@@ -54,4 +54,20 @@ public class TeamCreationTests : IClassFixture<ClientFixture>
 
         Assert.Equal(team_0.Id, team_1.Id);
     }
+
+    [Fact]
+    public async Task Should_archive_team()
+    {
+        // STEP 1: Create team.
+        var team = await _.PostTeamAsync(teamName);
+
+
+        // STEP 2: Archive app.
+        await _.Client.Teams.DeleteTeamAsync(team.Id);
+
+        var teams = await _.Client.Teams.GetTeamsAsync();
+
+        // Should not provide deleted team when teams are queried.
+        Assert.DoesNotContain(teams, x => x.Id == team.Id);
+    }
 }

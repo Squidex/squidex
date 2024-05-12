@@ -19,6 +19,10 @@ public record Team : Entity
 
     public AssignedPlan? Plan { get; init; }
 
+    public AuthScheme? AuthScheme { get; init; }
+
+    public bool IsDeleted { get; init; }
+
     [Pure]
     public Team Rename(string name)
     {
@@ -41,6 +45,17 @@ public record Team : Entity
         }
 
         return this with { Plan = plan };
+    }
+
+    [Pure]
+    public Team ChangeAuthScheme(AuthScheme? authScheme)
+    {
+        if (Equals(authScheme, AuthScheme))
+        {
+            return this;
+        }
+
+        return this with { AuthScheme = authScheme };
     }
 
     [Pure]

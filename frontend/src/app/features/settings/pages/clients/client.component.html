@@ -93,7 +93,9 @@
                         <div class="col">
                             <input type="number" class="form-control" min="0" [disabled]="!client.canUpdate" [(ngModel)]="apiCallsLimit">
         
-                            <sqx-form-hint>{{ 'clients.apiCallsLimitHint' | sqxTranslate }}</sqx-form-hint>
+                            <sqx-form-hint>
+                                {{ 'clients.apiCallsLimitHint' | sqxTranslate }}
+                            </sqx-form-hint>
                         </div>
                         <div class="col-auto" *ngIf="client.canUpdate">
                             <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit()">

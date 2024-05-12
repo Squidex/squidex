@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?4dk7jd');
-  src:  url('fonts/icomoon.eot?4dk7jd#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?4dk7jd') format('truetype'),
-    url('fonts/icomoon.woff?4dk7jd') format('woff'),
-    url('fonts/icomoon.svg?4dk7jd#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?hn1ts4');
+  src:  url('fonts/icomoon.eot?hn1ts4#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?hn1ts4') format('truetype'),
+    url('fonts/icomoon.woff?hn1ts4') format('woff'),
+    url('fonts/icomoon.svg?hn1ts4#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,102 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-shield:before {
+  content: "\e995";
+}
+.icon-lightbulb_outline:before {
+  content: "\e993";
+}
+.icon-hourglass_top:before {
+  content: "\e992";
+}
+.icon-wrap_text:before {
+  content: "\e991";
+}
+.icon-fullscreen_exit:before {
+  content: "\e98f";
+}
+.icon-fullscreen:before {
+  content: "\e990";
+}
+.icon-enter:before {
+  content: "\e984";
+}
+.icon-zoom_out:before {
+  content: "\e982";
+}
+.icon-zoom_in:before {
+  content: "\e983";
+}
+.icon-flip:before {
+  content: "\e97f";
+}
+.icon-rotate_right:before {
+  content: "\e980";
+}
+.icon-rotate_left:before {
+  content: "\e981";
+}
+.icon-create_new_folder:before {
+  content: "\e97b";
+}
+.icon-folder:before {
+  content: "\e97c";
+}
+.icon-help2:before {
+  content: "\e97a";
+}
+.icon-trigger-Manual:before {
+  content: "\e979";
+}
+.icon-play-line:before {
+  content: "\e979";
+}
+.icon-corner-down-right:before {
+  content: "\e977";
+}
+.icon-info-outline:before {
+  content: "\e974";
+}
+.icon-upload-2:before {
+  content: "\e972";
+}
+.icon-translate:before {
+  content: "\e96f";
+}
+.icon-arrow_back:before {
+  content: "\e96e";
+}
+.icon-external-link:before {
+  content: "\e96d";
+}
+.icon-minus-square:before {
+  content: "\e969";
+}
+.icon-plus-square:before {
+  content: "\e968";
+}
+.icon-drag2:before {
+  content: "\e961";
+}
+.icon-comments:before {
+  content: "\e95f";
+}
+.icon-backup:before {
+  content: "\e95b";
+}
+.icon-support:before {
+  content: "\e95a";
+}
+.icon-control-RichText:before {
+  content: "\e939";
+}
+.icon-type-RichText:before {
+  content: "\e939";
+}
+.icon-download:before {
+  content: "\e93e";
+}
 .icon-mouse-pointer:before {
   content: "\e994";
 }
@@ -177,99 +273,6 @@
 }
 .icon-search-Rule:before {
   content: "\e947";
-}
-.icon-lightbulb_outline:before {
-  content: "\e993";
-}
-.icon-hourglass_top:before {
-  content: "\e992";
-}
-.icon-wrap_text:before {
-  content: "\e991";
-}
-.icon-fullscreen_exit:before {
-  content: "\e98f";
-}
-.icon-fullscreen:before {
-  content: "\e990";
-}
-.icon-enter:before {
-  content: "\e984";
-}
-.icon-zoom_out:before {
-  content: "\e982";
-}
-.icon-zoom_in:before {
-  content: "\e983";
-}
-.icon-flip:before {
-  content: "\e97f";
-}
-.icon-rotate_right:before {
-  content: "\e980";
-}
-.icon-rotate_left:before {
-  content: "\e981";
-}
-.icon-create_new_folder:before {
-  content: "\e97b";
-}
-.icon-folder:before {
-  content: "\e97c";
-}
-.icon-help2:before {
-  content: "\e97a";
-}
-.icon-trigger-Manual:before {
-  content: "\e979";
-}
-.icon-play-line:before {
-  content: "\e979";
-}
-.icon-corner-down-right:before {
-  content: "\e977";
-}
-.icon-info-outline:before {
-  content: "\e974";
-}
-.icon-upload-2:before {
-  content: "\e972";
-}
-.icon-translate:before {
-  content: "\e96f";
-}
-.icon-arrow_back:before {
-  content: "\e96e";
-}
-.icon-external-link:before {
-  content: "\e96d";
-}
-.icon-minus-square:before {
-  content: "\e969";
-}
-.icon-plus-square:before {
-  content: "\e968";
-}
-.icon-drag2:before {
-  content: "\e961";
-}
-.icon-comments:before {
-  content: "\e95f";
-}
-.icon-backup:before {
-  content: "\e95b";
-}
-.icon-support:before {
-  content: "\e95a";
-}
-.icon-control-RichText:before {
-  content: "\e939";
-}
-.icon-type-RichText:before {
-  content: "\e939";
-}
-.icon-download:before {
-  content: "\e93e";
 }
 .icon-type-UI:before {
   content: "\e975";

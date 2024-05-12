@@ -17,4 +17,7 @@ public interface ITeamRepository
 
     Task<Team?> FindAsync(DomainId id,
         CancellationToken ct = default);
+
+    Task<Team?> FindByAuthDomainAsync(string authDomain,
+        CancellationToken ct = default);
 }

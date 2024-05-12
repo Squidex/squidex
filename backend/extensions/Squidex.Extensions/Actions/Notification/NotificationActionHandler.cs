@@ -34,12 +34,8 @@ public sealed class NotificationActionHandler : RuleActionHandler<NotificationAc
             return ("Ignore", new CommentCreated());
         }
 
-        var user = await userResolver.FindByIdOrEmailAsync(action.User);
-
-        if (user == null)
-        {
-            throw new InvalidOperationException($"Cannot find user by '{action.User}'");
-        }
+        var user = await userResolver.FindByIdOrEmailAsync(action.User)
+            ?? throw new InvalidOperationException($"Cannot find user by '{action.User}'");
 
         var actor = userEvent.Actor;
 

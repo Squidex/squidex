@@ -15,7 +15,7 @@ public static class Helper
     [
         [
             "apps",
-            "team"
+            "teams"
         ],
         [
             "chatBot",
@@ -134,7 +134,7 @@ public static class Helper
     {
         if (translations.Count > 0)
         {
-            var prefixes = new HashSet<string>();
+            var prefixes = new SortedSet<string>();
 
             foreach (var key in translations.ToList())
             {
@@ -176,7 +176,7 @@ public static class Helper
         return translations;
     }
 
-    private static bool HasInvalidPrefixes(HashSet<string> prefixes)
+    private static bool HasInvalidPrefixes(SortedSet<string> prefixes)
     {
         if (prefixes.Count <= 1)
         {

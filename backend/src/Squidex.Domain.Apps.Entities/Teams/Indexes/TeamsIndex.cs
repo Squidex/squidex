@@ -33,6 +33,19 @@ public sealed class TeamsIndex : ITeamsIndex
         }
     }
 
+    public async Task<Team?> GetTeamByAuthDomainAsync(string authDomain,
+        CancellationToken ct = default)
+    {
+        using (var activity = Telemetry.Activities.StartActivity("TeamsIndex/GetTeamByAuthDomainAsync"))
+        {
+            activity?.SetTag("authDomain", authDomain);
+
+            var team = await teamRepository.FindByAuthDomainAsync(authDomain, ct);
+
+            return IsValid(team) ? team : null;
+        }
+    }
+
     public async Task<List<Team>> GetTeamsAsync(string userId,
         CancellationToken ct = default)
     {
@@ -46,8 +59,8 @@ public sealed class TeamsIndex : ITeamsIndex
         }
     }
 
-    private static bool IsValid(Team? rule)
+    private static bool IsValid(Team? team)
     {
-        return rule is { Version: > EtagVersion.Empty };
+        return team is { Version: > EtagVersion.Empty, IsDeleted: false };
     }
 }

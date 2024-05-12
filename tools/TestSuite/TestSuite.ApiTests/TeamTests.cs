@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FluentAssertions;
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 
@@ -81,5 +82,72 @@ public class TeamTests : IClassFixture<CreatedTeamFixture>
         var app_2 = await client.Apps.PutAppTeamAsync(untransferRequest);
 
         Assert.Null(app_2.TeamId);
+    }
+
+    [Fact]
+    public async Task Should_assign_scheme()
+    {
+        var scheme = new AuthSchemeDto
+        {
+            Authority = "https://squidex.io",
+            Domain = "squidex.io",
+            DisplayName = "Squidex",
+            ClientId = "ID",
+            ClientSecret = "secret",
+        };
+
+        // STEP 1: Assign scheme.
+        var request = new AuthSchemeValueDto
+        {
+            Scheme = scheme
+        };
+
+        var scheme_0 = await _.Client.Teams.PutTeamAuthAsync(_.TeamId, request);
+
+        scheme_0.Scheme.Should().BeEquivalentTo(scheme);
+
+
+        // STEP 2: Get scheme.
+        var scheme_1 = await _.Client.Teams.GetTeamAuthAsync(_.TeamId);
+
+        scheme_1.Scheme.Should().BeEquivalentTo(scheme);
+    }
+
+    [Fact]
+    public async Task Should_unassign_scheme()
+    {
+        var scheme = new AuthSchemeDto
+        {
+            Authority = "https://squidex.io",
+            Domain = "squidex.io",
+            DisplayName = "Squidex",
+            ClientId = "ID",
+            ClientSecret = "secret",
+        };
+
+        // STEP 0: Assign scheme.
+        var request1 = new AuthSchemeValueDto
+        {
+            Scheme = scheme
+        };
+
+        await _.Client.Teams.PutTeamAuthAsync(_.TeamId, request1);
+
+
+        // STEP 1: Unassign scheme.
+        var request2 = new AuthSchemeValueDto
+        {
+            Scheme = null
+        };
+
+        var scheme_0 = await _.Client.Teams.PutTeamAuthAsync(_.TeamId, request2);
+
+        Assert.Null(scheme_0.Scheme);
+
+
+        // STEP 1: Get scheme.
+        var scheme_1 = await _.Client.Teams.GetTeamAuthAsync(_.TeamId);
+
+        Assert.Null(scheme_1.Scheme);
     }
 }

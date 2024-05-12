@@ -15,6 +15,9 @@ public interface ITeamsIndex
     Task<Team?> GetTeamAsync(DomainId id,
         CancellationToken ct = default);
 
+    Task<Team?> GetTeamByAuthDomainAsync(string authDomain,
+        CancellationToken ct = default);
+
     Task<List<Team>> GetTeamsAsync(string userId,
         CancellationToken ct = default);
 }

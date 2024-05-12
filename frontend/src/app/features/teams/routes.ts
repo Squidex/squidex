@@ -7,7 +7,8 @@
 
 import { Routes } from '@angular/router';
 import { HelpComponent, HistoryComponent } from '@app/shared';
-import { TeamContributorsService, TeamContributorsState, TeamPlansService, TeamPlansState } from './internal';
+import { TeamAuthState, TeamContributorsService, TeamContributorsState, TeamPlansService, TeamPlansState } from './internal';
+import { AuthPageComponent } from './pages/auth/auth-page.component';
 import { ContributorsPageComponent } from './pages/contributors/contributors-page.component';
 import { DashboardPageComponent } from './pages/dashboard/dashboard-page.component';
 import { MorePageComponent } from './pages/more/more-page.component';
@@ -72,6 +73,29 @@ export const TEAM_ROUTES: Routes = [
                                 component: HelpComponent,
                                 data: {
                                     helpPage: '05-integrated/plans-team',
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        path: 'auth',
+                        component: AuthPageComponent,
+                        providers: [
+                            TeamAuthState,
+                        ],
+                        children: [
+                            {
+                                path: 'history',
+                                component: HistoryComponent,
+                                data: {
+                                    channel: 'settings.auth',
+                                },
+                            },
+                            {
+                                path: 'help',
+                                component: HelpComponent,
+                                data: {
+                                    helpPage: '05-integrated/auth',
                                 },
                             },
                         ],

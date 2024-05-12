@@ -26,20 +26,35 @@ public sealed class ErrorController : IdentityServerController
         vm.ErrorMessage = response?.ErrorDescription;
         vm.ErrorCode = response?.Error;
 
-        if (string.IsNullOrWhiteSpace(vm.ErrorMessage))
+        if (!string.IsNullOrWhiteSpace(vm.ErrorMessage))
         {
-            var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
+            return View("Error", vm);
+        }
 
-            if (exception is DomainException domainException1)
-            {
-                vm.ErrorMessage = domainException1.Message;
-            }
-            else if (exception?.InnerException is DomainException domainException2)
-            {
-                vm.ErrorMessage = domainException2.Message;
-            }
+        var source = HttpContext.Features.Get<IExceptionHandlerFeature>();
+
+        if (source == null)
+        {
+            return View("Error", vm);
+        }
+
+        var exception = source.Error;
+
+        while (exception?.InnerException != null)
+        {
+            exception = exception.InnerException;
+        }
+
+        if (exception is DomainException || IsTestEndpoint(source))
+        {
+            vm.ErrorMessage = exception?.Message;
         }
 
         return View("Error", vm);
+    }
+
+    private static bool IsTestEndpoint(IExceptionHandlerFeature source)
+    {
+        return source.Endpoint is RouteEndpoint route && route.RoutePattern.RawText == "identity-server/test";
     }
 }

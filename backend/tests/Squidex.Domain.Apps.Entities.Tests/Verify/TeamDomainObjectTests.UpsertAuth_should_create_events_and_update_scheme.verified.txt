@@ -1,0 +1,46 @@
+﻿{
+  sut: {
+    UniqueId: Guid_1,
+    Snapshot: {
+      Name: My Team,
+      Contributors: {
+        me: Owner
+      },
+      AuthScheme: {
+        Domain: squidex.io,
+        DisplayName: Squidex,
+        ClientId: clientId,
+        ClientSecret: clientSecret,
+        Authority: https://identity.squidex.io
+      },
+      IsDeleted: false,
+      Id: Guid_1,
+      CreatedBy: subject:me,
+      LastModifiedBy: subject:me,
+      Version: 2,
+      UniqueId: Guid_1
+    },
+    Version: 2,
+    ObjectState: Created
+  },
+  events: [
+    {
+      Headers: {
+        AggregateId: Guid_1,
+        EventId: Guid_2
+      },
+      Payload: {
+        Scheme: {
+          Domain: squidex.io,
+          DisplayName: Squidex,
+          ClientId: clientId,
+          ClientSecret: clientSecret,
+          Authority: https://identity.squidex.io
+        },
+        TeamId: Guid_1,
+        Actor: subject:me,
+        FromRule: false
+      }
+    }
+  ]
+}

@@ -94,7 +94,7 @@ public sealed class Startup
             options.Path = "/api/swagger/v1/swagger.json";
         });
 
-        if (!app.ApplicationServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+        if (app.ApplicationServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
         {
             app.UseWhenPath(Constants.PrefixIdentityServer, builder =>
             {

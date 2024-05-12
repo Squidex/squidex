@@ -23,6 +23,12 @@ public sealed class ProfileVM
 
     public string? Project { get; set; }
 
+    public string? OldPassword { get; set; }
+
+    public string? Password { get; set; }
+
+    public string? PasswordConfirm { get; set; }
+
     public string? ClientSecret { get; set; }
 
     public string? ErrorMessage { get; set; }

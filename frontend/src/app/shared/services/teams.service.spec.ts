@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, DateTime, Resource, ResourceLinks, TeamDto, TeamsService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, DateTime, Resource, ResourceLinks, TeamAuthSchemeDto, TeamDto, TeamsService, Version } from '@app/shared/internal';
 
 describe('TeamsService', () => {
     const version = new Version('1');
@@ -111,6 +111,50 @@ describe('TeamsService', () => {
             expect(team!).toEqual(createTeam(12));
         }));
 
+    it('should make get request to get auth',
+        inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
+            let auth: TeamAuthSchemeDto;
+
+            teamsService.getTeamAuth('my-team').subscribe(result => {
+                auth = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/teams/my-team/auth');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush(teamAuthResponse(12), {
+                headers: {
+                    etag: '2',
+                },
+            });
+
+            expect(auth!).toEqual({ payload: { scheme: null, canUpdate: true }, version: new Version('2') });
+        }));
+
+    it('should make put request to update auth',
+        inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
+            let auth: TeamAuthSchemeDto;
+
+            teamsService.putTeamAuth('my-team', { scheme: null }, version).subscribe(result => {
+                auth = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/teams/my-team/auth');
+
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+            req.flush(teamAuthResponse(12), {
+                headers: {
+                    etag: '2',
+                },
+            });
+
+            expect(auth!).toEqual({ payload: { scheme: null, canUpdate: true }, version: new Version('2') });
+        }));
+
     it('should make delete request to leave team',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
@@ -122,6 +166,24 @@ describe('TeamsService', () => {
             teamsService.leaveTeam('my-team', resource).subscribe();
 
             const req = httpMock.expectOne('http://service/p/api/teams/my-team/contributors/me');
+
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush({});
+        }));
+
+    it('should make delete request to delete team',
+    inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    delete: { method: 'DELETE', href: '/api/teams/my-team' },
+                },
+            };
+
+            teamsService.deleteTeam('my-team', resource).subscribe();
+
+            const req = httpMock.expectOne('http://service/p/api/teams/my-team');
 
             expect(req.request.method).toEqual('DELETE');
             expect(req.request.headers.get('If-Match')).toBeNull();
@@ -144,6 +206,16 @@ describe('TeamsService', () => {
             roleProperties: createProperties(id),
             _links: {
                 update: { method: 'PUT', href: `teams/${id}` },
+            },
+        };
+    }
+
+    function teamAuthResponse(id: number) {
+
+        return {
+            scheme: null,
+            _links: {
+                update: { method: 'PUT', href: `teams/${id}/auth` },
             },
         };
     }

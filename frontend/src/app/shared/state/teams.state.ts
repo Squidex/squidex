@@ -118,9 +118,17 @@ export class TeamsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public delete(team: TeamDto): Observable<any> {
+        return this.teamsService.deleteTeam(team.name, team).pipe(
+            tap(() => {
+                this.removeTeam(team);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     private removeTeam(team: TeamDto) {
         this.next(s => {
-            const teams = s.teams.filter(x => x.name !== team.name);
+            const teams = s.teams.filter(x => x.id !== team.id);
 
             const selectedTeam =
                 s.selectedTeam?.id !== team.id ?

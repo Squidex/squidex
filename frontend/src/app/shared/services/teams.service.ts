@@ -9,11 +9,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, Version } from '@app/framework';
+import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
 
 export class TeamDto {
     public readonly _links: ResourceLinks;
 
+    public readonly canDelete: boolean;
+    public readonly canReadAuth: boolean;
     public readonly canReadContributors: boolean;
     public readonly canReadPlans: boolean;
     public readonly canUpdateGeneral: boolean;
@@ -31,11 +33,43 @@ export class TeamDto {
     ) {
         this._links = links;
 
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canReadAuth = hasAnyLink(links, 'auth');
         this.canReadContributors = hasAnyLink(links, 'contributors');
         this.canReadPlans = hasAnyLink(links, 'plans');
         this.canUpdateGeneral = hasAnyLink(links, 'update');
     }
 }
+
+export type TeamAuthSchemeDto = Versioned<TeamAuthSchemePayload>;
+
+export type TeamAuthSchemePayload = {
+    // The actual scheme.
+    scheme?: AuthSchemeDto | null;
+
+    // True, when the scheme can be updated.
+    canUpdate: boolean;
+};
+
+export type AuthSchemeDto = Readonly<{
+    // The domain name of your user accounts.
+    domain: string;
+
+    // The display name for buttons.
+    displayName: string;
+
+    // The client ID.
+    clientId: string;
+
+    // The client secret.
+    clientSecret: string;
+
+    // The authority URL.
+    authority: string;
+
+    // The URL to redirect after a signout.
+    signoutRedirectUrl?: string;
+}>;
 
 export type CreateTeamDto = Readonly<{
     // The new name of the team. Must not be unique.
@@ -45,6 +79,11 @@ export type CreateTeamDto = Readonly<{
 export type UpdateTeamDto = Readonly<{
     // The new name of the team. Must not be unique.
     name?: string;
+}>;
+
+export type AuthSchemeValueDto = Readonly<{
+    // The auth scheme.
+    scheme: AuthSchemeDto | null;
 }>;
 
 @Injectable({
@@ -69,8 +108,8 @@ export class TeamsService {
             pretifyError('i18n:teams.loadFailed'));
     }
 
-    public getTeam(teamName: string): Observable<TeamDto> {
-        const url = this.apiUrl.buildUrl(`/api/teams/${teamName}`);
+    public getTeam(teamId: string): Observable<TeamDto> {
+        const url = this.apiUrl.buildUrl(`/api/teams/${teamId}`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
@@ -103,6 +142,26 @@ export class TeamsService {
             pretifyError('i18n:teams.updateFailed'));
     }
 
+    public getTeamAuth(teamId: string): Observable<TeamAuthSchemeDto> {
+        const url = this.apiUrl.buildUrl(`api/teams/${teamId}/auth`);
+
+        return HTTP.getVersioned(this.http, url).pipe(
+            mapVersioned((payload) => {
+                return parseTeamAuth(payload.body);
+            }),
+            pretifyError('i18n:teams.teamLoadFailed'));
+    }
+
+    public putTeamAuth(teamId: string, dto: AuthSchemeValueDto, version: Version): Observable<TeamAuthSchemeDto> {
+        const url = this.apiUrl.buildUrl(`api/teams/${teamId}/auth`);
+
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+            mapVersioned((payload) => {
+                return parseTeamAuth(payload.body);
+            }),
+            pretifyError('i18n:teams.teamLoadFailed'));
+    }
+
     public leaveTeam(teamId: string, resource: Resource): Observable<any> {
         const link = resource._links['leave'];
 
@@ -110,6 +169,15 @@ export class TeamsService {
 
         return this.http.request(link.method, url).pipe(
             pretifyError('i18n:teams.leaveFailed'));
+    }
+
+    public deleteTeam(teamId: string, resource: Resource): Observable<any> {
+        const link = resource._links['delete'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
+            pretifyError('i18n:teams.archiveFailed'));
     }
 }
 
@@ -122,4 +190,12 @@ function parseTeam(response: any & Resource) {
         response.name,
         response.roleName,
         response.roleProperties);
+}
+
+function parseTeamAuth(response: any & Resource) {
+    const { scheme, _links } = response;
+
+    const canUpdate = hasAnyLink(_links, 'update');
+
+    return { scheme, canUpdate };
 }
