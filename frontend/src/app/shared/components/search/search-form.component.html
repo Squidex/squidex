@@ -9,7 +9,7 @@
             (ngModelChange)="changeQueryFullText($event)" 
             [ngModelOptions]="{ standalone: true }" 
             [placeholder]="placeholder"
-            hintText="search.fullTextTour"
+            hintText="i18n:search.fullTextTour"
             hintAfter="120000"
             hintPosition="bottom-end"
             sqxTourStep="search"
@@ -32,7 +32,7 @@
 
         <ng-container *ngIf="queryModel">
             <button type="button" class="btn btn-outline-secondary" (click)="searchDialog.toggle()"
-                hintText="search.advancedTour"
+                hintText="i18n:search.advancedTour"
                 hintAfter="60000"
                 hintPosition="bottom-end"
                 sqxTourStep="search">
