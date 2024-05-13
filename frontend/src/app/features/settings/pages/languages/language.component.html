@@ -71,7 +71,7 @@
                                 <div class="col">
                                     <select class="form-select fallback-select" [(ngModel)]="otherLanguage" name="otherLanguage">
                                         <option *ngFor="let otherLanguage of fallbackLanguagesNew; trackBy: trackByLanguage" [ngValue]="otherLanguage">
-                                            {{otherLanguage.englishName}}
+                                            {{otherLanguage.englishName || otherLanguage.iso2Code}}
                                         </option>
                                     </select>
                                 </div>
