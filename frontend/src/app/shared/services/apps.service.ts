@@ -281,7 +281,7 @@ export class AppsService {
             pretifyError('i18n:apps.updateAssetScriptsFailed'));
     }
 
-    public postAppImage(appName: string, resource: Resource, file: File, version: Version): Observable<number | AppDto> {
+    public postAppImage(appName: string, resource: Resource, file: HTTP.UploadFile, version: Version): Observable<number | AppDto> {
         const link = resource._links['image/upload'];
 
         const url = this.apiUrl.buildUrl(link.href);

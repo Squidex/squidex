@@ -14,7 +14,7 @@ public abstract class UploadAssetCommand : AssetCommand
 {
     public HashSet<string> Tags { get; set; } = [];
 
-    public AssetFile File { get; set; }
+    public IAssetFile File { get; set; }
 
     public AssetMetadata Metadata { get; } = [];
 

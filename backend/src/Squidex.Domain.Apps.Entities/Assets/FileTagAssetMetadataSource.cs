@@ -19,7 +19,7 @@ public sealed class FileTagAssetMetadataSource : IAssetMetadataSource
 {
     private sealed class FileAbstraction : IFileAbstraction
     {
-        private readonly AssetFile file;
+        private readonly IAssetFile file;
 
         public string Name
         {
@@ -36,7 +36,7 @@ public sealed class FileTagAssetMetadataSource : IAssetMetadataSource
             get => throw new NotSupportedException();
         }
 
-        public FileAbstraction(AssetFile file)
+        public FileAbstraction(IAssetFile file)
         {
             this.file = file;
         }

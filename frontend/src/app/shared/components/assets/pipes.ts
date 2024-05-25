@@ -21,19 +21,20 @@ export class AssetUrlPipe implements PipeTransform {
     }
 
     public transform(asset: AssetDto, version?: number | Version, withQuery = false): string {
-        let url = asset.fullUrl(this.apiUrl);
+        const url = asset.fullUrl(this.apiUrl);
 
+        const query: Record<string, any> = {};
         if (withQuery) {
-            url = StringHelper.appendToUrl(url, 'sq', MathHelper.guid());
+            query['sq'] = MathHelper.guid();
         }
 
         if (Types.isNumber(version)) {
-            url = StringHelper.appendToUrl(url, 'version', version);
+            query['version'] = version;
         } else if (Types.is(version, Version)) {
-            url = StringHelper.appendToUrl(url, 'version', version.value);
+            query['version'] = version.value;
         }
 
-        return url;
+        return url + StringHelper.buildQuery(query);
     }
 }
 
@@ -50,11 +51,17 @@ export class AssetPreviewUrlPipe implements PipeTransform {
     }
 
     public transform(asset: AssetDto): string {
-        let url = asset.fullUrl(this.apiUrl, this.authService);
+        const url = asset.fullUrl(this.apiUrl);
 
-        url = StringHelper.appendToUrl(url, 'version', asset.version);
+        const query: Record<string, any> = {
+            version: asset.version,
+        };
 
-        return url;
+        if (this.authService.user) {
+            query['access_token'] = this.authService.user.accessToken;
+        }
+
+        return url + StringHelper.buildQuery(query);
     }
 }
 

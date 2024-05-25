@@ -6,22 +6,22 @@
  */
 
 import { NgFor, NgIf } from '@angular/common';
-import { booleanAttribute, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { delay } from 'rxjs/operators';
-import { FocusOnInitDirective, MarkdownDirective, MathHelper, ModalDialogComponent, ResizedDirective, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
-import { AppsState, AuthService, StatefulComponent, TranslationsService } from '@app/shared/internal';
-import { UserIdPicturePipe } from './pipes';
+import { Observable } from 'rxjs';
+import { HTTP, MathHelper, ModalDialogComponent, ResizedDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { AppsState, AuthService, ChatEventDto, StatefulComponent, TranslationsService } from '@app/shared/internal';
+import { ChatItemComponent } from './chat-item.component';
 
 interface State {
-    // True, when running
-    isRunning: boolean;
-
     // The questions.
     chatQuestion: string;
 
+    // Indicates if an item is running.
+    isRunning: boolean;
+
     // The answers.
-    chatTalk: ReadonlyArray<{ text: string; type: 'user' | 'bot' | 'system' }>;
+    chatItems: ReadonlyArray<{ content: string | Observable<ChatEventDto>; type: 'User' | 'Bot' | 'System' }>;
 }
 
 @Component({
@@ -30,27 +30,27 @@ interface State {
     styleUrls: ['./chat-dialog.component.scss'],
     templateUrl: './chat-dialog.component.html',
     imports: [
-        FocusOnInitDirective,
+        ChatItemComponent,
         FormsModule,
-        MarkdownDirective,
         ModalDialogComponent,
         NgFor,
         NgIf,
         ResizedDirective,
-        ScrollActiveDirective,
         TooltipDirective,
         TranslatePipe,
-        UserIdPicturePipe,
     ],
 })
 export class ChatDialogComponent extends StatefulComponent<State> {
     private readonly conversationId = MathHelper.guid();
 
     @Output()
-    public textSelect = new EventEmitter<string | undefined | null>();
+    public contentSelect = new EventEmitter<string | HTTP.UploadFile | undefined | null>();
 
-    @Input({ required: true, transform: booleanAttribute })
-    public showFormatHint = false;
+    @Input()
+    public configuration?: string;
+
+    @Input()
+    public copyMode?: 'Text' | 'Image';
 
     @ViewChild('input', { static: false })
     public input!: ElementRef<HTMLInputElement>;
@@ -63,14 +63,37 @@ export class ChatDialogComponent extends StatefulComponent<State> {
         private readonly translator: TranslationsService,
     ) {
         super({
-            isRunning: false,
             chatQuestion: '',
-            chatTalk: [],
+            chatItems: [{
+                type: 'Bot',
+                content: 'HELLO',
+            },
+            {
+                type: 'Bot',
+                content: 'IMAGE: ![image](https://localhost:5001/ai-images/dall-e/4043c8c4-c05e-4212-b4c0-4653059c06d3)',
+            }],
+            isRunning: false,
         });
+    }
+
+    public ngOnInit() {
+        const { configuration, conversationId } = this;
+        const stream = this.translator.ask(this.appsState.appName, { conversationId, configuration });
+
+        this.next(s => ({
+            ...s,
+            chatQuestion: '',
+            chatItems: [...s.chatItems, { content: stream, type: 'Bot' }],
+            isRunning: true,
+        }));
     }
 
     public setQuestion(chatQuestion: string) {
         this.next({ chatQuestion });
+    }
+
+    public setCompleted() {
+        this.next({ isRunning: false });
     }
 
     public ask() {
@@ -80,50 +103,18 @@ export class ChatDialogComponent extends StatefulComponent<State> {
             return;
         }
 
+        const { configuration, conversationId } = this;
+        const stream = this.translator.ask(this.appsState.appName, { prompt, conversationId, configuration });
+
         this.next(s => ({
             ...s,
             chatQuestion: '',
-            chatTalk: [
-                ...s.chatTalk,
-                { text: prompt, type: 'user' },
+            chatItems: [
+                ...s.chatItems,
+                { content: prompt, type: 'User' },
+                { content: stream, type: 'Bot' },
             ],
             isRunning: true,
         }));
-
-        this.translator.ask(this.appsState.appName, { prompt, conversationId: this.conversationId }).pipe(delay(500))
-            .subscribe({
-                next: chatAnswers => {
-                    if (chatAnswers.length === 0) {
-                        this.next(s => ({
-                            ...s,
-                            chatQuestion: '',
-                            chatTalk: [
-                                ...s.chatTalk,
-                                { text: 'i18n:chat.answersEmpty', type: 'system' },
-                            ],
-                            isRunning: true,
-                        }));
-                    } else {
-                        this.next(s => ({
-                            ...s,
-                            chatTalk: [
-                                ...s.chatTalk,
-                                ...chatAnswers.map(text => ({ text, type: 'bot' } as any)),
-                            ],
-                            isRunning: false,
-                        }));
-                    }
-
-                    setTimeout(() => {
-                        this.input.nativeElement.focus();
-                    }, 100);
-                },
-                error: () => {
-                    this.next({ isRunning: false });
-                },
-                complete: () => {
-                    this.next({ isRunning: false });
-                },
-            });
     }
 }

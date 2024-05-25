@@ -1,0 +1,82 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    img {
+        width: 100%;
+    }
+}
+
+.bubble {
+    background-color: $color-white;
+    border: 0;
+    border-radius: $border-radius;
+    padding: 1rem;
+    position: relative;
+
+    &-right {
+        &::before {
+            @include caret-left($color-white, 10px);
+            @include absolute(.5rem, null, null, -18px);
+        }
+    }
+
+    &-left {
+        &::before {
+            @include caret-right($color-white, 10px);
+            @include absolute(.5rem, -18px);
+        }
+    }
+}
+
+.content {
+    .btn-image {
+        display: none;
+    }
+
+    &:has(img) {
+        .btn-image {
+            display: block;
+        }
+    }
+}
+
+.use-container {
+    position: relative;
+
+    .btn {
+        @include absolute(.75rem, 1rem);
+        visibility: hidden;
+    }
+
+    &:hover {
+        .btn {
+            visibility: visible;
+        }
+    }
+}
+
+@keyframes blink { 
+    50% { 
+        fill: transparent
+    }
+}
+
+.dot { 
+    animation: 1s blink infinite;
+}
+
+svg {
+
+    .dot {
+        fill: $color-border;
+    }
+}
+
+.dot:nth-child(2) {
+    animation-delay: 250ms;
+}
+
+.dot:nth-child(3) {
+    animation-delay: 500ms;
+}

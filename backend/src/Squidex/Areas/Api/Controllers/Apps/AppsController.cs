@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -193,9 +194,9 @@ public sealed class AppsController : ApiController
     [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppImageUpload)]
     [ApiCosts(0)]
-    public async Task<IActionResult> UploadImage(string app, IFormFile file)
+    public async Task<IActionResult> UploadImage(string app, [FromForm(Name = "file")] IAssetFile file)
     {
-        var response = await InvokeCommandAsync(CreateCommand(file));
+        var response = await InvokeCommandAsync(new UploadAppImage { File = file });
 
         return Ok(response);
     }
@@ -254,17 +255,5 @@ public sealed class AppsController : ApiController
         var response = converter(result);
 
         return response;
-    }
-
-    private UploadAppImage CreateCommand(IFormFile? file)
-    {
-        if (file == null || Request.Form.Files.Count != 1)
-        {
-            var error = T.Get("validation.onlyOneFile");
-
-            throw new ValidationException(error);
-        }
-
-        return new UploadAppImage { File = file.ToAssetFile() };
     }
 }

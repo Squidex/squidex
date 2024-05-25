@@ -20,13 +20,19 @@ public sealed class CreateAssetDto
     /// <summary>
     /// The file to upload.
     /// </summary>
+    [FromForm(Name = "file2")]
+    public IFormFile File2 { get; set; }
+
+    /// <summary>
+    /// The file to upload.
+    /// </summary>
     [FromForm(Name = "file")]
-    public IFormFile File { get; set; }
+    public IAssetFile File { get; set; }
 
     /// <summary>
     /// The optional parent folder id.
     /// </summary>
-    [FromQuery(Name = "parentId")]
+    // [FromQuery(Name = "parentId")]
     public DomainId ParentId { get; set; }
 
     /// <summary>
@@ -41,9 +47,9 @@ public sealed class CreateAssetDto
     [FromQuery(Name = "duplicate")]
     public bool Duplicate { get; set; }
 
-    public CreateAsset ToCommand(AssetFile file)
+    public CreateAsset ToCommand()
     {
-        var command = SimpleMapper.Map(this, new CreateAsset { File = file });
+        var command = SimpleMapper.Map(this, new CreateAsset());
 
         if (Id != null && Id.Value != default && !string.IsNullOrWhiteSpace(Id.Value.ToString()))
         {

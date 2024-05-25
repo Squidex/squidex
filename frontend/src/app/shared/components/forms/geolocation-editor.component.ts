@@ -8,7 +8,7 @@
 import { NgIf } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, inject, Input, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { ControlErrorsComponent, ResizedDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { ControlErrorsComponent, ResizedDirective, StringHelper, TooltipDirective, TranslatePipe } from '@app/framework';
 import { ExtendedFormGroup, LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
 declare const L: any;
@@ -228,8 +228,8 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         }
     }
 
-    private async ngAfterViewInitGoogle(apiKey: string) {
-        await this.resourceLoader.loadScript(`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`);
+    private async ngAfterViewInitGoogle(key: string) {
+        await this.resourceLoader.loadScript(`https://maps.googleapis.com/maps/api/js${StringHelper.buildQuery({ key, libraries: 'places' })}`);
 
         this.map = new google.maps.Map(this.editor.nativeElement, {
             zoom: 1,

@@ -61,9 +61,14 @@ public sealed class StringAsyncJintExtension : IJintExtension, IScriptDescriptor
                     return;
                 }
 
-                var result = await chatAgent.PromptAsync(prompt, ct: ct);
+                var request = new ChatRequest
+                {
+                    Prompt = prompt
+                };
 
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, result.Text));
+                var result = await chatAgent.PromptAsync(request, ct: ct);
+
+                scheduler.Run(callback, JsValue.FromObject(context.Engine, result.Content));
             }
             catch (Exception ex)
             {

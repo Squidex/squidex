@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, shareReplay, Subject, takeUntil } from 'rxjs';
-import { debug, DialogService, MathHelper, State, Types } from '@app/framework';
+import { debug, DialogService, HTTP, MathHelper, State, Types } from '@app/framework';
 import { AssetDto, AssetsService } from '../services/assets.service';
 import { AppsState } from './apps.state';
 
@@ -70,13 +70,13 @@ export class AssetUploaderState extends State<Snapshot> {
         }, 'Stopped');
     }
 
-    public uploadFile(file: File, parentId?: string): Observable<AssetDto | number> {
+    public uploadFile(file: HTTP.UploadFile, parentId?: string): Observable<AssetDto | number> {
         const stream = this.assetsService.postAssetFile(this.appName, file, parentId);
 
         return this.upload(stream, MathHelper.guid(), file.name);
     }
 
-    public uploadAsset(asset: AssetDto, file: Blob): Observable<AssetDto | number> {
+    public uploadAsset(asset: AssetDto, file: HTTP.UploadFile): Observable<AssetDto | number> {
         const stream = this.assetsService.putAssetFile(this.appName, asset, file, asset.version);
 
         return this.upload(stream, asset.id, (file as any)['name'] || asset.fileName);

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text.Json;
+using Squidex.AI;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -41,6 +42,8 @@ public static class MessagingServices
 
         if (isWorker)
         {
+            services.AddAICleaner();
+
             services.AddSingletonAs<AssetCleanupProcess>()
                 .AsSelf();
 

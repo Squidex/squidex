@@ -1,7 +1,7 @@
 <div class="field" [class.expanded]="isExpanded" *ngIf="formModel">
     <fieldset class="buttons-container" [disabled]="isDisabled | async">
         <div class="buttons">
-            <button type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" [disabled]="!hasChatBot" tabindex="-1">
+            <button type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" [disabled]="!hasChatBot || !isString" tabindex="-1">
                 AI
             </button>
 
@@ -60,7 +60,12 @@
                     </sqx-array-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Assets'">
-                    <sqx-assets-editor [formControl]="$any(fieldForm)" [folderId]="field.rawProperties.folderId" [isExpanded]="isExpanded"></sqx-assets-editor>
+                    <sqx-assets-editor
+                        [formControl]="$any(fieldForm)"
+                        [folderId]="field.rawProperties.folderId"
+                        [hasChatBot]="hasChatBot"
+                        [isExpanded]="isExpanded">
+                    </sqx-assets-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Boolean'">
                     <ng-container [ngSwitch]="field.rawProperties.editor">
@@ -287,6 +292,6 @@
     </sqx-form-hint>
 </div>
 
-<sqx-chat-dialog *sqxModal="chatDialog" showFormatHint="true"
-    (textSelect)="setValue($event)">
+<sqx-chat-dialog *sqxModal="chatDialog"
+    (contentSelect)="setValue($event)">
 </sqx-chat-dialog>

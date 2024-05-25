@@ -75,8 +75,7 @@ public static class StoreServices
                         options.DatabaseName = mongoDatabaseName;
                     });
 
-                services.AddKernel()
-                    .AddMongoChatStore(config, options =>
+                services.AddMongoChatStore(config, options =>
                     {
                         options.CollectionName = "Chat";
                     });

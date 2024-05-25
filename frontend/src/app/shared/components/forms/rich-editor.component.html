@@ -15,6 +15,6 @@
     [schemaIdentifiers]="schemaIds">
 </sqx-content-selector>
 
-<sqx-chat-dialog *sqxModal="chatDialog" showFormatHint="false"
-    (textSelect)="insertText($event)">
+<sqx-chat-dialog *sqxModal="chatDialog"
+    (contentSelect)="insertText($event)">
 </sqx-chat-dialog>

@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, pretifyError, ResourceLinks } from '@app/framework';
+import { ApiUrlConfig, pretifyError, ResourceLinks, StringHelper } from '@app/framework';
 
 export class SearchResultDto {
     public readonly _links: ResourceLinks;
@@ -38,7 +38,7 @@ export class SearchService {
     }
 
     public getResults(appName: string, query: string): Observable<ReadonlyArray<SearchResultDto>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/search/?query=${encodeURIComponent(query)}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/search${StringHelper.buildQuery({ query })}`);
 
         return this.http.get<any[]>(url).pipe(
             map(body => {

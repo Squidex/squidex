@@ -5,14 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Assets;
+namespace Squidex.Areas.Api.Config;
 
-namespace Squidex.Domain.Apps.Entities.TestHelpers;
-
-public sealed class NoopAssetFile : DelegateAssetFile
+public class AssetFileResolver
 {
-    public NoopAssetFile(string fileName = "image.png", string mimeType = "image/png", long fileSize = 1024)
-        : base(fileName, mimeType, fileSize, () => new MemoryStream())
-    {
-    }
 }

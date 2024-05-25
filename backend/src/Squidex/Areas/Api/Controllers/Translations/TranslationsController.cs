@@ -5,9 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 using Squidex.AI;
 using Squidex.Areas.Api.Controllers.Translations.Models;
+using Squidex.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Text.Translations;
@@ -22,14 +26,31 @@ namespace Squidex.Areas.Api.Controllers.Translations;
 [ApiExplorerSettings(GroupName = nameof(Translations))]
 public sealed class TranslationsController : ApiController
 {
+    private static readonly byte[] LineStart = Encoding.UTF8.GetBytes("data: ");
+    private static readonly byte[] LineEnd = Encoding.UTF8.GetBytes("\r\r");
+    private readonly IAssetStore assetStore;
     private readonly ITranslator translator;
     private readonly IChatAgent chatAgent;
 
-    public TranslationsController(ICommandBus commandBus, ITranslator translator, IChatAgent chatAgent)
+    public TranslationsController(ICommandBus commandBus, IAssetStore assetStore, ITranslator translator, IChatAgent chatAgent)
         : base(commandBus)
     {
+        this.assetStore = assetStore;
         this.translator = translator;
         this.chatAgent = chatAgent;
+    }
+
+    [OpenApiIgnore]
+    [HttpGet("/ai-images/{*path}")]
+    public IActionResult GetImage(string path)
+    {
+        return new FileCallbackResult("image/webp", async (body, range, ct) =>
+        {
+            await assetStore.DownloadAsync(path, body, range, ct);
+        })
+        {
+            ErrorAs404 = true
+        };
     }
 
     /// <summary>
@@ -57,16 +78,52 @@ public sealed class TranslationsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="request">The question request.</param>
     /// <response code="200">Question asked.</response>
-    [HttpPost]
+    [HttpGet]
     [Route("apps/{app}/ask/")]
-    [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppTranslate)]
     [ApiCosts(10)]
-    public async Task<IActionResult> PostQuestion(string app, [FromBody] AskDto request)
+    [OpenApiIgnore]
+    public IActionResult GetQuestion(string app, AskDto request)
     {
-        var result = await chatAgent.PromptAsync(request.Prompt, request.ConversationId, HttpContext.RequestAborted);
-        var response = new string[] { result.Text };
+        var chatRequest = new ChatRequest
+        {
+            Configuration = request.Configuration,
+            ConversationId = request.ConversationId,
+            Prompt = request.Prompt
+        };
 
-        return Ok(response);
+        var context = new ChatContext
+        {
+            User = User
+        };
+
+        return new FileCallbackResult("text/event-stream", async (body, range, ct) =>
+        {
+            await foreach (var @event in chatAgent.StreamAsync(chatRequest, context, HttpContext.RequestAborted))
+            {
+                object? json = null;
+                switch (@event)
+                {
+                    case ChunkEvent chunk:
+                        json = new { type = "Chunk", content = chunk.Content };
+                        break;
+                    case ToolStartEvent toolStart:
+                        json = new { type = "ToolStart", tool = toolStart.Tool.Spec.DisplayName };
+                        break;
+                    case ToolEndEvent toolEnd:
+                        json = new { type = "ToolEnd", tool = toolEnd.Tool.Spec.DisplayName };
+                        break;
+                }
+
+                if (json != null)
+                {
+                    await body.WriteAsync(LineStart, ct);
+                    await JsonSerializer.SerializeAsync(body, json, cancellationToken: ct);
+                    await body.WriteAsync(LineEnd, ct);
+
+                    await body.FlushAsync(ct);
+                }
+            }
+        });
     }
 }

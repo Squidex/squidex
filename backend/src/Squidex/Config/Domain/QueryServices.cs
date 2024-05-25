@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.AI.Implementation.OpenAI;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
@@ -24,7 +25,7 @@ public static class QueryServices
             .AsSelf();
 
         services.AddSingletonAs<UrlGenerator>()
-            .As<IUrlGenerator>();
+            .As<IUrlGenerator>().As<IHttpImageEndpoint>();
 
         services.AddSingletonAs<InstantGraphType>()
             .AsSelf();

@@ -15,8 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 public class ImageAssetMetadataSourceTests : GivenContext
 {
     private readonly IAssetThumbnailGenerator assetGenerator = A.Fake<IAssetThumbnailGenerator>();
+    private readonly IAssetFile file;
     private readonly MemoryStream stream = new MemoryStream();
-    private readonly AssetFile file;
     private readonly ImageAssetMetadataSource sut;
 
     public ImageAssetMetadataSourceTests()

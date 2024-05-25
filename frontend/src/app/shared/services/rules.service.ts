@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, Model, pretifyError, Resource, ResourceLinks, ScriptCompletions, Version } from '@app/framework';
+import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, Model, pretifyError, Resource, ResourceLinks, ScriptCompletions, StringHelper, Version } from '@app/framework';
 
 export type RuleElementMetadataDto = Readonly<{
     description: string;
@@ -355,7 +355,7 @@ export class RulesService {
     }
 
     public getEvents(appName: string, take: number, skip: number, ruleId?: string): Observable<RuleEventsDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}&ruleId=${ruleId || ''}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events${StringHelper.buildQuery({ take, skip, ruleId })}`);
 
         return this.http.get<any>(url).pipe(
             map(body => {

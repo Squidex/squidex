@@ -167,7 +167,7 @@ public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<Asset
         }
     }
 
-    private static string ComputeHash(AssetFile file, HasherStream hashStream)
+    private static string ComputeHash(IAssetFile file, HasherStream hashStream)
     {
         var steamHash = hashStream.GetHashStringAndReset();
 

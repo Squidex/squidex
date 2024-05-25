@@ -7,7 +7,7 @@
 
 import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DropdownMenuComponent, FileDropDirective, ModalDirective, ModalPlacementDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
+import { DropdownMenuComponent, FileDropDirective, HTTP, ModalDirective, ModalPlacementDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
 
 @Component({
@@ -41,7 +41,7 @@ export class AssetUploaderComponent {
     ) {
     }
 
-    public addFiles(files: ReadonlyArray<File>) {
+    public addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
         for (const file of files) {
             this.assetUploader.uploadFile(file)
                 .subscribe({

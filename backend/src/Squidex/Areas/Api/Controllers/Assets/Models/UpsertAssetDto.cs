@@ -21,7 +21,7 @@ public sealed class UpsertAssetDto
     /// The file to upload.
     /// </summary>
     [FromForm(Name = "file")]
-    public IFormFile File { get; set; }
+    public IAssetFile File { get; set; }
 
     /// <summary>
     /// The optional parent folder id.
@@ -72,8 +72,8 @@ public sealed class UpsertAssetDto
         return command;
     }
 
-    public UpsertAsset ToCommand(DomainId id, AssetFile file)
+    public UpsertAsset ToCommand(DomainId id)
     {
-        return SimpleMapper.Map(this, new UpsertAsset { File = file, AssetId = id });
+        return SimpleMapper.Map(this, new UpsertAsset { AssetId = id });
     }
 }

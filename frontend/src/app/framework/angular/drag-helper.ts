@@ -7,6 +7,7 @@
 
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Types } from '../utils/types';
+import { HTTP } from './http/http-extensions';
 
 export function sorted<T>(event: CdkDragDrop<ReadonlyArray<T>>): T[] {
     const items = <T[]>event.container.data;
@@ -16,12 +17,12 @@ export function sorted<T>(event: CdkDragDrop<ReadonlyArray<T>>): T[] {
     return items;
 }
 
-export function getFiles(files: FileList | ReadonlyArray<File>) {
+export function getFiles(files: FileList | ReadonlyArray<HTTP.UploadFile>) {
     if (Types.isArray(files)) {
         return files;
     }
 
-    const result: File[] = [];
+    const result: HTTP.UploadFile[] = [];
 
     for (let i = 0; i < files.length; i++) {
         result.push(files[i]);

@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, pretifyError, Resource } from '@app/framework';
+import { ApiUrlConfig, pretifyError, Resource, StringHelper } from '@app/framework';
 
 export class UserDto {
     constructor(
@@ -41,7 +41,7 @@ export class UsersService {
     }
 
     public getUsers(query?: string): Observable<ReadonlyArray<UserDto>> {
-        const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
+        const url = this.apiUrl.buildUrl(`api/users${StringHelper.buildQuery({ query })}`);
 
         return this.http.get<any[]>(url).pipe(
             map(body => {

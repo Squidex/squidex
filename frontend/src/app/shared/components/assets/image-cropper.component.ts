@@ -115,8 +115,8 @@ export class ImageCropperComponent implements AfterViewInit, OnDestroy {
         }
     }
 
-    public toFile(): Promise<Blob | null> {
-        return new Promise<Blob | null>(resolve => {
+    public async toFile(): Promise<File | null> {
+        return new Promise<File | null>(resolve => {
             if (!this.cropper) {
                 return resolve(null);
             } else {
@@ -128,8 +128,14 @@ export class ImageCropperComponent implements AfterViewInit, OnDestroy {
                     this.data = data;
 
                     this.cropper.getCroppedCanvas().toBlob(blob => {
-                        resolve(blob);
-                    });
+                        if (blob) {
+                            const file = new File([blob], 'image.png', { type: 'image.png' });
+
+                            resolve(file);
+                        } else {
+                            resolve(null);
+                        }
+                    }, 'image.png');
                 }
             }
 

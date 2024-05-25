@@ -5,22 +5,27 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Validation;
-using Squidex.Web;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Squidex.Areas.Api.Controllers.Translations.Models;
 
-[OpenApiRequest]
 public sealed class AskDto
 {
     /// <summary>
     /// Optional conversation ID.
     /// </summary>
+    [FromQuery(Name = "conversationId")]
     public string? ConversationId { get; set; }
+
+    /// <summary>
+    /// Optional configuration.
+    /// </summary>
+    [FromQuery(Name = "configuration")]
+    public string? Configuration { get; set; }
 
     /// <summary>
     /// The text to ask.
     /// </summary>
-    [LocalizedRequired]
-    public string Prompt { get; set; }
+    [FromQuery(Name = "prompt")]
+    public string? Prompt { get; set; }
 }

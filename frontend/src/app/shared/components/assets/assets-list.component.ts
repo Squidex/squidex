@@ -8,14 +8,14 @@
 import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FileDropDirective, TourStepDirective, TranslatePipe } from '@app/framework';
+import { FileDropDirective, HTTP, TourStepDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetFolderDto, AssetsState, getFiles, StatefulComponent, Types } from '@app/shared/internal';
 import { AssetFolderComponent } from './asset-folder.component';
 import { AssetComponent } from './asset.component';
 
 interface State {
     // The new files.
-    newFiles: ReadonlyArray<File>;
+    newFiles: ReadonlyArray<HTTP.UploadFile>;
 }
 
 @Component({
@@ -64,7 +64,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
         super({ newFiles: [] });
     }
 
-    public add(file: File, asset: AssetDto) {
+    public add(file: HTTP.UploadFile, asset: AssetDto) {
         if (asset.isDuplicate) {
             setTimeout(() => {
                 this.remove(file);
@@ -108,7 +108,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
         return this.selectedIds && this.selectedIds[asset.id];
     }
 
-    public remove(file: File) {
+    public remove(file: HTTP.UploadFile) {
         this.next(s => ({
             ...s,
             newFiles: s.newFiles.removed(file),
@@ -117,7 +117,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
         return true;
     }
 
-    public addFiles(files: ReadonlyArray<File>) {
+    public addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
         this.next(s => ({
             ...s,
             newFiles: [...getFiles(files), ...s.newFiles],

@@ -12,7 +12,7 @@ import { RouterLink } from '@angular/router';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormHintComponent, ModalDialogComponent, ProgressBarComponent, switchMapCached, TagEditorComponent, TooltipDirective, TransformInputDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
+import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormHintComponent, HTTP, ModalDialogComponent, ProgressBarComponent, switchMapCached, TagEditorComponent, TooltipDirective, TransformInputDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
 import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetPathItem, AssetsService, AssetsState, AssetUploaderState, AuthService, MoveAssetForm, MoveAssetItemDto, ROOT_ITEM, UploadCanceled } from '@app/shared/internal';
 import { AssetFolderDropdownComponent } from './asset-folder-dropdown.component';
 import { AssetHistoryComponent } from './asset-history.component';
@@ -184,7 +184,7 @@ export class AssetDialogComponent implements OnInit {
         this.uploadEdited(this.textEditor.first.toFile());
     }
 
-    public uploadEdited(fileChange: Promise<Blob | null>) {
+    public uploadEdited(fileChange: Promise<HTTP.UploadFile | null>) {
         fileChange.then(file => {
             if (file) {
                 this.setProgress(0);

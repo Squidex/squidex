@@ -121,15 +121,17 @@ export class ImageSourceDirective implements OnDestroy, OnInit, AfterViewInit {
         const h = Math.round(this.size.height);
 
         if (w > 0 && h > 0) {
-            let source = this.imageSource;
+            const query = StringHelper.buildQuery({
+                width: w,
+                height: h,
+                mode: 'Pad',
+                nofocus: 'nofocus',
+                q: this.loadQuery,
+            });
 
-            source = StringHelper.appendToUrl(source, `width=${w}&height=${h}&mode=Pad&nofocus`);
+            const url = this.imageSource + query;
 
-            if (this.loadQuery) {
-                source = StringHelper.appendToUrl(source, 'q', this.loadQuery);
-            }
-
-            this.renderer.setProperty(this.element.nativeElement, 'src', source);
+            this.renderer.setProperty(this.element.nativeElement, 'src', url);
         }
     }
 

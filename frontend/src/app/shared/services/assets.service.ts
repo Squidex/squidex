@@ -10,7 +10,6 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
 import { ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ScriptCompletions, StringHelper, Types, Version, Versioned } from '@app/framework';
-import { AuthService } from './auth.service';
 import { Query, sanitize } from './query';
 
 const SVG_PREVIEW_LIMIT = 10 * 1024;
@@ -84,14 +83,8 @@ export class AssetDto {
         this._meta = meta;
     }
 
-    public fullUrl(apiUrl: ApiUrlConfig, authService?: AuthService) {
-        let url = apiUrl.buildUrl(this.contentUrl);
-
-        if (authService && authService.user) {
-            url = StringHelper.appendToUrl(url, 'access_token', authService.user.accessToken);
-        }
-
-        return url;
+    public fullUrl(apiUrl: ApiUrlConfig) {
+        return apiUrl.buildUrl(this.contentUrl);
     }
 }
 
@@ -250,7 +243,7 @@ export class AssetsService {
     }
 
     public getAssetFolders(appName: string, parentId: string, scope: AssetFolderScope): Observable<AssetFoldersDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders?parentId=${parentId}&scope=${scope}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders${StringHelper.buildQuery({ parentId, scope })}`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
@@ -269,12 +262,8 @@ export class AssetsService {
             pretifyError('i18n:assets.loadFailed'));
     }
 
-    public postAssetFile(appName: string, file: Blob, parentId?: string): Observable<number | AssetDto> {
-        let url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
-
-        if (parentId) {
-            url += `?parentId=${parentId}`;
-        }
+    public postAssetFile(appName: string, file: HTTP.UploadFile, parentId?: string): Observable<number | AssetDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets${StringHelper.buildQuery({ parentId })}`);
 
         return HTTP.upload(this.http, 'POST', url, file).pipe(
             filter(event =>
@@ -301,7 +290,7 @@ export class AssetsService {
             pretifyError('i18n:assets.uploadFailed'));
     }
 
-    public putAssetFile(appName: string, resource: Resource, file: Blob, version: Version): Observable<number | AssetDto> {
+    public putAssetFile(appName: string, resource: Resource, file: HTTP.UploadFile, version: Version): Observable<number | AssetDto> {
         const link = resource._links['upload'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -392,7 +381,7 @@ export class AssetsService {
     public deleteAssetItem(appName: string, asset: Resource, checkReferrers: boolean, version: Version): Observable<Versioned<any>> {
         const link = asset._links['delete'];
 
-        const url = `${this.apiUrl.buildUrl(link.href)}?checkReferrers=${checkReferrers}`;
+        const url = `${this.apiUrl.buildUrl(link.href)}${StringHelper.buildQuery({ checkReferrers })}`;
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
             pretifyError('i18n:assets.deleteFailed'));
