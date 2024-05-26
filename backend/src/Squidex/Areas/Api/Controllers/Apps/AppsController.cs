@@ -8,14 +8,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Translations;
-using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -136,7 +133,9 @@ public sealed class AppsController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)
     {
-        var response = await InvokeCommandAsync(request.ToCommand());
+        var command = request.ToCommand();
+
+        var response = await InvokeCommandAsync(command);
 
         return CreatedAtAction(nameof(GetApps), response);
     }
@@ -156,7 +155,9 @@ public sealed class AppsController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> PutApp(string app, [FromBody] UpdateAppDto request)
     {
-        var response = await InvokeCommandAsync(request.ToCommand());
+        var command = request.ToCommand();
+
+        var response = await InvokeCommandAsync(command);
 
         return Ok(response);
     }
@@ -176,7 +177,9 @@ public sealed class AppsController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> PutAppTeam(string app, [FromBody] TransferToTeamDto request)
     {
-        var response = await InvokeCommandAsync(request.ToCommand());
+        var command = request.ToCommand();
+
+        var response = await InvokeCommandAsync(command);
 
         return Ok(response);
     }
@@ -185,7 +188,7 @@ public sealed class AppsController : ApiController
     /// Upload the app image.
     /// </summary>
     /// <param name="app">The name of the app to update.</param>
-    /// <param name="file">The file to upload.</param>
+    /// <param name="request">The request parameters.</param>
     /// <response code="200">App image uploaded.</response>
     /// <response code="400">App request not valid.</response>
     /// <response code="404">App not found.</response>
@@ -194,9 +197,11 @@ public sealed class AppsController : ApiController
     [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppImageUpload)]
     [ApiCosts(0)]
-    public async Task<IActionResult> UploadImage(string app, [FromForm(Name = "file")] IAssetFile file)
+    public async Task<IActionResult> UploadImage(string app, UploadAppImageDto request)
     {
-        var response = await InvokeCommandAsync(new UploadAppImage { File = file });
+        var command = await request.ToCommandAsync(HttpContext);
+
+        var response = await InvokeCommandAsync(command);
 
         return Ok(response);
     }

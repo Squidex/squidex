@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using NJsonSchema.Generation.TypeMappers;
@@ -27,9 +26,6 @@ public static class OpenApiServices
 {
     public static void AddSquidexOpenApiSettings(this IServiceCollection services)
     {
-        services.AddSingletonAs<AssetFileProcessor>()
-            .As<IOperationProcessor>();
-
         services.AddSingletonAs<ErrorDtoProcessor>()
             .As<IOperationProcessor>();
 
@@ -50,6 +46,9 @@ public static class OpenApiServices
 
         services.AddSingletonAs<SchemaNameGenerator>()
             .As<ISchemaNameGenerator>();
+
+        services.AddSingletonAs<AssetFileResolver>()
+            .AsSelf();
 
         services.AddSingletonAs<JsonSchemaGenerator>()
             .AsSelf();

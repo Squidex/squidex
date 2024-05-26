@@ -20,7 +20,6 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
-using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile;
 
@@ -134,9 +133,9 @@ public sealed class ProfileController : IdentityServerController
 
     [HttpPost]
     [Route("account/profile/upload-picture/")]
-    public Task<IActionResult> UploadPicture(IAssetFile file)
+    public Task<IActionResult> UploadPicture(List<IFormFile> files)
     {
-        return MakeChangeAsync((id, ct) => UpdatePictureAsync(file, id, ct),
+        return MakeChangeAsync((id, ct) => UpdatePictureAsync(files, id, ct),
             T.Get("users.profile.uploadPictureDone"), None.Value);
     }
 
@@ -156,10 +155,13 @@ public sealed class ProfileController : IdentityServerController
         await userService.AddLoginAsync(id, login, ct);
     }
 
-    private async Task UpdatePictureAsync(IAssetFile file, string id,
+    private async Task UpdatePictureAsync(List<IFormFile> files, string id,
         CancellationToken ct)
     {
-        await UploadResizedAsync(file, id, ct);
+        if (files.Count != 1)
+        {
+            throw new ValidationException(T.Get("validation.onlyOneFile"));
+        }
 
         var update = new UserValues
         {

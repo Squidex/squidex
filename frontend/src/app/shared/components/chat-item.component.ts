@@ -8,7 +8,7 @@
 import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HTTP, MarkdownDirective, StatefulComponent, TranslatePipe, Types } from '@app/framework';
+import { HTTP, MarkdownDirective, ResizedDirective, StatefulComponent, TranslatePipe, Types } from '@app/framework';
 import { ChatEventDto, Profile } from '../internal';
 import { UserIdPicturePipe } from './pipes';
 
@@ -35,6 +35,7 @@ interface State {
         MarkdownDirective,
         NgFor,
         NgIf,
+        ResizedDirective,
         TranslatePipe,
         UserIdPicturePipe,
     ],

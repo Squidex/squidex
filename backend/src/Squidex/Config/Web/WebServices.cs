@@ -52,9 +52,6 @@ public static class WebServices
         services.AddSingletonAs<UsageMiddleware>()
             .AsSelf();
 
-        services.AddSingletonAs<AssetFileModelBinder>()
-            .AsSelf();
-
         services.AddSingletonAs<StringLocalizer>()
             .As<IStringLocalizer>().As<IStringLocalizerFactory>();
 
@@ -92,8 +89,6 @@ public static class WebServices
             options.Filters.Add<TeamResolver>();
             options.Filters.Add<SchemaResolver>();
             options.Filters.Add<MeasureResultFilter>();
-
-            options.ModelBinderProviders.Insert(0, new AssetFileModelBinderProvider());
 
             // Ingore all values that could have JsonValue somewhere.
             options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(ContentData)));

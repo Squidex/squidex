@@ -8,7 +8,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using NodaTime;
 using Squidex.AI;
-using Squidex.AI.Implementation.OpenAI;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.News.Service;

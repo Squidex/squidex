@@ -30,25 +30,21 @@
     </div>
     <div class="col">
         <div class="bubble bubble-right use-container">
-            <div class="content" (load)="scrollIntoView()" #contentElement>
+            <div class="content" (sqxResized)="scrollIntoView()" #contentElement>
                 <div class="mb-2" *ngIf="snapshot.runningTools.length > 0">
                     <div class="badge badge-secondary me-1" *ngFor="let tool of snapshot.runningTools">
                         {{tool}}
                     </div>
                 </div>
 
-                <span *ngIf="!snapshot.isFailed" [sqxMarkdown]="snapshot.content" optional="false" inline="false"></span>
+                <span *ngIf="!snapshot.isFailed" [sqxMarkdown]="snapshot.content" (load)="scrollIntoView()" optional="false" inline="false"></span>
 
                 <span *ngIf="snapshot.isFailed">
                     {{ 'chat.failed' | sqxTranslate }}
                 </span>
     
                 <ng-container *ngIf="!snapshot.isRunning && !isFirst && type === 'Bot'">
-                    <button type="button" class="btn btn-secondary btn-sm btn-text" *ngIf="copyMode !== 'Image'" (click)="selectContent()">
-                        {{ 'chat.use' | sqxTranslate }}
-                    </button>
-        
-                    <button type="button" class="btn btn-secondary btn-sm btn-image" *ngIf="copyMode === 'Image'" (click)="selectImage()">
+                    <button type="button" class="btn btn-secondary btn-sm btn-text" (click)="selectContent()">
                         {{ 'chat.use' | sqxTranslate }}
                     </button>
                 </ng-container>

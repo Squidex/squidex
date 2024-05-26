@@ -63,15 +63,8 @@ export class ChatDialogComponent extends StatefulComponent<State> {
         private readonly translator: TranslationsService,
     ) {
         super({
+            chatItems: [],
             chatQuestion: '',
-            chatItems: [{
-                type: 'Bot',
-                content: 'HELLO',
-            },
-            {
-                type: 'Bot',
-                content: 'IMAGE: ![image](https://localhost:5001/ai-images/dall-e/4043c8c4-c05e-4212-b4c0-4653059c06d3)',
-            }],
             isRunning: false,
         });
     }

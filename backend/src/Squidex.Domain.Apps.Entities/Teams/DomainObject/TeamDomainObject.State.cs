@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Teams;
 using Squidex.Infrastructure.EventSourcing;
 

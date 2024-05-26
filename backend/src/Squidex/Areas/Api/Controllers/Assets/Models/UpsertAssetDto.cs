@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -15,14 +16,8 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Assets.Models;
 
 [OpenApiRequest]
-public sealed class UpsertAssetDto
+public sealed class UpsertAssetDto : UploadModel
 {
-    /// <summary>
-    /// The file to upload.
-    /// </summary>
-    [FromForm(Name = "file")]
-    public IAssetFile File { get; set; }
-
     /// <summary>
     /// The optional parent folder id.
     /// </summary>
@@ -72,8 +67,10 @@ public sealed class UpsertAssetDto
         return command;
     }
 
-    public UpsertAsset ToCommand(DomainId id)
+    public async Task<UpsertAsset> ToCommandAsync(DomainId id, HttpContext httpContext, App app)
     {
-        return SimpleMapper.Map(this, new UpsertAsset { AssetId = id });
+        var file = await ToFileAsync(httpContext, app);
+
+        return SimpleMapper.Map(this, new UpsertAsset { AssetId = id, File = file });
     }
 }

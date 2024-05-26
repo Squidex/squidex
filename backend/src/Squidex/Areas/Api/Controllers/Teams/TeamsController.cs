@@ -98,7 +98,9 @@ public sealed class TeamsController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> PostTeam([FromBody] CreateTeamDto request)
     {
-        var response = await InvokeCommandAsync(request.ToCommand());
+        var command = request.ToCommand();
+
+        var response = await InvokeCommandAsync(command);
 
         return CreatedAtAction(nameof(GetTeams), response);
     }
@@ -118,7 +120,9 @@ public sealed class TeamsController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> PutTeam(string team, [FromBody] UpdateTeamDto request)
     {
-        var response = await InvokeCommandAsync(request.ToCommand());
+        var command = request.ToCommand();
+
+        var response = await InvokeCommandAsync(command);
 
         return Ok(response);
     }
