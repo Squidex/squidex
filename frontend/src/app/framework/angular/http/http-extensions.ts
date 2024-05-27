@@ -65,11 +65,12 @@ export module HTTP {
     function getFormData(file: UploadFile) {
         const formData = new FormData();
 
-        if (file instanceof File) {
-            formData.append('file', file);
+        const untyped = file as any;
+        if (Types.isObject(untyped) && Types.isString(untyped['name']) && Types.isString(untyped['url'])) {
+            formData.append('url', untyped.url);
+            formData.append('name', untyped.name);
         } else {
-            formData.append('url', file.url);
-            formData.append('name', file.name);
+            formData.append('file', untyped);
         }
 
         return formData;

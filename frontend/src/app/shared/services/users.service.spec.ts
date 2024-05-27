@@ -44,7 +44,7 @@ describe('UsersService', () => {
                 users = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/users?query=');
+            const req = httpMock.expectOne('http://service/p/api/users');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
