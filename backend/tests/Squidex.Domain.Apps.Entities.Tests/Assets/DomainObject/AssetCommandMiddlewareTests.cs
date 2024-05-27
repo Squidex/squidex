@@ -20,11 +20,11 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
     private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
+    private readonly IAssetFile file = new NoopAssetFile();
     private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
     private readonly IAssetMetadataSource assetMetadataSource = A.Fake<IAssetMetadataSource>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly DomainId assetId = DomainId.NewGuid();
-    private readonly AssetFile file = new NoopAssetFile();
     private readonly AssetCommandMiddleware sut;
 
     public sealed class MyCommand : SquidexCommand
@@ -38,8 +38,6 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
 
     public AssetCommandMiddlewareTests()
     {
-        file = new NoopAssetFile();
-
         A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._, CancellationToken))
             .Returns(Task.FromResult<EnrichedAsset?>(null));
 

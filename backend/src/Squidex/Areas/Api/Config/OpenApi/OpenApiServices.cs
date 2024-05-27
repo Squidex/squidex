@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using NJsonSchema.Generation.TypeMappers;
@@ -30,6 +29,12 @@ public static class OpenApiServices
         services.AddSingletonAs<ErrorDtoProcessor>()
             .As<IOperationProcessor>();
 
+        services.AddSingletonAs<ScopesProcessor>()
+            .As<IOperationProcessor>();
+
+        services.AddSingletonAs<TagByGroupNameProcessor>()
+            .As<IOperationProcessor>();
+
         services.AddSingletonAs<CommonProcessor>()
             .As<IDocumentProcessor>();
 
@@ -39,14 +44,11 @@ public static class OpenApiServices
         services.AddSingletonAs<SecurityProcessor>()
             .As<IDocumentProcessor>();
 
-        services.AddSingletonAs<ScopesProcessor>()
-            .As<IOperationProcessor>();
-
-        services.AddSingletonAs<TagByGroupNameProcessor>()
-            .As<IOperationProcessor>();
-
         services.AddSingletonAs<SchemaNameGenerator>()
             .As<ISchemaNameGenerator>();
+
+        services.AddSingletonAs<AssetFileResolver>()
+            .AsSelf();
 
         services.AddSingletonAs<JsonSchemaGenerator>()
             .AsSelf();

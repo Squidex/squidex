@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BehaviorSubject, catchError, of, switchMap } from 'rxjs';
-import { ModalDirective, TypedSimpleChanges } from '@app/framework';
+import { HTTP, ModalDirective, TypedSimpleChanges } from '@app/framework';
 import { ApiUrlConfig, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
 import { AssetDialogComponent } from '../assets/asset-dialog.component';
 import { AssetSelectorComponent } from '../assets/asset-selector.component';
@@ -227,14 +227,14 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
         }
     }
 
-    public insertText(text: string | undefined | null) {
+    public insertText(content: string | HTTP.UploadFile | undefined | null) {
         this.chatDialog.hide();
 
-        if (!this.currentChat) {
+        if (!this.currentChat || !Types.isString(content)) {
             return;
         }
 
-        this.currentChat.resolve(text);
+        this.currentChat.resolve(content);
         this.currentChat = undefined;
     }
 

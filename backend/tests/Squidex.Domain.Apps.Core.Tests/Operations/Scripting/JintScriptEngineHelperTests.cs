@@ -619,8 +619,11 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     [Fact]
     public async Task Should_generate_content()
     {
-        A.CallTo(() => chatAgent.PromptAsync("prompt", A<string>._, A<CancellationToken>._))
-            .Returns(ChatBotResponse.Success("Generated"));
+        A.CallTo(() => chatAgent.PromptAsync(
+                A<ChatRequest>.That.Matches(x => x.Prompt == "prompt"),
+                A<ChatContext>._,
+                A<CancellationToken>._))
+            .Returns(new ChatResult { Content = "Generated", Metadata = new ChatMetadata() });
 
         var vars = new ScriptVars
         {
@@ -660,7 +663,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
         Assert.Equal(JsonValue.Null, actual);
 
-        A.CallTo(() => chatAgent.PromptAsync(A<string>._, A<string>._, A<CancellationToken>._))
+        A.CallTo(() => chatAgent.PromptAsync(A<ChatRequest>._, A<ChatContext>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
         A.CallTo(() => chatAgent.StopConversationAsync(A<string>._, A<CancellationToken>._))

@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks } from '@app/shared';
+import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks, StringHelper } from '@app/shared';
 
 export class UserDto implements Resource {
     public readonly _links: ResourceLinks;
@@ -69,7 +69,7 @@ export class UsersService {
     }
 
     public getUsers(take: number, skip: number, query?: string): Observable<UsersDto> {
-        const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
+        const url = this.apiUrl.buildUrl(`api/user-management${StringHelper.buildQuery({ take, skip, query })}`);
 
         return this.http.get<any>(url).pipe(
             map(body => {

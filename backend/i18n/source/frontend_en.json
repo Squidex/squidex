@@ -142,6 +142,7 @@
   "chat.describeFormat": "Also add the desired format (for example Markdown or HTML) to your prompt, dependending on the editor that you use.",
   "chat.description": "Use the ChatBot (usually OpenAI) to generate content. Just write a prompt and describe the content you want to generate.",
   "chat.prompt": "Describe the content you want to generate",
+  "chat.failed": "Failed to answer your request.",
   "chat.title": "Chat Bot",
   "chat.use": "Use",
   "chatBot.questionFailed": "",

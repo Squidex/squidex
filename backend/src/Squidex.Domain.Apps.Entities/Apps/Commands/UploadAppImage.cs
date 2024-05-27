@@ -11,5 +11,5 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands;
 
 public sealed class UploadAppImage : AppCommand
 {
-    public AssetFile File { get; set; }
+    public IAssetFile File { get; set; }
 }

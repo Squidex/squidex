@@ -20,20 +20,28 @@ export module StringHelper {
         return '';
     }
 
-    export function appendToUrl(url: string, key: string, value?: any, ambersand = false) {
-        if (url.includes('?') || ambersand) {
-            url += '&';
-        } else {
-            url += '?';
+    export function buildQuery(values: Record<string, any>) {
+        let query = '';
+
+        for (const [key, value] of Object.entries(values)) {
+            if (value === null || value === undefined) {
+                continue;
+            }
+
+            if (query.includes('?')) {
+                query += '&';
+            } else {
+                query += '?';
+            }
+
+            if (value === key) {
+                query += key;
+            } else {
+                query += `${key}=${encodeURIComponent(value)}`;
+            }
         }
 
-        if (value !== undefined) {
-            url += `${key}=${value}`;
-        } else {
-            url += key;
-        }
-
-        return url;
+        return query;
     }
 
     export function appendLast(row: string, char: string) {

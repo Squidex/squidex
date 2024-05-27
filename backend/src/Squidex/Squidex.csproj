@@ -34,26 +34,26 @@
   
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="8.0.0" />
-    <PackageReference Include="Google.Cloud.Trace.V2" Version="3.5.0" />
+    <PackageReference Include="Google.Cloud.Trace.V2" Version="3.6.0" />
     <PackageReference Include="GraphQL" Version="7.8.0" />
     <PackageReference Include="GraphQL.MicrosoftDI" Version="7.8.0" />
     <PackageReference Include="GraphQL.SystemTextJson" Version="7.8.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.150">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.153">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.5" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.RulesetToEditorconfigConverter" Version="3.3.3" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
-	<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.1" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.21.1" />
+	<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.2" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.21.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.25.0" />
     <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="1.0.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
@@ -64,19 +64,19 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.8.1" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.8.1" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="ReportGenerator" Version="5.2.5" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="6.6.4" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.6.4" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="6.6.4" />
-    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.6.4" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.6.4" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="6.6.4" />
-    <PackageReference Include="Squidex.Assets.S3" Version="6.6.4" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.6.4" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="19.1.0" />
-    <PackageReference Include="Squidex.Hosting" Version="6.6.4" />
-    <PackageReference Include="Squidex.Messaging.All" Version="6.6.4" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.6.4" />
+    <PackageReference Include="ReportGenerator" Version="5.3.4" PrivateAssets="all" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="6.8.8" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.8.8" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="6.8.8" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.8.8" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.8.8" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="6.8.8" />
+    <PackageReference Include="Squidex.Assets.S3" Version="6.8.8" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.8.8" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="19.2.0" />
+    <PackageReference Include="Squidex.Hosting" Version="6.8.8" />
+    <PackageReference Include="Squidex.Messaging.All" Version="6.8.8" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.8.8" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="5.1.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="YDotNet" Version="0.4.0" />

@@ -20,7 +20,6 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
-using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile;
 
@@ -134,9 +133,9 @@ public sealed class ProfileController : IdentityServerController
 
     [HttpPost]
     [Route("account/profile/upload-picture/")]
-    public Task<IActionResult> UploadPicture(List<IFormFile> file)
+    public Task<IActionResult> UploadPicture(List<IFormFile> files)
     {
-        return MakeChangeAsync((id, ct) => UpdatePictureAsync(file, id, ct),
+        return MakeChangeAsync((id, ct) => UpdatePictureAsync(files, id, ct),
             T.Get("users.profile.uploadPictureDone"), None.Value);
     }
 
@@ -164,8 +163,6 @@ public sealed class ProfileController : IdentityServerController
             throw new ValidationException(T.Get("validation.onlyOneFile"));
         }
 
-        await UploadResizedAsync(files[0], id, ct);
-
         var update = new UserValues
         {
             PictureUrl = SquidexClaimTypes.PictureUrlStore
@@ -174,10 +171,10 @@ public sealed class ProfileController : IdentityServerController
         await userService.UpdateAsync(id, update, ct: ct);
     }
 
-    private async Task UploadResizedAsync(IFormFile file, string id,
+    private async Task UploadResizedAsync(IAssetFile file, string id,
         CancellationToken ct)
     {
-        await using var assetResized = TempAssetFile.Create(file.ToAssetFile());
+        await using var assetResized = TempAssetFile.Create(file);
 
         var resizeOptions = new ResizeOptions
         {
@@ -187,11 +184,11 @@ public sealed class ProfileController : IdentityServerController
 
         try
         {
-            await using (var originalStream = file.OpenReadStream())
+            await using (var originalStream = file.OpenRead())
             {
                 await using (var resizeStream = assetResized.OpenWrite())
                 {
-                    await assetGenerator.CreateThumbnailAsync(originalStream, file.ContentType, resizeStream, resizeOptions, ct);
+                    await assetGenerator.CreateThumbnailAsync(originalStream, file.MimeType, resizeStream, resizeOptions, ct);
                 }
             }
         }

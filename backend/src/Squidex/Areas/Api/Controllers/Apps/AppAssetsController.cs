@@ -61,7 +61,9 @@ public sealed class AppAssetsController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> PutAssetScripts(string app, [FromBody] UpdateAssetScriptsDto request)
     {
-        var response = await InvokeCommandAsync(request.ToCommand());
+        var command = request.ToCommand();
+
+        var response = await InvokeCommandAsync(command);
 
         return Ok(response);
     }

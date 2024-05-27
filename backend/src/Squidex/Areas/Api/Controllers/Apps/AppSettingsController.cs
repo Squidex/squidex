@@ -61,7 +61,9 @@ public sealed class AppSettingsController : ApiController
     [ApiCosts(0)]
     public async Task<IActionResult> PutSettings(string app, [FromBody] UpdateAppSettingsDto request)
     {
-        var response = await InvokeCommandAsync(request.ToCommand());
+        var command = request.ToCommand();
+
+        var response = await InvokeCommandAsync(command);
 
         return Ok(response);
     }

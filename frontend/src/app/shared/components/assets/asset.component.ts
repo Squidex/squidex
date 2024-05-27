@@ -7,7 +7,7 @@
 
 import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
-import { ConfirmClickDirective, ExternalLinkDirective, FileDropDirective, FromNowPipe, ImageSourceDirective, ProgressBarComponent, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { ConfirmClickDirective, ExternalLinkDirective, FileDropDirective, FromNowPipe, HTTP, ImageSourceDirective, ProgressBarComponent, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetUploaderState, DialogService, StatefulComponent, Types, UploadCanceled } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { AssetPreviewUrlPipe, AssetUrlPipe, FileIconPipe } from './pipes';
@@ -65,7 +65,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public selectFolder = new EventEmitter<string>();
 
     @Input()
-    public assetFile?: File;
+    public assetFile?: HTTP.UploadFile;
 
     @Input()
     public asset?: AssetDto;
@@ -127,7 +127,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         }
     }
 
-    public updateFile(files: ReadonlyArray<File>) {
+    public updateFile(files: ReadonlyArray<HTTP.UploadFile>) {
         const asset = this.asset;
 
         if (files.length === 1 && asset?.canUpload) {

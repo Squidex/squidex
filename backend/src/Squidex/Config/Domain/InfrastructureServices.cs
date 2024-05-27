@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.SemanticKernel;
 using NodaTime;
+using Squidex.AI;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.News.Service;
@@ -127,22 +127,32 @@ public static class InfrastructureServices
         services.Configure<LanguagesOptions>(config,
             "languages");
 
+        services.Configure<ChatOptions>(config,
+            "chatbot");
+
         services.AddSingletonAs<LanguagesInitializer>()
             .AsSelf();
 
-        var kernel = services.AddKernel();
+        services.AddAI();
 
-        var openAiKey = config["chatBot:openAi:apiKey"];
-        var openAiModel = config["chatBot:openAi:model"] ?? "gpt-3.5-turbo-0125";
+        var apiKey = config["chatBot:openAi:apiKey"];
 
-        if (!string.IsNullOrWhiteSpace(openAiKey))
+        if (!string.IsNullOrWhiteSpace(apiKey))
         {
-            kernel.AddOpenAIChatCompletion(openAiModel, openAiKey);
+            services.AddOpenAIChat(config);
+            services.AddDallE(config, options =>
+            {
+                options.DownloadImage = true;
+
+                if (string.IsNullOrEmpty(options.ApiKey))
+                {
+                    options.ApiKey = apiKey;
+                }
+            });
         }
 
         services.AddDeepLTranslations(config);
         services.AddGoogleCloudTranslations(config);
-        services.AddOpenAIChatAgent(config);
     }
 
     public static void AddSquidexLocalization(this IServiceCollection services)

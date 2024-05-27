@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
+using Squidex.AI.Implementation.OpenAI;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -15,7 +16,7 @@ using IGenericUrlGenerator = Squidex.Hosting.IUrlGenerator;
 
 namespace Squidex.Web.Services;
 
-public sealed class UrlGenerator : IUrlGenerator
+public sealed class UrlGenerator : IUrlGenerator, IHttpImageEndpoint
 {
     private readonly IAssetFileStore assetFileStore;
     private readonly IGenericUrlGenerator urlGenerator;
@@ -170,5 +171,10 @@ public sealed class UrlGenerator : IUrlGenerator
     public string UI()
     {
         return urlGenerator.BuildUrl("app", false);
+    }
+
+    string IHttpImageEndpoint.GetUrl(string relativePath)
+    {
+        return urlGenerator.BuildUrl($"ai-images/{relativePath}", false);
     }
 }

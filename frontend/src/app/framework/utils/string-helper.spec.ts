@@ -58,15 +58,33 @@ describe('StringHelper', () => {
         expect(StringHelper.hashCode('ABC')).not.toBe(StringHelper.hashCode('XYZ'));
     });
 
-    it('should append query string to url if url already contains query', () => {
-        const url = StringHelper.appendToUrl('http://squidex.io?query=value', 'other', 1);
+    it('should build query for empty object', () => {
+        const url = StringHelper.buildQuery({});
 
-        expect(url).toEqual('http://squidex.io?query=value&other=1');
+        expect(url).toEqual('');
     });
 
-    it('should append query string to url if url already contains no query', () => {
-        const url = StringHelper.appendToUrl('http://squidex.io', 'other', 1);
+    it('should build query for single value', () => {
+        const url = StringHelper.buildQuery({ key1: '42' });
 
-        expect(url).toEqual('http://squidex.io?other=1');
+        expect(url).toEqual('?key1=42');
+    });
+
+    it('should build query for multiple values', () => {
+        const url = StringHelper.buildQuery({ key1: '42', key2: 21 });
+
+        expect(url).toEqual('?key1=42&key2=21');
+    });
+
+    it('should build query and ignore null and undefined', () => {
+        const url = StringHelper.buildQuery({ key1: '42', key2: 21, key: undefined, key4: null });
+
+        expect(url).toEqual('?key1=42&key2=21');
+    });
+
+    it('should build query with encoded values', () => {
+        const url = StringHelper.buildQuery({ key1: 'Hello World' });
+
+        expect(url).toEqual('?key1=Hello%20World');
     });
 });

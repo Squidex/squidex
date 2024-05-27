@@ -35,7 +35,7 @@ describe('UsersService', () => {
                 users = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/user-management?take=20&skip=30&query=');
+            const req = httpMock.expectOne('http://service/p/api/user-management?take=20&skip=30');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();

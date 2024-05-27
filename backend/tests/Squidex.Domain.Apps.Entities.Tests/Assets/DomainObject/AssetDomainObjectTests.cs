@@ -22,13 +22,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
 public class AssetDomainObjectTests : HandlerTestBase<Asset>
 {
+    private readonly IAssetFile file = new NoopAssetFile();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
     private readonly ITagService tagService = A.Fake<ITagService>();
     private readonly DomainId parentId = DomainId.NewGuid();
     private readonly DomainId assetId = DomainId.NewGuid();
-    private readonly AssetFile file = new NoopAssetFile();
     private readonly AssetDomainObject sut;
 
     protected override DomainId Id

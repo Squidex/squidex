@@ -9,15 +9,10 @@ using Squidex.Assets;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers;
 
-public sealed class NoopAssetFile : AssetFile
+public sealed class NoopAssetFile : DelegateAssetFile
 {
     public NoopAssetFile(string fileName = "image.png", string mimeType = "image/png", long fileSize = 1024)
-        : base(fileName, mimeType, fileSize)
+        : base(fileName, mimeType, fileSize, () => new MemoryStream())
     {
-    }
-
-    public override Stream OpenRead()
-    {
-        return new MemoryStream();
     }
 }

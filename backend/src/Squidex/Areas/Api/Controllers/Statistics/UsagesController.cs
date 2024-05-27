@@ -86,12 +86,10 @@ public sealed class UsagesController : ApiController
         var fileDate = DateTime.UtcNow;
         var fileName = $"Usage-{fileDate:yyy-MM-dd}.csv";
 
-        var callback = new FileCallback((body, range, ct) =>
+        return new FileCallbackResult("text/csv", (body, range, ct) =>
         {
             return usageLog.ReadLogAsync(appId, fileDate.AddDays(-30), fileDate, body, ct);
-        });
-
-        return new FileCallbackResult("text/csv", callback)
+        })
         {
             FileDownloadName = fileName
         };

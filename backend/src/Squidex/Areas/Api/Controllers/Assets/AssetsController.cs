@@ -15,12 +15,8 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Translations;
-using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -32,7 +28,6 @@ namespace Squidex.Areas.Api.Controllers.Assets;
 [ApiExplorerSettings(GroupName = nameof(Assets))]
 public sealed class AssetsController : ApiController
 {
-    private readonly IUsageGate usageGate;
     private readonly IAssetQueryService assetQuery;
     private readonly IAssetUsageTracker assetUsageTracker;
     private readonly ITagService tagService;
@@ -40,14 +35,12 @@ public sealed class AssetsController : ApiController
 
     public AssetsController(
         ICommandBus commandBus,
-        IUsageGate usageGate,
         IAssetQueryService assetQuery,
         IAssetUsageTracker assetUsageTracker,
         ITagService tagService,
         AssetTusRunner assetTusRunner)
         : base(commandBus)
     {
-        this.usageGate = usageGate;
         this.assetQuery = assetQuery;
         this.assetUsageTracker = assetUsageTracker;
         this.assetTusRunner = assetTusRunner;
@@ -207,7 +200,7 @@ public sealed class AssetsController : ApiController
     [ApiCosts(1)]
     public async Task<IActionResult> PostAsset(string app, CreateAssetDto request)
     {
-        var command = request.ToCommand(await CheckAssetFileAsync(request.File));
+        var command = await request.ToCommandAsync(HttpContext, App);
 
         var response = await InvokeCommandAsync(command);
 
@@ -295,7 +288,7 @@ public sealed class AssetsController : ApiController
     [ApiCosts(1)]
     public async Task<IActionResult> PostUpsertAsset(string app, DomainId id, UpsertAssetDto request)
     {
-        var command = request.ToCommand(id, await CheckAssetFileAsync(request.File));
+        var command = await request.ToCommandAsync(id, HttpContext, App);
 
         var response = await InvokeCommandAsync(command);
 
@@ -307,7 +300,7 @@ public sealed class AssetsController : ApiController
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the asset.</param>
-    /// <param name="file">The file to upload.</param>
+    /// <param name="request">The request parameters.</param>
     /// <response code="200">Asset updated.</response>
     /// <response code="400">Asset request not valid.</response>
     /// <response code="413">Asset exceeds the maximum upload size.</response>
@@ -321,9 +314,9 @@ public sealed class AssetsController : ApiController
     [AssetRequestSizeLimit]
     [ApiPermissionOrAnonymous(PermissionIds.AppAssetsUpload)]
     [ApiCosts(1)]
-    public async Task<IActionResult> PutAssetContent(string app, DomainId id, IFormFile file)
+    public async Task<IActionResult> PutAssetContent(string app, DomainId id, UpdateAssetDto request)
     {
-        var command = new UpdateAsset { File = await CheckAssetFileAsync(file), AssetId = id };
+        var command = await request.ToCommandAsync(id, HttpContext, App);
 
         var response = await InvokeCommandAsync(command);
 
@@ -438,29 +431,6 @@ public sealed class AssetsController : ApiController
         {
             return AssetDto.FromDomain(context.Result<EnrichedAsset>(), Resources);
         }
-    }
-
-    private async Task<AssetFile> CheckAssetFileAsync(IFormFile? file)
-    {
-        if (file == null || Request.Form.Files.Count != 1)
-        {
-            var error = T.Get("validation.onlyOneFile");
-
-            throw new ValidationException(error);
-        }
-
-        var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, true, HttpContext.RequestAborted);
-
-        var (_, currentSize) = await assetUsageTracker.GetTotalByAppAsync(AppId, HttpContext.RequestAborted);
-
-        if (plan.MaxAssetSize > 0 && plan.MaxAssetSize < currentSize + file.Length)
-        {
-            var error = new ValidationError(T.Get("assets.maxSizeReached"));
-
-            throw new ValidationException(error);
-        }
-
-        return file.ToAssetFile();
     }
 
     private Q CreateQuery(string? ids, string? q)

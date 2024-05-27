@@ -48,13 +48,17 @@ export class AssetTextEditorComponent implements OnInit {
             });
     }
 
-    public toFile(): Promise<Blob | null> {
-        return new Promise<Blob | null>(resolve => {
+    public toFile(): Promise<File | null> {
+        return new Promise<File | null>(resolve => {
             const blob = new Blob([this.text || ''], {
                 type: this.mimeType,
             });
 
-            resolve(blob);
+            const file = new File([blob], 'content.txt', {
+                type: this.mimeType,
+            });
+
+            resolve(file);
         });
     }
 }

@@ -10,6 +10,11 @@
                     {{ 'contents.assetsUpload' | sqxTranslate }}
                 </div>
             </div>
+            <div class="col-auto" *ngIf="hasChatBot">
+                <button type="button" class="btn btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" tabindex="-1">
+                    AI
+                </button>
+            </div>
             <div class="col-auto">
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="snapshot.isListView" [disabled]="snapshot.isListView" (click)="changeView(true)">
@@ -28,18 +33,18 @@
             <div class="row g-0">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles"
                     [assetFile]="file"
-                    [isDisabled]="snapshot.isDisabled"
                     [isCompact]="snapshot.isCompact"
+                    [isDisabled]="snapshot.isDisabled"
                     [folderId]="folderId"
                     (loadDone)="addAsset(file, $event)"
                     (loadError)="removeLoadingAsset(file)">
                 </sqx-asset>
 
-                <sqx-asset *ngFor="let asset of snapshot.assets; trackBy: trackByAsset"
+                <sqx-asset *ngFor="let asset of snapshot.assetItems; trackBy: trackByAsset"
                     [asset]="asset"
                     (edit)="editStart($event)"
-                    [isDisabled]="snapshot.isDisabled"
                     [isCompact]="snapshot.isCompact"
+                    [isDisabled]="snapshot.isDisabled"
                     removeMode="true"
                     (remove)="removeLoadedAsset(asset)"
                     (update)="notifyOthers(asset)">
@@ -61,18 +66,18 @@
                 
                 <div cdkDropList
                     [cdkDropListDisabled]="snapshot.isDisabled"
-                    [cdkDropListData]="snapshot.assets"
+                    [cdkDropListData]="snapshot.assetItems"
                     (cdkDropListDropped)="sortAssets($event)">
-                    <div *ngFor="let asset of snapshot.assets; trackBy: trackByAsset" class="table-drag" cdkDrag cdkDragLockAxis="y">
+                    <div *ngFor="let asset of snapshot.assetItems; trackBy: trackByAsset" class="table-drag" cdkDrag cdkDragLockAxis="y">
                         <sqx-asset
                             [asset]="asset"
                             (edit)="editStart($event)"
-                            isListView="true"
-                            [isDisabled]="snapshot.isDisabled"
                             [isCompact]="snapshot.isCompact"
-                            (update)="notifyOthers(asset)"
-                            removeMode="true"
-                            (remove)="removeLoadedAsset(asset)">
+                            [isDisabled]="snapshot.isDisabled"
+                            isListView="true"
+                            [removeMode]="true"
+                            (remove)="removeLoadedAsset(asset)"
+                            (update)="notifyOthers(asset)">
                         </sqx-asset>
                     </div>
                 </div>
@@ -91,3 +96,7 @@
     (assetUpdated)="notifyOthers($event)"
     (dialogClose)="editDone()">
 </sqx-asset-dialog>
+
+<sqx-chat-dialog *sqxModal="chatDialog" configuration="image" copyMode="Image"
+    (contentSelect)="addAssetFromAI($event)">
+</sqx-chat-dialog>

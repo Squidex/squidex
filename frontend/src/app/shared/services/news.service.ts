@@ -8,7 +8,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiUrlConfig, pretifyError } from '@app/framework';
+import { ApiUrlConfig, pretifyError, StringHelper } from '@app/framework';
 
 export type FeatureDto = Readonly<{
     // The name of the feature.
@@ -37,7 +37,7 @@ export class NewsService {
     }
 
     public getFeatures(version: number): Observable<FeaturesDto> {
-        const url = this.apiUrl.buildUrl(`api/news/features?version=${version}`);
+        const url = this.apiUrl.buildUrl(`api/news/features${StringHelper.buildQuery({ version })}`);
 
         return this.http.get<FeaturesDto>(url).pipe(
             pretifyError('i18n:features.loadFailed'));

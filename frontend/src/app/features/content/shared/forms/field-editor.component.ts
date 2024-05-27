@@ -9,7 +9,7 @@ import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common'
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FieldDto, FormHintComponent, GeolocationEditorComponent, hasNoValue$, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FieldDto, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -122,6 +122,10 @@ export class FieldEditorComponent {
         return this.formModel.form;
     }
 
+    public get isString() {
+        return this.field?.properties.fieldType === 'String';
+    }
+
     constructor(
         private readonly messageBus: MessageBus,
     ) {
@@ -174,11 +178,11 @@ export class FieldEditorComponent {
         this.formModel.unset();
     }
 
-    public setValue(value: any) {
-        if (value) {
-            this.formModel.setValue(value);
-        }
-
+    public setValue(content: string | HTTP.UploadFile | null | undefined) {
         this.chatDialog.hide();
+
+        if (Types.isString(content)) {
+            this.formModel.setValue(content);
+        }
     }
 }

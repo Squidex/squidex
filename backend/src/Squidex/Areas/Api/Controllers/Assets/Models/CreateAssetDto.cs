@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -15,18 +15,12 @@ using Squidex.Web;
 namespace Squidex.Areas.Api.Controllers.Assets.Models;
 
 [OpenApiRequest]
-public sealed class CreateAssetDto
+public sealed class CreateAssetDto : UploadModel
 {
-    /// <summary>
-    /// The file to upload.
-    /// </summary>
-    [FromForm(Name = "file")]
-    public IFormFile File { get; set; }
-
     /// <summary>
     /// The optional parent folder id.
     /// </summary>
-    [FromQuery(Name = "parentId")]
+    // [FromQuery(Name = "parentId")]
     public DomainId ParentId { get; set; }
 
     /// <summary>
@@ -41,8 +35,10 @@ public sealed class CreateAssetDto
     [FromQuery(Name = "duplicate")]
     public bool Duplicate { get; set; }
 
-    public CreateAsset ToCommand(AssetFile file)
+    public async Task<CreateAsset> ToCommandAsync(HttpContext httpContext, App app)
     {
+        var file = await ToFileAsync(httpContext, app);
+
         var command = SimpleMapper.Map(this, new CreateAsset { File = file });
 
         if (Id != null && Id.Value != default && !string.IsNullOrWhiteSpace(Id.Value.ToString()))

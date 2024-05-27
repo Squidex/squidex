@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, Version, Versioned } from '@app/framework';
+import { ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, StringHelper, Version, Versioned } from '@app/framework';
 import { StatusInfo } from '../state/contents.state';
 import { Query, sanitize } from './query';
 import { parseField, RootFieldDto } from './schemas.service';
@@ -241,7 +241,7 @@ export class ContentsService {
     public getContentReferences(appName: string, schemaName: string, id: string, q?: ContentsByQuery): Observable<ContentsDto> {
         const query = buildQuery(q);
 
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/references?${buildQueryString(query)}`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/references${buildQueryString(query)}`);
 
         return this.http.get<any>(url, buildHeaders(q)).pipe(
             map(body => {
@@ -253,7 +253,7 @@ export class ContentsService {
     public getContentReferencing(appName: string, schemaName: string, id: string, q?: ContentsByQuery): Observable<ContentsDto> {
         const query = buildQuery(q);
 
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/referencing?${buildQueryString(query)}`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/referencing${buildQueryString(query)}`);
 
         return this.http.get<any>(url, buildHeaders(q)).pipe(
             map(body => {
@@ -300,7 +300,7 @@ export class ContentsService {
     }
 
     public postContent(appName: string, schemaName: string, data: any, publish: boolean, id = ''): Observable<ContentDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}&id=${id ?? ''}`);
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}${StringHelper.buildQuery({ publish, id })}`);
 
         return HTTP.postVersioned(this.http, url, data).pipe(
             map(({ payload }) => {
@@ -409,7 +409,7 @@ function buildFullQuery(primary: FullQuery, q?: ContentsByQuery) {
 function buildQueryString(input: { q?: object; odata?: string }) {
     const { odata, q } = input;
 
-    return q ? `q=${JSON.stringify(q)}` : odata;
+    return q ? `?q=${JSON.stringify(q)}` : `?${odata}`;
 }
 
 function buildQuery(q?: ContentsByQuery): { q?: object; odata?: string } {

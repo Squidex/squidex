@@ -9,7 +9,7 @@ import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { NgFor, NgIf } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, DialogModel, FileDropDirective, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, sorted, StatefulControlComponent, Subscriptions, TranslatePipe, Types } from '@app/shared';
+import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, ChatDialogComponent, DialogModel, FileDropDirective, HTTP, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, sorted, StatefulControlComponent, Subscriptions, TranslatePipe, Types } from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true,
@@ -25,10 +25,10 @@ class AssetUpdated {
 
 interface State {
     // The uploading files.
-    assetFiles: ReadonlyArray<File>;
+    assetFiles: ReadonlyArray<HTTP.UploadFile>;
 
     // The assets to render.
-    assets: ReadonlyArray<AssetDto>;
+    assetItems: ReadonlyArray<AssetDto>;
 
     // The asset to edit.
     editAsset?: AssetDto;
@@ -55,6 +55,7 @@ interface State {
         AssetSelectorComponent,
         CdkDrag,
         CdkDropList,
+        ChatDialogComponent,
         FileDropDirective,
         ModalDirective,
         NgFor,
@@ -69,6 +70,9 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     @Input()
     public folderId?: string;
 
+    @Input({ required: true, transform: booleanAttribute })
+    public hasChatBot = false;
+
     @Input({ transform: booleanAttribute })
     public isExpanded = false;
 
@@ -77,6 +81,8 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         this.setDisabledState(value === true);
     }
 
+    public chatDialog = new DialogModel();
+
     public assetsDialog = new DialogModel();
 
     constructor(localStore: LocalStoreService,
@@ -84,7 +90,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         private readonly messageBus: MessageBus,
     ) {
         super({
-            assets: [],
+            assetItems: [],
             assetFiles: [],
             isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
         });
@@ -96,7 +102,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
 
     public writeValue(obj: any) {
         if (Types.isArrayOfString(obj)) {
-            if (!Types.equals(obj, this.snapshot.assets.map(x => x.id))) {
+            if (!Types.equals(obj, this.snapshot.assetItems.map(x => x.id))) {
                 const assetIds: string[] = obj;
 
                 this.assetsResolver.resolveMany(obj)
@@ -104,7 +110,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
                         next: ({ items }) => {
                             this.setAssets(items);
 
-                            if (this.snapshot.assets.length !== assetIds.length) {
+                            if (this.snapshot.assetItems.length !== assetIds.length) {
                                 this.updateValue();
                             }
                         },
@@ -126,7 +132,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         this.subscriptions.add(
             this.messageBus.of(AssetUpdated)
                 .subscribe(event => {
-                    this.setAssets(this.snapshot.assets.replacedBy('id', event.asset));
+                    this.setAssets(this.snapshot.assetItems.replacedBy('id', event.asset));
                 }));
     }
 
@@ -135,10 +141,26 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     }
 
     public setAssets(assets: ReadonlyArray<AssetDto>) {
-        this.next({ assets });
+        this.next({ assetItems: assets });
     }
 
-    public addFiles(files: ReadonlyArray<File>) {
+    public addBlob(content: string | HTTP.UploadFile | null | undefined) {
+        this.chatDialog.hide();
+
+        if (content && !Types.isString(content)) {
+            this.addFiles([content]);
+        }
+    }
+
+    public addAssetFromAI(file: string | HTTP.UploadFile | null | undefined) {
+        this.chatDialog.hide();
+
+        if (!Types.isString(file) && file) {
+            this.addFiles([file]);
+        }
+    }
+
+    public addFiles(files: ReadonlyArray<HTTP.UploadFile>) {
         for (const file of files) {
             this.next(s => ({
                 ...s,
@@ -148,7 +170,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     }
 
     public selectAssets(assets: ReadonlyArray<AssetDto>) {
-        this.setAssets([...this.snapshot.assets, ...assets]);
+        this.setAssets([...this.snapshot.assetItems, ...assets]);
 
         if (assets.length > 0) {
             this.updateValue();
@@ -157,12 +179,12 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         this.assetsDialog.hide();
     }
 
-    public addAsset(file: File, asset: AssetDto) {
+    public addAsset(file: HTTP.UploadFile, asset: AssetDto) {
         if (asset && file) {
             this.next(s => ({
                 ...s,
                 assetFiles: s.assetFiles.removed(file),
-                assets: [asset, ...s.assets],
+                assetItems: [asset, ...s.assetItems],
             }));
 
             this.updateValue();
@@ -179,13 +201,13 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
 
     public removeLoadedAsset(asset: AssetDto) {
         if (asset) {
-            this.setAssets(this.snapshot.assets.removed(asset));
+            this.setAssets(this.snapshot.assetItems.removed(asset));
 
             this.updateValue();
         }
     }
 
-    public removeLoadingAsset(file: File) {
+    public removeLoadingAsset(file: HTTP.UploadFile) {
         this.next(s => ({
             ...s,
             assetFiles: s.assetFiles.removed(file),
@@ -205,7 +227,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     }
 
     private updateValue() {
-        const ids = this.snapshot.assets.map(x => x.id);
+        const ids = this.snapshot.assetItems.map(x => x.id);
 
         if (ids.length === 0) {
             this.callChange(null);

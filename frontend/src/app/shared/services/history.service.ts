@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, escapeHTML, pretifyError, Version } from '@app/framework';
+import { ApiUrlConfig, DateTime, escapeHTML, pretifyError, StringHelper, Version } from '@app/framework';
 import { UsersProviderService } from './users-provider.service';
 
 export class HistoryEventDto {
@@ -81,7 +81,7 @@ export class HistoryService {
     }
 
     public getHistory(appName: string, channel: string): Observable<ReadonlyArray<HistoryEventDto>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/history?channel=${channel}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/history${StringHelper.buildQuery({ channel })}`);
 
         const options = {
             headers: new HttpHeaders({

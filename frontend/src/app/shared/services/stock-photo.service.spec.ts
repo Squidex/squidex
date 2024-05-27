@@ -35,7 +35,7 @@ describe('StockPhotoService', () => {
                 images = result;
             });
 
-            const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&page=4');
+            const req = httpMock.expectOne('https://stockphoto.squidex.io?query=my-query&page=4');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
@@ -66,7 +66,7 @@ describe('StockPhotoService', () => {
                 images = result;
             });
 
-            const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&page=1');
+            const req = httpMock.expectOne('https://stockphoto.squidex.io?query=my-query&page=1');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();

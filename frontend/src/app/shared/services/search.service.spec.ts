@@ -34,7 +34,7 @@ describe('SearchService', () => {
                 results = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/search/?query=my-query');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/search?query=my-query');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();

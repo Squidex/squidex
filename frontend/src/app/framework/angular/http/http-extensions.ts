@@ -12,7 +12,9 @@ import { catchError, map, Observable, throwError } from 'rxjs';
 import { ErrorDto, Types, Version, Versioned } from '@app/framework/internal';
 
 export module HTTP {
-    export function upload<T = any>(http: HttpClient, method: string, url: string, file: Blob, version?: Version): Observable<HttpEvent<T>> {
+    export type UploadFile = File | { url: string; name: string };
+
+    export function upload<T = any>(http: HttpClient, method: string, url: string, file: UploadFile, version?: Version): Observable<HttpEvent<T>> {
         const req = new HttpRequest(method, url, getFormData(file), { headers: createHeaders(version, undefined), reportProgress: true });
 
         return http.request<T>(req);
@@ -60,10 +62,16 @@ export module HTTP {
         return handleVersion(http.request<T>(method, url, { observe: 'response', headers, body }));
     }
 
-    function getFormData(file: Blob) {
+    function getFormData(file: UploadFile) {
         const formData = new FormData();
 
-        formData.append('file', file);
+        const untyped = file as any;
+        if (Types.isObject(untyped) && Types.isString(untyped['name']) && Types.isString(untyped['url'])) {
+            formData.append('url', untyped.url);
+            formData.append('name', untyped.name);
+        } else {
+            formData.append('file', untyped);
+        }
 
         return formData;
     }
