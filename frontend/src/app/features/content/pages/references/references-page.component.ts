@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
@@ -28,8 +28,6 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
         LanguageSelectorComponent,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
-        NgIf,
         PagerComponent,
         ReferenceItemComponent,
         ShortcutDirective,

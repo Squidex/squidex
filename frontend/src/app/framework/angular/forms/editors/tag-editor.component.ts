@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
@@ -47,19 +47,17 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        DropdownMenuComponent,
-        FormsModule,
-        LoaderComponent,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        ScrollActiveDirective,
-        StopClickDirective,
-        TooltipDirective,
-        TranslatePipe,
-    ],
+    DropdownMenuComponent,
+    FormsModule,
+    LoaderComponent,
+    ModalDirective,
+    ModalPlacementDirective,
+    ReactiveFormsModule,
+    ScrollActiveDirective,
+    StopClickDirective,
+    TooltipDirective,
+    TranslatePipe
+],
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();

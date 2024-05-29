@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { SimulatedRuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
@@ -16,10 +16,8 @@ import { SimulatedRuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/s
     templateUrl: './rule-transition.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgFor,
-        NgIf,
-        TranslatePipe,
-    ],
+    TranslatePipe
+],
 })
 export class RuleTransitionComponent {
     @Input()

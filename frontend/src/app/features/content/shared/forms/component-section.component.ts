@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSection, FormHintComponent, MarkdownDirective } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
@@ -20,8 +20,6 @@ import { FieldEditorComponent } from './field-editor.component';
         AsyncPipe,
         FormHintComponent,
         MarkdownDirective,
-        NgFor,
-        NgIf,
         forwardRef(() => FieldEditorComponent),
     ],
 })

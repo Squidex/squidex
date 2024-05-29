@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgForOf, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -28,23 +28,21 @@ interface State {
         bounceAnimation,
     ],
     imports: [
-        ConfirmClickDirective,
-        FocusOnInitDirective,
-        FormsModule,
-        FromNowPipe,
-        MarkdownPipe,
-        MentionModule,
-        NgIf,
-        NgForOf,
-        ReactiveFormsModule,
-        RouterLink,
-        SafeHtmlPipe,
-        ScrollActiveDirective,
-        TooltipDirective,
-        TranslatePipe,
-        UserNameRefPipe,
-        UserPictureRefPipe,
-    ],
+    ConfirmClickDirective,
+    FocusOnInitDirective,
+    FormsModule,
+    FromNowPipe,
+    MarkdownPipe,
+    MentionModule,
+    ReactiveFormsModule,
+    RouterLink,
+    SafeHtmlPipe,
+    ScrollActiveDirective,
+    TooltipDirective,
+    TranslatePipe,
+    UserNameRefPipe,
+    UserPictureRefPipe
+],
 })
 export class CommentComponent extends StatefulComponent<State> {
     @Input({ transform: booleanAttribute })

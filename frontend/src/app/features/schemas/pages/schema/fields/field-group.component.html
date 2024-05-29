@@ -1,27 +1,38 @@
-<div class="nested-field" *ngIf="fieldGroup.separator">
-    <span class="nested-field-line-h"></span>
-
-    <sqx-field [field]="$any(fieldGroup.separator)" [languages]="languages" [parent]="parent" plain="true" [schema]="schema" [settings]="settings">
-        <div class="d-flex align-items-center">
-            <ng-content></ng-content>
-    
-            <button type="button" class="btn btn-sm btn-text-secondary ms-2" (click)="toggle()">
-                <i [class.icon-caret-right]="snapshot.isCollapsed" [class.icon-caret-down]="!snapshot.isCollapsed"></i> 
-            </button>
-        </div>
-    </sqx-field>
-</div>
-
-<div *ngIf="!snapshot.isCollapsed" class="field-group nested-field" [class.field-placeholder]="fieldGroup.fields.length === 0 && !fieldsEmpty"
-    cdkDropList
-    [cdkDropListDisabled]="!sortable"
-    [cdkDropListData]="fieldGroup.fields"
-    (cdkDropListDropped)="sorted.emit($event)">
-    <div *ngFor="let field of fieldGroup.fields; trackBy: trackByFieldFn" class="nested-field table-drag" cdkDrag cdkDragLockAxis="y">
+@if (fieldGroup.separator) {
+    <div class="nested-field">
         <span class="nested-field-line-h"></span>
-
-        <sqx-field [field]="$any(field)" [languages]="languages" [parent]="parent" [schema]="schema" [settings]="settings">
-            <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+        <sqx-field
+            [field]="$any(fieldGroup.separator)"
+            [languages]="languages"
+            [parent]="parent"
+            [schema]="schema"
+            [settings]="settings"
+            plain="true">
+            <div class="d-flex align-items-center">
+                <ng-content></ng-content>
+                <button class="btn btn-sm btn-text-secondary ms-2" (click)="toggle()" type="button">
+                    <i [class.icon-caret-right]="snapshot.isCollapsed" [class.icon-caret-down]="!snapshot.isCollapsed"></i>
+                </button>
+            </div>
         </sqx-field>
     </div>
-</div>
+}
+
+@if (!snapshot.isCollapsed) {
+    <div
+        class="field-group nested-field"
+        [class.field-placeholder]="fieldGroup.fields.length === 0 && !fieldsEmpty"
+        [cdkDropListDisabled]="!sortable"
+        [cdkDropListData]="fieldGroup.fields"
+        (cdkDropListDropped)="sorted.emit($event)"
+        cdkDropList>
+        @for (field of fieldGroup.fields; track trackByFieldFn($index, field)) {
+            <div class="nested-field table-drag" cdkDrag cdkDragLockAxis="y">
+                <span class="nested-field-line-h"></span>
+                <sqx-field [field]="$any(field)" [languages]="languages" [parent]="parent" [schema]="schema" [settings]="settings">
+                    <i class="icon-drag2 drag-handle" cdkDragHandle></i>
+                </sqx-field>
+            </div>
+        }
+    </div>
+}

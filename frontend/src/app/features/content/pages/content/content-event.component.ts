@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ContentDto, FromNowPipe, HistoryEventDto, HistoryMessagePipe, TooltipDirective, TranslatePipe, TypedSimpleChanges, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
@@ -18,7 +18,6 @@ import { ContentDto, FromNowPipe, HistoryEventDto, HistoryMessagePipe, TooltipDi
     imports: [
         FromNowPipe,
         HistoryMessagePipe,
-        NgIf,
         TooltipDirective,
         TranslatePipe,
         UserNameRefPipe,

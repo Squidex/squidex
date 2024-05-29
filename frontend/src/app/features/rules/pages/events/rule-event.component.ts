@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent, ConfirmClickDirective, FromNowPipe, RuleEventDto, TranslatePipe } from '@app/shared';
@@ -20,14 +20,13 @@ import { RuleClassPipe } from '../../shared/pipes';
     templateUrl: './rule-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        CodeEditorComponent,
-        ConfirmClickDirective,
-        FormsModule,
-        FromNowPipe,
-        NgIf,
-        RuleClassPipe,
-        TranslatePipe,
-    ],
+    CodeEditorComponent,
+    ConfirmClickDirective,
+    FormsModule,
+    FromNowPipe,
+    RuleClassPipe,
+    TranslatePipe
+],
 })
 export class RuleEventComponent {
     @Input('sqxRuleEvent')

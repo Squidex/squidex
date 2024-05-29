@@ -1,26 +1,43 @@
-<div class="assets-container"
+<div
+    class="assets-container"
     [class.expanded]="isExpanded"
-    (sqxDropFile)="addFiles($event)" 
-    [sqxDropDisabled]="snapshot.isDisabled" 
+    [sqxDropDisabled]="snapshot.isDisabled"
+    (sqxDropFile)="addFiles($event)"
     tabindex="1000">
     <div class="header list">
         <div class="row gx-2">
             <div class="col" [class.disabled]="snapshot.isDisabled">
-                <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxDropFile)="addFiles($event)" [sqxDropDisabled]="snapshot.isDisabled">
-                    {{ 'contents.assetsUpload' | sqxTranslate }}
+                <div
+                    class="drop-area align-items-center"
+                    [sqxDropDisabled]="snapshot.isDisabled"
+                    (click)="assetsDialog.show()"
+                    (sqxDropFile)="addFiles($event)">
+                    {{ "contents.assetsUpload" | sqxTranslate }}
                 </div>
             </div>
-            <div class="col-auto" *ngIf="hasChatBot">
-                <button type="button" class="btn btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" tabindex="-1">
-                    AI
-                </button>
-            </div>
+            @if (hasChatBot) {
+                <div class="col-auto">
+                    <button class="btn btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" type="button" tabindex="-1">
+                        AI
+                    </button>
+                </div>
+            }
             <div class="col-auto">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="snapshot.isListView" [disabled]="snapshot.isListView" (click)="changeView(true)">
+                    <button
+                        class="btn btn-secondary btn-toggle"
+                        [class.btn-primary]="snapshot.isListView"
+                        [disabled]="snapshot.isListView"
+                        (click)="changeView(true)"
+                        type="button">
                         <i class="icon-list"></i>
                     </button>
-                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!snapshot.isListView" [disabled]="!snapshot.isListView" (click)="changeView(false)">
+                    <button
+                        class="btn btn-secondary btn-toggle"
+                        [class.btn-primary]="!snapshot.isListView"
+                        [disabled]="!snapshot.isListView"
+                        (click)="changeView(false)"
+                        type="button">
                         <i class="icon-grid"></i>
                     </button>
                 </div>
@@ -29,74 +46,71 @@
     </div>
 
     <div class="body" (sqxResizeCondition)="setCompact($event)" sqxResizeMinWidth="600" sqxResizeMaxWidth="0">
-        <ng-container *ngIf="!snapshot.isListView; else listTemplate">
+        @if (!snapshot.isListView) {
             <div class="row g-0">
-                <sqx-asset *ngFor="let file of snapshot.assetFiles"
-                    [assetFile]="file"
-                    [isCompact]="snapshot.isCompact"
-                    [isDisabled]="snapshot.isDisabled"
-                    [folderId]="folderId"
-                    (loadDone)="addAsset(file, $event)"
-                    (loadError)="removeLoadingAsset(file)">
-                </sqx-asset>
-
-                <sqx-asset *ngFor="let asset of snapshot.assetItems; trackBy: trackByAsset"
-                    [asset]="asset"
-                    (edit)="editStart($event)"
-                    [isCompact]="snapshot.isCompact"
-                    [isDisabled]="snapshot.isDisabled"
-                    removeMode="true"
-                    (remove)="removeLoadedAsset(asset)"
-                    (update)="notifyOthers(asset)">
-                </sqx-asset>
+                @for (file of snapshot.assetFiles; track file) {
+                    <sqx-asset
+                        [assetFile]="file"
+                        [isCompact]="snapshot.isCompact"
+                        [isDisabled]="snapshot.isDisabled"
+                        [folderId]="folderId"
+                        (loadDone)="addAsset(file, $event)"
+                        (loadError)="removeLoadingAsset(file)"></sqx-asset>
+                }
+                @for (asset of snapshot.assetItems; track trackByAsset($index, asset)) {
+                    <sqx-asset
+                        [asset]="asset"
+                        [isCompact]="snapshot.isCompact"
+                        [isDisabled]="snapshot.isDisabled"
+                        (edit)="editStart($event)"
+                        (remove)="removeLoadedAsset(asset)"
+                        (update)="notifyOthers(asset)"
+                        removeMode="true"></sqx-asset>
+                }
             </div>
-        </ng-container>
-    
-        <ng-template #listTemplate>
+        } @else {
             <div class="list-view">
-                <sqx-asset *ngFor="let file of snapshot.assetFiles"
-                    [assetFile]="file"
-                    [folderId]="folderId"
-                    [isCompact]="snapshot.isCompact"
-                    [isDisabled]="snapshot.isDisabled"
-                    isListView="true"
-                    (loadDone)="addAsset(file, $event)"
-                    (loadError)="removeLoadingAsset(file)">
-                </sqx-asset>
-                
-                <div cdkDropList
+                @for (file of snapshot.assetFiles; track file) {
+                    <sqx-asset
+                        [assetFile]="file"
+                        [folderId]="folderId"
+                        [isCompact]="snapshot.isCompact"
+                        [isDisabled]="snapshot.isDisabled"
+                        (loadDone)="addAsset(file, $event)"
+                        (loadError)="removeLoadingAsset(file)"
+                        isListView="true"></sqx-asset>
+                }
+                <div
                     [cdkDropListDisabled]="snapshot.isDisabled"
                     [cdkDropListData]="snapshot.assetItems"
-                    (cdkDropListDropped)="sortAssets($event)">
-                    <div *ngFor="let asset of snapshot.assetItems; trackBy: trackByAsset" class="table-drag" cdkDrag cdkDragLockAxis="y">
-                        <sqx-asset
-                            [asset]="asset"
-                            (edit)="editStart($event)"
-                            [isCompact]="snapshot.isCompact"
-                            [isDisabled]="snapshot.isDisabled"
-                            isListView="true"
-                            [removeMode]="true"
-                            (remove)="removeLoadedAsset(asset)"
-                            (update)="notifyOthers(asset)">
-                        </sqx-asset>
-                    </div>
+                    (cdkDropListDropped)="sortAssets($event)"
+                    cdkDropList>
+                    @for (asset of snapshot.assetItems; track trackByAsset($index, asset)) {
+                        <div class="table-drag" cdkDrag cdkDragLockAxis="y">
+                            <sqx-asset
+                                [asset]="asset"
+                                [isCompact]="snapshot.isCompact"
+                                [isDisabled]="snapshot.isDisabled"
+                                [removeMode]="true"
+                                (edit)="editStart($event)"
+                                (remove)="removeLoadedAsset(asset)"
+                                (update)="notifyOthers(asset)"
+                                isListView="true"></sqx-asset>
+                        </div>
+                    }
                 </div>
             </div>
-        </ng-template>
+        }
     </div>
 </div>
 
-<sqx-asset-selector *sqxModal="assetsDialog"
-    (assetSelect)="selectAssets($event)">
-</sqx-asset-selector>
+<sqx-asset-selector *sqxModal="assetsDialog" (assetSelect)="selectAssets($event)"></sqx-asset-selector>
 
-<sqx-asset-dialog *sqxModal="snapshot.editAsset;isDialog:true"
-    [asset]="snapshot.editAsset!" 
+<sqx-asset-dialog
+    *sqxModal="snapshot.editAsset; isDialog: true"
+    [asset]="snapshot.editAsset!"
     (assetReplaced)="notifyOthers($event)"
     (assetUpdated)="notifyOthers($event)"
-    (dialogClose)="editDone()">
-</sqx-asset-dialog>
+    (dialogClose)="editDone()"></sqx-asset-dialog>
 
-<sqx-chat-dialog *sqxModal="chatDialog" configuration="image" copyMode="Image"
-    (contentSelect)="addAssetFromAI($event)">
-</sqx-chat-dialog>
+<sqx-chat-dialog *sqxModal="chatDialog" (contentSelect)="addAssetFromAI($event)" configuration="image" copyMode="Image"></sqx-chat-dialog>

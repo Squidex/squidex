@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { timer } from 'rxjs';
@@ -40,18 +40,16 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FocusOnInitDirective,
-        FormsModule,
-        MarkdownPipe,
-        ModalDialogComponent,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgFor,
-        NgIf,
-        SafeHtmlPipe,
-        TooltipDirective,
-        TranslatePipe,
-    ],
+    FocusOnInitDirective,
+    FormsModule,
+    MarkdownPipe,
+    ModalDialogComponent,
+    ModalDirective,
+    ModalPlacementDirective,
+    SafeHtmlPipe,
+    TooltipDirective,
+    TranslatePipe
+],
 })
 export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

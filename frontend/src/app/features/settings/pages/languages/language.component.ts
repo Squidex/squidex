@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintComponent, LanguageDto, LanguagesState, sorted, TranslatePipe } from '@app/shared';
@@ -17,17 +17,15 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintCompon
     styleUrls: ['./language.component.scss'],
     templateUrl: './language.component.html',
     imports: [
-        CdkDrag,
-        CdkDragHandle,
-        CdkDropList,
-        ConfirmClickDirective,
-        FormHintComponent,
-        FormsModule,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        TranslatePipe,
-    ],
+    CdkDrag,
+    CdkDragHandle,
+    CdkDropList,
+    ConfirmClickDirective,
+    FormHintComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    TranslatePipe
+],
 })
 export class LanguageComponent {
     @Input({ required: true })

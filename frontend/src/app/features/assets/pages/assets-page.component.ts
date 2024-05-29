@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -29,7 +29,6 @@ import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathCo
         LayoutComponent,
         ListViewComponent,
         ModalDirective,
-        NgIf,
         PagerComponent,
         RouterLink,
         RouterLinkActive,

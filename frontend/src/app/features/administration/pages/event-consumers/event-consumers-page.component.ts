@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
@@ -26,7 +26,6 @@ import { EventConsumerComponent } from './event-consumer.component';
         ListViewComponent,
         ModalDialogComponent,
         ModalDirective,
-        NgFor,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,

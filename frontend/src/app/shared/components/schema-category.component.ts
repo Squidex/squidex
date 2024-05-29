@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragStart, CdkDropList } from '@angular/cdk/drag-drop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { EditableTitleComponent, StopDragDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
@@ -21,19 +21,17 @@ const ITEM_HEIGHT = 2.5;
     templateUrl: './schema-category.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        CdkDrag,
-        CdkDragHandle,
-        CdkDropList,
-        EditableTitleComponent,
-        NgFor,
-        NgIf,
-        RouterLink,
-        RouterLinkActive,
-        StopDragDirective,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    CdkDrag,
+    CdkDragHandle,
+    CdkDropList,
+    EditableTitleComponent,
+    RouterLink,
+    RouterLinkActive,
+    StopDragDirective,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class SchemaCategoryComponent {
     @Output()

@@ -1,57 +1,65 @@
-<div class="references-container" [class.expanded]="isExpanded"
+<div
+    class="references-container"
+    [class.expanded]="isExpanded"
     (sqxResizeCondition)="setCompact($event)"
     sqxResizeMinWidth="600"
     sqxResizeMaxWidth="0">
     <ng-container>
         <div class="drop-area-container" [class.disabled]="snapshot.isDisabled">
             <div class="drop-area">
-                <a (click)="createContent()">{{ 'contents.referencesCreateNew' | sqxTranslate }}</a>
+                <a (click)="createContent()">{{ "contents.referencesCreateNew" | sqxTranslate }}</a>
 
                 &middot;
 
-                <a (click)="contentSelectorDialog.show()">{{ 'contents.referencesSelectExisting' | sqxTranslate }}</a>
+                <a (click)="contentSelectorDialog.show()">{{ "contents.referencesSelectExisting" | sqxTranslate }}</a>
             </div>
         </div>
-        
-        <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.contentItems && snapshot.contentItems.length > 0" 
-            cdkDropList
-            [cdkDropListData]="snapshot.contentItems"
-            [cdkDropListDisabled]="snapshot.isDisabled"
-            (cdkDropListDropped)="sort($event)">
-            <tbody *ngFor="let content of snapshot.contentItems; trackBy: trackByContent"
-                [sqxReferenceItem]="content"
-                class="table-drag"
-                cdkDrag
-                cdkDragLockAxis="y" 
-                (clone)="createContent(content)"
-                [columns]="snapshot.contentItems | sqxContentsColumns"
-                [isCompact]="snapshot.isCompact"
-                [isDisabled]="snapshot.isDisabled"
-                [language]="language"
-                [languages]="languages"
-                (delete)="remove(content)">
-                <i cdkDragHandle class="icon-drag2 drag-handle"></i>
-            </tbody>
-        </table>
+
+        @if (snapshot.contentItems && snapshot.contentItems.length > 0) {
+            <table
+                class="table table-items table-fixed"
+                [class.disabled]="snapshot.isDisabled"
+                [cdkDropListData]="snapshot.contentItems"
+                [cdkDropListDisabled]="snapshot.isDisabled"
+                (cdkDropListDropped)="sort($event)"
+                cdkDropList>
+                @for (content of snapshot.contentItems; track trackByContent($index, content)) {
+                    <tbody
+                        class="table-drag"
+                        [sqxReferenceItem]="content"
+                        [columns]="snapshot.contentItems | sqxContentsColumns"
+                        [isCompact]="snapshot.isCompact"
+                        [isDisabled]="snapshot.isDisabled"
+                        [language]="language"
+                        [languages]="languages"
+                        (clone)="createContent(content)"
+                        (delete)="remove(content)"
+                        cdkDrag
+                        cdkDragLockAxis="y">
+                        <i class="icon-drag2 drag-handle" cdkDragHandle></i>
+                    </tbody>
+                }
+            </table>
+        }
     </ng-container>
 </div>
 
-<sqx-content-creator *sqxModal="contentCreatorDialog"
-    (contentCreate)="select($event)"
+<sqx-content-creator
+    *sqxModal="contentCreatorDialog"
     [formContext]="formContext"
     [initialData]="clonedContent?.data"
     [language]="language"
     [languages]="languages"
     [schemaName]="clonedContent?.schemaName"
-    [schemaIds]="schemaIds">
-</sqx-content-creator>
+    [schemaIds]="schemaIds"
+    (contentCreate)="select($event)"></sqx-content-creator>
 
-<sqx-content-selector *sqxModal="contentSelectorDialog"
-    (contentSelect)="select($event)"
+<sqx-content-selector
+    *sqxModal="contentSelectorDialog"
     [allowDuplicates]="allowDuplicates"
     [alreadySelected]="snapshot.contentItems"
     [language]="language"
     [languages]="languages"
     [query]="query"
-    [schemaIdentifiers]="schemaIds">
-</sqx-content-selector>
+    [schemaIdentifiers]="schemaIds"
+    (contentSelect)="select($event)"></sqx-content-selector>

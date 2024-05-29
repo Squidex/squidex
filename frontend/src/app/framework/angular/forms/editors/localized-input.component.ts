@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgSwitch, NgSwitchCase } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
@@ -35,14 +35,12 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        DateTimeEditorComponent,
-        FormsModule,
-        IndeterminateValueDirective,
-        LanguageSelectorComponent,
-        NgSwitch,
-        NgSwitchCase,
-        TagEditorComponent,
-    ],
+    DateTimeEditorComponent,
+    FormsModule,
+    IndeterminateValueDirective,
+    LanguageSelectorComponent,
+    TagEditorComponent
+],
 })
 export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {
     private value: { [key: string]: any } | undefined;

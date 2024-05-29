@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -18,25 +18,24 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
     styleUrls: ['./auth-page.component.scss'],
     templateUrl: './auth-page.component.html',
     imports: [
-        AsyncPipe,
-        ControlErrorsComponent,
-        CopyDirective,
-        FormErrorComponent,
-        FormHintComponent,
-        FormsModule,
-        LayoutComponent,
-        ListViewComponent,
-        NgIf,
-        ReactiveFormsModule,
-        RouterLink,
-        RouterLinkActive,
-        RouterOutlet,
-        SidebarMenuDirective,
-        ToggleComponent,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    ControlErrorsComponent,
+    CopyDirective,
+    FormErrorComponent,
+    FormHintComponent,
+    FormsModule,
+    LayoutComponent,
+    ListViewComponent,
+    ReactiveFormsModule,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    SidebarMenuDirective,
+    ToggleComponent,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class AuthPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

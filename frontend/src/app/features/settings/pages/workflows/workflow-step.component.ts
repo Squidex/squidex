@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, TypedSimpleChanges, WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
@@ -17,16 +17,14 @@ import { WorkflowTransitionComponent } from './workflow-transition.component';
     styleUrls: ['./workflow-step.component.scss'],
     templateUrl: './workflow-step.component.html',
     imports: [
-        ColorPickerComponent,
-        DropdownComponent,
-        EditableTitleComponent,
-        FormsModule,
-        NgFor,
-        NgIf,
-        TagEditorComponent,
-        TranslatePipe,
-        WorkflowTransitionComponent,
-    ],
+    ColorPickerComponent,
+    DropdownComponent,
+    EditableTitleComponent,
+    FormsModule,
+    TagEditorComponent,
+    TranslatePipe,
+    WorkflowTransitionComponent
+],
 })
 export class WorkflowStepComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };

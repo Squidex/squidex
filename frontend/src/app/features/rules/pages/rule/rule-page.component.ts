@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -26,35 +26,31 @@ import { RuleConfigured } from '../messages';
     styleUrls: ['./rule-page.component.scss'],
     templateUrl: './rule-page.component.html',
     imports: [
-        AssetChangedTriggerComponent,
-        AsyncPipe,
-        CommentTriggerComponent,
-        ConfirmClickDirective,
-        ContentChangedTriggerComponent,
-        FormAlertComponent,
-        FormsModule,
-        GenericActionComponent,
-        KeysPipe,
-        LayoutComponent,
-        ListViewComponent,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        RouterLink,
-        RouterLinkActive,
-        RouterOutlet,
-        RuleElementComponent,
-        SchemaChangedTriggerComponent,
-        SidebarMenuDirective,
-        TitleComponent,
-        ToggleComponent,
-        TooltipDirective,
-        TourHintDirective,
-        TourStepDirective,
-        TranslatePipe,
-        UsageTriggerComponent,
-    ],
+    AssetChangedTriggerComponent,
+    AsyncPipe,
+    CommentTriggerComponent,
+    ConfirmClickDirective,
+    ContentChangedTriggerComponent,
+    FormAlertComponent,
+    FormsModule,
+    GenericActionComponent,
+    KeysPipe,
+    LayoutComponent,
+    ListViewComponent,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    RuleElementComponent,
+    SchemaChangedTriggerComponent,
+    SidebarMenuDirective,
+    TitleComponent,
+    ToggleComponent,
+    TooltipDirective,
+    TourHintDirective,
+    TourStepDirective,
+    TranslatePipe,
+    UsageTriggerComponent
+],
 })
 export class RulePageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs/operators';
@@ -25,33 +25,29 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
     styleUrls: ['./schema-page.component.scss'],
     templateUrl: './schema-page.component.html',
     imports: [
-        AsyncPipe,
-        ConfirmClickDirective,
-        DropdownMenuComponent,
-        LayoutComponent,
-        ListViewComponent,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        NgSwitchDefault,
-        RouterLink,
-        RouterLinkActive,
-        RouterOutlet,
-        SchemaEditFormComponent,
-        SchemaExportFormComponent,
-        SchemaFieldRulesFormComponent,
-        SchemaFieldsComponent,
-        SchemaPreviewUrlsFormComponent,
-        SchemaScriptsFormComponent,
-        SchemaUIFormComponent,
-        SidebarMenuDirective,
-        TitleComponent,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    ConfirmClickDirective,
+    DropdownMenuComponent,
+    LayoutComponent,
+    ListViewComponent,
+    ModalDirective,
+    ModalPlacementDirective,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    SchemaEditFormComponent,
+    SchemaExportFormComponent,
+    SchemaFieldRulesFormComponent,
+    SchemaFieldsComponent,
+    SchemaPreviewUrlsFormComponent,
+    SchemaScriptsFormComponent,
+    SchemaUIFormComponent,
+    SidebarMenuDirective,
+    TitleComponent,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class SchemaPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

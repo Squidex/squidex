@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, CdkDropListGroup, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { NgFor } from '@angular/common';
+
 import { booleanAttribute, Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
 import { AppSettingsDto, FieldDto, FieldGroup, groupFields, LanguageDto, RootFieldDto, SchemaDto } from '@app/shared';
 import { FieldGroupComponent } from './field-group.component';
@@ -17,13 +17,12 @@ import { FieldGroupComponent } from './field-group.component';
     styleUrls: ['./sortable-field-list.component.scss'],
     templateUrl: './sortable-field-list.component.html',
     imports: [
-        CdkDrag,
-        CdkDragHandle,
-        CdkDropList,
-        CdkDropListGroup,
-        NgFor,
-        forwardRef(() => FieldGroupComponent),
-    ],
+    CdkDrag,
+    CdkDragHandle,
+    CdkDropList,
+    CdkDropListGroup,
+    forwardRef(() => FieldGroupComponent)
+],
 })
 export class SortableFieldListComponent {
     @Output()

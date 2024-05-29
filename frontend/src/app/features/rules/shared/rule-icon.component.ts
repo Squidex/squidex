@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RuleElementMetadataDto, SafeHtmlPipe } from '@app/shared';
 
@@ -16,9 +16,8 @@ import { RuleElementMetadataDto, SafeHtmlPipe } from '@app/shared';
     templateUrl: './rule-icon.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgIf,
-        SafeHtmlPipe,
-    ],
+    SafeHtmlPipe
+],
 })
 export class RuleIconComponent {
     @Input({ required: true })

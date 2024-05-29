@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
 import { LanguageDto, Query, QueryModel, StatusInfo } from '@app/shared/internal';
@@ -19,11 +19,10 @@ import { SortingComponent } from './sorting.component';
     templateUrl: './query.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FilterLogicalComponent,
-        NgFor,
-        SortingComponent,
-        TranslatePipe,
-    ],
+    FilterLogicalComponent,
+    SortingComponent,
+    TranslatePipe
+],
 })
 export class QueryComponent {
     @Output()

@@ -1,42 +1,39 @@
-<div class="card" (dblclick)="emitNavigate()" (mousedown)="preventSelection($event)" [title]="assetFolder.folderName | sqxTranslate">
+<div class="card" [title]="assetFolder.folderName | sqxTranslate" (dblclick)="emitNavigate()" (mousedown)="preventSelection($event)">
     <div class="card-body">
         <div class="row g-2">
             <div class="col-auto">
-                <img src="./images/folder.svg">
+                <img src="./images/folder.svg" />
             </div>
             <div class="col truncate">
-                {{assetFolder.folderName | sqxTranslate}}
+                {{ assetFolder.folderName | sqxTranslate }}
             </div>
             <div class="col-auto">
-                <ng-container *ngIf="(canDelete || canUpdate) && !isDisabled">
-                    <button type="button" class="btn btn-sm btn-text-secondary" (click)="editDropdown.toggle()" #buttonOptions>
-                        <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
+                @if ((canDelete || canUpdate) && !isDisabled) {
+                    <button class="btn btn-sm btn-text-secondary" #buttonOptions (click)="editDropdown.toggle()" type="button">
+                        <span class="hidden">{{ "common.options" | sqxTranslate }}</span>
                         <i class="icon-dots"></i>
                     </button>
-    
-                    <sqx-dropdown-menu *sqxModal="editDropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">  
-                        <ng-container *ngIf="canUpdate">
+                    <sqx-dropdown-menu *sqxModal="editDropdown; closeAlways: true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                        @if (canUpdate) {
                             <a class="dropdown-item" (click)="editDialog.show()">
-                                {{ 'common.rename' | sqxTranslate }}
+                                {{ "common.rename" | sqxTranslate }}
                             </a>
-                    
                             <div class="dropdown-divider"></div>
-                        </ng-container>
-
-                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!canDelete"
+                        }
+                        <a
+                            class="dropdown-item dropdown-item-delete"
+                            [class.disabled]="!canDelete"
                             (sqxConfirmClick)="emitDelete()"
                             confirmTitle="i18n:assets.deleteFolderConfirmTitle"
                             confirmText="i18n:assets.deleteFolderConfirmText"
                             confirmRememberKey="deleteAssetFolder">
-                            {{ 'common.delete' | sqxTranslate }}
+                            {{ "common.delete" | sqxTranslate }}
                         </a>
                     </sqx-dropdown-menu>
-                </ng-container>
+                }
             </div>
-        </div>            
+        </div>
     </div>
 </div>
 
-<sqx-asset-folder-dialog *sqxModal="editDialog"
-    (dialogClose)="editDialog.hide()" [assetFolder]="assetFolder">
-</sqx-asset-folder-dialog>
+<sqx-asset-folder-dialog *sqxModal="editDialog" [assetFolder]="assetFolder" (dialogClose)="editDialog.hide()"></sqx-asset-folder-dialog>

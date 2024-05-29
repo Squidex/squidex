@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -23,26 +23,24 @@ import { ContributorComponent } from './contributor.component';
         Router2State,
     ],
     imports: [
-        AsyncPipe,
-        ContributorAddFormComponent,
-        ContributorComponent,
-        FormsModule,
-        LayoutComponent,
-        ListViewComponent,
-        NgFor,
-        NgIf,
-        NotifoComponent,
-        PagerComponent,
-        RouterLink,
-        RouterLinkActive,
-        RouterOutlet,
-        ShortcutDirective,
-        SidebarMenuDirective,
-        TitleComponent,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    ContributorAddFormComponent,
+    ContributorComponent,
+    FormsModule,
+    LayoutComponent,
+    ListViewComponent,
+    NotifoComponent,
+    PagerComponent,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    ShortcutDirective,
+    SidebarMenuDirective,
+    TitleComponent,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class ContributorsPageComponent implements OnInit {
     constructor(

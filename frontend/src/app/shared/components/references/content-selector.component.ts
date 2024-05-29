@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, forwardRef, Input, numberAttribute, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
@@ -26,23 +26,21 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
         ComponentContentsState,
     ],
     imports: [
-        AsyncPipe,
-        ContentListCellDirective,
-        ContentListHeaderComponent,
-        ContentListWidthDirective,
-        ContentSelectorItemComponent,
-        FormsModule,
-        LanguageSelectorComponent,
-        ListViewComponent,
-        ModalDialogComponent,
-        NgFor,
-        NgIf,
-        PagerComponent,
-        SyncWidthDirective,
-        TooltipDirective,
-        TranslatePipe,
-        forwardRef(() => SearchFormComponent),
-    ],
+    AsyncPipe,
+    ContentListCellDirective,
+    ContentListHeaderComponent,
+    ContentListWidthDirective,
+    ContentSelectorItemComponent,
+    FormsModule,
+    LanguageSelectorComponent,
+    ListViewComponent,
+    ModalDialogComponent,
+    PagerComponent,
+    SyncWidthDirective,
+    TooltipDirective,
+    TranslatePipe,
+    forwardRef(() => SearchFormComponent)
+],
 })
 export class ContentSelectorComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

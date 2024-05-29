@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleEventDto, RuleEventsState, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -20,19 +20,17 @@ import { RuleEventComponent } from './rule-event.component';
         Router2State,
     ],
     imports: [
-        AsyncPipe,
-        ConfirmClickDirective,
-        LayoutComponent,
-        ListViewComponent,
-        NgFor,
-        NgIf,
-        PagerComponent,
-        RuleEventComponent,
-        ShortcutDirective,
-        TitleComponent,
-        TooltipDirective,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    ConfirmClickDirective,
+    LayoutComponent,
+    ListViewComponent,
+    PagerComponent,
+    RuleEventComponent,
+    ShortcutDirective,
+    TitleComponent,
+    TooltipDirective,
+    TranslatePipe
+],
 })
 export class RuleEventsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -2,33 +2,36 @@
 
 <sqx-layout layout="main" titleText="i18n:common.clients" titleIcon="clients" innerWidth="50">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:clients.refreshTooltip" shortcut="CTRL + B">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        <button class="btn btn-text-secondary" (click)="reload()" type="button" title="i18n:clients.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i>
+            {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
-    
-    <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="clientsState.isLoading | async">
-            <ng-container *ngIf="(clientsState.isLoaded | async) && (clientsState.clients | async); let clients">
-                <sqx-client-add-form *ngIf="clientsState.canCreate | async"></sqx-client-add-form>
 
-                <div class="table-items-row  table-items-row-summary table-items-row-empty" *ngIf="clients.length === 0">
-                    {{ 'clients.empty' | sqxTranslate }}
-                </div>
-            
-                <ng-container *ngIf="rolesState.roles | async; let roles">
-                    <sqx-client *ngFor="let client of clients; trackBy: trackByClient"
-                        [client]="client"
-                        [clientRoles]="roles">
-                    </sqx-client>
-                </ng-container>
-            </ng-container>
+    <ng-container>
+        <sqx-list-view [isLoading]="clientsState.isLoading | async" innerWidth="50rem">
+            @if ((clientsState.isLoaded | async) && (clientsState.clients | async); as clients) {
+                @if (clientsState.canCreate | async) {
+                    <sqx-client-add-form></sqx-client-add-form>
+                }
+                @if (clients.length === 0) {
+                    <div class="table-items-row table-items-row-summary table-items-row-empty">
+                        {{ "clients.empty" | sqxTranslate }}
+                    </div>
+                }
+                @if (rolesState.roles | async; as roles) {
+                    @for (client of clients; track trackByClient($index, client)) {
+                        <sqx-client [client]="client" [clientRoles]="roles"></sqx-client>
+                    }
+                }
+            }
         </sqx-list-view>
     </ng-container>
 
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="history"
                 routerLinkActive="active"
@@ -39,7 +42,8 @@
                 <i class="icon-time"></i>
             </a>
 
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"

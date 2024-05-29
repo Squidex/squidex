@@ -1,79 +1,79 @@
 <sqx-title message="i18n:apps.listPageTitle"></sqx-title>
 
-<div class="panel-container page" *ngIf="authState.userChanges | async; let user">  
-    <div class="apps-section">
-        <h1 class="apps-title">{{ 'apps.welcomeTitle' | sqxTranslate: { user: user.displayName } }}</h1>
-
-        <div class="subtext">
-            {{ 'apps.welcomeSubtitle' | sqxTranslate }}
+@if (authState.userChanges | async; as user) {
+    <div class="panel-container page">
+        <div class="apps-section">
+            <h1 class="apps-title">{{ "apps.welcomeTitle" | sqxTranslate: { user: user.displayName } }}</h1>
+            <div class="subtext">
+                {{ "apps.welcomeSubtitle" | sqxTranslate }}
+            </div>
         </div>
+        @if (groupedApps | async; as groups) {
+            <div class="apps-section" sqxTourStep="allApps">
+                @if (groups.length === 0) {
+                    <div class="empty">
+                        <h3 class="empty-headline">{{ "apps.empty" | sqxTranslate }}</h3>
+                    </div>
+                }
+                @for (group of groups; track trackByGroup($index, group)) {
+                    <div class="team">
+                        @if (group.team) {
+                            <div class="team-header">
+                                <sqx-team [team]="group.team" (leave)="leaveTeam($event)"></sqx-team>
+                            </div>
+                        }
+                        <div class="team-body" [class.padded]="group.team">
+                            @for (app of group.apps; track trackByApp($index, app)) {
+                                <sqx-app [app]="app" (leave)="leaveApp($event)"></sqx-app>
+                            }
+                            @if (group.apps.length === 0) {
+                                <small class="team-empty">
+                                    {{ "teams.empty" | sqxTranslate }}
+                                </small>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        @if ((uiState.settings | async)?.canCreateApps) {
+            <div class="apps-section">
+                <div class="card card-template card-href" (click)="createNewApp()" data-testid="new-app" sqxTourStep="addApp">
+                    <div class="card-body">
+                        <div class="card-image">
+                            <img src="./images/add-app.svg" />
+                        </div>
+                        <h3 class="card-title">{{ "apps.createBlankApp" | sqxTranslate }}</h3>
+                        <sqx-form-hint>
+                            {{ "apps.createBlankAppDescription" | sqxTranslate }}
+                        </sqx-form-hint>
+                    </div>
+                </div>
+                @for (template of templates | async; track template) {
+                    <div class="card card-template card-href" (click)="createNewApp(template)">
+                        <div class="card-body">
+                            <div class="card-image">
+                                <img src="./images/add-template.svg" />
+                            </div>
+                            <h3 class="card-title">{{ template.title }}</h3>
+                            <sqx-form-hint>
+                                {{ template.description }}
+                            </sqx-form-hint>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        @if (info) {
+            <div class="apps-section">
+                <small class="info">{{ info }}</small>
+            </div>
+        }
     </div>
+}
 
-    <ng-container *ngIf="groupedApps | async; let groups">
-        <div class="apps-section" sqxTourStep="allApps">
-            <div class="empty" *ngIf="groups.length === 0">
-                <h3 class="empty-headline">{{ 'apps.empty' | sqxTranslate }}</h3>
-            </div>
+<sqx-app-form *sqxModal="addAppDialog" [template]="addAppTemplate" (dialogClose)="addAppDialog.hide()"></sqx-app-form>
 
-            <div class="team" *ngFor="let group of groups; trackBy: trackByGroup">
-                <div class="team-header" *ngIf="group.team">
-                    <sqx-team [team]="group.team" (leave)="leaveTeam($event)"></sqx-team>
-                </div>
+<sqx-onboarding-dialog *sqxModal="onboardingDialog" (dialogClose)="onboardingDialog.hide()"></sqx-onboarding-dialog>
 
-                <div class="team-body" [class.padded]="group.team">
-                    <sqx-app *ngFor="let app of group.apps; trackBy: trackByApp" [app]="app" (leave)="leaveApp($event)"></sqx-app>
-
-                    <small class="team-empty" *ngIf="group.apps.length === 0">
-                        {{ 'teams.empty' | sqxTranslate }}
-                    </small>
-                </div>
-            </div>
-        </div>
-    </ng-container>
-
-    <div class="apps-section" *ngIf="(uiState.settings | async)?.canCreateApps">
-        <div class="card card-template card-href" data-testid="new-app" (click)="createNewApp()" sqxTourStep="addApp">
-            <div class="card-body">
-                <div class="card-image">
-                    <img src="./images/add-app.svg">
-                </div>
-
-                <h3 class="card-title">{{ 'apps.createBlankApp' | sqxTranslate }}</h3>
-
-                <sqx-form-hint>
-                    {{ 'apps.createBlankAppDescription' | sqxTranslate }}
-                </sqx-form-hint>
-            </div>
-        </div>
-
-        <div class="card card-template card-href" *ngFor="let template of templates | async" (click)="createNewApp(template)">
-            <div class="card-body">
-                <div class="card-image">
-                    <img src="./images/add-template.svg">
-                </div>
-
-                <h3 class="card-title">{{template.title}}</h3>
-
-                <sqx-form-hint>
-                    {{template.description}}
-                </sqx-form-hint>
-            </div>
-        </div>
-    </div>
-
-    <div *ngIf="info" class="apps-section">
-        <small class="info">{{info}}</small>
-    </div>
-</div>
-
-<sqx-app-form *sqxModal="addAppDialog"
-    (dialogClose)="addAppDialog.hide()" [template]="addAppTemplate">
-</sqx-app-form>
-
-<sqx-onboarding-dialog *sqxModal="onboardingDialog"
-    (dialogClose)="onboardingDialog.hide()">
-</sqx-onboarding-dialog>
-
-<sqx-news-dialog *sqxModal="newsDialog" [features]="newsFeatures!"
-    (dialogClose)="newsDialog.hide()">
-</sqx-news-dialog>
+<sqx-news-dialog *sqxModal="newsDialog" [features]="newsFeatures!" (dialogClose)="newsDialog.hide()"></sqx-news-dialog>

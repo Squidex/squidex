@@ -1,17 +1,20 @@
-<div *sqxModal="currentElement; closeAuto: false" [sqxAnchoredTo]="currentElement!" class="tour-step" 
+<div
+    class="tour-step"
+    *sqxModal="currentElement; closeAuto: false"
+    @fade
+    [sqxAnchoredTo]="currentElement!"
     [class.d-none]="!isVisible"
-    offset="4" 
-    spaceX="0"
-    spaceY="0"
     [position]="currentStep.position || 'bottom-start'"
-    @fade>
-    <div class="tour-progress" [style.width]="progress "></div>
+    offset="4"
+    spaceX="0"
+    spaceY="0">
+    <div class="tour-progress" [style.width]="progress"></div>
 
     <div class="tour-body">
         <div class="row g-2">
             <div class="col-auto">
                 <div class="squid d-flex align-items-center justify-content-center bordered">
-                    <img src="./images/squid.svg">
+                    <img src="./images/squid.svg" />
                 </div>
             </div>
 
@@ -22,36 +25,44 @@
             </div>
 
             <div class="col-auto">
-                <button type="button" class="btn btn-sm btn-close" (click)="tourService.end()"></button>
+                <button class="btn btn-sm btn-close" (click)="tourService.end()" type="button"></button>
             </div>
         </div>
     </div>
 
-    <div class="tour-footer" *ngIf="hasNext || hasPrev || hasFinish || currentStep.hideAll || currentStep.hideThis">
-        <div class="d-flex justify-content-between">
-            <div class="d-flex pe-4">
-                <button class="btn btn-outline-secondary btn-sm me-2" *ngIf="hasPrev" (click)="tourService.prev()">
-                    {{ 'common.prev' | sqxTranslate}}
-                </button>
-
-                <button class="btn btn-outline-danger btn-sm" *ngIf="currentStep.hideAll" (click)="currentStep.hideAll()">
-                    {{ 'tour.tooltipStop' | sqxTranslate }}
-                </button>
-            </div>
-
-            <div class="d-flex ps-4">
-                <button class="btn btn-outline-secondary btn-sm" *ngIf="hasNext" (click)="tourService.next()">
-                    {{ 'common.next' | sqxTranslate}}
-                </button>
-
-                <button class="btn btn-outline-success btn-sm" *ngIf="hasFinish" (click)="tourService.end()">
-                    {{ 'common.finish' | sqxTranslate}}
-                </button>
-
-                <button class="btn btn-outline-success btn-sm" *ngIf="currentStep.hideThis" (click)="currentStep.hideThis()" >
-                    {{ 'tour.tooltipConfirm' | sqxTranslate }}
-                </button>
+    @if (hasNext || hasPrev || hasFinish || currentStep.hideAll || currentStep.hideThis) {
+        <div class="tour-footer">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex pe-4">
+                    @if (hasPrev) {
+                        <button class="btn btn-outline-secondary btn-sm me-2" (click)="tourService.prev()">
+                            {{ "common.prev" | sqxTranslate }}
+                        </button>
+                    }
+                    @if (currentStep.hideAll) {
+                        <button class="btn btn-outline-danger btn-sm" (click)="currentStep.hideAll()">
+                            {{ "tour.tooltipStop" | sqxTranslate }}
+                        </button>
+                    }
+                </div>
+                <div class="d-flex ps-4">
+                    @if (hasNext) {
+                        <button class="btn btn-outline-secondary btn-sm" (click)="tourService.next()">
+                            {{ "common.next" | sqxTranslate }}
+                        </button>
+                    }
+                    @if (hasFinish) {
+                        <button class="btn btn-outline-success btn-sm" (click)="tourService.end()">
+                            {{ "common.finish" | sqxTranslate }}
+                        </button>
+                    }
+                    @if (currentStep.hideThis) {
+                        <button class="btn btn-outline-success btn-sm" (click)="currentStep.hideThis()">
+                            {{ "tour.tooltipConfirm" | sqxTranslate }}
+                        </button>
+                    }
+                </div>
             </div>
         </div>
-    </div>
+    }
 </div>

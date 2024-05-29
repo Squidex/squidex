@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ScrollActiveDirective, TranslatePipe } from '@app/framework';
 import { fadeAnimation, StatefulComponent, Subscriptions, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
@@ -25,12 +25,10 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
-        NgFor,
-        NgIf,
-        ScrollActiveDirective,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    ScrollActiveDirective,
+    TranslatePipe
+],
 })
 export class TourGuideComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

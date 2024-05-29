@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, LanguageDto, ModalDirective, ModalModel, ModalPlacementDirective, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
@@ -19,20 +19,19 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
     imports: [
-        ConfirmClickDirective,
-        DropdownMenuComponent,
-        FieldFormComponent,
-        FieldWizardComponent,
-        FormsModule,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgIf,
-        ReactiveFormsModule,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-        forwardRef(() => SortableFieldListComponent),
-    ],
+    ConfirmClickDirective,
+    DropdownMenuComponent,
+    FieldFormComponent,
+    FieldWizardComponent,
+    FormsModule,
+    ModalDirective,
+    ModalPlacementDirective,
+    ReactiveFormsModule,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe,
+    forwardRef(() => SortableFieldListComponent)
+],
 })
 export class FieldComponent {
     @Input({ required: true })

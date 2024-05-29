@@ -1,5 +1,7 @@
-<ng-container *ngIf="toolbar.buttonsChanges | async; let buttons">
-    <button type="submit" class="btn btn-{{button.color}} ms-2" *ngFor="let button of buttons" (click)="button.method()" [disabled]="button.disabled">
-        {{ button.name| sqxTranslate }}
-    </button>
-</ng-container>
+@if (toolbar.buttonsChanges | async; as buttons) {
+    @for (button of buttons; track button) {
+        <button class="btn btn-{{ button.color }} ms-2" [disabled]="button.disabled" (click)="button.method()" type="submit">
+            {{ button.name | sqxTranslate }}
+        </button>
+    }
+}

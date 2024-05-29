@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { VirtualScrollerComponent, VirtualScrollerModule } from '@iharbeck/ngx-virtual-scroller';
 import { combineLatest, Observable } from 'rxjs';
@@ -30,8 +30,6 @@ import { ArrayItemComponent } from './array-item.component';
         FormHintComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         TooltipDirective,
         TranslatePipe,
         VirtualScrollerModule,

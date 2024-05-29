@@ -1,13 +1,15 @@
 <div #container (sqxResized)="updateContainerWidth($event.width)">
-    <div class="form-check" *ngFor="let value of tagValues; trackBy: trackByValue"
-        [class.form-check-block]="!snapshot.isSingleline"
-        [class.form-check-inline]="snapshot.isSingleline">
-        <input class="form-check-input" type="checkbox" id="{{controlId}}_{{value}}"
-            (blur)="callTouched()"
-            (change)="check($any($event.target!)['checked']!, value)" 
-            [checked]="isChecked(value)"
-            [disabled]="snapshot.isDisabled">
-    
-        <label class="form-check-label" for="{{controlId}}_{{value}}">{{value.name}}</label>
-    </div>
+    @for (value of tagValues; track trackByValue($index, value)) {
+        <div class="form-check" [class.form-check-block]="!snapshot.isSingleline" [class.form-check-inline]="snapshot.isSingleline">
+            <input
+                class="form-check-input"
+                id="{{ controlId }}_{{ value }}"
+                [checked]="isChecked(value)"
+                [disabled]="snapshot.isDisabled"
+                (blur)="callTouched()"
+                (change)="check($any($event.target!)['checked']!, value)"
+                type="checkbox" />
+            <label class="form-check-label" for="{{ controlId }}_{{ value }}">{{ value.name }}</label>
+        </div>
+    }
 </div>

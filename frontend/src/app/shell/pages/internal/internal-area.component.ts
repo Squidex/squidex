@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { DialogService, LoadingService, Notification, Subscriptions, UIOptions } from '@app/shared';
@@ -23,18 +23,17 @@ import { SearchMenuComponent } from './search-menu.component';
     styleUrls: ['./internal-area.component.scss'],
     templateUrl: './internal-area.component.html',
     imports: [
-        AppsMenuComponent,
-        AssetUploaderComponent,
-        AsyncPipe,
-        FeedbackMenuComponent,
-        LogoComponent,
-        NgIf,
-        NotificationsMenuComponent,
-        ProfileMenuComponent,
-        RouterLink,
-        RouterOutlet,
-        SearchMenuComponent,
-    ],
+    AppsMenuComponent,
+    AssetUploaderComponent,
+    AsyncPipe,
+    FeedbackMenuComponent,
+    LogoComponent,
+    NotificationsMenuComponent,
+    ProfileMenuComponent,
+    RouterLink,
+    RouterOutlet,
+    SearchMenuComponent
+],
 })
 export class InternalAreaComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

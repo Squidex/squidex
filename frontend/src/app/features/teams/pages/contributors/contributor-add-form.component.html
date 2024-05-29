@@ -1,22 +1,27 @@
 <div class="card card-body mb-4">
-    <h5 class="card-title">{{ 'contributors.add.title' | sqxTranslate }}</h5>
+    <h5 class="card-title">{{ "contributors.add.title" | sqxTranslate }}</h5>
 
     <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
         <div class="row gx-2">
             <div class="col">
-                <sqx-autocomplete [itemsSource]="usersDataSource" formControlName="user" icon="search" placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}" displayProperty="displayName">
+                <sqx-autocomplete
+                    [itemsSource]="usersDataSource"
+                    formControlName="user"
+                    icon="search"
+                    placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}"
+                    displayProperty="displayName">
                     <ng-template let-user="$implicit">
                         <span class="autocomplete-user">
-                            <img class="user-picture" [src]="user | sqxUserDtoPicture">
+                            <img class="user-picture" [src]="user | sqxUserDtoPicture" />
 
-                            <span class="user-name">{{user.displayName}}</span>
+                            <span class="user-name">{{ user.displayName }}</span>
                         </span>
                     </ng-template>
                 </sqx-autocomplete>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async">
-                    {{ 'contributors.add' | sqxTranslate }}
+                <button class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async" type="submit">
+                    {{ "contributors.add" | sqxTranslate }}
                 </button>
             </div>
         </div>
@@ -24,11 +29,10 @@
 
     <div class="import-hint">
         <sqx-form-hint>
-            {{ 'contributors.importHint' | sqxTranslate }} <a class="force" (click)="importDialog.show()">{{ 'contributors.importButton' | sqxTranslate }}</a>
+            {{ "contributors.importHint" | sqxTranslate }}
+            <a class="force" (click)="importDialog.show()">{{ "contributors.importButton" | sqxTranslate }}</a>
         </sqx-form-hint>
     </div>
 </div>
 
-<sqx-import-contributors-dialog *sqxModal="importDialog"
-    (dialogClose)="importDialog.hide()">
-</sqx-import-contributors-dialog>
+<sqx-import-contributors-dialog *sqxModal="importDialog" (dialogClose)="importDialog.hide()"></sqx-import-contributors-dialog>

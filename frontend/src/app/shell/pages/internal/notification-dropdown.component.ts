@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { of } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -22,15 +22,13 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
         CommentsState,
     ],
     imports: [
-        AsyncPipe,
-        CommentComponent,
-        DropdownMenuComponent,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgFor,
-        NgIf,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    CommentComponent,
+    DropdownMenuComponent,
+    ModalDirective,
+    ModalPlacementDirective,
+    TranslatePipe
+],
 })
 export class NotificationDropdownComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -1,14 +1,16 @@
 <div class="card card-lg card-chart">
     <div class="card-header">
-        {{ 'dashboard.apiCallsCard' | sqxTranslate }}
+        {{ "dashboard.apiCallsCard" | sqxTranslate }}
 
-        <div class="float-end" *ngIf="app">
-            <a class="force" (click)="downloadLog(app)">
-                <small>{{ 'dashboard.downloadLog' | sqxTranslate }}</small>
-            </a>
-        </div>
+        @if (app) {
+            <div class="float-end">
+                <a class="force" (click)="downloadLog(app)">
+                    <small>{{ "dashboard.downloadLog" | sqxTranslate }}</small>
+                </a>
+            </div>
+        }
     </div>
     <div class="card-body">
-        <canvas baseChart type="bar" [data]="chartData" [options]="chartOptions"></canvas>
+        <canvas [data]="chartData" [options]="chartOptions" baseChart type="bar"></canvas>
     </div>
 </div>

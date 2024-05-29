@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
@@ -19,22 +19,20 @@ import { JobComponent } from './job.component';
     styleUrls: ['./jobs-page.component.scss'],
     templateUrl: './jobs-page.component.html',
     imports: [
-        AsyncPipe,
-        JobComponent,
-        LayoutComponent,
-        ListViewComponent,
-        NgFor,
-        NgIf,
-        RouterLink,
-        RouterLinkActive,
-        RouterOutlet,
-        ShortcutDirective,
-        SidebarMenuDirective,
-        TitleComponent,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    JobComponent,
+    LayoutComponent,
+    ListViewComponent,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    ShortcutDirective,
+    SidebarMenuDirective,
+    TitleComponent,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class JobsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

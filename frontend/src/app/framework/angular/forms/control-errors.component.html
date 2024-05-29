@@ -1,1 +1,3 @@
- <sqx-errors-messages [errorMessages]="snapshot.errorMessages" *ngIf="snapshot.errorMessages.length > 0"></sqx-errors-messages>
+@if (snapshot.errorMessages.length > 0) {
+    <sqx-errors-messages [errorMessages]="snapshot.errorMessages"></sqx-errors-messages>
+}

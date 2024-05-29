@@ -1,11 +1,18 @@
-<ng-container *ngIf="collaboration.userChanges | async; let currentUsers">
-    <ng-container *ngIf="currentUsers.length > 0">
-        <div class="user-item" *ngFor="let state of currentUsers | slice:0:5; trackBy: trackByUser; let i = index" [style]="{ zIndex: i }">
-            <img class="user-picture" title="{{state.user.displayName}}" [src]="state.user.id | sqxUserPicture" [style.borderColor]="state.user.id | sqxStringColor">
-        </div>
-    
-        <div class="user-item" *ngIf="currentUsers.length > 5" [style]="{ zIndex: 6 }">
-            <div class="user-more">+{{currentUsers.length - 5}}</div>
-        </div>
-    </ng-container>
-</ng-container>
+@if (collaboration.userChanges | async; as currentUsers) {
+    @if (currentUsers.length > 0) {
+        @for (state of currentUsers | slice: 0 : 5; track trackByUser(i, state); let i = $index) {
+            <div class="user-item" [style]="{ zIndex: i }">
+                <img
+                    class="user-picture"
+                    [src]="state.user.id | sqxUserPicture"
+                    [style.borderColor]="state.user.id | sqxStringColor"
+                    title="{{ state.user.displayName }}" />
+            </div>
+        }
+        @if (currentUsers.length > 5) {
+            <div class="user-item" [style]="{ zIndex: 6 }">
+                <div class="user-more">+{{ currentUsers.length - 5 }}</div>
+            </div>
+        }
+    }
+}

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppDto, TranslatePipe } from '@app/shared';
@@ -17,7 +17,6 @@ import { AppDto, TranslatePipe } from '@app/shared';
     templateUrl: './schema-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgIf,
         RouterLink,
         TranslatePipe,
     ],

@@ -1,21 +1,21 @@
 <div class="selection">
     <div class="form-select" #input (click)="dropdown.show()">
-        <div class="truncate">{{selection.item.folderName | sqxTranslate}}
+        <div class="truncate">
+            {{ selection.item.folderName | sqxTranslate }}
 
-            <span *ngIf="selectionPath">
-                {{ 'common.in' | sqxTranslate }}&nbsp;./{{selectionPath}}
-            </span>
+            @if (selectionPath) {
+                <span>{{ "common.in" | sqxTranslate }}&nbsp;./{{ selectionPath }}</span>
+            }
         </div>
     </div>
-</div> 
+</div>
 
 <div class="items-container">
     <div class="control-dropdown" *sqxModal="dropdown" [sqxAnchoredTo]="input" scrollY="true" position="bottom-start">
-        <sqx-asset-folder-dropdown-item 
+        <sqx-asset-folder-dropdown-item
             [appName]="appName"
             [nodeModel]="root"
             [nodeLevel]="0"
-            (selectNode)="select($event)">
-        </sqx-asset-folder-dropdown-item>
+            (selectNode)="select($event)"></sqx-asset-folder-dropdown-item>
     </div>
 </div>

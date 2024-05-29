@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -19,18 +19,16 @@ import { AppDto, AppFormComponent, AppsState, DialogModel, DropdownMenuComponent
     templateUrl: './apps-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AppFormComponent,
-        AsyncPipe,
-        DropdownMenuComponent,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgFor,
-        NgIf,
-        RouterLink,
-        RouterLinkActive,
-        TeamFormComponent,
-        TranslatePipe,
-    ],
+    AppFormComponent,
+    AsyncPipe,
+    DropdownMenuComponent,
+    ModalDirective,
+    ModalPlacementDirective,
+    RouterLink,
+    RouterLinkActive,
+    TeamFormComponent,
+    TranslatePipe
+],
 })
 export class AppsMenuComponent {
     public addAppDialog = new DialogModel();

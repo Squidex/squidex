@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowDto, WorkflowsState } from '@app/shared';
@@ -18,23 +18,21 @@ import { WorkflowComponent } from './workflow.component';
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html',
     imports: [
-        AsyncPipe,
-        LayoutComponent,
-        ListViewComponent,
-        NgFor,
-        NgIf,
-        RouterLink,
-        RouterLinkActive,
-        RouterOutlet,
-        ShortcutDirective,
-        SidebarMenuDirective,
-        TitleComponent,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-        WorkflowAddFormComponent,
-        WorkflowComponent,
-    ],
+    AsyncPipe,
+    LayoutComponent,
+    ListViewComponent,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    ShortcutDirective,
+    SidebarMenuDirective,
+    TitleComponent,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe,
+    WorkflowAddFormComponent,
+    WorkflowComponent
+],
 })
 export class WorkflowsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { map } from 'rxjs';
 import { StringColorPipe } from '@app/framework';
@@ -20,10 +20,9 @@ type CursorState = { user: Profile; cursor: { x: number; y: number } };
     templateUrl: './cursors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
-        NgFor,
-        StringColorPipe,
-    ],
+    AsyncPipe,
+    StringColorPipe
+],
 })
 export class CursorsComponent  {
     public otherCursor =

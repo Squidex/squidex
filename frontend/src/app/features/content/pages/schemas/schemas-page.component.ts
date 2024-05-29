@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -22,8 +22,6 @@ import { AppsState, getCategoryTree, LayoutComponent, SchemaCategory, SchemaCate
         AsyncPipe,
         FormsModule,
         LayoutComponent,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
@@ -32,7 +30,7 @@ import { AppsState, getCategoryTree, LayoutComponent, SchemaCategory, SchemaCate
         TitleComponent,
         TranslatePipe,
     ],
-})
+        })
 export class SchemasPageComponent {
     public schemasFilter = new UntypedFormControl();
 

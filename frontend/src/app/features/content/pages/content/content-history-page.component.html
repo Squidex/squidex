@@ -1,141 +1,156 @@
 <sqx-layout layout="right" titleText="i18n:common.workflow" width="20" white="true" overflow="true" padding="true">
     <ng-container>
         <div class="section mb-2">
-            <label for="id">{{ 'common.id' | sqxTranslate }}</label>
+            <label for="id">{{ "common.id" | sqxTranslate }}</label>
 
             <div class="input-group">
-                <input readonly class="form-control" name="id" id="id" value="{{content.id}}" #inputId>
-        
-                <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputId">
+                <input class="form-control" id="id" #inputId readonly name="id" value="{{ content.id }}" />
+
+                <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
                     <i class="icon-copy"></i>
                 </button>
             </div>
         </div>
         <div class="section mb-4">
-            <label for="version">{{ 'common.version' | sqxTranslate }}</label>: <span id="version">{{content.version}}</span>
+            <label for="version">{{ "common.version" | sqxTranslate }}</label>
+            :
+            <span id="version">{{ content.version }}</span>
         </div>
 
-        <div class="section mb-4" *ngIf="content.canDraftCreate || content.canDraftDelete">
-            <ng-container *ngIf="!content.newStatus; else newVersion">
-                <button class="btn btn-success btn-block" (click)="createDraft()">
-                    {{ 'contents.draftNew' | sqxTranslate }}
-                </button>
-            </ng-container>
-    
-            <ng-template #newVersion>
-                <label>{{ 'contents.draftStatus' | sqxTranslate }}</label>
-
-                <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdownNew.toggle()" #buttonOptions sqxTourStep="status">
-                    <sqx-content-status
-                        layout="multiline"
-                        [status]="content.newStatus!"
-                        [statusColor]="content.newStatusColor!"
-                        [scheduled]="content.scheduleJob">
-                    </sqx-content-status>
-                </button>
-
-                <sqx-dropdown-menu *sqxModal="dropdownNew;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
-                    <ng-container *ngIf="content.statusUpdates.length > 0">
-                        <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
-                            {{ 'common.statusChangeTo' | sqxTranslate }} <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
+        @if (content.canDraftCreate || content.canDraftDelete) {
+            <div class="section mb-4">
+                @if (!content.newStatus) {
+                    <button class="btn btn-success btn-block" (click)="createDraft()">
+                        {{ "contents.draftNew" | sqxTranslate }}
+                    </button>
+                } @else {
+                    <label>{{ "contents.draftStatus" | sqxTranslate }}</label>
+                    <button
+                        class="btn btn-outline-secondary btn-block btn-status"
+                        #buttonOptions
+                        (click)="dropdownNew.toggle()"
+                        type="button"
+                        sqxTourStep="status">
+                        <sqx-content-status
+                            [status]="content.newStatus!"
+                            [statusColor]="content.newStatusColor!"
+                            [scheduled]="content.scheduleJob"
+                            layout="multiline"></sqx-content-status>
+                    </button>
+                    <sqx-dropdown-menu *sqxModal="dropdownNew; closeAlways: true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                        @if (content.statusUpdates.length > 0) {
+                            @for (info of content.statusUpdates; track info) {
+                                <a class="dropdown-item" (click)="changeStatus(info.status)">
+                                    {{ "common.statusChangeTo" | sqxTranslate }}
+                                    <i class="icon-circle icon-sm" [style.color]="info.color"></i>
+                                    {{ info.status }}
+                                </a>
+                            }
+                            <div class="dropdown-divider"></div>
+                        }
+                        <a
+                            class="dropdown-item dropdown-item-delete"
+                            [class.disabled]="!content.canDraftDelete"
+                            (sqxConfirmClick)="deleteDraft()"
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmText="i18n:contents.deleteVersionConfirmText"
+                            confirmRememberKey="deleteDraft">
+                            {{ "contents.versionDelete" | sqxTranslate }}
                         </a>
-
                         <div class="dropdown-divider"></div>
-                    </ng-container>
-
-                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDraftDelete"
-                        (sqxConfirmClick)="deleteDraft()" 
-                        confirmTitle="i18n:contents.deleteConfirmTitle"
-                        confirmText="i18n:contents.deleteVersionConfirmText"
-                        confirmRememberKey="deleteDraft">
-                        {{ 'contents.versionDelete' | sqxTranslate }}
-                    </a>
-
-                    <div class="dropdown-divider"></div>
-
-                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
-                        (sqxConfirmClick)="delete()"
-                        confirmTitle="i18n:contents.deleteConfirmTitle"
-                        confirmText="i18n:contents.deleteConfirmText"
-                        confirmRememberKey="deleteContent">
-                        {{ 'common.delete' | sqxTranslate }}
-                    </a>
-                </sqx-dropdown-menu>
-            </ng-template>
-        </div>
+                        <a
+                            class="dropdown-item dropdown-item-delete"
+                            [class.disabled]="!content.canDelete"
+                            (sqxConfirmClick)="delete()"
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmText="i18n:contents.deleteConfirmText"
+                            confirmRememberKey="deleteContent">
+                            {{ "common.delete" | sqxTranslate }}
+                        </a>
+                    </sqx-dropdown-menu>
+                }
+            </div>
+        }
 
         <div class="section">
-            <label>{{ 'contents.currentStatusLabel' | sqxTranslate }}</label>
+            <label>{{ "contents.currentStatusLabel" | sqxTranslate }}</label>
 
-            <div *ngIf="!content.newStatus; else newStatusOld">
-                <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdown.toggle()" #buttonOptions sqxTourStep="status">
+            @if (!content.newStatus) {
+                <div>
+                    <button
+                        class="btn btn-outline-secondary btn-block btn-status"
+                        #buttonOptions
+                        (click)="dropdown.toggle()"
+                        type="button"
+                        sqxTourStep="status">
+                        <sqx-content-status
+                            [status]="content.status"
+                            [statusColor]="content.statusColor"
+                            [scheduled]="content.scheduleJob"
+                            layout="multiline"
+                            small="true"></sqx-content-status>
+                    </button>
+                    <sqx-dropdown-menu *sqxModal="dropdown; closeAlways: true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                        @if (content.statusUpdates.length > 0) {
+                            @for (info of content.statusUpdates; track info) {
+                                <a class="dropdown-item" (click)="changeStatus(info.status)">
+                                    {{ "common.statusChangeTo" | sqxTranslate }}
+                                    <sqx-content-status
+                                        [status]="info.status"
+                                        [statusColor]="info.color"
+                                        layout="text"
+                                        small="true"></sqx-content-status>
+                                </a>
+                            }
+                            <div class="dropdown-divider"></div>
+                        }
+                        <a
+                            class="dropdown-item dropdown-item-delete"
+                            [class.disabled]="!content.canCancelStatus"
+                            (sqxConfirmClick)="cancelStatus()"
+                            confirmTitle="i18n:contents.cancelStatusConfirmTitle"
+                            confirmText="i18n:contents.cancelStatusConfirmText"
+                            confirmRememberKey="cancelStatus">
+                            {{ "contents.cancelStatus" | sqxTranslate }}
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a
+                            class="dropdown-item dropdown-item-delete"
+                            [class.disabled]="!content.canDelete"
+                            (sqxConfirmClick)="delete()"
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmText="i18n:contents.deleteConfirmText"
+                            confirmRememberKey="deleteContent">
+                            {{ "common.delete" | sqxTranslate }}
+                        </a>
+                    </sqx-dropdown-menu>
+                </div>
+            } @else {
+                <button class="btn btn-outline-secondary btn-block btn-status" type="button">
                     <sqx-content-status
-                        layout="multiline"
                         [status]="content.status"
                         [statusColor]="content.statusColor"
-                        [scheduled]="content.scheduleJob"
-                        small="true">
-                    </sqx-content-status>
+                        layout="multiline"></sqx-content-status>
                 </button>
-
-                <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
-                    <ng-container *ngIf="content.statusUpdates.length > 0">
-                        <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
-                            {{ 'common.statusChangeTo' | sqxTranslate }} 
-                            
-                            <sqx-content-status
-                                layout="text"
-                                [status]="info.status"
-                                [statusColor]="info.color"
-                                small="true">
-                            </sqx-content-status>
-                        </a>
-
-                        <div class="dropdown-divider"></div>
-                    </ng-container>
-
-                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canCancelStatus"
-                        (sqxConfirmClick)="cancelStatus()"
-                        confirmTitle="i18n:contents.cancelStatusConfirmTitle"
-                        confirmText="i18n:contents.cancelStatusConfirmText"
-                        confirmRememberKey="cancelStatus">
-                        {{ 'contents.cancelStatus' | sqxTranslate }}
-                    </a>
-                    
-                    <div class="dropdown-divider"></div>
-
-                    <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
-                        (sqxConfirmClick)="delete()"
-                        confirmTitle="i18n:contents.deleteConfirmTitle"
-                        confirmText="i18n:contents.deleteConfirmText"
-                        confirmRememberKey="deleteContent">
-                        {{ 'common.delete' | sqxTranslate }}
-                    </a>
-                </sqx-dropdown-menu>
-            </div>
-
-            <ng-template #newStatusOld>
-                <button type="button" class="btn btn-outline-secondary btn-block btn-status">
-                    <sqx-content-status [status]="content.status" [statusColor]="content.statusColor" layout="multiline"></sqx-content-status>
-                </button>
-            </ng-template>
+            }
 
             <sqx-form-hint marginTop="1">
-                {{ 'contents.lastUpdatedLabel' | sqxTranslate }}: {{content.lastModified | sqxFromNow}}
+                {{ "contents.lastUpdatedLabel" | sqxTranslate }}: {{ content.lastModified | sqxFromNow }}
             </sqx-form-hint>
         </div>
 
         <div class="section">
-            <h3 class="bordered">{{ 'common.history' | sqxTranslate }}</h3>
-    
-            <sqx-content-event *ngFor="let event of contentEvents | async; trackBy: trackByEvent"
-                [content]="content"
-                [event]="event"
-                (dataLoad)="loadVersion(event)"
-                (dataCompare)="compareVersion(event)">
-            </sqx-content-event>
+            <h3 class="bordered">{{ "common.history" | sqxTranslate }}</h3>
+
+            @for (event of contentEvents | async; track trackByEvent($index, event)) {
+                <sqx-content-event
+                    [content]="content"
+                    [event]="event"
+                    (dataLoad)="loadVersion(event)"
+                    (dataCompare)="compareVersion(event)"></sqx-content-event>
+            }
         </div>
     </ng-container>
 </sqx-layout>
 
-<sqx-due-time-selector [disabled]="disableScheduler" #dueTimeSelector></sqx-due-time-selector>
+<sqx-due-time-selector #dueTimeSelector [disabled]="disableScheduler"></sqx-due-time-selector>

@@ -1,41 +1,54 @@
 <sqx-modal-dialog (dialogClose)="emitClose()" size="lg" fullHeight="true" flexBody="true" hasTabs="false">
     <ng-container title>
-        {{ 'assets.selectMany' | sqxTranslate }}
+        {{ "assets.selectMany" | sqxTranslate }}
     </ng-container>
 
     <ng-container tabs>
         <div class="row gx-2 mt-3 mb-3">
             <div class="col-auto">
-                <button type="button" class="btn btn-text-secondary" (click)="reload()">
+                <button class="btn btn-text-secondary" (click)="reload()" type="button">
                     <i class="icon-reset"></i>
                 </button>
             </div>
             <div class="col">
                 <div class="row g-0 search">
                     <div class="col-6">
-                        <sqx-tag-editor class="tags" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
+                        <sqx-tag-editor
+                            class="tags"
                             [itemsSource]="assetsState.tagsNames | async"
-                            (ngModelChange)="selectTags($event)" undefinedWhenEmpty="false"
                             [ngModel]="assetsState.selectedTagNames | async"
-                            styleScrollable="true">
-                        </sqx-tag-editor>
+                            (ngModelChange)="selectTags($event)"
+                            placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
+                            undefinedWhenEmpty="false"
+                            styleScrollable="true"></sqx-tag-editor>
                     </div>
                     <div class="col-6">
-                        <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" 
-                            enableShortcut="true"
+                        <sqx-search-form
                             [queriesTypes]="'common.assets' | sqxTranslate"
+                            [query]="assetsState.query | async"
                             (queryChange)="search($event)"
-                            [query]="assetsState.query | async">
-                        </sqx-search-form>
+                            formClass="form"
+                            placeholder="{{ 'assets.searchByName' | sqxTranslate }}"
+                            enableShortcut="true"></sqx-search-form>
                     </div>
                 </div>
             </div>
             <div class="col-auto">
                 <div class="btn-group" data-toggle="buttons">
-                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="snapshot.isListView" [disabled]="snapshot.isListView" (click)="changeView(true)">
+                    <button
+                        class="btn btn-secondary btn-toggle"
+                        [class.btn-primary]="snapshot.isListView"
+                        [disabled]="snapshot.isListView"
+                        (click)="changeView(true)"
+                        type="button">
                         <i class="icon-list"></i>
                     </button>
-                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!snapshot.isListView" [disabled]="!snapshot.isListView" (click)="changeView(false)">
+                    <button
+                        class="btn btn-secondary btn-toggle"
+                        [class.btn-primary]="!snapshot.isListView"
+                        [disabled]="!snapshot.isListView"
+                        (click)="changeView(false)"
+                        type="button">
                         <i class="icon-grid"></i>
                     </button>
                 </div>
@@ -47,27 +60,29 @@
         <sqx-list-view [isLoading]="assetsState.isLoading | async" overflow="true">
             <ng-container content>
                 <sqx-assets-list
-                    (assetSelect)="selectAsset($event)"
                     [assetsState]="assetsState"
                     [isDisabled]="true"
                     [isListView]="snapshot.isListView"
-                    [selectedIds]="snapshot.selectedAssets">
-                </sqx-assets-list>
+                    [selectedIds]="snapshot.selectedAssets"
+                    (assetSelect)="selectAsset($event)"></sqx-assets-list>
             </ng-container>
-    
+
             <ng-container footer>
-                <sqx-pager (loadTotal)="reloadTotal()" [paging]="assetsState.paging | async" (pagingChange)="assetsState.page($event)"></sqx-pager>
+                <sqx-pager
+                    [paging]="assetsState.paging | async"
+                    (loadTotal)="reloadTotal()"
+                    (pagingChange)="assetsState.page($event)"></sqx-pager>
             </ng-container>
         </sqx-list-view>
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn btn-text-secondary" (click)="emitClose()">
-            {{ 'common.cancel' | sqxTranslate }}
+        <button class="btn btn-text-secondary" (click)="emitClose()" type="button">
+            {{ "common.cancel" | sqxTranslate }}
         </button>
 
-        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="snapshot.selectionCount === 0">
-            {{ 'assets.linkSelected' | sqxTranslate: { count: snapshot.selectionCount } }})
+        <button class="btn btn-success" [disabled]="snapshot.selectionCount === 0" (click)="emitSelect()" type="submit">
+            {{ "assets.linkSelected" | sqxTranslate: { count: snapshot.selectionCount } }})
         </button>
     </ng-container>
 </sqx-modal-dialog>

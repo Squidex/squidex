@@ -2,110 +2,133 @@
     <ng-container title>
         <div class="row">
             <div class="col-selector">
-                <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)" *ngIf="schemas.length > 1">
-                    <option *ngFor="let schema of schemas" [ngValue]="schema">
-                        {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
-                    </option>
-                </select>
+                @if (schemas.length > 1) {
+                    <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
+                        @for (schema of schemas; track schema) {
+                            <option [ngValue]="schema">
+                                {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schema.displayName } }}
+                            </option>
+                        }
+                    </select>
+                }
             </div>
         </div>
 
-        <div *ngIf="schemas.length === 1">
-            {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schemas[0].displayName } }}
-        </div>
+        @if (schemas.length === 1) {
+            <div>
+                {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemas[0].displayName } }}
+            </div>
+        }
 
-        <div *ngIf="schemas.length === 0">
-            {{ 'contents.referencesNoSchema' | sqxTranslate }}
-        </div>
+        @if (schemas.length === 0) {
+            <div>
+                {{ "contents.referencesNoSchema" | sqxTranslate }}
+            </div>
+        }
     </ng-container>
 
     <ng-container tabs>
         <div class="row gx-2 mt-3 mb-3">
-            <ng-container *ngIf="schema">
+            @if (schema) {
                 <div class="col-auto">
-                    <button type="button" class="btn btn-text-secondary" (click)="reload()">
+                    <button class="btn btn-text-secondary" (click)="reload()" type="button">
                         <i class="icon-reset"></i>
                     </button>
                 </div>
                 <div class="col">
-                    <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}" 
+                    <sqx-search-form
                         [language]="language"
                         [languages]="languages"
-                        (queryChange)="search($event)"
                         [query]="contentsState.query | async"
                         [queryModel]="queryModel | async"
-                        [statuses]="contentsState.statuses | async">
-                    </sqx-search-form>
+                        [statuses]="contentsState.statuses | async"
+                        (queryChange)="search($event)"
+                        formClass="form"
+                        placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"></sqx-search-form>
                 </div>
-                    
-                <div class="col-auto" *ngIf="languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages"></sqx-language-selector>
-                </div>
-            </ng-container>
+                @if (languages.length > 1) {
+                    <div class="col-auto">
+                        <sqx-language-selector
+                            class="languages-buttons"
+                            [(language)]="language"
+                            [languages]="languages"></sqx-language-selector>
+                    </div>
+                }
+            }
         </div>
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="schema">
+        @if (schema) {
             <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
                 <ng-container header>
-                    <table class="table table-items table-fixed" [sqxContentListWidth]="schema.defaultReferenceFields" #header>
+                    <table class="table table-items table-fixed" #header [sqxContentListWidth]="schema.defaultReferenceFields">
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <input type="checkbox" class="form-check" 
-                                        [ngModel]="selectedAll" 
-                                        (ngModelChange)="selectAll($event)">
+                                    <input class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" type="checkbox" />
                                 </th>
-                                <th sqxContentListCell [field]="metaFields.lastModifiedByAvatar">
-                                    <sqx-content-list-header [language]="language" [field]="metaFields.lastModifiedByAvatar"></sqx-content-list-header>
-                                </th>
-                                <th *ngFor="let field of schema.defaultReferenceFields">
+                                <th [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>
                                     <sqx-content-list-header
-                                        [field]="field"
-                                        [query]="(contentsState.query | async)!"
-                                        (queryChange)="search($event)"
-                                        [language]="language">
-                                    </sqx-content-list-header>
+                                        [language]="language"
+                                        [field]="metaFields.lastModifiedByAvatar"></sqx-content-list-header>
                                 </th>
-                                <th sqxContentListCell [field]="metaFields.statusColor">
-                                    <sqx-content-list-header [language]="language" [field]="metaFields.statusColor"></sqx-content-list-header>
+                                @for (field of schema.defaultReferenceFields; track field) {
+                                    <th>
+                                        <sqx-content-list-header
+                                            [field]="field"
+                                            [query]="(contentsState.query | async)!"
+                                            [language]="language"
+                                            (queryChange)="search($event)"></sqx-content-list-header>
+                                    </th>
+                                }
+                                <th [field]="metaFields.statusColor" sqxContentListCell>
+                                    <sqx-content-list-header
+                                        [language]="language"
+                                        [field]="metaFields.statusColor"></sqx-content-list-header>
                                 </th>
                             </tr>
                         </thead>
                     </table>
                 </ng-container>
-    
                 <ng-container content>
                     <div class="table-container">
-                        <table class="table table-items table-fixed" [sqxContentListWidth]="schema.defaultReferenceFields" *ngIf="contentsState.contents | async; let contents" [sqxSyncWidth]="header">
-                            <tbody *ngFor="let content of contents; trackBy: trackByContent"
-                                [sqxContentSelectorItem]="content"
-                                [language]="language"
-                                [languages]="languages"
-                                [schema]="schema"
-                                [selectable]="!isItemAlreadySelected(content)"
-                                [selected]="isItemSelected(content)"
-                                (selectedChange)="selectContent(content)">
-                            </tbody>
-                        </table>
+                        @if (contentsState.contents | async; as contents) {
+                            <table
+                                class="table table-items table-fixed"
+                                [sqxContentListWidth]="schema.defaultReferenceFields"
+                                [sqxSyncWidth]="header">
+                                @for (content of contents; track trackByContent($index, content)) {
+                                    <tbody
+                                        [sqxContentSelectorItem]="content"
+                                        [language]="language"
+                                        [languages]="languages"
+                                        [schema]="schema"
+                                        [selectable]="!isItemAlreadySelected(content)"
+                                        [selected]="isItemSelected(content)"
+                                        (selectedChange)="selectContent(content)"></tbody>
+                                }
+                            </table>
+                        }
                     </div>
                 </ng-container>
-    
                 <ng-container footer>
-                    <sqx-pager (loadTotal)="reloadTotal()" [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)"></sqx-pager>
+                    <sqx-pager
+                        [paging]="contentsState.paging | async"
+                        (loadTotal)="reloadTotal()"
+                        (pagingChange)="contentsState.page($event)"></sqx-pager>
                 </ng-container>
             </sqx-list-view>
-        </ng-container>
+        }
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn btn-text-secondary" (click)="emitClose()">
-            {{ 'common.cancel' | sqxTranslate }}
+        <button class="btn btn-text-secondary" (click)="emitClose()" type="button">
+            {{ "common.cancel" | sqxTranslate }}
         </button>
 
-        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0 || selectionCount > maxItems">
-            {{ 'contents.referencesLink' | sqxTranslate: { count: selectionCount } }}
+        <button class="btn btn-success" [disabled]="selectionCount === 0 || selectionCount > maxItems" (click)="emitSelect()" type="submit">
+            {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount } }}
         </button>
     </ng-container>
 </sqx-modal-dialog>

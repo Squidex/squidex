@@ -1,0 +1,18 @@
+{
+    "plugins": ["prettier-plugin-organize-attributes"],
+    "overrides": [
+        {
+            "files": "*.html",
+            "options": {
+                "parser": "angular",
+                "printWidth": 140,
+                "htmlWhitespaceSensitivity": "ignore",
+                "bracketSameLine": true,
+                "bracketSpacing": true,
+                "singleAttributePerLine": false,                                                                                       
+                "tabWidth": 4
+            }
+        }
+    ],
+    "tabWidth": 4
+}

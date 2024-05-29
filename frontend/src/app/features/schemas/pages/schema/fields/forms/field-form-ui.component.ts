@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgSwitch, NgSwitchCase } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormHintComponent, SchemaDto, TranslatePipe } from '@app/shared';
@@ -29,26 +29,24 @@ import { TagsUIComponent } from '../types/tags-ui.component';
     styleUrls: ['./field-form-ui.component.scss'],
     templateUrl: './field-form-ui.component.html',
     imports: [
-        ArrayUIComponent,
-        AssetsUIComponent,
-        BooleanUIComponent,
-        ComponentUIComponent,
-        ComponentsUIComponent,
-        DateTimeUIComponent,
-        FormHintComponent,
-        FormsModule,
-        GeolocationUIComponent,
-        JsonUIComponent,
-        NgSwitch,
-        NgSwitchCase,
-        NumberUIComponent,
-        ReactiveFormsModule,
-        RichTextUIComponent,
-        ReferencesUIComponent,
-        StringUIComponent,
-        TagsUIComponent,
-        TranslatePipe,
-    ],
+    ArrayUIComponent,
+    AssetsUIComponent,
+    BooleanUIComponent,
+    ComponentUIComponent,
+    ComponentsUIComponent,
+    DateTimeUIComponent,
+    FormHintComponent,
+    FormsModule,
+    GeolocationUIComponent,
+    JsonUIComponent,
+    NumberUIComponent,
+    ReactiveFormsModule,
+    RichTextUIComponent,
+    ReferencesUIComponent,
+    StringUIComponent,
+    TagsUIComponent,
+    TranslatePipe
+],
 })
 export class FieldFormUIComponent {
     @Input({ required: true })

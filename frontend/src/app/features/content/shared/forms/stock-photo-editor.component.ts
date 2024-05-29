@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
@@ -49,8 +49,6 @@ type Request = { search?: string; page: number };
         LoaderComponent,
         ModalDialogComponent,
         ModalDirective,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         StopClickDirective,
         TooltipDirective,

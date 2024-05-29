@@ -1,65 +1,61 @@
 <div class="table-items-row-details-tabs clearfix">
     <ul class="nav nav-tabs2">
         <li class="nav-item">
-            <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">
-                {{ 'schemas.field.tabCommon' | sqxTranslate }}
+            <a class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
+                {{ "schemas.field.tabCommon" | sqxTranslate }}
             </a>
         </li>
         <li class="nav-item" [class.hidden]="!field.properties.isContentField">
-            <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">
-                {{ 'schemas.field.tabValidation' | sqxTranslate }}
+            <a class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
+                {{ "schemas.field.tabValidation" | sqxTranslate }}
             </a>
         </li>
         <li class="nav-item" [class.hidden]="!field.properties.isContentField">
-            <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">
-                {{ 'schemas.field.tabEditing' | sqxTranslate }}
+            <a class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)">
+                {{ "schemas.field.tabEditing" | sqxTranslate }}
             </a>
         </li>
         <li class="nav-item" [class.hidden]="field.properties.fieldType !== 'Json'">
-            <a class="nav-link" (click)="selectTab(3)" [class.active]="selectedTab === 3">
-                {{ 'schemas.field.tabMore' | sqxTranslate }}
+            <a class="nav-link" [class.active]="selectedTab === 3" (click)="selectTab(3)">
+                {{ "schemas.field.tabMore" | sqxTranslate }}
             </a>
         </li>
     </ul>
 
-    <div class="float-end" *ngIf="showButtons">
-        <button [disabled]="field.isLocked" type="button" class="btn btn-text-secondary" (click)="dialogClose.emit()">
-            {{ 'common.cancel' | sqxTranslate }}
-        </button>
-
-        <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ms-1" *ngIf="isEditable">
-            {{ 'common.save' | sqxTranslate }}
-        </button>
-    </div>
+    @if (showButtons) {
+        <div class="float-end">
+            <button class="btn btn-text-secondary" [disabled]="field.isLocked" (click)="dialogClose.emit()" type="button">
+                {{ "common.cancel" | sqxTranslate }}
+            </button>
+            @if (isEditable) {
+                <button class="btn btn-primary ms-1" [disabled]="field.isLocked" type="submit">
+                    {{ "common.save" | sqxTranslate }}
+                </button>
+            }
+        </div>
+    }
 </div>
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
-    <sqx-field-form-common
-        [fieldForm]="fieldForm"
-        [field]="field"
-        [schema]="schema">
-    </sqx-field-form-common>
+    <sqx-field-form-common [fieldForm]="fieldForm" [field]="field" [schema]="schema"></sqx-field-form-common>
 </div>
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
-    <sqx-field-form-validation 
+    <sqx-field-form-validation
         [languages]="languages"
         [fieldForm]="fieldForm"
         [field]="field"
         [schema]="schema"
         [isLocalizable]="isLocalizable"
-        [settings]="settings" >
-    </sqx-field-form-validation>
+        [settings]="settings"></sqx-field-form-validation>
 </div>
 
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
-    <sqx-field-form-ui
-        [fieldForm]="fieldForm"
-        [field]="field"
-        [schema]="schema">
-    </sqx-field-form-ui>
+    <sqx-field-form-ui [fieldForm]="fieldForm" [field]="field" [schema]="schema"></sqx-field-form-ui>
 </div>
 
-<div class="table-items-row-details-tab" *ngIf="selectedTab === 3">
-    <sqx-json-more [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-json-more>
-</div>
+@if (selectedTab === 3) {
+    <div class="table-items-row-details-tab">
+        <sqx-json-more [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-json-more>
+    </div>
+}

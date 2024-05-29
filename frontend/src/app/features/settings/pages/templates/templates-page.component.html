@@ -2,28 +2,35 @@
 
 <sqx-layout layout="main" titleText="i18n:common.templates" titleIcon="templates" innerWidth="50">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:templates.refreshTooltip" shortcut="CTRL + B">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        <button
+            class="btn btn-text-secondary me-2"
+            (click)="reload()"
+            type="button"
+            title="i18n:templates.refreshTooltip"
+            shortcut="CTRL + B">
+            <i class="icon-reset"></i>
+            {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
 
     <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="templatesState.isLoading | async">
+        <sqx-list-view [isLoading]="templatesState.isLoading | async" innerWidth="50rem">
             <sqx-form-alert light="true">
                 <div [innerHTML]="'templates.cliHint' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></div>
             </sqx-form-alert>
 
-            <ng-container *ngIf="(templatesState.isLoaded | async) && (templatesState.templates | async); let templates">    
-                <sqx-template *ngFor="let template of templates; trackBy: trackByTemplate"
-                    [template]="template">
-                </sqx-template>
-            </ng-container>
+            @if ((templatesState.isLoaded | async) && (templatesState.templates | async); as templates) {
+                @for (template of templates; track trackByTemplate($index, template)) {
+                    <sqx-template [template]="template"></sqx-template>
+                }
+            }
         </sqx-list-view>
     </ng-container>
 
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"

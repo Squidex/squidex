@@ -2,52 +2,58 @@
 
 <sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" innerWidth="60">
     <ng-container menu>
-        <sqx-notifo topic="apps/{{plansState.teamId}}/settings/plan"></sqx-notifo>
+        <sqx-notifo topic="apps/{{ plansState.teamId }}/settings/plan"></sqx-notifo>
 
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:plans.refreshTooltip" shortcut="CTRL + B">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        <button class="btn btn-text-secondary" (click)="reload()" type="button" title="i18n:plans.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i>
+            {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
 
     <ng-container>
-        <sqx-list-view innerWidth="60rem" [isLoading]="plansState.isLoading | async">
-            <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
+        <sqx-list-view [isLoading]="plansState.isLoading | async" innerWidth="60rem">
+            @if ((plansState.isLoaded | async) && (plansState.plans | async); as plans) {
                 <div class="alert alert-info">
-                    {{ 'plans.allApps' | sqxTranslate }}
+                    {{ "plans.allApps" | sqxTranslate }}
                 </div>
-
-                <div class="card card-body mb-4" *ngIf="plansState.referral | async; let referral">
-                    <h5 class="card-title">Squidex Referal Program</h5>
-                    
-                    <sqx-form-hint>
-                        <div [innerHTML]="'plans.referralHint' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
-                        <div [innerHTML]="referral.condition | sqxMarkdown | sqxSafeHtml"></div>
-                        <div [innerHTML]="'plans.referralEarned' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
-                    </sqx-form-hint>
-                </div>
-
+                @if (plansState.referral | async; as referral) {
+                    <div class="card card-body mb-4">
+                        <h5 class="card-title">Squidex Referal Program</h5>
+                        <sqx-form-hint>
+                            <div [innerHTML]="'plans.referralHint' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
+                            <div [innerHTML]="referral.condition | sqxMarkdown | sqxSafeHtml"></div>
+                            <div [innerHTML]="'plans.referralEarned' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
+                        </sqx-form-hint>
+                    </div>
+                }
                 <div>
-                    <div class="text-muted text-center empty" *ngIf="plans.length === 0">
-                        {{ 'plans.noPlanConfigured' | sqxTranslate }}
-                    </div>
-
-                    <div class="plans">
-                        <div class="plan" *ngFor="let planInfo of plans; trackBy: trackByPlan">
-                            <sqx-plan [planInfo]="planInfo"></sqx-plan>
+                    @if (plans.length === 0) {
+                        <div class="text-muted text-center empty">
+                            {{ "plans.noPlanConfigured" | sqxTranslate }}
                         </div>
+                    }
+                    <div class="plans">
+                        @for (planInfo of plans; track trackByPlan($index, planInfo)) {
+                            <div class="plan">
+                                <sqx-plan [planInfo]="planInfo"></sqx-plan>
+                            </div>
+                        }
                     </div>
-
-                    <div *ngIf="plansState.portalLink| async; let portalLink" class="billing-portal-link">
-                        {{ 'plans.billingPortalHint' | sqxTranslate }} <a [href]="portalLink" sqxExternalLink>{{ 'plans.billingPortal' | sqxTranslate }}</a>
-                    </div>
+                    @if (plansState.portalLink | async; as portalLink) {
+                        <div class="billing-portal-link">
+                            {{ "plans.billingPortalHint" | sqxTranslate }}
+                            <a [href]="portalLink" sqxExternalLink>{{ "plans.billingPortal" | sqxTranslate }}</a>
+                        </div>
+                    }
                 </div>
-            </ng-container>
+            }
         </sqx-list-view>
     </ng-container>
 
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="history"
                 routerLinkActive="active"
@@ -58,7 +64,8 @@
                 <i class="icon-time"></i>
             </a>
 
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"

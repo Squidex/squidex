@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodeComponent, FormHintComponent, SchemaDto, TemplatedFormArray, TranslatePipe, TriggerForm } from '@app/shared';
@@ -21,15 +21,13 @@ import { ContentChangedSchemaComponent } from './content-changed-schema.componen
         CompletionsCache,
     ],
     imports: [
-        CodeComponent,
-        ContentChangedSchemaComponent,
-        FormHintComponent,
-        FormsModule,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        TranslatePipe,
-    ],
+    CodeComponent,
+    ContentChangedSchemaComponent,
+    FormHintComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    TranslatePipe
+],
 })
 export class ContentChangedTriggerComponent {
     @Input()

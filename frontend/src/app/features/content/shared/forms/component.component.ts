@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, numberAttribute, QueryList, ViewChildren } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, DropdownMenuComponent, EditContentForm, FieldDto, FieldSection, FormHintComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
@@ -24,8 +24,6 @@ import { ComponentSectionComponent } from './component-section.component';
         FormHintComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         TranslatePipe,
     ],
 })

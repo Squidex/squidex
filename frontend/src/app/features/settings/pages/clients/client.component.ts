@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormHintComponent, ModalDirective, RoleDto, TourStepDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
@@ -18,18 +18,16 @@ import { ClientConnectFormComponent } from './client-connect-form.component';
     templateUrl: './client.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        ClientConnectFormComponent,
-        ConfirmClickDirective,
-        CopyDirective,
-        EditableTitleComponent,
-        FormHintComponent,
-        FormsModule,
-        ModalDirective,
-        NgFor,
-        NgIf,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    ClientConnectFormComponent,
+    ConfirmClickDirective,
+    CopyDirective,
+    EditableTitleComponent,
+    FormHintComponent,
+    FormsModule,
+    ModalDirective,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class ClientComponent {
     @Input({ required: true })

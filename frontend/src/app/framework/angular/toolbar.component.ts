@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ToolbarService } from '@app/framework/internal';
 import { TranslatePipe } from './pipes/translate.pipe';
@@ -17,11 +17,9 @@ import { TranslatePipe } from './pipes/translate.pipe';
     templateUrl: './toolbar.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
-        NgFor,
-        NgIf,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    TranslatePipe
+],
 })
 export class ToolbarComponent {
     constructor(

@@ -1,21 +1,30 @@
-<ng-container *ngIf="type === 'Text'; else code">
+@if (type === "Text") {
     <div class="input-group">
-        <sqx-code-editor [completion]="editorCompletion" singleLine="true" [mode]="editorMode" [snippets]="mode === 'Script'"></sqx-code-editor>
-
+        <sqx-code-editor
+            [completion]="editorCompletion"
+            [mode]="editorMode"
+            [snippets]="mode === 'Script'"
+            singleLine="true"></sqx-code-editor>
         <div class="input-group-apppend">
-            <select class="form-select" [ngModel]="mode" (ngModelChange)="setMode($event)" [disabled]="disabled" tabindex="-1">
-                <option *ngFor="let supportedMode of modes" [ngValue]="supportedMode">{{supportedMode}}</option>
+            <select class="form-select" [ngModel]="mode" [disabled]="disabled" (ngModelChange)="setMode($event)" tabindex="-1">
+                @for (supportedMode of modes; track supportedMode) {
+                    <option [ngValue]="supportedMode">{{ supportedMode }}</option>
+                }
             </select>
         </div>
     </div>
-</ng-container>
-
-<ng-template #code>
+} @else {
     <div class="btn-group btn-group-sm">
-        <button type="button" class="btn btn-toggle" *ngFor="let supportedMode of modes" [class.active]="mode === supportedMode" (click)="setMode(supportedMode)" tabindex="-1">
-            {{supportedMode}}
-        </button>
+        @for (supportedMode of modes; track supportedMode) {
+            <button
+                class="btn btn-toggle"
+                [class.active]="mode === supportedMode"
+                (click)="setMode(supportedMode)"
+                type="button"
+                tabindex="-1">
+                {{ supportedMode }}
+            </button>
+        }
     </div>
-
     <sqx-code-editor [completion]="editorCompletion" [height]="350" [mode]="editorMode" [snippets]="mode === 'Script'"></sqx-code-editor>
-</ng-template>
+}

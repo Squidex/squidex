@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { NgFor } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StopClickDirective } from '@app/framework';
@@ -22,12 +22,11 @@ import { ContentListFieldComponent } from '../contents/content-list-field.compon
     templateUrl: './content-selector-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        ContentListCellDirective,
-        ContentListFieldComponent,
-        FormsModule,
-        NgFor,
-        StopClickDirective,
-    ],
+    ContentListCellDirective,
+    ContentListFieldComponent,
+    FormsModule,
+    StopClickDirective
+],
 })
 export class ContentSelectorItemComponent {
     public readonly metaFields = META_FIELDS;

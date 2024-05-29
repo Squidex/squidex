@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor } from '@angular/common';
+
 import { AfterViewChecked, AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer } from '@app/framework/internal';
@@ -30,10 +30,9 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
-        NgFor,
-        ResizedDirective,
-    ],
+    FormsModule,
+    ResizedDirective
+],
 })
 export class RadioGroupComponent extends StatefulControlComponent<State, string> implements AfterViewInit, AfterViewChecked {
     private readonly textMeasurer: TextMeasurer;

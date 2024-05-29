@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AuthService, NotifoComponent, UIOptions } from '@app/shared';
 import { NotificationDropdownComponent } from './notification-dropdown.component';
@@ -17,10 +17,9 @@ import { NotificationDropdownComponent } from './notification-dropdown.component
     templateUrl: './notifications-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgIf,
-        NotificationDropdownComponent,
-        NotifoComponent,
-    ],
+    NotificationDropdownComponent,
+    NotifoComponent
+],
 })
 export class NotificationsMenuComponent {
     public isNotifoConfigured = false;

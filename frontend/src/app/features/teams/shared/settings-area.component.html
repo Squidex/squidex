@@ -2,7 +2,9 @@
 
 <sqx-layout layout="left" titleText="i18n:common.settings" titleIcon="settings" width="16" white="true" overflow="true" padding="true">
     <ng-container>
-        <sqx-settings-menu *ngIf="selectedTeam | async; let team" [team]="team"></sqx-settings-menu>
+        @if (selectedTeam | async; as team) {
+            <sqx-settings-menu [team]="team"></sqx-settings-menu>
+        }
     </ng-container>
 </sqx-layout>
 

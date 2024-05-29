@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, NumberFieldPropertiesDto, RootFieldDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
@@ -16,13 +16,12 @@ import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, Numb
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
     imports: [
-        FormHintComponent,
-        FormsModule,
-        LocalizedInputComponent,
-        NgIf,
-        ReactiveFormsModule,
-        TranslatePipe,
-    ],
+    FormHintComponent,
+    FormsModule,
+    LocalizedInputComponent,
+    ReactiveFormsModule,
+    TranslatePipe
+],
 })
 export class NumberValidationComponent {
     @Input({ required: true })

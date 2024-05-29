@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { AfterContentInit, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { fadeAnimation, StatefulComponent } from '@app/framework/internal';
 import { MarkdownInlinePipe, MarkdownPipe } from '../pipes/markdown.pipe';
@@ -25,14 +25,13 @@ import { StepDefinition, TourService } from './tour.service';
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        MarkdownInlinePipe,
-        MarkdownPipe,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgIf,
-        SafeHtmlPipe,
-        TranslatePipe,
-    ],
+    MarkdownInlinePipe,
+    MarkdownPipe,
+    ModalDirective,
+    ModalPlacementDirective,
+    SafeHtmlPipe,
+    TranslatePipe
+],
 })
 export class TourTemplateComponent extends StatefulComponent implements AfterContentInit {
     private delayedDestory: any;

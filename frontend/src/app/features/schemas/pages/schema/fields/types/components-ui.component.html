@@ -1,10 +1,12 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label">{{ 'schemas.field.defaultValue' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label">{{ "schemas.field.defaultValue" | sqxTranslate }}</label>
 
         <div class="col-3">
             <select class="form-select" formControlName="calculatedDefaultValue">
-                <option *ngFor="let value of calculatedDefaultValues" [ngValue]="value">{{value}}</option>
+                @for (value of calculatedDefaultValues; track value) {
+                    <option [ngValue]="value">{{ value }}</option>
+                }
             </select>
         </div>
     </div>

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -23,18 +23,16 @@ interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boo
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
     imports: [
-        AssetUrlPipe,
-        AsyncPipe,
-        ExternalLinkDirective,
-        FromNowPipe,
-        HistoryMessagePipe,
-        NgFor,
-        NgIf,
-        TooltipDirective,
-        TranslatePipe,
-        UserNameRefPipe,
-        UserPictureRefPipe,
-    ],
+    AssetUrlPipe,
+    AsyncPipe,
+    ExternalLinkDirective,
+    FromNowPipe,
+    HistoryMessagePipe,
+    TooltipDirective,
+    TranslatePipe,
+    UserNameRefPipe,
+    UserPictureRefPipe
+],
 })
 export class AssetHistoryComponent {
     @Input({ required: true })

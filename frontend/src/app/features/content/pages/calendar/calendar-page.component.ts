@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -29,7 +29,6 @@ type ViewMode = 'day' | 'week' | 'month';
         LayoutComponent,
         ModalDialogComponent,
         ModalDirective,
-        NgIf,
         RouterLink,
         TitleComponent,
         TooltipDirective,

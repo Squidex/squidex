@@ -1,9 +1,11 @@
-<div class="focus-container" (click)="onClick($event)" [style.borderColor]="(focusedUser | async)?.id | sqxStringColor">
-    <div class="focused" *ngIf="focusedUser | async; let user">
-        <div class="focus-user" [style.background]="user.id | sqxStringColor">
-            {{user.displayName}}
+<div class="focus-container" [style.borderColor]="(focusedUser | async)?.id | sqxStringColor" (click)="onClick($event)">
+    @if (focusedUser | async; as user) {
+        <div class="focused">
+            <div class="focus-user" [style.background]="user.id | sqxStringColor">
+                {{ user.displayName }}
+            </div>
         </div>
-    </div>
-    
+    }
+
     <ng-content></ng-content>
 </div>

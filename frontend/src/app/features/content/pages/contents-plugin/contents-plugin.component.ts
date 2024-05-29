@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
@@ -20,7 +20,6 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
         AsyncPipe,
         ContentExtensionComponent,
         LayoutComponent,
-        NgIf,
     ],
 })
 export class ContentsPluginComponent {

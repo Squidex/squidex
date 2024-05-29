@@ -1,32 +1,39 @@
-<div [formGroup]="triggerForm.form" class="form-horizontal">
+<div class="form-horizontal" [formGroup]="triggerForm.form">
     <div class="form-group">
-        <label for="condition">{{ 'common.condition' | sqxTranslate }}</label>
+        <label for="condition">{{ "common.condition" | sqxTranslate }}</label>
 
         <sqx-control-errors for="condition"></sqx-control-errors>
 
-        <textarea class="form-control code" id="condition" formControlName="condition" placeholder="{{ 'rules.conditionHint' | sqxTranslate }}"></textarea>
+        <textarea
+            class="form-control code"
+            id="condition"
+            formControlName="condition"
+            placeholder="{{ 'rules.conditionHint' | sqxTranslate }}"></textarea>
     </div>
 
     <div class="help">
-        <h4>{{ 'common.conditions' | sqxTranslate }}</h4>
-    
+        <h4>{{ "common.conditions" | sqxTranslate }}</h4>
+
         <sqx-form-hint>
-            {{ 'rules.conditionHint2' | sqxTranslate }}
+            {{ "rules.conditionHint2" | sqxTranslate }}
         </sqx-form-hint>
-    
+
         <ul class="help-examples">
             <li class="help-example">
-                {{ 'rules.conditions.event' | sqxTranslate }}:<br>
+                {{ "rules.conditions.event" | sqxTranslate }}:
+                <br />
 
                 <sqx-code>event.type == 'Created' || event.type == 'Updated'</sqx-code>
             </li>
             <li class="help-example">
-                {{ 'rules.conditions.largeAssets' | sqxTranslate }}:<br>
+                {{ "rules.conditions.largeAssets" | sqxTranslate }}:
+                <br />
 
                 <sqx-code>event.fileSize > 100000000</sqx-code>
             </li>
             <li class="help-example">
-                {{ 'rules.conditions.images' | sqxTranslate }}:<br>
+                {{ "rules.conditions.images" | sqxTranslate }}:
+                <br />
 
                 <sqx-code>event.isImage</sqx-code>
             </li>

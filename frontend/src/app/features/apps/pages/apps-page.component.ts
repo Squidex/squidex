@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
@@ -29,8 +29,6 @@ type GroupedApps = { team?: TeamDto; apps: AppDto[] };
         FormHintComponent,
         ModalDirective,
         NewsDialogComponent,
-        NgFor,
-        NgIf,
         OnboardingDialogComponent,
         TeamComponent,
         TitleComponent,

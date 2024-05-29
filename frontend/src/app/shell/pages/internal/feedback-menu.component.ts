@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import markerSDK, { MarkerSdk } from '@marker.io/browser';
 import { UIOptions } from '@app/shared';
@@ -16,9 +16,7 @@ import { UIOptions } from '@app/shared';
     styleUrls: ['./feedback-menu.component.scss'],
     templateUrl: './feedback-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        NgIf,
-    ],
+    imports: [],
 })
 export class FeedbackMenuComponent implements OnInit, OnDestroy {
     private widget?: MarkerSdk;

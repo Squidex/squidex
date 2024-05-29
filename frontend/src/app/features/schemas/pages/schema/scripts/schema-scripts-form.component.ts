@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
@@ -17,16 +17,14 @@ import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, Schema
     styleUrls: ['./schema-scripts-form.component.scss'],
     templateUrl: './schema-scripts-form.component.html',
     imports: [
-        AsyncPipe,
-        CodeEditorComponent,
-        FormsModule,
-        KeysPipe,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        ScriptNamePipe,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    CodeEditorComponent,
+    FormsModule,
+    KeysPipe,
+    ReactiveFormsModule,
+    ScriptNamePipe,
+    TranslatePipe
+],
 })
 export class SchemaScriptsFormComponent {
     @Input()

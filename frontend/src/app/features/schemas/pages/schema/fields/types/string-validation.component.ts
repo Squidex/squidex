@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -17,18 +17,16 @@ import { AppSettingsDto, DropdownMenuComponent, FieldDto, FormHintComponent, has
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
     imports: [
-        AsyncPipe,
-        DropdownMenuComponent,
-        FormHintComponent,
-        FormsModule,
-        LocalizedInputComponent,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    DropdownMenuComponent,
+    FormHintComponent,
+    FormsModule,
+    LocalizedInputComponent,
+    ModalDirective,
+    ModalPlacementDirective,
+    ReactiveFormsModule,
+    TranslatePipe
+],
 })
 export class StringValidationComponent  {
     private readonly subscriptions = new Subscriptions();

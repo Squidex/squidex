@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
 import { StatefulComponent } from '@app/framework/internal';
 import { CompensateScrollbarDirective } from './compensate-scrollbar.directive';
@@ -24,12 +24,11 @@ interface State {
     templateUrl: './list-view.component.html',
     changeDetection: ChangeDetectionStrategy.Default,
     imports: [
-        CompensateScrollbarDirective,
-        LoaderComponent,
-        NgIf,
-        NgTemplateOutlet,
-        SyncScollingDirective,
-    ],
+    CompensateScrollbarDirective,
+    LoaderComponent,
+    NgTemplateOutlet,
+    SyncScollingDirective
+],
 })
 export class ListViewComponent extends StatefulComponent<State> implements AfterViewInit {
     private timer: any;

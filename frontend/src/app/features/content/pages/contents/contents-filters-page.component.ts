@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { ContentsState, defined, LayoutComponent, Queries, Query, QueryListComponent, SavedQueriesComponent, SchemasState, TranslatePipe, UIState } from '@app/shared';
@@ -18,7 +18,6 @@ import { ContentsState, defined, LayoutComponent, Queries, Query, QueryListCompo
     imports: [
         AsyncPipe,
         LayoutComponent,
-        NgIf,
         QueryListComponent,
         SavedQueriesComponent,
         TranslatePipe,

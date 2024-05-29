@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DateTimeEditorComponent, DropdownComponent, HighlightPipe, TranslatePipe } from '@app/framework';
@@ -22,21 +22,17 @@ import { FilterOperatorPipe } from './query.pipes';
     templateUrl: './filter-comparison.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
-        DateTimeEditorComponent,
-        DropdownComponent,
-        FilterOperatorPipe,
-        FormsModule,
-        HighlightPipe,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        QueryPathComponent,
-        ReferenceInputComponent,
-        TranslatePipe,
-        UserDtoPicture,
-    ],
+    AsyncPipe,
+    DateTimeEditorComponent,
+    DropdownComponent,
+    FilterOperatorPipe,
+    FormsModule,
+    HighlightPipe,
+    QueryPathComponent,
+    ReferenceInputComponent,
+    TranslatePipe,
+    UserDtoPicture
+],
 })
 export class FilterComparisonComponent {
     @Output()

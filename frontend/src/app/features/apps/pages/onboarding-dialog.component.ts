@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { fadeAnimation, MarkdownPipe, ModalDialogComponent, SafeHtmlPipe, slideAnimation, TourState, TranslatePipe, UsersService } from '@app/shared';
@@ -22,7 +22,6 @@ import { fadeAnimation, MarkdownPipe, ModalDialogComponent, SafeHtmlPipe, slideA
         FormsModule,
         MarkdownPipe,
         ModalDialogComponent,
-        NgIf,
         ReactiveFormsModule,
         SafeHtmlPipe,
         TranslatePipe,

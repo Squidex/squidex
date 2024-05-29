@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DropdownMenuComponent, FileDropDirective, HTTP, ModalDirective, ModalPlacementDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
@@ -17,19 +17,14 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
     templateUrl: './asset-uploader.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
-        DropdownMenuComponent,
-        FileDropDirective,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        NgSwitchDefault,
-        ProgressBarComponent,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    DropdownMenuComponent,
+    FileDropDirective,
+    ModalDirective,
+    ModalPlacementDirective,
+    ProgressBarComponent,
+    TranslatePipe
+],
 })
 export class AssetUploaderComponent {
     public modalMenu = new ModalModel();

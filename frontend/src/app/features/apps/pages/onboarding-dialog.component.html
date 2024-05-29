@@ -1,100 +1,95 @@
 <sqx-modal-dialog showHeader="false">
     <ng-container tabs>
         <div class="squid d-flex align-items-center justify-content-center">
-            <img src="./images/squid.svg">
+            <img src="./images/squid.svg" />
         </div>
     </ng-container>
 
     <ng-container content>
-        <a class="header-right modal-close force" (click)="cancel()">{{ 'tour.skip' | sqxTranslate }}</a>
+        <a class="header-right modal-close force" (click)="cancel()">{{ "tour.skip" | sqxTranslate }}</a>
 
-        <div class="onboarding-step " *ngIf="step === 0">
-            <img @fade class="header-left" src="./images/logo-white-small.png">
-
-            <div @slide class="onboarding-enter-leave text-center">
-                <h1>{{ 'tour.welcome' | sqxTranslate }} <span class="header-focus">{{ 'tour.welcomeProduct' | sqxTranslate }}</span></h1>
-
-                <div [innerHTML]="'tour.stepIntroText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-
-                <div class="mt-4">
-                    <button (click)="next()" class="btn btn-success">
-                        {{ 'tour.stepIntroNext' | sqxTranslate }}
-                    </button>
+        @if (step === 0) {
+            <div class="onboarding-step">
+                <img class="header-left" @fade src="./images/logo-white-small.png" />
+                <div class="onboarding-enter-leave text-center" @slide>
+                    <h1>
+                        {{ "tour.welcome" | sqxTranslate }}
+                        <span class="header-focus">{{ "tour.welcomeProduct" | sqxTranslate }}</span>
+                    </h1>
+                    <div [innerHTML]="'tour.stepIntroText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                    <div class="mt-4">
+                        <button class="btn btn-success" (click)="next()">
+                            {{ "tour.stepIntroNext" | sqxTranslate }}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
 
-        <div *ngIf="step === 1">
-            <img @fade class="header-left" src="./images/logo-white-small.png">
-
-            <div @slide class="onboarding-enter-leave">
-                <form [formGroup]="answersForm" (ngSubmit)="submitAnswers()">
-                    <h2>{{ 'tour.stepDataTitle' | sqxTranslate }}</h2>
-
-                    <div [innerHTML]="'tour.stepDataText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-    
-                    <div class="form-group mt-4">
-                        <label for="role">{{ 'tour.stepDataCompanyRole' | sqxTranslate }}</label>
-    
-                        <select class="form-select" id="companyRole" formControlName="companyRole">
-                            <option [ngValue]="'RoleEmployee'">{{ 'tour.roleEmployee' | sqxTranslate }}</option>
-                            <option [ngValue]="'RoleBusinessOwner'">{{ 'tour.roleBusinessOwner' | sqxTranslate }}</option>
-                            <option [ngValue]="'RoleProductManager'">{{ 'tour.roleProductManager' | sqxTranslate }}</option>
-                            <option [ngValue]="'RoleContentCreator'">{{ 'tour.roleContentCreator' | sqxTranslate }}</option>
-                            <option [ngValue]="'RoleSoftwareDeveloper'">{{ 'tour.roleSoftwareDeveloper' | sqxTranslate }}</option>
-                            <option [ngValue]="'RoleBusinessAnalyst'">{{ 'tour.roleBusinessAnalyst' | sqxTranslate }}</option>
-                        </select>
-                    </div>
-    
-                    <div class="form-group">
-                        <label for="companySize">{{ 'tour.stepDataCompanySize' | sqxTranslate }}</label>
-    
-                        <select class="form-select" id="companySize" formControlName="companySize">
-                            <option [ngValue]="'SizeSingle'">{{ 'tour.sizeSingle' | sqxTranslate }}</option>
-                            <option [ngValue]="'SizeSmall'">{{ 'tour.sizeSmall' | sqxTranslate }}</option>
-                            <option [ngValue]="'SizeMedium'">{{ 'tour.sizeMedium' | sqxTranslate }}</option>
-                            <option [ngValue]="'SizeLarge'">{{ 'tour.sizeLarge' | sqxTranslate }}</option>
-                            <option [ngValue]="'SizeVeryLarge'">{{ 'tour.sizeVeryLarge' | sqxTranslate }}</option>
-                        </select>
-                    </div>
-    
-                    <div class="form-group">
-                        <label for="project">{{ 'tour.stepDataProject' | sqxTranslate }}</label>
-    
-                        <select class="form-select" id="project" formControlName="project">
-                            <option [ngValue]="'ProjectNewsMagazine'">{{ 'tour.projectNewsMagazine' | sqxTranslate }}</option>
-                            <option [ngValue]="'ProjectPersonalBlog'">{{ 'tour.projectPersonalBlog' | sqxTranslate }}</option>
-                            <option [ngValue]="'ProjectSmallBusiness'">{{ 'tour.projectSmallBusiness' | sqxTranslate }}</option>
-                            <option [ngValue]="'ProjectCommerce'">{{ 'tour.projectCommerce' | sqxTranslate }}</option>
-                            <option [ngValue]="'ProjectMobileApp'">{{ 'tour.projectMobileApp' | sqxTranslate }}</option>
-                            <option [ngValue]="'ProjectBackend'">{{ 'tour.projectBackend' | sqxTranslate }}</option>
-                            <option [ngValue]="'ProjectLearning'">{{ 'tour.projectLearning' | sqxTranslate }}</option>
-                        </select>
-                    </div>
-    
-                    <button type="submit" class="btn btn-success">{{ 'tour.stepDataNext' | sqxTranslate }}</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="onboarding-step" *ngIf="step === 2">
-            <img @fade class="header-left" src="./images/logo-white-small.png">
-
-            <div @slide class="onboarding-enter-leave text-center">
-                <h2>{{ 'tour.stepTourTitle' | sqxTranslate }}</h2>
-
-                <div [innerHTML]="'tour.stepTourText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-
-                <div class="mt-4">
-                    <button (click)="start()" class="btn btn-success">
-                        {{ 'tour.startYes' | sqxTranslate }}
-                    </button>
-
-                    <button (click)="cancel()" class="btn btn-outline-secondary ms-2">
-                        {{ 'tour.startNo' | sqxTranslate }}
-                    </button>
+        @if (step === 1) {
+            <div>
+                <img class="header-left" @fade src="./images/logo-white-small.png" />
+                <div class="onboarding-enter-leave" @slide>
+                    <form [formGroup]="answersForm" (ngSubmit)="submitAnswers()">
+                        <h2>{{ "tour.stepDataTitle" | sqxTranslate }}</h2>
+                        <div [innerHTML]="'tour.stepDataText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                        <div class="form-group mt-4">
+                            <label for="role">{{ "tour.stepDataCompanyRole" | sqxTranslate }}</label>
+                            <select class="form-select" id="companyRole" formControlName="companyRole">
+                                <option [ngValue]="'RoleEmployee'">{{ "tour.roleEmployee" | sqxTranslate }}</option>
+                                <option [ngValue]="'RoleBusinessOwner'">{{ "tour.roleBusinessOwner" | sqxTranslate }}</option>
+                                <option [ngValue]="'RoleProductManager'">{{ "tour.roleProductManager" | sqxTranslate }}</option>
+                                <option [ngValue]="'RoleContentCreator'">{{ "tour.roleContentCreator" | sqxTranslate }}</option>
+                                <option [ngValue]="'RoleSoftwareDeveloper'">{{ "tour.roleSoftwareDeveloper" | sqxTranslate }}</option>
+                                <option [ngValue]="'RoleBusinessAnalyst'">{{ "tour.roleBusinessAnalyst" | sqxTranslate }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="companySize">{{ "tour.stepDataCompanySize" | sqxTranslate }}</label>
+                            <select class="form-select" id="companySize" formControlName="companySize">
+                                <option [ngValue]="'SizeSingle'">{{ "tour.sizeSingle" | sqxTranslate }}</option>
+                                <option [ngValue]="'SizeSmall'">{{ "tour.sizeSmall" | sqxTranslate }}</option>
+                                <option [ngValue]="'SizeMedium'">{{ "tour.sizeMedium" | sqxTranslate }}</option>
+                                <option [ngValue]="'SizeLarge'">{{ "tour.sizeLarge" | sqxTranslate }}</option>
+                                <option [ngValue]="'SizeVeryLarge'">{{ "tour.sizeVeryLarge" | sqxTranslate }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="project">{{ "tour.stepDataProject" | sqxTranslate }}</label>
+                            <select class="form-select" id="project" formControlName="project">
+                                <option [ngValue]="'ProjectNewsMagazine'">{{ "tour.projectNewsMagazine" | sqxTranslate }}</option>
+                                <option [ngValue]="'ProjectPersonalBlog'">{{ "tour.projectPersonalBlog" | sqxTranslate }}</option>
+                                <option [ngValue]="'ProjectSmallBusiness'">{{ "tour.projectSmallBusiness" | sqxTranslate }}</option>
+                                <option [ngValue]="'ProjectCommerce'">{{ "tour.projectCommerce" | sqxTranslate }}</option>
+                                <option [ngValue]="'ProjectMobileApp'">{{ "tour.projectMobileApp" | sqxTranslate }}</option>
+                                <option [ngValue]="'ProjectBackend'">{{ "tour.projectBackend" | sqxTranslate }}</option>
+                                <option [ngValue]="'ProjectLearning'">{{ "tour.projectLearning" | sqxTranslate }}</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success" type="submit">
+                            {{ "tour.stepDataNext" | sqxTranslate }}
+                        </button>
+                    </form>
                 </div>
             </div>
-        </div>
+        }
+
+        @if (step === 2) {
+            <div class="onboarding-step">
+                <img class="header-left" @fade src="./images/logo-white-small.png" />
+                <div class="onboarding-enter-leave text-center" @slide>
+                    <h2>{{ "tour.stepTourTitle" | sqxTranslate }}</h2>
+                    <div [innerHTML]="'tour.stepTourText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                    <div class="mt-4">
+                        <button class="btn btn-success" (click)="start()">
+                            {{ "tour.startYes" | sqxTranslate }}
+                        </button>
+                        <button class="btn btn-outline-secondary ms-2" (click)="cancel()">
+                            {{ "tour.startNo" | sqxTranslate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
     </ng-container>
 </sqx-modal-dialog>

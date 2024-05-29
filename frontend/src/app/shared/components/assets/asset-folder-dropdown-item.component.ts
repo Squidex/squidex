@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectorRef, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { LoaderComponent, StopClickDirective, TranslatePipe } from '@app/framework';
 import { AssetsService } from '@app/shared/internal';
@@ -17,12 +17,10 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
     styleUrls: ['./asset-folder-dropdown-item.component.scss'],
     templateUrl: './asset-folder-dropdown-item.component.html',
     imports: [
-        LoaderComponent,
-        NgFor,
-        NgIf,
-        StopClickDirective,
-        TranslatePipe,
-    ],
+    LoaderComponent,
+    StopClickDirective,
+    TranslatePipe
+],
 })
 export class AssetFolderDropdownItemComponent {
     @Input({ required: true })

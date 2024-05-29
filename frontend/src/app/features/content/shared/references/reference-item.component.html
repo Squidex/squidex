@@ -3,62 +3,74 @@
         <ng-content></ng-content>
     </td>
 
-    <td class="content-field" sqxContentListCell [field]="metaFields.lastModifiedByAvatar">
-        <sqx-content-list-field 
+    <td class="content-field" [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>
+        <sqx-content-list-field
             [content]="content"
             [field]="metaFields.lastModifiedByAvatar"
             [language]="language"
             [languages]="languages"
-            [schema]="undefined">
-        </sqx-content-list-field>
+            [schema]="undefined"></sqx-content-list-field>
     </td>
 
-    <td class="cell-auto cell-content" *ngFor="let value of values">
-        <sqx-content-value [value]="value"></sqx-content-value>
-    </td>
+    @for (value of values; track value) {
+        <td class="cell-auto cell-content">
+            <sqx-content-value [value]="value"></sqx-content-value>
+        </td>
+    }
 
-    <td class="cell-valid" *ngIf="validityVisible">
-        <span class="badge rounded-pill badge-success" *ngIf="isValid === true">VALID</span>
-        <span class="badge rounded-pill badge-danger" *ngIf="isValid === false">INVALID</span>
-    </td>
+    @if (validityVisible) {
+        <td class="cell-valid">
+            @if (isValid === true) {
+                <span class="badge rounded-pill badge-success">VALID</span>
+            }
+            @if (isValid === false) {
+                <span class="badge rounded-pill badge-danger">INVALID</span>
+            }
+        </td>
+    }
 
-    <td sqxContentListCell [field]="metaFields.statusColor">
-        <sqx-content-list-field 
+    <td [field]="metaFields.statusColor" sqxContentListCell>
+        <sqx-content-list-field
             [content]="content"
             [field]="metaFields.statusColor"
-            [language]="language" 
+            [language]="language"
             [languages]="languages"
-            [schema]="undefined">
-        </sqx-content-list-field>
+            [schema]="undefined"></sqx-content-list-field>
     </td>
 
-    <td class="cell-label" *ngIf="!isCompact">
-        <div class="bg-container d-flex align-items-center">
-            <span class="badge badge-primary rounded-pill truncate-inline">{{content.schemaDisplayName}}</span>
-        </div>
-    </td>
+    @if (!isCompact) {
+        <td class="cell-label">
+            <div class="bg-container d-flex align-items-center">
+                <span class="badge badge-primary rounded-pill truncate-inline">{{ content.schemaDisplayName }}</span>
+            </div>
+        </td>
+    }
 
     <td class="cell-actions">
         <div class="reference-edit">
-            <button type="button" class="btn btn-text-secondary">
-                <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
+            <button class="btn btn-text-secondary" type="button">
+                <span class="hidden">{{ "common.options" | sqxTranslate }}</span>
                 <i class="icon-dots"></i>
             </button>
 
             <div class="reference-menu">
-                <button class="btn btn-text-secondary" title="{{ 'common.clone' | sqxTranslate }}" (click)="clone.emit()">
+                <button class="btn btn-text-secondary" (click)="clone.emit()" title="{{ 'common.clone' | sqxTranslate }}">
                     <i class="icon-copy"></i>
                 </button>
 
-                <button type="button" class="btn btn-text-secondary" *ngIf="canRemove"
-                    (sqxConfirmClick)="delete.emit()"
-                    confirmTitle="i18n:contents.removeConfirmTitle"
-                    confirmText="i18n:contents.removeConfirmText"
-                    confirmRememberKey="removeReference">
-                    <i class="icon-close"></i>
-                </button>
+                @if (canRemove) {
+                    <button
+                        class="btn btn-text-secondary"
+                        (sqxConfirmClick)="delete.emit()"
+                        type="button"
+                        confirmTitle="i18n:contents.removeConfirmTitle"
+                        confirmText="i18n:contents.removeConfirmText"
+                        confirmRememberKey="removeReference">
+                        <i class="icon-close"></i>
+                    </button>
+                }
 
-                <a class="btn btn-text-secondary" target="_blank" [routerLink]="['../..', content.schemaName, content.id]">
+                <a class="btn btn-text-secondary" [routerLink]="['../..', content.schemaName, content.id]" target="_blank">
                     <i class="icon-pencil"></i>
                 </a>
             </div>

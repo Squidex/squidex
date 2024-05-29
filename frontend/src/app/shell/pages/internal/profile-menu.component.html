@@ -2,44 +2,51 @@
     <li class="nav-item nav-icon dropdown" #button>
         <span class="nav-link dropdown-toggle" (click)="toggleProfile()">
             <span class="user">
-                <img class="user-picture" [src]="snapshot.profileId | sqxUserIdPicture">
+                <img class="user-picture" [src]="snapshot.profileId | sqxUserIdPicture" />
             </span>
         </span>
     </li>
 </ul>
 
-<sqx-dropdown-menu *sqxModal="modalMenu;closeAlways:true;onRoot:false" [sqxAnchoredTo]="button" offset="8">
-    <a class="dropdown-item dropdown-info" href="{{snapshot.profileUrl}}" sqxExternalLink="noicon">
-        <div>{{ 'profile.userEmail' | sqxTranslate }}</div>
+<sqx-dropdown-menu *sqxModal="modalMenu; closeAlways: true; onRoot: false" [sqxAnchoredTo]="button" offset="8">
+    <a class="dropdown-item dropdown-info" href="{{ snapshot.profileUrl }}" sqxExternalLink="noicon">
+        <div>{{ "profile.userEmail" | sqxTranslate }}</div>
 
-        <strong>{{snapshot.profileEmail}}</strong>
+        <strong>{{ snapshot.profileEmail }}</strong>
     </a>
-    
+
     <div class="dropdown-divider"></div>
 
-    <a class="dropdown-item" routerLink="/app/administration" *ngIf="uiState.canUseAdminResource | async">
-        {{ 'common.administration' | sqxTranslate }}
-    </a>
+    @if (uiState.canUseAdminResource | async) {
+        <a class="dropdown-item" routerLink="/app/administration">
+            {{ "common.administration" | sqxTranslate }}
+        </a>
+    }
 
-    <a class="dropdown-item" href="{{snapshot.profileUrl}}" sqxExternalLink="noicon">
-        {{ 'profile.title' | sqxTranslate }}
+    <a class="dropdown-item" href="{{ snapshot.profileUrl }}" sqxExternalLink="noicon">
+        {{ "profile.title" | sqxTranslate }}
     </a>
 
     <div class="dropdown-submenu">
         <a class="dropdown-item dropdown-toggle" (click)="toggleSubmenu()" sqxStopClick>
-            {{ 'common.language' | sqxTranslate }}
+            {{ "common.language" | sqxTranslate }}
         </a>
 
         <div class="dropdown-menu" [class.open]="snapshot.showSubmenu">
-            <a class="dropdown-item" *ngFor="let availableLanguage of languages" [class.active]="availableLanguage.iso2Code === language" (click)="changeLanguage(availableLanguage.iso2Code)">
-                {{ availableLanguage.localName }}
-            </a>
+            @for (availableLanguage of languages; track availableLanguage) {
+                <a
+                    class="dropdown-item"
+                    [class.active]="availableLanguage.iso2Code === language"
+                    (click)="changeLanguage(availableLanguage.iso2Code)">
+                    {{ availableLanguage.localName }}
+                </a>
+            }
         </div>
-        </div>
+    </div>
 
     <div class="dropdown-divider"></div>
 
     <a class="dropdown-item" (click)="logout()" sqxExternalLink>
-        {{ 'common.logout' | sqxTranslate }}
+        {{ "common.logout" | sqxTranslate }}
     </a>
 </sqx-dropdown-menu>

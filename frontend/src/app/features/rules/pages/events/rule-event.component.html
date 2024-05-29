@@ -1,58 +1,72 @@
-<tr [class.expanded]="expanded" class="table-items-row">
+<tr class="table-items-row" [class.expanded]="expanded">
     <td class="cell-label">
-        <span class="badge rounded-pill badge-{{event.jobResult | sqxRuleClass}}">{{event.jobResult}}</span>
+        <span class="badge rounded-pill badge-{{ event.jobResult | sqxRuleClass }}">{{ event.jobResult }}</span>
     </td>
     <td class="cell-40">
-        <span class="truncate">{{event.eventName}}</span>
+        <span class="truncate">{{ event.eventName }}</span>
     </td>
     <td class="cell-60">
-        <span class="truncate">{{event.description}}</span>
+        <span class="truncate">{{ event.description }}</span>
     </td>
     <td class="cell-time">
-        <small class="item-modified">{{event.created | sqxFromNow}}</small>
+        <small class="item-modified">{{ event.created | sqxFromNow }}</small>
     </td>
     <td class="cell-actions">
-        <button type="button" class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" (click)="expandedChange.emit()">
-            <span class="hidden">{{ 'common.settings' | sqxTranslate }}</span>
+        <button class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" (click)="expandedChange.emit()" type="button">
+            <span class="hidden">{{ "common.settings" | sqxTranslate }}</span>
             <i class="icon-settings"></i>
         </button>
     </td>
 </tr>
-<tr *ngIf="expanded">
-    <td colspan="5" class="details">
-        <div class="event-header">
-            <h4>{{ 'rules.ruleEvents.lastInvokedLabel' | sqxTranslate }}</h4>
-        </div>
-        
-        <div class="row g-0 event-stats align-items-center">
-            <div class="col-3">
-                <span class="badge rounded-pill badge-{{event.result | sqxRuleClass}}">{{event.result}}</span>
+@if (expanded) {
+    <tr>
+        <td class="details" colspan="5">
+            <div class="event-header">
+                <h4>{{ "rules.ruleEvents.lastInvokedLabel" | sqxTranslate }}</h4>
             </div>
-            <div class="col-2">
-                {{ 'rules.ruleEvents.numAttemptsLabel' | sqxTranslate }}: {{event.numCalls}}
+            <div class="row g-0 event-stats align-items-center">
+                <div class="col-3">
+                    <span class="badge rounded-pill badge-{{ event.result | sqxRuleClass }}">{{ event.result }}</span>
+                </div>
+                <div class="col-2">{{ "rules.ruleEvents.numAttemptsLabel" | sqxTranslate }}: {{ event.numCalls }}</div>
+                <div class="col-4">
+                    {{ "rules.ruleEvents.nextAttemptLabel" | sqxTranslate }}:
+                    @if (event.nextAttempt) {
+                        {{ event.nextAttempt | sqxFromNow }}
+                    }
+                </div>
+                <div class="col-3 text-end">
+                    @if (event.canDelete) {
+                        <button
+                            class="btn btn-danger me-1"
+                            (sqxConfirmClick)="cancel.emit()"
+                            type="button"
+                            confirmTitle="i18n:rules.ruleEvents.cancelConfirmTitle"
+                            confirmText="i18n:rules.ruleEvents.cancelConfirmText"
+                            confirmRememberKey="cancelRuleEvent">
+                            {{ "common.cancel" | sqxTranslate }}
+                        </button>
+                    }
+                    @if (event.canUpdate) {
+                        <button class="btn btn-success" (click)="enqueue.emit()" type="button">
+                            {{ "rules.ruleEvents.enqueue" | sqxTranslate }}
+                        </button>
+                    }
+                </div>
             </div>
-            <div class="col-4">
-                {{ 'rules.ruleEvents.nextAttemptLabel' | sqxTranslate }}: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
-            </div>
-            <div class="col-3 text-end">
-                <button type="button" class="btn btn-danger me-1" *ngIf="event.canDelete"
-                    (sqxConfirmClick)="cancel.emit()"
-                    confirmTitle="i18n:rules.ruleEvents.cancelConfirmTitle"
-                    confirmText="i18n:rules.ruleEvents.cancelConfirmText"
-                    confirmRememberKey="cancelRuleEvent">
-                    {{ 'common.cancel' | sqxTranslate }}
-                </button>
-
-                <button type="button" class="btn btn-success" (click)="enqueue.emit()" *ngIf="event.canUpdate">
-                    {{ 'rules.ruleEvents.enqueue' | sqxTranslate }}
-                </button>
-            </div>
-        </div>
-        <div class="row event-dump" *ngIf="event.lastDump">
-            <div class="col-12">
-                <sqx-code-editor [ngModel]="event.lastDump" disabled="true" wordWrap="true" height="auto" mode="ace/mode/text"></sqx-code-editor>
-            </div>
-        </div>
-    </td>
-</tr>
+            @if (event.lastDump) {
+                <div class="row event-dump">
+                    <div class="col-12">
+                        <sqx-code-editor
+                            [ngModel]="event.lastDump"
+                            disabled="true"
+                            wordWrap="true"
+                            height="auto"
+                            mode="ace/mode/text"></sqx-code-editor>
+                    </div>
+                </div>
+            }
+        </td>
+    </tr>
+}
 <tr class="spacer"></tr>

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, numberAttribute, Output } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, RootFieldDto, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
 import { ContentFieldComponent } from './content-field.component';
@@ -25,8 +25,6 @@ interface State {
         AsyncPipe,
         FormHintComponent,
         MarkdownDirective,
-        NgFor,
-        NgIf,
         forwardRef(() => ContentFieldComponent),
     ],
 })

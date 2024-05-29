@@ -1,103 +1,138 @@
 <div class="panel2" #panel [class.minimized]="isMinimized">
-    <ng-container *ngIf="layout === 'right'">
+    @if (layout === "right") {
         <div class="panel2-slice right" [style.minWidth]="desiredWidth" [style.maxWidth]="desiredWidth">
-            <div class="panel2-header right" *ngIf="!hideHeader">
-                <div class="panel2-header-inner right">
-                    <h3 *ngIf="titleText">
-                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
-                    </h3>
-                    <div>
-                        <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+            @if (!hideHeader) {
+                <div class="panel2-header right">
+                    <div class="panel2-header-inner right">
+                        @if (titleText) {
+                            <h3>
+                                @if (titleIcon) {
+                                    <i class="icon-{{ titleIcon }}"></i>
+                                }
+                                {{ titleText | sqxTranslate }}
+                            </h3>
+                        }
+                        <div>
+                            <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                        </div>
+                        <div class="flex-grow-1 text-end align-items-center">
+                            <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+                        </div>
                     </div>
-                    <div class="flex-grow-1 text-end align-items-center">
-                        <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
-                    </div>
+                    @if (route) {
+                        <a
+                            class="btn panel2-collapse"
+                            [routerLink]="['./../']"
+                            [queryParamsHandling]="closeQueryParamsHandling"
+                            [relativeTo]="route">
+                            <i class="icon-close"></i>
+                        </a>
+                    } @else {
+                        <a class="btn panel2-collapse">
+                            <i class="icon-close"></i>
+                        </a>
+                    }
                 </div>
-
-                <ng-container *ngIf="route; else noRoute">
-                    <a class="btn panel2-collapse" [routerLink]="['./../']" [queryParamsHandling]="closeQueryParamsHandling" [relativeTo]="route">
-                        <i class="icon-close"></i>
-                    </a>
-                </ng-container>
-
-                <ng-template #noRoute>
-                    <a class="btn panel2-collapse">
-                        <i class="icon-close"></i>
-                    </a>
-                </ng-template>
-            </div>
+            }
             <div class="panel2-main right">
                 <div class="panel2-main-inner right" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
-                </div> 
+                </div>
             </div>
         </div>
-    </ng-container>
+    }
 
-    <ng-container *ngIf="layout === 'left'">
-        <div class="panel2-slice left" [class.collapsed]="isCollapsed" [style.minWidth]="desiredWidth" [style.maxWidth]="desiredWidth" (click)="expand($event)">
-            <div class="panel2-header left" *ngIf="!hideHeader">
-                <div class="panel2-header-inner left">
-                    <h3 *ngIf="titleText">
-                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
-                    </h3>
-                    <div>
-                        <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+    @if (layout === "left") {
+        <div
+            class="panel2-slice left"
+            [class.collapsed]="isCollapsed"
+            [style.minWidth]="desiredWidth"
+            [style.maxWidth]="desiredWidth"
+            (click)="expand($event)">
+            @if (!hideHeader) {
+                <div class="panel2-header left">
+                    <div class="panel2-header-inner left">
+                        @if (titleText) {
+                            <h3>
+                                @if (titleIcon) {
+                                    <i class="icon-{{ titleIcon }}"></i>
+                                }
+                                {{ titleText | sqxTranslate }}
+                            </h3>
+                        }
+                        <div>
+                            <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                        </div>
+                        <div class="flex-grow-1 d-flex justify-content-end align-items-center">
+                            <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+                        </div>
                     </div>
-                    <div class="flex-grow-1 d-flex justify-content-end align-items-center">
-                        <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
-                    </div>
+                    <button
+                        class="btn panel2-collapse"
+                        (click)="toggle()"
+                        attr.aria-label="{{ 'common.collapse' | sqxTranslate }}"
+                        sqxStopClick>
+                        <i class="icon-angle-left"></i>
+                    </button>
+                    <div class="panel2-sidebar-title">{{ titleCollapsed || titleText | sqxTranslate }}</div>
                 </div>
-
-                <button class="btn panel2-collapse" attr.aria-label="{{ 'common.collapse' | sqxTranslate }}" (click)="toggle()" sqxStopClick>
-                    <i class="icon-angle-left"></i>
-                </button>
-
-                <div class="panel2-sidebar-title">{{ (titleCollapsed || titleText) | sqxTranslate }}</div>
-            </div>
-
+            }
             <div class="panel2-main left">
                 <div class="panel2-main-inner left" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div>
             </div>
         </div>
-    </ng-container>
-    
-    <ng-container *ngIf="layout === 'main'">
+    }
+
+    @if (layout === "main") {
         <div class="panel2-slice main">
-            <div class="panel2-header main" *ngIf="!hideHeader">
-                <div class="panel2-header-inner main" [style.width]="desiredInnerWidth"> 
-                    <h3 *ngIf="titleText">
-                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
-                    </h3>
-                    <div>
-                        <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
-                    </div>
-                    <div class="flex-grow-1 d-flex justify-content-end align-items-center">
-                        <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+            @if (!hideHeader) {
+                <div class="panel2-header main">
+                    <div class="panel2-header-inner main" [style.width]="desiredInnerWidth">
+                        @if (titleText) {
+                            <h3>
+                                @if (titleIcon) {
+                                    <i class="icon-{{ titleIcon }}"></i>
+                                }
+                                {{ titleText | sqxTranslate }}
+                            </h3>
+                        }
+                        <div>
+                            <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                        </div>
+                        <div class="flex-grow-1 d-flex justify-content-end align-items-center">
+                            <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
             <div class="panel2-main main">
                 <div class="panel2-main-inner main" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
-                </div> 
+                </div>
             </div>
         </div>
-
-        <div class="panel2-slice menu" *ngIf="!hideSidebar">
-            <div class="panel2-header menu">
-                <a class="btn panel2-collapse" [routerLink]="['./']" [queryParamsHandling]="closeQueryParamsHandling" [relativeTo]="route" replaceUrl="true" *ngIf="firstChild | async">
-                    <i class="icon-angle-right"></i>
-                </a>
+        @if (!hideSidebar) {
+            <div class="panel2-slice menu">
+                <div class="panel2-header menu">
+                    @if (firstChild | async) {
+                        <a
+                            class="btn panel2-collapse"
+                            [routerLink]="['./']"
+                            [queryParamsHandling]="closeQueryParamsHandling"
+                            [relativeTo]="route"
+                            replaceUrl="true">
+                            <i class="icon-angle-right"></i>
+                        </a>
+                    }
+                </div>
+                <div class="panel2-main menu">
+                    <ng-container *ngTemplateOutlet="sidebarMenuTemplate?.templateRef || null"></ng-container>
+                </div>
             </div>
-    
-            <div class="panel2-main menu">
-                <ng-container *ngTemplateOutlet="sidebarMenuTemplate?.templateRef || null"></ng-container>
-            </div>
-        </div>
-    </ng-container>
+        }
+    }
 
     <ng-template #contentTemplate>
         <ng-content></ng-content>

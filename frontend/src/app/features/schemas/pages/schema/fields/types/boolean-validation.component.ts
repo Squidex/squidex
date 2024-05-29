@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -17,14 +17,13 @@ import { BooleanFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, In
     styleUrls: ['boolean-validation.component.scss'],
     templateUrl: 'boolean-validation.component.html',
     imports: [
-        FormHintComponent,
-        FormsModule,
-        IndeterminateValueDirective,
-        LocalizedInputComponent,
-        NgIf,
-        ReactiveFormsModule,
-        TranslatePipe,
-    ],
+    FormHintComponent,
+    FormsModule,
+    IndeterminateValueDirective,
+    LocalizedInputComponent,
+    ReactiveFormsModule,
+    TranslatePipe
+],
 })
 export class BooleanValidationComponent {
     @Input({ required: true })

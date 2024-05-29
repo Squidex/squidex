@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ErrorDto, TypedSimpleChanges } from '@app/framework/internal';
 import { MarkdownPipe } from '../pipes/markdown.pipe';
@@ -19,11 +19,10 @@ import { SafeHtmlPipe } from '../safe-html.pipe';
     templateUrl: './form-error.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        MarkdownPipe,
-        NgIf,
-        SafeHtmlPipe,
-        TranslatePipe,
-    ],
+    MarkdownPipe,
+    SafeHtmlPipe,
+    TranslatePipe
+],
 })
 export class FormErrorComponent {
     @Input({ required: true })

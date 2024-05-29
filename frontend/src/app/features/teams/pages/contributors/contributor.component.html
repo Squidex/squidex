@@ -1,13 +1,16 @@
 <tr>
     <td class="cell-user">
-        <img class="user-picture" title="{{contributor.contributorName}}" [src]="contributor.contributorId | sqxUserPicture">
+        <img class="user-picture" [src]="contributor.contributorId | sqxUserPicture" title="{{ contributor.contributorName }}" />
     </td>
     <td class="cell-auto">
-        <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight:search"></span>
+        <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight: search"></span>
     </td>
     <td class="cell-actions">
-        <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke"
+        <button
+            class="btn btn-text-danger"
+            [disabled]="!contributor.canRevoke"
             (sqxConfirmClick)="remove()"
+            type="button"
             confirmTitle="i18n:contributors.deleteConfirmTitle"
             confirmText="i18n:contributors.deleteConfirmText"
             confirmRememberKey="removeContributor">

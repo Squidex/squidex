@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TableField, TranslatePipe } from '@app/shared';
 
@@ -19,8 +19,6 @@ import { TableField, TranslatePipe } from '@app/shared';
     imports: [
         CdkDrag,
         CdkDropList,
-        NgFor,
-        NgIf,
         TranslatePipe,
     ],
 })

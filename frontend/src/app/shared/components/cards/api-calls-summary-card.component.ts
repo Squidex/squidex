@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { KNumberPipe, TranslatePipe } from '@app/framework';
 import { CallsUsageDto } from '@app/shared';
@@ -17,10 +17,9 @@ import { CallsUsageDto } from '@app/shared';
     templateUrl: './api-calls-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        KNumberPipe,
-        NgIf,
-        TranslatePipe,
-    ],
+    KNumberPipe,
+    TranslatePipe
+],
 })
 export class ApiCallsSummaryCardComponent {
     @Input({ required: true })

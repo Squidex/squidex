@@ -3,108 +3,121 @@
         <sqx-list-view innerWidth="55rem">
             <ng-container content>
                 <form [formGroup]="updateForm.form" (ngSubmit)="save()">
-                    <h5>{{ 'apps.generalSettings' | sqxTranslate }}</h5>
+                    <h5>{{ "apps.generalSettings" | sqxTranslate }}</h5>
 
-                    <div class="card mb-4">        
+                    <div class="card mb-4">
                         <div class="card-body">
                             <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
-        
+
                             <div class="form-group">
-                                <label for="email">{{ 'common.name' | sqxTranslate }}</label>
-                
-                                <input readonly class="form-control" [value]="app.name">
+                                <label for="email">{{ "common.name" | sqxTranslate }}</label>
+
+                                <input class="form-control" [value]="app.name" readonly />
                             </div>
-        
+
                             <div class="form-group">
-                                <label for="label">{{ 'common.label' | sqxTranslate }}</label>
-                
+                                <label for="label">{{ "common.label" | sqxTranslate }}</label>
+
                                 <sqx-control-errors for="label"></sqx-control-errors>
-                
-                                <input class="form-control" id="label" maxlength="100" formControlName="label">
+
+                                <input class="form-control" id="label" maxlength="100" formControlName="label" />
                             </div>
-        
+
                             <div class="form-group">
-                                <label for="description">{{ 'common.description' | sqxTranslate }}</label>
-                
+                                <label for="description">{{ "common.description" | sqxTranslate }}</label>
+
                                 <sqx-control-errors for="description"></sqx-control-errors>
-                
-                                <input class="form-control" id="description" maxlength="100" formControlName="description">
+
+                                <input class="form-control" id="description" maxlength="100" formControlName="description" />
                             </div>
                         </div>
-        
+
                         <div class="card-footer">
-                            <button type="submit" class="float-end btn btn-primary" [disabled]="!isEditable">
-                                {{ 'common.save' | sqxTranslate }}
+                            <button class="float-end btn btn-primary" [disabled]="!isEditable" type="submit">
+                                {{ "common.save" | sqxTranslate }}
                             </button>
                         </div>
                     </div>
                 </form>
-        
-                <h5>{{ 'apps.image' | sqxTranslate }}</h5>
+
+                <h5>{{ "apps.image" | sqxTranslate }}</h5>
 
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-auto">
-                                <div class="app-image" (sqxDropFile)="uploadImage($event)" [sqxDropDisabled]="uploading || !isEditableImage" sqxDropOnlyImages="true" sqxDropNoPaste="true">
-                                    <div class="app-progress" *ngIf="uploading; else notUploading">
-                                        <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
-                                    </div>
-        
-                                    <ng-template #notUploading>
+                                <div
+                                    class="app-image"
+                                    [sqxDropDisabled]="uploading || !isEditableImage"
+                                    (sqxDropFile)="uploadImage($event)"
+                                    sqxDropOnlyImages="true"
+                                    sqxDropNoPaste="true">
+                                    @if (uploading) {
+                                        <div class="app-progress">
+                                            <sqx-progress-bar [value]="uploadProgress" mode="Circle"></sqx-progress-bar>
+                                        </div>
+                                    } @else {
                                         <div>
                                             <sqx-avatar [image]="app.image" [identifier]="app.name" size="150"></sqx-avatar>
-        
-                                            <ng-container *ngIf="isEditableImage && app?.image">
-                                                <button class="btn btn-danger btn-sm app-image-remove" title="i18n:apps.removeImage" (click)="removeImage()">
+                                            @if (isEditableImage && app?.image) {
+                                                <button
+                                                    class="btn btn-danger btn-sm app-image-remove"
+                                                    (click)="removeImage()"
+                                                    title="i18n:apps.removeImage">
                                                     <i class="icon-bin2"></i>
                                                 </button>
-                                            </ng-container>
+                                            }
                                         </div>
-                
                                         <div class="drop-overlay align-items-center justify-content-center">
                                             <div class="drop-overlay-background"></div>
-                                            <div class="drop-overlay-text">{{ 'apps.imageDrop' | sqxTranslate }}</div>
+                                            <div class="drop-overlay-text">{{ "apps.imageDrop" | sqxTranslate }}</div>
                                         </div>
-                                    </ng-template>
+                                    }
                                 </div>
                             </div>
                             <div class="col align-self-center">
                                 <sqx-form-hint>
-                                    {{ 'apps.uploadImage' | sqxTranslate }}
+                                    {{ "apps.uploadImage" | sqxTranslate }}
                                 </sqx-form-hint>
-        
+
                                 <span class="btn btn-success upload-button" [class.disabled]="!isEditableImage" (click)="fileInput.click()">
-                                    <span>{{ 'apps.uploadImageButton' | sqxTranslate }}</span>
-                        
-                                    <input type="file" (change)="uploadImage($any($event.target!)['files'])" #fileInput single accept="image/x-png,image/gif,image/jpeg">
+                                    <span>{{ "apps.uploadImageButton" | sqxTranslate }}</span>
+
+                                    <input
+                                        #fileInput
+                                        (change)="uploadImage($any($event.target!)['files'])"
+                                        type="file"
+                                        single
+                                        accept="image/x-png,image/gif,image/jpeg" />
                                 </span>
                             </div>
                         </div>
                     </div>
                 </div>
-        
-                <h5>{{ 'apps.generalSettingsDangerZone' | sqxTranslate }}</h5>
-        
+
+                <h5>{{ "apps.generalSettingsDangerZone" | sqxTranslate }}</h5>
+
                 <div class="card card-body">
                     <form [formGroup]="transferForm.form" (ngSubmit)="transfer()">
                         <div class="row pt-2 g-2">
                             <div class="col-6">
-                                <h5>{{ 'apps.transferTitle' | sqxTranslate }}</h5>
-            
+                                <h5>{{ "apps.transferTitle" | sqxTranslate }}</h5>
+
                                 <sqx-form-hint>
-                                    {{ 'apps.transferWarning' | sqxTranslate }}
+                                    {{ "apps.transferWarning" | sqxTranslate }}
                                 </sqx-form-hint>
                             </div>
                             <div class="col">
                                 <select class="form-select" formControlName="teamId">
                                     <option [ngValue]="null">-</option>
-                                    <option *ngFor="let team of teamsState.snapshot.teams" [ngValue]="team.id">{{team.name}}</option>
+                                    @for (team of teamsState.snapshot.teams; track team) {
+                                        <option [ngValue]="team.id">{{ team.name }}</option>
+                                    }
                                 </select>
                             </div>
                             <div class="col-auto">
-                                <button type="button" type="submit" class="btn btn-primary" [disabled]="!isTransferable">
-                                    {{ 'apps.transfer' | sqxTranslate }}
+                                <button class="btn btn-primary" [disabled]="!isTransferable" type="button" type="submit">
+                                    {{ "apps.transfer" | sqxTranslate }}
                                 </button>
                             </div>
                         </div>
@@ -114,18 +127,21 @@
 
                     <div class="row">
                         <div class="col">
-                            <h5>{{ 'apps.delete' | sqxTranslate }}</h5>
-        
+                            <h5>{{ "apps.delete" | sqxTranslate }}</h5>
+
                             <sqx-form-hint>
-                                {{ 'apps.deleteWarning' | sqxTranslate }}
+                                {{ "apps.deleteWarning" | sqxTranslate }}
                             </sqx-form-hint>
                         </div>
                         <div class="col-auto">
-                            <button type="button" class="btn btn-danger" [disabled]="!isDeletable"
+                            <button
+                                class="btn btn-danger"
+                                [disabled]="!isDeletable"
                                 (sqxConfirmClick)="deleteApp()"
+                                type="button"
                                 confirmTitle="i18n:apps.deleteConfirmTitle"
                                 confirmText="i18n:apps.deleteConfirmText">
-                                {{ 'apps.delete' | sqxTranslate }}
+                                {{ "apps.delete" | sqxTranslate }}
                             </button>
                         </div>
                     </div>
@@ -136,7 +152,8 @@
 
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="history"
                 routerLinkActive="active"
@@ -147,7 +164,8 @@
                 <i class="icon-time"></i>
             </a>
 
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"

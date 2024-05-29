@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent, JoinPipe, SimulatedRuleEventDto, TranslatePipe } from '@app/shared';
@@ -40,15 +40,14 @@ const ERRORS_FAILED = [
     templateUrl: './simulated-rule-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        CodeEditorComponent,
-        FormsModule,
-        JoinPipe,
-        NgIf,
-        RuleClassPipe,
-        RuleTransitionComponent,
-        SimulatedRuleEventStatusPipe,
-        TranslatePipe,
-    ],
+    CodeEditorComponent,
+    FormsModule,
+    JoinPipe,
+    RuleClassPipe,
+    RuleTransitionComponent,
+    SimulatedRuleEventStatusPipe,
+    TranslatePipe
+],
 })
 export class SimulatedRuleEventComponent {
     @Input('sqxSimulatedRuleEvent')

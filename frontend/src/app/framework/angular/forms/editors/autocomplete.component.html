@@ -1,47 +1,61 @@
 <div class="control-container">
-    <input class="form-control" #input
-        (blur)="blur()"
-        (keydown)="onKeyDown($event)"
+    <input
+        class="form-control"
+        #input
         [sqxFocusOnInit]="autoFocus"
-        autocapitalize="off"
-        autocomplete="off" 
-        autocorrect="off"
         [class.form-empty]="inputStyle === 'empty'"
         [class.form-icon]="!!icon"
         [class.form-underlined]="inputStyle === 'underlined'"
         [formControl]="queryInput"
-        [placeholder]="placeholder">
+        [placeholder]="placeholder"
+        (blur)="blur()"
+        (keydown)="onKeyDown($event)"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off" />
 
-    <div class="icon" *ngIf="icon">
-        <ng-container *ngIf="snapshot.isLoading; else notLoading">
-            <sqx-loader color="input"></sqx-loader>
-        </ng-container>
+    @if (icon) {
+        <div class="icon">
+            @if (snapshot.isLoading) {
+                <sqx-loader color="input"></sqx-loader>
+            } @else {
+                <i class="icon-{{ icon }}"></i>
+            }
+        </div>
+    }
 
-        <ng-template #notLoading>
-            <i class="icon-{{icon}}"></i>
-        </ng-template>
-    </div>
+    @if (allowOpen) {
+        <div class="btn btn-sm" (click)="openModal()" sqxStopClick>
+            <i class="icon-caret-down"></i>
+        </div>
+    }
 
-    <div class="btn btn-sm" (click)="openModal()" sqxStopClick *ngIf="allowOpen">
-        <i class="icon-caret-down"></i>
-    </div>
-
-    <sqx-dropdown-menu *sqxModal="suggestionsModal" [sqxAnchoredTo]="input" class="control-dropdown" #container
+    <sqx-dropdown-menu
+        class="control-dropdown"
+        #container
+        *sqxModal="suggestionsModal"
+        [sqxAnchoredTo]="input"
         [adjustWidth]="dropdownFullWidth"
+        [style]="dropdownStyles"
+        [position]="dropdownPosition"
         adjustHeight="false"
         scrollX="false"
-        scrollY="true" 
-        [style]="dropdownStyles"
-        [position]="dropdownPosition">
-        <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
-            [class.active]="i === snapshot.suggestedIndex"
-            (mousedown)="selectItem(item)"
-            (mouseover)="selectIndex(i)"
-            [sqxScrollActive]="i === snapshot.suggestedIndex"
-            [sqxScrollContainer]="$any(container.nativeElement)">
-            <ng-container *ngIf="!itemTemplate">{{item}}</ng-container>
-
-            <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
-        </div>
+        scrollY="true">
+        @for (item of snapshot.suggestedItems; track item; let i = $index) {
+            <div
+                class="control-dropdown-item control-dropdown-item-selectable"
+                [class.active]="i === snapshot.suggestedIndex"
+                [sqxScrollActive]="i === snapshot.suggestedIndex"
+                [sqxScrollContainer]="$any(container.nativeElement)"
+                (mousedown)="selectItem(item)"
+                (mouseover)="selectIndex(i)">
+                @if (!itemTemplate) {
+                    {{ item }}
+                }
+                @if (itemTemplate) {
+                    <ng-template [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
+                }
+            </div>
+        }
     </sqx-dropdown-menu>
 </div>

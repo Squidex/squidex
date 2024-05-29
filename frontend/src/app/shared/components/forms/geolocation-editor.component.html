@@ -1,46 +1,69 @@
-<div class="editor-container" [class.compact]="snapshot.isCompact" 
-    (sqxResizeCondition)="setCompact($event)" 
-    sqxResizeMinWidth="600" 
+<div
+    class="editor-container"
+    [class.compact]="snapshot.isCompact"
+    (sqxResizeCondition)="setCompact($event)"
+    sqxResizeMinWidth="600"
     sqxResizeMaxWidth="0">
     <form [class.hidden]="snapshot.isMapHidden">
         <div class="editor" #editor></div>
 
-        <input [class.hidden]="!isGoogleMaps" class="form-control search-control" [disabled]="snapshot.isDisabled" placeholder="{{ 'common.searchGoogleMaps' | sqxTranslate }}" #searchBox>
+        <input
+            class="form-control search-control"
+            #searchBox
+            [class.hidden]="!isGoogleMaps"
+            [disabled]="snapshot.isDisabled"
+            placeholder="{{ 'common.searchGoogleMaps' | sqxTranslate }}" />
     </form>
 
     <div class="row g-0 mt-2">
         <form class="col form-inline" [formGroup]="geolocationForm" (change)="updateValueByInput()" (ngSubmit)="updateValueByInput()">
             <div class="row g-2 align-items-center">
-                <div class="col-auto mb pe-2" *ngIf="!snapshot.isCompact">
-                    <label for="latitude">{{ 'common.latitudeShort' | sqxTranslate }}: </label>
-                </div>
+                @if (!snapshot.isCompact) {
+                    <div class="col-auto mb pe-2">
+                        <label for="latitude">{{ "common.latitudeShort" | sqxTranslate }}:</label>
+                    </div>
+                }
                 <div class="col">
-                    <sqx-control-errors for="latitude" style="z-index: 10000;"></sqx-control-errors>
-    
-                    <input type="number" class="form-control" id="latitude" formControlName="latitude" step="any">
+                    <sqx-control-errors for="latitude" style="z-index: 10000"></sqx-control-errors>
+
+                    <input class="form-control" id="latitude" type="number" formControlName="latitude" step="any" />
                 </div>
-    
-                <div class="col col-auto ps-2" *ngIf="!snapshot.isCompact">
-                    <label for="longitude">{{ 'common.longitudeShort' | sqxTranslate }}: </label>
-                </div>
+
+                @if (!snapshot.isCompact) {
+                    <div class="col col-auto ps-2">
+                        <label for="longitude">{{ "common.longitudeShort" | sqxTranslate }}:</label>
+                    </div>
+                }
                 <div class="col">
-                    <sqx-control-errors for="longitude" style="z-index: 10000;"></sqx-control-errors>
-                    
-                    <input type="number" class="form-control" id="longitude" formControlName="longitude" step="any">
+                    <sqx-control-errors for="longitude" style="z-index: 10000"></sqx-control-errors>
+
+                    <input class="form-control" id="longitude" type="number" formControlName="longitude" step="any" />
                 </div>
-    
-                <div class="col col-auto" *ngIf="!snapshot.isCompact">
-                    <button type="button" class="btn btn-text clear" [disabled]="snapshot.isDisabled" (click)="clearValue()">
-                        {{ 'common.clear' | sqxTranslate }}
-                    </button>
-                </div>
+
+                @if (!snapshot.isCompact) {
+                    <div class="col col-auto">
+                        <button class="btn btn-text clear" [disabled]="snapshot.isDisabled" (click)="clearValue()" type="button">
+                            {{ "common.clear" | sqxTranslate }}
+                        </button>
+                    </div>
+                }
             </div>
         </form>
         <div class="col-auto">
-            <button type="button" class="btn btn-text-secondary" [class.hidden]="!snapshot.isMapHidden" (click)="hideMap(false)" title="i18n:common.mapShow">
+            <button
+                class="btn btn-text-secondary"
+                [class.hidden]="!snapshot.isMapHidden"
+                (click)="hideMap(false)"
+                type="button"
+                title="i18n:common.mapShow">
                 <i class="icon-plus-square"></i>
             </button>
-            <button type="button" class="btn btn-text-secondary" [class.hidden]="snapshot.isMapHidden" (click)="hideMap(true)" title="i18n:common.mapHide">
+            <button
+                class="btn btn-text-secondary"
+                [class.hidden]="snapshot.isMapHidden"
+                (click)="hideMap(true)"
+                type="button"
+                title="i18n:common.mapHide">
                 <i class="icon-minus-square"></i>
             </button>
         </div>

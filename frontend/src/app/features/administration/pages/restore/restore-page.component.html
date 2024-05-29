@@ -3,63 +3,74 @@
 <sqx-layout layout="main" titleText="i18n:jobs.restoreTitle" titleIcon="backup" innerWidth="70">
     <ng-container>
         <sqx-list-view innerWidth="70rem">
-            <div class="card section" *ngIf="restoreJob | async; let job">
-                <div class="card-header">
-                    <div class="row gx-2 align-items-center">
-                        <div class="col-auto">
-                            <div *ngIf="job.status === 'Started'" class="restore-status restore-status-pending spin">
-                                <i class="icon-hour-glass"></i>
+            @if (restoreJob | async; as job) {
+                <div class="card section">
+                    <div class="card-header">
+                        <div class="row gx-2 align-items-center">
+                            <div class="col-auto">
+                                @if (job.status === "Started") {
+                                    <div class="restore-status restore-status-pending spin">
+                                        <i class="icon-hour-glass"></i>
+                                    </div>
+                                }
+                                @if (job.status === "Failed") {
+                                    <div class="restore-status restore-status-failed">
+                                        <i class="icon-exclamation"></i>
+                                    </div>
+                                }
+                                @if (job.status === "Completed") {
+                                    <div class="restore-status restore-status-success">
+                                        <i class="icon-checkmark"></i>
+                                    </div>
+                                }
                             </div>
-                            <div *ngIf="job.status === 'Failed'" class="restore-status restore-status-failed">
-                                <i class="icon-exclamation"></i>
+                            <div class="col">
+                                <h3>{{ "jobs.restoreLastStatus" | sqxTranslate }}</h3>
                             </div>
-                            <div *ngIf="job.status === 'Completed'" class="restore-status restore-status-success">
-                                <i class="icon-checkmark"></i>
+                            <div class="col text-end restore-url">
+                                {{ job.url }}
                             </div>
                         </div>
-                            
-                        <div class="col">
-                            <h3>{{ 'jobs.restoreLastStatus' | sqxTranslate }}</h3>
+                    </div>
+                    <div class="card-body">
+                        @for (row of job.log; track row) {
+                            <div>
+                                {{ row }}
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer small text-muted">
+                        <div class="row">
+                            <div class="col">{{ "jobs.restoreStartedLabel" | sqxTranslate }}: {{ job.started | sqxISODate }}</div>
+                            @if (job.stopped) {
+                                <div class="col text-end">
+                                    {{ "jobs.restoreStoppedLabel" | sqxTranslate }}: {{ job.stopped | sqxISODate }}
+                                </div>
+                            }
                         </div>
+                    </div>
+                </div>
+            }
 
-                        <div class="col text-end restore-url">
-                            {{job.url}}
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div *ngFor="let row of job.log">
-                        {{row}}
-                    </div>
-                </div>
-                <div class="card-footer small text-muted">
-                    <div class="row">
-                        <div class="col">
-                            {{ 'jobs.restoreStartedLabel' | sqxTranslate }}: {{job.started | sqxISODate}}
-                        </div>
-                        <div class="col text-end" *ngIf="job.stopped">
-                            {{ 'jobs.restoreStoppedLabel' | sqxTranslate }}: {{job.stopped | sqxISODate}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
             <div class="table-items-row table-items-row-summary">
                 <form [formGroup]="restoreForm.form" (ngSubmit)="restore()">
                     <div class="row gx-2">
                         <div class="col">
                             <sqx-control-errors for="url"></sqx-control-errors>
 
-                            <input class="form-control" formControlName="url" placeholder="{{ 'jobs.restoreLastUrl' | sqxTranslate }}">
+                            <input class="form-control" formControlName="url" placeholder="{{ 'jobs.restoreLastUrl' | sqxTranslate }}" />
                         </div>
                         <div class="col">
                             <sqx-control-errors for="name"></sqx-control-errors>
 
-                            <input class="form-control" formControlName="name" placeholder="{{ 'jobs.restoreNewAppName' | sqxTranslate }}">
+                            <input
+                                class="form-control"
+                                formControlName="name"
+                                placeholder="{{ 'jobs.restoreNewAppName' | sqxTranslate }}" />
                         </div>
                         <div class="col-auto">
-                            <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">
-                                {{ 'jobs.restore' | sqxTranslate }}
+                            <button class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async" type="submit">
+                                {{ "jobs.restore" | sqxTranslate }}
                             </button>
                         </div>
                     </div>
@@ -70,7 +81,8 @@
 
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"

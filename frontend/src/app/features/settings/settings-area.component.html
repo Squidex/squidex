@@ -2,7 +2,9 @@
 
 <sqx-layout layout="left" titleText="i18n:common.settings" titleIcon="settings" width="16" white="true" overflow="true" padding="true">
     <ng-container>
-        <sqx-settings-menu *ngIf="selectedApp | async; let app" [app]="app"></sqx-settings-menu>
+        @if (selectedApp | async; as app) {
+            <sqx-settings-menu [app]="app"></sqx-settings-menu>
+        }
     </ng-container>
 </sqx-layout>
 

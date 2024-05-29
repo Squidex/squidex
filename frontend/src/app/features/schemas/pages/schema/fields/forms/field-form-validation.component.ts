@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgSwitch, NgSwitchCase } from '@angular/common';
+
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto, TranslatePipe } from '@app/shared';
@@ -29,25 +29,23 @@ import { TagsValidationComponent } from '../types/tags-validation.component';
     styleUrls: ['./field-form-validation.component.scss'],
     templateUrl: './field-form-validation.component.html',
     imports: [
-        ArrayValidationComponent,
-        AssetsValidationComponent,
-        BooleanValidationComponent,
-        ComponentValidationComponent,
-        ComponentsValidationComponent,
-        DateTimeValidationComponent,
-        FormsModule,
-        GeolocationValidationComponent,
-        JsonValidationComponent,
-        NgSwitch,
-        NgSwitchCase,
-        NumberValidationComponent,
-        ReactiveFormsModule,
-        ReferencesValidationComponent,
-        RichTextValidationComponent,
-        StringValidationComponent,
-        TagsValidationComponent,
-        TranslatePipe,
-    ],
+    ArrayValidationComponent,
+    AssetsValidationComponent,
+    BooleanValidationComponent,
+    ComponentValidationComponent,
+    ComponentsValidationComponent,
+    DateTimeValidationComponent,
+    FormsModule,
+    GeolocationValidationComponent,
+    JsonValidationComponent,
+    NumberValidationComponent,
+    ReactiveFormsModule,
+    ReferencesValidationComponent,
+    RichTextValidationComponent,
+    StringValidationComponent,
+    TagsValidationComponent,
+    TranslatePipe
+],
 })
 export class FieldFormValidationComponent {
     @Input({ required: true })

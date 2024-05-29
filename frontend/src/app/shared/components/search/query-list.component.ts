@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { StopClickDirective, TranslatePipe } from '@app/framework';
 import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
@@ -17,11 +17,9 @@ import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
     templateUrl: './query-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgFor,
-        NgIf,
-        StopClickDirective,
-        TranslatePipe,
-    ],
+    StopClickDirective,
+    TranslatePipe
+],
 })
 export class QueryListComponent {
     @Output()

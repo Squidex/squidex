@@ -1,112 +1,104 @@
-<div class="row gx-2 mb-1 align-items-center" *ngIf="field">
-    <div class="col-auto path">
-        <sqx-query-path 
-            (pathChange)="changePath($event)"
-            [path]="filter.path"
-            [model]="model">
-        </sqx-query-path>
-    </div>
-    <div class="col-auto operator">
-        <select class="form-select" 
-            [disabled]="operators.length === 0"
-            [ngModel]="filter.op" 
-            (ngModelChange)="changeOp($event)">
-            <option *ngFor="let operator of operators" [ngValue]="operator">{{operator | sqxFilterOperator | sqxTranslate}}</option>
-        </select>
-    </div>
-    <div class="col align-items-center" [ngSwitch]="fieldUI">
-        <ng-container *ngSwitchCase="'Boolean'">
-            <input type="checkbox" class="form-check-input"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)" />
-        </ng-container>
-        <ng-container *ngSwitchCase="'Date'">
-            <sqx-date-time-editor mode="Date"
-                hideDateButtons="true"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)">
-            </sqx-date-time-editor>
-        </ng-container>
-        <ng-container *ngSwitchCase="'DateTime'">
-            <sqx-date-time-editor mode="DateTime"
-                hideDateButtons="true"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)">
-            </sqx-date-time-editor>
-        </ng-container>
-        <ng-container *ngSwitchCase="'Number'">
-            <input type="number" class="form-control"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)" />
-        </ng-container>
-        <ng-container *ngSwitchCase="'Reference'">
-            <sqx-reference-input [schemaIds]="field.schema.extra?.schemaIds"
-                mode="Single"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)"
-                [language]="language"
-                [languages]="languages"
-                [query]="undefined">
-            </sqx-reference-input>
-        </ng-container>
-        <ng-container *ngSwitchCase="'Select'">
-            <select class="form-select"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)">
-                <option [ngValue]="null"></option>
-                <option *ngFor="let value of field.schema.extra?.options" [ngValue]="value">{{value}}</option>
+@if (field) {
+    <div class="row gx-2 mb-1 align-items-center">
+        <div class="col-auto path">
+            <sqx-query-path [path]="filter.path" [model]="model" (pathChange)="changePath($event)"></sqx-query-path>
+        </div>
+        <div class="col-auto operator">
+            <select class="form-select" [disabled]="operators.length === 0" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">
+                @for (operator of operators; track operator) {
+                    <option [ngValue]="operator">{{ operator | sqxFilterOperator | sqxTranslate }}</option>
+                }
             </select>
-        </ng-container>
-        <ng-container *ngSwitchCase="'Status'">
-            <sqx-dropdown 
-                valueProperty="status"
-                [items]="statuses"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)"
-                canSearch="false">
-                <ng-template let-status="$implicit">
-                    <i class="icon-circle" [style.color]="status.color"></i> {{status.status}}
-                </ng-template>
-            </sqx-dropdown>
-        </ng-container>
-        <ng-container *ngSwitchCase="'String'">
-            <input class="form-control" *ngIf="!field.schema.extra"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)" />
-        </ng-container>
-        <ng-container *ngSwitchCase="'User'">
-            <ng-container *ngIf="contributorsState.isLoaded | async; else noPermission">
-                <sqx-dropdown
-                    valueProperty="token"
-                    [items]="contributorsState.contributors | async"
-                    [ngModel]="filter.value"
-                    (ngModelChange)="changeValue($event)"
-                    searchProperty="contributorName">
-                    <ng-template let-user="$implicit" let-context="context">
-                        <span class="dropdown-user">
-                            <img class="user-picture" [src]="user | sqxUserDtoPicture">
-
-                            <span class="user-name" [innerHTML]="user.contributorName | sqxHighlight:context"></span>
-                        </span>
-                    </ng-template>
-                    <ng-template let-user="$implicit">
-                        <span class="user-name">{{user.contributorName}}</span>
-                    </ng-template>
-                </sqx-dropdown>
-            </ng-container>
-            <ng-template #noPermission>
-                <input class="form-control"
-                    [ngModel]="filter.value"
-                    (ngModelChange)="changeValue($event)" />
-            </ng-template>
-        </ng-container>
-        <ng-container *ngSwitchCase="'Unsupported'">
-            {{ 'common.notSupported' | sqxTranslate }}
-        </ng-container>
+        </div>
+        <div class="col align-items-center">
+            @switch (fieldUI) {
+                @case ("Boolean") {
+                    <input class="form-check-input" [ngModel]="filter.value" (ngModelChange)="changeValue($event)" type="checkbox" />
+                }
+                @case ("Date") {
+                    <sqx-date-time-editor
+                        [ngModel]="filter.value"
+                        (ngModelChange)="changeValue($event)"
+                        mode="Date"
+                        hideDateButtons="true"></sqx-date-time-editor>
+                }
+                @case ("DateTime") {
+                    <sqx-date-time-editor
+                        [ngModel]="filter.value"
+                        (ngModelChange)="changeValue($event)"
+                        mode="DateTime"
+                        hideDateButtons="true"></sqx-date-time-editor>
+                }
+                @case ("Number") {
+                    <input class="form-control" [ngModel]="filter.value" (ngModelChange)="changeValue($event)" type="number" />
+                }
+                @case ("Reference") {
+                    <sqx-reference-input
+                        [schemaIds]="field.schema.extra?.schemaIds"
+                        [ngModel]="filter.value"
+                        [language]="language"
+                        [languages]="languages"
+                        [query]="undefined"
+                        (ngModelChange)="changeValue($event)"
+                        mode="Single"></sqx-reference-input>
+                }
+                @case ("Select") {
+                    <select class="form-select" [ngModel]="filter.value" (ngModelChange)="changeValue($event)">
+                        <option [ngValue]="null"></option>
+                        @for (value of field.schema.extra?.options; track value) {
+                            <option [ngValue]="value">{{ value }}</option>
+                        }
+                    </select>
+                }
+                @case ("Status") {
+                    <sqx-dropdown
+                        [items]="statuses"
+                        [ngModel]="filter.value"
+                        (ngModelChange)="changeValue($event)"
+                        valueProperty="status"
+                        canSearch="false">
+                        <ng-template let-status="$implicit">
+                            <i class="icon-circle" [style.color]="status.color"></i>
+                            {{ status.status }}
+                        </ng-template>
+                    </sqx-dropdown>
+                }
+                @case ("String") {
+                    @if (!field.schema.extra) {
+                        <input class="form-control" [ngModel]="filter.value" (ngModelChange)="changeValue($event)" />
+                    }
+                }
+                @case ("User") {
+                    @if (contributorsState.isLoaded | async) {
+                        <sqx-dropdown
+                            [items]="contributorsState.contributors | async"
+                            [ngModel]="filter.value"
+                            (ngModelChange)="changeValue($event)"
+                            valueProperty="token"
+                            searchProperty="contributorName">
+                            <ng-template let-user="$implicit" let-context="context">
+                                <span class="dropdown-user">
+                                    <img class="user-picture" [src]="user | sqxUserDtoPicture" />
+                                    <span class="user-name" [innerHTML]="user.contributorName | sqxHighlight: context"></span>
+                                </span>
+                            </ng-template>
+                            <ng-template let-user="$implicit">
+                                <span class="user-name">{{ user.contributorName }}</span>
+                            </ng-template>
+                        </sqx-dropdown>
+                    } @else {
+                        <input class="form-control" [ngModel]="filter.value" (ngModelChange)="changeValue($event)" />
+                    }
+                }
+                @case ("Unsupported") {
+                    {{ "common.notSupported" | sqxTranslate }}
+                }
+            }
+        </div>
+        <div class="col-auto ps-2">
+            <button class="btn btn-text-danger" (click)="remove.emit()" type="button">
+                <i class="icon-bin2"></i>
+            </button>
+        </div>
     </div>
-    <div class="col-auto ps-2">
-        <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
-            <i class="icon-bin2"></i>
-        </button>
-    </div>
-</div>
+}

@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { fadeAnimation } from '@app/framework/internal';
 
@@ -18,10 +18,7 @@ import { fadeAnimation } from '@app/framework/internal';
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        NgFor,
-        NgIf,
-    ],
+    imports: [],
 })
 export class ControlErrorsMessagesComponent {
     @Input()

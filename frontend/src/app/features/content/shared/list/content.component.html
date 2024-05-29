@@ -1,79 +1,82 @@
 <tr [sqxTabRouterLink]="link">
     <td class="cell-select inline-edit" sqxStopClick>
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="{{content.id}}_selected" 
+            <input
+                class="form-check-input"
+                id="{{ content.id }}_selected"
                 [ngModel]="selected"
-                (ngModelChange)="selectedChange.emit($event)" />
+                (ngModelChange)="selectedChange.emit($event)"
+                type="checkbox" />
 
-            <label class="form-check-label" for="{{content.id}}_selected" ></label>
+            <label class="form-check-label" for="{{ content.id }}_selected"></label>
         </div>
 
-        <ng-container *ngIf="isDirty">
+        @if (isDirty) {
             <div class="edit-menu">
-                <button type="button" class="btn btn-text-secondary btn-cancel me-2" (click)="cancel()" sqxStopClick>
+                <button class="btn btn-text-secondary btn-cancel me-2" (click)="cancel()" type="button" sqxStopClick>
                     <i class="icon-close"></i>
                 </button>
-
-                <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
+                <button class="btn btn-success" (click)="save()" type="button" sqxStopClick>
                     <i class="icon-checkmark"></i>
                 </button>
             </div>
-        </ng-container>
+        }
     </td>
-    
+
     <td class="cell-actions cell-actions-left" sqxStopClick>
-        <button type="button" class="btn btn-text-secondary" attr.aria-label="{{ 'common.options' | sqxTranslate }}" (click)="dropdown.toggle()" #buttonOptions>
+        <button
+            class="btn btn-text-secondary"
+            #buttonOptions
+            (click)="dropdown.toggle()"
+            type="button"
+            attr.aria-label="{{ 'common.options' | sqxTranslate }}">
             <i class="icon-dots"></i>
         </button>
 
-        <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true" position="bottom-start">
+        <sqx-dropdown-menu *sqxModal="dropdown; closeAlways: true" [sqxAnchoredTo]="buttonOptions" scrollY="true" position="bottom-start">
             <a class="dropdown-item" [routerLink]="link" target="_blank" sqxExternalLink>
-                {{ 'common.editInNewTab' | sqxTranslate }}
+                {{ "common.editInNewTab" | sqxTranslate }}
             </a>
 
-            <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
-                {{ 'common.statusChangeTo' | sqxTranslate }} 
+            @for (info of content.statusUpdates; track info) {
+                <a class="dropdown-item" (click)="statusChange.emit(info.status)">
+                    {{ "common.statusChangeTo" | sqxTranslate }}
+                    <sqx-content-status [status]="info.status" [statusColor]="info.color" layout="text" small="true"></sqx-content-status>
+                </a>
+            }
+            @if (cloneable) {
+                <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()">
+                    {{ "common.clone" | sqxTranslate }}
+                </a>
+            }
 
-                <sqx-content-status
-                    layout="text"
-                    [status]="info.status"
-                    [statusColor]="info.color"
-                    small="true">
-                </sqx-content-status>
-            </a>
-            <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()" *ngIf="cloneable">
-                {{ 'common.clone' | sqxTranslate }}
-            </a>
-            
             <div class="dropdown-divider"></div>
 
-            <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
+            <a
+                class="dropdown-item dropdown-item-delete"
+                [class.disabled]="!content.canDelete"
                 (sqxConfirmClick)="delete.emit()"
                 confirmTitle="i18n:contents.deleteConfirmTitle"
                 confirmText="i18n:contents.deleteConfirmText"
                 confirmRememberKey="deleteContent">
-                {{ 'common.delete' | sqxTranslate }}
+                {{ "common.delete" | sqxTranslate }}
             </a>
         </sqx-dropdown-menu>
     </td>
 
-    <td *ngFor="let field of tableFields" 
-        sqxContentListCell
-        sqxContentListCellResize
-        [field]="field"
-        [fields]="tableSettings"
-        [sqxStopClick]="shouldStop(field)">
-        <sqx-content-list-field
-            [content]="content"
-            [field]="field"
-            [fields]="tableSettings"
-            [language]="language"
-            [languages]="languages"
-            [patchAllowed]="patchAllowed"
-            [patchForm]="patchForm?.form"
-            [schema]="schema">
-        </sqx-content-list-field>
-    </td>
+    @for (field of tableFields; track field) {
+        <td [field]="field" [fields]="tableSettings" [sqxStopClick]="shouldStop(field)" sqxContentListCell sqxContentListCellResize>
+            <sqx-content-list-field
+                [content]="content"
+                [field]="field"
+                [fields]="tableSettings"
+                [language]="language"
+                [languages]="languages"
+                [patchAllowed]="patchAllowed"
+                [patchForm]="patchForm?.form"
+                [schema]="schema"></sqx-content-list-field>
+        </td>
+    }
 
     <td></td>
 </tr>

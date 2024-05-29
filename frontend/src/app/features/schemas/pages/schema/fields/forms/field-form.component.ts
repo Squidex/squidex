@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { AfterViewInit, booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto, TranslatePipe } from '@app/shared';
@@ -20,13 +20,12 @@ import { FieldFormValidationComponent } from './field-form-validation.component'
     styleUrls: ['./field-form.component.scss'],
     templateUrl: './field-form.component.html',
     imports: [
-        FieldFormCommonComponent,
-        FieldFormUIComponent,
-        FieldFormValidationComponent,
-        JsonMoreComponent,
-        NgIf,
-        TranslatePipe,
-    ],
+    FieldFormCommonComponent,
+    FieldFormUIComponent,
+    FieldFormValidationComponent,
+    JsonMoreComponent,
+    TranslatePipe
+],
 })
 export class FieldFormComponent implements AfterViewInit {
     @Input({ transform: booleanAttribute })

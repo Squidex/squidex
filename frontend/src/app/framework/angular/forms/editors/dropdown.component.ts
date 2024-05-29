@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { AfterContentInit, booleanAttribute, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { map } from 'rxjs/operators';
@@ -47,19 +47,17 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        DropdownMenuComponent,
-        FocusOnInitDirective,
-        FormsModule,
-        LoaderComponent,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        ScrollActiveDirective,
-        TemplateWrapperDirective,
-        TranslatePipe,
-    ],
+    DropdownMenuComponent,
+    FocusOnInitDirective,
+    FormsModule,
+    LoaderComponent,
+    ModalDirective,
+    ModalPlacementDirective,
+    ReactiveFormsModule,
+    ScrollActiveDirective,
+    TemplateWrapperDirective,
+    TranslatePipe
+],
 })
 export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnInit {
     private readonly subscriptions = new Subscriptions();

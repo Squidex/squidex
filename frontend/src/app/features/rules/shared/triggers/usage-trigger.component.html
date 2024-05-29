@@ -1,25 +1,25 @@
-<div [formGroup]="triggerForm.form" class="form-horizontal">
+<div class="form-horizontal" [formGroup]="triggerForm.form">
     <div class="form-group">
-        <label for="limit">{{ 'rules.conditions.usageLimit' | sqxTranslate }}</label>
+        <label for="limit">{{ "rules.conditions.usageLimit" | sqxTranslate }}</label>
 
         <sqx-control-errors for="limit"></sqx-control-errors>
 
-        <input type="number" step="1" class="form-control" id="limit" formControlName="limit">
-        
+        <input class="form-control" id="limit" type="number" step="1" formControlName="limit" />
+
         <sqx-form-hint>
-            {{ 'rules.conditions.usageLimitHint' | sqxTranslate }}
+            {{ "rules.conditions.usageLimitHint" | sqxTranslate }}
         </sqx-form-hint>
     </div>
 
     <div class="form-group">
-        <label for="condition">{{ 'rules.conditions.usageDays' | sqxTranslate }}</label>
+        <label for="condition">{{ "rules.conditions.usageDays" | sqxTranslate }}</label>
 
         <sqx-control-errors for="numDays" fieldName="Days"></sqx-control-errors>
 
-        <input type="number" step="1" class="form-control" id="condition" formControlName="numDays">
-        
+        <input class="form-control" id="condition" type="number" step="1" formControlName="numDays" />
+
         <sqx-form-hint>
-            {{ 'rules.conditions.usageDaysHint' | sqxTranslate }}
+            {{ "rules.conditions.usageDaysHint" | sqxTranslate }}
         </sqx-form-hint>
     </div>
 </div>

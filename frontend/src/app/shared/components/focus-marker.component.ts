@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, Input, Optional, Renderer2 } from '@angular/core';
 import { map } from 'rxjs';
 import { StringColorPipe } from '@app/framework';
@@ -17,10 +17,9 @@ import { CollaborationService, Subscriptions } from '@app/shared/internal';
     styleUrls: ['./focus-marker.component.scss'],
     templateUrl: './focus-marker.component.html',
     imports: [
-        AsyncPipe,
-        NgIf,
-        StringColorPipe,
-    ],
+    AsyncPipe,
+    StringColorPipe
+],
 })
 export class FocusMarkerComponent {
     private readonly subscriptions = new Subscriptions();

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -28,37 +28,33 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
     styleUrls: ['./asset-dialog.component.scss'],
     templateUrl: './asset-dialog.component.html',
     imports: [
-        AssetFolderDropdownComponent,
-        AssetHistoryComponent,
-        AssetPathComponent,
-        AssetPreviewUrlPipe,
-        AssetTextEditorComponent,
-        AssetUrlPipe,
-        AsyncPipe,
-        ConfirmClickDirective,
-        ControlErrorsComponent,
-        CopyDirective,
-        FormErrorComponent,
-        FormHintComponent,
-        FormsModule,
-        ImageCropperComponent,
-        ImageFocusPointComponent,
-        ModalDialogComponent,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        NgxDocViewerModule,
-        PreviewableType,
-        ProgressBarComponent,
-        ReactiveFormsModule,
-        RouterLink,
-        TagEditorComponent,
-        TooltipDirective,
-        TransformInputDirective,
-        TranslatePipe,
-        VideoPlayerComponent,
-    ],
+    AssetFolderDropdownComponent,
+    AssetHistoryComponent,
+    AssetPathComponent,
+    AssetPreviewUrlPipe,
+    AssetTextEditorComponent,
+    AssetUrlPipe,
+    AsyncPipe,
+    ConfirmClickDirective,
+    ControlErrorsComponent,
+    CopyDirective,
+    FormErrorComponent,
+    FormHintComponent,
+    FormsModule,
+    ImageCropperComponent,
+    ImageFocusPointComponent,
+    ModalDialogComponent,
+    NgxDocViewerModule,
+    PreviewableType,
+    ProgressBarComponent,
+    ReactiveFormsModule,
+    RouterLink,
+    TagEditorComponent,
+    TooltipDirective,
+    TransformInputDirective,
+    TranslatePipe,
+    VideoPlayerComponent
+],
 })
 export class AssetDialogComponent implements OnInit {
     @Output()

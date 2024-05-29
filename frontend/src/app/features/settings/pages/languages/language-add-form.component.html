@@ -1,24 +1,26 @@
 <div class="card card-body mb-4">
-    <h5 class="card-title">{{ 'languages.add.title' | sqxTranslate }}</h5>
+    <h5 class="card-title">{{ "languages.add.title" | sqxTranslate }}</h5>
 
     <form [formGroup]="addLanguageForm.form" (ngSubmit)="addLanguage()">
         <div class="row gx-2">
             <div class="col">
-                <sqx-autocomplete formControlName="language" displayProperty="iso2Code" valueProperty="iso2Code" [itemsSource]="addLanguagesSource">
-                    <ng-template let-language="$implicit">
-                        {{language.iso2Code}} ({{language.englishName}})
-                    </ng-template>
+                <sqx-autocomplete
+                    [itemsSource]="addLanguagesSource"
+                    formControlName="language"
+                    displayProperty="iso2Code"
+                    valueProperty="iso2Code">
+                    <ng-template let-language="$implicit">{{ language.iso2Code }} ({{ language.englishName }})</ng-template>
                 </sqx-autocomplete>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-success">
-                    {{ 'languages.add' | sqxTranslate }}
+                <button class="btn btn-success" type="submit">
+                    {{ "languages.add" | sqxTranslate }}
                 </button>
             </div>
         </div>
     </form>
 
     <sqx-form-hint>
-        {{ 'languages.add.description' | sqxTranslate }}
+        {{ "languages.add.description" | sqxTranslate }}
     </sqx-form-hint>
 </div>

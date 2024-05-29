@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output, QueryList, ViewChildren } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -23,8 +23,6 @@ import { ComponentSectionComponent } from './component-section.component';
         ComponentSectionComponent,
         FormHintComponent,
         IfOnceDirective,
-        NgFor,
-        NgIf,
         TooltipDirective,
         TranslatePipe,
     ],

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, switchMap } from 'rxjs';
@@ -18,15 +18,14 @@ import { CompletionsCache } from './completions-cache';
     styleUrls: ['./content-changed-schema.component.scss'],
     templateUrl: './content-changed-schema.component.html',
     imports: [
-        AsyncPipe,
-        CodeEditorComponent,
-        ConfirmClickDirective,
-        ControlErrorsComponent,
-        FormsModule,
-        NgFor,
-        ReactiveFormsModule,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    CodeEditorComponent,
+    ConfirmClickDirective,
+    ControlErrorsComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    TranslatePipe
+],
 })
 export class ContentChangedSchemaComponent {
     @Input({ required: true })

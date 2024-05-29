@@ -1,11 +1,12 @@
 <main sqxCopyGlobal>
     <sqx-root-view>
         <router-outlet (activate)="isLoaded = true">
-            <div class="loading" *ngIf="!isLoaded">
-                <img alt="Loading" src="./images/loader.svg">
-
-                <div>{{ 'common.loading' | sqxTranslate }}</div>
-            </div>
+            @if (!isLoaded) {
+                <div class="loading">
+                    <img alt="Loading" src="./images/loader.svg" />
+                    <div>{{ "common.loading" | sqxTranslate }}</div>
+                </div>
+            }
         </router-outlet>
 
         <sqx-tour-guide></sqx-tour-guide>

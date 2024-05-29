@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -21,16 +21,14 @@ import { CommentComponent } from './comment.component';
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
     imports: [
-        AsyncPipe,
-        CommentComponent,
-        FormsModule,
-        MentionModule,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        ResizedDirective,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    CommentComponent,
+    FormsModule,
+    MentionModule,
+    ReactiveFormsModule,
+    ResizedDirective,
+    TranslatePipe
+],
 })
 export class CommentsComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

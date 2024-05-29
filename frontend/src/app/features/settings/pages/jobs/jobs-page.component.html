@@ -2,36 +2,43 @@
 
 <sqx-layout layout="main" titleText="i18n:common.jobsBackups" titleIcon="jobs" innerWidth="50">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:jobs.refreshTooltip" shortcut="CTRL + B">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        <button class="btn btn-text-secondary me-2" (click)="reload()" type="button" title="i18n:jobs.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i>
+            {{ "common.refresh" | sqxTranslate }}
         </button>
 
-        <button type="button" class="btn btn-success" [disabled]="jobsState.maxBackupsReached | async" *ngIf="jobsState.canCreateBackup | async" (click)="startBackup()">
-            {{ 'jobs.backupStart' | sqxTranslate }}
-        </button>
+        @if (jobsState.canCreateBackup | async) {
+            <button class="btn btn-success" [disabled]="jobsState.maxBackupsReached | async" (click)="startBackup()" type="button">
+                {{ "jobs.backupStart" | sqxTranslate }}
+            </button>
+        }
     </ng-container>
 
     <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="jobsState.isLoading | async">
-            <div class="alert alert-danger mb-4" *ngIf="jobsState.maxBackupsReached | async">
-                {{ 'jobs.backupMaximumReached' | sqxTranslate }}
-            </div>
-
-            <ng-container *ngIf="(jobsState.isLoaded | async) && (jobsState.jobs | async); let jobs">
-                <div class="table-items-row table-items-row-summary table-items-row-empty" *ngIf="jobs.length === 0">
-                    {{ 'jobs.empty' | sqxTranslate }}
+        <sqx-list-view [isLoading]="jobsState.isLoading | async" innerWidth="50rem">
+            @if (jobsState.maxBackupsReached | async) {
+                <div class="alert alert-danger mb-4">
+                    {{ "jobs.backupMaximumReached" | sqxTranslate }}
                 </div>
-    
-                <sqx-job *ngFor="let job of jobs; trackBy: trackByJob"
-                    [job]="job">
-                </sqx-job>
-            </ng-container>
+            }
+
+            @if ((jobsState.isLoaded | async) && (jobsState.jobs | async); as jobs) {
+                @if (jobs.length === 0) {
+                    <div class="table-items-row table-items-row-summary table-items-row-empty">
+                        {{ "jobs.empty" | sqxTranslate }}
+                    </div>
+                }
+                @for (job of jobs; track trackByJob($index, job)) {
+                    <sqx-job [job]="job"></sqx-job>
+                }
+            }
         </sqx-list-view>
     </ng-container>
 
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"

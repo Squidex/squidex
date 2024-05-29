@@ -122,6 +122,8 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "prettier": "^3.2.5",
+    "prettier-plugin-organize-attributes": "^1.0.0",
     "storybook": "^7.5.3",
     "stylelint": "15.11.0",
     "stylelint-config-standard": "34.0.0",

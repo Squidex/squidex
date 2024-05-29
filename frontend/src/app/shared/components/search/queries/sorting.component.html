@@ -1,18 +1,16 @@
 <div class="row g-1">
     <div class="col">
-        <sqx-query-path
-            (pathChange)="changePath($event)"
-            [path]="sorting.path"
-            [model]="model">
-        </sqx-query-path>
+        <sqx-query-path [path]="sorting.path" [model]="model" (pathChange)="changePath($event)"></sqx-query-path>
     </div>
     <div class="col-auto">
         <select class="form-select ms-2" [ngModel]="sorting.order" (ngModelChange)="changeOrder($event)">
-            <option *ngFor="let mode of modes" [ngValue]="mode">{{mode}}</option>
+            @for (mode of modes; track mode) {
+                <option [ngValue]="mode">{{ mode }}</option>
+            }
         </select>
     </div>
     <div class="col-auto">
-        <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
+        <button class="btn btn-text-danger" (click)="remove.emit()" type="button">
             <i class="icon-bin2"></i>
         </button>
     </div>

@@ -1,44 +1,46 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPlaceholder">{{ 'schemas.field.placeholder' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldPlaceholder">
+            {{ "schemas.field.placeholder" | sqxTranslate }}
+        </label>
 
         <div class="col-9">
-            <input class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder">
+            <input class="form-control" id="{{ field.fieldId }}_fieldPlaceholder" maxlength="100" formControlName="placeholder" />
 
             <sqx-form-hint>
-                {{ 'schemas.field.placeholderHint' | sqxTranslate }}
+                {{ "schemas.field.placeholderHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
-    
+
     <div class="form-group row">
-        <label class="col-3 col-form-label">{{ 'schemas.field.editor' | sqxTranslate }}</label>
-        
+        <label class="col-3 col-form-label">{{ "schemas.field.editor" | sqxTranslate }}</label>
+
         <div class="col-9">
-            <label class="btn btn-radio" *ngFor="let editor of editors" [class.active]="fieldForm.controls['editor'].value === editor">
-                <input type="radio" class="radio-input" name="editor" formControlName="editor" [value]="editor">
-
-                <i class="icon-control-{{editor}}"></i>
-
-                <span class="radio-label">{{editor}}</span>
-            </label>
+            @for (editor of editors; track editor) {
+                <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === editor">
+                    <input class="radio-input" [value]="editor" type="radio" name="editor" formControlName="editor" />
+                    <i class="icon-control-{{ editor }}"></i>
+                    <span class="radio-label">{{ editor }}</span>
+                </label>
+            }
         </div>
     </div>
 
     <div class="form-group row" [class.hidden]="hideClassNames | async">
-        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.string.classNames' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.string.classNames" | sqxTranslate }}</label>
 
         <div class="col-9">
             <sqx-tag-editor formControlName="classNames"></sqx-tag-editor>
 
             <sqx-form-hint>
-                {{ 'schemas.fieldTypes.string.classNamesHint' | sqxTranslate }}
+                {{ "schemas.fieldTypes.string.classNamesHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
 
     <div class="form-group row" [class.hidden]="hideAllowedValues | async">
-        <label class="col-3 col-form-label">{{ 'schemas.field.allowedValues' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label">{{ "schemas.field.allowedValues" | sqxTranslate }}</label>
 
         <div class="col-9">
             <sqx-tag-editor formControlName="allowedValues"></sqx-tag-editor>
@@ -46,13 +48,15 @@
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_folderId">{{ 'schemas.fieldTypes.string.folderId' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{ field.fieldId }}_folderId">
+            {{ "schemas.fieldTypes.string.folderId" | sqxTranslate }}
+        </label>
 
         <div class="col-9">
             <sqx-asset-folder-dropdown formControlName="folderId"></sqx-asset-folder-dropdown>
 
             <sqx-form-hint>
-                {{ 'schemas.fieldTypes.string.folderIdHint' | sqxTranslate }}
+                {{ "schemas.fieldTypes.string.folderIdHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
@@ -60,14 +64,14 @@
     <div class="form-group row" [class.hidden]="hideAllowedValues | async">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_createEnum" formControlName="createEnum">
-                <label class="form-check-label" for="{{field.fieldId}}_createEnum">
-                    {{ 'schemas.field.createEnum' | sqxTranslate }}
+                <input class="form-check-input" id="{{ field.fieldId }}_createEnum" type="checkbox" formControlName="createEnum" />
+                <label class="form-check-label" for="{{ field.fieldId }}_createEnum">
+                    {{ "schemas.field.createEnum" | sqxTranslate }}
                 </label>
             </div>
 
             <sqx-form-hint>
-                {{ 'schemas.field.createEnumHint' | sqxTranslate }}
+                {{ "schemas.field.createEnumHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
@@ -75,9 +79,13 @@
     <div class="form-group row" [class.hidden]="hideInlineEditable | async">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldInlineEditable" formControlName="inlineEditable">
-                <label class="form-check-label" for="{{field.fieldId}}_fieldInlineEditable">
-                    {{ 'schemas.field.inlineEditable' | sqxTranslate }}
+                <input
+                    class="form-check-input"
+                    id="{{ field.fieldId }}_fieldInlineEditable"
+                    type="checkbox"
+                    formControlName="inlineEditable" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldInlineEditable">
+                    {{ "schemas.field.inlineEditable" | sqxTranslate }}
                 </label>
             </div>
         </div>
@@ -86,26 +94,27 @@
     <div class="form-group row">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldIsEmbeddable" formControlName="isEmbeddable">
-                <label class="form-check-label" for="{{field.fieldId}}_fieldIsEmbeddable">
-                    {{ 'schemas.field.isEmbeddable' | sqxTranslate }}
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldIsEmbeddable" type="checkbox" formControlName="isEmbeddable" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldIsEmbeddable">
+                    {{ "schemas.field.isEmbeddable" | sqxTranslate }}
                 </label>
             </div>
 
             <sqx-form-hint>
-                {{ 'schemas.field.isEmbeddableHint' | sqxTranslate }}
+                {{ "schemas.field.isEmbeddableHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
 
     <div class="form-group row" [class.hidden]="hideSchemaIds | async">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldSchemaIds">{{ 'common.schemas' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldSchemaIds">{{ "common.schemas" | sqxTranslate }}</label>
 
         <div class="col-9">
-            <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" formControlName="schemaIds" 
+            <sqx-tag-editor
                 [itemConverter]="(schemasSource.normalConverter | async)!"
-                [itemsSource]="(schemasSource.normalConverter | async)?.suggestions">
-            </sqx-tag-editor>
+                [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
+                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"
+                formControlName="schemaIds"></sqx-tag-editor>
         </div>
     </div>
 </div>

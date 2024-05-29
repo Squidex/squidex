@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { defined, LayoutComponent, TeamsState, TitleComponent } from '@app/shared';
@@ -17,13 +17,12 @@ import { SettingsMenuComponent } from './settings-menu.component';
     styleUrls: ['./settings-area.component.scss'],
     templateUrl: './settings-area.component.html',
     imports: [
-        AsyncPipe,
-        LayoutComponent,
-        NgIf,
-        RouterOutlet,
-        SettingsMenuComponent,
-        TitleComponent,
-    ],
+    AsyncPipe,
+    LayoutComponent,
+    RouterOutlet,
+    SettingsMenuComponent,
+    TitleComponent
+],
 })
 export class SettingsAreaComponent {
     public selectedTeam = this.teamsState.selectedTeam.pipe(defined());

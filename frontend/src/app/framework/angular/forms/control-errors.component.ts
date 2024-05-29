@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Host, Input, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
 import { merge } from 'rxjs';
@@ -26,9 +26,8 @@ interface State {
     templateUrl: './control-errors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        ControlErrorsMessagesComponent,
-        NgIf,
-    ],
+    ControlErrorsMessagesComponent
+],
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements  OnDestroy {
     private readonly subscriptions = new Subscriptions();

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
@@ -26,8 +26,6 @@ import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, Client
         LayoutComponent,
         ModalDialogComponent,
         ModalDirective,
-        NgFor,
-        NgIf,
         TitleComponent,
         TooltipDirective,
         TourStepDirective,

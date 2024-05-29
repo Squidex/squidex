@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, SlicePipe } from '@angular/common';
+import { AsyncPipe, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { StringColorPipe, TooltipDirective } from '@app/framework';
 import { CollaborationService, Profile } from '@app/shared/internal';
@@ -18,14 +18,12 @@ import { UserPicturePipe } from './pipes';
     templateUrl: './watching-users.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
-        NgFor,
-        NgIf,
-        SlicePipe,
-        StringColorPipe,
-        TooltipDirective,
-        UserPicturePipe,
-    ],
+    AsyncPipe,
+    SlicePipe,
+    StringColorPipe,
+    TooltipDirective,
+    UserPicturePipe
+],
 })
 export class WatchingUsersComponent {
     constructor(

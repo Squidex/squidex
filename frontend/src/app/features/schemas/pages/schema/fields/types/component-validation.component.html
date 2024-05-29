@@ -1,13 +1,13 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldSchemaIds">{{ 'common.schemas' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldSchemaIds">{{ "common.schemas" | sqxTranslate }}</label>
 
         <div class="col-9">
-            <sqx-tag-editor placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" formControlName="schemaIds" 
+            <sqx-tag-editor
                 [itemConverter]="(schemasSource.converter | async)!"
-                [itemsSource]="(schemasSource.converter | async)?.suggestions">
-            </sqx-tag-editor>
+                [itemsSource]="(schemasSource.converter | async)?.suggestions"
+                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"
+                formControlName="schemaIds"></sqx-tag-editor>
         </div>
     </div>
 </div>
-

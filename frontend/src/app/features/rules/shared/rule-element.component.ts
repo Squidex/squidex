@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { DarkenPipe, ExternalLinkDirective, HoverBackgroundDirective, RuleElementMetadataDto, StopClickDirective, TranslatePipe } from '@app/shared';
 import { RuleIconComponent } from './rule-icon.component';
@@ -17,14 +17,13 @@ import { RuleIconComponent } from './rule-icon.component';
     templateUrl: './rule-element.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        DarkenPipe,
-        ExternalLinkDirective,
-        HoverBackgroundDirective,
-        NgIf,
-        RuleIconComponent,
-        StopClickDirective,
-        TranslatePipe,
-    ],
+    DarkenPipe,
+    ExternalLinkDirective,
+    HoverBackgroundDirective,
+    RuleIconComponent,
+    StopClickDirective,
+    TranslatePipe
+],
 })
 export class RuleElementComponent {
     @Input({ required: true })

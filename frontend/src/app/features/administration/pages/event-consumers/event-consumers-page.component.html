@@ -2,28 +2,34 @@
 
 <sqx-layout layout="main" titleText="i18n:common.consumers" titleIcon="time" innerWidth="50">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:eventConsumers.refreshTooltip" shortcut="CTRL + B">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        <button
+            class="btn btn-text-secondary"
+            (click)="reload()"
+            type="button"
+            title="i18n:eventConsumers.refreshTooltip"
+            shortcut="CTRL + B">
+            <i class="icon-reset"></i>
+            {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
 
     <ng-container>
-        <sqx-list-view innerWidth="50rem" [isLoading]="eventConsumersState.isLoading | async" table="true">
+        <sqx-list-view [isLoading]="eventConsumersState.isLoading | async" innerWidth="50rem" table="true">
             <ng-container header>
                 <table class="table table-items table-fixed" #header>
                     <thead>
                         <tr>
                             <th class="cell-auto">
-                                {{ 'common.name' | sqxTranslate }}
+                                {{ "common.name" | sqxTranslate }}
                             </th>
                             <th class="cell-auto-right">
-                                {{ 'eventConsumers.count' | sqxTranslate }}
+                                {{ "eventConsumers.count" | sqxTranslate }}
                             </th>
                             <th class="cell-auto-right">
-                                {{ 'eventConsumers.position' | sqxTranslate }}
+                                {{ "eventConsumers.position" | sqxTranslate }}
                             </th>
                             <th class="cell-actions-lg">
-                                {{ 'common.actions' | sqxTranslate }}
+                                {{ "common.actions" | sqxTranslate }}
                             </th>
                         </tr>
                     </thead>
@@ -31,10 +37,10 @@
             </ng-container>
 
             <ng-container>
-                <table class="table table-items table-fixed" [sqxSyncWidth]="header">        
-                    <tbody *ngFor="let eventConsumer of eventConsumersState.eventConsumers | async; trackBy: trackByEventConsumer"
-                        [sqxEventConsumer]="eventConsumer" (failure)="showError(eventConsumer)">
-                    </tbody>
+                <table class="table table-items table-fixed" [sqxSyncWidth]="header">
+                    @for (eventConsumer of eventConsumersState.eventConsumers | async; track trackByEventConsumer($index, eventConsumer)) {
+                        <tbody [sqxEventConsumer]="eventConsumer" (failure)="showError(eventConsumer)"></tbody>
+                    }
                 </table>
             </ng-container>
         </sqx-list-view>
@@ -42,7 +48,8 @@
 
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"
@@ -60,10 +67,10 @@
 
 <sqx-modal-dialog *sqxModal="eventConsumerErrorDialog" (dialogClose)="eventConsumerErrorDialog.hide()">
     <ng-container title>
-        {{ 'common.error' | sqxTranslate }}
+        {{ "common.error" | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
-        <textarea readonly class="form-control error-message small">{{eventConsumerError}}</textarea>
+        <textarea class="form-control error-message small" readonly>{{ eventConsumerError }}</textarea>
     </ng-container>
 </sqx-modal-dialog>

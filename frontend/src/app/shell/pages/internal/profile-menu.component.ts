@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, TranslatePipe, UILanguages, UIOptions, UIState, UserIdPicturePipe } from '@app/shared';
@@ -34,18 +34,16 @@ interface State {
     templateUrl: './profile-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
-        DropdownMenuComponent,
-        ExternalLinkDirective,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgFor,
-        NgIf,
-        RouterLink,
-        StopClickDirective,
-        TranslatePipe,
-        UserIdPicturePipe,
-    ],
+    AsyncPipe,
+    DropdownMenuComponent,
+    ExternalLinkDirective,
+    ModalDirective,
+    ModalPlacementDirective,
+    RouterLink,
+    StopClickDirective,
+    TranslatePipe,
+    UserIdPicturePipe
+],
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

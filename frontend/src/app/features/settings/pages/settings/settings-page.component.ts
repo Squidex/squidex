@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -17,25 +17,23 @@ import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponen
     styleUrls: ['./settings-page.component.scss'],
     templateUrl: './settings-page.component.html',
     imports: [
-        ConfirmClickDirective,
-        ControlErrorsComponent,
-        FormHintComponent,
-        FormsModule,
-        LayoutComponent,
-        ListViewComponent,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        RouterLink,
-        RouterLinkActive,
-        RouterOutlet,
-        ShortcutDirective,
-        SidebarMenuDirective,
-        TitleComponent,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    ConfirmClickDirective,
+    ControlErrorsComponent,
+    FormHintComponent,
+    FormsModule,
+    LayoutComponent,
+    ListViewComponent,
+    ReactiveFormsModule,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    ShortcutDirective,
+    SidebarMenuDirective,
+    TitleComponent,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class SettingsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

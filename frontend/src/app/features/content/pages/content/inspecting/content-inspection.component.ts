@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, combineLatest, of } from 'rxjs';
@@ -24,7 +24,6 @@ type Mode = 'Content' | 'Data' | 'FlatData';
         CodeEditorComponent,
         FormErrorComponent,
         FormsModule,
-        NgIf,
         TranslatePipe,
     ],
 })

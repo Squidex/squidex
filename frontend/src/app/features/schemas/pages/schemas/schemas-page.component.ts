@@ -6,7 +6,7 @@
  */
 
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
@@ -22,23 +22,21 @@ import { SchemaFormComponent } from './schema-form.component';
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
     imports: [
-        AsyncPipe,
-        CdkDropListGroup,
-        FormsModule,
-        LayoutComponent,
-        ModalDirective,
-        NgFor,
-        NgIf,
-        ReactiveFormsModule,
-        RouterOutlet,
-        SchemaCategoryComponent,
-        SchemaFormComponent,
-        ShortcutDirective,
-        TitleComponent,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    CdkDropListGroup,
+    FormsModule,
+    LayoutComponent,
+    ModalDirective,
+    ReactiveFormsModule,
+    RouterOutlet,
+    SchemaCategoryComponent,
+    SchemaFormComponent,
+    ShortcutDirective,
+    TitleComponent,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class SchemasPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

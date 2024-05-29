@@ -1,31 +1,56 @@
-<ng-container *ngIf="isSmall; else large">
-    <div class="small root" [class.disabled]="disabled" [style.background]="element.iconColor" [sqxHoverBackground]="element.iconColor | sqxDarken:5">
-        <div class="small-icon" [style.background]="element.iconColor | sqxDarken:5">
-            <sqx-rule-icon size="md" [element]="element"></sqx-rule-icon>
+@if (isSmall) {
+    <div
+        class="small root"
+        [class.disabled]="disabled"
+        [style.background]="element.iconColor"
+        [sqxHoverBackground]="element.iconColor | sqxDarken: 5">
+        <div class="small-icon" [style.background]="element.iconColor | sqxDarken: 5">
+            <sqx-rule-icon [element]="element" size="md"></sqx-rule-icon>
         </div>
         <div class="small-text">
-            {{element.display}}
+            {{ element.display }}
         </div>
     </div>
-</ng-container>
+} @else {
+    <div class="row g-0 large root" [class.disabled]="disabled">
+        <div class="col-auto">
+            <div class="large-icon" [style.background]="element.iconColor | sqxDarken: 5">
+                <sqx-rule-icon [element]="element" size="lg"></sqx-rule-icon>
+            </div>
+        </div>
+        <div class="col pe-2">
+            <div class="large-title">{{ element.title || type }}</div>
+            <div class="large-text text-muted">
+                {{ element.description }}
+            </div>
+            @if (element.readMore) {
+                <div class="large-link">
+                    <a [href]="element.readMore" sqxStopClick sqxExternalLink>{{ "rules.readMore" | sqxTranslate }}</a>
+                </div>
+            }
+        </div>
+    </div>
+}
 
 <ng-template #large>
     <div class="row g-0 large root" [class.disabled]="disabled">
         <div class="col-auto">
-            <div class="large-icon" [style.background]="element.iconColor | sqxDarken:5">
-                <sqx-rule-icon size="lg" [element]="element"></sqx-rule-icon>
+            <div class="large-icon" [style.background]="element.iconColor | sqxDarken: 5">
+                <sqx-rule-icon [element]="element" size="lg"></sqx-rule-icon>
             </div>
         </div>
         <div class="col pe-2">
-            <div class="large-title">{{element.title || type}}</div>
+            <div class="large-title">{{ element.title || type }}</div>
 
             <div class="large-text text-muted">
-                {{element.description}}
+                {{ element.description }}
             </div>
 
-            <div class="large-link" *ngIf="element.readMore">
-                <a [href]="element.readMore" sqxStopClick sqxExternalLink>{{ 'rules.readMore' | sqxTranslate }}</a>
-            </div>
+            @if (element.readMore) {
+                <div class="large-link">
+                    <a [href]="element.readMore" sqxStopClick sqxExternalLink>{{ "rules.readMore" | sqxTranslate }}</a>
+                </div>
+            }
         </div>
     </div>
 </ng-template>

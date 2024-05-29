@@ -4,60 +4,81 @@
             <div class="col col-name">
                 <sqx-editable-title
                     [disabled]="!rule.canUpdate"
-                    [displayFallback]="'rules.unnamed' | sqxTranslate" 
-                    (inputTitleChange)="rename($event)"
+                    [displayFallback]="'rules.unnamed' | sqxTranslate"
                     [inputTitle]="rule.name"
+                    (inputTitleChange)="rename($event)"
                     inputTitleLength="60"
-                    inputTitleRequired="false" >
-                </sqx-editable-title>
+                    inputTitleRequired="false"></sqx-editable-title>
             </div>
             <div class="col-auto" [class.invisible]="!rule.canDelete && !rule.canRun">
-                <button type="button" class="btn btn-text-secondary" attr.aria-label="{{ 'common.options' | sqxTranslate }}" (click)="dropdown.toggle()" #buttonOptions>
+                <button
+                    class="btn btn-text-secondary"
+                    #buttonOptions
+                    (click)="dropdown.toggle()"
+                    type="button"
+                    attr.aria-label="{{ 'common.options' | sqxTranslate }}">
                     <i class="icon-dots"></i>
                 </button>
-        
-                <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true" position="bottom-end">
-                    <a class="dropdown-item" *ngIf="rule.canUpdate" [routerLink]="rule.id">
-                        {{ 'common.edit' | sqxTranslate }}
-                    </a>
 
-                    <a class="dropdown-item" *ngIf="rule.canEnable" (click)="enable()">
-                        {{ 'common.enable' | sqxTranslate }}
-                    </a>
+                <sqx-dropdown-menu
+                    *sqxModal="dropdown; closeAlways: true"
+                    [sqxAnchoredTo]="buttonOptions"
+                    scrollY="true"
+                    position="bottom-end">
+                    @if (rule.canUpdate) {
+                        <a class="dropdown-item" [routerLink]="rule.id">
+                            {{ "common.edit" | sqxTranslate }}
+                        </a>
+                    }
 
-                    <a class="dropdown-item" *ngIf="rule.canDisable" (click)="disable()">
-                        {{ 'common.disable' | sqxTranslate }}
-                    </a>
+                    @if (rule.canEnable) {
+                        <a class="dropdown-item" (click)="enable()">
+                            {{ "common.enable" | sqxTranslate }}
+                        </a>
+                    }
+
+                    @if (rule.canDisable) {
+                        <a class="dropdown-item" (click)="disable()">
+                            {{ "common.disable" | sqxTranslate }}
+                        </a>
+                    }
 
                     <div class="dropdown-divider"></div>
 
-                    <ng-container *ngIf="rule.canRun || rule.canRunFromSnapshots">
-                        <a class="dropdown-item" *ngIf="rule.canRun"
-                            (sqxConfirmClick)="run()"
-                            confirmTitle="i18n:rules.runRuleConfirmTitle"
-                            confirmText="i18n:rules.runRuleConfirmText"
-                            confirmRememberKey="runRule">
-                            {{ 'rules.run' | sqxTranslate }}
-                        </a>
-
-                        <a class="dropdown-item" *ngIf="rule.canRunFromSnapshots"
-                            (sqxConfirmClick)="runFromSnapshots()"
-                            confirmTitle="i18n:rules.runRuleConfirmTitle"
-                            confirmText="i18n:rules.runRuleConfirmText"
-                            confirmRememberKey="runRuleFromSnapshots">
-                            {{ 'rules.runFromSnapshots' | sqxTranslate }}
-                        </a>
-
+                    @if (rule.canRun || rule.canRunFromSnapshots) {
+                        @if (rule.canRun) {
+                            <a
+                                class="dropdown-item"
+                                (sqxConfirmClick)="run()"
+                                confirmTitle="i18n:rules.runRuleConfirmTitle"
+                                confirmText="i18n:rules.runRuleConfirmText"
+                                confirmRememberKey="runRule">
+                                {{ "rules.run" | sqxTranslate }}
+                            </a>
+                        }
+                        @if (rule.canRunFromSnapshots) {
+                            <a
+                                class="dropdown-item"
+                                (sqxConfirmClick)="runFromSnapshots()"
+                                confirmTitle="i18n:rules.runRuleConfirmTitle"
+                                confirmText="i18n:rules.runRuleConfirmText"
+                                confirmRememberKey="runRuleFromSnapshots">
+                                {{ "rules.runFromSnapshots" | sqxTranslate }}
+                            </a>
+                        }
                         <div class="dropdown-divider"></div>
-                    </ng-container>
-        
-                    <a class="dropdown-item dropdown-item-delete" *ngIf="rule.canDelete"
-                        (sqxConfirmClick)="delete()"
-                        confirmTitle="i18n:rules.deleteConfirmTitle"
-                        confirmText="i18n:rules.deleteConfirmText"
-                        confirmRememberKey="deleteRule">
-                        {{ 'common.delete' | sqxTranslate }}
-                    </a>
+                    }
+
+                    @if (rule.canDelete) {
+                        <a
+                            class="dropdown-item dropdown-item-delete"
+                            (sqxConfirmClick)="delete()"
+                            confirmTitle="i18n:rules.deleteConfirmTitle"
+                            confirmText="i18n:rules.deleteConfirmText"
+                            confirmRememberKey="deleteRule">
+                            {{ "common.delete" | sqxTranslate }}
+                        </a>
+                    }
                 </sqx-dropdown-menu>
             </div>
         </div>
@@ -65,55 +86,68 @@
     <div class="card-body">
         <div class="row align-items-center">
             <div class="col-auto">
-                <h3>{{ 'rules.ruleSyntax.if' | sqxTranslate }}</h3>
+                <h3>{{ "rules.ruleSyntax.if" | sqxTranslate }}</h3>
             </div>
             <div class="col">
-                <sqx-rule-element disabled="true" [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]"></sqx-rule-element>
+                <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]" disabled="true"></sqx-rule-element>
             </div>
             <div class="col-auto">
-                <h3>{{ 'rules.ruleSyntax.then' | sqxTranslate }}</h3>
+                <h3>{{ "rules.ruleSyntax.then" | sqxTranslate }}</h3>
             </div>
             <div class="col">
-                <sqx-rule-element disabled="true" [type]="rule.actionType" [element]="$any(ruleActions[rule.actionType])"></sqx-rule-element>
+                <sqx-rule-element
+                    [type]="rule.actionType"
+                    [element]="$any(ruleActions[rule.actionType])"
+                    disabled="true"></sqx-rule-element>
             </div>
             <div class="col col-last text-end">
-                <ng-container *ngIf="isManual; else notManual">
-                    <button class="btn btn-outline-secondary btn-run" [disabled]="!rule.canTrigger"
+                @if (isManual) {
+                    <button
+                        class="btn btn-outline-secondary btn-run"
+                        [disabled]="!rule.canTrigger"
                         (sqxConfirmClick)="trigger()"
                         confirmTitle="i18n:rules.triggerConfirmTitle"
                         confirmText="i18n:rules.triggerConfirmText"
                         confirmRememberKey="triggerRule">
                         <i class="icon-play-line"></i>
                     </button>
-                </ng-container>
-
-                <ng-template #notManual>
-                    <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()"></sqx-toggle>
-                </ng-template>
+                } @else {
+                    <sqx-toggle
+                        [disabled]="!rule.canDisable && !rule.canEnable"
+                        [ngModel]="rule.isEnabled"
+                        (ngModelChange)="toggle()"></sqx-toggle>
+                }
             </div>
         </div>
     </div>
     <div class="card-footer">
         <div class="row">
             <div class="col">
-                {{ 'common.succeeded' | sqxTranslate }} 
-                
-                <span class="badge badge-success rounded-pill" *ngIf="rule.numSucceeded > 0">{{rule.numSucceeded}}</span>
+                {{ "common.succeeded" | sqxTranslate }}
+
+                @if (rule.numSucceeded > 0) {
+                    <span class="badge badge-success rounded-pill">{{ rule.numSucceeded }}</span>
+                }
             </div>
             <div class="col">
-                {{ 'common.failed' | sqxTranslate }} 
-                
-                <span class="badge badge-danger rounded-pill" *ngIf="rule.numFailed > 0">{{rule.numFailed}}</span>
+                {{ "common.failed" | sqxTranslate }}
+
+                @if (rule.numFailed > 0) {
+                    <span class="badge badge-danger rounded-pill">{{ rule.numFailed }}</span>
+                }
             </div>
-            <div class="col-auto" *ngIf="rule.canReadLogs">
-                <a routerLink="events" [queryParams]="{ ruleId: rule.id }">
-                    {{ 'common.logs' | sqxTranslate }}
-                </a>
-                
-                <a routerLink="simulator" [queryParams]="{ ruleId: rule.id }" *ngIf="!isManual" class="ms-2">
-                    {{ 'rules.simulator' | sqxTranslate }}
-                </a>
-            </div>
+            @if (rule.canReadLogs) {
+                <div class="col-auto">
+                    <a [queryParams]="{ ruleId: rule.id }" routerLink="events">
+                        {{ "common.logs" | sqxTranslate }}
+                    </a>
+                    @if (!isManual) {
+                        <a class="ms-2" [queryParams]="{ ruleId: rule.id }" routerLink="simulator">
+                            {{ "rules.simulator" | sqxTranslate }}
+                        </a>
+                    }
+                </div>
+            }
         </div>
     </div>
 </div>

@@ -7,7 +7,7 @@
 
 /* eslint-disable no-return-assign */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
@@ -37,24 +37,22 @@ class PermissionsAutocomplete implements AutocompleteSource {
     styleUrls: ['./roles-page.component.scss'],
     templateUrl: './roles-page.component.html',
     imports: [
-        AsyncPipe,
-        FormHintComponent,
-        LayoutComponent,
-        ListViewComponent,
-        NgFor,
-        NgIf,
-        RoleAddFormComponent,
-        RoleComponent,
-        RouterLink,
-        RouterLinkActive,
-        RouterOutlet,
-        ShortcutDirective,
-        SidebarMenuDirective,
-        TitleComponent,
-        TooltipDirective,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    AsyncPipe,
+    FormHintComponent,
+    LayoutComponent,
+    ListViewComponent,
+    RoleAddFormComponent,
+    RoleComponent,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    ShortcutDirective,
+    SidebarMenuDirective,
+    TitleComponent,
+    TooltipDirective,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class RolesPageComponent implements OnInit {
     public allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);

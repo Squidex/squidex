@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -19,18 +19,17 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     templateUrl: './rule.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        ConfirmClickDirective,
-        DropdownMenuComponent,
-        EditableTitleComponent,
-        FormsModule,
-        ModalDirective,
-        ModalPlacementDirective,
-        NgIf,
-        RouterLink,
-        RuleElementComponent,
-        ToggleComponent,
-        TranslatePipe,
-    ],
+    ConfirmClickDirective,
+    DropdownMenuComponent,
+    EditableTitleComponent,
+    FormsModule,
+    ModalDirective,
+    ModalPlacementDirective,
+    RouterLink,
+    RuleElementComponent,
+    ToggleComponent,
+    TranslatePipe
+],
 })
 export class RuleComponent {
     @Input({ required: true })

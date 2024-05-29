@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -17,15 +17,14 @@ import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSou
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',
     imports: [
-        AssetFolderDropdownComponent,
-        AsyncPipe,
-        FormHintComponent,
-        FormsModule,
-        NgFor,
-        ReactiveFormsModule,
-        TagEditorComponent,
-        TranslatePipe,
-    ],
+    AssetFolderDropdownComponent,
+    AsyncPipe,
+    FormHintComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    TagEditorComponent,
+    TranslatePipe
+],
 })
 export class StringUIComponent  {
     private readonly subscriptions = new Subscriptions();

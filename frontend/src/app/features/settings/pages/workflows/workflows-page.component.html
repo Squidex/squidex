@@ -2,43 +2,53 @@
 
 <sqx-layout layout="main" titleText="i18n:common.workflows" titleIcon="workflows" innerWidth="80">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:workflows.refreshTooltip" shortcut="CTRL + B">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        <button class="btn btn-text-secondary" (click)="reload()" type="button" title="i18n:workflows.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i>
+            {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
 
     <ng-container>
-        <sqx-list-view innerWidth="80rem" [isLoading]="workflowsState.isLoading | async">
+        <sqx-list-view [isLoading]="workflowsState.isLoading | async" innerWidth="80rem">
             <ng-container>
-                <ng-container *ngIf="workflowsState.errors | async; let errors">
-                    <div class="alert alert-danger" *ngIf="errors.length > 1">
-                        <ul>
-                            <li *ngFor="let error of errors">{{error}}</li>
-                        </ul>
-                    </div>
-                    <div class="alert alert-danger" *ngIf="errors.length === 1">
-                        {{errors[0]}}
-                    </div>
-                </ng-container>
+                @if (workflowsState.errors | async; as errors) {
+                    @if (errors.length > 1) {
+                        <div class="alert alert-danger">
+                            <ul>
+                                @for (error of errors; track error) {
+                                    <li>{{ error }}</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    @if (errors.length === 1) {
+                        <div class="alert alert-danger">
+                            {{ errors[0] }}
+                        </div>
+                    }
+                }
 
-                <ng-container *ngIf="schemasSource && (workflowsState.isLoaded | async) && (workflowsState.workflows | async); let workflows">
-                    <div class="table-items-row  table-items-row-summary table-items-row-empty" *ngIf="workflows.length === 0">
-                        {{ 'workflows.empty' | sqxTranslate }}
-                    </div>
-
-                    <sqx-workflow *ngFor="let workflow of workflows; trackBy: trackByWorkflow" 
-                        [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource">
-                    </sqx-workflow>
-
-                    <sqx-workflow-add-form *ngIf="workflowsState.canCreate | async"></sqx-workflow-add-form>
-                </ng-container>
+                @if (schemasSource && (workflowsState.isLoaded | async) && (workflowsState.workflows | async); as workflows) {
+                    @if (workflows.length === 0) {
+                        <div class="table-items-row table-items-row-summary table-items-row-empty">
+                            {{ "workflows.empty" | sqxTranslate }}
+                        </div>
+                    }
+                    @for (workflow of workflows; track trackByWorkflow($index, workflow)) {
+                        <sqx-workflow [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource"></sqx-workflow>
+                    }
+                    @if (workflowsState.canCreate | async) {
+                        <sqx-workflow-add-form></sqx-workflow-add-form>
+                    }
+                }
             </ng-container>
         </sqx-list-view>
     </ng-container>
 
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="history"
                 routerLinkActive="active"
@@ -49,7 +59,8 @@
                 <i class="icon-time"></i>
             </a>
 
-            <a class="panel-link"
+            <a
+                class="panel-link"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"

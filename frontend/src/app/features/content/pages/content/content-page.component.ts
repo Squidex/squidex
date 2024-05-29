@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, Location, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AsyncPipe, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -43,9 +43,6 @@ import { ContentReferencesComponent } from './references/content-references.comp
         LayoutComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
         NotifoComponent,
         PreviewButtonComponent,
         ReactiveFormsModule,

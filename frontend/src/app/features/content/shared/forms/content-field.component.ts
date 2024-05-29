@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Optional, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, AppsState, changed$, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, SchemaDto, Settings, TooltipDirective, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
@@ -24,8 +24,6 @@ import { FieldLanguagesComponent } from './field-languages.component';
         FieldEditorComponent,
         FieldLanguagesComponent,
         FocusMarkerComponent,
-        NgFor,
-        NgIf,
         TooltipDirective,
     ],
 })

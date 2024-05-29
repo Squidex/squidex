@@ -1,7 +1,8 @@
-<div [formGroup]="actionForm.form" class="form-horizontal">
+<div class="form-horizontal" [formGroup]="actionForm.form">
     <div class="form-group row" *ngFor="let property of actionForm.definition.properties">
         <label class="col-3 col-form-label" [for]="property.name">
-            <ng-container *ngIf="property.editor !== 'Checkbox'">{{property.display}}</ng-container> <small class="hint" *ngIf="property.isRequired">&nbsp;*</small>
+            <ng-container *ngIf="property.editor !== 'Checkbox'">{{ property.display }}</ng-container>
+            <small class="hint" *ngIf="property.isRequired">&nbsp;*</small>
         </label>
 
         <div class="col-9">
@@ -13,36 +14,46 @@
                         <sqx-formattable-input [formControlName]="property.name" type="Text"></sqx-formattable-input>
                     </ng-container>
                     <ng-template #plain>
-                        <input class="form-control" id="{{property.name}}" [formControlName]="property.name">
+                        <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
                     </ng-template>
                 </ng-container>
                 <ng-container *ngSwitchCase="'TextArea'">
                     <ng-container *ngIf="property.isFormattable; else plain">
-                        <sqx-formattable-input [completion]="ruleCompletions | async" [formControlName]="property.name" type="Code"></sqx-formattable-input>
+                        <sqx-formattable-input
+                            [completion]="ruleCompletions | async"
+                            [formControlName]="property.name"
+                            type="Code"></sqx-formattable-input>
                     </ng-container>
                     <ng-template #plain>
-                        <textarea class="form-control" id="{{property.name}}" [formControlName]="property.name"></textarea>
+                        <textarea class="form-control" id="{{ property.name }}" [formControlName]="property.name"></textarea>
                     </ng-template>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Javascript'">
-                    <sqx-code-editor [completion]="ruleCompletions | async" [formControlName]="property.name" [height]="350"></sqx-code-editor>
+                    <sqx-code-editor
+                        [completion]="ruleCompletions | async"
+                        [formControlName]="property.name"
+                        [height]="350"></sqx-code-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Checkbox'">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="{{property.name}}" [formControlName]="property.name">
-                        <label class="form-check-label" for="{{property.name}}">
-                            {{property.display}}
+                        <input class="form-check-input" id="{{ property.name }}" [formControlName]="property.name" type="checkbox" />
+                        <label class="form-check-label" for="{{ property.name }}">
+                            {{ property.display }}
                         </label>
                     </div>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Dropdown'">
                     <select class="form-select" [formControlName]="property.name">
                         <option *ngIf="!property.isRequired"></option>
-                        <option *ngFor="let option of property.options" [ngValue]="option">{{option}}</option>
+                        <option *ngFor="let option of property.options" [ngValue]="option">{{ option }}</option>
                     </select>
                 </ng-container>
                 <ng-container *ngSwitchDefault>
-                    <input type="{{property.editor | lowercase}}" class="form-control" id="{{property.name}}" [formControlName]="property.name">
+                    <input
+                        class="form-control"
+                        id="{{ property.name }}"
+                        [formControlName]="property.name"
+                        type="{{ property.editor | lowercase }}" />
                 </ng-container>
             </ng-container>
 
@@ -50,7 +61,10 @@
                 <span [sqxMarkdown]="property.description" inline="true"></span>
 
                 <div *ngIf="property.isFormattable">
-                    {{ 'rules.advancedFormattingHint' | sqxTranslate }}: <a tabindex="-1" href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink>{{ 'common.documentation' | sqxTranslate }}</a>
+                    {{ "rules.advancedFormattingHint" | sqxTranslate }}:
+                    <a tabindex="-1" href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink>
+                        {{ "common.documentation" | sqxTranslate }}
+                    </a>
                 </div>
             </sqx-form-hint>
         </div>

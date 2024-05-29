@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { GridsterComponent, GridsterConfig, GridsterItem, GridsterItemComponent, GridType } from 'angular-gridster2';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, IFrameCardComponent, LocalStoreService, MarkdownPipe, RandomCatCardComponent, RandomDogCardComponent, SafeHtmlPipe, Settings, StorageUsagePerDateDto, Subscriptions, SupportCardComponent, switchSafe, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
@@ -25,37 +25,33 @@ import { DashboardConfigComponent } from './dashboard-config.component';
         fadeAnimation,
     ],
     imports: [
-        ApiCallsCardComponent,
-        ApiCallsSummaryCardComponent,
-        ApiCardComponent,
-        ApiPerformanceCardComponent,
-        ApiTrafficCardComponent,
-        ApiTrafficSummaryCardComponent,
-        AssetUploadsCountCardComponent,
-        AssetUploadsSizeCardComponent,
-        AssetUploadsSizeSummaryCardComponent,
-        AsyncPipe,
-        ContentSummaryCardComponent,
-        DashboardConfigComponent,
-        GithubCardComponent,
-        GridsterComponent,
-        GridsterItemComponent,
-        HistoryCardComponent,
-        IFrameCardComponent,
-        MarkdownPipe,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        RandomCatCardComponent,
-        RandomDogCardComponent,
-        SafeHtmlPipe,
-        SchemaCardComponent,
-        SupportCardComponent,
-        TitleComponent,
-        TourStepDirective,
-        TranslatePipe,
-    ],
+    ApiCallsCardComponent,
+    ApiCallsSummaryCardComponent,
+    ApiCardComponent,
+    ApiPerformanceCardComponent,
+    ApiTrafficCardComponent,
+    ApiTrafficSummaryCardComponent,
+    AssetUploadsCountCardComponent,
+    AssetUploadsSizeCardComponent,
+    AssetUploadsSizeSummaryCardComponent,
+    AsyncPipe,
+    ContentSummaryCardComponent,
+    DashboardConfigComponent,
+    GithubCardComponent,
+    GridsterComponent,
+    GridsterItemComponent,
+    HistoryCardComponent,
+    IFrameCardComponent,
+    MarkdownPipe,
+    RandomCatCardComponent,
+    RandomDogCardComponent,
+    SafeHtmlPipe,
+    SchemaCardComponent,
+    SupportCardComponent,
+    TitleComponent,
+    TourStepDirective,
+    TranslatePipe
+],
 })
 export class DashboardPageComponent implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();

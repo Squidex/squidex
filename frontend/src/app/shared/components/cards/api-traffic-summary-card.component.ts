@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
 import { CallsUsageDto, FileSizePipe } from '@app/shared/internal';
@@ -17,10 +17,9 @@ import { CallsUsageDto, FileSizePipe } from '@app/shared/internal';
     templateUrl: './api-traffic-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FileSizePipe,
-        NgIf,
-        TranslatePipe,
-    ],
+    FileSizePipe,
+    TranslatePipe
+],
 })
 export class ApiTrafficSummaryCardComponent {
     @Input({ required: true })
