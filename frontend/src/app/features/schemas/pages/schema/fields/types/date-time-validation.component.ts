@@ -19,14 +19,14 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html',
     imports: [
-    AsyncPipe,
-    DateTimeEditorComponent,
-    FormHintComponent,
-    FormsModule,
-    LocalizedInputComponent,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        AsyncPipe,
+        DateTimeEditorComponent,
+        FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class DateTimeValidationComponent {
     @Input({ required: true })

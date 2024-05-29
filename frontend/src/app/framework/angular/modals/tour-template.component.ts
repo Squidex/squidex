@@ -25,13 +25,13 @@ import { StepDefinition, TourService } from './tour.service';
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    MarkdownInlinePipe,
-    MarkdownPipe,
-    ModalDirective,
-    ModalPlacementDirective,
-    SafeHtmlPipe,
-    TranslatePipe
-],
+        MarkdownInlinePipe,
+        MarkdownPipe,
+        ModalDirective,
+        ModalPlacementDirective,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class TourTemplateComponent extends StatefulComponent implements AfterContentInit {
     private delayedDestory: any;

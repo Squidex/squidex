@@ -28,21 +28,21 @@ interface State {
         bounceAnimation,
     ],
     imports: [
-    ConfirmClickDirective,
-    FocusOnInitDirective,
-    FormsModule,
-    FromNowPipe,
-    MarkdownPipe,
-    MentionModule,
-    ReactiveFormsModule,
-    RouterLink,
-    SafeHtmlPipe,
-    ScrollActiveDirective,
-    TooltipDirective,
-    TranslatePipe,
-    UserNameRefPipe,
-    UserPictureRefPipe
-],
+        ConfirmClickDirective,
+        FocusOnInitDirective,
+        FormsModule,
+        FromNowPipe,
+        MarkdownPipe,
+        MentionModule,
+        ReactiveFormsModule,
+        RouterLink,
+        SafeHtmlPipe,
+        ScrollActiveDirective,
+        TooltipDirective,
+        TranslatePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class CommentComponent extends StatefulComponent<State> {
     @Input({ transform: booleanAttribute })
@@ -173,9 +173,5 @@ export class CommentComponent extends StatefulComponent<State> {
             event.preventDefault();
             this.update();
         }
-    }
-
-    public trackByComment(_: number, item: { index: number }) {
-        return item.index;
     }
 }

@@ -144,10 +144,6 @@ export class ArrayItemComponent {
             section.reset();
         });
     }
-
-    public trackBySection(_index: number, section: FieldSection<FieldDto, any>) {
-        return section.separator?.fieldId;
-    }
 }
 
 function getTitle(formModel: ObjectFormBase) {

@@ -23,7 +23,7 @@ import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootVie
         TourGuideComponent,
         TourTemplateComponent,
         TranslatePipe,
-    ],
+        ],
 })
 export class AppComponent {
     public isLoaded?: boolean | null;

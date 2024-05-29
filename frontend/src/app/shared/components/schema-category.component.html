@@ -40,7 +40,7 @@
 
         <div class="nav-collapsed" [hidden]="isCollapsed" [style.height]="getContainerHeight()">
             @if (!forContent) {
-                @for (schema of schemas; track trackBySchema($index, schema)) {
+                @for (schema of schemas; track schema.id) {
                     <li
                         class="nav-item truncate"
                         [cdkDragData]="schema"
@@ -67,7 +67,7 @@
                     </li>
                 }
             } @else {
-                @for (schema of schemas; track trackBySchema($index, schema)) {
+                @for (schema of schemas; track schema.id) {
                     <li class="nav-item truncate" sqxTourStep="contentSchema">
                         <a
                             class="nav-link truncate drag-none"
@@ -87,7 +87,7 @@
     </div>
 
     <div class="categories" [hidden]="isCollapsed">
-        @for (category of schemaCategory.categories; track trackByCategory($index, category)) {
+        @for (category of schemaCategory.categories; track category.name) {
             <sqx-schema-category
                 [schemaCategory]="category"
                 [schemaTarget]="schemaTarget"

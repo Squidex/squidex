@@ -18,19 +18,19 @@ import { AppsState, CreateAppForm, TemplateDto } from '@app/shared/internal';
     templateUrl: './app-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    ControlErrorsComponent,
-    FocusOnInitDirective,
-    FormAlertComponent,
-    FormErrorComponent,
-    FormHintComponent,
-    FormsModule,
-    ModalDialogComponent,
-    ReactiveFormsModule,
-    TooltipDirective,
-    TransformInputDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        FormAlertComponent,
+        FormErrorComponent,
+        FormHintComponent,
+        FormsModule,
+        ModalDialogComponent,
+        ReactiveFormsModule,
+        TooltipDirective,
+        TransformInputDirective,
+        TranslatePipe,
+    ],
 })
 export class AppFormComponent {
     @Output()

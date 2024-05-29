@@ -28,7 +28,7 @@
                         {{ "jobs.empty" | sqxTranslate }}
                     </div>
                 }
-                @for (job of jobs; track trackByJob($index, job)) {
+                @for (job of jobs; track job.id) {
                     <sqx-job [job]="job"></sqx-job>
                 }
             }

@@ -40,16 +40,16 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FocusOnInitDirective,
-    FormsModule,
-    MarkdownPipe,
-    ModalDialogComponent,
-    ModalDirective,
-    ModalPlacementDirective,
-    SafeHtmlPipe,
-    TooltipDirective,
-    TranslatePipe
-],
+        FocusOnInitDirective,
+        FormsModule,
+        MarkdownPipe,
+        ModalDialogComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        SafeHtmlPipe,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

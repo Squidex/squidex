@@ -18,14 +18,14 @@ import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
     templateUrl: './asset-folder.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AssetFolderDialogComponent,
-    ConfirmClickDirective,
-    DropdownMenuComponent,
-    ModalDirective,
-    ModalPlacementDirective,
-    TooltipDirective,
-    TranslatePipe
-],
+        AssetFolderDialogComponent,
+        ConfirmClickDirective,
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class AssetFolderComponent {
     @Output()

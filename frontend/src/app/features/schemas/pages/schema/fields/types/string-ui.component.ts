@@ -17,14 +17,14 @@ import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSou
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',
     imports: [
-    AssetFolderDropdownComponent,
-    AsyncPipe,
-    FormHintComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TagEditorComponent,
-    TranslatePipe
-],
+        AssetFolderDropdownComponent,
+        AsyncPipe,
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class StringUIComponent  {
     private readonly subscriptions = new Subscriptions();

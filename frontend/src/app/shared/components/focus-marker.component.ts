@@ -17,9 +17,9 @@ import { CollaborationService, Subscriptions } from '@app/shared/internal';
     styleUrls: ['./focus-marker.component.scss'],
     templateUrl: './focus-marker.component.html',
     imports: [
-    AsyncPipe,
-    StringColorPipe
-],
+        AsyncPipe,
+        StringColorPipe,
+    ],
 })
 export class FocusMarkerComponent {
     private readonly subscriptions = new Subscriptions();

@@ -110,8 +110,4 @@ export class ContentHistoryPageComponent implements OnInit {
     public compareVersion(event: HistoryEventDto) {
         this.contentPage.loadVersion(event.version, true);
     }
-
-    public trackByEvent(_index: number, event: HistoryEventDto) {
-        return event.eventId;
-    }
 }

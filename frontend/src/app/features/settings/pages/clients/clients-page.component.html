@@ -20,7 +20,7 @@
                     </div>
                 }
                 @if (rolesState.roles | async; as roles) {
-                    @for (client of clients; track trackByClient($index, client)) {
+                    @for (client of clients; track client.id) {
                         <sqx-client [client]="client" [clientRoles]="roles"></sqx-client>
                     }
                 }

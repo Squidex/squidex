@@ -161,8 +161,4 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public setCompact(isCompact: boolean) {
         this.next({ isCompact });
     }
-
-    public trackByContent(_index: number, content: ContentDto) {
-        return content.id;
-    }
 }

@@ -5,7 +5,7 @@
         </a>
     </div>
 
-    @for (tag of tags; track trackByTag($index, tag)) {
+    @for (tag of tags; track tag.name) {
         <div class="nav-item">
             <a class="nav-link" [class.active]="isSelected(tag)" (click)="toggle.emit(tag.name)">
                 <div class="row g-0">

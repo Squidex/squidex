@@ -170,8 +170,4 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
     public isSelected(photo: StockPhotoDto) {
         return photo.url === this.valueControl.value;
     }
-
-    public trackByPhoto(_index: number, photo: StockPhotoDto) {
-        return photo.thumbUrl;
-    }
 }

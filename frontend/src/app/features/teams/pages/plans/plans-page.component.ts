@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ApiUrlConfig, ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownPipe, NotifoComponent, PlanDto, SafeHtmlPipe, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ApiUrlConfig, ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownPipe, NotifoComponent, SafeHtmlPipe, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamPlansState } from '../../internal';
 import { PlanComponent } from './plan.component';
 
@@ -18,25 +18,25 @@ import { PlanComponent } from './plan.component';
     styleUrls: ['./plans-page.component.scss'],
     templateUrl: './plans-page.component.html',
     imports: [
-    AsyncPipe,
-    ExternalLinkDirective,
-    FormHintComponent,
-    LayoutComponent,
-    ListViewComponent,
-    MarkdownPipe,
-    NotifoComponent,
-    PlanComponent,
-    RouterLink,
-    RouterLinkActive,
-    RouterOutlet,
-    SafeHtmlPipe,
-    ShortcutDirective,
-    SidebarMenuDirective,
-    TitleComponent,
-    TooltipDirective,
-    TourStepDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        ExternalLinkDirective,
+        FormHintComponent,
+        LayoutComponent,
+        ListViewComponent,
+        MarkdownPipe,
+        NotifoComponent,
+        PlanComponent,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        SafeHtmlPipe,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class PlansPageComponent implements OnInit {
     private overridePlanId?: string;
@@ -58,9 +58,5 @@ export class PlansPageComponent implements OnInit {
 
     public reload() {
         this.plansState.load(true, this.overridePlanId);
-    }
-
-    public trackByPlan(_index: number, planInfo: { plan: PlanDto }) {
-        return planInfo.plan.id;
     }
 }

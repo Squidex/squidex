@@ -1,5 +1,5 @@
 <div class="events">
-    @for (assetEvent of assetEvents | async; track trackByEvent($index, assetEvent)) {
+    @for (assetEvent of assetEvents | async; track assetEvent.event.eventId) {
         <div class="event row g-0">
             <div class="col-auto">
                 <img

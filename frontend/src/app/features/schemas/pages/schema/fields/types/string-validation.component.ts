@@ -17,16 +17,16 @@ import { AppSettingsDto, DropdownMenuComponent, FieldDto, FormHintComponent, has
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
     imports: [
-    AsyncPipe,
-    DropdownMenuComponent,
-    FormHintComponent,
-    FormsModule,
-    LocalizedInputComponent,
-    ModalDirective,
-    ModalPlacementDirective,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        AsyncPipe,
+        DropdownMenuComponent,
+        FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class StringValidationComponent  {
     private readonly subscriptions = new Subscriptions();

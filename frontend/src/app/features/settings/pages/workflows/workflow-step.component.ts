@@ -17,14 +17,14 @@ import { WorkflowTransitionComponent } from './workflow-transition.component';
     styleUrls: ['./workflow-step.component.scss'],
     templateUrl: './workflow-step.component.html',
     imports: [
-    ColorPickerComponent,
-    DropdownComponent,
-    EditableTitleComponent,
-    FormsModule,
-    TagEditorComponent,
-    TranslatePipe,
-    WorkflowTransitionComponent
-],
+        ColorPickerComponent,
+        DropdownComponent,
+        EditableTitleComponent,
+        FormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+        WorkflowTransitionComponent,
+    ],
 })
 export class WorkflowStepComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
@@ -102,9 +102,5 @@ export class WorkflowStepComponent {
 
     public changeNoUpdateRoles(noUpdateRoles?: ReadonlyArray<string>) {
         this.update.emit({ noUpdateRoles });
-    }
-
-    public trackByTransition(_index: number, transition: WorkflowTransitionView) {
-        return transition.to;
     }
 }

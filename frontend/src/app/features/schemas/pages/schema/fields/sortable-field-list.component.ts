@@ -17,12 +17,12 @@ import { FieldGroupComponent } from './field-group.component';
     styleUrls: ['./sortable-field-list.component.scss'],
     templateUrl: './sortable-field-list.component.html',
     imports: [
-    CdkDrag,
-    CdkDragHandle,
-    CdkDropList,
-    CdkDropListGroup,
-    forwardRef(() => FieldGroupComponent)
-],
+        CdkDrag,
+        CdkDragHandle,
+        CdkDropList,
+        CdkDropListGroup,
+        forwardRef(() => FieldGroupComponent),
+    ],
 })
 export class SortableFieldListComponent {
     @Output()

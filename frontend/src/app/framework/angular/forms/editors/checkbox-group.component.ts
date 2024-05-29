@@ -33,8 +33,8 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    ResizedDirective
-],
+        ResizedDirective,
+    ],
 })
 export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> implements AfterViewInit, AfterViewChecked {
     private readonly textMeasurer: TextMeasurer;
@@ -163,9 +163,5 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
 
     public isChecked(value: TagValue) {
         return this.snapshot.checkedValues.includes(value);
-    }
-
-    public trackByValue(_index: number, tag: TagValue) {
-        return tag.id;
     }
 }

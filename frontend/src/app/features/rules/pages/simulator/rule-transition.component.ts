@@ -16,8 +16,8 @@ import { SimulatedRuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/s
     templateUrl: './rule-transition.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    TranslatePipe
-],
+        TranslatePipe,
+    ],
 })
 export class RuleTransitionComponent {
     @Input()

@@ -47,8 +47,4 @@ export class AssetsFiltersPageComponent {
     public resetTags() {
         this.assetsState.resetTags();
     }
-
-    public trackByTag(_index: number, tag: { name: string }) {
-        return tag.name;
-    }
 }

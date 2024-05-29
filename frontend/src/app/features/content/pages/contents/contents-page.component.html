@@ -145,7 +145,7 @@
                                 [sqxContentListWidth]="tableFields"
                                 [fields]="tableSettings"
                                 [sqxSyncWidth]="header">
-                                @for (content of contentsState.contents | async; track trackByContent($index, content)) {
+                                @for (content of contentsState.contents | async; track content.id) {
                                     <tbody
                                         [sqxContent]="content"
                                         [cloneable]="contentsState.snapshot.canCreate"

@@ -40,16 +40,16 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
     templateUrl: './role.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AutocompleteComponent,
-    ConfirmClickDirective,
-    ControlErrorsComponent,
-    FormAlertComponent,
-    FormHintComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    SlicePipe,
-    TranslatePipe
-],
+        AutocompleteComponent,
+        ConfirmClickDirective,
+        ControlErrorsComponent,
+        FormAlertComponent,
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        SlicePipe,
+        TranslatePipe,
+    ],
 })
 export class RoleComponent {
     @Input({ required: true })
@@ -129,13 +129,5 @@ export class RoleComponent {
                     },
                 });
         }
-    }
-
-    public trackByProperty(_index: number, property: Property) {
-        return property.key;
-    }
-
-    public trackBySchema(_index: number, schema: SchemaDto) {
-        return schema.id;
     }
 }

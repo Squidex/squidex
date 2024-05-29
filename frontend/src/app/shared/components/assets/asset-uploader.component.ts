@@ -17,14 +17,14 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
     templateUrl: './asset-uploader.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    DropdownMenuComponent,
-    FileDropDirective,
-    ModalDirective,
-    ModalPlacementDirective,
-    ProgressBarComponent,
-    TranslatePipe
-],
+        AsyncPipe,
+        DropdownMenuComponent,
+        FileDropDirective,
+        ModalDirective,
+        ModalPlacementDirective,
+        ProgressBarComponent,
+        TranslatePipe,
+    ],
 })
 export class AssetUploaderComponent {
     public modalMenu = new ModalModel();
@@ -53,9 +53,5 @@ export class AssetUploaderComponent {
 
     public stopUpload(upload: Upload) {
         this.assetUploader.stopUpload(upload);
-    }
-
-    public trackByUpload(_index: number, upload: Upload) {
-        return upload.id;
     }
 }

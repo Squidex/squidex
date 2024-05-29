@@ -19,12 +19,12 @@ import { FocusOnInitDirective } from './focus-on-init.directive';
     styleUrls: ['./editable-title.component.scss'],
     templateUrl: './editable-title.component.html',
     imports: [
-    ControlErrorsComponent,
-    FocusOnInitDirective,
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class EditableTitleComponent {
     @Output()

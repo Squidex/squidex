@@ -21,7 +21,7 @@
                 {{ "notifications.empty" | sqxTranslate }}
             </small>
         }
-        @for (item of items.slice().reverse(); track trackByComment(i, item); let i = $index) {
+        @for (item of items.slice().reverse(); track $index) {
             <sqx-comment
                 [commentItem]="item"
                 [comments]="commentsState"

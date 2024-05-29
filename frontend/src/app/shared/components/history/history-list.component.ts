@@ -19,18 +19,14 @@ import { HistoryMessagePipe } from './pipes';
     templateUrl: './history-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FromNowPipe,
-    HistoryMessagePipe,
-    TooltipDirective,
-    UserNameRefPipe,
-    UserPictureRefPipe
-],
+        FromNowPipe,
+        HistoryMessagePipe,
+        TooltipDirective,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class HistoryListComponent {
     @Input({ required: true })
     public events: ReadonlyArray<HistoryEventDto> | undefined | null;
-
-    public trackByEvent(_index: number, event: HistoryEventDto) {
-        return event.eventId;
-    }
 }

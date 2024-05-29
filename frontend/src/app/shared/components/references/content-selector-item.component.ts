@@ -22,11 +22,11 @@ import { ContentListFieldComponent } from '../contents/content-list-field.compon
     templateUrl: './content-selector-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    ContentListCellDirective,
-    ContentListFieldComponent,
-    FormsModule,
-    StopClickDirective
-],
+        ContentListCellDirective,
+        ContentListFieldComponent,
+        FormsModule,
+        StopClickDirective,
+    ],
 })
 export class ContentSelectorItemComponent {
     public readonly metaFields = META_FIELDS;

@@ -17,14 +17,14 @@ import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, Schema
     styleUrls: ['./schema-scripts-form.component.scss'],
     templateUrl: './schema-scripts-form.component.html',
     imports: [
-    AsyncPipe,
-    CodeEditorComponent,
-    FormsModule,
-    KeysPipe,
-    ReactiveFormsModule,
-    ScriptNamePipe,
-    TranslatePipe
-],
+        AsyncPipe,
+        CodeEditorComponent,
+        FormsModule,
+        KeysPipe,
+        ReactiveFormsModule,
+        ScriptNamePipe,
+        TranslatePipe,
+    ],
 })
 export class SchemaScriptsFormComponent {
     @Input()

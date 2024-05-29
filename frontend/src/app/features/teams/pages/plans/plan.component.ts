@@ -17,13 +17,13 @@ import { TeamPlansState } from '../../internal';
     templateUrl: './plan.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    ConfirmClickDirective,
-    FileSizePipe,
-    FormHintComponent,
-    KNumberPipe,
-    TranslatePipe
-],
+        AsyncPipe,
+        ConfirmClickDirective,
+        FileSizePipe,
+        FormHintComponent,
+        KNumberPipe,
+        TranslatePipe,
+    ],
 })
 export class PlanComponent {
     @Input({ required: true })

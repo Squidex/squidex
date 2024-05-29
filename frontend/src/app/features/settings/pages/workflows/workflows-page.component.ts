@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowDto, WorkflowsState } from '@app/shared';
+import { LayoutComponent, ListViewComponent, RolesState, SchemaTagSource, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, WorkflowsState } from '@app/shared';
 import { WorkflowAddFormComponent } from './workflow-add-form.component';
 import { WorkflowComponent } from './workflow.component';
 
@@ -18,21 +18,21 @@ import { WorkflowComponent } from './workflow.component';
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html',
     imports: [
-    AsyncPipe,
-    LayoutComponent,
-    ListViewComponent,
-    RouterLink,
-    RouterLinkActive,
-    RouterOutlet,
-    ShortcutDirective,
-    SidebarMenuDirective,
-    TitleComponent,
-    TooltipDirective,
-    TourStepDirective,
-    TranslatePipe,
-    WorkflowAddFormComponent,
-    WorkflowComponent
-],
+        AsyncPipe,
+        LayoutComponent,
+        ListViewComponent,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
+        WorkflowAddFormComponent,
+        WorkflowComponent,
+    ],
 })
 export class WorkflowsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
@@ -60,9 +60,5 @@ export class WorkflowsPageComponent implements OnInit {
 
     public reload() {
         this.workflowsState.load(true);
-    }
-
-    public trackByWorkflow(_index: number, workflow: WorkflowDto) {
-        return workflow.id;
     }
 }

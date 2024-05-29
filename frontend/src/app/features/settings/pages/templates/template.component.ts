@@ -17,13 +17,13 @@ import { AppsState, ClientsState, FormHintComponent, LoaderComponent, MarkdownPi
     templateUrl: './template.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    FormHintComponent,
-    LoaderComponent,
-    MarkdownPipe,
-    SafeHtmlPipe,
-    TranslatePipe
-],
+        AsyncPipe,
+        FormHintComponent,
+        LoaderComponent,
+        MarkdownPipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class TemplateComponent {
     @Input({ required: true })

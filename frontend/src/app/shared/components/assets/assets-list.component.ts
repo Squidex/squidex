@@ -25,16 +25,16 @@ interface State {
     templateUrl: './assets-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AssetComponent,
-    AssetFolderComponent,
-    AsyncPipe,
-    CdkDrag,
-    CdkDropList,
-    CdkDropListGroup,
-    FileDropDirective,
-    TourStepDirective,
-    TranslatePipe
-],
+        AssetComponent,
+        AssetFolderComponent,
+        AsyncPipe,
+        CdkDrag,
+        CdkDropList,
+        CdkDropListGroup,
+        FileDropDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class AssetsListComponent extends StatefulComponent<State> {
     @Output()
@@ -126,13 +126,5 @@ export class AssetsListComponent extends StatefulComponent<State> {
 
     public canEnter(drag: CdkDrag, drop: CdkDropList) {
         return drag.data.id !== drop.data;
-    }
-
-    public trackByAssetFolder(_index: number, asset: AssetFolderDto) {
-        return asset.id;
-    }
-
-    public trackByAsset(_index: number, asset: AssetDto) {
-        return asset.id;
     }
 }

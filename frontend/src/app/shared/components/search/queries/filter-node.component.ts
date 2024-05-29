@@ -18,9 +18,9 @@ import { FilterLogicalComponent } from './filter-logical.component';
     templateUrl: './filter-node.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    forwardRef(() => FilterComparisonComponent),
-    forwardRef(() => FilterLogicalComponent)
-],
+        forwardRef(() => FilterComparisonComponent),
+        forwardRef(() => FilterLogicalComponent),
+    ],
 })
 export class FilterNodeComponent {
     public comparison?: FilterComparison;

@@ -21,12 +21,12 @@ import { SidebarMenuDirective } from './template.directive';
     templateUrl: './layout.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    NgTemplateOutlet,
-    RouterLink,
-    StopClickDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        NgTemplateOutlet,
+        RouterLink,
+        StopClickDirective,
+        TranslatePipe,
+    ],
 })
 export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     private widthPrevious?: string;

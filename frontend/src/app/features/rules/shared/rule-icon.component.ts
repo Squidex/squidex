@@ -16,8 +16,8 @@ import { RuleElementMetadataDto, SafeHtmlPipe } from '@app/shared';
     templateUrl: './rule-icon.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    SafeHtmlPipe
-],
+        SafeHtmlPipe,
+    ],
 })
 export class RuleIconComponent {
     @Input({ required: true })

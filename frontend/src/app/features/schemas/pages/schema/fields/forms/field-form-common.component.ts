@@ -16,13 +16,13 @@ import { ControlErrorsComponent, FieldDto, FormHintComponent, SchemaDto, TagEdit
     styleUrls: ['./field-form-common.component.scss'],
     templateUrl: './field-form-common.component.html',
     imports: [
-    ControlErrorsComponent,
-    FormHintComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TagEditorComponent,
-    TranslatePipe
-],
+        ControlErrorsComponent,
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class FieldFormCommonComponent {
     @Input({ required: true })

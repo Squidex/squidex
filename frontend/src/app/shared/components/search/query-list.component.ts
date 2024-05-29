@@ -17,9 +17,9 @@ import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
     templateUrl: './query-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    StopClickDirective,
-    TranslatePipe
-],
+        StopClickDirective,
+        TranslatePipe,
+    ],
 })
 export class QueryListComponent {
     @Output()
@@ -42,9 +42,5 @@ export class QueryListComponent {
 
     public isSelectedQuery(saved: SavedQuery) {
         return equalsQuery(saved.query, this.queryUsed);
-    }
-
-    public trackByQuery(_index: number, query: SavedQuery) {
-        return query.name;
     }
 }

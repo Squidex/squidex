@@ -15,7 +15,7 @@
                     @if (languagesState.canCreate | async) {
                         <sqx-language-add-form [newLanguages]="(languagesState.newLanguages | async)!"></sqx-language-add-form>
                     }
-                    @for (languageInfo of languages; track trackByLanguage($index, languageInfo)) {
+                    @for (languageInfo of languages; track languageInfo.language.iso2Code) {
                         <sqx-language
                             [language]="languageInfo.language"
                             [fallbackLanguages]="languageInfo.fallbackLanguages"

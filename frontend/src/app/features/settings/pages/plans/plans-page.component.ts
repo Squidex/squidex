@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ApiUrlConfig, ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownPipe, NotifoComponent, PlanDto, PlansState, SafeHtmlPipe, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UserNamePipe } from '@app/shared';
+import { ApiUrlConfig, ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownPipe, NotifoComponent, PlansState, SafeHtmlPipe, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UserNamePipe } from '@app/shared';
 import { PlanComponent } from './plan.component';
 
 @Component({
@@ -17,26 +17,26 @@ import { PlanComponent } from './plan.component';
     styleUrls: ['./plans-page.component.scss'],
     templateUrl: './plans-page.component.html',
     imports: [
-    AsyncPipe,
-    ExternalLinkDirective,
-    FormHintComponent,
-    LayoutComponent,
-    ListViewComponent,
-    MarkdownPipe,
-    NotifoComponent,
-    PlanComponent,
-    RouterLink,
-    RouterLinkActive,
-    RouterOutlet,
-    SafeHtmlPipe,
-    ShortcutDirective,
-    SidebarMenuDirective,
-    TitleComponent,
-    TooltipDirective,
-    TourStepDirective,
-    TranslatePipe,
-    UserNamePipe
-],
+        AsyncPipe,
+        ExternalLinkDirective,
+        FormHintComponent,
+        LayoutComponent,
+        ListViewComponent,
+        MarkdownPipe,
+        NotifoComponent,
+        PlanComponent,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        SafeHtmlPipe,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
+        UserNamePipe,
+    ],
 })
 export class PlansPageComponent implements OnInit {
     private overridePlanId?: string;
@@ -61,9 +61,5 @@ export class PlansPageComponent implements OnInit {
 
     public reload() {
         this.plansState.load(true, this.overridePlanId);
-    }
-
-    public trackByPlan(_index: number, planInfo: { plan: PlanDto }) {
-        return planInfo.plan.id;
     }
 }

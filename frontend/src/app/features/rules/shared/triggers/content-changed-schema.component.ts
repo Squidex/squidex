@@ -18,14 +18,14 @@ import { CompletionsCache } from './completions-cache';
     styleUrls: ['./content-changed-schema.component.scss'],
     templateUrl: './content-changed-schema.component.html',
     imports: [
-    AsyncPipe,
-    CodeEditorComponent,
-    ConfirmClickDirective,
-    ControlErrorsComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        AsyncPipe,
+        CodeEditorComponent,
+        ConfirmClickDirective,
+        ControlErrorsComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class ContentChangedSchemaComponent {
     @Input({ required: true })
@@ -50,9 +50,5 @@ export class ContentChangedSchemaComponent {
                 value$(this.form.controls['schemaId']).pipe(
                     switchMap(x => this.completionsCache.getCompletions(x, true)));
         }
-    }
-
-    public trackBySchema(_index: number, schema: SchemaDto) {
-        return schema.id;
     }
 }

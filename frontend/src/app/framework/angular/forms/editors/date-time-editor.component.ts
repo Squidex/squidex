@@ -38,12 +38,12 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    ResizedDirective,
-    TooltipDirective,
-    TranslatePipe
-],
+        FormsModule,
+        ReactiveFormsModule,
+        ResizedDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements OnInit, AfterViewInit, FocusComponent {
     private readonly subscriptions = new Subscriptions();

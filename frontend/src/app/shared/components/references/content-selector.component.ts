@@ -26,21 +26,21 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
         ComponentContentsState,
     ],
     imports: [
-    AsyncPipe,
-    ContentListCellDirective,
-    ContentListHeaderComponent,
-    ContentListWidthDirective,
-    ContentSelectorItemComponent,
-    FormsModule,
-    LanguageSelectorComponent,
-    ListViewComponent,
-    ModalDialogComponent,
-    PagerComponent,
-    SyncWidthDirective,
-    TooltipDirective,
-    TranslatePipe,
-    forwardRef(() => SearchFormComponent)
-],
+        AsyncPipe,
+        ContentListCellDirective,
+        ContentListHeaderComponent,
+        ContentListWidthDirective,
+        ContentSelectorItemComponent,
+        FormsModule,
+        LanguageSelectorComponent,
+        ListViewComponent,
+        ModalDialogComponent,
+        PagerComponent,
+        SyncWidthDirective,
+        TooltipDirective,
+        TranslatePipe,
+        forwardRef(() => SearchFormComponent),
+    ],
 })
 export class ContentSelectorComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
@@ -196,9 +196,5 @@ export class ContentSelectorComponent implements OnInit {
 
     private updateModel() {
         this.querySource.next(this.schema);
-    }
-
-    public trackByContent(_index: number, content: ContentDto): string {
-        return content.id;
     }
 }

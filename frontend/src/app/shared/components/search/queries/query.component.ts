@@ -19,10 +19,10 @@ import { SortingComponent } from './sorting.component';
     templateUrl: './query.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FilterLogicalComponent,
-    SortingComponent,
-    TranslatePipe
-],
+        FilterLogicalComponent,
+        SortingComponent,
+        TranslatePipe,
+    ],
 })
 export class QueryComponent {
     @Output()

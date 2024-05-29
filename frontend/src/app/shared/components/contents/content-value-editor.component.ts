@@ -18,13 +18,13 @@ import { FieldDto, MathHelper } from '@app/shared/internal';
     templateUrl: './content-value-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FormsModule,
-    IndeterminateValueDirective,
-    ReactiveFormsModule,
-    StarsComponent,
-    ToggleComponent,
-    TransformInputDirective
-],
+        FormsModule,
+        IndeterminateValueDirective,
+        ReactiveFormsModule,
+        StarsComponent,
+        ToggleComponent,
+        TransformInputDirective,
+    ],
 })
 export class ContentValueEditorComponent {
     @Input({ required: true })

@@ -25,10 +25,10 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    ScrollActiveDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        ScrollActiveDirective,
+        TranslatePipe,
+    ],
 })
 export class TourGuideComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

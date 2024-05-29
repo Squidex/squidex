@@ -21,17 +21,17 @@ const ITEM_HEIGHT = 2.5;
     templateUrl: './schema-category.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    CdkDrag,
-    CdkDragHandle,
-    CdkDropList,
-    EditableTitleComponent,
-    RouterLink,
-    RouterLinkActive,
-    StopDragDirective,
-    TooltipDirective,
-    TourStepDirective,
-    TranslatePipe
-],
+        CdkDrag,
+        CdkDragHandle,
+        CdkDropList,
+        EditableTitleComponent,
+        RouterLink,
+        RouterLinkActive,
+        StopDragDirective,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class SchemaCategoryComponent {
     @Output()
@@ -110,14 +110,6 @@ export class SchemaCategoryComponent {
 
     public getContainerHeight() {
         return `${ITEM_HEIGHT * this.schemas.length}rem`;
-    }
-
-    public trackBySchema(_index: number, schema: SchemaDto) {
-        return schema.id;
-    }
-
-    public trackByCategory(_index: number, category: SchemaCategory) {
-        return category.name;
     }
 
     private isCollapsedKey(): string {

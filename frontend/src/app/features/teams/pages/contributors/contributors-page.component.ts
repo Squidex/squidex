@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ContributorDto, LayoutComponent, ListViewComponent, NotifoComponent, PagerComponent, Router2State, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { LayoutComponent, ListViewComponent, NotifoComponent, PagerComponent, Router2State, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamContributorsState } from '../../internal';
 import { ContributorAddFormComponent } from './contributor-add-form.component';
 import { ContributorComponent } from './contributor.component';
@@ -23,24 +23,24 @@ import { ContributorComponent } from './contributor.component';
         Router2State,
     ],
     imports: [
-    AsyncPipe,
-    ContributorAddFormComponent,
-    ContributorComponent,
-    FormsModule,
-    LayoutComponent,
-    ListViewComponent,
-    NotifoComponent,
-    PagerComponent,
-    RouterLink,
-    RouterLinkActive,
-    RouterOutlet,
-    ShortcutDirective,
-    SidebarMenuDirective,
-    TitleComponent,
-    TooltipDirective,
-    TourStepDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        ContributorAddFormComponent,
+        ContributorComponent,
+        FormsModule,
+        LayoutComponent,
+        ListViewComponent,
+        NotifoComponent,
+        PagerComponent,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class ContributorsPageComponent implements OnInit {
     constructor(
@@ -65,9 +65,5 @@ export class ContributorsPageComponent implements OnInit {
 
     public search(query: string) {
         this.contributorsState.search(query);
-    }
-
-    public trackByContributor(_index: number, contributor: ContributorDto) {
-        return contributor.contributorId;
     }
 }

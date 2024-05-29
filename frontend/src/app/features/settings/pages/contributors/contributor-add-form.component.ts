@@ -49,16 +49,16 @@ export class UsersDataSource implements AutocompleteSource {
         UsersDataSource,
     ],
     imports: [
-    AsyncPipe,
-    AutocompleteComponent,
-    FormHintComponent,
-    FormsModule,
-    ImportContributorsDialogComponent,
-    ModalDirective,
-    ReactiveFormsModule,
-    TranslatePipe,
-    UserDtoPicture
-],
+        AsyncPipe,
+        AutocompleteComponent,
+        FormHintComponent,
+        FormsModule,
+        ImportContributorsDialogComponent,
+        ModalDirective,
+        ReactiveFormsModule,
+        TranslatePipe,
+        UserDtoPicture,
+    ],
 })
 export class ContributorAddFormComponent {
     private defaultValue: any;

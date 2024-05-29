@@ -17,13 +17,13 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     styleUrls: ['./schema-fields.component.scss'],
     templateUrl: './schema-fields.component.html',
     imports: [
-    AsyncPipe,
-    FieldWizardComponent,
-    ModalDirective,
-    TourStepDirective,
-    TranslatePipe,
-    forwardRef(() => SortableFieldListComponent)
-],
+        AsyncPipe,
+        FieldWizardComponent,
+        ModalDirective,
+        TourStepDirective,
+        TranslatePipe,
+        forwardRef(() => SortableFieldListComponent),
+    ],
 })
 export class SchemaFieldsComponent implements OnInit {
     @Input({ required: true })

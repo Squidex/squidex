@@ -36,11 +36,11 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    ColorPickerModule,
-    FormsModule,
-    ModalDirective,
-    ModalPlacementDirective
-],
+        ColorPickerModule,
+        FormsModule,
+        ModalDirective,
+        ModalPlacementDirective,
+    ],
 })
 export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {
     private wasOpen = false;

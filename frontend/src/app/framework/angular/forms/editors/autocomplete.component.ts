@@ -54,17 +54,17 @@ const NO_EMIT = { emitEvent: false };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    DropdownMenuComponent,
-    FocusOnInitDirective,
-    FormsModule,
-    LoaderComponent,
-    ModalDirective,
-    ModalPlacementDirective,
-    ReactiveFormsModule,
-    ScrollActiveDirective,
-    StopClickDirective,
-    TemplateWrapperDirective
-],
+        DropdownMenuComponent,
+        FocusOnInitDirective,
+        FormsModule,
+        LoaderComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        ReactiveFormsModule,
+        ScrollActiveDirective,
+        StopClickDirective,
+        TemplateWrapperDirective,
+    ],
 })
 export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
     private readonly subscriptions = new Subscriptions();

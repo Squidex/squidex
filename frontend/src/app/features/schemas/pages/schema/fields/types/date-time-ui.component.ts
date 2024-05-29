@@ -16,13 +16,13 @@ import { DATETIME_FIELD_EDITORS, DateTimeFieldPropertiesDto, FieldDto, FloatConv
     styleUrls: ['date-time-ui.component.scss'],
     templateUrl: 'date-time-ui.component.html',
     imports: [
-    FormHintComponent,
-    FormsModule,
-    MarkdownInlinePipe,
-    ReactiveFormsModule,
-    SafeHtmlPipe,
-    TranslatePipe
-],
+        FormHintComponent,
+        FormsModule,
+        MarkdownInlinePipe,
+        ReactiveFormsModule,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class DateTimeUIComponent {
     public readonly converter = FloatConverter.INSTANCE;

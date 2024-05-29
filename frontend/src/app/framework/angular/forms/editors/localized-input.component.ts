@@ -35,12 +35,12 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    DateTimeEditorComponent,
-    FormsModule,
-    IndeterminateValueDirective,
-    LanguageSelectorComponent,
-    TagEditorComponent
-],
+        DateTimeEditorComponent,
+        FormsModule,
+        IndeterminateValueDirective,
+        LanguageSelectorComponent,
+        TagEditorComponent,
+    ],
 })
 export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {
     private value: { [key: string]: any } | undefined;

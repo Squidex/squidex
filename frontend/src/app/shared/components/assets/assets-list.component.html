@@ -26,7 +26,7 @@
                             <sqx-asset-folder [assetPathItem]="parent" (navigate)="assetsState.navigate($event.id)"></sqx-asset-folder>
                         </div>
                     }
-                    @for (assetFolder of assetsState.folders | async; track trackByAssetFolder($index, assetFolder)) {
+                    @for (assetFolder of assetsState.folders | async; track assetFolder.id) {
                         <div
                             class="folder-container"
                             [cdkDropListEnterPredicate]="canEnter"
@@ -61,7 +61,7 @@
                         (loadDone)="add(file, $event)"
                         (loadError)="remove(file)"></sqx-asset>
                 }
-                @for (asset of assets; track trackByAsset($index, asset)) {
+                @for (asset of assets; track asset.id) {
                     <sqx-asset
                         [asset]="asset"
                         [cdkDragData]="asset"

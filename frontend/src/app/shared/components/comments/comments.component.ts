@@ -21,14 +21,14 @@ import { CommentComponent } from './comment.component';
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
     imports: [
-    AsyncPipe,
-    CommentComponent,
-    FormsModule,
-    MentionModule,
-    ReactiveFormsModule,
-    ResizedDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        CommentComponent,
+        FormsModule,
+        MentionModule,
+        ReactiveFormsModule,
+        ResizedDirective,
+        TranslatePipe,
+    ],
 })
 export class CommentsComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
@@ -89,9 +89,5 @@ export class CommentsComponent implements OnInit {
         setTimeout(() => {
             this.reference = undefined;
         }, 100);
-    }
-
-    public trackByComment(_: number, item: { index: number }) {
-        return item.index;
     }
 }

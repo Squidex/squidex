@@ -26,8 +26,8 @@ interface State {
     templateUrl: './control-errors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    ControlErrorsMessagesComponent
-],
+        ControlErrorsMessagesComponent,
+    ],
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements  OnDestroy {
     private readonly subscriptions = new Subscriptions();

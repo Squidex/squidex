@@ -17,10 +17,10 @@ import { TeamDto, TranslatePipe } from '@app/shared';
     templateUrl: './settings-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    RouterLink,
-    RouterLinkActive,
-    TranslatePipe
-],
+        RouterLink,
+        RouterLinkActive,
+        TranslatePipe,
+    ],
 })
 export class SettingsMenuComponent {
     @Input({ required: true })

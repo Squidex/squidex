@@ -17,15 +17,15 @@ import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, C
     styleUrls: ['./schema-preview-urls-form.component.scss'],
     templateUrl: './schema-preview-urls-form.component.html',
     imports: [
-    AsyncPipe,
-    CodeEditorComponent,
-    ConfirmClickDirective,
-    ControlErrorsComponent,
-    FormAlertComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        AsyncPipe,
+        CodeEditorComponent,
+        ConfirmClickDirective,
+        ControlErrorsComponent,
+        FormAlertComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class SchemaPreviewUrlsFormComponent implements OnInit {
     @Input()

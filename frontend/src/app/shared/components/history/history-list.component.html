@@ -1,5 +1,5 @@
 @if (events) {
-    @for (event of events; track trackByEvent($index, event)) {
+    @for (event of events; track event.eventId) {
         <div class="event row g-0">
             <div class="col-auto">
                 <img class="user-picture" [src]="event.actor | sqxUserPictureRef" title="{{ event.actor | sqxUserNameRef }}" />

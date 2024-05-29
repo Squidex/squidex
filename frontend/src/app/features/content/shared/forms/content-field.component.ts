@@ -180,10 +180,6 @@ export class ContentFieldComponent {
         return this.formModelCompare?.get(this.language.iso2Code);
     }
 
-    public trackByLanguage(_index: number, language: AppLanguageDto) {
-        return language.iso2Code;
-    }
-
     private showAllControlsKey() {
         return Settings.Local.FIELD_ALL(this.schema?.id, this.formModel.field.fieldId);
     }

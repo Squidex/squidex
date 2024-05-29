@@ -32,11 +32,11 @@ interface State {
     styleUrls: ['./chat-item.component.scss'],
     templateUrl: './chat-item.component.html',
     imports: [
-    MarkdownDirective,
-    ResizedDirective,
-    TranslatePipe,
-    UserIdPicturePipe
-],
+        MarkdownDirective,
+        ResizedDirective,
+        TranslatePipe,
+        UserIdPicturePipe,
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatItemComponent extends StatefulComponent<State> {

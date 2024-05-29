@@ -21,10 +21,10 @@ export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
     templateUrl: './pager.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FormsModule,
-    TooltipDirective,
-    TranslatePipe
-],
+        FormsModule,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class PagerComponent {
     @Output()

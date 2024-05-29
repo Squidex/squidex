@@ -94,10 +94,7 @@
                                                     class="form-select fallback-select"
                                                     [(ngModel)]="otherLanguage"
                                                     name="otherLanguage">
-                                                    @for (
-                                                        otherLanguage of fallbackLanguagesNew;
-                                                        track trackByLanguage($index, otherLanguage)
-                                                    ) {
+                                                    @for (otherLanguage of fallbackLanguagesNew; track language.iso2Code) {
                                                         <option [ngValue]="otherLanguage">
                                                             {{ otherLanguage.englishName || otherLanguage.iso2Code }}
                                                         </option>

@@ -111,7 +111,7 @@
                                 {{ "roles.propertiesDescription" | sqxTranslate }}
                             </sqx-form-hint>
                             <div class="row g-0 rule-section">
-                                @for (property of propertiesSimple; track trackByProperty($index, property)) {
+                                @for (property of propertiesSimple; track property.key) {
                                     <div class="form-check col-6">
                                         <input
                                             class="form-check-input"
@@ -132,7 +132,7 @@
                                     <h5>{{ "common.schemas" | sqxTranslate }}</h5>
                                     <div class="row g-0 rule-section">
                                         <div class="col-6">
-                                            @for (schema of schemas | slice: 0 : halfSchemas; track trackBySchema($index, schema)) {
+                                            @for (schema of schemas | slice: 0 : halfSchemas; track schema.id) {
                                                 <div class="form-check">
                                                     <input
                                                         class="form-check-input"
@@ -154,7 +154,7 @@
                                             }
                                         </div>
                                         <div class="col-6">
-                                            @for (schema of schemas | slice: halfSchemas; track trackBySchema($index, schema)) {
+                                            @for (schema of schemas | slice: halfSchemas; track schema.id) {
                                                 <div class="form-check">
                                                     <input
                                                         class="form-check-input"

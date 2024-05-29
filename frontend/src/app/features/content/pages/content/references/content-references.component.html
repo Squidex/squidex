@@ -2,7 +2,7 @@
     <ng-container>
         @if (contentsState.contents | async; as contents) {
             <table class="table table-items table-fixed">
-                @for (content of contents; track trackByContent($index, content)) {
+                @for (content of contents; track content.id) {
                     <tbody
                         [sqxReferenceItem]="content"
                         [canRemove]="false"

@@ -16,12 +16,12 @@ import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, Numb
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
     imports: [
-    FormHintComponent,
-    FormsModule,
-    LocalizedInputComponent,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class NumberValidationComponent {
     @Input({ required: true })

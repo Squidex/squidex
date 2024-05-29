@@ -56,8 +56,4 @@ export class AssetTagsComponent {
         this.tagRenaming = tag;
         this.tagRenameDialog.show();
     }
-
-    public trackByTag(_index: number, tag: TagItem) {
-        return tag.name;
-    }
 }

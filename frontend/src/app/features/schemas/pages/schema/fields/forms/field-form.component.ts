@@ -20,12 +20,12 @@ import { FieldFormValidationComponent } from './field-form-validation.component'
     styleUrls: ['./field-form.component.scss'],
     templateUrl: './field-form.component.html',
     imports: [
-    FieldFormCommonComponent,
-    FieldFormUIComponent,
-    FieldFormValidationComponent,
-    JsonMoreComponent,
-    TranslatePipe
-],
+        FieldFormCommonComponent,
+        FieldFormUIComponent,
+        FieldFormValidationComponent,
+        JsonMoreComponent,
+        TranslatePipe,
+    ],
 })
 export class FieldFormComponent implements AfterViewInit {
     @Input({ transform: booleanAttribute })

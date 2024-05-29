@@ -17,10 +17,10 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
     styleUrls: ['./asset-folder-dropdown-item.component.scss'],
     templateUrl: './asset-folder-dropdown-item.component.html',
     imports: [
-    LoaderComponent,
-    StopClickDirective,
-    TranslatePipe
-],
+        LoaderComponent,
+        StopClickDirective,
+        TranslatePipe,
+    ],
 })
 export class AssetFolderDropdownItemComponent {
     @Input({ required: true })
@@ -95,9 +95,5 @@ export class AssetFolderDropdownItemComponent {
                     }, 250);
                 },
             });
-    }
-
-    public trackByNode(_index: number, node: AssetFolderDropdowNode) {
-        return node.item.id;
     }
 }

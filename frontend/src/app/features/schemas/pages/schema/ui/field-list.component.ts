@@ -19,11 +19,11 @@ const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELD
     templateUrl: './field-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    CdkDrag,
-    CdkDropList,
-    FormAlertComponent,
-    TranslatePipe
-],
+        CdkDrag,
+        CdkDropList,
+        FormAlertComponent,
+        TranslatePipe,
+    ],
 })
 export class FieldListComponent {
     @Input()

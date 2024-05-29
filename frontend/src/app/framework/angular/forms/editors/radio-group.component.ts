@@ -30,9 +30,9 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FormsModule,
-    ResizedDirective
-],
+        FormsModule,
+        ResizedDirective,
+    ],
 })
 export class RadioGroupComponent extends StatefulControlComponent<State, string> implements AfterViewInit, AfterViewChecked {
     private readonly textMeasurer: TextMeasurer;
@@ -134,9 +134,5 @@ export class RadioGroupComponent extends StatefulControlComponent<State, string>
 
     public writeValue(obj: any) {
         this.valueModel = obj;
-    }
-
-    public trackByValue(_index: number, tag: TagValue) {
-        return tag.id;
     }
 }

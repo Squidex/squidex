@@ -1,4 +1,4 @@
-@for (cursor of otherCursor | async; track trackByUser($index, cursor)) {
+@for (cursor of otherCursor | async; track cursor.user.id) {
     <div
         class="cursor"
         [style.left]="sizeInPx(cursor.cursor.x)"

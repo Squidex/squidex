@@ -16,14 +16,14 @@ import { ControlErrorsComponent, EditSchemaForm, FormAlertComponent, FormHintCom
     styleUrls: ['./schema-edit-form.component.scss'],
     templateUrl: './schema-edit-form.component.html',
     imports: [
-    ControlErrorsComponent,
-    FormAlertComponent,
-    FormHintComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TagEditorComponent,
-    TranslatePipe
-],
+        ControlErrorsComponent,
+        FormAlertComponent,
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class SchemaEditFormComponent {
     @Input({ required: true })

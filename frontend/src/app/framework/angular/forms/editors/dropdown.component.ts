@@ -47,17 +47,17 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    DropdownMenuComponent,
-    FocusOnInitDirective,
-    FormsModule,
-    LoaderComponent,
-    ModalDirective,
-    ModalPlacementDirective,
-    ReactiveFormsModule,
-    ScrollActiveDirective,
-    TemplateWrapperDirective,
-    TranslatePipe
-],
+        DropdownMenuComponent,
+        FocusOnInitDirective,
+        FormsModule,
+        LoaderComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        ReactiveFormsModule,
+        ScrollActiveDirective,
+        TemplateWrapperDirective,
+        TranslatePipe,
+    ],
 })
 export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnInit {
     private readonly subscriptions = new Subscriptions();

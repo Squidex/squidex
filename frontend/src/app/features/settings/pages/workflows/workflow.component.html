@@ -95,7 +95,7 @@
                             </sqx-form-hint>
                         </div>
                     </div>
-                    @for (step of workflow.steps; track trackByStep($index, step)) {
+                    @for (step of workflow.steps; track step.name) {
                         <sqx-workflow-step
                             [step]="step"
                             [workflow]="workflow"

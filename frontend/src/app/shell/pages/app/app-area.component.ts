@@ -17,12 +17,12 @@ import { LeftMenuComponent } from './left-menu.component';
     styleUrls: ['./app-area.component.scss'],
     templateUrl: './app-area.component.html',
     imports: [
-    AsyncPipe,
-    LayoutContainerDirective,
-    LeftMenuComponent,
-    RouterOutlet,
-    TitleComponent
-],
+        AsyncPipe,
+        LayoutContainerDirective,
+        LeftMenuComponent,
+        RouterOutlet,
+        TitleComponent,
+    ],
 })
 export class AppAreaComponent {
     public selectedApp = this.appsState.selectedApp.pipe(defined());

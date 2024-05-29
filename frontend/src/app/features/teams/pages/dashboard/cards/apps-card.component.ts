@@ -22,10 +22,10 @@ interface State {
     templateUrl: './apps-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    RouterLink,
-    StopClickDirective,
-    TranslatePipe
-],
+        RouterLink,
+        StopClickDirective,
+        TranslatePipe,
+    ],
 })
 export class AppsCardComponent extends StatefulComponent<State> implements OnInit {
     @Input({ required: true })

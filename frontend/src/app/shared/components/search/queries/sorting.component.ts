@@ -18,9 +18,9 @@ import { QueryPathComponent } from './query-path.component';
     templateUrl: './sorting.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FormsModule,
-    QueryPathComponent
-],
+        FormsModule,
+        QueryPathComponent,
+    ],
 })
 export class SortingComponent {
     @Output()

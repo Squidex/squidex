@@ -21,7 +21,7 @@
 }
 
 <div class="row gx-1" [class.hidden]="snapshot.isCollapsed && !formCompare">
-    @for (field of formSection.fields; track trackByField($index, field)) {
+    @for (field of formSection.fields; track field.field.fieldId) {
         <sqx-content-field
             [form]="form"
             [formCompare]="formCompare"

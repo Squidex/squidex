@@ -43,7 +43,7 @@
     </div>
 
     <div class="step-inner">
-        @for (transition of transitions; track trackByTransition($index, transition)) {
+        @for (transition of transitions; track transition.to) {
             <sqx-workflow-transition
                 [transition]="transition"
                 [disabled]="disabled"

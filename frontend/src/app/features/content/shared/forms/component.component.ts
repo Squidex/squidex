@@ -94,8 +94,4 @@ export class ComponentComponent {
     public setSchema(schema: SchemaDto) {
         this.formModel.selectSchema(schema.id);
     }
-
-    public trackBySection(_index: number, section: FieldSection<FieldDto, any>) {
-        return section.separator?.fieldId;
-    }
 }

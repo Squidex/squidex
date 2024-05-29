@@ -16,11 +16,11 @@ import { FieldDto, FormHintComponent, REFERENCES_FIELD_EDITORS, ReferencesFieldP
     styleUrls: ['references-ui.component.scss'],
     templateUrl: 'references-ui.component.html',
     imports: [
-    FormHintComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class ReferencesUIComponent {
     public readonly editors = REFERENCES_FIELD_EDITORS;

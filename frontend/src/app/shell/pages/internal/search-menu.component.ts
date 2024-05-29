@@ -42,14 +42,14 @@ export class SearchSource implements AutocompleteSource {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    AutocompleteComponent_1,
-    FormsModule,
-    ShortcutComponent,
-    ShortcutDirective,
-    TooltipDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        AutocompleteComponent_1,
+        FormsModule,
+        ShortcutComponent,
+        ShortcutDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class SearchMenuComponent {
     @ViewChild(AutocompleteComponent, { static: false })

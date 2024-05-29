@@ -16,13 +16,13 @@ import { AssetsFieldPropertiesDto, FieldDto, FormHintComponent, LanguageDto, Loc
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html',
     imports: [
-    FormHintComponent,
-    FormsModule,
-    LocalizedInputComponent,
-    ReactiveFormsModule,
-    TagEditorComponent,
-    TranslatePipe
-],
+        FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class AssetsValidationComponent {
     @Input({ required: true })

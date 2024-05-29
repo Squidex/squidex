@@ -142,7 +142,7 @@
         <div class="section">
             <h3 class="bordered">{{ "common.history" | sqxTranslate }}</h3>
 
-            @for (event of contentEvents | async; track trackByEvent($index, event)) {
+            @for (event of contentEvents | async; track event.eventId) {
                 <sqx-content-event
                     [content]="content"
                     [event]="event"

@@ -17,13 +17,13 @@ import { RuleIconComponent } from './rule-icon.component';
     templateUrl: './rule-element.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    DarkenPipe,
-    ExternalLinkDirective,
-    HoverBackgroundDirective,
-    RuleIconComponent,
-    StopClickDirective,
-    TranslatePipe
-],
+        DarkenPipe,
+        ExternalLinkDirective,
+        HoverBackgroundDirective,
+        RuleIconComponent,
+        StopClickDirective,
+        TranslatePipe,
+    ],
 })
 export class RuleElementComponent {
     @Input({ required: true })

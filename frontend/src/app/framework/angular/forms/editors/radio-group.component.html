@@ -1,5 +1,5 @@
 <div #container (sqxResized)="updateContainerWidth($event.width)">
-    @for (value of tagValues; track trackByValue($index, value)) {
+    @for (value of tagValues; track value.id) {
         <div class="form-check" [class.form-check-block]="!snapshot.isSingleline" [class.form-check-inline]="snapshot.isSingleline">
             <input
                 class="form-check-input"

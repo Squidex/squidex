@@ -23,7 +23,7 @@
                             </div>
                         }
                         <div class="team-body" [class.padded]="group.team">
-                            @for (app of group.apps; track trackByApp($index, app)) {
+                            @for (app of group.apps; track app.id) {
                                 <sqx-app [app]="app" (leave)="leaveApp($event)"></sqx-app>
                             }
                             @if (group.apps.length === 0) {

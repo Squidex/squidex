@@ -235,8 +235,4 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
 
         this.callTouched();
     }
-
-    public trackByAsset(_index: number, asset: AssetDto) {
-        return asset.id;
-    }
 }

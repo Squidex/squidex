@@ -17,17 +17,17 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
     styleUrls: ['./asset-folder-dialog.component.scss'],
     templateUrl: './asset-folder-dialog.component.html',
     imports: [
-    AsyncPipe,
-    ControlErrorsComponent,
-    FocusOnInitDirective,
-    FormAlertComponent,
-    FormErrorComponent,
-    FormsModule,
-    ModalDialogComponent,
-    ReactiveFormsModule,
-    TooltipDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        ControlErrorsComponent,
+        FocusOnInitDirective,
+        FormAlertComponent,
+        FormErrorComponent,
+        FormsModule,
+        ModalDialogComponent,
+        ReactiveFormsModule,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class AssetFolderDialogComponent implements OnInit {
     @Output()

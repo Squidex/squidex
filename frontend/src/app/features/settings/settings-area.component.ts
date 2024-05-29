@@ -17,12 +17,12 @@ import { SettingsMenuComponent } from './settings-menu.component';
     styleUrls: ['./settings-area.component.scss'],
     templateUrl: './settings-area.component.html',
     imports: [
-    AsyncPipe,
-    LayoutComponent,
-    RouterOutlet,
-    SettingsMenuComponent,
-    TitleComponent
-],
+        AsyncPipe,
+        LayoutComponent,
+        RouterOutlet,
+        SettingsMenuComponent,
+        TitleComponent,
+    ],
 })
 export class SettingsAreaComponent {
     public selectedApp = this.appsState.selectedApp.pipe(defined());

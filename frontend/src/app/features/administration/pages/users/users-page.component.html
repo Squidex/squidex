@@ -50,7 +50,7 @@
             <ng-container>
                 @if (usersState.users | async; as users) {
                     <table class="table table-items table-fixed" [sqxSyncWidth]="header">
-                        @for (user of users; track trackByUser($index, user)) {
+                        @for (user of users; track user.id) {
                             <tbody [sqxUser]="user"></tbody>
                         }
                     </table>

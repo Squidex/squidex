@@ -16,14 +16,14 @@ import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, Refe
     styleUrls: ['references-validation.component.scss'],
     templateUrl: 'references-validation.component.html',
     imports: [
-    AsyncPipe,
-    FormHintComponent,
-    FormsModule,
-    LocalizedInputComponent,
-    ReactiveFormsModule,
-    TagEditorComponent,
-    TranslatePipe
-],
+        AsyncPipe,
+        FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class ReferencesValidationComponent {
     @Input({ required: true })

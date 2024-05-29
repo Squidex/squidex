@@ -18,9 +18,9 @@ import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from
     templateUrl: './api-calls-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    NgChartsModule,
-    TranslatePipe
-],
+        NgChartsModule,
+        TranslatePipe,
+    ],
 })
 export class ApiCallsCardComponent {
     @Input()

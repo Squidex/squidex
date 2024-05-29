@@ -16,9 +16,9 @@
         </form>
     </div>
     <div class="comments-list" #scrollContainer>
-        @for (item of commentsItems | async; track trackByComment($index, item)) {
+        @for (comment of commentsItems | async; track comment.index) {
             <sqx-comment
-                [commentItem]="item"
+                [commentItem]="comment"
                 [comments]="commentsState"
                 [currenUrl]="router.url"
                 [mentionConfig]="mentionConfig"

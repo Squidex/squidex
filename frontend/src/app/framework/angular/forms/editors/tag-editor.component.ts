@@ -47,17 +47,17 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    DropdownMenuComponent,
-    FormsModule,
-    LoaderComponent,
-    ModalDirective,
-    ModalPlacementDirective,
-    ReactiveFormsModule,
-    ScrollActiveDirective,
-    StopClickDirective,
-    TooltipDirective,
-    TranslatePipe
-],
+        DropdownMenuComponent,
+        FormsModule,
+        LoaderComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        ReactiveFormsModule,
+        ScrollActiveDirective,
+        StopClickDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();

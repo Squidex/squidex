@@ -21,12 +21,12 @@ interface State {
     templateUrl: './content-value.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    LongHoverDirective,
-    ModalDirective,
-    ModalPlacementDirective,
-    StopClickDirective,
-    TooltipDirective
-],
+        LongHoverDirective,
+        ModalDirective,
+        ModalPlacementDirective,
+        StopClickDirective,
+        TooltipDirective,
+    ],
 })
 export class ContentValueComponent extends StatefulComponent<State> {
     private readonly subscriptions = new Subscriptions();

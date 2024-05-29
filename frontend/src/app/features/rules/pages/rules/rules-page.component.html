@@ -36,7 +36,7 @@
                         }
                     </div>
                 }
-                @for (rule of rules; track trackByRule($index, rule)) {
+                @for (rule of rules; track rule.id) {
                     <sqx-rule
                         [rule]="rule"
                         [ruleActions]="supportedActions"

@@ -41,7 +41,7 @@
                     </tr>
                 </thead>
 
-                @for (event of ruleEventsState.ruleEvents | async; track trackByRuleEvent($index, event)) {
+                @for (event of ruleEventsState.ruleEvents | async; track event.id) {
                     <tbody
                         [sqxRuleEvent]="event"
                         [expanded]="event.id === selectedEventId"

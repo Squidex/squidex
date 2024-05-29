@@ -20,7 +20,7 @@
             </sqx-form-alert>
 
             @if ((templatesState.isLoaded | async) && (templatesState.templates | async); as templates) {
-                @for (template of templates; track trackByTemplate($index, template)) {
+                @for (template of templates; track template.name) {
                     <sqx-template [template]="template"></sqx-template>
                 }
             }

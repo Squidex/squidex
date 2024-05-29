@@ -18,10 +18,10 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
     styleUrls: ['array-ui.component.scss'],
     templateUrl: 'array-ui.component.html',
     imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class ArrayUIComponent {
     @Input({ required: true })

@@ -34,7 +34,7 @@
 
     <ng-container>
         <div cdkDropListGroup>
-            @for (category of categories | async; track trackByCategory($index, category)) {
+            @for (category of categories | async; track category.name) {
                 <sqx-schema-category [schemaCategory]="category" (remove)="removeCategory($event)"></sqx-schema-category>
             }
         </div>

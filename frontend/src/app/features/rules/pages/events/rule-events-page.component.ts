@@ -20,17 +20,17 @@ import { RuleEventComponent } from './rule-event.component';
         Router2State,
     ],
     imports: [
-    AsyncPipe,
-    ConfirmClickDirective,
-    LayoutComponent,
-    ListViewComponent,
-    PagerComponent,
-    RuleEventComponent,
-    ShortcutDirective,
-    TitleComponent,
-    TooltipDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        ConfirmClickDirective,
+        LayoutComponent,
+        ListViewComponent,
+        PagerComponent,
+        RuleEventComponent,
+        ShortcutDirective,
+        TitleComponent,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class RuleEventsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
@@ -81,9 +81,5 @@ export class RuleEventsPageComponent implements OnInit {
         } else {
             this.selectedEventId = id;
         }
-    }
-
-    public trackByRuleEvent(_index: number, ruleEvent: RuleEventDto) {
-        return ruleEvent.id;
     }
 }

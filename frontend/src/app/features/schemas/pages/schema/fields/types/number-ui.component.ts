@@ -17,13 +17,13 @@ import { FieldDto, FloatConverter, FormHintComponent, NUMBER_FIELD_EDITORS, Numb
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html',
     imports: [
-    AsyncPipe,
-    FormHintComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TagEditorComponent,
-    TranslatePipe
-],
+        AsyncPipe,
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class NumberUIComponent  {
     private readonly subscriptions = new Subscriptions();

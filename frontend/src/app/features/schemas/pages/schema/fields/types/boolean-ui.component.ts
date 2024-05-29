@@ -16,11 +16,11 @@ import { BOOLEAN_FIELD_EDITORS, BooleanFieldPropertiesDto, FieldDto, FormHintCom
     styleUrls: ['boolean-ui.component.scss'],
     templateUrl: 'boolean-ui.component.html',
     imports: [
-    FormHintComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class BooleanUIComponent {
     public readonly editors = BOOLEAN_FIELD_EDITORS;

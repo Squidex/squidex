@@ -20,7 +20,7 @@
                                     {{ "assets.uploaderUploadHere" | sqxTranslate }}
                                 </small>
                             }
-                            @for (upload of uploads; track trackByUpload($index, upload)) {
+                            @for (upload of uploads; track upload.id) {
                                 <div class="upload row g-0">
                                     <div class="col-auto">
                                         @switch (upload.status) {

@@ -19,19 +19,19 @@ const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createP
     styleUrls: ['./field-wizard.component.scss'],
     templateUrl: './field-wizard.component.html',
     imports: [
-    AsyncPipe,
-    ControlErrorsComponent,
-    FieldFormComponent,
-    FocusOnInitDirective,
-    FormAlertComponent,
-    FormErrorComponent,
-    FormHintComponent,
-    FormsModule,
-    ModalDialogComponent,
-    ReactiveFormsModule,
-    TooltipDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        ControlErrorsComponent,
+        FieldFormComponent,
+        FocusOnInitDirective,
+        FormAlertComponent,
+        FormErrorComponent,
+        FormHintComponent,
+        FormsModule,
+        ModalDialogComponent,
+        ReactiveFormsModule,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class FieldWizardComponent implements OnInit {
     @ViewChild('nameInput', { static: false })

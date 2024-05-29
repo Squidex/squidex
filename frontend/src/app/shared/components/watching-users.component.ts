@@ -8,7 +8,7 @@
 import { AsyncPipe, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { StringColorPipe, TooltipDirective } from '@app/framework';
-import { CollaborationService, Profile } from '@app/shared/internal';
+import { CollaborationService } from '@app/shared/internal';
 import { UserPicturePipe } from './pipes';
 
 @Component({
@@ -18,20 +18,16 @@ import { UserPicturePipe } from './pipes';
     templateUrl: './watching-users.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    SlicePipe,
-    StringColorPipe,
-    TooltipDirective,
-    UserPicturePipe
-],
+        AsyncPipe,
+        SlicePipe,
+        StringColorPipe,
+        TooltipDirective,
+        UserPicturePipe,
+    ],
 })
 export class WatchingUsersComponent {
     constructor(
         public readonly collaboration: CollaborationService,
     ) {
-    }
-
-    public trackByUser(_: number, item: { user: Profile }) {
-        return item.user.id;
     }
 }

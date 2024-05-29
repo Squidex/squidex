@@ -17,21 +17,21 @@ import { RuleComponent } from './rule.component';
     styleUrls: ['./rules-page.component.scss'],
     templateUrl: './rules-page.component.html',
     imports: [
-    AsyncPipe,
-    LayoutComponent,
-    ListViewComponent,
-    RouterLink,
-    RouterLinkActive,
-    RouterOutlet,
-    RuleComponent,
-    ShortcutDirective,
-    SidebarMenuDirective,
-    TitleComponent,
-    TooltipDirective,
-    TourHintDirective,
-    TourStepDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        LayoutComponent,
+        ListViewComponent,
+        RouterLink,
+        RouterLinkActive,
+        RouterOutlet,
+        RuleComponent,
+        ShortcutDirective,
+        SidebarMenuDirective,
+        TitleComponent,
+        TooltipDirective,
+        TourHintDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class RulesPageComponent implements OnInit {
     public supportedActions?: { [name: string]: RuleElementDto };
@@ -69,9 +69,5 @@ export class RulesPageComponent implements OnInit {
 
     public toggle(rule: RuleDto) {
         this.rulesState.update(rule, { isEnabled: !rule.isEnabled });
-    }
-
-    public trackByRule(_index: number, rule: RuleDto) {
-        return rule.id;
     }
 }

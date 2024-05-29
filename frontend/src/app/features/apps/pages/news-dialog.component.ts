@@ -27,8 +27,4 @@ export class NewsDialogComponent {
 
     @Input({ required: true })
     public features!: ReadonlyArray<FeatureDto>;
-
-    public trackByFeature(_index: number, feature: FeatureDto) {
-        return feature;
-    }
 }

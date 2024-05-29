@@ -17,11 +17,11 @@ import { AppDto, TourStepDirective, TranslatePipe } from '@app/shared';
     templateUrl: './settings-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    RouterLink,
-    RouterLinkActive,
-    TourStepDirective,
-    TranslatePipe
-],
+        RouterLink,
+        RouterLinkActive,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class SettingsMenuComponent {
     @Input({ required: true })

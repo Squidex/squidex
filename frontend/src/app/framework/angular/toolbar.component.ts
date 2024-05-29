@@ -17,9 +17,9 @@ import { TranslatePipe } from './pipes/translate.pipe';
     templateUrl: './toolbar.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    TranslatePipe
-],
+        AsyncPipe,
+        TranslatePipe,
+    ],
 })
 export class ToolbarComponent {
     constructor(

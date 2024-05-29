@@ -61,8 +61,4 @@ export class SchemasPageComponent {
         private readonly appsState: AppsState,
     ) {
     }
-
-    public trackByCategory(_index: number, category: SchemaCategory) {
-        return category.name;
-    }
 }

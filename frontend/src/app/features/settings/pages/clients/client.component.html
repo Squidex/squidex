@@ -65,7 +65,7 @@
                 </label>
                 <div class="col">
                     <select class="form-select" [disabled]="!client.canUpdate" [ngModel]="client.role" (ngModelChange)="updateRole($event)">
-                        @for (role of clientRoles; track trackByRole($index, role)) {
+                        @for (role of clientRoles; track role.name) {
                             <option [ngValue]="role.name">{{ role.name }}</option>
                         }
                     </select>

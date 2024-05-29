@@ -18,14 +18,14 @@ import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, Co
     styleUrls: ['./schema-field-rules-form.component.scss'],
     templateUrl: './schema-field-rules-form.component.html',
     imports: [
-    AsyncPipe,
-    CodeEditorComponent,
-    ConfirmClickDirective,
-    ControlErrorsComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        AsyncPipe,
+        CodeEditorComponent,
+        ConfirmClickDirective,
+        ControlErrorsComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class SchemaFieldRulesFormComponent implements  OnInit {
     @Input()

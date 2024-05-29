@@ -17,8 +17,8 @@ import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
     templateUrl: './table-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    TranslatePipe
-],
+        TranslatePipe,
+    ],
 })
 export class TableHeaderComponent {
     @Output()

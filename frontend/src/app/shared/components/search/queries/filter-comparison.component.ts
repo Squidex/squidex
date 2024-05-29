@@ -22,17 +22,17 @@ import { FilterOperatorPipe } from './query.pipes';
     templateUrl: './filter-comparison.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    DateTimeEditorComponent,
-    DropdownComponent,
-    FilterOperatorPipe,
-    FormsModule,
-    HighlightPipe,
-    QueryPathComponent,
-    ReferenceInputComponent,
-    TranslatePipe,
-    UserDtoPicture
-],
+        AsyncPipe,
+        DateTimeEditorComponent,
+        DropdownComponent,
+        FilterOperatorPipe,
+        FormsModule,
+        HighlightPipe,
+        QueryPathComponent,
+        ReferenceInputComponent,
+        TranslatePipe,
+        UserDtoPicture,
+    ],
 })
 export class FilterComparisonComponent {
     @Output()

@@ -19,10 +19,10 @@ import { SafeHtmlPipe } from '../safe-html.pipe';
     templateUrl: './form-error.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    MarkdownPipe,
-    SafeHtmlPipe,
-    TranslatePipe
-],
+        MarkdownPipe,
+        SafeHtmlPipe,
+        TranslatePipe,
+    ],
 })
 export class FormErrorComponent {
     @Input({ required: true })

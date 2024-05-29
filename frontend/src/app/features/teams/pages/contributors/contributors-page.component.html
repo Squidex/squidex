@@ -39,7 +39,7 @@
                         </div>
                     }
                     <table class="table table-items table-fixed">
-                        @for (contributor of contributors; track trackByContributor($index, contributor)) {
+                        @for (contributor of contributors; track contributor.contributorId) {
                             <tbody [sqxContributor]="contributor" [search]="contributorsState.queryRegex | async"></tbody>
                         }
                     </table>

@@ -34,7 +34,7 @@
 
     <ng-container content>
         <div class="photos">
-            @for (photo of snapshot.stockPhotos; track trackByPhoto($index, photo)) {
+            @for (photo of snapshot.stockPhotos; track photo.thumbUrl) {
                 <div class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
                     <img [src]="photo.thumbUrl" />
                     <div class="photo-user">

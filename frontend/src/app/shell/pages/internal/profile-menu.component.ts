@@ -34,16 +34,16 @@ interface State {
     templateUrl: './profile-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    DropdownMenuComponent,
-    ExternalLinkDirective,
-    ModalDirective,
-    ModalPlacementDirective,
-    RouterLink,
-    StopClickDirective,
-    TranslatePipe,
-    UserIdPicturePipe
-],
+        AsyncPipe,
+        DropdownMenuComponent,
+        ExternalLinkDirective,
+        ModalDirective,
+        ModalPlacementDirective,
+        RouterLink,
+        StopClickDirective,
+        TranslatePipe,
+        UserIdPicturePipe,
+    ],
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

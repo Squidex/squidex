@@ -10,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { LayoutComponent, ListViewComponent, PagerComponent, Router2State, ShortcutDirective, SidebarMenuDirective, Subscriptions, SyncWidthDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
-import { UserDto, UsersState } from '../../internal';
+import { UsersState } from '../../internal';
 import { UserComponent } from './user.component';
 
 @Component({
@@ -72,9 +72,5 @@ export class UsersPageComponent implements OnInit {
 
     public search() {
         this.usersState.search(this.usersFilter.value);
-    }
-
-    public trackByUser(_index: number, user: UserDto) {
-        return user.id;
     }
 }

@@ -17,9 +17,9 @@ import { CallsUsageDto } from '@app/shared';
     templateUrl: './api-calls-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    KNumberPipe,
-    TranslatePipe
-],
+        KNumberPipe,
+        TranslatePipe,
+    ],
 })
 export class ApiCallsSummaryCardComponent {
     @Input({ required: true })

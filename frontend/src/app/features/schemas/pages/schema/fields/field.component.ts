@@ -19,19 +19,19 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
     imports: [
-    ConfirmClickDirective,
-    DropdownMenuComponent,
-    FieldFormComponent,
-    FieldWizardComponent,
-    FormsModule,
-    ModalDirective,
-    ModalPlacementDirective,
-    ReactiveFormsModule,
-    TooltipDirective,
-    TourStepDirective,
-    TranslatePipe,
-    forwardRef(() => SortableFieldListComponent)
-],
+        ConfirmClickDirective,
+        DropdownMenuComponent,
+        FieldFormComponent,
+        FieldWizardComponent,
+        FormsModule,
+        ModalDirective,
+        ModalPlacementDirective,
+        ReactiveFormsModule,
+        TooltipDirective,
+        TourStepDirective,
+        TranslatePipe,
+        forwardRef(() => SortableFieldListComponent),
+    ],
 })
 export class FieldComponent {
     @Input({ required: true })

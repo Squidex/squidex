@@ -18,16 +18,16 @@ import { ClientConnectFormComponent } from './client-connect-form.component';
     templateUrl: './client.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    ClientConnectFormComponent,
-    ConfirmClickDirective,
-    CopyDirective,
-    EditableTitleComponent,
-    FormHintComponent,
-    FormsModule,
-    ModalDirective,
-    TourStepDirective,
-    TranslatePipe
-],
+        ClientConnectFormComponent,
+        ConfirmClickDirective,
+        CopyDirective,
+        EditableTitleComponent,
+        FormHintComponent,
+        FormsModule,
+        ModalDirective,
+        TourStepDirective,
+        TranslatePipe,
+    ],
 })
 export class ClientComponent {
     @Input({ required: true })
@@ -70,9 +70,5 @@ export class ClientComponent {
 
     public rename(name: string) {
         this.clientsState.update(this.client, { name });
-    }
-
-    public trackByRole(_index: number, role: RoleDto) {
-        return role.name;
     }
 }

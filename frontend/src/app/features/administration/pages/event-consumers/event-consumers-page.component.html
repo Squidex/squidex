@@ -38,7 +38,7 @@
 
             <ng-container>
                 <table class="table table-items table-fixed" [sqxSyncWidth]="header">
-                    @for (eventConsumer of eventConsumersState.eventConsumers | async; track trackByEventConsumer($index, eventConsumer)) {
+                    @for (eventConsumer of eventConsumersState.eventConsumers | async; track eventConsumer.name) {
                         <tbody [sqxEventConsumer]="eventConsumer" (failure)="showError(eventConsumer)"></tbody>
                     }
                 </table>

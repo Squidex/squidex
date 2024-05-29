@@ -90,7 +90,7 @@
 
     @if (commentItem.replies.length > 0 || snapshot.mode === "Reply") {
         <div class="replies">
-            @for (item of commentItem.replies; track trackByComment($index, item)) {
+            @for (item of commentItem.replies; track $index) {
                 <sqx-comment
                     [commentItem]="item"
                     [comments]="comments"

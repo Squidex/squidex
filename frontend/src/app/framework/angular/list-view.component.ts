@@ -24,11 +24,11 @@ interface State {
     templateUrl: './list-view.component.html',
     changeDetection: ChangeDetectionStrategy.Default,
     imports: [
-    CompensateScrollbarDirective,
-    LoaderComponent,
-    NgTemplateOutlet,
-    SyncScollingDirective
-],
+        CompensateScrollbarDirective,
+        LoaderComponent,
+        NgTemplateOutlet,
+        SyncScollingDirective,
+    ],
 })
 export class ListViewComponent extends StatefulComponent<State> implements AfterViewInit {
     private timer: any;

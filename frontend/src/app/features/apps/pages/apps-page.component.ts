@@ -139,10 +139,6 @@ export class AppsPageComponent implements OnInit {
         this.teamsState.leave(team);
     }
 
-    public trackByApp(_index: number, app: AppDto) {
-        return app.id;
-    }
-
     public trackByGroup(_index: number, group: GroupedApps) {
         return group.team?.id || '0';
     }

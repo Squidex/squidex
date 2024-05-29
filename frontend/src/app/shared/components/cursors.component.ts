@@ -20,9 +20,9 @@ type CursorState = { user: Profile; cursor: { x: number; y: number } };
     templateUrl: './cursors.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    AsyncPipe,
-    StringColorPipe
-],
+        AsyncPipe,
+        StringColorPipe,
+    ],
 })
 export class CursorsComponent  {
     public otherCursor =
@@ -36,9 +36,5 @@ export class CursorsComponent  {
 
     public sizeInPx(value: number) {
         return `${value}px`;
-    }
-
-    public trackByUser(_: number, item: { user: Profile }) {
-        return item.user.id;
     }
 }

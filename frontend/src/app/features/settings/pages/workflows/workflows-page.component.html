@@ -34,7 +34,7 @@
                             {{ "workflows.empty" | sqxTranslate }}
                         </div>
                     }
-                    @for (workflow of workflows; track trackByWorkflow($index, workflow)) {
+                    @for (workflow of workflows; track workflow.id) {
                         <sqx-workflow [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource"></sqx-workflow>
                     }
                     @if (workflowsState.canCreate | async) {

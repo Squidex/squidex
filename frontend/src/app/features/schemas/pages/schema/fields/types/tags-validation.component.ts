@@ -16,13 +16,13 @@ import { FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, TagE
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html',
     imports: [
-    FormHintComponent,
-    FormsModule,
-    LocalizedInputComponent,
-    ReactiveFormsModule,
-    TagEditorComponent,
-    TranslatePipe
-],
+        FormHintComponent,
+        FormsModule,
+        LocalizedInputComponent,
+        ReactiveFormsModule,
+        TagEditorComponent,
+        TranslatePipe,
+    ],
 })
 export class TagsValidationComponent {
     @Input({ required: true })

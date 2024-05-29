@@ -29,7 +29,7 @@
 
 @if (nodeModel.isExpanded || nodeModel.isSelected) {
     <div class="tree-children">
-        @for (child of nodeModel.children; track trackByNode($index, child)) {
+        @for (child of nodeModel.children; track child.item.id) {
             <sqx-asset-folder-dropdown-item
                 [appName]="appName"
                 [nodeModel]="child"

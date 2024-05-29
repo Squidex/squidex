@@ -16,11 +16,11 @@ import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, Tr
     styleUrls: ['./schema-export-form.component.scss'],
     templateUrl: './schema-export-form.component.html',
     imports: [
-    CodeEditorComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        CodeEditorComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class SchemaExportFormComponent {
     @Input({ required: true })

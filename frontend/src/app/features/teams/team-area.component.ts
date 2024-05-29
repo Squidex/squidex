@@ -17,12 +17,12 @@ import { LeftMenuComponent } from './left-menu.component';
     styleUrls: ['./team-area.component.scss'],
     templateUrl: './team-area.component.html',
     imports: [
-    AsyncPipe,
-    LayoutContainerDirective,
-    LeftMenuComponent,
-    RouterOutlet,
-    TitleComponent
-],
+        AsyncPipe,
+        LayoutContainerDirective,
+        LeftMenuComponent,
+        RouterOutlet,
+        TitleComponent,
+    ],
 })
 export class TeamAreaComponent {
     public selectedTeam = this.teamsState.selectedTeam.pipe(defined());

@@ -22,11 +22,11 @@ interface State {
     styleUrls: ['./field-group.component.scss'],
     templateUrl: './field-group.component.html',
     imports: [
-    CdkDrag,
-    CdkDragHandle,
-    CdkDropList,
-    FieldComponent
-],
+        CdkDrag,
+        CdkDragHandle,
+        CdkDropList,
+        FieldComponent,
+    ],
 })
 export class FieldGroupComponent extends StatefulComponent<State> {
     @Output()

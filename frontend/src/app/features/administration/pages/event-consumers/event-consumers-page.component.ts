@@ -61,10 +61,6 @@ export class EventConsumersPageComponent implements OnInit {
         this.eventConsumersState.load(true, false);
     }
 
-    public trackByEventConsumer(_index: number, es: EventConsumerDto) {
-        return es.name;
-    }
-
     public showError(eventConsumer: EventConsumerDto) {
         this.eventConsumerError = eventConsumer.error;
         this.eventConsumerErrorDialog.show();

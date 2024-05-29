@@ -23,7 +23,7 @@
                 [cdkDropListDisabled]="snapshot.isDisabled"
                 (cdkDropListDropped)="sort($event)"
                 cdkDropList>
-                @for (content of snapshot.contentItems; track trackByContent($index, content)) {
+                @for (content of snapshot.contentItems; track content.id) {
                     <tbody
                         class="table-drag"
                         [sqxReferenceItem]="content"

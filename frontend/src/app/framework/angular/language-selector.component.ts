@@ -22,11 +22,11 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
     templateUrl: './language-selector.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    DropdownMenuComponent,
-    ModalDirective,
-    ModalPlacementDirective,
-    TooltipDirective
-],
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        TooltipDirective,
+    ],
 })
 export class LanguageSelectorComponent implements  OnInit {
     @Output()
@@ -75,9 +75,5 @@ export class LanguageSelectorComponent implements  OnInit {
             this.language = language;
             this.languageChange.emit(language);
         }
-    }
-
-    public trackByLanguage(_index: number, language: Language) {
-        return language.iso2Code;
     }
 }

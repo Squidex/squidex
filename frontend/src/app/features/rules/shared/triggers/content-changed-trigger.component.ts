@@ -21,13 +21,13 @@ import { ContentChangedSchemaComponent } from './content-changed-schema.componen
         CompletionsCache,
     ],
     imports: [
-    CodeComponent,
-    ContentChangedSchemaComponent,
-    FormHintComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        CodeComponent,
+        ContentChangedSchemaComponent,
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class ContentChangedTriggerComponent {
     @Input()

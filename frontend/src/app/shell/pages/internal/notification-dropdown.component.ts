@@ -22,13 +22,13 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
         CommentsState,
     ],
     imports: [
-    AsyncPipe,
-    CommentComponent,
-    DropdownMenuComponent,
-    ModalDirective,
-    ModalPlacementDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        CommentComponent,
+        DropdownMenuComponent,
+        ModalDirective,
+        ModalPlacementDirective,
+        TranslatePipe,
+    ],
 })
 export class NotificationDropdownComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
@@ -55,9 +55,5 @@ export class NotificationDropdownComponent implements OnInit {
                     this.commentsState.markRead();
                 }),
             ));
-    }
-
-    public trackByComment(index: number) {
-        return index;
     }
 }

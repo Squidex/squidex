@@ -17,15 +17,15 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintCompon
     styleUrls: ['./language.component.scss'],
     templateUrl: './language.component.html',
     imports: [
-    CdkDrag,
-    CdkDragHandle,
-    CdkDropList,
-    ConfirmClickDirective,
-    FormHintComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        CdkDrag,
+        CdkDragHandle,
+        CdkDropList,
+        ConfirmClickDirective,
+        FormHintComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class LanguageComponent {
     @Input({ required: true })
@@ -104,9 +104,5 @@ export class LanguageComponent {
         this.fallbackLanguagesNew = this.fallbackLanguagesNew.removed(this.otherLanguage);
 
         this.otherLanguage = this.fallbackLanguagesNew[0];
-    }
-
-    public trackByLanguage(_index: number, language: LanguageDto) {
-        return language.iso2Code;
     }
 }

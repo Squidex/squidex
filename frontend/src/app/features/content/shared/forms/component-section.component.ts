@@ -59,8 +59,4 @@ export class ComponentSectionComponent {
             editor.reset();
         });
     }
-
-    public trackByField(_index: number, field: AbstractContentForm<any, any>) {
-        return field.field.fieldId;
-    }
 }

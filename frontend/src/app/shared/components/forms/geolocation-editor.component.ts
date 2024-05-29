@@ -40,13 +40,13 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    ControlErrorsComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    ResizedDirective,
-    TooltipDirective,
-    TranslatePipe
-],
+        ControlErrorsComponent,
+        FormsModule,
+        ReactiveFormsModule,
+        ResizedDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class GeolocationEditorComponent extends StatefulControlComponent<State, Geolocation> implements AfterViewInit {
     private readonly googleMapsKey = inject(UIOptions).value.map.googleMaps.key;

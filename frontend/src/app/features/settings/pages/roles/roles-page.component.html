@@ -21,7 +21,7 @@
                             <sqx-form-hint>
                                 {{ "roles.defaultRoles.hint" | sqxTranslate }}
                             </sqx-form-hint>
-                            @for (role of defaultRoles; track trackByRole($index, role)) {
+                            @for (role of defaultRoles; track role.name) {
                                 <sqx-role
                                     [role]="role"
                                     [schemas]="(schemasState.schemas | async)!"
@@ -34,7 +34,7 @@
                     @if (customRoles.length > 0) {
                         <div>
                             <h5 class="mt-4">{{ "roles.customRoles" | sqxTranslate }}</h5>
-                            @for (role of customRoles; track trackByRole($index, role)) {
+                            @for (role of customRoles; track role.name) {
                                 <sqx-role
                                     [role]="role"
                                     [schemas]="(schemasState.schemas | async)!"

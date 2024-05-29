@@ -7,7 +7,7 @@
         <div class="help">
             <h1>{{ "news.headline" | sqxTranslate }}</h1>
 
-            @for (feature of features; track trackByFeature($index, feature); let last = $last) {
+            @for (feature of features; track feature; let last = $last) {
                 <div>
                     <h4>{{ feature.name }}</h4>
                     <div [innerHTML]="feature.text | sqxHelpMarkdown"></div>

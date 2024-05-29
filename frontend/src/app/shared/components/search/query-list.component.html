@@ -1,6 +1,6 @@
 @if (queries && queries.length > 0) {
     <ul class="nav nav-light flex-column">
-        @for (saved of queries; track trackByQuery($index, saved)) {
+        @for (saved of queries; track saved.name) {
             <li class="nav-item">
                 <a class="nav-link" [class.active]="isSelectedQuery(saved)" (click)="search.emit(saved.query)">
                     <div class="row g-0">

@@ -20,7 +20,7 @@
                 </li>
             </ul>
             <ng-container>
-                @for (category of categories | async; track trackByCategory($index, category)) {
+                @for (category of categories | async; track category.name) {
                     <sqx-schema-category [schemaCategory]="category" [schemaTarget]="'Contents'"></sqx-schema-category>
                 }
             </ng-container>

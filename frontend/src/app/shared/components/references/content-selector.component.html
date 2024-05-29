@@ -98,12 +98,12 @@
                                 class="table table-items table-fixed"
                                 [sqxContentListWidth]="schema.defaultReferenceFields"
                                 [sqxSyncWidth]="header">
-                                @for (content of contents; track trackByContent($index, content)) {
+                                @for (content of contents; track content.id) {
                                     <tbody
+                                        [schema]="schema"
                                         [sqxContentSelectorItem]="content"
                                         [language]="language"
                                         [languages]="languages"
-                                        [schema]="schema"
                                         [selectable]="!isItemAlreadySelected(content)"
                                         [selected]="isItemSelected(content)"
                                         (selectedChange)="selectContent(content)"></tbody>

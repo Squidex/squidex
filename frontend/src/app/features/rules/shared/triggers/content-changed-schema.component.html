@@ -3,7 +3,7 @@
         <sqx-control-errors for="action"></sqx-control-errors>
 
         <select class="form-select schemas-control" formControlName="schemaId">
-            @for (schema of schemas; track trackBySchema($index, schema)) {
+            @for (schema of schemas; track schema.id) {
                 <option [ngValue]="schema.id">{{ schema.displayName }}</option>
             }
         </select>

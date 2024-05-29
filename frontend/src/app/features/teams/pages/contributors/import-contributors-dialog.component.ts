@@ -26,15 +26,15 @@ type ImportStatus = {
     styleUrls: ['./import-contributors-dialog.component.scss'],
     templateUrl: './import-contributors-dialog.component.html',
     imports: [
-    AsyncPipe,
-    FormHintComponent,
-    FormsModule,
-    ModalDialogComponent,
-    ReactiveFormsModule,
-    StatusIconComponent,
-    TooltipDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        FormHintComponent,
+        FormsModule,
+        ModalDialogComponent,
+        ReactiveFormsModule,
+        StatusIconComponent,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class ImportContributorsDialogComponent {
     @Output()

@@ -30,13 +30,13 @@ interface State {
     styleUrls: ['./chat-dialog.component.scss'],
     templateUrl: './chat-dialog.component.html',
     imports: [
-    ChatItemComponent,
-    FormsModule,
-    ModalDialogComponent,
-    ResizedDirective,
-    TooltipDirective,
-    TranslatePipe
-],
+        ChatItemComponent,
+        FormsModule,
+        ModalDialogComponent,
+        ResizedDirective,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class ChatDialogComponent extends StatefulComponent<State> {
     private readonly conversationId = MathHelper.guid();

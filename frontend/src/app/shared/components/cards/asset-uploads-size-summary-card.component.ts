@@ -17,9 +17,9 @@ import { CurrentStorageDto } from '@app/shared/internal';
     templateUrl: './asset-uploads-size-summary-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FileSizePipe,
-    TranslatePipe
-],
+        FileSizePipe,
+        TranslatePipe,
+    ],
 })
 export class AssetUploadsSizeSummaryCardComponent {
     @Input({ required: true })

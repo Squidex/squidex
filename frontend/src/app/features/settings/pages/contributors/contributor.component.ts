@@ -19,12 +19,12 @@ import { ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe
     templateUrl: './contributor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    ConfirmClickDirective,
-    FormsModule,
-    HighlightPipe,
-    TooltipDirective,
-    UserPicturePipe
-],
+        ConfirmClickDirective,
+        FormsModule,
+        HighlightPipe,
+        TooltipDirective,
+        UserPicturePipe,
+    ],
 })
 export class ContributorComponent {
     @Input()

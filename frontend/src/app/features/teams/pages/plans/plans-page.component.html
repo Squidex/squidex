@@ -33,7 +33,7 @@
                         </div>
                     }
                     <div class="plans">
-                        @for (planInfo of plans; track trackByPlan($index, planInfo)) {
+                        @for (planInfo of plans; track planInfo.plan.id) {
                             <div class="plan">
                                 <sqx-plan [planInfo]="planInfo"></sqx-plan>
                             </div>

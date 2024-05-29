@@ -18,14 +18,14 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
     styleUrls: ['./rule-simulator-page.component.scss'],
     templateUrl: './rule-simulator-page.component.html',
     imports: [
-    AsyncPipe,
-    LayoutComponent,
-    ListViewComponent,
-    SimulatedRuleEventComponent,
-    TitleComponent,
-    TooltipDirective,
-    TranslatePipe
-],
+        AsyncPipe,
+        LayoutComponent,
+        ListViewComponent,
+        SimulatedRuleEventComponent,
+        TitleComponent,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class RuleSimulatorPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
@@ -63,9 +63,5 @@ export class RuleSimulatorPageComponent implements OnInit {
         } else {
             this.selectedRuleEvent = event.uniqueId;
         }
-    }
-
-    public trackByEvent(_index: number, event: SimulatedRuleEventDto) {
-        return event.uniqueId;
     }
 }

@@ -17,10 +17,10 @@ import { ScheduleDto } from '@app/shared/internal';
     templateUrl: './content-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FullDateTimePipe,
-    TooltipDirective,
-    TranslatePipe
-],
+        FullDateTimePipe,
+        TooltipDirective,
+        TranslatePipe,
+    ],
 })
 export class ContentStatusComponent {
     @Input({ required: true })

@@ -43,7 +43,7 @@
         <div class="cursors" sqxCursors>
             <sqx-cursors></sqx-cursors>
 
-            @for (section of contentForm.sections; track trackBySection($index, section)) {
+            @for (section of contentForm.sections; track section.separator?.fieldId) {
                 <sqx-content-section
                     [form]="contentForm"
                     [formCompare]="contentFormCompare"

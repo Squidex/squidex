@@ -30,7 +30,7 @@
                         </div>
                     </a>
                     <div class="apps-list">
-                        @for (app of apps; track trackByApp($index, app)) {
+                        @for (app of apps; track app.id) {
                             <a class="dropdown-item" [routerLink]="['/app', app.name]" routerLinkActive="active">
                                 {{ app.displayName }}
                             </a>
@@ -53,7 +53,7 @@
                         </div>
                     </a>
                     <div class="teams-list">
-                        @for (team of teams; track trackByTeam($index, team)) {
+                        @for (team of teams; track team.id) {
                             <a class="dropdown-item" [routerLink]="['/app/teams', team.id]" routerLinkActive="active">
                                 {{ team.name }}
                             </a>
@@ -86,7 +86,7 @@
             @if (path.length > 0) {
                 <ol class="breadcrumb ms-2">
                     <li class="breadcrumb-item"></li>
-                    @for (item of path; track trackByTitle($index, item); let last = $last) {
+                    @for (item of path; track item.value; let last = $last) {
                         <li class="breadcrumb-item" [class.active]="last">
                             <a [routerLink]="item.route" [relativeTo]="route" [class.disabled]="last">{{ item.localized }}</a>
                         </li>

@@ -21,9 +21,9 @@ import { TourStepDirective } from './tour-step.directive';
     ],
     changeDetection: ChangeDetectionStrategy.Default,
     imports: [
-    ShortcutComponent,
-    TourStepDirective
-],
+        ShortcutComponent,
+        TourStepDirective,
+    ],
 })
 export class ModalDialogComponent implements AfterViewInit {
     @Output()

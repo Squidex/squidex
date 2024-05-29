@@ -20,13 +20,13 @@ import { RuleClassPipe } from '../../shared/pipes';
     templateUrl: './rule-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    CodeEditorComponent,
-    ConfirmClickDirective,
-    FormsModule,
-    FromNowPipe,
-    RuleClassPipe,
-    TranslatePipe
-],
+        CodeEditorComponent,
+        ConfirmClickDirective,
+        FormsModule,
+        FromNowPipe,
+        RuleClassPipe,
+        TranslatePipe,
+    ],
 })
 export class RuleEventComponent {
     @Input('sqxRuleEvent')

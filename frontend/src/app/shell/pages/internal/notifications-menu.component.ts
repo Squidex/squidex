@@ -17,9 +17,9 @@ import { NotificationDropdownComponent } from './notification-dropdown.component
     templateUrl: './notifications-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    NotificationDropdownComponent,
-    NotifoComponent
-],
+        NotificationDropdownComponent,
+        NotifoComponent,
+    ],
 })
 export class NotificationsMenuComponent {
     public isNotifoConfigured = false;

@@ -92,10 +92,6 @@ export class ContentSectionComponent extends StatefulComponent<State> {
         return this.formCompare?.get(formState.field.name);
     }
 
-    public trackByField(_index: number, formState: FieldForm) {
-        return formState.field.fieldId;
-    }
-
     private isCollapsedKey(): string {
         return Settings.Local.FIELD_COLLAPSED(this.schema?.id, this.formSection?.separator?.fieldId);
     }

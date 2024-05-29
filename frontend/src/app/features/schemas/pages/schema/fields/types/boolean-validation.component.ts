@@ -17,13 +17,13 @@ import { BooleanFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, In
     styleUrls: ['boolean-validation.component.scss'],
     templateUrl: 'boolean-validation.component.html',
     imports: [
-    FormHintComponent,
-    FormsModule,
-    IndeterminateValueDirective,
-    LocalizedInputComponent,
-    ReactiveFormsModule,
-    TranslatePipe
-],
+        FormHintComponent,
+        FormsModule,
+        IndeterminateValueDirective,
+        LocalizedInputComponent,
+        ReactiveFormsModule,
+        TranslatePipe,
+    ],
 })
 export class BooleanValidationComponent {
     @Input({ required: true })

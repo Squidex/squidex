@@ -298,10 +298,6 @@ export class ContentsPageComponent implements OnInit {
         }
     }
 
-    public trackByContent(_index: number, content: ContentDto): string {
-        return content.id;
-    }
-
     private selectItems(predicate?: (content: ContentDto) => boolean) {
         return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
     }

@@ -95,8 +95,4 @@ export class ContentReferencesComponent implements OnInit, OnDestroy {
     private publishAll() {
         this.contentsState.changeManyStatus(this.contentsState.snapshot.contents.filter(x => x.canPublish), 'Published');
     }
-
-    public trackByContent(_index: number, content: ContentDto) {
-        return content.id;
-    }
 }

@@ -23,16 +23,16 @@ interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boo
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
     imports: [
-    AssetUrlPipe,
-    AsyncPipe,
-    ExternalLinkDirective,
-    FromNowPipe,
-    HistoryMessagePipe,
-    TooltipDirective,
-    TranslatePipe,
-    UserNameRefPipe,
-    UserPictureRefPipe
-],
+        AssetUrlPipe,
+        AsyncPipe,
+        ExternalLinkDirective,
+        FromNowPipe,
+        HistoryMessagePipe,
+        TooltipDirective,
+        TranslatePipe,
+        UserNameRefPipe,
+        UserPictureRefPipe,
+    ],
 })
 export class AssetHistoryComponent {
     @Input({ required: true })
@@ -64,9 +64,5 @@ export class AssetHistoryComponent {
                         return { event, version, canDownload };
                     });
                 }));
-    }
-
-    public trackByEvent(_index: number, assetEvent: AssetEvent) {
-        return assetEvent.event.eventId;
     }
 }

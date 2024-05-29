@@ -18,9 +18,9 @@ import { FilterNodeComponent } from './filter-node.component';
     templateUrl: './filter-logical.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-    FilterNodeComponent,
-    TranslatePipe
-],
+        FilterNodeComponent,
+        TranslatePipe,
+    ],
 })
 export class FilterLogicalComponent {
     private filterValue!: FilterLogical;

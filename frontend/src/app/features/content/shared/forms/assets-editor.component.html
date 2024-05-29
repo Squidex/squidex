@@ -57,7 +57,7 @@
                         (loadDone)="addAsset(file, $event)"
                         (loadError)="removeLoadingAsset(file)"></sqx-asset>
                 }
-                @for (asset of snapshot.assetItems; track trackByAsset($index, asset)) {
+                @for (asset of snapshot.assetItems; track asset.id) {
                     <sqx-asset
                         [asset]="asset"
                         [isCompact]="snapshot.isCompact"
@@ -85,7 +85,7 @@
                     [cdkDropListData]="snapshot.assetItems"
                     (cdkDropListDropped)="sortAssets($event)"
                     cdkDropList>
-                    @for (asset of snapshot.assetItems; track trackByAsset($index, asset)) {
+                    @for (asset of snapshot.assetItems; track asset.id) {
                         <div class="table-drag" cdkDrag cdkDragLockAxis="y">
                             <sqx-asset
                                 [asset]="asset"

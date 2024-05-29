@@ -12,7 +12,7 @@
         <sqx-dropdown-menu *sqxModal="dropdown; closeAlways: true" [sqxAnchoredTo]="button" [position]="dropdownPosition" scrollY="true">
             <table>
                 <tbody>
-                    @for (supported of languages; track trackByLanguage($index, supported)) {
+                    @for (supported of languages; track supported.iso2Code) {
                         <tr
                             class="dropdown-item"
                             [class.active]="supported === language"
@@ -30,7 +30,7 @@
         </sqx-dropdown-menu>
     } @else {
         <div class="btn-group btn-group-{{ size }}">
-            @for (supported of languages; track trackByLanguage($index, supported)) {
+            @for (supported of languages; track supported.iso2Code) {
                 <button
                     class="btn btn-outline-secondary"
                     [class.active]="supported === language"
