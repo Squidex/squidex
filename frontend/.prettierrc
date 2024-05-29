@@ -4,9 +4,11 @@
         {
             "files": "*.html",
             "options": {
+                "attributeGroups": [
+                    "$ANGULAR"
+                  ],
                 "parser": "angular",
                 "printWidth": 140,
-                "htmlWhitespaceSensitivity": "ignore",
                 "bracketSameLine": true,
                 "bracketSpacing": true,
                 "singleAttributePerLine": false,                                                                                       

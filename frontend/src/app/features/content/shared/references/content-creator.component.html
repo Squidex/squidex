@@ -1,4 +1,3 @@
--
 <sqx-modal-dialog (dialogClose)="emitClose()" size="lg" showFooter="false">
     <ng-container title>
         @if (schemas.length > 1) {
@@ -39,7 +38,7 @@
                     {{ "common.create" | sqxTranslate }}
                 </button>
 
-                @if (schema?.canContentsCreateAndPublish) {
+                @if (schema.canContentsCreateAndPublish) {
                     <button class="btn btn-success ms-2" (click)="saveAndPublish()" type="button">
                         {{ "contents.referencesCreatePublish" | sqxTranslate }}
                     </button>

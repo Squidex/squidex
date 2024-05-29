@@ -59,7 +59,7 @@
                                     } @else {
                                         <div>
                                             <sqx-avatar [image]="app.image" [identifier]="app.name" size="150"></sqx-avatar>
-                                            @if (isEditableImage && app?.image) {
+                                            @if (isEditableImage && app.image) {
                                                 <button
                                                     class="btn btn-danger btn-sm app-image-remove"
                                                     (click)="removeImage()"

@@ -16,6 +16,7 @@ import { APP_ROUTES } from '@app/app.routes';
 import { ApiUrlConfig, authInterceptor, buildTasks, cachingInterceptor, DateHelper, GlobalErrorHandler, loadingInterceptor, LocalizerService, TASK_CONFIGURATION, TitlesConfig, TourService, UIOptions } from '@app/shared';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 const options = (window as any)['options'] || {};
 
@@ -92,6 +93,7 @@ if (environment.production) {
 bootstrapApplication(AppComponent, {
     providers: [
         provideAnimations(),
+        provideCharts(withDefaultRegisterables()),
         provideHttpClient(
             withInterceptors([
                 loadingInterceptor,

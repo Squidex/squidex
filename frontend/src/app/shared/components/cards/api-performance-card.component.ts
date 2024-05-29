@@ -7,7 +7,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { TranslatePipe } from '@app/framework';
 import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
 
@@ -18,8 +18,8 @@ import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
     templateUrl: './api-performance-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        BaseChartDirective,
         FormsModule,
-        NgChartsModule,
         TranslatePipe,
     ],
 })

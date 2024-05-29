@@ -75,7 +75,7 @@
                         [languages]="languages"
                         [percents]="contentForm.translationStatus | async"
                         (languageChange)="changeLanguage($event)"></sqx-language-selector>
-                    @if (content?.canDelete) {
+                    @if (content.canDelete) {
                         <button class="btn btn-outline-secondary ms-2" #buttonOptions (click)="dropdown.toggle()" type="button">
                             <span class="hidden">{{ "common.options" | sqxTranslate }}</span>
                             <i class="icon-dots"></i>
@@ -95,7 +95,7 @@
                         <sqx-toolbar></sqx-toolbar>
                         @if (tab === "editor") {
                             <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
-                            @if (content?.canUpdate) {
+                            @if (content.canUpdate) {
                                 <button class="btn btn-primary ms-2" type="submit" shortcut="CTRL + SHIFT + S" sqxTourStep="saveContent">
                                     {{ "common.save" | sqxTranslate }}
                                 </button>

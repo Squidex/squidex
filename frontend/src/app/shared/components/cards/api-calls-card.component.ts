@@ -7,7 +7,7 @@
 
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { TranslatePipe } from '@app/framework';
 import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from '@app/shared/internal';
 
@@ -18,7 +18,7 @@ import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from
     templateUrl: './api-calls-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgChartsModule,
+        BaseChartDirective,
         TranslatePipe,
     ],
 })
