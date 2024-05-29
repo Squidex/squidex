@@ -2,7 +2,7 @@
 # Stage 1, Build Backend
 #
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 as backend
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 as backend
 
 ARG SQUIDEX__BUILD__VERSION=7.0.0
 
