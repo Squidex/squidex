@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, AppDto, AppSettingsDto, AppsService, AssetScriptsDto, AssetScriptsPayload, DateTime, EditorDto, ErrorDto, PatternDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
 
@@ -14,14 +15,14 @@ describe('AppsService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-            ],
-            providers: [
-                AppsService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-            ],
-        });
+    imports: [],
+    providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+        AppsService,
+        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+    ],
+});
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {

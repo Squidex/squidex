@@ -7,7 +7,8 @@
 
 /* eslint-disable object-property-newline */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, Resource, Version, WorkflowDto, WorkflowsDto, WorkflowsPayload, WorkflowsService } from '@app/shared/internal';
 
@@ -16,14 +17,14 @@ describe('WorkflowsService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-            ],
-            providers: [
-                WorkflowsService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-            ],
-        });
+    imports: [],
+    providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+        WorkflowsService,
+        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+    ],
+});
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
