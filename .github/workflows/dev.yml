@@ -39,7 +39,6 @@ jobs:
           build-args: "SQUIDEX__RUNTIME__VERSION=7.0.0-dev-${{ env.BUILD_NUMBER }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
           tags: squidex-local
 
       - name: Test - Start Compose
@@ -135,6 +134,15 @@ jobs:
           BUILD_NUMBER: ${{ github.run_number }}
         run: |
           echo "BUILD_NUMBER=$(($BUILD_NUMBER + 6000))" >> $GITHUB_ENV
+
+      - name: Publish - Build for Multi-Platforms
+        uses: docker/build-push-action@v5.3.0
+        with:
+          build-args: "SQUIDEX__RUNTIME__VERSION=7.0.0-dev-${{ env.BUILD_NUMBER }}"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+          tags: squidex-local
 
       - name: Publish - Login to Docker Hub
         if: github.event_name != 'pull_request'
