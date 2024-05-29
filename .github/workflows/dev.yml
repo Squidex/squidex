@@ -39,6 +39,7 @@ jobs:
           build-args: "SQUIDEX__RUNTIME__VERSION=7.0.0-dev-${{ env.BUILD_NUMBER }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
           tags: squidex-local
 
       - name: Test - Start Compose
