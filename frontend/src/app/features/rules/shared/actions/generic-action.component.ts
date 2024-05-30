@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, LowerCasePipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { AsyncPipe, LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
@@ -28,13 +28,8 @@ import { FormattableInputComponent } from './formattable-input.component';
         FormsModule,
         LowerCasePipe,
         MarkdownDirective,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        NgSwitchDefault,
         ReactiveFormsModule,
-        TranslatePipe,
+        TranslatePipe
     ],
 })
 export class GenericActionComponent {

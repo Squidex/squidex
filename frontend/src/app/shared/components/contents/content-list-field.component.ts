@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { FromNowPipe, ShortDatePipe, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -32,16 +32,12 @@ interface State {
         ContentValueComponent,
         ContentValueEditorComponent,
         FromNowPipe,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        NgSwitchDefault,
         ShortDatePipe,
         TooltipDirective,
         TranslatePipe,
         TranslationStatusComponent,
         UserNameRefPipe,
-        UserPictureRefPipe,
+        UserPictureRefPipe
     ],
 })
 export class ContentListFieldComponent extends StatefulComponent<State> {

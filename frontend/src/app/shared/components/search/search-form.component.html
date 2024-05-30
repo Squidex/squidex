@@ -1,6 +1,6 @@
-<ng-container *ngIf="enableShortcut">
+@if (enableShortcut) {
     <sqx-shortcut (trigger)="inputFind.focus()" keys="CTRL + I"></sqx-shortcut>
-</ng-container>
+}
 
 <form [class]="formClass" (ngSubmit)="search()">
     <div class="input-group">
@@ -18,21 +18,19 @@
             shortcut="CTRL + I"
             shortcutAction="none" />
 
-        <ng-container *ngIf="queries">
-            <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
+        @if (queries) {
+            @if (saveKey | async; as key) {
                 <button class="btn btn-outline-secondary" (click)="queries.remove(key)" type="button">
                     <i class="icon-star-full"></i>
                 </button>
-            </ng-container>
-
-            <ng-template #notBookmarked>
+            } @else {
                 <button class="btn btn-outline-secondary" (click)="saveQuery()" type="button">
                     <i class="icon-star-empty"></i>
                 </button>
-            </ng-template>
-        </ng-container>
+            }
+        }
 
-        <ng-container *ngIf="queryModel">
+        @if (queryModel) {
             <button
                 class="btn btn-outline-secondary"
                 (click)="searchDialog.toggle()"
@@ -43,7 +41,7 @@
                 sqxTourStep="search">
                 <i [class.icon-filter]="!hasFilter" [class.icon-filter-filled]="hasFilter"></i>
             </button>
-        </ng-container>
+        }
     </div>
 </form>
 
@@ -53,62 +51,64 @@
     </ng-container>
 
     <ng-container content>
-        <div class="buttons2" *ngIf="queries && queriesTypes">
-            <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
-                <a class="btn" (click)="queries.remove(key)">
-                    <i class="icon-star-full"></i>
-                </a>
-            </ng-container>
+        @if (queries && queriesTypes) {
+            <div class="buttons2">
+                @if (saveKey | async; as key) {
+                    <a class="btn" (click)="queries.remove(key)">
+                        <i class="icon-star-full"></i>
+                    </a>
+                } @else {
+                    <a class="btn" (click)="saveQuery()">
+                        <i class="icon-star-empty"></i>
+                    </a>
+                }
 
-            <ng-template #notBookmarked>
-                <a class="btn" (click)="saveQuery()">
-                    <i class="icon-star-empty"></i>
-                </a>
-            </ng-template>
-
-            <div class="btn-group ms-2">
-                <button
-                    class="btn btn-sm btn-secondary btn-toggle"
-                    [class.btn-primary]="!showQueries"
-                    [disabled]="!showQueries"
-                    (click)="changeView(false)"
-                    type="button">
-                    {{ "common.designer" | sqxTranslate }}
-                </button>
-                <button
-                    class="btn btn-sm btn-secondary btn-toggle"
-                    [class.btn-primary]="showQueries"
-                    [disabled]="showQueries"
-                    (click)="changeView(true)"
-                    type="button">
-                    {{ "common.bookmarks" | sqxTranslate }}
-                </button>
+                <div class="btn-group ms-2">
+                    <button
+                        class="btn btn-sm btn-secondary btn-toggle"
+                        [class.btn-primary]="!showQueries"
+                        [disabled]="!showQueries"
+                        (click)="changeView(false)"
+                        type="button">
+                        {{ "common.designer" | sqxTranslate }}
+                    </button>
+                    <button
+                        class="btn btn-sm btn-secondary btn-toggle"
+                        [class.btn-primary]="showQueries"
+                        [disabled]="showQueries"
+                        (click)="changeView(true)"
+                        type="button">
+                        {{ "common.bookmarks" | sqxTranslate }}
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <ng-container *ngIf="!showQueries; else savedQueries">
-            <div class="form-horizontal" *ngIf="queryModel && statuses">
-                <sqx-query
-                    [language]="language"
-                    [languages]="languages"
-                    [model]="queryModel"
-                    [query]="query"
-                    [statuses]="statuses"
-                    (queryChange)="changeQuery($event)"></sqx-query>
+            @if (showQueries) {
+                @if (queryModel && statuses) {
+                    <div class="form-horizontal">
+                        <sqx-query
+                            [language]="language"
+                            [languages]="languages"
+                            [model]="queryModel"
+                            [query]="query"
+                            [statuses]="statuses"
+                            (queryChange)="changeQuery($event)"></sqx-query>
 
-                <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-            </div>
-        </ng-container>
-
-        <ng-template #savedQueries>
-            <div class="mt-4" *ngIf="queries && queriesTypes">
-                <sqx-shared-queries
-                    [types]="queriesTypes"
-                    [queryUsed]="query"
-                    [queries]="queries"
-                    (search)="changeQuery($event)"></sqx-shared-queries>
-            </div>
-        </ng-template>
+                        <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                    </div>
+                }
+            } @else {
+                @if (queries && queriesTypes) {
+                    <div class="mt-4">
+                        <sqx-shared-queries
+                            [types]="queriesTypes"
+                            [queryUsed]="query"
+                            [queries]="queries"
+                            (search)="changeQuery($event)"></sqx-shared-queries>
+                    </div>
+                }
+            }
+        }
     </ng-container>
 
     <ng-container footer>

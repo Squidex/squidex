@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf, NgSwitch } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, JobDto, JobsState, KNumberPipe, StatusIconComponent, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
@@ -23,8 +22,6 @@ import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, Ext
         FormsModule,
         FromNowPipe,
         KNumberPipe,
-        NgIf,
-        NgSwitch,
         StatusIconComponent,
         TooltipDirective,
         TranslatePipe,

@@ -1,72 +1,83 @@
 <div class="form-horizontal" [formGroup]="actionForm.form">
-    <div class="form-group row" *ngFor="let property of actionForm.definition.properties">
-        <label class="col-3 col-form-label" [for]="property.name">
-            <ng-container *ngIf="property.editor !== 'Checkbox'">{{ property.display }}</ng-container>
-            <small class="hint" *ngIf="property.isRequired">&nbsp;*</small>
-        </label>
+    @for (property of actionForm.definition.properties; track property.name) {
+        <div class="form-group row">
+            <label class="col-3 col-form-label" [for]="property.name">
+                @if (property.editor !== "Checkbox") {
+                    {{ property.display }}
+                }
+                @if (property.isRequired) {
+                    <small class="hint">&nbsp;*</small>
+                }
+            </label>
 
-        <div class="col-9">
-            <sqx-control-errors [for]="property.name"></sqx-control-errors>
+            <div class="col-9">
+                <sqx-control-errors [for]="property.name"></sqx-control-errors>
 
-            <ng-container [ngSwitch]="property.editor">
-                <ng-container *ngSwitchCase="'Text'">
-                    <ng-container *ngIf="property.isFormattable; else plain">
-                        <sqx-formattable-input [formControlName]="property.name" type="Text"></sqx-formattable-input>
-                    </ng-container>
-                    <ng-template #plain>
-                        <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
-                    </ng-template>
-                </ng-container>
-                <ng-container *ngSwitchCase="'TextArea'">
-                    <ng-container *ngIf="property.isFormattable; else plain">
-                        <sqx-formattable-input
+                @switch (property.editor) {
+                    @case ("Text") {
+                        @if (property.isFormattable) {
+                            <sqx-formattable-input [formControlName]="property.name" type="Text"></sqx-formattable-input>
+                        } @else {
+                            <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
+                        }
+                    }
+                    @case ("TextArea") {
+                        @if (property.isFormattable) {
+                            <sqx-formattable-input
+                                [completion]="ruleCompletions | async"
+                                [formControlName]="property.name"
+                                type="Code"></sqx-formattable-input>
+                        } @else {
+                            <textarea class="form-control" id="{{ property.name }}" [formControlName]="property.name"></textarea>
+                        }
+                    }
+                    @case ("JavaScript") {
+                        <sqx-code-editor
                             [completion]="ruleCompletions | async"
                             [formControlName]="property.name"
-                            type="Code"></sqx-formattable-input>
-                    </ng-container>
-                    <ng-template #plain>
-                        <textarea class="form-control" id="{{ property.name }}" [formControlName]="property.name"></textarea>
-                    </ng-template>
-                </ng-container>
-                <ng-container *ngSwitchCase="'Javascript'">
-                    <sqx-code-editor
-                        [completion]="ruleCompletions | async"
-                        [formControlName]="property.name"
-                        [height]="350"></sqx-code-editor>
-                </ng-container>
-                <ng-container *ngSwitchCase="'Checkbox'">
-                    <div class="form-check">
-                        <input class="form-check-input" id="{{ property.name }}" [formControlName]="property.name" type="checkbox" />
-                        <label class="form-check-label" for="{{ property.name }}">
-                            {{ property.display }}
-                        </label>
-                    </div>
-                </ng-container>
-                <ng-container *ngSwitchCase="'Dropdown'">
-                    <select class="form-select" [formControlName]="property.name">
-                        <option *ngIf="!property.isRequired"></option>
-                        <option *ngFor="let option of property.options" [ngValue]="option">{{ option }}</option>
-                    </select>
-                </ng-container>
-                <ng-container *ngSwitchDefault>
-                    <input
-                        class="form-control"
-                        id="{{ property.name }}"
-                        [formControlName]="property.name"
-                        type="{{ property.editor | lowercase }}" />
-                </ng-container>
-            </ng-container>
+                            [height]="350"></sqx-code-editor>
+                    }
+                    @case ("Checkbox") {
+                        <div class="form-check">
+                            <input class="form-check-input" id="{{ property.name }}" [formControlName]="property.name" type="checkbox" />
+                            <label class="form-check-label" for="{{ property.name }}">
+                                {{ property.display }}
+                            </label>
+                        </div>
+                    }
+                    @case ("Dropdown") {
+                        <select class="form-select" [formControlName]="property.name">
+                            @if (!property.isRequired) {
+                                <option></option>
+                            }
 
-            <sqx-form-hint>
-                <span [sqxMarkdown]="property.description" inline="true"></span>
+                            @for (option of property.options; track option) {
+                                <option [ngValue]="option">{{ option }}</option>
+                            }
+                        </select>
+                    }
+                    @default {
+                        <input
+                            class="form-control"
+                            id="{{ property.name }}"
+                            [formControlName]="property.name"
+                            type="{{ property.editor | lowercase }}" />
+                    }
+                }
 
-                <div *ngIf="property.isFormattable">
-                    {{ "rules.advancedFormattingHint" | sqxTranslate }}:
-                    <a tabindex="-1" href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink>
-                        {{ "common.documentation" | sqxTranslate }}
-                    </a>
-                </div>
-            </sqx-form-hint>
+                <sqx-form-hint>
+                    <span [sqxMarkdown]="property.description" inline="true"></span>
+
+                    @if (property.isFormattable) {
+                        <div>
+                            {{ "rules.advancedFormattingHint" | sqxTranslate }}:
+                            <a tabindex="-1" href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink>
+                                {{ "common.documentation" | sqxTranslate }}
+                            </a>
+                        </div>
+                    }
+                </sqx-form-hint>
+            </div>
         </div>
-    </div>
+    }
 </div>

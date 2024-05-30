@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -29,7 +29,6 @@ import { SavedQueriesComponent } from './shared-queries.component';
         MarkdownPipe,
         ModalDialogComponent,
         ModalDirective,
-        NgIf,
         QueryComponent,
         ReactiveFormsModule,
         SafeHtmlPipe,
@@ -39,7 +38,7 @@ import { SavedQueriesComponent } from './shared-queries.component';
         TooltipDirective,
         TourHintDirective,
         TourStepDirective,
-        TranslatePipe,
+        TranslatePipe
     ],
 })
 export class SearchFormComponent {

@@ -16,7 +16,6 @@ import { UIOptions } from '@app/shared';
     styleUrls: ['./feedback-menu.component.scss'],
     templateUrl: './feedback-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [],
 })
 export class FeedbackMenuComponent implements OnInit, OnDestroy {
     private widget?: MarkerSdk;

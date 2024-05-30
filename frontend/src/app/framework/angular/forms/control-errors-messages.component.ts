@@ -18,7 +18,6 @@ import { fadeAnimation } from '@app/framework/internal';
         fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [],
 })
 export class ControlErrorsMessagesComponent {
     @Input()

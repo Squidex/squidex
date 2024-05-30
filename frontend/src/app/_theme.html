@@ -1092,11 +1092,14 @@
                                     <i class="nav-icon icon-help2"></i>
                                 </a>
                             </li>
-                            <li class="nav-item" *ngIf="!isSettingsHidden(app)">
-                                <a class="nav-link">
-                                    <i class="nav-icon icon-settings"></i>
-                                </a>
-                            </li>
+
+                            @if (!isSettingsHidden(app)) {
+                                <li class="nav-item">
+                                    <a class="nav-link">
+                                        <i class="nav-icon icon-settings"></i>
+                                    </a>
+                                </li>
+                            }
                         </ul>
                     </div>
                 </div>
@@ -1488,7 +1491,7 @@
 
                             <div class="modal-dialog modal-lg" style="position: absolute; top: 50px; left: 50px; right: 50px; bottom: 50px; display: block;">
                                 <div class="modal-content">
-                                    <div class="modal-header with-tabs" *ngIf="showHeader">
+                                    <div class="modal-header with-tabs">
                                         <h4 class="modal-title">
                                             Title
                                         </h4>
@@ -1537,7 +1540,7 @@
 
                             <div class="modal-dialog modal-lg" style="position: absolute; top: 50px; left: 50px; right: 50px; bottom: 50px; display: block;">
                                 <div class="modal-content">
-                                    <div class="modal-header" *ngIf="showHeader">
+                                    <div class="modal-header">
                                         <h4 class="modal-title">
                                             Title
                                         </h4>

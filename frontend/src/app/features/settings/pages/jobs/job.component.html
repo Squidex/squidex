@@ -1,7 +1,7 @@
 <div class="table-items-row table-items-row-expandable">
     <div class="table-items-row-summary">
         <div class="row align-items-center">
-            <div class="col-auto pe-4" [ngSwitch]="job.status">
+            <div class="col-auto pe-4">
                 <sqx-status-icon [status]="job.status" size="lg"></sqx-status-icon>
             </div>
             <div class="col">
@@ -13,16 +13,14 @@
                     <div class="col">
                         {{ "jobs.startedLabel" | sqxTranslate }}:
 
-                        <span>
-                            {{ job.started | sqxFromNow }}
-                        </span>
+                        <span>{{ job.started | sqxFromNow }}</span>
                     </div>
                     <div class="col">
                         {{ "jobs.jobDuration" | sqxTranslate }}:
 
-                        <span *ngIf="job.stopped">
-                            {{ duration }}
-                        </span>
+                        @if (job.stopped) {
+                            <span>{{ duration }}</span>
+                        }
                     </div>
                 </div>
             </div>
@@ -58,20 +56,22 @@
         </div>
     </div>
 
-    <div class="table-items-row-details" *ngIf="expanded">
-        <div class="job-header">
-            <h4>{{ "common.details" | sqxTranslate }}</h4>
-        </div>
-        <div class="row job-dump">
-            <div class="col-12">
-                <sqx-code-editor
-                    [ngModel]="details"
-                    disabled="true"
-                    wordWrap="true"
-                    height="auto"
-                    minLines="12"
-                    mode="ace/mode/text"></sqx-code-editor>
+    @if (expanded) {
+        <div class="table-items-row-details">
+            <div class="job-header">
+                <h4>{{ "common.details" | sqxTranslate }}</h4>
+            </div>
+            <div class="row job-dump">
+                <div class="col-12">
+                    <sqx-code-editor
+                        [ngModel]="details"
+                        disabled="true"
+                        wordWrap="true"
+                        height="auto"
+                        minLines="12"
+                        mode="ace/mode/text"></sqx-code-editor>
+                </div>
             </div>
         </div>
-    </div>
+    }
 </div>

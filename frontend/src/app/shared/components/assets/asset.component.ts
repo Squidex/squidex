@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { ConfirmClickDirective, ExternalLinkDirective, FileDropDirective, FromNowPipe, HTTP, ImageSourceDirective, ProgressBarComponent, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetUploaderState, DialogService, StatefulComponent, Types, UploadCanceled } from '@app/shared/internal';
@@ -32,14 +32,12 @@ interface State {
         FileIconPipe,
         FromNowPipe,
         ImageSourceDirective,
-        NgFor,
-        NgIf,
         ProgressBarComponent,
         StopClickDirective,
         TooltipDirective,
         TranslatePipe,
         UserNameRefPipe,
-        UserPictureRefPipe,
+        UserPictureRefPipe
     ],
 })
 export class AssetComponent extends StatefulComponent<State> implements OnInit {

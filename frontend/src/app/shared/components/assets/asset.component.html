@@ -1,4 +1,4 @@
-<ng-container *ngIf="!isListView; else listTemplate">
+@if (!isListView) {
     <div
         class="card"
         [class.selectable]="isSelectable"
@@ -8,111 +8,125 @@
         (sqxDropFile)="updateFile($event)"
         sqxDropNoPaste="true">
         <div class="card-body">
-            <div class="file-preview" *ngIf="asset && snapshot.progress === 0">
-                <span class="file-type" *ngIf="asset.fileType">
-                    {{ asset.fileType }}
-                </span>
+            @if (asset && snapshot.progress === 0) {
+                <div class="file-preview">
+                    @if (asset.fileType) {
+                        <span class="file-type">
+                            {{ asset.fileType }}
+                        </span>
+                    }
 
-                <ng-container *ngIf="asset.canPreview; else noPreview">
-                    <div class="file-image">
-                        <img [sqxImageSource]="asset | sqxAssetPreviewUrl" layoutKey="asset-large" />
-                    </div>
-                </ng-container>
-                <ng-template #noPreview>
-                    <div class="file-icon">
-                        <img [src]="asset | sqxFileIcon" />
-                    </div>
-                </ng-template>
+                    @if (asset.canPreview) {
+                        <div class="file-image">
+                            <img [sqxImageSource]="asset | sqxAssetPreviewUrl" layoutKey="asset-large" />
+                        </div>
+                    } @else {
+                        <div class="file-icon">
+                            <img [src]="asset | sqxFileIcon" />
+                        </div>
+                    }
 
-                <div class="overlay">
-                    <div class="overlay-background"></div>
+                    <div class="overlay">
+                        <div class="overlay-background"></div>
 
-                    <div class="overlay-menu">
-                        <a class="file-edit ms-2" *ngIf="!isDisabled" (click)="emitEdit()">
-                            <i class="icon-pencil"></i>
-                        </a>
-
-                        <a
-                            class="file-download ms-2"
-                            [href]="asset | sqxAssetUrl: asset.version : false"
-                            sqxStopClick
-                            sqxExternalLink="noicon">
-                            <i class="icon-download"></i>
-                        </a>
-
-                        <a class="file-folder ms-2" *ngIf="folderIcon" (click)="selectFolder.emit(asset.parentId)">
-                            <i class="icon-folder"></i>
-                        </a>
-
-                        <ng-container *ngIf="!isDisabled">
-                            <a
-                                class="file-delete ms-2"
-                                *ngIf="!removeMode && asset.canDelete"
-                                (sqxConfirmClick)="delete.emit()"
-                                confirmTitle="i18n:assets.deleteConfirmTitle"
-                                confirmText="i18n:assets.deleteConfirmText"
-                                confirmRememberKey="deleteAsset">
-                                <i class="icon-delete"></i>
-                            </a>
+                        <div class="overlay-menu">
+                            @if (!isDisabled) {
+                                <a class="file-edit ms-2" (click)="emitEdit()">
+                                    <i class="icon-pencil"></i>
+                                </a>
+                            }
 
                             <a
-                                class="file-delete ms-2"
-                                *ngIf="removeMode"
-                                (sqxConfirmClick)="remove.emit()"
-                                confirmTitle="i18n:assets.removeConfirmTitle"
-                                confirmText="i18n:assets.removeConfirmText"
-                                confirmRememberKey="removeAsset">
-                                <i class="icon-close"></i>
+                                class="file-download ms-2"
+                                [href]="asset | sqxAssetUrl: asset.version : false"
+                                sqxStopClick
+                                sqxExternalLink="noicon">
+                                <i class="icon-download"></i>
                             </a>
-                        </ng-container>
-                    </div>
 
-                    <span class="overlay-type" *ngIf="asset.fileType">
-                        {{ asset.fileType }}
-                    </span>
+                            @if (folderIcon) {
+                                <a class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)">
+                                    <i class="icon-folder"></i>
+                                </a>
+                            }
 
-                    <div class="overlay-user">
-                        <div>
-                            <i class="icon-user"></i>
-                            {{ asset.lastModifiedBy | sqxUserNameRef }}
+                            @if (!isDisabled && !removeMode && asset.canDelete) {
+                                <a
+                                    class="file-delete ms-2"
+                                    (sqxConfirmClick)="delete.emit()"
+                                    confirmTitle="i18n:assets.deleteConfirmTitle"
+                                    confirmText="i18n:assets.deleteConfirmText"
+                                    confirmRememberKey="deleteAsset">
+                                    <i class="icon-delete"></i>
+                                </a>
+                            }
+
+                            @if (!isDisabled && removeMode) {
+                                <a
+                                    class="file-delete ms-2"
+                                    (sqxConfirmClick)="remove.emit()"
+                                    confirmTitle="i18n:assets.removeConfirmTitle"
+                                    confirmText="i18n:assets.removeConfirmText"
+                                    confirmRememberKey="removeAsset">
+                                    <i class="icon-close"></i>
+                                </a>
+                            }
                         </div>
-                        <div>
-                            {{ asset.lastModified | sqxFromNow }}
+
+                        @if (asset.fileType) {
+                            <span class="overlay-type">
+                                {{ asset.fileType }}
+                            </span>
+                        }
+
+                        <div class="overlay-user">
+                            <div>
+                                <i class="icon-user"></i>
+                                {{ asset.lastModifiedBy | sqxUserNameRef }}
+                            </div>
+                            <div>
+                                {{ asset.lastModified | sqxFromNow }}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="drop-overlay align-items-center justify-content-center">
-                    <div class="drop-overlay-background"></div>
-                    <div class="drop-overlay-text">{{ "assets.dropToUpdate" | sqxTranslate }}</div>
-                </div>
-            </div>
-
-            <div class="upload-progress" *ngIf="snapshot.progress > 0">
-                <sqx-progress-bar [value]="snapshot.progress" mode="Circle"></sqx-progress-bar>
-            </div>
-        </div>
-        <div class="card-footer" (dblclick)="emitEdit()">
-            <ng-container *ngIf="asset">
-                <div>
-                    <div class="file-name truncate editable" (click)="emitEdit()">
-                        <i class="icon-lock" *ngIf="asset?.isProtected"></i>
-
-                        {{ asset.fileName }}
+                    <div class="drop-overlay align-items-center justify-content-center">
+                        <div class="drop-overlay-background"></div>
+                        <div class="drop-overlay-text">{{ "assets.dropToUpdate" | sqxTranslate }}</div>
                     </div>
                 </div>
-                <div class="file-tags tags">
-                    <div class="tag" *ngFor="let tag of asset.tags">{{ tag }}</div>
+
+                @if (snapshot.progress > 0) {
+                    <div class="upload-progress">
+                        <sqx-progress-bar [value]="snapshot.progress" mode="Circle"></sqx-progress-bar>
+                    </div>
+                }
+            }
+
+            @if (asset) {
+                <div class="card-footer" (dblclick)="emitEdit()">
+                    <div>
+                        <div class="file-name truncate editable" (click)="emitEdit()">
+                            @if (asset.isProtected) {
+                                <i class="icon-lock"></i>
+                            }
+
+                            {{ asset.fileName }}
+                        </div>
+                    </div>
+                    <div class="file-tags tags">
+                        @for (tag of asset.tags; track tag) {
+                            <div class="tag">{{ tag }}</div>
+                        }
+                    </div>
+                    <div class="file-info">
+                        {{ asset.metadataText }}
+                    </div>
                 </div>
-                <div class="file-info">
-                    {{ asset.metadataText }}
-                </div>
-            </ng-container>
+            }
         </div>
     </div>
-</ng-container>
-
-<ng-template #listTemplate>
+} @else {
     <div
         class="table-items-row table-items-row-summary"
         [class.selectable]="isSelectable"
@@ -122,29 +136,30 @@
         (sqxDropFile)="updateFile($event)">
         <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected"></div>
 
-        <ng-container *ngIf="asset && snapshot.progress === 0">
-            <ng-container *ngIf="asset.canPreview; else noPreview">
+        @if (asset && snapshot.progress === 0) {
+            @if (asset.canPreview) {
                 <div class="image" [class.image-left]="!isSelectable">
                     <img class="bg2" [sqxImageSource]="asset | sqxAssetPreviewUrl" layoutKey="asset-small" />
                 </div>
-            </ng-container>
-            <ng-template #noPreview>
+            } @else {
                 <div class="image image-padded" [class.image-left]="!isSelectable">
                     <img class="icon" [src]="asset | sqxFileIcon" />
                 </div>
-            </ng-template>
+            }
 
             <table class="table-fixed">
                 <tr>
                     <td class="col-name">
                         <div class="file-name truncate editable" (click)="emitEdit()">
-                            <i class="icon-lock" *ngIf="asset?.isProtected"></i>
+                            @if (asset.isProtected) {
+                                <i class="icon-lock"></i>
+                            }
 
                             {{ asset.fileName }}
                         </div>
                     </td>
 
-                    <ng-container *ngIf="!isCompact">
+                    @if (!isCompact) {
                         <td class="col-info">
                             <div class="truncate">{{ asset.metadataText }}</div>
                         </td>
@@ -163,40 +178,40 @@
                                 <i class="icon-download"></i>
                             </a>
 
-                            <button
-                                class="btn btn-text-secondary"
-                                *ngIf="folderIcon"
-                                (click)="selectFolder.emit(asset.parentId)"
-                                type="button">
-                                <i class="icon-folder"></i>
-                            </button>
+                            @if (folderIcon) {
+                                <button class="btn btn-text-secondary" (click)="selectFolder.emit(asset.parentId)" type="button">
+                                    <i class="icon-folder"></i>
+                                </button>
+                            }
                         </td>
-                    </ng-container>
+                    }
 
                     <td class="col-delete text-end">
-                        <button
-                            class="btn btn-text-danger"
-                            *ngIf="!removeMode && asset.canDelete"
-                            [disabled]="isDisabled"
-                            (sqxConfirmClick)="delete.emit()"
-                            type="button"
-                            confirmTitle="i18n:assets.deleteConfirmTitle"
-                            confirmText="i18n:assets.deleteConfirmText"
-                            confirmRememberKey="deleteAsset">
-                            <i class="icon-bin2"></i>
-                        </button>
+                        @if (!isDisabled && !removeMode && asset.canDelete) {
+                            <button
+                                class="btn btn-text-danger"
+                                [disabled]="isDisabled"
+                                (sqxConfirmClick)="delete.emit()"
+                                type="button"
+                                confirmTitle="i18n:assets.deleteConfirmTitle"
+                                confirmText="i18n:assets.deleteConfirmText"
+                                confirmRememberKey="deleteAsset">
+                                <i class="icon-bin2"></i>
+                            </button>
+                        }
 
-                        <button
-                            class="btn btn-text-secondary"
-                            *ngIf="removeMode"
-                            [disabled]="isDisabled"
-                            (sqxConfirmClick)="remove.emit()"
-                            type="button"
-                            confirmTitle="i18n:assets.removeConfirmTitle"
-                            confirmText="i18n:assets.removeConfirmText"
-                            confirmRememberKey="removeAsset">
-                            <i class="icon-close"></i>
-                        </button>
+                        @if (!isDisabled && removeMode) {
+                            <button
+                                class="btn btn-text-secondary"
+                                [disabled]="isDisabled"
+                                (sqxConfirmClick)="remove.emit()"
+                                type="button"
+                                confirmTitle="i18n:assets.removeConfirmTitle"
+                                confirmText="i18n:assets.removeConfirmText"
+                                confirmRememberKey="removeAsset">
+                                <i class="icon-close"></i>
+                            </button>
+                        }
                     </td>
                 </tr>
             </table>
@@ -205,10 +220,12 @@
                 <div class="drop-overlay-background"></div>
                 <div class="drop-overlay-text">{{ "assets.dropToUpdate" | sqxTranslate }}</div>
             </div>
-        </ng-container>
+        }
 
-        <div class="upload-progress" *ngIf="snapshot.progress > 0">
-            <sqx-progress-bar [value]="snapshot.progress" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>
-        </div>
+        @if (snapshot.progress > 0) {
+            <div class="upload-progress">
+                <sqx-progress-bar [value]="snapshot.progress" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>
+            </div>
+        }
     </div>
-</ng-template>
+}
