@@ -43,7 +43,7 @@ export class ContentEventComponent {
         if (changes.event) {
             this.canLoadOrCompare =
                 (this.event.eventType === 'ContentUpdatedEvent' ||
-                this.event.eventType === 'ContentCreatedEventV2') &&
+                 this.event.eventType === 'ContentCreatedEventV2') &&
                 !this.event.version.eq(this.content.version);
         }
     }
