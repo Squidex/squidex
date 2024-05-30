@@ -22,10 +22,10 @@
                 <input
                     class="form-control"
                     id="name"
-                    formControlName="name"
                     autocomplete="off"
-                    sqxTransformInput="LowerCase"
-                    sqxFocusOnInit />
+                    formControlName="name"
+                    sqxFocusOnInit
+                    sqxTransformInput="LowerCase" />
 
                 <sqx-form-hint>
                     {{ "schemas.schemaNameHint" | sqxTranslate }}
@@ -36,7 +36,7 @@
                 <div class="row">
                     <div class="col-6 type">
                         <label>
-                            <input class="radio-input" [value]="'Default'" type="radio" name="type" formControlName="type" />
+                            <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Default'" />
 
                             <div class="row g-0">
                                 <div class="col-auto">
@@ -53,7 +53,7 @@
                     </div>
                     <div class="col-6 type">
                         <label>
-                            <input class="radio-input" [value]="'Singleton'" type="radio" name="type" formControlName="type" />
+                            <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Singleton'" />
 
                             <div class="row g-0">
                                 <div class="col-auto">
@@ -70,7 +70,7 @@
                     </div>
                     <div class="col-6 type">
                         <label>
-                            <input class="radio-input" [value]="'Component'" type="radio" name="type" formControlName="type" />
+                            <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Component'" />
 
                             <div class="row g-0">
                                 <div class="col-auto">
@@ -115,7 +115,7 @@
                 </button>
 
                 @if (showImport) {
-                    <sqx-code-editor [height]="250" formControlName="importing" valueMode="Json"></sqx-code-editor>
+                    <sqx-code-editor formControlName="importing" [height]="250" valueMode="Json"></sqx-code-editor>
                 }
             </div>
         </ng-container>

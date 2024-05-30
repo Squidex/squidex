@@ -11,9 +11,9 @@
                 @for (form of schemasForm.controls; track form; let i = $index) {
                     <div class="mb-2">
                         <sqx-content-changed-schema
-                            [schemas]="schemas"
                             [form]="$any(form)"
-                            (remove)="removeSchema(i)"></sqx-content-changed-schema>
+                            (remove)="removeSchema(i)"
+                            [schemas]="schemas"></sqx-content-changed-schema>
                     </div>
                 }
                 <div class="form-group row gx-2 align-items-center">
@@ -37,7 +37,7 @@
 
         <div class="form-group" [formGroup]="triggerForm.form">
             <div class="form-check">
-                <input class="form-check-input" id="handleAll" type="checkbox" formControlName="handleAll" />
+                <input class="form-check-input" id="handleAll" formControlName="handleAll" type="checkbox" />
                 <label class="form-check-label" for="handleAll">
                     {{ "rules.triggerAll" | sqxTranslate }}
                 </label>
@@ -55,9 +55,9 @@
         @for (form of referencedSchemasForm.controls; track form; let i = $index) {
             <div class="mb-2">
                 <sqx-content-changed-schema
-                    [schemas]="schemas"
                     [form]="$any(form)"
-                    (remove)="removeReferencedSchema(i)"></sqx-content-changed-schema>
+                    (remove)="removeReferencedSchema(i)"
+                    [schemas]="schemas"></sqx-content-changed-schema>
             </div>
         }
 

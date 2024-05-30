@@ -8,12 +8,12 @@
     <td class="cell-actions">
         <button
             class="btn btn-text-danger"
+            confirmRememberKey="removeContributor"
+            confirmText="i18n:contributors.deleteConfirmText"
+            confirmTitle="i18n:contributors.deleteConfirmTitle"
             [disabled]="!contributor.canRevoke"
             (sqxConfirmClick)="remove()"
-            type="button"
-            confirmTitle="i18n:contributors.deleteConfirmTitle"
-            confirmText="i18n:contributors.deleteConfirmText"
-            confirmRememberKey="removeContributor">
+            type="button">
             <i class="icon-bin2"></i>
         </button>
     </td>

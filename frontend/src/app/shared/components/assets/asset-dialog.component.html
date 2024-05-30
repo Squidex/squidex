@@ -1,5 +1,5 @@
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
-    <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl" fullHeight="true" showFooter="false" hasTabs="true">
+    <sqx-modal-dialog (dialogClose)="dialogClose.emit()" fullHeight="true" hasTabs="true" showFooter="false" size="xl">
         <ng-container title>
             {{ "assets.edit" | sqxTranslate }}
         </ng-container>
@@ -59,8 +59,8 @@
                             <button
                                 class="btn btn-primary"
                                 [class.invisible]="!isUploadable"
-                                [disabled]="progress > 0"
                                 (click)="cropImage()"
+                                [disabled]="progress > 0"
                                 type="button">
                                 {{ "common.upload" | sqxTranslate }}
                             </button>
@@ -105,9 +105,9 @@
                                     <div class="row align-items-center g-2">
                                         <div class="col">
                                             <sqx-asset-path
-                                                [path]="pathItems | async"
+                                                all="true"
                                                 (navigate)="navigate($event.id)"
-                                                all="true"></sqx-asset-path>
+                                                [path]="pathItems | async"></sqx-asset-path>
                                         </div>
                                         @if (isMoveable) {
                                             <div class="col-auto">
@@ -123,7 +123,7 @@
                         <div class="form-group">
                             <label for="id">{{ "common.id" | sqxTranslate }}</label>
                             <div class="input-group">
-                                <input class="form-control" id="id" #inputId readonly name="id" value="{{ asset.id }}" />
+                                <input class="form-control" id="id" #inputId name="id" readonly value="{{ asset.id }}" />
                                 <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
                                     <i class="icon-copy"></i>
                                 </button>
@@ -136,8 +136,8 @@
                                     class="form-control"
                                     id="url"
                                     #inputUrl
-                                    readonly
                                     name="url"
+                                    readonly
                                     value="{{ asset | sqxAssetUrl: asset.version : false }}" />
                                 <button class="btn btn-outline-secondary" [sqxCopy]="inputUrl" type="button">
                                     <i class="icon-copy"></i>
@@ -156,8 +156,8 @@
                                 class="form-control slug"
                                 id="slug"
                                 formControlName="slug"
-                                sqxTransformInput="Slugify"
-                                spellcheck="false" />
+                                spellcheck="false"
+                                sqxTransformInput="Slugify" />
                             <button class="btn btn-text-secondary btn-sm slug-generate" (click)="generateSlug()" type="button">
                                 {{ "common.generate" | sqxTranslate }}
                             </button>
@@ -167,10 +167,10 @@
                                 <label>{{ "common.tags" | sqxTranslate }}</label>
                                 <sqx-control-errors for="tags"></sqx-control-errors>
                                 <sqx-tag-editor
-                                    [itemsSource]="tags"
                                     allowDuplicates="false"
-                                    undefinedWhenEmpty="false"
-                                    formControlName="tags"></sqx-tag-editor>
+                                    formControlName="tags"
+                                    [itemsSource]="tags"
+                                    undefinedWhenEmpty="false"></sqx-tag-editor>
                             </div>
                         }
                         <div class="form-group">
@@ -178,16 +178,16 @@
                             @for (form of annotateForm.metadataControls; track form; let i = $index) {
                                 <div class="metadata-row row g-0" [formGroup]="form">
                                     <div class="col col-name pe-1">
-                                        <sqx-control-errors for="name" fieldName="Name"></sqx-control-errors>
+                                        <sqx-control-errors fieldName="Name" for="name"></sqx-control-errors>
                                         <input
                                             class="form-control"
-                                            maxlength="1000"
                                             formControlName="name"
+                                            maxlength="1000"
                                             placeholder="{{ 'common.name' | sqxTranslate }}"
                                             spellcheck="false" />
                                     </div>
                                     <div class="col pe-1">
-                                        <sqx-control-errors for="value" fieldName="Value"></sqx-control-errors>
+                                        <sqx-control-errors fieldName="Value" for="value"></sqx-control-errors>
                                         <input
                                             class="form-control"
                                             formControlName="value"
@@ -196,12 +196,12 @@
                                     <div class="col-auto col-options">
                                         <button
                                             class="btn btn-text-danger"
+                                            confirmRememberKey="removeAssetMetadata"
+                                            confirmText="i18n:assets.deleteMetadataConfirmText"
+                                            confirmTitle="i18n:assets.deleteMetadataConfirmTitle"
                                             [disabled]="!isEditable"
                                             (sqxConfirmClick)="annotateForm.metadata.removeAt(i)"
-                                            type="button"
-                                            confirmTitle="i18n:assets.deleteMetadataConfirmTitle"
-                                            confirmText="i18n:assets.deleteMetadataConfirmText"
-                                            confirmRememberKey="removeAssetMetadata">
+                                            type="button">
                                             <i class="icon-bin2"></i>
                                         </button>
                                     </div>
@@ -210,15 +210,15 @@
                             <div class="form-group">
                                 <button
                                     class="btn btn-success"
-                                    [disabled]="!isEditable"
                                     (click)="annotateForm.metadata.add()"
+                                    [disabled]="!isEditable"
                                     type="button">
                                     {{ "assets.metadataAdd" | sqxTranslate }}
                                 </button>
                             </div>
                         </div>
                         <div class="form-group form-check">
-                            <input class="form-check-input" id="isProtected" type="checkbox" formControlName="isProtected" />
+                            <input class="form-check-input" id="isProtected" formControlName="isProtected" type="checkbox" />
                             <label class="form-check-label" for="isProtected">{{ "assets.protected" | sqxTranslate }}</label>
                             <sqx-form-hint>
                                 {{ "assets.protectedHint" | sqxTranslate }}
@@ -238,10 +238,10 @@
                         @if (progress > 0) {
                             <div class="editor-progress">
                                 <sqx-progress-bar
-                                    [value]="progress"
                                     strokeWidth="2"
                                     trailColor="transparent"
-                                    trailWidth="0"></sqx-progress-bar>
+                                    trailWidth="0"
+                                    [value]="progress"></sqx-progress-bar>
                             </div>
                         }
                     </div>
@@ -249,15 +249,15 @@
                 @case (2) {
                     <div>
                         <sqx-image-focus-point
-                            [imageSource]="asset | sqxAssetPreviewUrl"
-                            [focusPoint]="asset.metadata"></sqx-image-focus-point>
+                            [focusPoint]="asset.metadata"
+                            [imageSource]="asset | sqxAssetPreviewUrl"></sqx-image-focus-point>
                         @if (progress > 0) {
                             <div class="editor-progress">
                                 <sqx-progress-bar
-                                    [value]="progress"
                                     strokeWidth="2"
                                     trailColor="transparent"
-                                    trailWidth="0"></sqx-progress-bar>
+                                    trailWidth="0"
+                                    [value]="progress"></sqx-progress-bar>
                             </div>
                         }
                     </div>
@@ -265,16 +265,16 @@
                 @case (3) {
                     <div class="editor">
                         <sqx-asset-text-editor
-                            [fileSource]="asset | sqxAssetPreviewUrl"
                             [fileName]="asset.fileName"
+                            [fileSource]="asset | sqxAssetPreviewUrl"
                             [mimeType]="asset.mimeType"></sqx-asset-text-editor>
                         @if (progress > 0) {
                             <div class="editor-progress">
                                 <sqx-progress-bar
-                                    [value]="progress"
                                     strokeWidth="2"
                                     trailColor="transparent"
-                                    trailWidth="0"></sqx-progress-bar>
+                                    trailWidth="0"
+                                    [value]="progress"></sqx-progress-bar>
                             </div>
                         }
                     </div>
@@ -282,12 +282,12 @@
                 @case (4) {
                     @if (asset | sqxPreviewable) {
                         <ngx-doc-viewer
-                            [url]="asset | sqxAssetPreviewUrl"
                             [style]="{}"
-                            viewer="google"
-                            style="width: 100%; height: 50vh"></ngx-doc-viewer>
+                            style="width: 100%; height: 50vh"
+                            [url]="asset | sqxAssetPreviewUrl"
+                            viewer="google"></ngx-doc-viewer>
                     } @else {
-                        <sqx-video-player [source]="asset | sqxAssetPreviewUrl" [mimeType]="asset.mimeType"></sqx-video-player>
+                        <sqx-video-player [mimeType]="asset.mimeType" [source]="asset | sqxAssetPreviewUrl"></sqx-video-player>
                     }
                 }
                 @case (5) {

@@ -9,15 +9,15 @@
             <div class="col" [class.disabled]="snapshot.isDisabled">
                 <div
                     class="drop-area align-items-center"
-                    [sqxDropDisabled]="snapshot.isDisabled"
                     (click)="assetsDialog.show()"
+                    [sqxDropDisabled]="snapshot.isDisabled"
                     (sqxDropFile)="addFiles($event)">
                     {{ "contents.assetsUpload" | sqxTranslate }}
                 </div>
             </div>
             @if (hasChatBot) {
                 <div class="col-auto">
-                    <button class="btn btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" type="button" tabindex="-1">
+                    <button class="btn btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" tabindex="-1" type="button">
                         AI
                     </button>
                 </div>
@@ -27,16 +27,16 @@
                     <button
                         class="btn btn-secondary btn-toggle"
                         [class.btn-primary]="snapshot.isListView"
-                        [disabled]="snapshot.isListView"
                         (click)="changeView(true)"
+                        [disabled]="snapshot.isListView"
                         type="button">
                         <i class="icon-list"></i>
                     </button>
                     <button
                         class="btn btn-secondary btn-toggle"
                         [class.btn-primary]="!snapshot.isListView"
-                        [disabled]="!snapshot.isListView"
                         (click)="changeView(false)"
+                        [disabled]="!snapshot.isListView"
                         type="button">
                         <i class="icon-grid"></i>
                     </button>
@@ -45,27 +45,27 @@
         </div>
     </div>
 
-    <div class="body" (sqxResizeCondition)="setCompact($event)" sqxResizeMinWidth="600" sqxResizeMaxWidth="0">
+    <div class="body" (sqxResizeCondition)="setCompact($event)" sqxResizeMaxWidth="0" sqxResizeMinWidth="600">
         @if (!snapshot.isListView) {
             <div class="row g-0">
                 @for (file of snapshot.assetFiles; track file) {
                     <sqx-asset
                         [assetFile]="file"
+                        [folderId]="folderId"
                         [isCompact]="snapshot.isCompact"
                         [isDisabled]="snapshot.isDisabled"
-                        [folderId]="folderId"
                         (loadDone)="addAsset(file, $event)"
                         (loadError)="removeLoadingAsset(file)"></sqx-asset>
                 }
                 @for (asset of snapshot.assetItems; track asset.id) {
                     <sqx-asset
                         [asset]="asset"
+                        (edit)="editStart($event)"
                         [isCompact]="snapshot.isCompact"
                         [isDisabled]="snapshot.isDisabled"
-                        (edit)="editStart($event)"
                         (remove)="removeLoadedAsset(asset)"
-                        (update)="notifyOthers(asset)"
-                        removeMode="true"></sqx-asset>
+                        removeMode="true"
+                        (update)="notifyOthers(asset)"></sqx-asset>
                 }
             </div>
         } @else {
@@ -76,26 +76,26 @@
                         [folderId]="folderId"
                         [isCompact]="snapshot.isCompact"
                         [isDisabled]="snapshot.isDisabled"
+                        isListView="true"
                         (loadDone)="addAsset(file, $event)"
-                        (loadError)="removeLoadingAsset(file)"
-                        isListView="true"></sqx-asset>
+                        (loadError)="removeLoadingAsset(file)"></sqx-asset>
                 }
                 <div
-                    [cdkDropListDisabled]="snapshot.isDisabled"
+                    cdkDropList
                     [cdkDropListData]="snapshot.assetItems"
-                    (cdkDropListDropped)="sortAssets($event)"
-                    cdkDropList>
+                    [cdkDropListDisabled]="snapshot.isDisabled"
+                    (cdkDropListDropped)="sortAssets($event)">
                     @for (asset of snapshot.assetItems; track asset.id) {
                         <div class="table-drag" cdkDrag cdkDragLockAxis="y">
                             <sqx-asset
                                 [asset]="asset"
+                                (edit)="editStart($event)"
                                 [isCompact]="snapshot.isCompact"
                                 [isDisabled]="snapshot.isDisabled"
-                                [removeMode]="true"
-                                (edit)="editStart($event)"
+                                isListView="true"
                                 (remove)="removeLoadedAsset(asset)"
-                                (update)="notifyOthers(asset)"
-                                isListView="true"></sqx-asset>
+                                [removeMode]="true"
+                                (update)="notifyOthers(asset)"></sqx-asset>
                         </div>
                     }
                 </div>
@@ -104,13 +104,13 @@
     </div>
 </div>
 
-<sqx-asset-selector *sqxModal="assetsDialog" (assetSelect)="selectAssets($event)"></sqx-asset-selector>
+<sqx-asset-selector (assetSelect)="selectAssets($event)" *sqxModal="assetsDialog"></sqx-asset-selector>
 
 <sqx-asset-dialog
-    *sqxModal="snapshot.editAsset; isDialog: true"
     [asset]="snapshot.editAsset!"
     (assetReplaced)="notifyOthers($event)"
     (assetUpdated)="notifyOthers($event)"
-    (dialogClose)="editDone()"></sqx-asset-dialog>
+    (dialogClose)="editDone()"
+    *sqxModal="snapshot.editAsset; isDialog: true"></sqx-asset-dialog>
 
-<sqx-chat-dialog *sqxModal="chatDialog" (contentSelect)="addAssetFromAI($event)" configuration="image" copyMode="Image"></sqx-chat-dialog>
+<sqx-chat-dialog configuration="image" (contentSelect)="addAssetFromAI($event)" copyMode="Image" *sqxModal="chatDialog"></sqx-chat-dialog>

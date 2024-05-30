@@ -16,18 +16,18 @@
     <div class="col">
         <sqx-control-errors for="condition"></sqx-control-errors>
 
-        <sqx-code-editor [completion]="completions | async" singleLine="true" formControlName="condition"></sqx-code-editor>
+        <sqx-code-editor [completion]="completions | async" formControlName="condition" singleLine="true"></sqx-code-editor>
     </div>
 
     <div class="col-auto">
         <button
             class="btn btn-text-danger"
+            confirmRememberKey="deleteContentChangedSchema"
+            confirmText="i18n:rules.deleteContentChangedSchemaText"
+            confirmTitle="i18n:rules.deleteContentChangedSchemaTitle"
             [disabled]="form.disabled"
             (sqxConfirmClick)="remove.emit()"
-            type="button"
-            confirmTitle="i18n:rules.deleteContentChangedSchemaTitle"
-            confirmText="i18n:rules.deleteContentChangedSchemaText"
-            confirmRememberKey="deleteContentChangedSchema">
+            type="button">
             <i class="icon-bin2"></i>
         </button>
     </div>

@@ -2,8 +2,8 @@
     class="references-container"
     [class.expanded]="isExpanded"
     (sqxResizeCondition)="setCompact($event)"
-    sqxResizeMinWidth="600"
-    sqxResizeMaxWidth="0">
+    sqxResizeMaxWidth="0"
+    sqxResizeMinWidth="600">
     <ng-container>
         <div class="drop-area-container" [class.disabled]="snapshot.isDisabled">
             <div class="drop-area">
@@ -18,24 +18,24 @@
         @if (snapshot.contentItems && snapshot.contentItems.length > 0) {
             <table
                 class="table table-items table-fixed"
-                [class.disabled]="snapshot.isDisabled"
+                cdkDropList
                 [cdkDropListData]="snapshot.contentItems"
                 [cdkDropListDisabled]="snapshot.isDisabled"
                 (cdkDropListDropped)="sort($event)"
-                cdkDropList>
+                [class.disabled]="snapshot.isDisabled">
                 @for (content of snapshot.contentItems; track content.id) {
                     <tbody
                         class="table-drag"
-                        [sqxReferenceItem]="content"
+                        cdkDrag
+                        cdkDragLockAxis="y"
+                        (clone)="createContent(content)"
                         [columns]="snapshot.contentItems | sqxContentsColumns"
+                        (delete)="remove(content)"
                         [isCompact]="snapshot.isCompact"
                         [isDisabled]="snapshot.isDisabled"
                         [language]="language"
                         [languages]="languages"
-                        (clone)="createContent(content)"
-                        (delete)="remove(content)"
-                        cdkDrag
-                        cdkDragLockAxis="y">
+                        [sqxReferenceItem]="content">
                         <i class="icon-drag2 drag-handle" cdkDragHandle></i>
                     </tbody>
                 }
@@ -45,21 +45,21 @@
 </div>
 
 <sqx-content-creator
-    *sqxModal="contentCreatorDialog"
+    (contentCreate)="select($event)"
     [formContext]="formContext"
     [initialData]="clonedContent?.data"
     [language]="language"
     [languages]="languages"
-    [schemaName]="clonedContent?.schemaName"
     [schemaIds]="schemaIds"
-    (contentCreate)="select($event)"></sqx-content-creator>
+    [schemaName]="clonedContent?.schemaName"
+    *sqxModal="contentCreatorDialog"></sqx-content-creator>
 
 <sqx-content-selector
-    *sqxModal="contentSelectorDialog"
     [allowDuplicates]="allowDuplicates"
     [alreadySelected]="snapshot.contentItems"
+    (contentSelect)="select($event)"
     [language]="language"
     [languages]="languages"
     [query]="query"
     [schemaIdentifiers]="schemaIds"
-    (contentSelect)="select($event)"></sqx-content-selector>
+    *sqxModal="contentSelectorDialog"></sqx-content-selector>

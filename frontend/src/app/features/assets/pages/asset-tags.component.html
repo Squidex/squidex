@@ -27,6 +27,6 @@
 </div>
 
 <sqx-asset-tag-dialog
+    (dialogClose)="tagRenameDialog.hide()"
     *sqxModal="tagRenameDialog"
-    [tagName]="tagRenaming!.name"
-    (dialogClose)="tagRenameDialog.hide()"></sqx-asset-tag-dialog>
+    [tagName]="tagRenaming!.name"></sqx-asset-tag-dialog>

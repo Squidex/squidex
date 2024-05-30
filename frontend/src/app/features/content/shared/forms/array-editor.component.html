@@ -2,32 +2,32 @@
     @if (items.length > 0 && items.length <= 20) {
         <div
             class="array-container static"
-            [class.expanded]="isExpanded"
-            [cdkDropListSortingDisabled]="isDisabled | async"
-            [cdkDropListDisabled]="isDisabled | async"
+            cdkDropList
             [cdkDropListData]="items"
+            [cdkDropListDisabled]="isDisabled | async"
             (cdkDropListDropped)="sort($event)"
-            cdkDropList>
+            [cdkDropListSortingDisabled]="isDisabled | async"
+            [class.expanded]="isExpanded">
             @for (itemForm of items; track itemForm; let i = $index; let isLast = $last; let isFirst = $first) {
-                <div class="table-drag item" [class.first]="isFirst" [class.last]="isLast" cdkDrag cdkDragLockAxis="y">
+                <div class="table-drag item" cdkDrag cdkDragLockAxis="y" [class.first]="isFirst" [class.last]="isLast">
                     <sqx-array-item
+                        (clone)="addCopy(itemForm)"
                         [form]="form"
                         [formContext]="formContext"
                         [formLevel]="formLevel + 1"
                         [formModel]="itemForm"
+                        [hasChatBot]="hasChatBot"
                         [index]="i"
-                        [isComparing]="isComparing"
                         [isCollapsedInitial]="isCollapsedInitial"
+                        [isComparing]="isComparing"
                         [isDisabled]="isDisabled | async"
                         [isFirst]="isFirst"
                         [isLast]="isLast"
-                        [hasChatBot]="hasChatBot"
-                        [language]="language"
-                        [languages]="languages"
-                        (clone)="addCopy(itemForm)"
+                        (itemMove)="move(itemForm, $event)"
                         (itemRemove)="removeItem(i)"
-                        (itemMove)="move(itemForm, $event)">
-                        <i class="icon-drag2" [class.disabled]="isDisabled | async" cdkDragHandle></i>
+                        [language]="language"
+                        [languages]="languages">
+                        <i class="icon-drag2" cdkDragHandle [class.disabled]="isDisabled | async"></i>
                     </sqx-array-item>
                 </div>
             }
@@ -35,30 +35,30 @@
     }
     @if (items.length > 20) {
         <div class="array-container" [class.expanded]="isExpanded">
-            <virtual-scroller #scroll [items]="$any(items)" [enableUnequalChildrenSizes]="true">
+            <virtual-scroller #scroll [enableUnequalChildrenSizes]="true" [items]="$any(items)">
                 @for (itemForm of scroll.viewPortItems; track itemForm; let i = $index) {
                     <div
                         class="item"
                         [class.first]="scroll.viewPortInfo.startIndexWithBuffer + i === 0"
                         [class.last]="scroll.viewPortInfo.startIndexWithBuffer + i === items.length - 1">
                         <sqx-array-item
+                            (clone)="addCopy(itemForm)"
                             [form]="form"
                             [formContext]="formContext"
                             [formLevel]="formLevel + 1"
                             [formModel]="itemForm"
+                            [hasChatBot]="hasChatBot"
                             [index]="scroll.viewPortInfo.startIndexWithBuffer + i"
                             [isCollapsedInitial]="isCollapsedInitial"
                             [isComparing]="isComparing"
                             [isDisabled]="isDisabled | async"
                             [isFirst]="scroll.viewPortInfo.startIndexWithBuffer + i === 0"
                             [isLast]="scroll.viewPortInfo.startIndexWithBuffer + i === items.length - 1"
-                            [hasChatBot]="hasChatBot"
-                            [language]="language"
-                            [languages]="languages"
-                            (clone)="addCopy(itemForm)"
                             (itemExpanded)="scroll.invalidateCachedMeasurementAtIndex(scroll.viewPortInfo.startIndexWithBuffer + i)"
+                            (itemMove)="move(itemForm, $event)"
                             (itemRemove)="removeItem(scroll.viewPortInfo.startIndexWithBuffer + i)"
-                            (itemMove)="move(itemForm, $event)"></sqx-array-item>
+                            [language]="language"
+                            [languages]="languages"></sqx-array-item>
                     </div>
                 }
             </virtual-scroller>
@@ -68,7 +68,7 @@
         <div class="col-auto">
             @if (isArray) {
                 @if (hasField) {
-                    <button class="btn btn-outline-success" [disabled]="isDisabledOrFull | async" (click)="addItem()" type="button">
+                    <button class="btn btn-outline-success" (click)="addItem()" [disabled]="isDisabledOrFull | async" type="button">
                         {{ "contents.arrayAddItem" | sqxTranslate }}
                     </button>
                 }
@@ -82,12 +82,12 @@
                     <button
                         class="btn btn-outline-success dropdown-toggle"
                         #buttonSelect
-                        [disabled]="isDisabledOrFull | async"
                         (click)="schemasDropdown.show()"
+                        [disabled]="isDisabledOrFull | async"
                         type="button">
                         {{ "contents.addComponent" | sqxTranslate }}
                     </button>
-                    <sqx-dropdown-menu *sqxModal="schemasDropdown; closeAlways: true" [sqxAnchoredTo]="buttonSelect" scrollY="true">
+                    <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
                         @for (schema of schemasList; track schema) {
                             <a class="dropdown-item" (click)="addComponent(schema)">
                                 {{ schema.displayName }}
@@ -98,8 +98,8 @@
                 @if (schemasList.length === 1) {
                     <button
                         class="btn btn-outline-success"
-                        [disabled]="isDisabledOrFull | async"
                         (click)="addComponent(schemasList[0])"
+                        [disabled]="isDisabledOrFull | async"
                         type="button">
                         {{ "contents.addComponent" | sqxTranslate }}
                     </button>
@@ -115,22 +115,22 @@
             @if (items.length > 0) {
                 <button
                     class="btn btn-text-danger ms-2"
+                    confirmRememberKey="leaveApp"
+                    confirmText="i18n:contents.arrayClearConfirmText"
+                    confirmTitle="i18n:contents.arrayClearConfirmTitle"
                     [disabled]="isDisabled | async"
                     (sqxConfirmClick)="clear()"
-                    type="button"
-                    confirmTitle="i18n:contents.arrayClearConfirmTitle"
-                    confirmText="i18n:contents.arrayClearConfirmText"
-                    confirmRememberKey="leaveApp">
+                    type="button">
                     {{ "contents.arrayClear" | sqxTranslate }}
                 </button>
             }
         </div>
         @if (items.length > 0) {
             <div class="col-auto">
-                <button class="btn btn-text-secondary" (click)="expandAll()" type="button" title="i18n:contents.arrayExpandAll">
+                <button class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll" type="button">
                     <i class="icon-plus-square"></i>
                 </button>
-                <button class="btn btn-text-secondary" (click)="collapseAll()" type="button" title="i18n:contents.arrayCollapseAll">
+                <button class="btn btn-text-secondary" (click)="collapseAll()" title="i18n:contents.arrayCollapseAll" type="button">
                     <i class="icon-minus-square"></i>
                 </button>
             </div>

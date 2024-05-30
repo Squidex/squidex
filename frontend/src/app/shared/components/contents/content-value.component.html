@@ -11,12 +11,12 @@
     <div
         class="html-value"
         #htmlValue
-        [longHoverSelector]="'img'"
         [innerHTML]="value.html"
-        (sqxLongHover)="show()"
         (longHoverCancelled)="hide()"
-        longHoverDuration="1500"></div>
-    <div class="preview" *sqxModal="previewModal; closeAuto: false" [sqxAnchoredTo]="htmlValue" position="bottom-start">
+        longHoverDuration="1500"
+        [longHoverSelector]="'img'"
+        (sqxLongHover)="show()"></div>
+    <div class="preview" position="bottom-start" [sqxAnchoredTo]="htmlValue" *sqxModal="previewModal; closeAuto: false">
         <img [src]="value.preview" />
     </div>
 }
@@ -24,13 +24,13 @@
     <div
         class="html-value"
         #htmlValue
-        [longHoverSelector]="'img'"
         [innerHTML]="value.html"
-        (sqxLongHover)="show()"
         (longHoverCancelled)="hide()"
-        longHoverDuration="1500"></div>
+        longHoverDuration="1500"
+        [longHoverSelector]="'img'"
+        (sqxLongHover)="show()"></div>
 
-    <div class="preview" *sqxModal="previewModal; closeAuto: false" [sqxAnchoredTo]="htmlValue" position="bottom-start">
+    <div class="preview" position="bottom-start" [sqxAnchoredTo]="htmlValue" *sqxModal="previewModal; closeAuto: false">
         <img [src]="value.preview" />
     </div>
 </ng-template>

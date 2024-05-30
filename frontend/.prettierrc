@@ -1,12 +1,12 @@
 {
-    "plugins": ["prettier-plugin-organize-attributes"],
+    "plugins": ["squidex-prettier-plugin-organize-attributes"],
     "overrides": [
         {
             "files": "*.html",
             "options": {
-                "attributeGroups": [
-                    "$ANGULAR"
-                  ],
+                "attributeGroups": ["$ANGULAR"],
+                "attributeIgnoreChars": "[]()*",
+                "attributeSort": "ASC",
                 "parser": "angular",
                 "printWidth": 140,
                 "bracketSameLine": true,

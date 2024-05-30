@@ -5,7 +5,7 @@
                 <a class="nav-link" [class.active]="isSelectedQuery(saved)" (click)="search.emit(saved.query)">
                     <div class="row g-0">
                         <div class="col truncate">
-                            <i class="icon-circle" [style.color]="saved.color" [class.hidden]="!saved.color"></i>
+                            <i class="icon-circle" [class.hidden]="!saved.color" [style.color]="saved.color"></i>
                             {{ saved.name | sqxTranslate }}
                         </div>
                         <div class="col-auto">

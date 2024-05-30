@@ -2,12 +2,12 @@
     <div class="col">
         <sqx-language-selector
             [language]="snapshot.language"
-            [languages]="languages"
             (languageChange)="setLanguage($event)"
+            [languages]="languages"
             size="sm"></sqx-language-selector>
     </div>
     <div class="col-auto">
-        <button class="btn btn-sm btn-secondary" [disabled]="isEmpty" (click)="unset()" type="button">
+        <button class="btn btn-sm btn-secondary" (click)="unset()" [disabled]="isEmpty" type="button">
             <i class="icon-close"></i>
         </button>
     </div>
@@ -17,50 +17,50 @@
     @case ("text") {
         <input
             class="form-control"
-            [attr.type]="type"
             [attr.id]="id"
             [attr.name]="name"
+            [attr.type]="type"
+            (blur)="callTouched()"
             [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)"
-            (blur)="callTouched()" />
+            (ngModelChange)="setValue($event)" />
     }
     @case ("number") {
         <input
             class="form-control"
-            [attr.type]="type"
             [attr.id]="id"
             [attr.name]="name"
+            [attr.type]="type"
+            (blur)="callTouched()"
             [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)"
-            (blur)="callTouched()" />
+            (ngModelChange)="setValue($event)" />
     }
     @case ("tags") {
-        <sqx-tag-editor [ngModel]="currentValue" (ngModelChange)="setValue($event)" (editorBlur)="callTouched()"></sqx-tag-editor>
+        <sqx-tag-editor (editorBlur)="callTouched()" [ngModel]="currentValue" (ngModelChange)="setValue($event)"></sqx-tag-editor>
     }
     @case ("datetime") {
         <sqx-date-time-editor
-            [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)"
             (editorBlur)="callTouched()"
-            mode="DateTime"></sqx-date-time-editor>
+            mode="DateTime"
+            [ngModel]="currentValue"
+            (ngModelChange)="setValue($event)"></sqx-date-time-editor>
     }
     @case ("date") {
         <sqx-date-time-editor
-            [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)"
             (editorBlur)="callTouched()"
-            mode="Date"></sqx-date-time-editor>
+            mode="Date"
+            [ngModel]="currentValue"
+            (ngModelChange)="setValue($event)"></sqx-date-time-editor>
     }
     @case ("boolean") {
         <div class="form-check">
             <input
                 class="form-check-input"
                 [attr.id]="id"
+                (blur)="callTouched()"
                 [ngModel]="currentValue"
                 (ngModelChange)="setValue($event)"
-                (blur)="callTouched()"
-                type="checkbox"
-                sqxIndeterminateValue />
+                sqxIndeterminateValue
+                type="checkbox" />
             <label class="form-check-label" [attr.for]="id"></label>
         </div>
     }

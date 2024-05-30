@@ -22,7 +22,7 @@
         <div class="col-9">
             <sqx-control-errors for="label"></sqx-control-errors>
 
-            <input class="form-control" id="{{ field.fieldId }}_fieldLabel" maxlength="100" formControlName="label" />
+            <input class="form-control" id="{{ field.fieldId }}_fieldLabel" formControlName="label" maxlength="100" />
 
             <sqx-form-hint>
                 {{ "schemas.field.labelHint" | sqxTranslate }}
@@ -36,7 +36,7 @@
         <div class="col-9">
             <sqx-control-errors for="hints"></sqx-control-errors>
 
-            <input class="form-control" id="{{ field.fieldId }}_fieldHints" maxlength="1000" formControlName="hints" />
+            <input class="form-control" id="{{ field.fieldId }}_fieldHints" formControlName="hints" maxlength="1000" />
 
             <sqx-form-hint>
                 {{ "schemas.field.hintsHint" | sqxTranslate }}

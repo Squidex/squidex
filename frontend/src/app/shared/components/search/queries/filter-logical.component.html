@@ -5,16 +5,16 @@
                 <button
                     class="btn btn-secondary btn-toggle"
                     [class.btn-primary]="isAnd"
-                    [disabled]="isAnd"
                     (click)="toggleType()"
+                    [disabled]="isAnd"
                     type="button">
                     AND
                 </button>
                 <button
                     class="btn btn-secondary btn-toggle"
                     [class.btn-primary]="isOr"
-                    [disabled]="isOr"
                     (click)="toggleType()"
+                    [disabled]="isOr"
                     type="button">
                     OR
                 </button>
@@ -38,13 +38,13 @@
                 <span class="filter-line-h"></span>
                 <sqx-filter-node
                     [filter]="filter"
+                    (filterChange)="emitChange()"
                     [language]="language"
                     [languages]="languages"
                     [level]="level + 1"
                     [model]="model"
-                    [statuses]="statuses"
-                    (filterChange)="emitChange()"
-                    (remove)="removeFilter(i)"></sqx-filter-node>
+                    (remove)="removeFilter(i)"
+                    [statuses]="statuses"></sqx-filter-node>
             </div>
         }
 

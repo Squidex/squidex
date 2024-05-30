@@ -11,11 +11,11 @@
 </div>
 
 <div class="items-container">
-    <div class="control-dropdown" *sqxModal="dropdown" [sqxAnchoredTo]="input" scrollY="true" position="bottom-start">
+    <div class="control-dropdown" position="bottom-start" scrollY="true" [sqxAnchoredTo]="input" *sqxModal="dropdown">
         <sqx-asset-folder-dropdown-item
             [appName]="appName"
-            [nodeModel]="root"
             [nodeLevel]="0"
+            [nodeModel]="root"
             (selectNode)="select($event)"></sqx-asset-folder-dropdown-item>
     </div>
 </div>

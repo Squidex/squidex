@@ -16,30 +16,30 @@
             class="form-control"
             [class.dashed]="!transition.expression"
             [disabled]="!!disabled"
-            [ngModelOptions]="onBlur"
             [ngModel]="transition.expression"
             (ngModelChange)="changeExpression($event)"
-            spellcheck="false"
-            placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}" />
+            [ngModelOptions]="onBlur"
+            placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
+            spellcheck="false" />
     </div>
     <div class="col-auto col-label">
         <span class="text-decent">{{ "workflows.syntax.for" | sqxTranslate }}</span>
     </div>
     <div class="col col-roles">
         <sqx-tag-editor
+            allowDuplicates="false"
             [disabled]="!!disabled"
             [itemsSource]="roles"
-            [ngModelOptions]="onBlur"
             [ngModel]="transition.roles"
             (ngModelChange)="changeRole($event)"
+            [ngModelOptions]="onBlur"
             placeholder="{{ 'common.role' | sqxTranslate }}"
-            allowDuplicates="false"
             styleDashed="true"
             styleScrollable="true"></sqx-tag-editor>
     </div>
 
     <div class="col col-button ps-2">
-        <button class="btn btn-text-danger" [disabled]="disabled" (click)="remove.emit()" type="button">
+        <button class="btn btn-text-danger" (click)="remove.emit()" [disabled]="disabled" type="button">
             <i class="icon-bin2"></i>
         </button>
     </div>

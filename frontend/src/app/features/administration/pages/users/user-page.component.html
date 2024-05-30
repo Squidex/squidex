@@ -1,7 +1,7 @@
 <form [formGroup]="userForm.form" (ngSubmit)="save()">
-    <input style="display: none" type="password" name="foilautofill" />
+    <input name="foilautofill" style="display: none" type="password" />
 
-    <sqx-layout layout="right" width="30" white="true" padding="true" overflow="true">
+    <sqx-layout layout="right" overflow="true" padding="true" white="true" width="30">
         <ng-container title>
             @if (usersState.selectedUser | async) {
                 <sqx-title message="i18n:users.editPageTitle"></sqx-title>
@@ -15,12 +15,12 @@
         <ng-container menu>
             @if (usersState.selectedUser | async; as user) {
                 @if (isEditable) {
-                    <button class="btn btn-primary" type="submit" shortcut="CTRL + SHIFT + S">
+                    <button class="btn btn-primary" shortcut="CTRL + SHIFT + S" type="submit">
                         {{ "common.save" | sqxTranslate }}
                     </button>
                 }
             } @else {
-                <button class="btn btn-primary" type="submit" shortcut="CTRL + SHIFT + S">
+                <button class="btn btn-primary" shortcut="CTRL + SHIFT + S" type="submit">
                     {{ "common.save" | sqxTranslate }}
                 </button>
             }
@@ -37,7 +37,7 @@
 
                 <sqx-control-errors for="email"></sqx-control-errors>
 
-                <input class="form-control" id="email" type="email" maxlength="100" formControlName="email" autocomplete="off" />
+                <input class="form-control" id="email" autocomplete="off" formControlName="email" maxlength="100" type="email" />
             </div>
             <div class="form-group">
                 <label for="displayName">
@@ -50,9 +50,9 @@
                 <input
                     class="form-control"
                     id="displayName"
-                    maxlength="100"
-                    formControlName="displayName"
                     autocomplete="off"
+                    formControlName="displayName"
+                    maxlength="100"
                     spellcheck="false" />
             </div>
 
@@ -65,10 +65,10 @@
                     <input
                         class="form-control"
                         id="password"
-                        type="password"
-                        maxlength="100"
+                        autocomplete="off"
                         formControlName="password"
-                        autocomplete="off" />
+                        maxlength="100"
+                        type="password" />
                 </div>
 
                 <div class="form-group">
@@ -79,10 +79,10 @@
                     <input
                         class="form-control"
                         id="passwordConfirm"
-                        type="password"
-                        maxlength="100"
+                        autocomplete="off"
                         formControlName="passwordConfirm"
-                        autocomplete="off" />
+                        maxlength="100"
+                        type="password" />
                 </div>
             </div>
 
@@ -94,9 +94,9 @@
                 <textarea
                     class="form-control"
                     id="permissions"
+                    autocomplete="off"
                     formControlName="permissions"
                     placeholder="{{ 'common.separateByLine' | sqxTranslate }}"
-                    autocomplete="off"
                     spellcheck="false"></textarea>
             </div>
         </ng-container>

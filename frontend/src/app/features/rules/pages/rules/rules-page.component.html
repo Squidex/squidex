@@ -1,14 +1,14 @@
 <sqx-title message="i18n:rules.listPageTitle"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:common.rules" titleIcon="rules" innerWidth="54">
+<sqx-layout innerWidth="54" layout="main" titleIcon="rules" titleText="i18n:common.rules">
     <ng-container menu>
-        <button class="btn btn-text-secondary" (click)="reload()" type="button" title="i18n:rules.refreshTooltip" shortcut="CTRL + B">
+        <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:rules.refreshTooltip" type="button">
             <i class="icon-reset"></i>
             {{ "common.refresh" | sqxTranslate }}
         </button>
 
         @if (rulesState.canCreate | async) {
-            <a class="btn btn-success ms-2" routerLink="new" title="i18n:rules.createTooltip" shortcut="CTRL + U">
+            <a class="btn btn-success ms-2" routerLink="new" shortcut="CTRL + U" title="i18n:rules.createTooltip">
                 <i class="icon-plus"></i>
                 {{ "rules.create" | sqxTranslate }}
             </a>
@@ -16,7 +16,7 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view [isLoading]="rulesState.isLoading | async" innerWidth="54rem">
+        <sqx-list-view innerWidth="54rem" [isLoading]="rulesState.isLoading | async">
             @if (rulesState.runningRule | async; as runningRule) {
                 <div class="alert alert-danger d-flex justify-content-between align-items-center p-2 ps-4 mb-4">
                     {{ "rules.runningRule" | sqxTranslate: { name: runningRule.name || "Unnamed Rule" } }}
@@ -29,7 +29,7 @@
                     <div class="table-items-row table-items-row-summary table-items-row-empty">
                         {{ "rules.empty" | sqxTranslate }}
                         @if (rulesState.canCreate | async) {
-                            <button class="btn btn-success btn-sm ms-1" type="button" routerLink="new">
+                            <button class="btn btn-success btn-sm ms-1" routerLink="new" type="button">
                                 <i class="icon icon-plus"></i>
                                 {{ "rules.emptyAddRule" | sqxTranslate }}
                             </button>
@@ -38,10 +38,10 @@
                 }
                 @for (rule of rules; track rule.id) {
                     <sqx-rule
+                        (delete)="delete(rule)"
                         [rule]="rule"
                         [ruleActions]="supportedActions"
                         [ruleTriggers]="supportedTriggers"
-                        (delete)="delete(rule)"
                         (toggle)="toggle(rule)"></sqx-rule>
                 }
             }
@@ -55,9 +55,9 @@
                     class="panel-link panel-link-gray"
                     routerLink="events"
                     routerLinkActive="active"
+                    sqxTourStep="history"
                     title="i18n:common.history"
-                    titlePosition="left"
-                    sqxTourStep="history">
+                    titlePosition="left">
                     <i class="icon-time"></i>
                 </a>
             }
@@ -65,15 +65,15 @@
             <a
                 class="panel-link"
                 #helpLink
+                hintAfter="180000"
+                hintText="i18n:common.helpTour"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
-                hintText="i18n:common.helpTour"
-                hintAfter="180000"
+                sqxTourStep="help"
                 title="i18n:common.help"
-                titlePosition="left"
-                sqxTourStep="help">
+                titlePosition="left">
                 <i class="icon-help2"></i>
             </a>
         </div>

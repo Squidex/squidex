@@ -1,6 +1,6 @@
 <div class="panel2" #panel [class.minimized]="isMinimized">
     @if (layout === "right") {
-        <div class="panel2-slice right" [style.minWidth]="desiredWidth" [style.maxWidth]="desiredWidth">
+        <div class="panel2-slice right" [style.maxWidth]="desiredWidth" [style.minWidth]="desiredWidth">
             @if (!hideHeader) {
                 <div class="panel2-header right">
                     <div class="panel2-header-inner right">
@@ -22,9 +22,9 @@
                     @if (route) {
                         <a
                             class="btn panel2-collapse"
-                            [routerLink]="['./../']"
                             [queryParamsHandling]="closeQueryParamsHandling"
-                            [relativeTo]="route">
+                            [relativeTo]="route"
+                            [routerLink]="['./../']">
                             <i class="icon-close"></i>
                         </a>
                     } @else {
@@ -35,7 +35,7 @@
                 </div>
             }
             <div class="panel2-main right">
-                <div class="panel2-main-inner right" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
+                <div class="panel2-main-inner right" [class.overflow]="overflow" [class.padded]="padding" [class.white]="white">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div>
             </div>
@@ -46,9 +46,9 @@
         <div
             class="panel2-slice left"
             [class.collapsed]="isCollapsed"
-            [style.minWidth]="desiredWidth"
+            (click)="expand($event)"
             [style.maxWidth]="desiredWidth"
-            (click)="expand($event)">
+            [style.minWidth]="desiredWidth">
             @if (!hideHeader) {
                 <div class="panel2-header left">
                     <div class="panel2-header-inner left">
@@ -69,8 +69,8 @@
                     </div>
                     <button
                         class="btn panel2-collapse"
-                        (click)="toggle()"
                         attr.aria-label="{{ 'common.collapse' | sqxTranslate }}"
+                        (click)="toggle()"
                         sqxStopClick>
                         <i class="icon-angle-left"></i>
                     </button>
@@ -78,7 +78,7 @@
                 </div>
             }
             <div class="panel2-main left">
-                <div class="panel2-main-inner left" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
+                <div class="panel2-main-inner left" [class.overflow]="overflow" [class.padded]="padding" [class.white]="white">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div>
             </div>
@@ -108,7 +108,7 @@
                 </div>
             }
             <div class="panel2-main main">
-                <div class="panel2-main-inner main" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
+                <div class="panel2-main-inner main" [class.overflow]="overflow" [class.padded]="padding" [class.white]="white">
                     <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div>
             </div>
@@ -119,10 +119,10 @@
                     @if (firstChild | async) {
                         <a
                             class="btn panel2-collapse"
-                            [routerLink]="['./']"
                             [queryParamsHandling]="closeQueryParamsHandling"
                             [relativeTo]="route"
-                            replaceUrl="true">
+                            replaceUrl="true"
+                            [routerLink]="['./']">
                             <i class="icon-angle-right"></i>
                         </a>
                     }

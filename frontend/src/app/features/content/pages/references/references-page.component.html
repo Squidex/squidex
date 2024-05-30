@@ -1,15 +1,15 @@
 <sqx-title message="i18n:common.references"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:common.references" titleIcon="contents">
+<sqx-layout layout="main" titleIcon="contents" titleText="i18n:common.references">
     <ng-container menu>
         <div class="row flex-nowrap flex-grow-1 gx-2">
             <div class="col-auto ms-8">
                 <button
                     class="btn btn-text-secondary"
                     (click)="reload()"
-                    type="button"
+                    shortcut="CTRL + B"
                     title="i18n:contents.refreshTooltip"
-                    shortcut="CTRL + B">
+                    type="button">
                     <i class="icon-reset"></i>
                     {{ "common.refresh" | sqxTranslate }}
                 </button>
@@ -19,8 +19,8 @@
                     <sqx-language-selector
                         class="languages-buttons"
                         [language]="language"
-                        [languages]="languages"
-                        (languageChange)="changeLanguage($event)"></sqx-language-selector>
+                        (languageChange)="changeLanguage($event)"
+                        [languages]="languages"></sqx-language-selector>
                 </div>
             }
         </div>
@@ -33,13 +33,13 @@
                     <table class="table table-items table-fixed">
                         @for (content of contents; track content.id) {
                             <tbody
-                                [sqxReferenceItem]="content"
                                 [canRemove]="false"
                                 [columns]="contents | sqxContentsColumns"
                                 [isCompact]="false"
                                 [isDisabled]="false"
                                 [language]="language"
                                 [languages]="languages"
+                                [sqxReferenceItem]="content"
                                 [validations]="(contentsState.validationResults | async)!"
                                 [validityVisible]="true"></tbody>
                         }

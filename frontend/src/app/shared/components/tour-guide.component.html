@@ -20,7 +20,7 @@
                             @for (task of tasks; track task) {
                                 <div class="row g-3 mb-3 step align-items-center" [class.active]="task.isActive" (click)="start(task)">
                                     <div class="col-auto">
-                                        <div class="checkmark" [class.pending]="!task.isCompleted" [class.completed]="task.isCompleted">
+                                        <div class="checkmark" [class.completed]="task.isCompleted" [class.pending]="!task.isCompleted">
                                             <i class="icon-checkmark" [class.hidden]="!task.isCompleted"></i>
                                         </div>
                                     </div>
@@ -37,9 +37,9 @@
                     }
                     <button
                         class="btn btn-outline-secondary btn-block mt-2"
+                        (click)="complete()"
                         [sqxScrollActive]="(tourState.pendingTasks | async) === 0"
-                        [sqxScrollContainer]="body"
-                        (click)="complete()">
+                        [sqxScrollContainer]="body">
                         {{ "tour.complete" | sqxTranslate }}
                     </button>
                 </div>

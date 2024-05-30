@@ -1,4 +1,4 @@
-<sqx-modal-dialog *sqxModal="dueTimeDialog" (dialogClose)="cancelStatusChange()">
+<sqx-modal-dialog (dialogClose)="cancelStatusChange()" *sqxModal="dueTimeDialog">
     <ng-container title>
         {{ "contents.changeStatusTo" | sqxTranslate: { action: dueTimeAction } }}
     </ng-container>
@@ -8,28 +8,28 @@
             <input
                 class="form-check-input"
                 id="immediately"
+                name="dueTimeMode"
                 [(ngModel)]="dueTimeMode"
                 type="radio"
-                value="Immediately"
-                name="dueTimeMode" />
+                value="Immediately" />
             <label class="form-check-label" for="immediately">
                 {{ "contents.changeStatusToImmediately" | sqxTranslate: { action: dueTimeAction } }}
             </label>
         </div>
 
         <div class="form-check">
-            <input class="form-check-input" id="scheduled" [(ngModel)]="dueTimeMode" type="radio" value="Scheduled" name="dueTimeMode" />
+            <input class="form-check-input" id="scheduled" name="dueTimeMode" [(ngModel)]="dueTimeMode" type="radio" value="Scheduled" />
             <label class="form-check-label" for="scheduled">
                 {{ "contents.changeStatusToLater" | sqxTranslate: { action: dueTimeAction } }}
             </label>
         </div>
 
         <sqx-date-time-editor
-            [(ngModel)]="dueTime"
             [disabled]="dueTimeMode === 'Immediately'"
             enforceTime="true"
+            hideClear="true"
             mode="DateTime"
-            hideClear="true"></sqx-date-time-editor>
+            [(ngModel)]="dueTime"></sqx-date-time-editor>
     </ng-container>
 
     <ng-container footer>
@@ -39,10 +39,10 @@
 
         <button
             class="btn btn-primary"
-            [disabled]="dueTimeMode === 'Scheduled' && !dueTime"
             (click)="confirmStatusChange()"
-            type="button"
-            sqxFocusOnInit>
+            [disabled]="dueTimeMode === 'Scheduled' && !dueTime"
+            sqxFocusOnInit
+            type="button">
             {{ "common.confirm" | sqxTranslate }}
         </button>
     </ng-container>

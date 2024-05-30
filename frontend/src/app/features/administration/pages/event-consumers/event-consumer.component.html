@@ -17,17 +17,17 @@
     </td>
     <td class="cell-actions-lg">
         @if (eventConsumer.canReset) {
-            <button class="btn btn-text-secondary" (click)="reset()" type="button" title="i18n:eventConsumers.resetTooltip">
+            <button class="btn btn-text-secondary" (click)="reset()" title="i18n:eventConsumers.resetTooltip" type="button">
                 <i class="icon icon-reset"></i>
             </button>
         }
         @if (eventConsumer.canStart) {
-            <button class="btn btn-text-secondary" (click)="start()" type="button" title="i18n:eventConsumers.startTooltip">
+            <button class="btn btn-text-secondary" (click)="start()" title="i18n:eventConsumers.startTooltip" type="button">
                 <i class="icon icon-play"></i>
             </button>
         }
         @if (eventConsumer.canStop) {
-            <button class="btn btn-text-secondary" (click)="stop()" type="button" title="i18n:eventConsumers.stopTooltip">
+            <button class="btn btn-text-secondary" (click)="stop()" title="i18n:eventConsumers.stopTooltip" type="button">
                 <i class="icon icon-pause"></i>
             </button>
         }

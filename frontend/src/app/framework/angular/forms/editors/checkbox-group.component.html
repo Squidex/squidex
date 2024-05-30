@@ -4,10 +4,10 @@
             <input
                 class="form-check-input"
                 id="{{ controlId }}_{{ value }}"
-                [checked]="isChecked(value)"
-                [disabled]="snapshot.isDisabled"
                 (blur)="callTouched()"
                 (change)="check($any($event.target!)['checked']!, value)"
+                [checked]="isChecked(value)"
+                [disabled]="snapshot.isDisabled"
                 type="checkbox" />
             <label class="form-check-label" for="{{ controlId }}_{{ value }}">{{ value.name }}</label>
         </div>

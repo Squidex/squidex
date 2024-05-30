@@ -11,13 +11,13 @@
         @if (editForm) {
             <form class="edit-form" [formGroup]="editForm.form" (ngSubmit)="save()">
                 <sqx-field-form
-                    [languages]="(languagesState.isoLanguages | async)!"
                     [field]="field"
                     [fieldForm]="editForm.form"
-                    [schema]="schema"
+                    isEditable="true"
                     [isLocalizable]="isLocalizable"
-                    [settings]="settings"
-                    isEditable="true"></sqx-field-form>
+                    [languages]="(languagesState.isoLanguages | async)!"
+                    [schema]="schema"
+                    [settings]="settings"></sqx-field-form>
             </form>
         } @else {
             <form [formGroup]="addFieldForm.form" (ngSubmit)="addField(false)">
@@ -29,9 +29,9 @@
                                 <label>
                                     <input
                                         class="radio-input"
-                                        type="radio"
-                                        name="type"
                                         formControlName="type"
+                                        name="type"
+                                        type="radio"
                                         value="{{ fieldType.type }}" />
                                     <div class="row g-0">
                                         <div class="col-auto">
@@ -64,7 +64,7 @@
                 @if (schema.type !== "Component" && !parent && (addFieldForm.isContentField | async)) {
                     <div class="form-group">
                         <div class="form-check">
-                            <input class="form-check-input" id="isLocalizable" type="checkbox" formControlName="isLocalizable" />
+                            <input class="form-check-input" id="isLocalizable" formControlName="isLocalizable" type="checkbox" />
                             <label class="form-check-label" for="isLocalizable">
                                 {{ "schemas.field.localizable" | sqxTranslate }}
                             </label>

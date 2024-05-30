@@ -1,6 +1,6 @@
 <sqx-title message="i18n:api.graphqlPageTitle"></sqx-title>
 
-<sqx-layout layout="main" hideHeader="true" hideSidebar="true">
+<sqx-layout hideHeader="true" hideSidebar="true" layout="main">
     <div #graphiQLContainer inner sqxTourStep="graphQLExplorer"></div>
 
     @if (clientsReadable) {
@@ -10,7 +10,7 @@
     }
 </sqx-layout>
 
-<sqx-modal-dialog *sqxModal="clientsDialog" (dialogClose)="clientsDialog.hide()">
+<sqx-modal-dialog (dialogClose)="clientsDialog.hide()" *sqxModal="clientsDialog">
     <ng-container title>
         {{ "api.selectClient" | sqxTranslate }}
     </ng-container>

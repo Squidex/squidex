@@ -61,11 +61,11 @@
                 @if (canRemove) {
                     <button
                         class="btn btn-text-secondary"
-                        (sqxConfirmClick)="delete.emit()"
-                        type="button"
-                        confirmTitle="i18n:contents.removeConfirmTitle"
+                        confirmRememberKey="removeReference"
                         confirmText="i18n:contents.removeConfirmText"
-                        confirmRememberKey="removeReference">
+                        confirmTitle="i18n:contents.removeConfirmTitle"
+                        (sqxConfirmClick)="delete.emit()"
+                        type="button">
                         <i class="icon-close"></i>
                     </button>
                 }

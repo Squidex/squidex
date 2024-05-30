@@ -4,12 +4,12 @@
             class="btn btn-outline-secondary btn-{{ size }} dropdown-toggle"
             #button
             (click)="dropdown.toggle()"
-            type="button"
+            tabindex="-1"
             title="{{ language.englishName }}"
-            tabindex="-1">
+            type="button">
             {{ language.iso2Code }}
         </button>
-        <sqx-dropdown-menu *sqxModal="dropdown; closeAlways: true" [sqxAnchoredTo]="button" [position]="dropdownPosition" scrollY="true">
+        <sqx-dropdown-menu [position]="dropdownPosition" scrollY="true" [sqxAnchoredTo]="button" *sqxModal="dropdown; closeAlways: true">
             <table>
                 <tbody>
                     @for (supported of languages; track supported.iso2Code) {
@@ -36,9 +36,9 @@
                     [class.active]="supported === language"
                     [class.missing]="exists && !exists[supported.iso2Code]"
                     (click)="selectLanguage(supported)"
-                    type="button"
+                    tabindex="-1"
                     title="{{ supported.englishName }}"
-                    tabindex="-1">
+                    type="button">
                     <span>{{ supported.iso2Code }}</span>
                 </button>
             }

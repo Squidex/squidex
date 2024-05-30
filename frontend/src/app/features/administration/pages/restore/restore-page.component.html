@@ -1,6 +1,6 @@
 <sqx-title message="i18n:jobs.restorePageTitle"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:jobs.restoreTitle" titleIcon="backup" innerWidth="70">
+<sqx-layout innerWidth="70" layout="main" titleIcon="backup" titleText="i18n:jobs.restoreTitle">
     <ng-container>
         <sqx-list-view innerWidth="70rem">
             @if (restoreJob | async; as job) {
@@ -83,13 +83,13 @@
         <div class="panel-nav">
             <a
                 class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="help"
                 title="i18n:common.help"
-                titlePosition="left"
-                sqxTourStep="help">
+                titlePosition="left">
                 <i class="icon-help2"></i>
             </a>
         </div>

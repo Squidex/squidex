@@ -1,18 +1,18 @@
 <sqx-title message="i18n:appSettings.title"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:appSettings.title" titleIcon="patterns" innerWidth="55">
+<sqx-layout innerWidth="55" layout="main" titleIcon="patterns" titleText="i18n:appSettings.title">
     <ng-container menu>
         <button
             class="btn btn-text-secondary me-2"
             (click)="reload()"
-            type="button"
+            shortcut="CTRL + B"
             title="i18n:appSettings.refreshTooltip"
-            shortcut="CTRL + B">
+            type="button">
             <i class="icon-reset"></i>
             {{ "common.refresh" | sqxTranslate }}
         </button>
 
-        <button class="float-end btn btn-primary" [disabled]="!isEditable" (click)="save()" type="submit">
+        <button class="float-end btn btn-primary" (click)="save()" [disabled]="!isEditable" type="submit">
             {{ "common.save" | sqxTranslate }}
         </button>
     </ng-container>
@@ -39,35 +39,35 @@
                                 <sqx-control-errors for="name"></sqx-control-errors>
                                 <input
                                     class="form-control"
-                                    maxlength="1000"
                                     formControlName="name"
+                                    maxlength="1000"
                                     placeholder="{{ 'common.name' | sqxTranslate }}" />
                             </div>
                             <div class="col">
                                 <sqx-control-errors for="regex"></sqx-control-errors>
                                 <input
                                     class="form-control"
-                                    maxlength="1000"
                                     formControlName="regex"
+                                    maxlength="1000"
                                     placeholder="{{ 'common.pattern' | sqxTranslate }}" />
                             </div>
                             <div class="col-4">
                                 <sqx-control-errors for="message"></sqx-control-errors>
                                 <input
                                     class="form-control"
-                                    maxlength="1000"
                                     formControlName="message"
+                                    maxlength="1000"
                                     placeholder="{{ 'common.message' | sqxTranslate }}" />
                             </div>
                             <div class="col-auto">
                                 <button
                                     class="btn btn-text-danger"
+                                    confirmRememberKey="deletePattern"
+                                    confirmText="i18n:appSettings.patterns.deleteConfirmText"
+                                    confirmTitle="i18n:appSettings.patterns.deleteConfirmTitle"
                                     [disabled]="!isEditable"
                                     (sqxConfirmClick)="editForm.patterns.removeAt(i)"
-                                    type="button"
-                                    confirmTitle="i18n:appSettings.patterns.deleteConfirmTitle"
-                                    confirmText="i18n:appSettings.patterns.deleteConfirmText"
-                                    confirmRememberKey="deletePattern">
+                                    type="button">
                                     <i class="icon-bin2"></i>
                                 </button>
                             </div>
@@ -115,27 +115,27 @@
                                 <sqx-control-errors for="name"></sqx-control-errors>
                                 <input
                                     class="form-control"
-                                    maxlength="1000"
                                     formControlName="name"
+                                    maxlength="1000"
                                     placeholder="{{ 'common.name' | sqxTranslate }}" />
                             </div>
                             <div class="col">
                                 <sqx-control-errors for="url"></sqx-control-errors>
                                 <input
                                     class="form-control"
-                                    maxlength="1000"
                                     formControlName="url"
+                                    maxlength="1000"
                                     placeholder="{{ 'common.url' | sqxTranslate }}" />
                             </div>
                             <div class="col-auto">
                                 <button
                                     class="btn btn-text-danger"
+                                    confirmRememberKey="deleteEditor"
+                                    confirmText="i18n:appSettings.editors.deleteConfirmText"
+                                    confirmTitle="i18n:appSettings.editors.deleteConfirmTitle"
                                     [disabled]="!isEditable"
                                     (sqxConfirmClick)="editForm.editors.removeAt(i)"
-                                    type="button"
-                                    confirmTitle="i18n:appSettings.editors.deleteConfirmTitle"
-                                    confirmText="i18n:appSettings.editors.deleteConfirmText"
-                                    confirmRememberKey="deleteEditor">
+                                    type="button">
                                     <i class="icon-bin2"></i>
                                 </button>
                             </div>
@@ -165,7 +165,7 @@
             <div class="card mb-2">
                 <div class="card-body" [formGroup]="editForm.form">
                     <div class="form-check">
-                        <input class="form-check-input" id="hideScheduler" type="checkbox" formControlName="hideScheduler" />
+                        <input class="form-check-input" id="hideScheduler" formControlName="hideScheduler" type="checkbox" />
 
                         <label class="form-check-label" for="hideScheduler">
                             {{ "appSettings.hideScheduler" | sqxTranslate }}
@@ -180,25 +180,25 @@
         <div class="panel-nav">
             <a
                 class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="history"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="history"
                 title="i18n:common.history"
-                titlePosition="left"
-                sqxTourStep="history">
+                titlePosition="left">
                 <i class="icon-time"></i>
             </a>
 
             <a
                 class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="help"
                 title="i18n:common.help"
-                titlePosition="left"
-                sqxTourStep="help">
+                titlePosition="left">
                 <i class="icon-help2"></i>
             </a>
         </div>

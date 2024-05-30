@@ -1,4 +1,4 @@
-<sqx-modal-dialog (dialogClose)="emitClose()" size="lg" showFooter="false">
+<sqx-modal-dialog (dialogClose)="emitClose()" showFooter="false" size="lg">
     <ng-container title>
         @if (schemas.length > 1) {
             <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
@@ -24,11 +24,11 @@
                     <div>
                         <sqx-language-selector
                             class="languages-buttons"
+                            dropdownPosition="bottom-end"
                             [language]="language"
-                            [languages]="languages"
-                            [percents]="contentForm.translationStatus | async"
                             (languageChange)="language = $event"
-                            dropdownPosition="bottom-end"></sqx-language-selector>
+                            [languages]="languages"
+                            [percents]="contentForm.translationStatus | async"></sqx-language-selector>
                     </div>
                 }
             </div>
@@ -44,7 +44,7 @@
                     </button>
                 }
 
-                <sqx-form-error [error]="contentForm.error | async" bubble="true" closeable="true"></sqx-form-error>
+                <sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async"></sqx-form-error>
             </div>
         </div>
     </ng-container>
@@ -54,12 +54,12 @@
             <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
                 @for (section of contentForm.sections; track section) {
                     <sqx-content-section
-                        [(language)]="language"
                         [form]="contentForm"
                         [formContext]="formContext"
                         [formLevel]="0"
                         [formSection]="section"
                         [isCompact]="true"
+                        [(language)]="language"
                         [languages]="languages"
                         [schema]="schema"></sqx-content-section>
                 }

@@ -1,10 +1,10 @@
-<sqx-layout layout="right" titleText="i18n:common.workflow" width="20" white="true" overflow="true" padding="true">
+<sqx-layout layout="right" overflow="true" padding="true" titleText="i18n:common.workflow" white="true" width="20">
     <ng-container>
         <div class="section mb-2">
             <label for="id">{{ "common.id" | sqxTranslate }}</label>
 
             <div class="input-group">
-                <input class="form-control" id="id" #inputId readonly name="id" value="{{ content.id }}" />
+                <input class="form-control" id="id" #inputId name="id" readonly value="{{ content.id }}" />
 
                 <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
                     <i class="icon-copy"></i>
@@ -29,15 +29,15 @@
                         class="btn btn-outline-secondary btn-block btn-status"
                         #buttonOptions
                         (click)="dropdownNew.toggle()"
-                        type="button"
-                        sqxTourStep="status">
+                        sqxTourStep="status"
+                        type="button">
                         <sqx-content-status
-                            [status]="content.newStatus!"
-                            [statusColor]="content.newStatusColor!"
+                            layout="multiline"
                             [scheduled]="content.scheduleJob"
-                            layout="multiline"></sqx-content-status>
+                            [status]="content.newStatus!"
+                            [statusColor]="content.newStatusColor!"></sqx-content-status>
                     </button>
-                    <sqx-dropdown-menu *sqxModal="dropdownNew; closeAlways: true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                    <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdownNew; closeAlways: true">
                         @if (content.statusUpdates.length > 0) {
                             @for (info of content.statusUpdates; track info) {
                                 <a class="dropdown-item" (click)="changeStatus(info.status)">
@@ -51,20 +51,20 @@
                         <a
                             class="dropdown-item dropdown-item-delete"
                             [class.disabled]="!content.canDraftDelete"
-                            (sqxConfirmClick)="deleteDraft()"
-                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmRememberKey="deleteDraft"
                             confirmText="i18n:contents.deleteVersionConfirmText"
-                            confirmRememberKey="deleteDraft">
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            (sqxConfirmClick)="deleteDraft()">
                             {{ "contents.versionDelete" | sqxTranslate }}
                         </a>
                         <div class="dropdown-divider"></div>
                         <a
                             class="dropdown-item dropdown-item-delete"
                             [class.disabled]="!content.canDelete"
-                            (sqxConfirmClick)="delete()"
-                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmRememberKey="deleteContent"
                             confirmText="i18n:contents.deleteConfirmText"
-                            confirmRememberKey="deleteContent">
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            (sqxConfirmClick)="delete()">
                             {{ "common.delete" | sqxTranslate }}
                         </a>
                     </sqx-dropdown-menu>
@@ -81,25 +81,25 @@
                         class="btn btn-outline-secondary btn-block btn-status"
                         #buttonOptions
                         (click)="dropdown.toggle()"
-                        type="button"
-                        sqxTourStep="status">
+                        sqxTourStep="status"
+                        type="button">
                         <sqx-content-status
-                            [status]="content.status"
-                            [statusColor]="content.statusColor"
-                            [scheduled]="content.scheduleJob"
                             layout="multiline"
-                            small="true"></sqx-content-status>
+                            [scheduled]="content.scheduleJob"
+                            small="true"
+                            [status]="content.status"
+                            [statusColor]="content.statusColor"></sqx-content-status>
                     </button>
-                    <sqx-dropdown-menu *sqxModal="dropdown; closeAlways: true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                    <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                         @if (content.statusUpdates.length > 0) {
                             @for (info of content.statusUpdates; track info) {
                                 <a class="dropdown-item" (click)="changeStatus(info.status)">
                                     {{ "common.statusChangeTo" | sqxTranslate }}
                                     <sqx-content-status
-                                        [status]="info.status"
-                                        [statusColor]="info.color"
                                         layout="text"
-                                        small="true"></sqx-content-status>
+                                        small="true"
+                                        [status]="info.status"
+                                        [statusColor]="info.color"></sqx-content-status>
                                 </a>
                             }
                             <div class="dropdown-divider"></div>
@@ -107,20 +107,20 @@
                         <a
                             class="dropdown-item dropdown-item-delete"
                             [class.disabled]="!content.canCancelStatus"
-                            (sqxConfirmClick)="cancelStatus()"
-                            confirmTitle="i18n:contents.cancelStatusConfirmTitle"
+                            confirmRememberKey="cancelStatus"
                             confirmText="i18n:contents.cancelStatusConfirmText"
-                            confirmRememberKey="cancelStatus">
+                            confirmTitle="i18n:contents.cancelStatusConfirmTitle"
+                            (sqxConfirmClick)="cancelStatus()">
                             {{ "contents.cancelStatus" | sqxTranslate }}
                         </a>
                         <div class="dropdown-divider"></div>
                         <a
                             class="dropdown-item dropdown-item-delete"
                             [class.disabled]="!content.canDelete"
-                            (sqxConfirmClick)="delete()"
-                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            confirmRememberKey="deleteContent"
                             confirmText="i18n:contents.deleteConfirmText"
-                            confirmRememberKey="deleteContent">
+                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                            (sqxConfirmClick)="delete()">
                             {{ "common.delete" | sqxTranslate }}
                         </a>
                     </sqx-dropdown-menu>
@@ -128,9 +128,9 @@
             } @else {
                 <button class="btn btn-outline-secondary btn-block btn-status" type="button">
                     <sqx-content-status
+                        layout="multiline"
                         [status]="content.status"
-                        [statusColor]="content.statusColor"
-                        layout="multiline"></sqx-content-status>
+                        [statusColor]="content.statusColor"></sqx-content-status>
                 </button>
             }
 
@@ -145,9 +145,9 @@
             @for (event of contentEvents | async; track event.eventId) {
                 <sqx-content-event
                     [content]="content"
-                    [event]="event"
+                    (dataCompare)="compareVersion(event)"
                     (dataLoad)="loadVersion(event)"
-                    (dataCompare)="compareVersion(event)"></sqx-content-event>
+                    [event]="event"></sqx-content-event>
             }
         </div>
     </ng-container>

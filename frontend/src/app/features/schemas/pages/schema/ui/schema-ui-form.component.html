@@ -24,16 +24,16 @@
         <sqx-field-list
             [class.hidden]="selectedTab !== 0"
             [emptyText]="'schemas.listFieldsEmpty' | sqxTranslate"
-            [schema]="schema"
             [fieldNames]="fieldsInLists"
             (fieldNamesChange)="setFieldsInLists($event)"
+            [schema]="schema"
             withMetaFields="true"></sqx-field-list>
 
         <sqx-field-list
             [class.hidden]="selectedTab !== 1"
             [emptyText]="'schemas.referenceFieldsEmpty' | sqxTranslate"
-            [schema]="schema"
             [fieldNames]="fieldsInReferences"
-            (fieldNamesChange)="setFieldsInReferences($event)"></sqx-field-list>
+            (fieldNamesChange)="setFieldsInReferences($event)"
+            [schema]="schema"></sqx-field-list>
     </div>
 </form>

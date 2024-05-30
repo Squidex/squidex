@@ -1,22 +1,22 @@
 @if (logical) {
     <sqx-filter-logical
-        [model]="model"
         [filter]="logical"
+        (filterChange)="filterChange.emit()"
         [language]="language"
         [languages]="languages"
         [level]="level"
-        [statuses]="statuses"
-        (filterChange)="filterChange.emit()"
-        (remove)="remove.emit()"></sqx-filter-logical>
+        [model]="model"
+        (remove)="remove.emit()"
+        [statuses]="statuses"></sqx-filter-logical>
 }
 
 @if (comparison) {
     <sqx-filter-comparison
-        [model]="model"
         [filter]="comparison"
+        (filterChange)="filterChange.emit()"
         [language]="language"
         [languages]="languages"
-        [statuses]="statuses"
-        (filterChange)="filterChange.emit()"
-        (remove)="remove.emit()"></sqx-filter-comparison>
+        [model]="model"
+        (remove)="remove.emit()"
+        [statuses]="statuses"></sqx-filter-comparison>
 }

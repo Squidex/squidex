@@ -1,25 +1,25 @@
 <ul class="nav nav-light flex-column" [hidden]="forContent && schemaCategory.countSchemasInSubtree === 0">
     <div
         class="droppable nav-category"
+        cdkDropList
         [cdkDropListData]="schemaCategory.name"
         (cdkDropListDropped)="changeCategory($event)"
-        cdkDropList
         cdkDropListSortingDisabled>
         <li class="nav-item nav-heading">
             <div class="row g-1 align-items-center overflow-hidden">
                 <div class="col-auto">
                     <button class="btn btn-sm btn-decent btn-text-secondary btn-toggle" (click)="toggle()" type="button">
-                        <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i>
+                        <i [class.icon-caret-down]="!isCollapsed" [class.icon-caret-right]="isCollapsed"></i>
                     </button>
                 </div>
                 <div class="col overflow-hidden pe-1">
                     <sqx-editable-title
-                        [inputTitle]="schemaCategory.displayName | sqxTranslate"
-                        [disabled]="!schemaCategory.name"
-                        (inputTitleChange)="changeName($event)"
-                        size="sm"
                         closeButton="false"
-                        inputTitleLength="30"></sqx-editable-title>
+                        [disabled]="!schemaCategory.name"
+                        [inputTitle]="schemaCategory.displayName | sqxTranslate"
+                        (inputTitleChange)="changeName($event)"
+                        inputTitleLength="30"
+                        size="sm"></sqx-editable-title>
                 </div>
                 <div class="col-auto">
                     @if (schemaCategory.countSchemasInSubtree > 0) {
@@ -43,10 +43,10 @@
                 @for (schema of schemas; track schema.id) {
                     <li
                         class="nav-item truncate"
+                        cdkDrag
                         [cdkDragData]="schema"
                         (cdkDragStarted)="dragStarted($event)"
-                        sqxTourStep="schema"
-                        cdkDrag>
+                        sqxTourStep="schema">
                         <a
                             class="nav-link truncate"
                             [routerLink]="schemaRoute(schema)"
@@ -89,9 +89,9 @@
     <div class="categories" [hidden]="isCollapsed">
         @for (category of schemaCategory.categories; track category.name) {
             <sqx-schema-category
+                (remove)="remove.emit($event)"
                 [schemaCategory]="category"
-                [schemaTarget]="schemaTarget"
-                (remove)="remove.emit($event)"></sqx-schema-category>
+                [schemaTarget]="schemaTarget"></sqx-schema-category>
         }
     </div>
 </ul>

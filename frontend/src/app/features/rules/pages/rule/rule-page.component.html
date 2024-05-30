@@ -1,12 +1,12 @@
-<sqx-title [url]="['..']" message="i18n:rules.listPageTitle"></sqx-title>
+<sqx-title message="i18n:rules.listPageTitle" [url]="['..']"></sqx-title>
 <sqx-title message="i18n:rules.itemPageTitle"></sqx-title>
 
 <form (ngSubmit)="save()">
     #
-    <sqx-layout layout="main" innerWidth="54">
+    <sqx-layout innerWidth="54" layout="main">
         <ng-container title>
             <div class="d-flex align-items-center">
-                <a class="btn btn-text-secondary" (click)="back()" attr.aria-label="{{ 'common.back' | sqxTranslate }}">
+                <a class="btn btn-text-secondary" attr.aria-label="{{ 'common.back' | sqxTranslate }}" (click)="back()">
                     <i class="icon-angle-left"></i>
                 </a>
 
@@ -27,18 +27,18 @@
                             {{ "common.disabled" | sqxTranslate }}
                         </span>
                     }
-                    <sqx-toggle [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }" [disabled]="!isEditable"></sqx-toggle>
+                    <sqx-toggle [disabled]="!isEditable" [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }"></sqx-toggle>
                 </div>
             }
 
             @if (isManual) {
                 <button
                     class="btn btn-outline-secondary btn-run ms-2"
-                    [disabled]="!rule?.canTrigger"
-                    (sqxConfirmClick)="trigger()"
-                    confirmTitle="i18n:rules.triggerConfirmTitle"
+                    confirmRememberKey="triggerRule"
                     confirmText="i18n:rules.triggerConfirmText"
-                    confirmRememberKey="triggerRule">
+                    confirmTitle="i18n:rules.triggerConfirmTitle"
+                    [disabled]="!rule?.canTrigger"
+                    (sqxConfirmClick)="trigger()">
                     <i class="icon-play-line"></i>
                 </button>
             }
@@ -60,10 +60,10 @@
                                 @if (currentTrigger) {
                                     <div class="col col-icon">
                                         <sqx-rule-element
-                                            [type]="currentTrigger.triggerType"
+                                            disabled="true"
                                             [element]="triggerElement"
                                             isSmall="true"
-                                            disabled="true"></sqx-rule-element>
+                                            [type]="currentTrigger.triggerType"></sqx-rule-element>
                                     </div>
                                 }
                                 @if (currentTrigger && !rule) {
@@ -113,9 +113,9 @@
                                         <div class="col-12 col-md-6">
                                             <div class="rule-element" (click)="selectTrigger(triggerType)">
                                                 <sqx-rule-element
-                                                    [type]="triggerType"
                                                     [element]="$any(supportedTriggers)[triggerType]"
-                                                    isSmall="false"></sqx-rule-element>
+                                                    isSmall="false"
+                                                    [type]="triggerType"></sqx-rule-element>
                                             </div>
                                         </div>
                                     }
@@ -132,10 +132,10 @@
                                 @if (currentAction) {
                                     <div class="col col-icon">
                                         <sqx-rule-element
-                                            [type]="currentAction.actionType"
+                                            disabled="true"
                                             [element]="$any(actionElement)"
                                             isSmall="true"
-                                            disabled="true"></sqx-rule-element>
+                                            [type]="currentAction.actionType"></sqx-rule-element>
                                     </div>
                                 }
                                 @if (currentAction && !rule) {
@@ -161,18 +161,18 @@
                                 }
                                 <sqx-generic-action
                                     [actionForm]="currentAction"
+                                    [appName]="rulesState.appName"
                                     [trigger]="currentTrigger?.form.value"
-                                    [triggerType]="currentTrigger?.triggerType"
-                                    [appName]="rulesState.appName"></sqx-generic-action>
+                                    [triggerType]="currentTrigger?.triggerType"></sqx-generic-action>
                             } @else {
                                 <div class="row g-0">
                                     @for (actionType of supportedActions | sqxKeys; track actionType) {
                                         <div class="col-12 col-md-6">
                                             <div class="rule-element" (click)="selectAction(actionType)">
                                                 <sqx-rule-element
-                                                    [type]="actionType"
                                                     [element]="$any(supportedActions[actionType])"
-                                                    isSmall="false"></sqx-rule-element>
+                                                    isSmall="false"
+                                                    [type]="actionType"></sqx-rule-element>
                                             </div>
                                         </div>
                                     }
@@ -192,9 +192,9 @@
                         [queryParams]="{ ruleId: rule.id }"
                         routerLink="events"
                         routerLinkActive="active"
+                        sqxTourStep="history"
                         title="i18n:common.history"
-                        titlePosition="left"
-                        sqxTourStep="history">
+                        titlePosition="left">
                         <i class="icon-time"></i>
                     </a>
                     <a
@@ -202,9 +202,9 @@
                         [queryParams]="{ ruleId: rule.id }"
                         routerLink="simulator"
                         routerLinkActive="active"
+                        sqxTourStep="simulator"
                         title="i18n:rules.simulator"
-                        titlePosition="left"
-                        sqxTourStep="simulator">
+                        titlePosition="left">
                         <i class="icon-play-line"></i>
                     </a>
                 }
@@ -212,15 +212,15 @@
                 <a
                     class="panel-link"
                     #helpLink
+                    hintAfter="180000"
+                    hintText="i18n:common.helpTour"
+                    queryParamsHandling="preserve"
                     replaceUrl="true"
                     routerLink="help"
                     routerLinkActive="active"
-                    queryParamsHandling="preserve"
-                    hintText="i18n:common.helpTour"
-                    hintAfter="180000"
+                    sqxTourStep="help"
                     title="i18n:common.help"
-                    titlePosition="left"
-                    sqxTourStep="help">
+                    titlePosition="left">
                     <i class="icon-help2"></i>
                 </a>
             </div>

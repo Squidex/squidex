@@ -5,7 +5,7 @@
         <div class="col-9">
             @for (editor of editors; track editor) {
                 <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === editor">
-                    <input class="radio-input" [value]="editor" type="radio" name="editor" formControlName="editor" />
+                    <input class="radio-input" formControlName="editor" name="editor" type="radio" [value]="editor" />
                     <i class="icon-control-{{ editor }}"></i>
                     <span class="radio-label">{{ editor }}</span>
                 </label>
@@ -20,8 +20,8 @@
                     <input
                         class="form-check-input"
                         id="{{ field.fieldId }}_fieldResolveReference"
-                        type="checkbox"
-                        formControlName="resolveReference" />
+                        formControlName="resolveReference"
+                        type="checkbox" />
                     <label class="form-check-label" for="{{ field.fieldId }}_fieldResolveReference">
                         {{ "schemas.fieldTypes.references.resolve" | sqxTranslate }}
                     </label>
@@ -39,7 +39,7 @@
         </label>
 
         <div class="col-9">
-            <input class="form-control" id="{{ field.fieldId }}_query" type="text" formControlName="query" />
+            <input class="form-control" id="{{ field.fieldId }}_query" formControlName="query" type="text" />
 
             <sqx-form-hint>
                 {{ "schemas.fieldTypes.references.queryHint" | sqxTranslate }}

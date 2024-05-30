@@ -3,7 +3,7 @@
         <div class="form-group row">
             <div class="col-9 offset-3">
                 <div class="form-check">
-                    <input class="form-check-input" id="{{ field.fieldId }}_fieldUnique" type="checkbox" formControlName="isUnique" />
+                    <input class="form-check-input" id="{{ field.fieldId }}_fieldUnique" formControlName="isUnique" type="checkbox" />
                     <label class="form-check-label" for="{{ field.fieldId }}_fieldUnique">
                         {{ "schemas.field.unique" | sqxTranslate }}
                     </label>
@@ -20,9 +20,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="minLength"
-                        placeholder="{{ 'schemas.fieldTypes.string.lengthMin' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.string.lengthMin' | sqxTranslate }}"
+                        type="number" />
                 </div>
                 <div class="col-auto">
                     <label class="col-form-label minmax">-</label>
@@ -30,9 +30,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="maxLength"
-                        placeholder="{{ 'schemas.fieldTypes.string.lengthMax' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.string.lengthMax' | sqxTranslate }}"
+                        type="number" />
                 </div>
             </div>
         </div>
@@ -46,20 +46,20 @@
                 class="form-control"
                 id="{{ field.fieldId }}_fieldPattern"
                 #inputPattern
-                (focus)="patternsModal.show()"
-                formControlName="pattern"
-                placeholder="{{ 'schemas.fieldTypes.string.pattern' | sqxTranslate }}"
+                autocapitalize="off"
                 autocomplete="off"
                 autocorrect="off"
-                autocapitalize="off" />
+                (focus)="patternsModal.show()"
+                formControlName="pattern"
+                placeholder="{{ 'schemas.fieldTypes.string.pattern' | sqxTranslate }}" />
 
             @if (settings.patterns.length > 0 && (showPatternSuggestions | async)) {
                 <sqx-dropdown-menu
                     class="control-dropdown"
-                    *sqxModal="patternsModal"
-                    [sqxAnchoredTo]="inputPattern"
+                    position="bottom-start"
                     scrollY="true"
-                    position="bottom-start">
+                    [sqxAnchoredTo]="inputPattern"
+                    *sqxModal="patternsModal">
                     <h4>{{ "schemas.fieldTypes.string.suggestions" | sqxTranslate }}</h4>
                     @for (pattern of settings.patterns; track pattern) {
                         <div class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
@@ -115,9 +115,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="minCharacters"
-                        placeholder="{{ 'schemas.fieldTypes.string.charactersMin' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.string.charactersMin' | sqxTranslate }}"
+                        type="number" />
                 </div>
                 <div class="col-auto">
                     <label class="col-form-label minmax">-</label>
@@ -125,9 +125,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="maxCharacters"
-                        placeholder="{{ 'schemas.fieldTypes.string.charactersMax' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.string.charactersMax' | sqxTranslate }}"
+                        type="number" />
                 </div>
             </div>
         </div>
@@ -141,9 +141,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="minWords"
-                        placeholder="{{ 'schemas.fieldTypes.string.wordsMin' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.string.wordsMin' | sqxTranslate }}"
+                        type="number" />
                 </div>
                 <div class="col-auto">
                     <label class="col-form-label minmax">-</label>
@@ -151,9 +151,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="maxWords"
-                        placeholder="{{ 'schemas.fieldTypes.string.wordsMax' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.string.wordsMax' | sqxTranslate }}"
+                        type="number" />
                 </div>
             </div>
         </div>
@@ -177,8 +177,8 @@
             <div class="col-9">
                 <sqx-localized-input
                     id="{{ field.fieldId }}_fieldDefaultValues"
-                    [languages]="languages"
-                    formControlName="defaultValues"></sqx-localized-input>
+                    formControlName="defaultValues"
+                    [languages]="languages"></sqx-localized-input>
                 <sqx-form-hint>
                     {{ "schemas.field.defaultValuesHint" | sqxTranslate }}
                 </sqx-form-hint>

@@ -6,7 +6,7 @@
             @if (i > 0) {
                 <i class="icon-angle-right"></i>
             }
-            <a class="btn" [class.force]="i < path.length - 1 || all" [class.first]="i === 0" (click)="navigate.emit(item)">
+            <a class="btn" [class.first]="i === 0" [class.force]="i < path.length - 1 || all" (click)="navigate.emit(item)">
                 {{ item.folderName | sqxTranslate }}
             </a>
         }

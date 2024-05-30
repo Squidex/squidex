@@ -4,7 +4,7 @@
 
         <sqx-control-errors for="limit"></sqx-control-errors>
 
-        <input class="form-control" id="limit" type="number" step="1" formControlName="limit" />
+        <input class="form-control" id="limit" formControlName="limit" step="1" type="number" />
 
         <sqx-form-hint>
             {{ "rules.conditions.usageLimitHint" | sqxTranslate }}
@@ -14,9 +14,9 @@
     <div class="form-group">
         <label for="condition">{{ "rules.conditions.usageDays" | sqxTranslate }}</label>
 
-        <sqx-control-errors for="numDays" fieldName="Days"></sqx-control-errors>
+        <sqx-control-errors fieldName="Days" for="numDays"></sqx-control-errors>
 
-        <input class="form-control" id="condition" type="number" step="1" formControlName="numDays" />
+        <input class="form-control" id="condition" formControlName="numDays" step="1" type="number" />
 
         <sqx-form-hint>
             {{ "rules.conditions.usageDaysHint" | sqxTranslate }}

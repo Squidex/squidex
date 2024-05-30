@@ -2,17 +2,17 @@
     <input
         class="form-control"
         #input
-        [sqxFocusOnInit]="autoFocus"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        (blur)="blur()"
         [class.form-empty]="inputStyle === 'empty'"
         [class.form-icon]="!!icon"
         [class.form-underlined]="inputStyle === 'underlined'"
         [formControl]="queryInput"
-        [placeholder]="placeholder"
-        (blur)="blur()"
         (keydown)="onKeyDown($event)"
-        autocapitalize="off"
-        autocomplete="off"
-        autocorrect="off" />
+        [placeholder]="placeholder"
+        [sqxFocusOnInit]="autoFocus" />
 
     @if (icon) {
         <div class="icon">
@@ -33,27 +33,27 @@
     <sqx-dropdown-menu
         class="control-dropdown"
         #container
-        *sqxModal="suggestionsModal"
-        [sqxAnchoredTo]="input"
-        [adjustWidth]="dropdownFullWidth"
-        [style]="dropdownStyles"
-        [position]="dropdownPosition"
         adjustHeight="false"
+        [adjustWidth]="dropdownFullWidth"
+        [position]="dropdownPosition"
         scrollX="false"
-        scrollY="true">
+        scrollY="true"
+        [sqxAnchoredTo]="input"
+        *sqxModal="suggestionsModal"
+        [style]="dropdownStyles">
         @for (item of snapshot.suggestedItems; track item; let i = $index) {
             <div
                 class="control-dropdown-item control-dropdown-item-selectable"
                 [class.active]="i === snapshot.suggestedIndex"
-                [sqxScrollActive]="i === snapshot.suggestedIndex"
-                [sqxScrollContainer]="$any(container.nativeElement)"
                 (mousedown)="selectItem(item)"
-                (mouseover)="selectIndex(i)">
+                (mouseover)="selectIndex(i)"
+                [sqxScrollActive]="i === snapshot.suggestedIndex"
+                [sqxScrollContainer]="$any(container.nativeElement)">
                 @if (!itemTemplate) {
                     {{ item }}
                 }
                 @if (itemTemplate) {
-                    <ng-template [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
+                    <ng-template [index]="i" [item]="item" [sqxTemplateWrapper]="itemTemplate"></ng-template>
                 }
             </div>
         }

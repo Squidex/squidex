@@ -1,19 +1,19 @@
 <sqx-title message="i18n:contents.calendar"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:contents.calendar" hideSidebar="true">
+<sqx-layout hideSidebar="true" layout="main" titleText="i18n:contents.calendar">
     <ng-container menu>
         {{ title }}
 
-        <select class="form-select ms-4" [ngModel]="view" [disabled]="isLoading" (ngModelChange)="changeView($event)">
+        <select class="form-select ms-4" [disabled]="isLoading" [ngModel]="view" (ngModelChange)="changeView($event)">
             <option ngValue="day">{{ "common.daily" | sqxTranslate }}</option>
             <option ngValue="week">{{ "common.weekly" | sqxTranslate }}</option>
             <option ngValue="month">{{ "common.monthly" | sqxTranslate }}</option>
         </select>
 
-        <button class="btn btn-text-secondary btn-navigate ms-2" [disabled]="isLoading" (click)="goPrev()" type="button">
+        <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goPrev()" [disabled]="isLoading" type="button">
             <i class="icon-caret-left"></i>
         </button>
-        <button class="btn btn-text-secondary btn-navigate ms-2" [disabled]="isLoading" (click)="goNext()" type="button">
+        <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goNext()" [disabled]="isLoading" type="button">
             <i class="icon-caret-right"></i>
         </button>
     </ng-container>
@@ -23,7 +23,7 @@
     </ng-container>
 </sqx-layout>
 
-<sqx-modal-dialog *sqxModal="contentDialog" (dialogClose)="contentDialog.hide()">
+<sqx-modal-dialog (dialogClose)="contentDialog.hide()" *sqxModal="contentDialog">
     <ng-container title>
         {{ "common.content" | sqxTranslate }}
     </ng-container>
@@ -35,7 +35,7 @@
                     <label class="col-4 col-form-label">{{ "common.id" | sqxTranslate }}</label>
                     <div class="col-8">
                         <div class="input-group">
-                            <input class="form-control" id="id" #inputId readonly name="id" value="{{ contentSelected.id }}" />
+                            <input class="form-control" id="id" #inputId name="id" readonly value="{{ contentSelected.id }}" />
                             <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
                                 <i class="icon-copy"></i>
                             </button>
@@ -62,10 +62,10 @@
                     <label class="col-4 col-form-label">{{ "common.status" | sqxTranslate }}</label>
                     <div class="col-8">
                         <sqx-content-status
-                            [status]="contentSelected.status"
-                            [statusColor]="contentSelected.statusColor"
                             layout="text"
-                            small="true"></sqx-content-status>
+                            small="true"
+                            [status]="contentSelected.status"
+                            [statusColor]="contentSelected.statusColor"></sqx-content-status>
                     </div>
                 </div>
                 <hr />
@@ -73,10 +73,10 @@
                     <label class="col-4 col-form-label">{{ "contents.scheduledToLabel" | sqxTranslate }}</label>
                     <div class="col-8">
                         <sqx-content-status
-                            [status]="contentSelected.scheduleJob.status"
-                            [statusColor]="contentSelected.scheduleJob.color"
                             layout="text"
-                            small="true"></sqx-content-status>
+                            small="true"
+                            [status]="contentSelected.scheduleJob.status"
+                            [statusColor]="contentSelected.scheduleJob.color"></sqx-content-status>
                     </div>
                 </div>
                 <div class="form-group form-group-aligned row">
@@ -99,11 +99,11 @@
                             <button
                                 class="btn btn-outline-danger"
                                 [class.disabled]="!contentSelected.canCancelStatus"
-                                (sqxConfirmClick)="cancelStatus()"
-                                type="button"
-                                confirmTitle="i18n:contents.cancelStatusConfirmTitle"
+                                confirmRememberKey="cancelStatus"
                                 confirmText="i18n:contents.cancelStatusConfirmText"
-                                confirmRememberKey="cancelStatus">
+                                confirmTitle="i18n:contents.cancelStatusConfirmTitle"
+                                (sqxConfirmClick)="cancelStatus()"
+                                type="button">
                                 {{ "contents.cancelStatus" | sqxTranslate }}
                             </button>
                         </div>

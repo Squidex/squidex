@@ -9,10 +9,10 @@
 
                     <input
                         class="form-control"
+                        autocomplete="off"
                         formControlName="name"
                         maxlength="40"
-                        placeholder="{{ 'roles.roleNamePlaceholder' | sqxTranslate }}"
-                        autocomplete="off" />
+                        placeholder="{{ 'roles.roleNamePlaceholder' | sqxTranslate }}" />
                 </div>
                 <div class="col-auto">
                     <button class="btn btn-success" [disabled]="addRoleForm.hasNoName | async" type="submit">

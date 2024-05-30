@@ -13,71 +13,71 @@
             <div class="col-auto pe-4">
                 <button
                     class="btn btn-text-secondary"
-                    [disabled]="isDisabled || isFirst"
                     (click)="moveTop()"
-                    type="button"
-                    title="i18n:contents.arrayMoveTop">
+                    [disabled]="isDisabled || isFirst"
+                    title="i18n:contents.arrayMoveTop"
+                    type="button">
                     <i class="icon-caret-top"></i>
                 </button>
                 <button
                     class="btn btn-text-secondary"
-                    [disabled]="isDisabled || isFirst"
                     (click)="moveUp()"
-                    type="button"
-                    title="i18n:contents.arrayMoveUp">
+                    [disabled]="isDisabled || isFirst"
+                    title="i18n:contents.arrayMoveUp"
+                    type="button">
                     <i class="icon-caret-up"></i>
                 </button>
                 <button
                     class="btn btn-text-secondary"
-                    [disabled]="isDisabled || isLast"
                     (click)="moveDown()"
-                    type="button"
-                    title="i18n:contents.arrayMoveDown">
+                    [disabled]="isDisabled || isLast"
+                    title="i18n:contents.arrayMoveDown"
+                    type="button">
                     <i class="icon-caret-down"></i>
                 </button>
                 <button
                     class="btn btn-text-secondary"
-                    [disabled]="isDisabled || isLast"
                     (click)="moveBottom()"
-                    type="button"
-                    title="i18n:contents.arrayMoveBottom">
+                    [disabled]="isDisabled || isLast"
+                    title="i18n:contents.arrayMoveBottom"
+                    type="button">
                     <i class="icon-caret-bottom"></i>
                 </button>
                 <button
                     class="btn btn-text-secondary"
                     [class.hidden]="!(isCollapsed | async)"
                     (click)="expand()"
-                    type="button"
-                    title="i18n:contents.arrayExpandItem">
+                    title="i18n:contents.arrayExpandItem"
+                    type="button">
                     <i class="icon-plus-square"></i>
                 </button>
                 <button
                     class="btn btn-text-secondary"
                     [class.hidden]="isCollapsed | async"
                     (click)="collapse()"
-                    type="button"
-                    title="i18n:contents.arrayCollapseItem">
+                    title="i18n:contents.arrayCollapseItem"
+                    type="button">
                     <i class="icon-minus-square"></i>
                 </button>
             </div>
             <div class="col-auto">
                 <button
                     class="btn btn-text-secondary"
-                    [disabled]="isDisabled"
                     (click)="clone.emit()"
-                    type="button"
-                    title="i18n:contents.arrayCloneItem">
+                    [disabled]="isDisabled"
+                    title="i18n:contents.arrayCloneItem"
+                    type="button">
                     <i class="icon-clone"></i>
                 </button>
 
-                <button class="btn btn-text-danger" [disabled]="isDisabled" (click)="itemRemove.emit()" type="button">
+                <button class="btn btn-text-danger" (click)="itemRemove.emit()" [disabled]="isDisabled" type="button">
                     <i class="icon-bin2"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="card-body" *sqxIfOnce="!(isCollapsed | async)" [class.hidden]="isCollapsed | async">
+    <div class="card-body" [class.hidden]="isCollapsed | async" *sqxIfOnce="!(isCollapsed | async)">
         @for (section of formModel.sectionsChanges | async; track section) {
             <div class="form-group">
                 <sqx-component-section
@@ -85,9 +85,9 @@
                     [formContext]="formContext"
                     [formLevel]="formLevel"
                     [formSection]="$any(section)"
+                    [hasChatBot]="hasChatBot"
                     [index]="index"
                     [isComparing]="isComparing"
-                    [hasChatBot]="hasChatBot"
                     [language]="language"
                     [languages]="languages"></sqx-component-section>
             </div>

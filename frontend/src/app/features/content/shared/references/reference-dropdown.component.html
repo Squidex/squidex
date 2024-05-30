@@ -1,8 +1,8 @@
 <sqx-dropdown
+    (dropdownOpen)="onOpened()"
     [formControl]="control"
     [items]="snapshot.contentNames"
     [itemsLoading]="snapshot.isLoading"
-    (dropdownOpen)="onOpened()"
     valueProperty="id">
     <ng-template let-content="$implicit" let-context="context">
         <span class="truncate" [innerHTML]="content.name | sqxHighlight: context | sqxSafeHtml"></span>

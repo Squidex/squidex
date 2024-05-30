@@ -2,7 +2,7 @@
     <div class="table-items-row-summary">
         <div class="row align-items-center">
             <div class="col-auto pe-4">
-                <sqx-status-icon [status]="job.status" size="lg"></sqx-status-icon>
+                <sqx-status-icon size="lg" [status]="job.status"></sqx-status-icon>
             </div>
             <div class="col">
                 <div>
@@ -44,12 +44,12 @@
 
                 <button
                     class="btn btn-text-danger ms-1"
+                    confirmRememberKey="deleteBackup"
+                    confirmText="i18n:jobs.deleteConfirmText"
+                    confirmTitle="i18n:jobs.deleteConfirmTitle"
                     [disabled]="!job.canDelete"
                     (sqxConfirmClick)="delete()"
-                    type="button"
-                    confirmTitle="i18n:jobs.deleteConfirmTitle"
-                    confirmText="i18n:jobs.deleteConfirmText"
-                    confirmRememberKey="deleteBackup">
+                    type="button">
                     <i class="icon-bin2"></i>
                 </button>
             </div>
@@ -64,12 +64,12 @@
             <div class="row job-dump">
                 <div class="col-12">
                     <sqx-code-editor
-                        [ngModel]="details"
                         disabled="true"
-                        wordWrap="true"
                         height="auto"
                         minLines="12"
-                        mode="ace/mode/text"></sqx-code-editor>
+                        mode="ace/mode/text"
+                        [ngModel]="details"
+                        wordWrap="true"></sqx-code-editor>
                 </div>
             </div>
         </div>

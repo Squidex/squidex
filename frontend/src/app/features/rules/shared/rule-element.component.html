@@ -2,8 +2,8 @@
     <div
         class="small root"
         [class.disabled]="disabled"
-        [style.background]="element.iconColor"
-        [sqxHoverBackground]="element.iconColor | sqxDarken: 5">
+        [sqxHoverBackground]="element.iconColor | sqxDarken: 5"
+        [style.background]="element.iconColor">
         <div class="small-icon" [style.background]="element.iconColor | sqxDarken: 5">
             <sqx-rule-icon [element]="element" size="md"></sqx-rule-icon>
         </div>
@@ -25,7 +25,7 @@
             </div>
             @if (element.readMore) {
                 <div class="large-link">
-                    <a [href]="element.readMore" sqxStopClick sqxExternalLink>{{ "rules.readMore" | sqxTranslate }}</a>
+                    <a [href]="element.readMore" sqxExternalLink sqxStopClick>{{ "rules.readMore" | sqxTranslate }}</a>
                 </div>
             }
         </div>
@@ -48,7 +48,7 @@
 
             @if (element.readMore) {
                 <div class="large-link">
-                    <a [href]="element.readMore" sqxStopClick sqxExternalLink>{{ "rules.readMore" | sqxTranslate }}</a>
+                    <a [href]="element.readMore" sqxExternalLink sqxStopClick>{{ "rules.readMore" | sqxTranslate }}</a>
                 </div>
             }
         </div>

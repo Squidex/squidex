@@ -2,13 +2,13 @@
     <input
         class="form-select"
         #input
-        [disabled]="snapshot.isDisabled"
-        (click)="openModal()"
-        (keydown)="onKeyDown($event)"
-        readonly
+        autocapitalize="off"
         autocomplete="off"
         autocorrect="off"
-        autocapitalize="off" />
+        (click)="openModal()"
+        [disabled]="snapshot.isDisabled"
+        (keydown)="onKeyDown($event)"
+        readonly />
 
     @if (snapshot.selectedItem; as selectedItem) {
         <div class="control-dropdown-item">
@@ -17,7 +17,7 @@
                     <span class="truncate">{{ selectedItem }}</span>
                 }
                 @if (templateSelection) {
-                    <ng-template [sqxTemplateWrapper]="templateSelection" [item]="selectedItem"></ng-template>
+                    <ng-template [item]="selectedItem" [sqxTemplateWrapper]="templateSelection"></ng-template>
                 }
             </div>
         </div>
@@ -26,15 +26,15 @@
 
 <div class="items-container">
     <sqx-dropdown-menu
-        *sqxModal="dropdown"
-        [sqxAnchoredTo]="input"
+        adjustHeight="false"
         [adjustWidth]="dropdownFullWidth"
-        [style]="dropdownStyles"
         [position]="dropdownPosition"
         r
-        adjustHeight="false"
         scrollX="false"
-        scrollY="true">
+        scrollY="true"
+        [sqxAnchoredTo]="input"
+        *sqxModal="dropdown"
+        [style]="dropdownStyles">
         @if (canSearch) {
             <div class="search-form">
                 <input
@@ -52,14 +52,14 @@
                     class="control-dropdown-item control-dropdown-item-selectable"
                     [class.active]="i === snapshot.suggestedIndex"
                     [class.separated]="itemSeparator"
+                    (mousedown)="selectIndexAndClose(i)"
                     [sqxScrollActive]="i === snapshot.suggestedIndex"
-                    [sqxScrollContainer]="container"
-                    (mousedown)="selectIndexAndClose(i)">
+                    [sqxScrollContainer]="container">
                     @if (!templateItem) {
                         {{ item }}
                     }
                     @if (templateItem) {
-                        <ng-template [sqxTemplateWrapper]="templateItem" [item]="item" [index]="i" [context]="snapshot.query"></ng-template>
+                        <ng-template [context]="snapshot.query" [index]="i" [item]="item" [sqxTemplateWrapper]="templateItem"></ng-template>
                     }
                 </div>
             }

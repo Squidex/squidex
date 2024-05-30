@@ -66,12 +66,12 @@
                 }
 
                 <sqx-form-hint>
-                    <span [sqxMarkdown]="property.description" inline="true"></span>
+                    <span inline="true" [sqxMarkdown]="property.description"></span>
 
                     @if (property.isFormattable) {
                         <div>
                             {{ "rules.advancedFormattingHint" | sqxTranslate }}:
-                            <a tabindex="-1" href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink>
+                            <a href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink tabindex="-1">
                                 {{ "common.documentation" | sqxTranslate }}
                             </a>
                         </div>

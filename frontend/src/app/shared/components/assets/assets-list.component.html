@@ -5,7 +5,7 @@
         <div class="file-drop-button">
             <span class="btn btn-success" (click)="fileInput.click()">
                 <span>{{ "assets.uploadByDialog" | sqxTranslate }})</span>
-                <input class="file-drop-button-input" #fileInput (change)="addFiles($any($event.target!)['files'])" type="file" multiple />
+                <input class="file-drop-button-input" #fileInput (change)="addFiles($any($event.target!)['files'])" multiple type="file" />
             </span>
         </div>
         <div class="file-drop-info">{{ "assets.uploadHint" | sqxTranslate }}</div>
@@ -21,7 +21,7 @@
                 }
                 <div class="row g-0">
                     @if (assetsState.parentFolder | async; as parent) {
-                        <div class="folder-container" [cdkDropListData]="parent?.id" (cdkDropListDropped)="move($event)" cdkDropList>
+                        <div class="folder-container" cdkDropList [cdkDropListData]="parent?.id" (cdkDropListDropped)="move($event)">
                             <div class="folder-container-over"></div>
                             <sqx-asset-folder [assetPathItem]="parent" (navigate)="assetsState.navigate($event.id)"></sqx-asset-folder>
                         </div>
@@ -29,19 +29,19 @@
                     @for (assetFolder of assetsState.folders | async; track assetFolder.id) {
                         <div
                             class="folder-container"
-                            [cdkDropListEnterPredicate]="canEnter"
+                            cdkDropList
                             [cdkDropListData]="assetFolder.id"
                             (cdkDropListDropped)="move($event)"
-                            cdkDropList
+                            [cdkDropListEnterPredicate]="canEnter"
                             cdkDropListSortingDisabled>
                             <div class="folder-container-over"></div>
                             <sqx-asset-folder
                                 [assetPathItem]="assetFolder"
+                                cdkDrag
                                 [cdkDragData]="assetFolder"
                                 [cdkDragDisabled]="isDisabled || !assetFolder.canMove"
-                                (navigate)="assetsState.navigate($event.id)"
                                 (delete)="deleteAssetFolder($event)"
-                                cdkDrag></sqx-asset-folder>
+                                (navigate)="assetsState.navigate($event.id)"></sqx-asset-folder>
                         </div>
                     }
                 </div>
@@ -51,32 +51,32 @@
             @if (assets.length > 0 || snapshot.newFiles.length > 0) {
                 <h5>{{ "common.files" | sqxTranslate }}</h5>
             }
-            <div class="row g-0" [class.unrow]="isListView" cdkDropList cdkDropListSortingDisabled>
+            <div class="row g-0" cdkDropList cdkDropListSortingDisabled [class.unrow]="isListView">
                 @for (file of snapshot.newFiles; track file) {
                     <sqx-asset
                         [assetFile]="file"
+                        [folderId]="assetsState.parentId"
                         [isDisabled]="isDisabled"
                         [isListView]="isListView"
-                        [folderId]="assetsState.parentId"
                         (loadDone)="add(file, $event)"
                         (loadError)="remove(file)"></sqx-asset>
                 }
                 @for (asset of assets; track asset.id) {
                     <sqx-asset
                         [asset]="asset"
+                        cdkDrag
                         [cdkDragData]="asset"
                         [cdkDragDisabled]="isDisabled || !asset.canMove"
+                        (delete)="deleteAsset(asset)"
+                        (edit)="edit.emit($event)"
                         [folderIcon]="showFolderIcon && path.length === 0"
                         [isDisabled]="isDisabled"
                         [isListView]="isListView"
                         [isSelectable]="!!selectedIds"
                         [isSelected]="!!isSelected(asset)"
-                        (delete)="deleteAsset(asset)"
-                        (edit)="edit.emit($event)"
                         (loadDone)="replaceAsset($event)"
                         (selectAsset)="assetSelect.emit(asset)"
-                        (selectFolder)="selectFolder(asset)"
-                        cdkDrag></sqx-asset>
+                        (selectFolder)="selectFolder(asset)"></sqx-asset>
                 }
             </div>
         }

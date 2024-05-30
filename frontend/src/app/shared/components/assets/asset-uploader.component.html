@@ -9,11 +9,11 @@
                     </span>
                     <sqx-dropdown-menu
                         class="container"
-                        *sqxModal="modalMenu; onRoot: false"
+                        offset="8"
+                        scrollY="true"
                         [sqxAnchoredTo]="button"
                         (sqxDropFile)="addFiles($event)"
-                        scrollY="true"
-                        offset="8">
+                        *sqxModal="modalMenu; onRoot: false">
                         <div class="uploads">
                             @if (uploads.length === 0) {
                                 <small class="uploads-empty text-muted">
@@ -46,11 +46,11 @@
                                     </div>
                                     <div class="col">
                                         <sqx-progress-bar
-                                            [value]="upload.progress"
-                                            trailWidth="1.5"
-                                            strokeWidth="1.5"
+                                            animated="false"
                                             showText="false"
-                                            animated="false"></sqx-progress-bar>
+                                            strokeWidth="1.5"
+                                            trailWidth="1.5"
+                                            [value]="upload.progress"></sqx-progress-bar>
                                     </div>
                                     <div class="col-auto">
                                         <button class="btn btn-text-secondary" (click)="stopUpload(upload)" type="button">

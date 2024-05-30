@@ -1,8 +1,8 @@
 <div
     class="control-dropdown-item d-flex align-items-center"
     [class.active]="nodeModel.isSelected"
-    [style.paddingLeft]="paddingLeft"
-    (click)="selectNode.emit(nodeModel)">
+    (click)="selectNode.emit(nodeModel)"
+    [style.paddingLeft]="paddingLeft">
     @if (nodeModel.isLoading) {
         <ng-container class="loader">
             <button class="btn btn-sm btn-decent btn-text-secondary" type="button">
@@ -14,11 +14,11 @@
             class="btn btn-sm btn-decent btn-text-secondary"
             [class.invisible]="nodeModel.isLoaded && nodeModel.children.length === 0"
             (click)="toggle()"
-            type="button"
-            sqxStopClick>
+            sqxStopClick
+            type="button">
             <i
-                [class.icon-caret-right]="!nodeModel.isExpanded || !nodeModel.isLoaded"
-                [class.icon-caret-down]="nodeModel.isExpanded && nodeModel.isLoaded"></i>
+                [class.icon-caret-down]="nodeModel.isExpanded && nodeModel.isLoaded"
+                [class.icon-caret-right]="!nodeModel.isExpanded || !nodeModel.isLoaded"></i>
         </button>
     }
 
@@ -32,8 +32,8 @@
         @for (child of nodeModel.children; track child.item.id) {
             <sqx-asset-folder-dropdown-item
                 [appName]="appName"
-                [nodeModel]="child"
                 [nodeLevel]="nodeLevel + 1"
+                [nodeModel]="child"
                 (selectNode)="selectNode.emit($event)"></sqx-asset-folder-dropdown-item>
         }
     </div>

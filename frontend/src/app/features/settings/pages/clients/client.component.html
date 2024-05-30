@@ -9,19 +9,19 @@
                     inputTitleLength="100"></sqx-editable-title>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" (click)="connectDialog.show()" type="button" sqxTourStep="connect">
+                <button class="btn btn-primary" (click)="connectDialog.show()" sqxTourStep="connect" type="button">
                     {{ "clients.connect" | sqxTranslate }}
                 </button>
             </div>
             <div class="col-auto">
                 <button
                     class="btn btn-text-danger"
+                    confirmRememberKey="revokeClient"
+                    confirmText="i18n:clients.deleteConfirmText"
+                    confirmTitle="i18n:clients.deleteConfirmTitle"
                     [disabled]="!client.canRevoke"
                     (sqxConfirmClick)="revoke()"
-                    type="button"
-                    confirmTitle="i18n:clients.deleteConfirmTitle"
-                    confirmText="i18n:clients.deleteConfirmText"
-                    confirmRememberKey="revokeClient">
+                    type="button">
                     <i class="icon-bin2"></i>
                 </button>
             </div>
@@ -50,7 +50,7 @@
                 </label>
                 <div class="col">
                     <div class="input-group">
-                        <input class="form-control" #inputSecret [value]="client.secret" readonly />
+                        <input class="form-control" #inputSecret readonly [value]="client.secret" />
 
                         <button class="btn btn-outline-secondary" [sqxCopy]="inputSecret" type="button">
                             <i class="icon-copy"></i>
@@ -101,7 +101,7 @@
                 <div class="col">
                     <div class="row gx-2">
                         <div class="col">
-                            <input class="form-control" [(ngModel)]="apiCallsLimit" [disabled]="!client.canUpdate" type="number" min="0" />
+                            <input class="form-control" [disabled]="!client.canUpdate" min="0" [(ngModel)]="apiCallsLimit" type="number" />
 
                             <sqx-form-hint>
                                 {{ "clients.apiCallsLimitHint" | sqxTranslate }}
@@ -121,4 +121,4 @@
     </div>
 </div>
 
-<sqx-client-connect-form *sqxModal="connectDialog" [client]="client" (dialogClose)="connectDialog.hide()"></sqx-client-connect-form>
+<sqx-client-connect-form [client]="client" (dialogClose)="connectDialog.hide()" *sqxModal="connectDialog"></sqx-client-connect-form>

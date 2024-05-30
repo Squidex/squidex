@@ -4,14 +4,14 @@
             <div class="row g-0 align">
                 <div class="col-auto">
                     <button class="btn btn-sm btn-text-secondary" (click)="toggle()" type="button">
-                        <i [class.icon-caret-right]="snapshot.isCollapsed" [class.icon-caret-down]="!snapshot.isCollapsed"></i>
+                        <i [class.icon-caret-down]="!snapshot.isCollapsed" [class.icon-caret-right]="snapshot.isCollapsed"></i>
                     </button>
                 </div>
                 <div class="col">
                     <h3>{{ separator.displayName }}</h3>
                     @if (separator.properties.hints && separator.properties.hints.length > 0) {
                         <sqx-form-hint>
-                            <span [sqxMarkdown]="separator.properties.hints" optional="true" inline="true"></span>
+                            <span inline="true" optional="true" [sqxMarkdown]="separator.properties.hints"></span>
                         </sqx-form-hint>
                     }
                 </div>
@@ -31,8 +31,8 @@
             [formModelCompare]="getFieldFormCompare(field)"
             [isCompact]="isCompact"
             [language]="language"
+            (languageChange)="languageChange.emit($event)"
             [languages]="languages"
-            [schema]="schema"
-            (languageChange)="languageChange.emit($event)"></sqx-content-field>
+            [schema]="schema"></sqx-content-field>
     }
 </div>

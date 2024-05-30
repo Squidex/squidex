@@ -7,18 +7,18 @@
                     <input
                         class="form-control form-control-{{ size }}"
                         [formControl]="renameForm"
-                        [maxLength]="inputTitleLength"
                         (keydown)="onKeyDown($event)"
-                        sqxFocusOnInit
-                        spellcheck="false" />
+                        [maxLength]="inputTitleLength"
+                        spellcheck="false"
+                        sqxFocusOnInit />
                 </div>
             </div>
             <div class="col-auto">
                 <button
                     class="btn btn-primary btn-{{ size }}"
+                    attr.aria-label="{{ 'common.save' | sqxTranslate }}"
                     [disabled]="!renameForm.valid || !renameForm.dirty"
-                    type="submit"
-                    attr.aria-label="{{ 'common.save' | sqxTranslate }}">
+                    type="submit">
                     <i class="icon-checkmark"></i>
                 </button>
             </div>
@@ -26,9 +26,9 @@
                 <div class="col-auto">
                     <button
                         class="btn btn-text-secondary btn-{{ size }} btn-cancel"
+                        attr.aria-label="{{ 'common.cancel' | sqxTranslate }}"
                         (click)="toggleRename()"
-                        type="button"
-                        attr.aria-label="{{ 'common.cancel' | sqxTranslate }}">
+                        type="button">
                         <i class="icon-close"></i>
                     </button>
                 </div>

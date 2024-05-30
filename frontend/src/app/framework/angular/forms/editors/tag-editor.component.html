@@ -23,17 +23,17 @@
         <input
             class="blank text-input"
             #input
-            [placeholder]="placeholder | sqxTranslate"
-            [formControl]="addInput"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
             (blur)="markTouched()"
             (copy)="onCopy($event)"
             (cut)="onCut($event)"
             (focus)="focus()"
+            [formControl]="addInput"
             (keydown)="onKeyDown($event)"
             (paste)="onPaste($event)"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
+            [placeholder]="placeholder | sqxTranslate"
             spellcheck="false" />
     </div>
 
@@ -46,23 +46,23 @@
     <sqx-dropdown-menu
         class="control-dropdown"
         #container
-        *sqxModal="snapshot.suggestedItems.length > 0"
-        [sqxAnchoredTo]="form"
-        [style.minWidth]="dropdownWidth"
-        adjustWidth="true"
         adjustHeight="false"
+        adjustWidth="true"
+        position="bottom-end"
         scrollX="false"
         scrollY="true"
-        position="bottom-end">
+        [sqxAnchoredTo]="form"
+        *sqxModal="snapshot.suggestedItems.length > 0"
+        [style.minWidth]="dropdownWidth">
         @for (item of snapshot.suggestedItems; track item; let i = $index) {
             <div
                 class="control-dropdown-item control-dropdown-item-selectable"
                 [class.active]="i === snapshot.suggestedIndex"
                 [class.separated]="itemSeparator"
-                [sqxScrollActive]="i === snapshot.suggestedIndex"
-                [sqxScrollContainer]="container.nativeElement"
                 (mousedown)="selectValue(item)"
-                (mouseover)="selectIndex(i)">
+                (mouseover)="selectIndex(i)"
+                [sqxScrollActive]="i === snapshot.suggestedIndex"
+                [sqxScrollContainer]="container.nativeElement">
                 <ng-container>{{ item }}</ng-container>
             </div>
         }
@@ -70,13 +70,13 @@
 
     <sqx-dropdown-menu
         class="control-dropdown suggestions-dropdown"
-        *sqxModal="itemsModal"
-        [sqxAnchoredTo]="form"
-        adjustWidth="false"
         adjustHeight="false"
+        adjustWidth="false"
+        position="bottom-end"
         scrollX="false"
         scrollY="true"
-        position="bottom-end">
+        [sqxAnchoredTo]="form"
+        *sqxModal="itemsModal">
         <div class="row">
             @for (item of itemsSorted; track item; let i = $index) {
                 <div class="col-6">

@@ -11,8 +11,8 @@
                         [formContext]="formContext"
                         [formLevel]="formLevel + 1"
                         [formSection]="$any(section)"
-                        [isComparing]="isComparing"
                         [hasChatBot]="hasChatBot"
+                        [isComparing]="isComparing"
                         [language]="language"
                         [languages]="languages"></sqx-component-section>
                 </div>
@@ -23,12 +23,12 @@
             <button
                 class="btn btn-outline-success dropdown-toggle"
                 #buttonSelect
-                [disabled]="isDisabled | async"
                 (click)="schemasDropdown.show()"
+                [disabled]="isDisabled | async"
                 type="button">
                 {{ "contents.addComponent" | sqxTranslate }}
             </button>
-            <sqx-dropdown-menu *sqxModal="schemasDropdown; closeAlways: true" [sqxAnchoredTo]="buttonSelect" scrollY="true">
+            <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
                 @for (schema of schemasList; track schema) {
                     <a class="dropdown-item" (click)="setSchema(schema)">
                         {{ schema.displayName }}
@@ -37,7 +37,7 @@
             </sqx-dropdown-menu>
         }
         @if (schemasList.length === 1) {
-            <button class="btn btn-outline-success" [disabled]="isDisabled | async" (click)="setSchema(schemasList[0])" type="button">
+            <button class="btn btn-outline-success" (click)="setSchema(schemasList[0])" [disabled]="isDisabled | async" type="button">
                 {{ "contents.addComponent" | sqxTranslate }}
             </button>
         }

@@ -28,12 +28,12 @@
 
                 <button
                     class="btn btn-text-danger"
+                    confirmRememberKey="deleteRole"
+                    confirmText="i18n:roles.deleteConfirmText"
+                    confirmTitle="i18n:roles.deleteConfirmTitle"
                     [disabled]="!role.canDelete"
                     (sqxConfirmClick)="delete()"
-                    type="button"
-                    confirmTitle="i18n:roles.deleteConfirmTitle"
-                    confirmText="i18n:roles.deleteConfirmText"
-                    confirmRememberKey="deleteRole">
+                    type="button">
                     <i class="icon-bin2"></i>
                 </button>
             </div>
@@ -64,7 +64,7 @@
                         @for (control of editForm.controls; track control; let i = $index) {
                             <div class="row gx-2 mb-1">
                                 <div class="col">
-                                    <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
+                                    <sqx-control-errors [fieldName]="'Permission'" [for]="control"></sqx-control-errors>
                                     <sqx-autocomplete [formControl]="control" [itemsSource]="allPermissions"></sqx-autocomplete>
                                 </div>
                                 @if (isEditable) {
@@ -118,8 +118,8 @@
                                             id="{{ role.name }}_{{ property.key }}"
                                             [disabled]="!isEditable"
                                             [ngModel]="getProperty(property.key)"
-                                            [ngModelOptions]="{ standalone: true }"
                                             (ngModelChange)="setProperty(property.key, $event)"
+                                            [ngModelOptions]="{ standalone: true }"
                                             type="checkbox" />
                                         <label class="form-check-label" for="{{ role.name }}_{{ property.key }}">
                                             {{ property.name | sqxTranslate }}
@@ -139,8 +139,8 @@
                                                         id="{{ role.name }}_schema_{{ schema.name }}"
                                                         [disabled]="!isEditable"
                                                         [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
-                                                        [ngModelOptions]="{ standalone: true }"
                                                         (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
+                                                        [ngModelOptions]="{ standalone: true }"
                                                         type="checkbox" />
                                                     <label class="form-check-label" for="{{ role.name }}_schema_{{ schema.name }}">
                                                         <span class="truncate">
@@ -161,8 +161,8 @@
                                                         id="{{ role.name }}_schema_{{ schema.name }}"
                                                         [disabled]="!isEditable"
                                                         [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
-                                                        [ngModelOptions]="{ standalone: true }"
                                                         (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
+                                                        [ngModelOptions]="{ standalone: true }"
                                                         type="checkbox" />
                                                     <label class="form-check-label" for="{{ role.name }}_schema_{{ schema.name }}">
                                                         <span class="truncate">

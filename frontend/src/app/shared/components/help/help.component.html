@@ -1,4 +1,4 @@
-<sqx-layout titleText="i18n:common.help" titleIcon="help2" width="20" layout="right" white="true" padding="true" overflow="true">
+<sqx-layout layout="right" overflow="true" padding="true" titleIcon="help2" titleText="i18n:common.help" white="true" width="20">
     <div class="help">
         <div [innerHTML]="helpMarkdown | async | sqxHelpMarkdown"></div>
     </div>

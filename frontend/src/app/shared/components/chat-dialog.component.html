@@ -1,4 +1,4 @@
-<sqx-modal-dialog (dialogClose)="contentSelect.emit()" size="lg" fullHeight="true" flexBody="true">
+<sqx-modal-dialog (dialogClose)="contentSelect.emit()" flexBody="true" fullHeight="true" size="lg">
     <ng-container title>
         {{ "chat.title" | sqxTranslate }}
     </ng-container>
@@ -8,13 +8,13 @@
             @for (item of snapshot.chatItems; track item; let isLast = $last; let isFirst = $first) {
                 <sqx-chat-item
                     [content]="item.content"
+                    (contentSelect)="contentSelect.emit($event)"
                     [copyMode]="copyMode"
+                    (done)="setCompleted()"
                     [isFirst]="isFirst"
                     [isLast]="isLast"
                     [type]="item.type"
-                    [user]="user"
-                    (contentSelect)="contentSelect.emit($event)"
-                    (done)="setCompleted()"></sqx-chat-item>
+                    [user]="user"></sqx-chat-item>
             }
         </div>
     </ng-container>
@@ -26,10 +26,10 @@
                     <input
                         class="form-control"
                         #input
-                        [ngModel]="snapshot.chatQuestion"
-                        [ngModelOptions]="{ standalone: true }"
                         [disabled]="snapshot.isRunning"
+                        [ngModel]="snapshot.chatQuestion"
                         (ngModelChange)="setQuestion($event)"
+                        [ngModelOptions]="{ standalone: true }"
                         placeholder="{{ 'chat.prompt' | sqxTranslate }}"
                         sqxFocusOnInit />
                 </div>

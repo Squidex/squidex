@@ -56,14 +56,14 @@
                     <button
                         class="btn btn-text-secondary ms-1"
                         #buttonOptions
-                        [disabled]="!field.properties.isContentField && field.isLocked"
+                        attr.aria-label="{{ 'common.options' | sqxTranslate }}"
                         (click)="dropdown.toggle()"
-                        type="button"
-                        attr.aria-label="{{ 'common.options' | sqxTranslate }}">
+                        [disabled]="!field.properties.isContentField && field.isLocked"
+                        type="button">
                         <i class="icon-dots"></i>
                     </button>
 
-                    <sqx-dropdown-menu *sqxModal="dropdown; closeAlways: true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                    <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                         @if (field.properties.isContentField) {
                             @if (field.canEnable) {
                                 <a class="dropdown-item" (click)="enableField()">
@@ -91,10 +91,10 @@
                             <div class="dropdown-divider"></div>
                             <a
                                 class="dropdown-item"
-                                (sqxConfirmClick)="lockField()"
-                                confirmTitle="i18n:schemas.field.lockConfirmTitle"
+                                confirmRememberKey="lockField"
                                 confirmText="i18n:schemas.field.lockConfirmText"
-                                confirmRememberKey="lockField">
+                                confirmTitle="i18n:schemas.field.lockConfirmTitle"
+                                (sqxConfirmClick)="lockField()">
                                 {{ "schemas.field.lock" | sqxTranslate }}
                             </a>
                         }
@@ -105,10 +105,10 @@
                             <a
                                 class="dropdown-item dropdown-item-delete"
                                 [class.disabled]="!field.canDelete"
-                                (sqxConfirmClick)="deleteField()"
-                                confirmTitle="i18n:schemas.field.deleteConfirmTitle"
+                                confirmRememberKey="deleteField"
                                 confirmText="i18n:schemas.field.deleteConfirmText"
-                                confirmRememberKey="deleteField">
+                                confirmTitle="i18n:schemas.field.deleteConfirmTitle"
+                                (sqxConfirmClick)="deleteField()">
                                 {{ "common.delete" | sqxTranslate }}
                             </a>
                         </ng-container>
@@ -122,6 +122,7 @@
         <div class="table-items-row-details">
             <form [formGroup]="editForm.form" (ngSubmit)="save()">
                 <sqx-field-form
+                    (dialogClose)="toggleEditing()"
                     [field]="field"
                     [fieldForm]="editForm.form"
                     [isEditable]="isEditable"
@@ -129,7 +130,6 @@
                     [languages]="languages"
                     [schema]="schema"
                     [settings]="settings"
-                    (dialogClose)="toggleEditing()"
                     showButtons="true"></sqx-field-form>
             </form>
         </div>
@@ -158,11 +158,11 @@
                     </div>
                 }
                 <sqx-field-wizard
-                    *sqxModal="fieldWizard"
+                    (dialogClose)="fieldWizard.hide()"
                     [parent]="$any(field)"
                     [schema]="schema"
                     [settings]="settings"
-                    (dialogClose)="fieldWizard.hide()"></sqx-field-wizard>
+                    *sqxModal="fieldWizard"></sqx-field-wizard>
             }
         </div>
     }

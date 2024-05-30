@@ -9,19 +9,19 @@
                                 <sqx-field-languages
                                     [formModel]="formModel"
                                     [language]="language"
+                                    (languageChange)="languageChange.emit($event)"
                                     [languages]="languages"
                                     [showAllControls]="showAllControls"
-                                    (languageChange)="languageChange.emit($event)"
                                     (showAllControlsChange)="changeShowAllControls($event)"></sqx-field-languages>
                                 <sqx-field-copy-button [formModel]="formModel" [languages]="languages"></sqx-field-copy-button>
                                 @if (isTranslatable) {
                                     <button
                                         class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1"
-                                        [disabled]="formModel.field.isDisabled"
                                         (click)="translate()"
-                                        type="button"
+                                        [disabled]="formModel.field.isDisabled"
+                                        tabindex="-1"
                                         title="i18n:contents.autotranslate"
-                                        tabindex="-1">
+                                        type="button">
                                         <i class="icon-translate"></i>
                                     </button>
                                 }
@@ -38,8 +38,8 @@
                                     [formContext]="formContext"
                                     [formLevel]="formLevel"
                                     [formModel]="formModel.get(language)"
-                                    [isComparing]="!!formModelCompare"
                                     [hasChatBot]="hasChatBot"
+                                    [isComparing]="!!formModelCompare"
                                     [language]="language"
                                     [languages]="languages"></sqx-field-editor>
                             </div>
@@ -51,8 +51,8 @@
                             [formContext]="formContext"
                             [formLevel]="formLevel"
                             [formModel]="getControl()"
-                            [isComparing]="!!formModelCompare"
                             [hasChatBot]="hasChatBot"
+                            [isComparing]="!!formModelCompare"
                             [language]="language"
                             [languages]="languages"></sqx-field-editor>
                     }
@@ -80,9 +80,9 @@
                                 <sqx-field-languages
                                     [formModel]="formModelCompare!"
                                     [language]="language"
+                                    (languageChange)="languageChange.emit($event)"
                                     [languages]="languages"
                                     [showAllControls]="showAllControls"
-                                    (languageChange)="languageChange.emit($event)"
                                     (showAllControlsChange)="changeShowAllControls($event)"></sqx-field-languages>
                             </div>
                         </div>
@@ -96,8 +96,8 @@
                                     [formContext]="formContext"
                                     [formLevel]="formLevel"
                                     [formModel]="formModelCompare.get(language)"
-                                    [isComparing]="!!formModelCompare"
                                     [hasChatBot]="hasChatBot"
+                                    [isComparing]="!!formModelCompare"
                                     [language]="language"
                                     [languages]="languages"></sqx-field-editor>
                             </div>
@@ -108,10 +108,10 @@
                             [formContext]="formContext"
                             [formLevel]="formLevel"
                             [formModel]="getControlCompare()!"
-                            [language]="language"
-                            [languages]="languages"
+                            [hasChatBot]="hasChatBot"
                             [isComparing]="!!formModelCompare"
-                            [hasChatBot]="hasChatBot"></sqx-field-editor>
+                            [language]="language"
+                            [languages]="languages"></sqx-field-editor>
                     }
                 </div>
             }

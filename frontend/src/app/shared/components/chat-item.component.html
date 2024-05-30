@@ -2,7 +2,7 @@
     <div class="row mt-3">
         <div class="col">
             <div class="bubble bubble-left">
-                <span [sqxMarkdown]="snapshot.content" optional="false" inline="false"></span>
+                <span inline="false" optional="false" [sqxMarkdown]="snapshot.content"></span>
             </div>
         </div>
         <div class="col-auto">
@@ -46,7 +46,7 @@
                         </div>
                     }
                     @if (!snapshot.isFailed) {
-                        <span [sqxMarkdown]="snapshot.content" (load)="scrollIntoView()" optional="false" inline="false"></span>
+                        <span inline="false" (load)="scrollIntoView()" optional="false" [sqxMarkdown]="snapshot.content"></span>
                     }
                     @if (snapshot.isFailed) {
                         <span>

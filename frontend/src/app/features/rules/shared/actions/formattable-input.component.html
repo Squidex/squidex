@@ -3,10 +3,10 @@
         <sqx-code-editor
             [completion]="editorCompletion"
             [mode]="editorMode"
-            [snippets]="mode === 'Script'"
-            singleLine="true"></sqx-code-editor>
+            singleLine="true"
+            [snippets]="mode === 'Script'"></sqx-code-editor>
         <div class="input-group-apppend">
-            <select class="form-select" [ngModel]="mode" [disabled]="disabled" (ngModelChange)="setMode($event)" tabindex="-1">
+            <select class="form-select" [disabled]="disabled" [ngModel]="mode" (ngModelChange)="setMode($event)" tabindex="-1">
                 @for (supportedMode of modes; track supportedMode) {
                     <option [ngValue]="supportedMode">{{ supportedMode }}</option>
                 }
@@ -20,8 +20,8 @@
                 class="btn btn-toggle"
                 [class.active]="mode === supportedMode"
                 (click)="setMode(supportedMode)"
-                type="button"
-                tabindex="-1">
+                tabindex="-1"
+                type="button">
                 {{ supportedMode }}
             </button>
         }

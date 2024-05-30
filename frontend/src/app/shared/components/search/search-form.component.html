@@ -1,5 +1,5 @@
 @if (enableShortcut) {
-    <sqx-shortcut (trigger)="inputFind.focus()" keys="CTRL + I"></sqx-shortcut>
+    <sqx-shortcut keys="CTRL + I" (trigger)="inputFind.focus()"></sqx-shortcut>
 }
 
 <form [class]="formClass" (ngSubmit)="search()">
@@ -7,16 +7,16 @@
         <input
             class="form-control"
             #inputFind
-            [ngModel]="query?.fullText"
-            [ngModelOptions]="{ standalone: true }"
-            [placeholder]="placeholder"
-            (ngModelChange)="changeQueryFullText($event)"
-            hintText="i18n:search.fullTextTour"
             hintAfter="120000"
             hintPosition="bottom-end"
-            sqxTourStep="search"
+            hintText="i18n:search.fullTextTour"
+            [ngModel]="query?.fullText"
+            (ngModelChange)="changeQueryFullText($event)"
+            [ngModelOptions]="{ standalone: true }"
+            [placeholder]="placeholder"
             shortcut="CTRL + I"
-            shortcutAction="none" />
+            shortcutAction="none"
+            sqxTourStep="search" />
 
         @if (queries) {
             @if (saveKey | async; as key) {
@@ -34,18 +34,18 @@
             <button
                 class="btn btn-outline-secondary"
                 (click)="searchDialog.toggle()"
-                type="button"
-                hintText="i18n:search.advancedTour"
                 hintAfter="60000"
                 hintPosition="bottom-end"
-                sqxTourStep="search">
+                hintText="i18n:search.advancedTour"
+                sqxTourStep="search"
+                type="button">
                 <i [class.icon-filter]="!hasFilter" [class.icon-filter-filled]="hasFilter"></i>
             </button>
         }
     </div>
 </form>
 
-<sqx-modal-dialog *sqxModal="searchDialog" (dialogClose)="searchDialog.hide()" size="lg">
+<sqx-modal-dialog (dialogClose)="searchDialog.hide()" size="lg" *sqxModal="searchDialog">
     <ng-container title>
         {{ "search.customQuery" | sqxTranslate }}
     </ng-container>
@@ -67,16 +67,16 @@
                     <button
                         class="btn btn-sm btn-secondary btn-toggle"
                         [class.btn-primary]="!showQueries"
-                        [disabled]="!showQueries"
                         (click)="changeView(false)"
+                        [disabled]="!showQueries"
                         type="button">
                         {{ "common.designer" | sqxTranslate }}
                     </button>
                     <button
                         class="btn btn-sm btn-secondary btn-toggle"
                         [class.btn-primary]="showQueries"
-                        [disabled]="showQueries"
                         (click)="changeView(true)"
+                        [disabled]="showQueries"
                         type="button">
                         {{ "common.bookmarks" | sqxTranslate }}
                     </button>
@@ -91,8 +91,8 @@
                             [languages]="languages"
                             [model]="queryModel"
                             [query]="query"
-                            [statuses]="statuses"
-                            (queryChange)="changeQuery($event)"></sqx-query>
+                            (queryChange)="changeQuery($event)"
+                            [statuses]="statuses"></sqx-query>
 
                         <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
                     </div>
@@ -101,10 +101,10 @@
                 @if (queries && queriesTypes) {
                     <div class="mt-4">
                         <sqx-shared-queries
-                            [types]="queriesTypes"
-                            [queryUsed]="query"
                             [queries]="queries"
-                            (search)="changeQuery($event)"></sqx-shared-queries>
+                            [queryUsed]="query"
+                            (search)="changeQuery($event)"
+                            [types]="queriesTypes"></sqx-shared-queries>
                     </div>
                 }
             }
@@ -131,11 +131,11 @@
                 <div class="form-group mt-2">
                     <sqx-control-errors for="name"></sqx-control-errors>
 
-                    <input class="form-control" id="appName" formControlName="name" autocomplete="off" sqxFocusOnInit />
+                    <input class="form-control" id="appName" autocomplete="off" formControlName="name" sqxFocusOnInit />
                 </div>
 
                 <div class="form-check">
-                    <input class="form-check-input" id="user" type="checkbox" formControlName="user" />
+                    <input class="form-check-input" id="user" formControlName="user" type="checkbox" />
                     <label class="form-check-label" for="user">
                         {{ "search.saveQueryMyself" | sqxTranslate }}
                     </label>

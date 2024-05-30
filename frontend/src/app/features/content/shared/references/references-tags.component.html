@@ -1,9 +1,9 @@
 <sqx-tag-editor
+    allowDuplicates="false"
+    allowOpen="true"
+    (dropdownOpen)="onOpened()"
     [formControl]="control"
     [itemConverter]="snapshot.converter"
     [itemsSource]="snapshot.converter.tags"
     [itemsSourceLoading]="snapshot.isLoading"
-    (dropdownOpen)="onOpened()"
-    placeholder="{{ 'common.tagAddReference' | sqxTranslate }}"
-    allowDuplicates="false"
-    allowOpen="true"></sqx-tag-editor>
+    placeholder="{{ 'common.tagAddReference' | sqxTranslate }}"></sqx-tag-editor>

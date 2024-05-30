@@ -1,4 +1,4 @@
-<div class="d-flex root" [class.mini]="size === 'Mini'" [class.compact]="size === 'Compact'" (sqxResized)="setSize($event)">
+<div class="d-flex root" [class.compact]="size === 'Compact'" [class.mini]="size === 'Mini'" (sqxResized)="setSize($event)">
     <div class="form-group flex-grow me-1 mb-0">
         @if (isDateTimeMode && shouldShowDateTimeModeButton) {
             <div>
@@ -18,18 +18,18 @@
             <input
                 class="form-control form-date"
                 #dateInput
-                [formControl]="dateControl"
-                [class.with-buttons]="isDateTimeMode && shouldShowDateTimeModeButton"
                 (blur)="callTouched()"
-                placeholder="{{ 'common.date' | sqxTranslate }}"
+                [class.with-buttons]="isDateTimeMode && shouldShowDateTimeModeButton"
+                [formControl]="dateControl"
+                maxlength="10"
                 minlength="0"
-                maxlength="10" />
+                placeholder="{{ 'common.date' | sqxTranslate }}" />
 
             @if (isDateTimeMode) {
                 <input
                     class="form-control form-time"
-                    [formControl]="timeControl"
                     (blur)="callTouched()"
+                    [formControl]="timeControl"
                     placeholder="{{ 'common.time' | sqxTranslate }}" />
             }
         </div>
@@ -38,8 +38,8 @@
             <button
                 class="btn btn-text-secondary btn-sm btn-clear"
                 [class.hidden]="!hasValue"
-                [disabled]="snapshot.isDisabled"
                 (click)="reset()"
+                [disabled]="snapshot.isDisabled"
                 type="button">
                 <i class="icon-close"></i>
             </button>
@@ -49,10 +49,10 @@
         <div class="form-group">
             <button
                 class="btn btn-text-secondary btn-quick"
-                [disabled]="snapshot.isDisabled"
                 (click)="writeNow()"
-                type="button"
-                title="i18n:common.dateTimeEditor.nowTooltip">
+                [disabled]="snapshot.isDisabled"
+                title="i18n:common.dateTimeEditor.nowTooltip"
+                type="button">
                 {{ "common.dateTimeEditor.now" | sqxTranslate }}
             </button>
         </div>
@@ -61,10 +61,10 @@
         <div class="form-group">
             <button
                 class="btn btn-text-secondary btn-quick"
-                [disabled]="snapshot.isDisabled"
                 (click)="writeToday()"
-                type="button"
-                title="i18n:common.dateTimeEditor.todayTooltip">
+                [disabled]="snapshot.isDisabled"
+                title="i18n:common.dateTimeEditor.todayTooltip"
+                type="button">
                 {{ "common.dateTimeEditor.today" | sqxTranslate }}
             </button>
         </div>

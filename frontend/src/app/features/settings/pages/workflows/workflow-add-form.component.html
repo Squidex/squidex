@@ -9,10 +9,10 @@
 
                     <input
                         class="form-control"
+                        autocomplete="off"
                         formControlName="name"
                         maxlength="40"
-                        placeholder="{{ 'workflows.workflowNamePlaceholder' | sqxTranslate }}"
-                        autocomplete="off" />
+                        placeholder="{{ 'workflows.workflowNamePlaceholder' | sqxTranslate }}" />
                 </div>
                 <div class="col-auto">
                     <button class="btn btn-success" [disabled]="addWorkflowForm.hasNoName | async" type="submit">

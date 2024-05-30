@@ -1,10 +1,10 @@
 @if (!isListView) {
     <div
         class="card"
-        [class.selectable]="isSelectable"
         [class.border-primary]="isSelected"
-        [sqxDropDisabled]="!asset || !asset.canUpload"
+        [class.selectable]="isSelectable"
         (click)="selectAsset.emit()"
+        [sqxDropDisabled]="!asset || !asset.canUpload"
         (sqxDropFile)="updateFile($event)"
         sqxDropNoPaste="true">
         <div class="card-body">
@@ -18,7 +18,7 @@
 
                     @if (asset.canPreview) {
                         <div class="file-image">
-                            <img [sqxImageSource]="asset | sqxAssetPreviewUrl" layoutKey="asset-large" />
+                            <img layoutKey="asset-large" [sqxImageSource]="asset | sqxAssetPreviewUrl" />
                         </div>
                     } @else {
                         <div class="file-icon">
@@ -39,8 +39,8 @@
                             <a
                                 class="file-download ms-2"
                                 [href]="asset | sqxAssetUrl: asset.version : false"
-                                sqxStopClick
-                                sqxExternalLink="noicon">
+                                sqxExternalLink="noicon"
+                                sqxStopClick>
                                 <i class="icon-download"></i>
                             </a>
 
@@ -53,10 +53,10 @@
                             @if (!isDisabled && !removeMode && asset.canDelete) {
                                 <a
                                     class="file-delete ms-2"
-                                    (sqxConfirmClick)="delete.emit()"
-                                    confirmTitle="i18n:assets.deleteConfirmTitle"
+                                    confirmRememberKey="deleteAsset"
                                     confirmText="i18n:assets.deleteConfirmText"
-                                    confirmRememberKey="deleteAsset">
+                                    confirmTitle="i18n:assets.deleteConfirmTitle"
+                                    (sqxConfirmClick)="delete.emit()">
                                     <i class="icon-delete"></i>
                                 </a>
                             }
@@ -64,10 +64,10 @@
                             @if (!isDisabled && removeMode) {
                                 <a
                                     class="file-delete ms-2"
-                                    (sqxConfirmClick)="remove.emit()"
-                                    confirmTitle="i18n:assets.removeConfirmTitle"
+                                    confirmRememberKey="removeAsset"
                                     confirmText="i18n:assets.removeConfirmText"
-                                    confirmRememberKey="removeAsset">
+                                    confirmTitle="i18n:assets.removeConfirmTitle"
+                                    (sqxConfirmClick)="remove.emit()">
                                     <i class="icon-close"></i>
                                 </a>
                             }
@@ -98,7 +98,7 @@
 
                 @if (snapshot.progress > 0) {
                     <div class="upload-progress">
-                        <sqx-progress-bar [value]="snapshot.progress" mode="Circle"></sqx-progress-bar>
+                        <sqx-progress-bar mode="Circle" [value]="snapshot.progress"></sqx-progress-bar>
                     </div>
                 }
             }
@@ -130,16 +130,16 @@
     <div
         class="table-items-row table-items-row-summary"
         [class.selectable]="isSelectable"
-        [sqxDropDisabled]="!asset || !asset.canUpload"
-        [sqxDropNoPaste]="true"
         (click)="selectAsset.emit()"
-        (sqxDropFile)="updateFile($event)">
+        [sqxDropDisabled]="!asset || !asset.canUpload"
+        (sqxDropFile)="updateFile($event)"
+        [sqxDropNoPaste]="true">
         <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected"></div>
 
         @if (asset && snapshot.progress === 0) {
             @if (asset.canPreview) {
                 <div class="image" [class.image-left]="!isSelectable">
-                    <img class="bg2" [sqxImageSource]="asset | sqxAssetPreviewUrl" layoutKey="asset-small" />
+                    <img class="bg2" layoutKey="asset-small" [sqxImageSource]="asset | sqxAssetPreviewUrl" />
                 </div>
             } @else {
                 <div class="image image-padded" [class.image-left]="!isSelectable">
@@ -173,8 +173,8 @@
                             <a
                                 class="btn btn-text-secondary"
                                 [href]="asset | sqxAssetUrl: asset.version : false"
-                                sqxStopClick
-                                sqxExternalLink="noicon">
+                                sqxExternalLink="noicon"
+                                sqxStopClick>
                                 <i class="icon-download"></i>
                             </a>
 
@@ -190,12 +190,12 @@
                         @if (!isDisabled && !removeMode && asset.canDelete) {
                             <button
                                 class="btn btn-text-danger"
+                                confirmRememberKey="deleteAsset"
+                                confirmText="i18n:assets.deleteConfirmText"
+                                confirmTitle="i18n:assets.deleteConfirmTitle"
                                 [disabled]="isDisabled"
                                 (sqxConfirmClick)="delete.emit()"
-                                type="button"
-                                confirmTitle="i18n:assets.deleteConfirmTitle"
-                                confirmText="i18n:assets.deleteConfirmText"
-                                confirmRememberKey="deleteAsset">
+                                type="button">
                                 <i class="icon-bin2"></i>
                             </button>
                         }
@@ -203,12 +203,12 @@
                         @if (!isDisabled && removeMode) {
                             <button
                                 class="btn btn-text-secondary"
+                                confirmRememberKey="removeAsset"
+                                confirmText="i18n:assets.removeConfirmText"
+                                confirmTitle="i18n:assets.removeConfirmTitle"
                                 [disabled]="isDisabled"
                                 (sqxConfirmClick)="remove.emit()"
-                                type="button"
-                                confirmTitle="i18n:assets.removeConfirmTitle"
-                                confirmText="i18n:assets.removeConfirmText"
-                                confirmRememberKey="removeAsset">
+                                type="button">
                                 <i class="icon-close"></i>
                             </button>
                         }
@@ -224,7 +224,7 @@
 
         @if (snapshot.progress > 0) {
             <div class="upload-progress">
-                <sqx-progress-bar [value]="snapshot.progress" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>
+                <sqx-progress-bar [showText]="false" [strokeWidth]="0.8" [trailWidth]="0.8" [value]="snapshot.progress"></sqx-progress-bar>
             </div>
         }
     </div>

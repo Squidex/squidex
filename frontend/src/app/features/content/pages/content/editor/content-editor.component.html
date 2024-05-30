@@ -1,4 +1,4 @@
-<sqx-form-error [error]="contentForm.error | async" bubble="true" closeable="true"></sqx-form-error>
+<sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async"></sqx-form-error>
 
 <sqx-list-view noPadding="true">
     <ng-container topHeader>
@@ -51,9 +51,9 @@
                     [formLevel]="0"
                     [formSection]="section"
                     [language]="language"
+                    (languageChange)="languageChange.emit($event)"
                     [languages]="languages"
-                    [schema]="schema"
-                    (languageChange)="languageChange.emit($event)"></sqx-content-section>
+                    [schema]="schema"></sqx-content-section>
             }
         </div>
     </ng-container>

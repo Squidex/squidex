@@ -7,7 +7,7 @@
 
     <hr />
 
-    <div [cdkDropListData]="listFields" (cdkDropListDropped)="drop($event)" cdkDropList>
+    <div cdkDropList [cdkDropListData]="listFields" (cdkDropListDropped)="drop($event)">
         @for (field of listFields; track field) {
             <div cdkDrag>
                 <i class="icon-drag2 drag-handle"></i>
@@ -15,10 +15,10 @@
                     <input
                         class="form-check-input"
                         id="field_{{ field }}"
-                        [disabled]="!field"
+                        checked
                         (click)="removeField(field)"
-                        type="checkbox"
-                        checked />
+                        [disabled]="!field"
+                        type="checkbox" />
                     <label class="form-check-label" for="field_{{ field }}">
                         @if (field.name) {
                             <span>

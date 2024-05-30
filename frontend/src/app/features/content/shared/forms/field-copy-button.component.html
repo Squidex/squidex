@@ -3,14 +3,14 @@
         class="btn btn-outline-secondary btn-sm ms-1 dropdown-toggle"
         #button
         (click)="dropdown.toggle()"
-        type="button"
+        tabindex="-1"
         title="{{ 'common.copy' | sqxTranslate }}"
-        tabindex="-1">
+        type="button">
         <i class="icon-copy"></i>
     </button>
-    <sqx-dropdown-menu *sqxModal="dropdown" [sqxAnchoredTo]="button" scrollY="true">
+    <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="button" *sqxModal="dropdown">
         <div class="section d-flex justify-content-end">
-            <button class="btn btn-primary" (click)="copy()" type="button" tabindex="-1">
+            <button class="btn btn-primary" (click)="copy()" tabindex="-1" type="button">
                 {{ "common.copy" | sqxTranslate }}
             </button>
         </div>
@@ -30,7 +30,7 @@
         <div class="dropdown-divider"></div>
         <div class="section">
             <label>{{ "common.to" | sqxTranslate }}</label>
-            <sqx-checkbox-group [(ngModel)]="copyTargets" [values]="languageCodes" layout="Multiline"></sqx-checkbox-group>
+            <sqx-checkbox-group layout="Multiline" [(ngModel)]="copyTargets" [values]="languageCodes"></sqx-checkbox-group>
         </div>
     </sqx-dropdown-menu>
 }

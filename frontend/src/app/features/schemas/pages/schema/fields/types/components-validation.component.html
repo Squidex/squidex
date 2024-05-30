@@ -7,9 +7,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="minItems"
-                        placeholder="{{ 'schemas.fieldTypes.references.countMin' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.references.countMin' | sqxTranslate }}"
+                        type="number" />
                 </div>
                 <div class="col-auto">
                     <label class="col-form-label minmax">-</label>
@@ -17,9 +17,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="maxItems"
-                        placeholder="{{ 'schemas.fieldTypes.references.countMax' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.references.countMax' | sqxTranslate }}"
+                        type="number" />
                 </div>
             </div>
         </div>
@@ -30,10 +30,10 @@
 
         <div class="col-9">
             <sqx-tag-editor
+                formControlName="schemaIds"
                 [itemConverter]="(schemasSource.converter | async)!"
                 [itemsSource]="(schemasSource.converter | async)?.suggestions"
-                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"
-                formControlName="schemaIds"></sqx-tag-editor>
+                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"></sqx-tag-editor>
         </div>
     </div>
 

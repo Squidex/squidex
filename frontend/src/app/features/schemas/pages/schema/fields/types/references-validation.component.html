@@ -4,10 +4,10 @@
 
         <div class="col-9">
             <sqx-tag-editor
+                formControlName="schemaIds"
                 [itemConverter]="(schemasSource.normalConverter | async)!"
                 [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
-                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"
-                formControlName="schemaIds"></sqx-tag-editor>
+                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"></sqx-tag-editor>
         </div>
     </div>
 
@@ -17,8 +17,8 @@
                 <input
                     class="form-check-input"
                     id="{{ field.fieldId }}_fieldAllowDuplicates"
-                    type="checkbox"
-                    formControlName="allowDuplicates" />
+                    formControlName="allowDuplicates"
+                    type="checkbox" />
                 <label class="form-check-label" for="{{ field.fieldId }}_fieldAllowDuplicates">
                     {{ "schemas.fieldTypes.assets.allowDuplicates" | sqxTranslate }}
                 </label>
@@ -34,9 +34,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="minItems"
-                        placeholder="{{ 'schemas.fieldTypes.references.countMin' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.references.countMin' | sqxTranslate }}"
+                        type="number" />
                 </div>
                 <div class="col-auto">
                     <label class="col-form-label minmax">-</label>
@@ -44,9 +44,9 @@
                 <div class="col">
                     <input
                         class="form-control"
-                        type="number"
                         formControlName="maxItems"
-                        placeholder="{{ 'schemas.fieldTypes.references.countMax' | sqxTranslate }}" />
+                        placeholder="{{ 'schemas.fieldTypes.references.countMax' | sqxTranslate }}"
+                        type="number" />
                 </div>
             </div>
         </div>
@@ -58,8 +58,8 @@
                 <input
                     class="form-check-input"
                     id="{{ field.fieldId }}_fieldMustBePublished"
-                    type="checkbox"
-                    formControlName="mustBePublished" />
+                    formControlName="mustBePublished"
+                    type="checkbox" />
                 <label class="form-check-label" for="{{ field.fieldId }}_fieldMustBePublished">
                     {{ "schemas.fieldTypes.references.mustBePublished" | sqxTranslate }}
                 </label>
@@ -79,7 +79,7 @@
         <div class="form-group row">
             <label class="col-3 col-form-label">{{ "schemas.field.defaultValues" | sqxTranslate }}</label>
             <div class="col-9">
-                <sqx-localized-input [languages]="languages" type="tags" formControlName="defaultValues"></sqx-localized-input>
+                <sqx-localized-input formControlName="defaultValues" [languages]="languages" type="tags"></sqx-localized-input>
                 <sqx-form-hint>
                     {{ "schemas.field.defaultValuesHint" | sqxTranslate }}
                 </sqx-form-hint>

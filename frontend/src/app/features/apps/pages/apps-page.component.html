@@ -19,7 +19,7 @@
                     <div class="team">
                         @if (group.team) {
                             <div class="team-header">
-                                <sqx-team [team]="group.team" (leave)="leaveTeam($event)"></sqx-team>
+                                <sqx-team (leave)="leaveTeam($event)" [team]="group.team"></sqx-team>
                             </div>
                         }
                         <div class="team-body" [class.padded]="group.team">
@@ -72,8 +72,8 @@
     </div>
 }
 
-<sqx-app-form *sqxModal="addAppDialog" [template]="addAppTemplate" (dialogClose)="addAppDialog.hide()"></sqx-app-form>
+<sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [template]="addAppTemplate"></sqx-app-form>
 
-<sqx-onboarding-dialog *sqxModal="onboardingDialog" (dialogClose)="onboardingDialog.hide()"></sqx-onboarding-dialog>
+<sqx-onboarding-dialog (dialogClose)="onboardingDialog.hide()" *sqxModal="onboardingDialog"></sqx-onboarding-dialog>
 
-<sqx-news-dialog *sqxModal="newsDialog" [features]="newsFeatures!" (dialogClose)="newsDialog.hide()"></sqx-news-dialog>
+<sqx-news-dialog (dialogClose)="newsDialog.hide()" [features]="newsFeatures!" *sqxModal="newsDialog"></sqx-news-dialog>

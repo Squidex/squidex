@@ -1,9 +1,9 @@
 <div class="table-items-row table-items-row-expandable language">
     <div class="table-items-row-summary row gx-2 align-items-center">
-        <div class="col-2" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+        <div class="col-2" [class.language-master]="language.isMaster" [class.language-optional]="language.isOptional">
             {{ language.iso2Code }}
         </div>
-        <div class="col" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+        <div class="col" [class.language-master]="language.isMaster" [class.language-optional]="language.isOptional">
             {{ language.englishName }}
         </div>
         <div class="col-auto">
@@ -21,12 +21,12 @@
 
                 <button
                     class="btn btn-text-danger"
+                    confirmRememberKey="removeLanguage"
+                    confirmText="i18n:languages.deleteConfirmText"
+                    confirmTitle="i18n:languages.deleteConfirmTitle"
                     [disabled]="!language.canDelete"
                     (sqxConfirmClick)="remove()"
-                    type="button"
-                    confirmTitle="i18n:languages.deleteConfirmTitle"
-                    confirmText="i18n:languages.deleteConfirmText"
-                    confirmRememberKey="removeLanguage">
+                    type="button">
                     <i class="icon-bin2"></i>
                 </button>
             </div>
@@ -56,10 +56,10 @@
                                 @if (fallbackLanguages.length > 0) {
                                     <div
                                         class="fallback-languages"
+                                        cdkDropList
                                         [cdkDropListData]="$any(fallbackLanguages)"
                                         [cdkDropListDisabled]="!isEditable"
-                                        (cdkDropListDropped)="sort($event)"
-                                        cdkDropList>
+                                        (cdkDropListDropped)="sort($event)">
                                         @for (language of fallbackLanguages; track language) {
                                             <div class="fallback-language table-drag" cdkDrag cdkDragLockAxis="y">
                                                 <div class="row g-0">
@@ -92,8 +92,8 @@
                                             <div class="col">
                                                 <select
                                                     class="form-select fallback-select"
-                                                    [(ngModel)]="otherLanguage"
-                                                    name="otherLanguage">
+                                                    name="otherLanguage"
+                                                    [(ngModel)]="otherLanguage">
                                                     @for (otherLanguage of fallbackLanguagesNew; track language.iso2Code) {
                                                         <option [ngValue]="otherLanguage">
                                                             {{ otherLanguage.englishName || otherLanguage.iso2Code }}
@@ -119,8 +119,8 @@
                                     <input
                                         class="form-check-input"
                                         id="{{ language.iso2Code }}_isMaster"
-                                        type="checkbox"
-                                        formControlName="isMaster" />
+                                        formControlName="isMaster"
+                                        type="checkbox" />
                                     <label class="form-check-label" for="{{ language.iso2Code }}_isMaster">
                                         {{ "languages.master" | sqxTranslate }}
                                     </label>
@@ -138,8 +138,8 @@
                                     <input
                                         class="form-check-input"
                                         id="{{ language.iso2Code }}_isOptional"
-                                        type="checkbox"
-                                        formControlName="isOptional" />
+                                        formControlName="isOptional"
+                                        type="checkbox" />
                                     <label class="form-check-label" for="{{ language.iso2Code }}_isOptional">
                                         {{ "languages.optional" | sqxTranslate }}
                                     </label>

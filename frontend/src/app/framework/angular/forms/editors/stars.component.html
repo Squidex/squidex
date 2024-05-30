@@ -5,8 +5,8 @@
                 <span
                     class="star"
                     [class.selected]="star <= snapshot.stars"
-                    (mouseenter)="setPreview(star)"
-                    (click)="setValue(star)"></span>
+                    (click)="setValue(star)"
+                    (mouseenter)="setPreview(star)"></span>
             }
         </span>
         <button class="btn btn-text-secondary" [class.hidden]="!snapshot.value" (click)="reset()" type="button">

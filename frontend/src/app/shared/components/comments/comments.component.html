@@ -4,30 +4,30 @@
             <input
                 class="form-control"
                 #input
-                [mention]="$any(users)"
-                [mentionConfig]="mentionConfig"
-                (blur)="blurComment()"
-                name="text"
-                formControlName="text"
-                placeholder="{{ 'comments.create' | sqxTranslate }}"
+                autocapitalize="off"
                 autocomplete="off"
                 autocorrect="off"
-                autocapitalize="off" />
+                (blur)="blurComment()"
+                formControlName="text"
+                [mention]="$any(users)"
+                [mentionConfig]="mentionConfig"
+                name="text"
+                placeholder="{{ 'comments.create' | sqxTranslate }}" />
         </form>
     </div>
     <div class="comments-list" #scrollContainer>
         @for (comment of commentsItems | async; track comment.index) {
             <sqx-comment
+                canAnswer="true"
+                canEdit="true"
+                canFollow="false"
                 [commentItem]="comment"
                 [comments]="commentsState"
                 [currenUrl]="router.url"
                 [mentionConfig]="mentionConfig"
                 [mentionUsers]="users"
                 [scrollContainer]="'.comments-list'"
-                [userToken]="commentUser"
-                canAnswer="true"
-                canEdit="true"
-                canFollow="false"></sqx-comment>
+                [userToken]="commentUser"></sqx-comment>
         }
     </div>
 }

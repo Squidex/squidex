@@ -25,13 +25,13 @@
         @if (scheduled) {
             <span
                 class="content-status pending"
-                [style.color]="scheduled.color"
                 attr.aria-label="{{ tooltipText }}"
+                [style.color]="scheduled.color"
                 title="{{ tooltipText }}">
                 <i class="icon-clock" [class.icon-sm]="small"></i>
             </span>
         } @else {
-            <span class="content-status default" [style.color]="statusColor" attr.aria-label="{{ tooltipText }}" title="{{ tooltipText }}">
+            <span class="content-status default" attr.aria-label="{{ tooltipText }}" [style.color]="statusColor" title="{{ tooltipText }}">
                 <i class="icon-circle" [class.icon-sm]="small"></i>
             </span>
         }

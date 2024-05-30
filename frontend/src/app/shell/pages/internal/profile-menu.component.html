@@ -8,7 +8,7 @@
     </li>
 </ul>
 
-<sqx-dropdown-menu *sqxModal="modalMenu; closeAlways: true; onRoot: false" [sqxAnchoredTo]="button" offset="8">
+<sqx-dropdown-menu offset="8" [sqxAnchoredTo]="button" *sqxModal="modalMenu; closeAlways: true; onRoot: false">
     <a class="dropdown-item dropdown-info" href="{{ snapshot.profileUrl }}" sqxExternalLink="noicon">
         <div>{{ "profile.userEmail" | sqxTranslate }}</div>
 

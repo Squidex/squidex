@@ -43,15 +43,15 @@
                         }
                         @case ("api-traffic") {
                             <sqx-api-traffic-card
-                                [usage]="callsUsage"
                                 [isStacked]="isStacked"
-                                (isStackedChange)="changeIsStacked($event)"></sqx-api-traffic-card>
+                                (isStackedChange)="changeIsStacked($event)"
+                                [usage]="callsUsage"></sqx-api-traffic-card>
                         }
                         @case ("api-performance") {
                             <sqx-api-performance-card
-                                [usage]="callsUsage"
                                 [isStacked]="isStacked"
-                                (isStackedChange)="changeIsStacked($event)"></sqx-api-performance-card>
+                                (isStackedChange)="changeIsStacked($event)"
+                                [usage]="callsUsage"></sqx-api-performance-card>
                         }
                         @case ("random-dog") {
                             <sqx-random-dog-card></sqx-random-dog-card>
@@ -82,9 +82,9 @@
                     [app]="app"
                     [config]="gridConfig!"
                     [configAvailable]="gridConfigAvailable"
+                    (configChange)="changeConfig($event)"
                     [configDefaults]="gridConfigDefaults"
-                    [needsAttention]="isScrolled"
-                    (configChange)="changeConfig($event)"></sqx-dashboard-config>
+                    [needsAttention]="isScrolled"></sqx-dashboard-config>
             </div>
         }
     </div>

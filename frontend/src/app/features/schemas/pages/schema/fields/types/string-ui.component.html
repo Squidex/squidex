@@ -5,7 +5,7 @@
         </label>
 
         <div class="col-9">
-            <input class="form-control" id="{{ field.fieldId }}_fieldPlaceholder" maxlength="100" formControlName="placeholder" />
+            <input class="form-control" id="{{ field.fieldId }}_fieldPlaceholder" formControlName="placeholder" maxlength="100" />
 
             <sqx-form-hint>
                 {{ "schemas.field.placeholderHint" | sqxTranslate }}
@@ -19,7 +19,7 @@
         <div class="col-9">
             @for (editor of editors; track editor) {
                 <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === editor">
-                    <input class="radio-input" [value]="editor" type="radio" name="editor" formControlName="editor" />
+                    <input class="radio-input" formControlName="editor" name="editor" type="radio" [value]="editor" />
                     <i class="icon-control-{{ editor }}"></i>
                     <span class="radio-label">{{ editor }}</span>
                 </label>
@@ -64,7 +64,7 @@
     <div class="form-group row" [class.hidden]="hideAllowedValues | async">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" id="{{ field.fieldId }}_createEnum" type="checkbox" formControlName="createEnum" />
+                <input class="form-check-input" id="{{ field.fieldId }}_createEnum" formControlName="createEnum" type="checkbox" />
                 <label class="form-check-label" for="{{ field.fieldId }}_createEnum">
                     {{ "schemas.field.createEnum" | sqxTranslate }}
                 </label>
@@ -82,8 +82,8 @@
                 <input
                     class="form-check-input"
                     id="{{ field.fieldId }}_fieldInlineEditable"
-                    type="checkbox"
-                    formControlName="inlineEditable" />
+                    formControlName="inlineEditable"
+                    type="checkbox" />
                 <label class="form-check-label" for="{{ field.fieldId }}_fieldInlineEditable">
                     {{ "schemas.field.inlineEditable" | sqxTranslate }}
                 </label>
@@ -94,7 +94,7 @@
     <div class="form-group row">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" id="{{ field.fieldId }}_fieldIsEmbeddable" type="checkbox" formControlName="isEmbeddable" />
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldIsEmbeddable" formControlName="isEmbeddable" type="checkbox" />
                 <label class="form-check-label" for="{{ field.fieldId }}_fieldIsEmbeddable">
                     {{ "schemas.field.isEmbeddable" | sqxTranslate }}
                 </label>
@@ -111,10 +111,10 @@
 
         <div class="col-9">
             <sqx-tag-editor
+                formControlName="schemaIds"
                 [itemConverter]="(schemasSource.normalConverter | async)!"
                 [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
-                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"
-                formControlName="schemaIds"></sqx-tag-editor>
+                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"></sqx-tag-editor>
         </div>
     </div>
 </div>

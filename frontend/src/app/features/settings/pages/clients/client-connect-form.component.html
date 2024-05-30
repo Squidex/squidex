@@ -163,7 +163,7 @@
                             <span>&middot;</span>
                             <a [attr.href]="sdk.repository" sqxExternalLink>{{ "common.repository" | sqxTranslate }}</a>
                         </div>
-                        <span [sqxMarkdown]="sdk.instructions" inline="false" trusted="true"></span>
+                        <span inline="false" [sqxMarkdown]="sdk.instructions" trusted="true"></span>
                     </div>
                 }
                 @if (sdk) {
@@ -181,7 +181,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button class="btn btn-text-secondary" [disabled]="step === 'Start'" (click)="go('Start')">
+        <button class="btn btn-text-secondary" (click)="go('Start')" [disabled]="step === 'Start'">
             {{ "common.back" | sqxTranslate }}
         </button>
     </ng-container>

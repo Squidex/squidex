@@ -5,7 +5,7 @@
         <ng-container title>
             <div class="d-flex align-items-center">
                 @if (schema.type !== "Singleton") {
-                    <a class="btn btn-text-secondary" (click)="back()" aria-labelledby="content-back">
+                    <a class="btn btn-text-secondary" aria-labelledby="content-back" (click)="back()">
                         <span id="content-back" hidden>{{ "common.back" | sqxTranslate }}</span>
                         <i class="icon-angle-left"></i>
                     </a>
@@ -21,30 +21,30 @@
                 @if (content && contentTab | async; as tab) {
                     <ul class="nav nav-tabs2">
                         <li class="nav-item">
-                            <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'editor' }" [class.active]="tab === 'editor'">
+                            <a class="nav-link" [class.active]="tab === 'editor'" [queryParams]="{ tab: 'editor' }" [routerLink]="[]">
                                 {{ "contents.contentTab.editor" | sqxTranslate }}
                             </a>
                         </li>
                         <li>
                             <a
                                 class="nav-link"
-                                [routerLink]="[]"
+                                [class.active]="tab === 'references'"
                                 [queryParams]="{ tab: 'references' }"
-                                [class.active]="tab === 'references'">
+                                [routerLink]="[]">
                                 {{ "contents.contentTab.references" | sqxTranslate }}
                             </a>
                         </li>
                         <li>
                             <a
                                 class="nav-link"
-                                [routerLink]="[]"
+                                [class.active]="tab === 'referencing'"
                                 [queryParams]="{ tab: 'referencing' }"
-                                [class.active]="tab === 'referencing'">
+                                [routerLink]="[]">
                                 {{ "contents.contentTab.referencing" | sqxTranslate }}
                             </a>
                         </li>
                         <li>
-                            <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'inspect' }" [class.active]="tab === 'inspect'">
+                            <a class="nav-link" [class.active]="tab === 'inspect'" [queryParams]="{ tab: 'inspect' }" [routerLink]="[]">
                                 {{ "contents.contentTab.inspect" | sqxTranslate }}
                             </a>
                         </li>
@@ -52,9 +52,9 @@
                             <li>
                                 <a
                                     class="nav-link"
-                                    [routerLink]="[]"
+                                    [class.active]="tab === 'extension'"
                                     [queryParams]="{ tab: 'extension' }"
-                                    [class.active]="tab === 'extension'">
+                                    [routerLink]="[]">
                                     {{ "common.extension" | sqxTranslate }}
                                 </a>
                             </li>
@@ -72,21 +72,21 @@
                     <sqx-language-selector
                         class="languages-buttons"
                         [language]="language"
+                        (languageChange)="changeLanguage($event)"
                         [languages]="languages"
-                        [percents]="contentForm.translationStatus | async"
-                        (languageChange)="changeLanguage($event)"></sqx-language-selector>
+                        [percents]="contentForm.translationStatus | async"></sqx-language-selector>
                     @if (content.canDelete) {
                         <button class="btn btn-outline-secondary ms-2" #buttonOptions (click)="dropdown.toggle()" type="button">
                             <span class="hidden">{{ "common.options" | sqxTranslate }}</span>
                             <i class="icon-dots"></i>
                         </button>
-                        <sqx-dropdown-menu *sqxModal="dropdown; closeAlways: true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
+                        <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                             <a
                                 class="dropdown-item dropdown-item-delete"
-                                (sqxConfirmClick)="delete()"
-                                confirmTitle="i18n:contents.deleteConfirmTitle"
+                                confirmRememberKey="deleteContent"
                                 confirmText="i18n:contents.deleteConfirmText"
-                                confirmRememberKey="deleteContent">
+                                confirmTitle="i18n:contents.deleteConfirmTitle"
+                                (sqxConfirmClick)="delete()">
                                 {{ "common.delete" | sqxTranslate }}
                             </a>
                         </sqx-dropdown-menu>
@@ -94,9 +94,9 @@
                     @if (contentTab | async; as tab) {
                         <sqx-toolbar></sqx-toolbar>
                         @if (tab === "editor") {
-                            <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
+                            <sqx-preview-button [confirm]="confirmPreview" [content]="content" [schema]="schema"></sqx-preview-button>
                             @if (content.canUpdate) {
-                                <button class="btn btn-primary ms-2" type="submit" shortcut="CTRL + SHIFT + S" sqxTourStep="saveContent">
+                                <button class="btn btn-primary ms-2" shortcut="CTRL + SHIFT + S" sqxTourStep="saveContent" type="submit">
                                     {{ "common.save" | sqxTranslate }}
                                 </button>
                             }
@@ -110,9 +110,9 @@
                     <sqx-language-selector
                         class="languages-buttons"
                         [language]="language"
+                        (languageChange)="changeLanguage($event)"
                         [languages]="languages"
-                        [percents]="contentForm.translationStatus | async"
-                        (languageChange)="changeLanguage($event)"></sqx-language-selector>
+                        [percents]="contentForm.translationStatus | async"></sqx-language-selector>
                     <div sqxTourStep="saveContent">
                         @if (contentsState.canCreate | async) {
                             <button class="btn btn-primary ms-2" (click)="save()" type="button">
@@ -120,7 +120,7 @@
                             </button>
                         }
                         @if (contentsState.canCreateAndPublish | async) {
-                            <button class="btn btn-success ms-2" type="submit" shortcut="CTRL + SHIFT + S">
+                            <button class="btn btn-success ms-2" shortcut="CTRL + SHIFT + S" type="submit">
                                 {{ "contents.saveAndPublish" | sqxTranslate }}
                             </button>
                         }
@@ -148,17 +148,17 @@
                     }
                     @case ("inspect") {
                         <sqx-content-inspection
+                            [appName]="contentsState.appName"
                             [content]="content"
                             [language]="language"
-                            [languages]="languages"
-                            [appName]="contentsState.appName"></sqx-content-inspection>
+                            [languages]="languages"></sqx-content-inspection>
                     }
                     @case ("extension") {
                         @if (schema.properties.contentEditorUrl && content) {
                             <sqx-content-extension
-                                [editorUrl]="schema.properties.contentEditorUrl"
                                 [contentItem]="content"
                                 [contentSchema]="schema"
+                                [editorUrl]="schema.properties.contentEditorUrl"
                                 mode="referencing"></sqx-content-extension>
                         }
                     }
@@ -167,19 +167,19 @@
 
             @if (!content || (contentTab | async) === "editor") {
                 <sqx-content-editor
-                    [(contentId)]="contentId"
-                    [isNew]="!content"
-                    [isDeleted]="content?.isDeleted"
                     [contentForm]="contentForm"
                     [contentFormCompare]="contentFormCompare"
+                    [(contentId)]="contentId"
                     [contentVersion]="contentVersion"
                     [formContext]="formContext"
+                    [isDeleted]="content?.isDeleted"
+                    [isNew]="!content"
                     [language]="language"
-                    [languages]="languages"
-                    [schema]="schema"
-                    [showIdInput]="showIdInput"
                     (languageChange)="language = $event"
-                    (loadLatest)="loadLatest()"></sqx-content-editor>
+                    [languages]="languages"
+                    (loadLatest)="loadLatest()"
+                    [schema]="schema"
+                    [showIdInput]="showIdInput"></sqx-content-editor>
             }
         </ng-container>
 
@@ -188,40 +188,40 @@
                 <a
                     class="panel-link"
                     #linkHistory
+                    queryParamsHandling="preserve"
                     replaceUrl="true"
                     routerLink="history"
                     routerLinkActive="active"
-                    queryParamsHandling="preserve"
+                    sqxTourStep="history"
                     title="i18n:common.workflow"
-                    titlePosition="left"
-                    sqxTourStep="history">
+                    titlePosition="left">
                     <i class="icon-time"></i>
                 </a>
 
                 <a
                     class="panel-link"
+                    hintAfter="120000"
+                    hintText="i18n:common.sidebarTour"
+                    queryParamsHandling="preserve"
                     replaceUrl="true"
                     routerLink="comments"
                     routerLinkActive="active"
-                    queryParamsHandling="preserve"
+                    sqxTourStep="comments"
                     title="i18n:common.comments"
-                    titlePosition="left"
-                    hintText="i18n:common.sidebarTour"
-                    hintAfter="120000"
-                    sqxTourStep="comments">
+                    titlePosition="left">
                     <i class="icon-comments"></i>
                 </a>
 
                 @if (schema.properties.contentSidebarUrl) {
                     <a
                         class="panel-link"
+                        queryParamsHandling="preserve"
                         replaceUrl="true"
                         routerLink="sidebar"
                         routerLinkActive="active"
-                        queryParamsHandling="preserve"
+                        sqxTourStep="plugin"
                         title="i18n:common.sidebar"
-                        titlePosition="left"
-                        sqxTourStep="plugin">
+                        titlePosition="left">
                         <i class="icon-plugin"></i>
                     </a>
                 }

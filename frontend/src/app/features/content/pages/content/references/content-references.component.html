@@ -4,13 +4,13 @@
             <table class="table table-items table-fixed">
                 @for (content of contents; track content.id) {
                     <tbody
-                        [sqxReferenceItem]="content"
                         [canRemove]="false"
                         [columns]="contents | sqxContentsColumns"
                         [isCompact]="false"
                         [isDisabled]="false"
                         [language]="language"
                         [languages]="languages"
+                        [sqxReferenceItem]="content"
                         [validations]="(contentsState.validationResults | async)!"
                         [validityVisible]="true"></tbody>
                 }

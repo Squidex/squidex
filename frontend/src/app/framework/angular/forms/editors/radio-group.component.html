@@ -4,12 +4,12 @@
             <input
                 class="form-check-input"
                 id="{{ controlId }}_{{ value }}"
-                [name]="controlId"
                 [disabled]="snapshot.isDisabled"
+                [name]="controlId"
                 [ngModel]="valueModel"
-                [value]="value.value"
                 (ngModelChange)="callChange($event)"
-                type="radio" />
+                type="radio"
+                [value]="value.value" />
             <label class="form-check-label" for="{{ controlId }}_{{ value }}">{{ value.name }}</label>
         </div>
     }

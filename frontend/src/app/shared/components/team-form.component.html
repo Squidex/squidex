@@ -18,10 +18,10 @@
                 <input
                     class="form-control"
                     id="name"
-                    formControlName="name"
                     autocomplete="off"
-                    sqxTransformInput="LowerCase"
-                    sqxFocusOnInit />
+                    formControlName="name"
+                    sqxFocusOnInit
+                    sqxTransformInput="LowerCase" />
 
                 <sqx-form-hint>
                     {{ "teams.teamNameHint" | sqxTranslate }}
@@ -29,7 +29,7 @@
             </div>
 
             <div class="form-group">
-                <sqx-form-alert marginTop="2" marginBottom="0">
+                <sqx-form-alert marginBottom="0" marginTop="2">
                     {{ "teams.teamNameWarning" | sqxTranslate }}
                 </sqx-form-alert>
             </div>

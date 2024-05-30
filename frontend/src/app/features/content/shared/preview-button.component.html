@@ -8,7 +8,7 @@
         @if (snapshot.previewNamesMore.length > 0) {
             <div class="btn-group">
                 <button class="btn btn-secondary dropdown-toggle" (click)="dropdown.toggle()" type="button"></button>
-                <sqx-dropdown-menu *sqxModal="dropdown; closeAlways: true" [sqxAnchoredTo]="buttonGroup" scrollY="true">
+                <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonGroup" *sqxModal="dropdown; closeAlways: true">
                     @for (name of snapshot.previewNamesMore; track name) {
                         <a class="dropdown-item" (click)="follow(name)">{{ name }}</a>
                     }

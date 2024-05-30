@@ -1,13 +1,13 @@
 <div
     class="tour-step"
-    *sqxModal="currentElement; closeAuto: false"
     @fade
-    [sqxAnchoredTo]="currentElement!"
     [class.d-none]="!isVisible"
-    [position]="currentStep.position || 'bottom-start'"
     offset="4"
+    [position]="currentStep.position || 'bottom-start'"
     spaceX="0"
-    spaceY="0">
+    spaceY="0"
+    [sqxAnchoredTo]="currentElement!"
+    *sqxModal="currentElement; closeAuto: false">
     <div class="tour-progress" [style.width]="progress"></div>
 
     <div class="tour-body">

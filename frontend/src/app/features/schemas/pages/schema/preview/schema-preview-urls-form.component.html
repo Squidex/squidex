@@ -20,27 +20,27 @@
                             <sqx-control-errors for="name"></sqx-control-errors>
                             <input
                                 class="form-control"
-                                maxlength="1000"
                                 formControlName="name"
+                                maxlength="1000"
                                 placeholder="{{ 'schemas.previewUrls.namePlaceholder' | sqxTranslate }}" />
                         </div>
                         <div class="col">
                             <sqx-control-errors for="url"></sqx-control-errors>
                             <sqx-code-editor
                                 [completion]="fieldCompletions | async"
-                                singleLine="true"
+                                formControlName="url"
                                 mode="ace/mode/liquid"
-                                formControlName="url"></sqx-code-editor>
+                                singleLine="true"></sqx-code-editor>
                         </div>
                         <div class="col-auto">
                             <button
                                 class="btn btn-text-danger"
+                                confirmRememberKey="removePreviewUrl"
+                                confirmText="i18n:schemas.deleteUrlConfirmText"
+                                confirmTitle="i18n:schemas.deleteUrlConfirmTitle"
                                 [disabled]="!isEditable"
                                 (sqxConfirmClick)="editForm.form.removeAt(i)"
-                                type="button"
-                                confirmTitle="i18n:schemas.deleteUrlConfirmTitle"
-                                confirmText="i18n:schemas.deleteUrlConfirmText"
-                                confirmRememberKey="removePreviewUrl">
+                                type="button">
                                 <i class="icon-bin2"></i>
                             </button>
                         </div>

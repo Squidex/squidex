@@ -5,11 +5,11 @@
         <div class="row gx-2">
             <div class="col">
                 <sqx-autocomplete
-                    [itemsSource]="usersDataSource"
+                    displayProperty="displayName"
                     formControlName="user"
                     icon="search"
-                    placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}"
-                    displayProperty="displayName">
+                    [itemsSource]="usersDataSource"
+                    placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}">
                     <ng-template let-user="$implicit">
                         <span class="autocomplete-user">
                             <img class="user-picture" [src]="user | sqxUserDtoPicture" />
@@ -35,4 +35,4 @@
     </div>
 </div>
 
-<sqx-import-contributors-dialog *sqxModal="importDialog" (dialogClose)="importDialog.hide()"></sqx-import-contributors-dialog>
+<sqx-import-contributors-dialog (dialogClose)="importDialog.hide()" *sqxModal="importDialog"></sqx-import-contributors-dialog>

@@ -28,12 +28,12 @@
         @if (!planInfo.isSelected) {
             <button
                 class="btn btn-block btn-success"
-                [disabled]="(plansState.locked | async) !== 'None'"
-                [confirmText]="planInfo.plan.confirmText"
-                [confirmRequired]="!!planInfo.plan.confirmText"
-                (sqxConfirmClick)="changeMonthly()"
                 confirmRememberKey="changePlan"
-                confirmTitle="i18n:plans.changeConfirmTitle">
+                [confirmRequired]="!!planInfo.plan.confirmText"
+                [confirmText]="planInfo.plan.confirmText"
+                confirmTitle="i18n:plans.changeConfirmTitle"
+                [disabled]="(plansState.locked | async) !== 'None'"
+                (sqxConfirmClick)="changeMonthly()">
                 {{ "plans.change" | sqxTranslate }}
             </button>
         }
@@ -52,11 +52,11 @@
             @if (!planInfo.isYearlySelected) {
                 <button
                     class="btn btn-block btn-success"
-                    [disabled]="(plansState.locked | async) !== 'None'"
-                    [confirmText]="planInfo.plan.yearlyConfirmText!"
                     [confirmRequired]="!!planInfo.plan.yearlyConfirmText"
-                    (sqxConfirmClick)="changeYearly()"
-                    confirmTitle="i18n:plans.changeConfirmTitle">
+                    [confirmText]="planInfo.plan.yearlyConfirmText!"
+                    confirmTitle="i18n:plans.changeConfirmTitle"
+                    [disabled]="(plansState.locked | async) !== 'None'"
+                    (sqxConfirmClick)="changeYearly()">
                     {{ "plans.change" | sqxTranslate }}
                 </button>
             }

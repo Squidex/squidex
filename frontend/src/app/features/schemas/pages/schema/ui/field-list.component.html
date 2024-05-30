@@ -1,10 +1,10 @@
 <div
     class="field-list field-list-assigned"
     #assignedList="cdkDropList"
-    [cdkDropListData]="fieldsAdded"
+    cdkDropList
     [cdkDropListConnectedTo]="[availableList]"
-    (cdkDropListDropped)="drop($event)"
-    cdkDropList>
+    [cdkDropListData]="fieldsAdded"
+    (cdkDropListDropped)="drop($event)">
     <label>{{ "schemas.ui" | sqxTranslate }}</label>
 
     @if (fieldsAdded.length === 0) {
@@ -25,10 +25,10 @@
 <div
     class="field-list field-list-available"
     #availableList="cdkDropList"
-    [cdkDropListData]="fieldsNotAdded"
-    [cdkDropListConnectedTo]="[assignedList]"
-    (cdkDropListDropped)="drop($event)"
     cdkDropList
+    [cdkDropListConnectedTo]="[assignedList]"
+    [cdkDropListData]="fieldsNotAdded"
+    (cdkDropListDropped)="drop($event)"
     cdkDropListSortingDisabled>
     <label>{{ "schemas.ui.unassignedFields" | sqxTranslate }}</label>
 

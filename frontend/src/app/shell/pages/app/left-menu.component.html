@@ -1,13 +1,13 @@
 <ul class="nav flex-column">
     <li class="nav-item" sqxTourStep="dashboard">
-        <a class="nav-link" [routerLinkActiveOptions]="{ exact: true }" routerLink="./" routerLinkActive="active" data-testid="dashboard">
+        <a class="nav-link" data-testid="dashboard" routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <i class="nav-icon icon-dashboard"></i>
             <div class="nav-text">{{ "common.dashboard" | sqxTranslate }}</div>
         </a>
     </li>
     @if (!isSchemasHidden(app) && app.canReadSchemas) {
         <li class="nav-item" sqxTourStep="schemas">
-            <a class="nav-link" routerLink="schemas" routerLinkActive="active" data-testid="schemas">
+            <a class="nav-link" data-testid="schemas" routerLink="schemas" routerLinkActive="active">
                 <i class="nav-icon icon-schemas"></i>
                 <div class="nav-text">{{ "common.schemas" | sqxTranslate }}</div>
             </a>
@@ -15,7 +15,7 @@
     }
     @if (app.canAccessContent) {
         <li class="nav-item" sqxTourStep="content">
-            <a class="nav-link" routerLink="content" routerLinkActive="active" data-testid="content">
+            <a class="nav-link" data-testid="content" routerLink="content" routerLinkActive="active">
                 <i class="nav-icon icon-contents"></i>
                 <div class="nav-text">{{ "common.content" | sqxTranslate }}</div>
             </a>
@@ -23,7 +23,7 @@
     }
     @if (!isAssetsHidden(app) && app.canReadAssets) {
         <li class="nav-item" sqxTourStep="assets">
-            <a class="nav-link" routerLink="assets" routerLinkActive="active" data-testid="assets">
+            <a class="nav-link" data-testid="assets" routerLink="assets" routerLinkActive="active">
                 <i class="nav-icon icon-assets"></i>
                 <div class="nav-text">{{ "common.assets" | sqxTranslate }}</div>
             </a>
@@ -31,7 +31,7 @@
     }
     @if (app.canReadRules) {
         <li class="nav-item" sqxTourStep="rules">
-            <a class="nav-link" routerLink="rules" routerLinkActive="active" data-testid="rules">
+            <a class="nav-link" data-testid="rules" routerLink="rules" routerLinkActive="active">
                 <i class="nav-icon icon-rules"></i>
                 <div class="nav-text">{{ "common.rules" | sqxTranslate }}</div>
             </a>
@@ -39,7 +39,7 @@
     }
     @if (!isApiHidden(app)) {
         <li class="nav-item" sqxTourStep="api">
-            <a class="nav-link" routerLink="api" routerLinkActive="active" data-testid="api">
+            <a class="nav-link" data-testid="api" routerLink="api" routerLinkActive="active">
                 <i class="nav-icon icon-api"></i>
                 <div class="nav-text">{{ "common.api" | sqxTranslate }}</div>
             </a>
@@ -55,7 +55,7 @@
     </li>
     @if (!isSettingsHidden(app)) {
         <li class="nav-item" sqxTourStep="settings">
-            <a class="nav-link" routerLink="settings" routerLinkActive="active" data-testid="settings">
+            <a class="nav-link" data-testid="settings" routerLink="settings" routerLinkActive="active">
                 <i class="nav-icon icon-settings"></i>
             </a>
         </li>

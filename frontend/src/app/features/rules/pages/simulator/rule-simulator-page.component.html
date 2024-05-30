@@ -1,8 +1,8 @@
 <sqx-title message="i18n:rules.ruleSimulator.listPageTitle"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:rules.simulator" width="50" hideSidebar="true">
+<sqx-layout hideSidebar="true" layout="main" titleText="i18n:rules.simulator" width="50">
     <ng-container menu>
-        <button class="btn btn-text-secondary" (click)="simulate()" type="button" title="i18n:rules.simulateTooltip">
+        <button class="btn btn-text-secondary" (click)="simulate()" title="i18n:rules.simulateTooltip" type="button">
             <i class="icon-play-line"></i>
             {{ "rules.simulate" | sqxTranslate }}
         </button>
@@ -28,9 +28,9 @@
 
                 @for (event of ruleSimulatorState.simulatedRuleEvents | async; track event.uniqueId) {
                     <tbody
-                        [sqxSimulatedRuleEvent]="event"
                         [expanded]="event.uniqueId === selectedRuleEvent"
-                        (expandedChange)="selectEvent(event)"></tbody>
+                        (expandedChange)="selectEvent(event)"
+                        [sqxSimulatedRuleEvent]="event"></tbody>
                 }
             </table>
         </sqx-list-view>

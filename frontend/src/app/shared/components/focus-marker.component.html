@@ -1,4 +1,4 @@
-<div class="focus-container" [style.borderColor]="(focusedUser | async)?.id | sqxStringColor" (click)="onClick($event)">
+<div class="focus-container" (click)="onClick($event)" [style.borderColor]="(focusedUser | async)?.id | sqxStringColor">
     @if (focusedUser | async; as user) {
         <div class="focused">
             <div class="focus-user" [style.background]="user.id | sqxStringColor">

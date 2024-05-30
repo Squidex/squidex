@@ -5,9 +5,9 @@
                 <input
                     class="form-check-input"
                     id="{{ field.fieldId }}_fieldDefaultValue"
-                    type="checkbox"
                     formControlName="defaultValue"
-                    sqxIndeterminateValue />
+                    sqxIndeterminateValue
+                    type="checkbox" />
                 <label class="form-check-label" for="{{ field.fieldId }}_fieldDefaultValue">
                     {{ "schemas.field.defaultValue" | sqxTranslate }}
                 </label>
@@ -23,9 +23,9 @@
             <div class="col-9">
                 <sqx-localized-input
                     id="{{ field.fieldId }}_fieldDefaultValues"
+                    formControlName="defaultValues"
                     [languages]="languages"
-                    type="boolean"
-                    formControlName="defaultValues"></sqx-localized-input>
+                    type="boolean"></sqx-localized-input>
                 <sqx-form-hint>
                     {{ "schemas.field.defaultValuesHint" | sqxTranslate }}
                 </sqx-form-hint>

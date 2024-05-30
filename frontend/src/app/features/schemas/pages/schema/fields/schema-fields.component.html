@@ -2,7 +2,7 @@
     <div class="table-items-row table-items-row-summary table-items-row-empty">
         {{ "schemas.field.empty" | sqxTranslate }}
         @if (schema.canAddField) {
-            <button class="btn btn-success btn-sm ms-2" (click)="fieldWizard.show()" type="button" sqxTourStep="addField">
+            <button class="btn btn-success btn-sm ms-2" (click)="fieldWizard.show()" sqxTourStep="addField" type="button">
                 <i class="icon icon-plus"></i>
                 {{ "schemas.addField" | sqxTranslate }}
             </button>
@@ -27,5 +27,5 @@
             </button>
         }
     }
-    <sqx-field-wizard *sqxModal="fieldWizard" [settings]="settings" [schema]="schema" (dialogClose)="fieldWizard.hide()"></sqx-field-wizard>
+    <sqx-field-wizard (dialogClose)="fieldWizard.hide()" [schema]="schema" [settings]="settings" *sqxModal="fieldWizard"></sqx-field-wizard>
 }

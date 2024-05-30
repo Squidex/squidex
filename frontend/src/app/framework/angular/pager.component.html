@@ -20,10 +20,10 @@
                             {{ "common.pagerInfoNoTotal" | sqxTranslate: translationInfo }}
                         </button>
                     }
-                    <button class="btn btn-sm btn-text-secondary ms-2" [disabled]="!canGoPrev" (click)="goPrev()" type="button">
+                    <button class="btn btn-sm btn-text-secondary ms-2" (click)="goPrev()" [disabled]="!canGoPrev" type="button">
                         <i class="icon-angle-left"></i>
                     </button>
-                    <button class="btn btn-sm btn-text-secondary ms-2" [disabled]="!canGoNext" (click)="goNext()" type="button">
+                    <button class="btn btn-sm btn-text-secondary ms-2" (click)="goNext()" [disabled]="!canGoNext" type="button">
                         <i class="icon-angle-right"></i>
                     </button>
                 </span>

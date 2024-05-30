@@ -4,17 +4,17 @@
 
 @if (!syncedHeader) {
     <div class="list-header" #headerElement [class.loading-indicator]="isLoading">
-        <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
+        <div class="inner" [style.maxWidth]="innerWidth" [style.minWidth]="innerWidth">
             <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
         </div>
     </div>
     <div class="list-content normal" #contentElement [class.loading-indicator]="isLoading" [sqxCompensateScrollbar]="innerWidth !== '100%'">
         <div
             class="inner normal"
-            [style.minWidth]="innerWidth"
-            [style.maxWidth]="innerWidth"
             [class.tabled]="table"
-            [class.tabled2]="noPadding">
+            [class.tabled2]="noPadding"
+            [style.maxWidth]="innerWidth"
+            [style.minWidth]="innerWidth">
             <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
         </div>
     </div>
@@ -34,7 +34,7 @@
 }
 
 <div class="list-footer" #footerElement [class.loading-indicator]="isLoading">
-    <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
+    <div class="inner" [style.maxWidth]="innerWidth" [style.minWidth]="innerWidth">
         <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
     </div>
 </div>

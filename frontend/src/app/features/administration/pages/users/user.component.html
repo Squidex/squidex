@@ -1,4 +1,4 @@
-<tr [routerLink]="user.id" queryParamsHandling="preserve" routerLinkActive="active">
+<tr queryParamsHandling="preserve" [routerLink]="user.id" routerLinkActive="active">
     <td class="cell-user">
         <img class="user-picture" [src]="user | sqxUserDtoPicture" title="{{ user.displayName }}" />
     </td>
@@ -10,25 +10,25 @@
     </td>
     <td class="cell-actions-lg">
         @if (user.canLock) {
-            <button class="btn btn-text-secondary" (click)="lock()" type="button" sqxStopClick title="i18n:users.lockTooltip">
+            <button class="btn btn-text-secondary" (click)="lock()" sqxStopClick title="i18n:users.lockTooltip" type="button">
                 <i class="icon icon-unlocked"></i>
             </button>
         }
         @if (user.canUnlock) {
-            <button class="btn btn-text-secondary" (click)="unlock()" type="button" sqxStopClick title="i18n:users.unlockTooltip">
+            <button class="btn btn-text-secondary" (click)="unlock()" sqxStopClick title="i18n:users.unlockTooltip" type="button">
                 <i class="icon icon-lock"></i>
             </button>
         }
 
         <button
             class="btn btn-text-danger"
+            confirmRememberKey="deleteUser"
+            confirmText="i18n:users.deleteConfirmText"
+            confirmTitle="i18n:users.deleteConfirmTitle"
             [disabled]="!user.canDelete"
             (sqxConfirmClick)="delete()"
-            type="button"
-            confirmTitle="i18n:users.deleteConfirmTitle"
-            confirmText="i18n:users.deleteConfirmText"
-            confirmRememberKey="deleteUser"
-            sqxStopClick>
+            sqxStopClick
+            type="button">
             <i class="icon-bin2"></i>
         </button>
     </td>

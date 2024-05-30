@@ -13,10 +13,10 @@
 
         @if (isDirty) {
             <div class="edit-menu">
-                <button class="btn btn-text-secondary btn-cancel me-2" (click)="cancel()" type="button" sqxStopClick>
+                <button class="btn btn-text-secondary btn-cancel me-2" (click)="cancel()" sqxStopClick type="button">
                     <i class="icon-close"></i>
                 </button>
-                <button class="btn btn-success" (click)="save()" type="button" sqxStopClick>
+                <button class="btn btn-success" (click)="save()" sqxStopClick type="button">
                     <i class="icon-checkmark"></i>
                 </button>
             </div>
@@ -27,21 +27,21 @@
         <button
             class="btn btn-text-secondary"
             #buttonOptions
+            attr.aria-label="{{ 'common.options' | sqxTranslate }}"
             (click)="dropdown.toggle()"
-            type="button"
-            attr.aria-label="{{ 'common.options' | sqxTranslate }}">
+            type="button">
             <i class="icon-dots"></i>
         </button>
 
-        <sqx-dropdown-menu *sqxModal="dropdown; closeAlways: true" [sqxAnchoredTo]="buttonOptions" scrollY="true" position="bottom-start">
-            <a class="dropdown-item" [routerLink]="link" target="_blank" sqxExternalLink>
+        <sqx-dropdown-menu position="bottom-start" scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
+            <a class="dropdown-item" [routerLink]="link" sqxExternalLink target="_blank">
                 {{ "common.editInNewTab" | sqxTranslate }}
             </a>
 
             @for (info of content.statusUpdates; track info) {
                 <a class="dropdown-item" (click)="statusChange.emit(info.status)">
                     {{ "common.statusChangeTo" | sqxTranslate }}
-                    <sqx-content-status [status]="info.status" [statusColor]="info.color" layout="text" small="true"></sqx-content-status>
+                    <sqx-content-status layout="text" small="true" [status]="info.status" [statusColor]="info.color"></sqx-content-status>
                 </a>
             }
             @if (cloneable) {
@@ -55,17 +55,17 @@
             <a
                 class="dropdown-item dropdown-item-delete"
                 [class.disabled]="!content.canDelete"
-                (sqxConfirmClick)="delete.emit()"
-                confirmTitle="i18n:contents.deleteConfirmTitle"
+                confirmRememberKey="deleteContent"
                 confirmText="i18n:contents.deleteConfirmText"
-                confirmRememberKey="deleteContent">
+                confirmTitle="i18n:contents.deleteConfirmTitle"
+                (sqxConfirmClick)="delete.emit()">
                 {{ "common.delete" | sqxTranslate }}
             </a>
         </sqx-dropdown-menu>
     </td>
 
     @for (field of tableFields; track field) {
-        <td [field]="field" [fields]="tableSettings" [sqxStopClick]="shouldStop(field)" sqxContentListCell sqxContentListCellResize>
+        <td [field]="field" [fields]="tableSettings" sqxContentListCell sqxContentListCellResize [sqxStopClick]="shouldStop(field)">
             <sqx-content-list-field
                 [content]="content"
                 [field]="field"

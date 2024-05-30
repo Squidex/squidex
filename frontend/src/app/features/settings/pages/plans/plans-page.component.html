@@ -1,17 +1,17 @@
 <sqx-title message="i18n:common.subscription"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" innerWidth="63">
+<sqx-layout innerWidth="63" layout="main" titleIcon="subscription" titleText="i18n:common.subscription">
     <ng-container menu>
         <sqx-notifo topic="apps/{{ plansState.appId }}/settings/plan"></sqx-notifo>
 
-        <button class="btn btn-text-secondary" (click)="reload()" type="button" title="i18n:plans.refreshTooltip" shortcut="CTRL + B">
+        <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:plans.refreshTooltip" type="button">
             <i class="icon-reset"></i>
             {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
 
     <ng-container>
-        <sqx-list-view [isLoading]="plansState.isLoading | async" innerWidth="63rem">
+        <sqx-list-view innerWidth="63rem" [isLoading]="plansState.isLoading | async">
             @if ((plansState.isLoaded | async) && (plansState.plans | async); as plans) {
                 @if ((plansState.locked | async) === "NotOwner") {
                     <div class="alert alert-danger">
@@ -62,25 +62,25 @@
         <div class="panel-nav">
             <a
                 class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="history"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="history"
                 title="i18n:common.history"
-                titlePosition="left"
-                sqxTourStep="history">
+                titlePosition="left">
                 <i class="icon-time"></i>
             </a>
 
             <a
                 class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="help"
                 title="i18n:common.help"
-                titlePosition="left"
-                sqxTourStep="help">
+                titlePosition="left">
                 <i class="icon-help2"></i>
             </a>
         </div>

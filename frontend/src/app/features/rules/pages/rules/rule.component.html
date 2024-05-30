@@ -14,17 +14,17 @@
                 <button
                     class="btn btn-text-secondary"
                     #buttonOptions
+                    attr.aria-label="{{ 'common.options' | sqxTranslate }}"
                     (click)="dropdown.toggle()"
-                    type="button"
-                    attr.aria-label="{{ 'common.options' | sqxTranslate }}">
+                    type="button">
                     <i class="icon-dots"></i>
                 </button>
 
                 <sqx-dropdown-menu
-                    *sqxModal="dropdown; closeAlways: true"
-                    [sqxAnchoredTo]="buttonOptions"
+                    position="bottom-end"
                     scrollY="true"
-                    position="bottom-end">
+                    [sqxAnchoredTo]="buttonOptions"
+                    *sqxModal="dropdown; closeAlways: true">
                     @if (rule.canUpdate) {
                         <a class="dropdown-item" [routerLink]="rule.id">
                             {{ "common.edit" | sqxTranslate }}
@@ -49,20 +49,20 @@
                         @if (rule.canRun) {
                             <a
                                 class="dropdown-item"
-                                (sqxConfirmClick)="run()"
-                                confirmTitle="i18n:rules.runRuleConfirmTitle"
+                                confirmRememberKey="runRule"
                                 confirmText="i18n:rules.runRuleConfirmText"
-                                confirmRememberKey="runRule">
+                                confirmTitle="i18n:rules.runRuleConfirmTitle"
+                                (sqxConfirmClick)="run()">
                                 {{ "rules.run" | sqxTranslate }}
                             </a>
                         }
                         @if (rule.canRunFromSnapshots) {
                             <a
                                 class="dropdown-item"
-                                (sqxConfirmClick)="runFromSnapshots()"
-                                confirmTitle="i18n:rules.runRuleConfirmTitle"
+                                confirmRememberKey="runRuleFromSnapshots"
                                 confirmText="i18n:rules.runRuleConfirmText"
-                                confirmRememberKey="runRuleFromSnapshots">
+                                confirmTitle="i18n:rules.runRuleConfirmTitle"
+                                (sqxConfirmClick)="runFromSnapshots()">
                                 {{ "rules.runFromSnapshots" | sqxTranslate }}
                             </a>
                         }
@@ -72,10 +72,10 @@
                     @if (rule.canDelete) {
                         <a
                             class="dropdown-item dropdown-item-delete"
-                            (sqxConfirmClick)="delete()"
-                            confirmTitle="i18n:rules.deleteConfirmTitle"
+                            confirmRememberKey="deleteRule"
                             confirmText="i18n:rules.deleteConfirmText"
-                            confirmRememberKey="deleteRule">
+                            confirmTitle="i18n:rules.deleteConfirmTitle"
+                            (sqxConfirmClick)="delete()">
                             {{ "common.delete" | sqxTranslate }}
                         </a>
                     }
@@ -89,26 +89,26 @@
                 <h3>{{ "rules.ruleSyntax.if" | sqxTranslate }}</h3>
             </div>
             <div class="col">
-                <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]" disabled="true"></sqx-rule-element>
+                <sqx-rule-element disabled="true" [element]="ruleTriggers[rule.triggerType]" [type]="rule.triggerType"></sqx-rule-element>
             </div>
             <div class="col-auto">
                 <h3>{{ "rules.ruleSyntax.then" | sqxTranslate }}</h3>
             </div>
             <div class="col">
                 <sqx-rule-element
-                    [type]="rule.actionType"
+                    disabled="true"
                     [element]="$any(ruleActions[rule.actionType])"
-                    disabled="true"></sqx-rule-element>
+                    [type]="rule.actionType"></sqx-rule-element>
             </div>
             <div class="col col-last text-end">
                 @if (isManual) {
                     <button
                         class="btn btn-outline-secondary btn-run"
-                        [disabled]="!rule.canTrigger"
-                        (sqxConfirmClick)="trigger()"
-                        confirmTitle="i18n:rules.triggerConfirmTitle"
+                        confirmRememberKey="triggerRule"
                         confirmText="i18n:rules.triggerConfirmText"
-                        confirmRememberKey="triggerRule">
+                        confirmTitle="i18n:rules.triggerConfirmTitle"
+                        [disabled]="!rule.canTrigger"
+                        (sqxConfirmClick)="trigger()">
                         <i class="icon-play-line"></i>
                     </button>
                 } @else {

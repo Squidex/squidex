@@ -2,7 +2,7 @@
     <div class="form-group row mb-3">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" id="{{ field.fieldId }}_fieldRequired" type="checkbox" formControlName="isRequired" />
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldRequired" formControlName="isRequired" type="checkbox" />
                 <label class="form-check-label" for="{{ field.fieldId }}_fieldRequired">
                     {{ "schemas.field.required" | sqxTranslate }}
                 </label>
@@ -16,8 +16,8 @@
                 <input
                     class="form-check-input"
                     id="{{ field.fieldId }}_fieldRequiredOnPublish"
-                    type="checkbox"
-                    formControlName="isRequiredOnPublish" />
+                    formControlName="isRequiredOnPublish"
+                    type="checkbox" />
                 <label class="form-check-label" for="{{ field.fieldId }}_fieldRequiredOnPublish">
                     {{ "schemas.field.requiredOnPublish" | sqxTranslate }}
                 </label>
@@ -28,80 +28,80 @@
 
 @switch (field.rawProperties.fieldType) {
     @case ("Array") {
-        <sqx-array-validation [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-array-validation>
+        <sqx-array-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-array-validation>
     }
     @case ("Assets") {
         <sqx-assets-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
             [properties]="field.rawProperties"></sqx-assets-validation>
     }
     @case ("Boolean") {
         <sqx-boolean-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
             [properties]="field.rawProperties"></sqx-boolean-validation>
     }
     @case ("Component") {
-        <sqx-component-validation [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-component-validation>
+        <sqx-component-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-component-validation>
     }
     @case ("Components") {
-        <sqx-components-validation [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-components-validation>
+        <sqx-components-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-components-validation>
     }
     @case ("DateTime") {
         <sqx-date-time-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
             [properties]="field.rawProperties"></sqx-date-time-validation>
     }
     @case ("Geolocation") {
-        <sqx-geolocation-validation [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-geolocation-validation>
+        <sqx-geolocation-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-geolocation-validation>
     }
     @case ("Json") {
-        <sqx-json-validation [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-json-validation>
+        <sqx-json-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-json-validation>
     }
     @case ("Number") {
         <sqx-number-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
             [properties]="field.rawProperties"
             [schema]="schema"></sqx-number-validation>
     }
     @case ("References") {
         <sqx-references-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
             [properties]="field.rawProperties"></sqx-references-validation>
     }
     @case ("RichText") {
-        <sqx-rich-text-validation [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-rich-text-validation>
+        <sqx-rich-text-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-rich-text-validation>
     }
     @case ("String") {
         <sqx-string-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
             [properties]="field.rawProperties"
             [schema]="schema"
             [settings]="settings"></sqx-string-validation>
     }
     @case ("Tags") {
         <sqx-tags-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
             [properties]="field.rawProperties"></sqx-tags-validation>
     }
 }

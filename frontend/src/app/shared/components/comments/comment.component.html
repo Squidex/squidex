@@ -1,18 +1,18 @@
 <div
     class="comment row g-0"
     [@bounce]="commentItem.isSelected"
-    [class.selected]="commentItem.isSelected"
     [class.reply]="commentItem.comment.replyTo"
+    [class.selected]="commentItem.isSelected"
     [sqxScrollActive]="true"
-    [sqxScrollOffset]="20"
-    [sqxScrollContainer]="scrollContainer">
+    [sqxScrollContainer]="scrollContainer"
+    [sqxScrollOffset]="20">
     @if (snapshot.mode !== "Edit") {
         <div
             class="comment-text row g-0"
+            sqxSc
             [sqxScrollActive]="commentItem.isSelected"
-            [sqxScrollOffset]="-20"
             [sqxScrollContainer]="scrollContainer"
-            sqxSc>
+            [sqxScrollOffset]="-20">
             <div class="col-auto pe-2">
                 <img
                     class="user-picture"
@@ -50,12 +50,12 @@
                 @if (isDeletable || canDelete) {
                     <button
                         class="btn btn-sm btn-text-danger"
+                        confirmRememberKey="deleteComment"
                         [confirmRequired]="confirmDelete"
-                        (sqxConfirmClick)="delete()"
-                        type="button"
-                        confirmTitle="i18n:comments.deleteConfirmTitle"
                         confirmText="i18n:comments.deleteConfirmText"
-                        confirmRememberKey="deleteComment">
+                        confirmTitle="i18n:comments.deleteConfirmTitle"
+                        (sqxConfirmClick)="delete()"
+                        type="button">
                         <i class="icon-bin2"></i>
                     </button>
                 }
@@ -67,15 +67,15 @@
         <form (ngSubmit)="update()">
             <textarea
                 class="form-control mb-1"
-                [(ngModel)]="editingText"
-                [mention]="$any(mentionUsers)"
-                [mentionConfig]="mentionConfig"
-                (keydown)="updateOnEnter($event)"
-                name="{{ commentItem.comment }}"
-                sqxFocusOnInit
+                autocapitalize="off"
                 autocomplete="off"
                 autocorrect="off"
-                autocapitalize="off"></textarea>
+                (keydown)="updateOnEnter($event)"
+                [mention]="$any(mentionUsers)"
+                [mentionConfig]="mentionConfig"
+                name="{{ commentItem.comment }}"
+                [(ngModel)]="editingText"
+                sqxFocusOnInit></textarea>
             <div>
                 <button class="btn btn-sm btn-primary" type="submit">
                     <i class="icon-enter"></i>
@@ -92,27 +92,27 @@
         <div class="replies">
             @for (item of commentItem.replies; track $index) {
                 <sqx-comment
+                    canEdit="true"
+                    canFollow="false"
                     [commentItem]="item"
                     [comments]="comments"
                     [mentionConfig]="mentionConfig"
                     [mentionUsers]="mentionUsers"
-                    [userToken]="userToken"
-                    canEdit="true"
-                    canFollow="false"></sqx-comment>
+                    [userToken]="userToken"></sqx-comment>
             }
             @if (snapshot.mode === "Reply") {
                 <form [formGroup]="replyForm.form" (ngSubmit)="reply()">
                     <textarea
                         class="form-control mb-1"
-                        [mention]="$any(mentionUsers)"
-                        [mentionConfig]="mentionConfig"
-                        (keydown)="replayOnEnter($event)"
-                        name="text"
-                        formControlName="text"
-                        sqxFocusOnInit
+                        autocapitalize="off"
                         autocomplete="off"
                         autocorrect="off"
-                        autocapitalize="off"></textarea>
+                        formControlName="text"
+                        (keydown)="replayOnEnter($event)"
+                        [mention]="$any(mentionUsers)"
+                        [mentionConfig]="mentionConfig"
+                        name="text"
+                        sqxFocusOnInit></textarea>
                     <div>
                         <button class="btn btn-sm btn-primary" type="submit">
                             <i class="icon-enter"></i>

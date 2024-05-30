@@ -3,10 +3,10 @@
         <div class="col-auto">
             <button
                 class="btn btn-text-secondary btn-initial me-1"
-                [class.enabled]="step.name !== workflow.initial && !step.isLocked"
                 [class.active]="step.name === workflow.initial"
-                [disabled]="step.name === workflow.initial || step.isLocked || disabled"
-                (click)="makeInitial.emit()">
+                [class.enabled]="step.name !== workflow.initial && !step.isLocked"
+                (click)="makeInitial.emit()"
+                [disabled]="step.name === workflow.initial || step.isLocked || disabled">
                 @if (!step.isLocked) {
                     <i class="icon-arrow-right text-decent"></i>
                 }
@@ -15,10 +15,10 @@
         <div class="col-auto color pe-2">
             <sqx-color-picker
                 [disabled]="$any(disabled)"
-                [ngModelOptions]="onBlur"
+                mode="Circle"
                 [ngModel]="step.color"
                 (ngModelChange)="changeColor($event)"
-                mode="Circle"></sqx-color-picker>
+                [ngModelOptions]="onBlur"></sqx-color-picker>
         </div>
         <div class="col">
             <sqx-editable-title
@@ -35,7 +35,7 @@
         }
         <div class="col-auto">
             @if (!step.isLocked && workflow.steps.length > 2) {
-                <button class="btn btn-text-danger" [disabled]="disabled" (click)="remove.emit()" type="button">
+                <button class="btn btn-text-danger" (click)="remove.emit()" [disabled]="disabled" type="button">
                     <i class="icon-bin2"></i>
                 </button>
             }
@@ -45,10 +45,10 @@
     <div class="step-inner">
         @for (transition of transitions; track transition.to) {
             <sqx-workflow-transition
-                [transition]="transition"
                 [disabled]="disabled"
-                [roles]="roles"
                 (remove)="transitionRemove.emit(transition)"
+                [roles]="roles"
+                [transition]="transition"
                 (update)="changeTransition(transition, $event)"></sqx-workflow-transition>
         }
 
@@ -58,7 +58,7 @@
                     <i class="icon-corner-down-right text-decent"></i>
                 </div>
                 <div class="col col-step">
-                    <sqx-dropdown [(ngModel)]="openStep" [items]="openSteps" canSearch="false">
+                    <sqx-dropdown canSearch="false" [items]="openSteps" [(ngModel)]="openStep">
                         <ng-template let-target="$implicit">
                             <i class="icon-circle" [style.color]="target.color"></i>
                             {{ target.name }}
@@ -99,23 +99,23 @@
                         class="form-control"
                         [class.dashed]="!step.noUpdateExpression"
                         [disabled]="!!disabled"
-                        [ngModelOptions]="onBlur"
                         [ngModel]="step.noUpdateExpression"
                         (ngModelChange)="changeNoUpdateExpression($event)"
-                        spellcheck="false"
-                        placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}" />
+                        [ngModelOptions]="onBlur"
+                        placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
+                        spellcheck="false" />
                 </div>
                 <div class="col-auto col-label">
                     <span class="text-decent">{{ "workflows.syntax.for" | sqxTranslate }}</span>
                 </div>
                 <div class="col col-roles">
                     <sqx-tag-editor
+                        allowDuplicates="false"
                         [disabled]="!!disabled"
                         [itemsSource]="roles"
-                        [ngModelOptions]="onBlur"
                         [ngModel]="step.noUpdateRoles"
                         (ngModelChange)="changeNoUpdateRoles($event)"
-                        allowDuplicates="false"
+                        [ngModelOptions]="onBlur"
                         placeholder="{{ 'common.role' | sqxTranslate }}"
                         styleDashed="true"
                         styleScrollable="true"></sqx-tag-editor>

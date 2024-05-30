@@ -5,7 +5,7 @@
         </label>
 
         <div class="col-9">
-            <input class="form-control" id="{{ field.fieldId }}_fieldPlaceholder" maxlength="100" formControlName="placeholder" />
+            <input class="form-control" id="{{ field.fieldId }}_fieldPlaceholder" formControlName="placeholder" maxlength="100" />
 
             <sqx-form-hint>
                 {{ "schemas.field.placeholderHint" | sqxTranslate }}
@@ -18,7 +18,7 @@
         </label>
 
         <div class="col-9">
-            <input class="form-control" id="{{ field.fieldId }}_fieldFormat" maxlength="100" formControlName="format" />
+            <input class="form-control" id="{{ field.fieldId }}_fieldFormat" formControlName="format" maxlength="100" />
 
             <sqx-form-hint>
                 <span [innerHTML]="'schemas.fieldTypes.dateTime.formatHint' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span>
@@ -31,7 +31,7 @@
         <div class="col-9">
             @for (editor of editors; track editor) {
                 <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === editor">
-                    <input class="radio-input" [value]="editor" type="radio" name="editor" formControlName="editor" />
+                    <input class="radio-input" formControlName="editor" name="editor" type="radio" [value]="editor" />
                     <i class="icon-control-{{ editor }}"></i>
                     <span class="radio-label">{{ editor }}</span>
                 </label>

@@ -2,12 +2,12 @@
     <div class="search-container ms-4">
         <sqx-autocomplete
             #searchControl
-            [dropdownStyles]="{ width: '30rem' }"
             [dropdownPosition]="'bottom-end'"
-            [ngModel]="searchResult"
-            [itemsSource]="searchSource"
-            (ngModelChange)="selectResult($event)"
+            [dropdownStyles]="{ width: '30rem' }"
             icon="search"
+            [itemsSource]="searchSource"
+            [ngModel]="searchResult"
+            (ngModelChange)="selectResult($event)"
             placeholder="{{ 'search.quickNavPlaceholder' | sqxTranslate }}"
             shortcut="q"
             shortcutAction="none">
@@ -27,6 +27,6 @@
                 </div>
             </ng-template>
         </sqx-autocomplete>
-        <sqx-shortcut (trigger)="searchControl.focus()" keys="q"></sqx-shortcut>
+        <sqx-shortcut keys="q" (trigger)="searchControl.focus()"></sqx-shortcut>
     </div>
 }

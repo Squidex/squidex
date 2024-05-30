@@ -13,10 +13,10 @@
         </span>
 
         <sqx-dropdown-menu
-            *sqxModal="appsMenu; closeAlways: true; onRoot: false"
-            [sqxAnchoredTo]="button"
+            position="bottom-start"
             scrollY="true"
-            position="bottom-start">
+            [sqxAnchoredTo]="button"
+            *sqxModal="appsMenu; closeAlways: true; onRoot: false">
             @if (appsState.apps | async; as apps) {
                 @if (apps.length > 0) {
                     <a class="dropdown-item dropdown-header" routerLink="/app">
@@ -88,7 +88,7 @@
                     <li class="breadcrumb-item"></li>
                     @for (item of path; track item.value; let last = $last) {
                         <li class="breadcrumb-item" [class.active]="last">
-                            <a [routerLink]="item.route" [relativeTo]="route" [class.disabled]="last">{{ item.localized }}</a>
+                            <a [class.disabled]="last" [relativeTo]="route" [routerLink]="item.route">{{ item.localized }}</a>
                         </li>
                     }
                 </ol>
@@ -97,6 +97,6 @@
     }
 </ul>
 
-<sqx-app-form *sqxModal="addAppDialog" (dialogClose)="addAppDialog.hide()"></sqx-app-form>
+<sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog"></sqx-app-form>
 
-<sqx-team-form *sqxModal="addTeamDialog" (dialogClose)="addTeamDialog.hide()"></sqx-team-form>
+<sqx-team-form (dialogClose)="addTeamDialog.hide()" *sqxModal="addTeamDialog"></sqx-team-form>

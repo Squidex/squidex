@@ -9,8 +9,8 @@
                 @case ("Start") {
                     <textarea
                         class="form-control content"
-                        placeholder="user1@squidex.io;user2@squidex.io"
-                        formControlName="import"></textarea>
+                        formControlName="import"
+                        placeholder="user1@squidex.io;user2@squidex.io"></textarea>
                     <sqx-form-hint>
                         @if (importForm.numberOfEmails | async; as count) {
                             {{ "contributors.import.emailsDetected" | sqxTranslate: { count: count } }}
@@ -42,9 +42,9 @@
                             </div>
                             <div class="col-auto aligned">
                                 <sqx-status-icon
+                                    size="sm"
                                     [status]="status.result"
-                                    [statusText]="status.resultText | sqxTranslate"
-                                    size="sm"></sqx-status-icon>
+                                    [statusText]="status.resultText | sqxTranslate"></sqx-status-icon>
                             </div>
                         </div>
                     }
@@ -64,7 +64,7 @@
                     </button>
                 }
                 @case ("Change") {
-                    <button class="btn btn-success" [disabled]="importStatus.length === 0" (click)="import()" type="button">
+                    <button class="btn btn-success" (click)="import()" [disabled]="importStatus.length === 0" type="button">
                         {{ "contributors.import.run2" | sqxTranslate }}
                     </button>
                 }

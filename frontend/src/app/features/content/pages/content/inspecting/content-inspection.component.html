@@ -1,4 +1,4 @@
-<sqx-form-error [error]="contentError" bubble="true" closeable="true"></sqx-form-error>
+<sqx-form-error bubble="true" closeable="true" [error]="contentError"></sqx-form-error>
 
 <div class="inner-menu">
     @if (mode | async; as currentMode) {
@@ -23,5 +23,5 @@
 </div>
 
 <div class="inner-main">
-    <sqx-code-editor [ngModel]="actualData | async" (ngModelChange)="setData($event)" borderless="true" valueMode="Json"></sqx-code-editor>
+    <sqx-code-editor borderless="true" [ngModel]="actualData | async" (ngModelChange)="setData($event)" valueMode="Json"></sqx-code-editor>
 </div>

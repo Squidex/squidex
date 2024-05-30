@@ -10,11 +10,11 @@
 
 <sqx-dropdown-menu
     #scrollMe
-    *sqxModal="modalMenu; onRoot: false"
-    [sqxAnchoredTo]="button"
+    offset="8"
     [scrollTop]="scrollMe.nativeElement.scrollHeight"
     scrollY="true"
-    offset="8">
+    [sqxAnchoredTo]="button"
+    *sqxModal="modalMenu; onRoot: false">
     @if (commentItems | async; as items) {
         @if (items.length === 0) {
             <small class="text-muted">
@@ -23,15 +23,15 @@
         }
         @for (item of items.slice().reverse(); track $index) {
             <sqx-comment
+                canAnswer="false"
+                canDelete="true"
+                canFollow="true"
                 [commentItem]="item"
                 [comments]="commentsState"
+                confirmDelete="false"
                 [mentionConfig]="{}"
                 [mentionUsers]="undefined"
-                [userToken]="commentUser"
-                canAnswer="false"
-                confirmDelete="false"
-                canDelete="true"
-                canFollow="true"></sqx-comment>
+                [userToken]="commentUser"></sqx-comment>
         }
     }
 </sqx-dropdown-menu>

@@ -35,18 +35,18 @@
                             <sqx-control-errors for="condition"></sqx-control-errors>
                             <sqx-code-editor
                                 [completion]="fieldCompletions | async"
-                                singleLine="true"
-                                formControlName="condition"></sqx-code-editor>
+                                formControlName="condition"
+                                singleLine="true"></sqx-code-editor>
                         </div>
                         <div class="col-auto">
                             <button
                                 class="btn btn-text-danger"
+                                confirmRememberKey="deleteFieldRule"
+                                confirmText="i18n:schemas.deleteRuleConfirmText"
+                                confirmTitle="i18n:schemas.deleteRuleConfirmTitle"
                                 [disabled]="!isEditable"
                                 (sqxConfirmClick)="editForm.remove(i)"
-                                type="button"
-                                confirmTitle="i18n:schemas.deleteRuleConfirmTitle"
-                                confirmText="i18n:schemas.deleteRuleConfirmText"
-                                confirmRememberKey="deleteFieldRule">
+                                type="button">
                                 <i class="icon-bin2"></i>
                             </button>
                         </div>

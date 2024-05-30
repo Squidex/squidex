@@ -1,3 +1,3 @@
 @if (imageSource) {
-    <img [style.width]="imageSize" [style.height]="imageSize" [src]="imageSource | sqxSafeUrl" (error)="unsetImage()" />
+    <img (error)="unsetImage()" [src]="imageSource | sqxSafeUrl" [style.height]="imageSize" [style.width]="imageSize" />
 }

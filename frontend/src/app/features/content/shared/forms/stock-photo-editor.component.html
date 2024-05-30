@@ -1,5 +1,5 @@
 <div class="input-group">
-    <button class="btn btn-outline-secondary" [disabled]="!valueControl.value" (click)="reset()" type="button">
+    <button class="btn btn-outline-secondary" (click)="reset()" [disabled]="!valueControl.value" type="button">
         <i class="icon-close"></i>
     </button>
 
@@ -12,20 +12,20 @@
 
 @if (stockPhotoThumbnail | async; as url) {
     <div class="preview mt-1" [class.hidden-important]="snapshot.thumbnailStatus === 'Failed'">
-        <img [src]="url" (error)="onThumbnailFailed()" (load)="onThumbnailLoaded()" />
+        <img (error)="onThumbnailFailed()" (load)="onThumbnailLoaded()" [src]="url" />
         @if (snapshot.thumbnailStatus !== "Loaded") {
             <sqx-loader color="white"></sqx-loader>
         }
     </div>
 }
 
-<sqx-modal-dialog *sqxModal="searchDialog" (dialogClose)="searchDialog.hide()" size="lg" fullHeight="true">
+<sqx-modal-dialog (dialogClose)="searchDialog.hide()" fullHeight="true" size="lg" *sqxModal="searchDialog">
     <ng-container title>
         <input
             class="form-control search"
             [formControl]="stockPhotoSearch"
-            sqxFocusOnInit
-            placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}" />
+            placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}"
+            sqxFocusOnInit />
 
         @if (snapshot.isLoading) {
             <sqx-loader></sqx-loader>
@@ -54,7 +54,7 @@
 
         @if (snapshot.hasMore) {
             <div class="mt-4 text-center">
-                <button class="btn btn-outline-secondary" [disabled]="snapshot.isLoading" (click)="loadMore()" type="button">
+                <button class="btn btn-outline-secondary" (click)="loadMore()" [disabled]="snapshot.isLoading" type="button">
                     {{ "common.loadMore" | sqxTranslate }}
                     @if (snapshot.isLoading) {
                         <sqx-loader></sqx-loader>
