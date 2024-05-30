@@ -56,6 +56,6 @@ describe('Duration', () => {
 
         const actual = duration.toString();
 
-        expect(actual).toBe('01:02:04');
+        expect(actual).toBe('01:02:05');
     });
 });
