@@ -12,9 +12,7 @@
             </div>
         </div>
         <div class="section mb-4">
-            <label for="version">{{ "common.version" | sqxTranslate }}</label>
-            :
-            <span id="version">{{ content.version }}</span>
+            <label for="version">{{ "common.version" | sqxTranslate }}</label>: <span id="version">{{ content.version }}</span>
         </div>
 
         @if (content.canDraftCreate || content.canDraftDelete) {

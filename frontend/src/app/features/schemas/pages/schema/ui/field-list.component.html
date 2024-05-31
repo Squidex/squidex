@@ -7,17 +7,15 @@
     (cdkDropListDropped)="drop($event)">
     <label>{{ "schemas.ui" | sqxTranslate }}</label>
 
-    @if (fieldsAdded.length === 0) {
-        <div class="empty-hint">
-            <sqx-form-alert>{{ emptyText }}</sqx-form-alert>
-        </div>
-    }
-
     @for (field of fieldsAdded; track field) {
         <div class="table-items-row table-items-row-summary truncate" cdkDrag>
             <i class="icon-drag2 drag-handle"></i>
             {{ field.title || field.label | sqxTranslate }}:
             <code>{{ field.name }}</code>
+        </div>
+    } @empty {
+        <div class="empty-hint">
+            <sqx-form-alert>{{ emptyText }}</sqx-form-alert>
         </div>
     }
 </div>

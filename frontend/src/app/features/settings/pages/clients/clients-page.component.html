@@ -14,14 +14,13 @@
                 @if (clientsState.canCreate | async) {
                     <sqx-client-add-form></sqx-client-add-form>
                 }
-                @if (clients.length === 0) {
-                    <div class="table-items-row table-items-row-summary table-items-row-empty">
-                        {{ "clients.empty" | sqxTranslate }}
-                    </div>
-                }
                 @if (rolesState.roles | async; as roles) {
                     @for (client of clients; track client.id) {
                         <sqx-client [client]="client" [clientRoles]="roles"></sqx-client>
+                    } @empty {
+                        <div class="table-items-row table-items-row-summary table-items-row-empty">
+                            {{ "clients.empty" | sqxTranslate }}
+                        </div>
                     }
                 }
             }

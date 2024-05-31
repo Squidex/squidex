@@ -43,14 +43,12 @@
                         </a>
                     </div>
                 </div>
+            } @empty {
+                <div class="empty small text-muted text-center">
+                    {{ "contents.stockPhotoSearchEmpty" | sqxTranslate }}
+                </div>
             }
         </div>
-
-        @if (snapshot.stockPhotos.length === 0) {
-            <div class="empty small text-muted text-center">
-                {{ "contents.stockPhotoSearchEmpty" | sqxTranslate }}
-            </div>
-        }
 
         @if (snapshot.hasMore) {
             <div class="mt-4 text-center">

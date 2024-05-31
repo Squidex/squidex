@@ -97,16 +97,14 @@
                         <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
                     </div>
                 }
-            } @else {
-                @if (queries && queriesTypes) {
-                    <div class="mt-4">
-                        <sqx-shared-queries
-                            [queries]="queries"
-                            [queryUsed]="query"
-                            (search)="changeQuery($event)"
-                            [types]="queriesTypes"></sqx-shared-queries>
-                    </div>
-                }
+            } @else if (queries && queriesTypes) {
+                <div class="mt-4">
+                    <sqx-shared-queries
+                        [queries]="queries"
+                        [queryUsed]="query"
+                        (search)="changeQuery($event)"
+                        [types]="queriesTypes"></sqx-shared-queries>
+                </div>
             }
         }
     </ng-container>

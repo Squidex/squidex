@@ -10,11 +10,6 @@
         </div>
         @if (groupedApps | async; as groups) {
             <div class="apps-section" sqxTourStep="allApps">
-                @if (groups.length === 0) {
-                    <div class="empty">
-                        <h3 class="empty-headline">{{ "apps.empty" | sqxTranslate }}</h3>
-                    </div>
-                }
                 @for (group of groups; track trackByGroup($index, group)) {
                     <div class="team">
                         @if (group.team) {
@@ -25,13 +20,16 @@
                         <div class="team-body" [class.padded]="group.team">
                             @for (app of group.apps; track app.id) {
                                 <sqx-app [app]="app" (leave)="leaveApp($event)"></sqx-app>
-                            }
-                            @if (group.apps.length === 0) {
+                            } @empty {
                                 <small class="team-empty">
                                     {{ "teams.empty" | sqxTranslate }}
                                 </small>
                             }
                         </div>
+                    </div>
+                } @empty {
+                    <div class="empty">
+                        <h3 class="empty-headline">{{ "apps.empty" | sqxTranslate }}</h3>
                     </div>
                 }
             </div>

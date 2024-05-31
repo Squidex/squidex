@@ -25,7 +25,14 @@
             }
 
             @if (supportedActions && supportedTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); as rules) {
-                @if (rules.length === 0) {
+                @for (rule of rules; track rule.id) {
+                    <sqx-rule
+                        (delete)="delete(rule)"
+                        [rule]="rule"
+                        [ruleActions]="supportedActions"
+                        [ruleTriggers]="supportedTriggers"
+                        (toggle)="toggle(rule)"></sqx-rule>
+                } @empty {
                     <div class="table-items-row table-items-row-summary table-items-row-empty">
                         {{ "rules.empty" | sqxTranslate }}
                         @if (rulesState.canCreate | async) {
@@ -35,14 +42,6 @@
                             </button>
                         }
                     </div>
-                }
-                @for (rule of rules; track rule.id) {
-                    <sqx-rule
-                        (delete)="delete(rule)"
-                        [rule]="rule"
-                        [ruleActions]="supportedActions"
-                        [ruleTriggers]="supportedTriggers"
-                        (toggle)="toggle(rule)"></sqx-rule>
                 }
             }
         </sqx-list-view>

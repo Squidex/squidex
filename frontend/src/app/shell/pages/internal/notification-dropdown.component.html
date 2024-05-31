@@ -16,11 +16,6 @@
     [sqxAnchoredTo]="button"
     *sqxModal="modalMenu; onRoot: false">
     @if (commentItems | async; as items) {
-        @if (items.length === 0) {
-            <small class="text-muted">
-                {{ "notifications.empty" | sqxTranslate }}
-            </small>
-        }
         @for (item of items.slice().reverse(); track $index) {
             <sqx-comment
                 canAnswer="false"
@@ -32,6 +27,10 @@
                 [mentionConfig]="{}"
                 [mentionUsers]="undefined"
                 [userToken]="commentUser"></sqx-comment>
+        } @empty {
+            <small class="text-muted">
+                {{ "notifications.empty" | sqxTranslate }}
+            </small>
         }
     }
 </sqx-dropdown-menu>

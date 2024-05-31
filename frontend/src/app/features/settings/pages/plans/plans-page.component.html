@@ -35,11 +35,6 @@
                     </div>
                 }
                 <div>
-                    @if (plans.length === 0) {
-                        <div class="text-muted text-center empty">
-                            {{ "plans.noPlanConfigured" | sqxTranslate }}
-                        </div>
-                    }
                     <div class="plans">
                         @for (planInfo of plans; track planInfo.plan.id) {
                             <div class="plan">
@@ -47,6 +42,13 @@
                             </div>
                         }
                     </div>
+
+                    @if (plans.length === 0) {
+                        <div class="text-muted text-center empty">
+                            {{ "plans.noPlanConfigured" | sqxTranslate }}
+                        </div>
+                    }
+
                     @if (plansState.portalLink | async; as portalLink) {
                         <div class="billing-portal-link">
                             {{ "plans.billingPortalHint" | sqxTranslate }}

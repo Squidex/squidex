@@ -62,9 +62,7 @@
                         <ng-template [context]="snapshot.query" [index]="i" [item]="item" [sqxTemplateWrapper]="templateItem"></ng-template>
                     }
                 </div>
-            }
-
-            @if (snapshot.suggestedItems.length === 0) {
+            } @empty {
                 <div class="text-decent control-dropdown-item no-events">
                     @if (itemsLoading) {
                         <sqx-loader color="input"></sqx-loader>
