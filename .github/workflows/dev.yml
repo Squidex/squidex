@@ -128,6 +128,11 @@ jobs:
         run: docker-compose down
         working-directory: tools/TestSuite
 
+      - name: Publish - Remove unnecessary files
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
       - name: Publish - Calculate Version
         if: github.event_name != 'pull_request'
         env:
