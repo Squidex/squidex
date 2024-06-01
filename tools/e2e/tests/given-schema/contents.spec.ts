@@ -42,7 +42,7 @@ test('update content', async ({ page }) => {
     await page.getByRole('button', { name: 'Save', exact: true }).click();
 
     // Wait for update of the version
-    await page.getByText(/Version[\s]*:[\s]*1/i).waitFor({ state: 'visible' });
+    await page.getByText('Version: 1').waitFor({ state: 'visible' });
 
     // Go back
     await page.getByLabel('Back').click();
