@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Injectable, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -45,7 +45,6 @@ export class SearchSource implements AutocompleteSource {
         AsyncPipe,
         AutocompleteComponent_1,
         FormsModule,
-        NgIf,
         ShortcutComponent,
         ShortcutDirective,
         TooltipDirective,

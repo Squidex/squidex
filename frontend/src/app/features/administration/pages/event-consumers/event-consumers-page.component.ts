@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
@@ -26,7 +26,6 @@ import { EventConsumerComponent } from './event-consumer.component';
         ListViewComponent,
         ModalDialogComponent,
         ModalDirective,
-        NgFor,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -60,10 +59,6 @@ export class EventConsumersPageComponent implements OnInit {
 
     public reload() {
         this.eventConsumersState.load(true, false);
-    }
-
-    public trackByEventConsumer(_index: number, es: EventConsumerDto) {
-        return es.name;
     }
 
     public showError(eventConsumer: EventConsumerDto) {

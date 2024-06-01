@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -23,7 +23,6 @@ import { UpsertUserDto, UserDto, UserForm, UsersState } from '../../internal';
         FormErrorComponent,
         FormsModule,
         LayoutComponent,
-        NgIf,
         ReactiveFormsModule,
         ShortcutDirective,
         TitleComponent,

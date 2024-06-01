@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, LanguageDto, ModalDirective, ModalModel, ModalPlacementDirective, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
@@ -26,7 +26,6 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
-        NgIf,
         ReactiveFormsModule,
         TooltipDirective,
         TourStepDirective,

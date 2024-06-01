@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, numberAttribute } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
@@ -36,8 +36,6 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgFor,
-        NgIf,
         TranslatePipe,
     ],
 })

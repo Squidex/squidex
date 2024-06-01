@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { ApiUrlConfig, JobDto, JobsState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ApiUrlConfig, JobsState, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { JobComponent } from './job.component';
 
 @Component({
@@ -23,8 +23,6 @@ import { JobComponent } from './job.component';
         JobComponent,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
-        NgIf,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -59,9 +57,5 @@ export class JobsPageComponent implements OnInit {
 
     public startBackup() {
         this.jobsState.startBackup();
-    }
-
-    public trackByJob(_index: number, item: JobDto) {
-        return item.id;
     }
 }

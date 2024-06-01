@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, ModalDirective, SchemaDto, SchemasState, TourStepDirective, TranslatePipe } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
@@ -20,7 +20,6 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
         AsyncPipe,
         FieldWizardComponent,
         ModalDirective,
-        NgIf,
         TourStepDirective,
         TranslatePipe,
         forwardRef(() => SortableFieldListComponent),

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import Pikaday from 'pikaday/pikaday';
@@ -39,7 +39,6 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormsModule,
-        NgIf,
         ReactiveFormsModule,
         ResizedDirective,
         TooltipDirective,

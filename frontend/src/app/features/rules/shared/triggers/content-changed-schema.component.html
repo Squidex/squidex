@@ -3,26 +3,31 @@
         <sqx-control-errors for="action"></sqx-control-errors>
 
         <select class="form-select schemas-control" formControlName="schemaId">
-            <option *ngFor="let schema of schemas; trackBy: trackBySchema" [ngValue]="schema.id">{{schema.displayName}}</option>
+            @for (schema of schemas; track schema.id) {
+                <option [ngValue]="schema.id">{{ schema.displayName }}</option>
+            }
         </select>
     </div>
 
     <div class="col-auto">
-        <div class="label text-muted">{{ 'rules.when' | sqxTranslate }}</div>
+        <div class="label text-muted">{{ "rules.when" | sqxTranslate }}</div>
     </div>
 
     <div class="col">
         <sqx-control-errors for="condition"></sqx-control-errors>
 
-        <sqx-code-editor singleLine="true" formControlName="condition" [completion]="completions | async"></sqx-code-editor>
+        <sqx-code-editor [completion]="completions | async" formControlName="condition" singleLine="true"></sqx-code-editor>
     </div>
 
     <div class="col-auto">
-        <button type="button" class="btn btn-text-danger" [disabled]="form.disabled"
-            (sqxConfirmClick)="remove.emit()"
-            confirmTitle="i18n:rules.deleteContentChangedSchemaTitle"
+        <button
+            class="btn btn-text-danger"
+            confirmRememberKey="deleteContentChangedSchema"
             confirmText="i18n:rules.deleteContentChangedSchemaText"
-            confirmRememberKey="deleteContentChangedSchema">
+            confirmTitle="i18n:rules.deleteContentChangedSchemaTitle"
+            [disabled]="form.disabled"
+            (sqxConfirmClick)="remove.emit()"
+            type="button">
             <i class="icon-bin2"></i>
         </button>
     </div>

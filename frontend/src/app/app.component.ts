@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { Component, Injector } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootViewComponent, TourGuideComponent, TourTemplateComponent, TranslatePipe } from '@app/shared';
@@ -18,7 +18,6 @@ import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootVie
     imports: [
         CopyGlobalDirective,
         DialogRendererComponent,
-        NgIf,
         RootViewComponent,
         RouterOutlet,
         TourGuideComponent,

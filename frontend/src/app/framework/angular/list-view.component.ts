@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
 import { StatefulComponent } from '@app/framework/internal';
 import { CompensateScrollbarDirective } from './compensate-scrollbar.directive';
@@ -26,7 +26,6 @@ interface State {
     imports: [
         CompensateScrollbarDirective,
         LoaderComponent,
-        NgIf,
         NgTemplateOutlet,
         SyncScollingDirective,
     ],

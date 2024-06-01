@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormHintComponent, REFERENCES_FIELD_EDITORS, ReferencesFieldPropertiesDto, TranslatePipe } from '@app/shared';
@@ -18,8 +18,6 @@ import { FieldDto, FormHintComponent, REFERENCES_FIELD_EDITORS, ReferencesFieldP
     imports: [
         FormHintComponent,
         FormsModule,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         TranslatePipe,
     ],

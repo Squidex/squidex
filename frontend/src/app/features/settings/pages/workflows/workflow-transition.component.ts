@@ -7,7 +7,7 @@
 
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RoleDto, TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
+import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -44,9 +44,5 @@ export class WorkflowTransitionComponent {
 
     public changeRole(roles: ReadonlyArray<string>) {
         this.update.emit(({ roles: roles || [] }) as any);
-    }
-
-    public trackByRole(_index: number, role: RoleDto) {
-        return role.name;
     }
 }

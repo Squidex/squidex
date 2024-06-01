@@ -1,44 +1,50 @@
 <div class="component">
-    <div *ngIf="formModel.schemaChanges | async; let schema; else noSchema">
-        <sqx-form-hint>
-            {{schema.displayName}}
-        </sqx-form-hint>
-
-        <div class="form-group" *ngFor="let section of formModel.sectionsChanges | async">
-            <sqx-component-section
-                [form]="form"
-                [formContext]="formContext"
-                [formLevel]="formLevel + 1"
-                [formSection]="$any(section)"
-                [isComparing]="isComparing"
-                [hasChatBot]="hasChatBot"
-                [language]="language"
-                [languages]="languages">
-            </sqx-component-section>
-        </div>
-    </div>
-    
-    <ng-template #noSchema>
-        <ng-container *ngIf="schemasList.length > 1">
-            <button type="button" class="btn btn-outline-success dropdown-toggle" [disabled]="isDisabled | async" (click)="schemasDropdown.show()" #buttonSelect>
-                {{ 'contents.addComponent' | sqxTranslate}}
-            </button>
-            
-            <sqx-dropdown-menu *sqxModal="schemasDropdown;closeAlways:true" [sqxAnchoredTo]="buttonSelect" scrollY="true">
-                <a class="dropdown-item" *ngFor="let schema of schemasList" (click)="setSchema(schema)">
-                    {{schema.displayName}}
-                </a>
-            </sqx-dropdown-menu>
-        </ng-container>
-        <ng-container *ngIf="schemasList.length === 1">
-            <button type="button" class="btn btn-outline-success" [disabled]="isDisabled | async" (click)="setSchema(schemasList[0])">
-                {{ 'contents.addComponent' | sqxTranslate}}
-            </button>
-        </ng-container>
-        <ng-container *ngIf="schemasList.length === 0">
+    @if (formModel.schemaChanges | async; as schema) {
+        <div>
             <sqx-form-hint>
-                {{ 'contents.componentNoSchema' | sqxTranslate }}
+                {{ schema.displayName }}
             </sqx-form-hint>
-        </ng-container>
-    </ng-template>
+            @for (section of formModel.sectionsChanges | async; track section) {
+                <div class="form-group">
+                    <sqx-component-section
+                        [form]="form"
+                        [formContext]="formContext"
+                        [formLevel]="formLevel + 1"
+                        [formSection]="$any(section)"
+                        [hasChatBot]="hasChatBot"
+                        [isComparing]="isComparing"
+                        [language]="language"
+                        [languages]="languages"></sqx-component-section>
+                </div>
+            }
+        </div>
+    } @else {
+        @if (schemasList.length > 1) {
+            <button
+                class="btn btn-outline-success dropdown-toggle"
+                #buttonSelect
+                (click)="schemasDropdown.show()"
+                [disabled]="isDisabled | async"
+                type="button">
+                {{ "contents.addComponent" | sqxTranslate }}
+            </button>
+            <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
+                @for (schema of schemasList; track schema) {
+                    <a class="dropdown-item" (click)="setSchema(schema)">
+                        {{ schema.displayName }}
+                    </a>
+                }
+            </sqx-dropdown-menu>
+        }
+        @if (schemasList.length === 1) {
+            <button class="btn btn-outline-success" (click)="setSchema(schemasList[0])" [disabled]="isDisabled | async" type="button">
+                {{ "contents.addComponent" | sqxTranslate }}
+            </button>
+        }
+        @if (schemasList.length === 0) {
+            <sqx-form-hint>
+                {{ "contents.componentNoSchema" | sqxTranslate }}
+            </sqx-form-hint>
+        }
+    }
 </div>

@@ -1,52 +1,55 @@
-<sqx-layout layout="main" titleText="i18n:common.settings" titleIcon="settings" innerWidth="55">
+<sqx-layout innerWidth="55" layout="main" titleIcon="settings" titleText="i18n:common.settings">
     <ng-container>
         <sqx-list-view innerWidth="55rem">
             <ng-container content>
                 <form [formGroup]="updateForm.form" (ngSubmit)="save()">
-                    <h5>{{ 'apps.generalSettings' | sqxTranslate }}</h5>
+                    <h5>{{ "apps.generalSettings" | sqxTranslate }}</h5>
 
-                    <div class="card mb-4">        
+                    <div class="card mb-4">
                         <div class="card-body">
                             <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
-        
+
                             <div class="form-group">
-                                <label for="name">{{ 'common.name' | sqxTranslate }}</label>
-                
+                                <label for="name">{{ "common.name" | sqxTranslate }}</label>
+
                                 <sqx-control-errors for="name"></sqx-control-errors>
-                
-                                <input class="form-control" id="name" maxlength="100" formControlName="name">
-                                
+
+                                <input class="form-control" id="name" formControlName="name" maxlength="100" />
+
                                 <sqx-form-hint>
-                                    {{ 'teams.teamNameHint' | sqxTranslate }}
+                                    {{ "teams.teamNameHint" | sqxTranslate }}
                                 </sqx-form-hint>
                             </div>
                         </div>
-        
+
                         <div class="card-footer">
-                            <button type="submit" class="float-end btn btn-primary" [disabled]="!isEditable">
-                                {{ 'common.save' | sqxTranslate }}
+                            <button class="float-end btn btn-primary" [disabled]="!isEditable" type="submit">
+                                {{ "common.save" | sqxTranslate }}
                             </button>
                         </div>
                     </div>
                 </form>
 
-                <h5>{{ 'apps.generalSettingsDangerZone' | sqxTranslate }}</h5>
-        
+                <h5>{{ "apps.generalSettingsDangerZone" | sqxTranslate }}</h5>
+
                 <div class="card card-body">
                     <div class="row">
                         <div class="col">
-                            <h5>{{ 'teams.delete' | sqxTranslate }}</h5>
-        
+                            <h5>{{ "teams.delete" | sqxTranslate }}</h5>
+
                             <sqx-form-hint>
-                                {{ 'teams.deleteWarning' | sqxTranslate }}
+                                {{ "teams.deleteWarning" | sqxTranslate }}
                             </sqx-form-hint>
                         </div>
                         <div class="col-auto">
-                            <button type="button" class="btn btn-danger" [disabled]="!isDeletable"
-                                (sqxConfirmClick)="deleteTeam()"
+                            <button
+                                class="btn btn-danger"
+                                confirmText="i18n:teams.deleteConfirmText"
                                 confirmTitle="i18n:teams.deleteConfirmTitle"
-                                confirmText="i18n:teams.deleteConfirmText">
-                                {{ 'teams.delete' | sqxTranslate }}
+                                [disabled]="!isDeletable"
+                                (sqxConfirmClick)="deleteTeam()"
+                                type="button">
+                                {{ "teams.delete" | sqxTranslate }}
                             </button>
                         </div>
                     </div>
@@ -54,27 +57,29 @@
             </ng-container>
         </sqx-list-view>
     </ng-container>
-    
+
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="history"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="history"
                 title="i18n:common.history"
-                titlePosition="left"
-                sqxTourStep="history">
+                titlePosition="left">
                 <i class="icon-time"></i>
             </a>
-            <a class="panel-link"
+            <a
+                class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="help"
                 title="i18n:common.help"
-                titlePosition="left"
-                sqxTourStep="help">
+                titlePosition="left">
                 <i class="icon-help2"></i>
             </a>
         </div>

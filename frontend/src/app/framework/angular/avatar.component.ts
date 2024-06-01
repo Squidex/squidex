@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
 import { picasso, TypedSimpleChanges } from '@app/framework/internal';
 import { SafeUrlPipe } from './safe-html.pipe';
@@ -17,7 +17,6 @@ import { SafeUrlPipe } from './safe-html.pipe';
     templateUrl: './avatar.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgIf,
         SafeUrlPipe,
     ],
 })

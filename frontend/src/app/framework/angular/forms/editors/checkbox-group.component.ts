@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor } from '@angular/common';
+
 import { AfterViewChecked, AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { getTagValues, MathHelper, StatefulControlComponent, TagValue, TextMeasurer, Types } from '@app/framework/internal';
@@ -33,7 +33,6 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgFor,
         ResizedDirective,
     ],
 })
@@ -164,9 +163,5 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
 
     public isChecked(value: TagValue) {
         return this.snapshot.checkedValues.includes(value);
-    }
-
-    public trackByValue(_index: number, tag: TagValue) {
-        return tag.id;
     }
 }

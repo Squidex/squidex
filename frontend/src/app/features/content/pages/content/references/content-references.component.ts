@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ToolbarService, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 import { ReferenceItemComponent } from '../../../shared/references/reference-item.component';
@@ -24,8 +24,6 @@ import { ReferenceItemComponent } from '../../../shared/references/reference-ite
         AsyncPipe,
         ContentsColumnsPipe,
         ListViewComponent,
-        NgFor,
-        NgIf,
         PagerComponent,
         ReferenceItemComponent,
         TranslatePipe,
@@ -96,9 +94,5 @@ export class ContentReferencesComponent implements OnInit, OnDestroy {
 
     private publishAll() {
         this.contentsState.changeManyStatus(this.contentsState.snapshot.contents.filter(x => x.canPublish), 'Published');
-    }
-
-    public trackByContent(_index: number, content: ContentDto) {
-        return content.id;
     }
 }

@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { NgFor } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, UserPicturePipe } from '@app/shared';
@@ -22,7 +22,6 @@ import { ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe
         ConfirmClickDirective,
         FormsModule,
         HighlightPipe,
-        NgFor,
         TooltipDirective,
         UserPicturePipe,
     ],

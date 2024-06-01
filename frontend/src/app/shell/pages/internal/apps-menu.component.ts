@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppDto, AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TeamDto, TeamFormComponent, TeamsState, Title, TitleService, TranslatePipe, UIState } from '@app/shared';
+import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TeamFormComponent, TeamsState, Title, TitleService, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -24,8 +24,6 @@ import { AppDto, AppFormComponent, AppsState, DialogModel, DropdownMenuComponent
         DropdownMenuComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         RouterLink,
         RouterLinkActive,
         TeamFormComponent,
@@ -46,17 +44,5 @@ export class AppsMenuComponent {
         public readonly uiState: UIState,
     ) {
         this.appPath = titleService.pathChanges.pipe(map(x => x.slice(1)));
-    }
-
-    public trackByApp(_index: number, app: AppDto) {
-        return app.id;
-    }
-
-    public trackByTeam(_index: number, team: TeamDto) {
-        return team.id;
-    }
-
-    public trackByTitle(_index: number, title: Title) {
-        return title.value;
     }
 }

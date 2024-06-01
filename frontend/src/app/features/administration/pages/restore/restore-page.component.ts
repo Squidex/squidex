@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -24,8 +24,6 @@ import { AuthService, ControlErrorsComponent, DialogService, ISODatePipe, JobsSe
         ISODatePipe,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,

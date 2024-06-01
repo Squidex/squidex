@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FileSizePipe, TranslatePipe } from '@app/framework';
 import { CurrentStorageDto } from '@app/shared/internal';
@@ -18,7 +18,6 @@ import { CurrentStorageDto } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FileSizePipe,
-        NgIf,
         TranslatePipe,
     ],
 })

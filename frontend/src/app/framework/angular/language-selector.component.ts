@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, OnInit, Output } from '@angular/core';
 import { FloatingPlacement, ModalModel } from '@app/framework/internal';
 import { DropdownMenuComponent } from './dropdown-menu.component';
@@ -25,8 +25,6 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
         DropdownMenuComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         TooltipDirective,
     ],
 })
@@ -77,9 +75,5 @@ export class LanguageSelectorComponent implements  OnInit {
             this.language = language;
             this.languageChange.emit(language);
         }
-    }
-
-    public trackByLanguage(_index: number, language: Language) {
-        return language.iso2Code;
     }
 }

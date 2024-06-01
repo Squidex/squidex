@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -32,8 +32,6 @@ import { ContentPageComponent } from './content-page.component';
         LayoutComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         TourStepDirective,
         TranslatePipe,
     ],
@@ -111,9 +109,5 @@ export class ContentHistoryPageComponent implements OnInit {
 
     public compareVersion(event: HistoryEventDto) {
         this.contentPage.loadVersion(event.version, true);
-    }
-
-    public trackByEvent(_index: number, event: HistoryEventDto) {
-        return event.eventId;
     }
 }

@@ -1,16 +1,16 @@
 <div class="input-group">
-    <input readonly class="form-control" [ngModel]="snapshot.selectedName" (click)="openDialog()" />
+    <input class="form-control" (click)="openDialog()" [ngModel]="snapshot.selectedName" readonly />
 
-    <button type="button" class="btn btn-outline-secondary" [disabled]="snapshot.isDisabled" (click)="selectContent()" sqxStopClick>
+    <button class="btn btn-outline-secondary" (click)="selectContent()" [disabled]="snapshot.isDisabled" sqxStopClick type="button">
         <i class="icon-close"></i>
     </button>
 </div>
 
-<sqx-content-selector *sqxModal="contentSelectorDialog"
+<sqx-content-selector
     (contentSelect)="select($event)"
     [language]="language"
     [languages]="languages"
+    maxItems="1"
     [query]="query"
     [schemaIdentifiers]="schemaIds"
-    maxItems="1">
-</sqx-content-selector>
+    *sqxModal="contentSelectorDialog"></sqx-content-selector>

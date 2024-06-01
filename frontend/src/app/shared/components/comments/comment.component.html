@@ -1,110 +1,129 @@
-<div class="comment row g-0" [class.selected]="commentItem.isSelected" [class.reply]="commentItem.comment.replyTo" [@bounce]="commentItem.isSelected"
+<div
+    class="comment row g-0"
+    [@bounce]="commentItem.isSelected"
+    [class.reply]="commentItem.comment.replyTo"
+    [class.selected]="commentItem.isSelected"
     [sqxScrollActive]="true"
-    [sqxScrollOffset]="20"
-    [sqxScrollContainer]="scrollContainer">
-    <div class="comment-text row g-0" sqxSc *ngIf="snapshot.mode !== 'Edit'"
-        [sqxScrollActive]="commentItem.isSelected"
-        [sqxScrollOffset]="-20"
-        [sqxScrollContainer]="scrollContainer">
-        <div class="col-auto pe-2">
-            <img class="user-picture" title="{{commentItem.comment.user | sqxUserNameRef}}" [src]="commentItem.comment.user | sqxUserPictureRef">
-        </div>
-
-        <div class="col col-text">
-            <div class="comment-message">
-                <div class="user-row">
-                    <div class="user-ref" [title]="commentItem.comment.user | sqxUserNameRef:null">{{commentItem.comment.user | sqxUserNameRef:null}}</div>
-                </div>
-    
-                <div [innerHTML]="commentItem.comment.text | sqxMarkdown | sqxSafeHtml"></div>
-    
-                <div class="comment-created text-muted">
-                    <ng-container *ngIf="canFollow && commentItem.comment.url">
-                        <a [routerLink]="commentItem.comment.url">{{ 'comments.follow' | sqxTranslate }}</a>&nbsp;
-                    </ng-container>
-    
-                    {{commentItem.comment.time | sqxFromNow}} 
+    [sqxScrollContainer]="scrollContainer"
+    [sqxScrollOffset]="20">
+    @if (snapshot.mode !== "Edit") {
+        <div
+            class="comment-text row g-0"
+            sqxSc
+            [sqxScrollActive]="commentItem.isSelected"
+            [sqxScrollContainer]="scrollContainer"
+            [sqxScrollOffset]="-20">
+            <div class="col-auto pe-2">
+                <img
+                    class="user-picture"
+                    [src]="commentItem.comment.user | sqxUserPictureRef"
+                    title="{{ commentItem.comment.user | sqxUserNameRef }}" />
+            </div>
+            <div class="col col-text">
+                <div class="comment-message">
+                    <div class="user-row">
+                        <div class="user-ref" [title]="commentItem.comment.user | sqxUserNameRef: null">
+                            {{ commentItem.comment.user | sqxUserNameRef: null }}
+                        </div>
+                    </div>
+                    <div [innerHTML]="commentItem.comment.text | sqxMarkdown | sqxSafeHtml"></div>
+                    <div class="comment-created text-muted">
+                        @if (canFollow && commentItem.comment.url) {
+                            <a [routerLink]="commentItem.comment.url">{{ "comments.follow" | sqxTranslate }}</a>
+                            &nbsp;
+                        }
+                        {{ commentItem.comment.time | sqxFromNow }}
+                    </div>
                 </div>
             </div>
+            <div class="actions">
+                @if (canAnswer) {
+                    <button class="btn btn-sm btn-text-secondary" (click)="startReply()" type="button">
+                        <i class="icon-enter"></i>
+                    </button>
+                }
+                @if (isEditable && canEdit) {
+                    <button class="btn btn-sm btn-text-secondary" (click)="startEdit()" type="button">
+                        <i class="icon-pencil"></i>
+                    </button>
+                }
+                @if (isDeletable || canDelete) {
+                    <button
+                        class="btn btn-sm btn-text-danger"
+                        confirmRememberKey="deleteComment"
+                        [confirmRequired]="confirmDelete"
+                        confirmText="i18n:comments.deleteConfirmText"
+                        confirmTitle="i18n:comments.deleteConfirmTitle"
+                        (sqxConfirmClick)="delete()"
+                        type="button">
+                        <i class="icon-bin2"></i>
+                    </button>
+                }
+            </div>
         </div>
+    }
 
-        <div class="actions">
-            <button *ngIf="canAnswer" type="button" class="btn btn-sm btn-text-secondary" (click)="startReply()">
-                <i class="icon-enter"></i>
-            </button>
-
-            <button *ngIf="isEditable && canEdit" type="button" class="btn btn-sm btn-text-secondary" (click)="startEdit()">
-                <i class="icon-pencil"></i>
-            </button>
-        
-            <button *ngIf="isDeletable || canDelete" type="button" class="btn btn-sm btn-text-danger"
-                (sqxConfirmClick)="delete()"
-                confirmTitle="i18n:comments.deleteConfirmTitle"
-                confirmText="i18n:comments.deleteConfirmText"
-                confirmRememberKey="deleteComment"
-                [confirmRequired]="confirmDelete">
-                <i class="icon-bin2"></i>
-            </button>
-        </div>
-    </div>
-
-    <ng-container *ngIf="snapshot.mode === 'Edit'">
+    @if (snapshot.mode === "Edit") {
         <form (ngSubmit)="update()">
-            <textarea class="form-control mb-1" name="{{commentItem.comment}}" [(ngModel)]="editingText"
-                sqxFocusOnInit
-                [mention]="$any(mentionUsers)"
-                [mentionConfig]="mentionConfig"
+            <textarea
+                class="form-control mb-1"
+                autocapitalize="off"
                 autocomplete="off"
                 autocorrect="off"
-                autocapitalize="off"
-                (keydown)="updateOnEnter($event)">
-            </textarea>
-
+                (keydown)="updateOnEnter($event)"
+                [mention]="$any(mentionUsers)"
+                [mentionConfig]="mentionConfig"
+                name="{{ commentItem.comment }}"
+                [(ngModel)]="editingText"
+                sqxFocusOnInit></textarea>
             <div>
-                <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="icon-enter"></i> {{ 'common.save' | sqxTranslate }}
+                <button class="btn btn-sm btn-primary" type="submit">
+                    <i class="icon-enter"></i>
+                    {{ "common.save" | sqxTranslate }}
                 </button>
-
-                <button type="button" class="btn btn-sm btn-text-secondary me-1" (click)="cancelEditOrReply()">
-                    {{ 'common.cancel' | sqxTranslate }}
+                <button class="btn btn-sm btn-text-secondary me-1" (click)="cancelEditOrReply()" type="button">
+                    {{ "common.cancel" | sqxTranslate }}
                 </button>
             </div>
         </form>
-    </ng-container>
+    }
 
-    <div class="replies" *ngIf="commentItem.replies.length > 0 || snapshot.mode === 'Reply'">
-        <sqx-comment *ngFor="let item of commentItem.replies; trackBy: trackByComment;"
-            canEdit="true"
-            canFollow="false"
-            [commentItem]="item"
-            [comments]="comments"
-            [mentionConfig]="mentionConfig"
-            [mentionUsers]="mentionUsers"
-            [userToken]="userToken">
-        </sqx-comment>
-
-        <ng-container *ngIf="snapshot.mode === 'Reply'">
-            <form [formGroup]="replyForm.form" (ngSubmit)="reply()">
-                <textarea class="form-control mb-1" name="text" formControlName="text"
-                    sqxFocusOnInit
-                    [mention]="$any(mentionUsers)"
+    @if (commentItem.replies.length > 0 || snapshot.mode === "Reply") {
+        <div class="replies">
+            @for (item of commentItem.replies; track $index) {
+                <sqx-comment
+                    canEdit="true"
+                    canFollow="false"
+                    [commentItem]="item"
+                    [comments]="comments"
                     [mentionConfig]="mentionConfig"
-                    autocomplete="off"
-                    autocorrect="off"
-                    autocapitalize="off"
-                    (keydown)="replayOnEnter($event)">
-                </textarea>
-
-                <div>
-                    <button type="submit" class="btn btn-sm btn-primary">
-                        <i class="icon-enter"></i> {{ 'common.reply' | sqxTranslate }}
-                    </button>
-
-                    <button type="button" class="btn btn-sm btn-text-secondary me-1" (click)="cancelEditOrReply()">
-                        {{ 'common.cancel' | sqxTranslate }}
-                    </button>
-                </div>
-            </form>
-        </ng-container>
-    </div>
+                    [mentionUsers]="mentionUsers"
+                    [userToken]="userToken"></sqx-comment>
+            }
+            @if (snapshot.mode === "Reply") {
+                <form [formGroup]="replyForm.form" (ngSubmit)="reply()">
+                    <textarea
+                        class="form-control mb-1"
+                        autocapitalize="off"
+                        autocomplete="off"
+                        autocorrect="off"
+                        formControlName="text"
+                        (keydown)="replayOnEnter($event)"
+                        [mention]="$any(mentionUsers)"
+                        [mentionConfig]="mentionConfig"
+                        name="text"
+                        sqxFocusOnInit></textarea>
+                    <div>
+                        <button class="btn btn-sm btn-primary" type="submit">
+                            <i class="icon-enter"></i>
+                            {{ "common.reply" | sqxTranslate }}
+                        </button>
+                        <button class="btn btn-sm btn-text-secondary me-1" (click)="cancelEditOrReply()" type="button">
+                            {{ "common.cancel" | sqxTranslate }}
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    }
 </div>

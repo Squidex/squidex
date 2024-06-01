@@ -1,79 +1,86 @@
-<div class="tour" *ngIf="(tourState.status | async) === 'Started'">
-    <div class="card" *ngIf="!snapshot.isCollapsed" @fade>
-        <div class="card-header">
-            <div class="row align-items-center">
-                <div class="col">
-                    {{ 'tour.guide-title' | sqxTranslate }}
-                </div>
-                <div class="col-auto">
-                    <button class="btn btn-simple btn-sm" (click)="toggle()">
-                        <i class="icon-angle-down"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="card-body" #body>    
-            <div *ngIf="tourState.tasks | async; let tasks">
-                <div class="row g-3 mb-3 step align-items-center" *ngFor="let task of tasks" (click)="start(task)" [class.active]="task.isActive">
-                    <div class="col-auto">
-                        <div class="checkmark" [class.pending]="!task.isCompleted" [class.completed]="task.isCompleted">
-                            <i class="icon-checkmark" [class.hidden]="!task.isCompleted"></i>
+@if ((tourState.status | async) === "Started") {
+    <div class="tour">
+        @if (!snapshot.isCollapsed) {
+            <div class="card" @fade>
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            {{ "tour.guide-title" | sqxTranslate }}
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-simple btn-sm" (click)="toggle()">
+                                <i class="icon-angle-down"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="col" [class.strikethrough]="task.isCompleted" [class.text-completed]="task.isCompleted || !task.isActive">
-                        <h5 class="mb-0">{{task.title | sqxTranslate}}</h5>
-    
-                        <div>{{task.description | sqxTranslate}}</div>
-                    </div>
+                </div>
+                <div class="card-body" #body>
+                    @if (tourState.tasks | async; as tasks) {
+                        <div>
+                            @for (task of tasks; track task) {
+                                <div class="row g-3 mb-3 step align-items-center" [class.active]="task.isActive" (click)="start(task)">
+                                    <div class="col-auto">
+                                        <div class="checkmark" [class.completed]="task.isCompleted" [class.pending]="!task.isCompleted">
+                                            <i class="icon-checkmark" [class.hidden]="!task.isCompleted"></i>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="col"
+                                        [class.strikethrough]="task.isCompleted"
+                                        [class.text-completed]="task.isCompleted || !task.isActive">
+                                        <h5 class="mb-0">{{ task.title | sqxTranslate }}</h5>
+                                        <div>{{ task.description | sqxTranslate }}</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    <button
+                        class="btn btn-outline-secondary btn-block mt-2"
+                        (click)="complete()"
+                        [sqxScrollActive]="(tourState.pendingTasks | async) === 0"
+                        [sqxScrollContainer]="body">
+                        {{ "tour.complete" | sqxTranslate }}
+                    </button>
+                </div>
+                <div class="card-footer">
+                    <a href="https://squidex.io/help" target="_blank">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-auto">
+                                <i class="icon-help"></i>
+                            </div>
+                            <div class="col ps-4">
+                                {{ "tour.documentation" | sqxTranslate }}
+                            </div>
+                            <div class="col-auto">
+                                <i class="icon-angle-right"></i>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="https://support.squidex.io" target="_blank">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-auto">
+                                <i class="icon-user-o"></i>
+                            </div>
+                            <div class="col ps-4">
+                                {{ "tour.support" | sqxTranslate }}
+                            </div>
+                            <div class="col-auto">
+                                <i class="icon-angle-right"></i>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
-
-            <button class="btn btn-outline-secondary btn-block mt-2" (click)="complete()"
-                [sqxScrollActive]="(tourState.pendingTasks | async) === 0"
-                [sqxScrollContainer]="body">
-                {{ 'tour.complete' | sqxTranslate}}
-            </button>
-        </div>
-        <div class="card-footer">
-            <a href="https://squidex.io/help" target="_blank">
-                <div class="row g-0 align-items-center">
-                    <div class="col-auto">
-                        <i class="icon-help"></i>
-                    </div>
-                    <div class="col ps-4">
-                        {{ 'tour.documentation' | sqxTranslate }}
-                    </div>
-                    <div class="col-auto">
-                        <i class="icon-angle-right"></i>
-                    </div>
+        }
+        <div class="d-flex justify-content-end">
+            <div class="summary" [class.expanded]="snapshot.isCollapsed" (click)="toggle()">
+                <div class="counter">{{ tourState.pendingTasks | async }}</div>
+                <span>{{ "tour.guide-title" | sqxTranslate }}</span>
+                <div class="squid">
+                    <img src="./images/squid.svg" />
                 </div>
-            </a>
-
-            <a href="https://support.squidex.io" target="_blank">
-                <div class="row g-0 align-items-center">
-                    <div class="col-auto">
-                        <i class="icon-user-o"></i>
-                    </div>
-                    <div class="col ps-4">
-                        {{ 'tour.support' | sqxTranslate }}
-                    </div>
-                    <div class="col-auto">
-                        <i class="icon-angle-right"></i>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <div class="d-flex justify-content-end">
-        <div class="summary" [class.expanded]="snapshot.isCollapsed" (click)="toggle()">
-            <div class="counter">{{tourState.pendingTasks | async}}</div>
-    
-            <span>{{ 'tour.guide-title' | sqxTranslate }}</span>
-            
-            <div class="squid">
-                <img src="./images/squid.svg">
             </div>
         </div>
     </div>
-</div>
+}

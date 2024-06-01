@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppDto, AppsService, StatefulComponent, StopClickDirective, TeamDto, TranslatePipe } from '@app/shared';
@@ -22,8 +22,6 @@ interface State {
     templateUrl: './apps-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgFor,
-        NgIf,
         RouterLink,
         StopClickDirective,
         TranslatePipe,

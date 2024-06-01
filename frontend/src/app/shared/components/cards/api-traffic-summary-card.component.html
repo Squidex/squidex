@@ -1,14 +1,16 @@
 <div class="card card">
-    <div class="card-header">{{ 'dashboard.trafficHeader' | sqxTranslate }}</div>
+    <div class="card-header">{{ "dashboard.trafficHeader" | sqxTranslate }}</div>
     <div class="card-body">
-        <div class="aggregation" *ngIf="bytesMonth >= 0">
-            <div class="aggregation-label">{{ 'dashboard.currentMonthLabel' | sqxTranslate }}</div>
-
-            <div class="aggregation-value">{{bytesMonth | sqxFileSize}}</div>
-
-            <div class="aggregation-label" *ngIf="bytesAllowed > 0">
-                {{ 'dashboard.trafficLimitLabel' | sqxTranslate }}: {{bytesAllowed | sqxFileSize}}
+        @if (bytesMonth >= 0) {
+            <div class="aggregation">
+                <div class="aggregation-label">{{ "dashboard.currentMonthLabel" | sqxTranslate }}</div>
+                <div class="aggregation-value">{{ bytesMonth | sqxFileSize }}</div>
+                @if (bytesAllowed > 0) {
+                    <div class="aggregation-label">
+                        {{ "dashboard.trafficLimitLabel" | sqxTranslate }}: {{ bytesAllowed | sqxFileSize }}
+                    </div>
+                }
             </div>
-        </div>
+        }
     </div>
 </div>

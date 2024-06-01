@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GridsterItem } from 'angular-gridster2';
@@ -25,8 +25,6 @@ import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirect
         ModalDialogComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         TooltipDirective,
         TranslatePipe,
     ],

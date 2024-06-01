@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalDirective, ModalModel, ModalPlacementDirective, StatefulControlComponent, TranslatePipe, Types } from '@app/framework';
@@ -29,7 +29,6 @@ export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
         AssetFolderDropdownItemComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgIf,
         TranslatePipe,
     ],
 })

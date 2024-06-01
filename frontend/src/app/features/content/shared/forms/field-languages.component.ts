@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppLanguageDto, FieldForm, LanguageSelectorComponent, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
@@ -18,7 +18,6 @@ import { AppLanguageDto, FieldForm, LanguageSelectorComponent, TourHintDirective
     imports: [
         AsyncPipe,
         LanguageSelectorComponent,
-        NgIf,
         TourHintDirective,
         TourStepDirective,
         TranslatePipe,

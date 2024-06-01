@@ -1,68 +1,97 @@
 <ul class="nav nav-light flex-column">
-    <li class="nav-item nav-heading" *ngIf="app.canReadClients || app.canReadRoles || app.canReadContributors">
-        {{ 'common.security' | sqxTranslate }}
-    </li>
-    <li class="nav-item" *ngIf="app.canReadClients" sqxTourStep="clients">
-        <a class="nav-link" routerLink="clients" routerLinkActive="active">
-            <i class="icon-clients"></i> {{ 'common.clients' | sqxTranslate }}
-        </a>
-    </li>
-    <li class="nav-item" *ngIf="app.canReadContributors" sqxTourStep="contributors">
-        <a class="nav-link" routerLink="contributors" routerLinkActive="active">
-            <i class="icon-contributors"></i> {{ 'common.contributors' | sqxTranslate }}
-        </a>
-    </li>
-    <li class="nav-item" *ngIf="app.canReadRoles" sqxTourStep="roles">
-        <a class="nav-link" routerLink="roles" routerLinkActive="active">
-            <i class="icon-roles"></i> {{ 'common.roles' | sqxTranslate }}
-        </a>
-    </li>
+    @if (app.canReadClients || app.canReadRoles || app.canReadContributors) {
+        <li class="nav-item nav-heading">
+            {{ "common.security" | sqxTranslate }}
+        </li>
+    }
+    @if (app.canReadClients) {
+        <li class="nav-item" sqxTourStep="clients">
+            <a class="nav-link" routerLink="clients" routerLinkActive="active">
+                <i class="icon-clients"></i>
+                {{ "common.clients" | sqxTranslate }}
+            </a>
+        </li>
+    }
+    @if (app.canReadContributors) {
+        <li class="nav-item" sqxTourStep="contributors">
+            <a class="nav-link" routerLink="contributors" routerLinkActive="active">
+                <i class="icon-contributors"></i>
+                {{ "common.contributors" | sqxTranslate }}
+            </a>
+        </li>
+    }
+    @if (app.canReadRoles) {
+        <li class="nav-item" sqxTourStep="roles">
+            <a class="nav-link" routerLink="roles" routerLinkActive="active">
+                <i class="icon-roles"></i>
+                {{ "common.roles" | sqxTranslate }}
+            </a>
+        </li>
+    }
 
     <li class="nav-item nav-heading">
-        {{ 'common.editing' | sqxTranslate }}
+        {{ "common.editing" | sqxTranslate }}
     </li>
-    <li class="nav-item" *ngIf="app.canReadAssetsScripts" sqxTourStep="asset-scripts">
-        <a class="nav-link" routerLink="asset-scripts" routerLinkActive="active">
-            <i class="icon-assets"></i> {{ 'common.assetScripts' | sqxTranslate }}
-        </a>
-    </li>
+    @if (app.canReadAssetsScripts) {
+        <li class="nav-item" sqxTourStep="asset-scripts">
+            <a class="nav-link" routerLink="asset-scripts" routerLinkActive="active">
+                <i class="icon-assets"></i>
+                {{ "common.assetScripts" | sqxTranslate }}
+            </a>
+        </li>
+    }
     <li class="nav-item" sqxTourStep="ui">
         <a class="nav-link" routerLink="settings" routerLinkActive="active" sqxTourStep="clients">
-            <i class="icon-patterns"></i> {{ 'appSettings.title' | sqxTranslate }}
+            <i class="icon-patterns"></i>
+            {{ "appSettings.title" | sqxTranslate }}
         </a>
     </li>
-    <li class="nav-item" *ngIf="app.canReadLanguages" sqxTourStep="languages">
-        <a class="nav-link" routerLink="languages" routerLinkActive="active">
-            <i class="icon-languages"></i> {{ 'common.languages' | sqxTranslate }}
-        </a>
-    </li>
-    <li class="nav-item" *ngIf="app.canReadWorkflows" sqxTourStep="workflows">
-        <a class="nav-link" routerLink="workflows" routerLinkActive="active">
-            <i class="icon-workflows"></i> {{ 'common.workflows' | sqxTranslate }}
-        </a>
-    </li>
+    @if (app.canReadLanguages) {
+        <li class="nav-item" sqxTourStep="languages">
+            <a class="nav-link" routerLink="languages" routerLinkActive="active">
+                <i class="icon-languages"></i>
+                {{ "common.languages" | sqxTranslate }}
+            </a>
+        </li>
+    }
+    @if (app.canReadWorkflows) {
+        <li class="nav-item" sqxTourStep="workflows">
+            <a class="nav-link" routerLink="workflows" routerLinkActive="active">
+                <i class="icon-workflows"></i>
+                {{ "common.workflows" | sqxTranslate }}
+            </a>
+        </li>
+    }
 
     <li class="nav-item nav-heading">
-        {{ 'common.more' | sqxTranslate }}
+        {{ "common.more" | sqxTranslate }}
     </li>
     <li class="nav-item" sqxTourStep="templates">
         <a class="nav-link" routerLink="templates" routerLinkActive="active">
-            <i class="icon-download"></i> {{ 'common.templates' | sqxTranslate }}
+            <i class="icon-download"></i>
+            {{ "common.templates" | sqxTranslate }}
         </a>
     </li>
-    <li class="nav-item" *ngIf="app.canReadJobs" sqxTourStep="jobs">
-        <a class="nav-link" routerLink="jobs" routerLinkActive="active">
-            <i class="icon-backups"></i> {{ 'common.jobsBackups' | sqxTranslate }}
-        </a>
-    </li>
-    <li class="nav-item" *ngIf="app.canReadPlans" sqxTourStep="plans">
-        <a class="nav-link" routerLink="plans" routerLinkActive="active">
-            <i class="icon-subscription"></i> {{ 'common.subscription' | sqxTranslate }}
-        </a>
-    </li>
+    @if (app.canReadJobs) {
+        <li class="nav-item" sqxTourStep="jobs">
+            <a class="nav-link" routerLink="jobs" routerLinkActive="active">
+                <i class="icon-backups"></i>
+                {{ "common.jobsBackups" | sqxTranslate }}
+            </a>
+        </li>
+    }
+    @if (app.canReadPlans) {
+        <li class="nav-item" sqxTourStep="plans">
+            <a class="nav-link" routerLink="plans" routerLinkActive="active">
+                <i class="icon-subscription"></i>
+                {{ "common.subscription" | sqxTranslate }}
+            </a>
+        </li>
+    }
     <li class="nav-item" sqxTourStep="more">
         <a class="nav-link" routerLink="more" routerLinkActive="active">
-            <i class="icon-settings"></i> {{ 'common.settings' | sqxTranslate }}
+            <i class="icon-settings"></i>
+            {{ "common.settings" | sqxTranslate }}
         </a>
     </li>
 </ul>

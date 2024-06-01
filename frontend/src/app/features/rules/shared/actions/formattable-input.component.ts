@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { AfterViewInit, ChangeDetectionStrategy, Component, forwardRef, Input, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CodeEditorComponent, ScriptCompletions, Types } from '@app/shared';
@@ -30,8 +30,6 @@ export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     imports: [
         CodeEditorComponent,
         FormsModule,
-        NgFor,
-        NgIf,
     ],
 })
 export class FormattableInputComponent implements ControlValueAccessor, AfterViewInit {

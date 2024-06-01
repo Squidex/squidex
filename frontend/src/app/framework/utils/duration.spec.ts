@@ -48,14 +48,14 @@ describe('Duration', () => {
         expect(actual).toBe('01:02:05');
     });
 
-    it('should print to string correctly for one partial seconds', () => {
+    it('should print to string correctly for partial seconds', () => {
         const time1 = DateTime.today();
-        const time2 = time1.addHours(1).addMinutes(2).addSeconds(4.555334);
+        const time2 = time1.addHours(1).addMinutes(2).addSeconds(4.32);
 
         const duration = Duration.create(time1, time2);
 
         const actual = duration.toString();
 
-        expect(actual).toBe('01:02:04');
+        expect(actual).toBe('01:02:05');
     });
 });

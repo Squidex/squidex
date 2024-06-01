@@ -1,27 +1,25 @@
-<ng-container *ngIf="formModel.field.isLocalizable && languages.length > 1">
-    <button *ngIf="!formModel.field.properties.isComplexUI" type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="toggleShowAllControls()">
-        <ng-container *ngIf="showAllControls; else singleLanguage">
-            <span>{{ 'contents.languageModeSingle' | sqxTranslate }}</span>
-        </ng-container>
-
-        <ng-template #singleLanguage>
-            <span>{{ 'contents.languageModeAll' | sqxTranslate }}</span>
-        </ng-template>
-    </button>
-
-    <ng-container *ngIf="formModel.field.properties.isComplexUI || !showAllControls">
+@if (formModel.field.isLocalizable && languages.length > 1) {
+    @if (!formModel.field.properties.isComplexUI) {
+        <button class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="toggleShowAllControls()" type="button">
+            @if (showAllControls) {
+                <span>{{ "contents.languageModeSingle" | sqxTranslate }}</span>
+            } @else {
+                <span>{{ "contents.languageModeAll" | sqxTranslate }}</span>
+            }
+        </button>
+    }
+    @if (formModel.field.properties.isComplexUI || !showAllControls) {
         <div class="button-container ms-1">
             <sqx-language-selector
-                size="sm"
                 [exists]="formModel.translationStatus | async"
-                (languageChange)="languageChange.emit($event)"
-                [language]="language"
-                [languages]="languages"
-                hintText="i18n:contents.validationHint"
                 hintAfter="120000"
                 hintPosition="top-end"
-                sqxTourStep="languages">
-            </sqx-language-selector>
+                hintText="i18n:contents.validationHint"
+                [language]="language"
+                (languageChange)="languageChange.emit($event)"
+                [languages]="languages"
+                size="sm"
+                sqxTourStep="languages"></sqx-language-selector>
         </div>
-    </ng-container>
-</ng-container>
+    }
+}

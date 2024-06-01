@@ -1,14 +1,16 @@
 <div #container (sqxResized)="updateContainerWidth($event.width)">
-    <div class="form-check" *ngFor="let value of tagValues; trackBy: trackByValue"
-        [class.form-check-block]="!snapshot.isSingleline"
-        [class.form-check-inline]="snapshot.isSingleline">
-        <input class="form-check-input" type="radio" id="{{controlId}}_{{value}}" [name]="controlId"
-            [disabled]="snapshot.isDisabled"
-            [ngModel]="valueModel"
-            (ngModelChange)="callChange($event)"
-            [value]="value.value"
-        />
-
-        <label class="form-check-label" for="{{controlId}}_{{value}}">{{value.name}}</label>
-    </div>
+    @for (value of tagValues; track value.id) {
+        <div class="form-check" [class.form-check-block]="!snapshot.isSingleline" [class.form-check-inline]="snapshot.isSingleline">
+            <input
+                class="form-check-input"
+                id="{{ controlId }}_{{ value }}"
+                [disabled]="snapshot.isDisabled"
+                [name]="controlId"
+                [ngModel]="valueModel"
+                (ngModelChange)="callChange($event)"
+                type="radio"
+                [value]="value.value" />
+            <label class="form-check-label" for="{{ controlId }}_{{ value }}">{{ value.name }}</label>
+        </div>
+    }
 </div>

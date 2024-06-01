@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 import { TranslatePipe } from '@app/framework';
 import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/internal';
 
@@ -17,7 +17,7 @@ import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/
     templateUrl: './asset-uploads-count-card.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgChartsModule,
+        BaseChartDirective,
         TranslatePipe,
     ],
 })

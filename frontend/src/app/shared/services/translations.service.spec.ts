@@ -5,21 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, TranslationDto, TranslationsService } from '@app/shared/internal';
 
 describe('TranslationsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-            ],
-            providers: [
-                TranslationsService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-            ],
-        });
+    imports: [],
+    providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+        TranslationsService,
+        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+    ],
+});
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {

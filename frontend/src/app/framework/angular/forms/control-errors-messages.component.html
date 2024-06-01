@@ -1,7 +1,9 @@
-<div class="errors-container" *ngIf="errorMessages && errorMessages.length > 0" @fade>
-    <div class="errors">
-        <ng-container *ngFor="let message of errorMessages">
-            {{message}}
-        </ng-container>
+@if (errorMessages && errorMessages.length > 0) {
+    <div class="errors-container" @fade>
+        <div class="errors">
+            @for (message of errorMessages; track message) {
+                {{ message }}
+            }
+        </div>
     </div>
-</div>
+}

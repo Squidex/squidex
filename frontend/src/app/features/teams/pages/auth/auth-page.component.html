@@ -1,4 +1,4 @@
-<sqx-layout layout="main" titleText="i18n:common.auth" titleIcon="shield" innerWidth="50">
+<sqx-layout innerWidth="50" layout="main" titleIcon="shield" titleText="i18n:common.auth">
     <ng-container>
         <sqx-list-view innerWidth="50rem">
             <ng-container content>
@@ -6,158 +6,144 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-auto">
-                                <sqx-toggle [disabled]="!isEditable"
-                                    [ngModel]="isEditing"
-                                    (ngModelChange)="toggle($event)">
-                                </sqx-toggle>
+                                <sqx-toggle [disabled]="!isEditable" [ngModel]="isEditing" (ngModelChange)="toggle($event)"></sqx-toggle>
                             </div>
 
                             <div class="col">
-                                <h5>{{ 'teams.auth.use' | sqxTranslate }}</h5>
+                                <h5>{{ "teams.auth.use" | sqxTranslate }}</h5>
 
                                 <sqx-form-hint marginTop="2">
-                                    {{ 'teams.auth.useHint' | sqxTranslate }}
+                                    {{ "teams.auth.useHint" | sqxTranslate }}
                                 </sqx-form-hint>
                             </div>
                         </div>
-                    </div>    
+                    </div>
 
-                    <form [formGroup]="updateForm.form" (ngSubmit)="save()" *ngIf="isEditing">
-                        <div class="card-body">
-                            <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
-
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label" for="domain">{{ 'teams.auth.domain' | sqxTranslate }}</label>
-                        
-                                <div class="col-9">
-                                    <sqx-control-errors for="domain"></sqx-control-errors>
-
-                                    <input class="form-control" id="domain" formControlName="domain">
-                        
-                                    <sqx-form-hint>
-                                        {{ 'teams.auth.domainHint' | sqxTranslate }}
-                                    </sqx-form-hint>
-                        
-                                    <sqx-form-hint>
-                                        {{ 'teams.auth.domainHintEmail' | sqxTranslate }}: <strong>user&commat;{{ updateForm.domainValue$ | async }}</strong>
-                                    </sqx-form-hint>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label" for="displayName">{{ 'teams.auth.displayName' | sqxTranslate }}</label>
-                        
-                                <div class="col-9">
-                                    <sqx-control-errors for="displayName"></sqx-control-errors>
-
-                                    <input class="form-control" id="displayName" formControlName="displayName">
-                        
-                                    <sqx-form-hint>
-                                        {{ 'teams.auth.displayNameHint' | sqxTranslate }}
-                                    </sqx-form-hint>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label" for="clientId">{{ 'teams.auth.clientId' | sqxTranslate }}</label>
-                        
-                                <div class="col-9">
-                                    <sqx-control-errors for="clientId"></sqx-control-errors>
-
-                                    <input class="form-control" id="clientId" formControlName="clientId">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label" for="clientSecret">{{ 'teams.auth.clientSecret' | sqxTranslate }}</label>
-                        
-                                <div class="col-9">
-                                    <sqx-control-errors for="clientSecret"></sqx-control-errors>
-
-                                    <input class="form-control" id="clientSecret" formControlName="clientSecret">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label" for="authority">{{ 'teams.auth.authority' | sqxTranslate }}</label>
-                        
-                                <div class="col-9">
-                                    <sqx-control-errors for="authority"></sqx-control-errors>
-
-                                    <input class="form-control" id="authority" formControlName="authority">
-                        
-                                    <sqx-form-hint>
-                                        {{ 'teams.auth.authorityHint' | sqxTranslate }}
-                                    </sqx-form-hint>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label" for="signoutRedirectUrl">{{ 'teams.auth.signoutRedirectUrl' | sqxTranslate }}</label>
-                        
-                                <div class="col-9">
-                                    <sqx-control-errors for="signoutRedirectUrl"></sqx-control-errors>
-                                    
-                                    <input class="form-control" id="signoutRedirectUrl" formControlName="signoutRedirectUrl">
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-3 col-form-label" for="redirectUrl">{{ 'teams.auth.redirectUrl' | sqxTranslate }}</label>
-                        
-                                <div class="col-9">
-                                    <div class="input-group">
-                                        <input readonly class="form-control" value="{{urlToRedirect}}" #redirectUri>
-                
-                                        <button type="button" class="btn btn-outline-secondary" [sqxCopy]="redirectUri">
-                                            <i class="icon-copy"></i>
-                                        </button>
+                    @if (isEditing) {
+                        <form [formGroup]="updateForm.form" (ngSubmit)="save()">
+                            <div class="card-body">
+                                <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="domain">{{ "teams.auth.domain" | sqxTranslate }}</label>
+                                    <div class="col-9">
+                                        <sqx-control-errors for="domain"></sqx-control-errors>
+                                        <input class="form-control" id="domain" formControlName="domain" />
+                                        <sqx-form-hint>
+                                            {{ "teams.auth.domainHint" | sqxTranslate }}
+                                        </sqx-form-hint>
+                                        <sqx-form-hint>
+                                            {{ "teams.auth.domainHintEmail" | sqxTranslate }}:
+                                            <strong>user&commat;{{ updateForm.domainValue$ | async }}</strong>
+                                        </sqx-form-hint>
                                     </div>
-
-                                    <sqx-form-hint>
-                                        {{ 'teams.auth.redirectUrlHint' | sqxTranslate }}
-                                    </sqx-form-hint>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="displayName">
+                                        {{ "teams.auth.displayName" | sqxTranslate }}
+                                    </label>
+                                    <div class="col-9">
+                                        <sqx-control-errors for="displayName"></sqx-control-errors>
+                                        <input class="form-control" id="displayName" formControlName="displayName" />
+                                        <sqx-form-hint>
+                                            {{ "teams.auth.displayNameHint" | sqxTranslate }}
+                                        </sqx-form-hint>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="clientId">{{ "teams.auth.clientId" | sqxTranslate }}</label>
+                                    <div class="col-9">
+                                        <sqx-control-errors for="clientId"></sqx-control-errors>
+                                        <input class="form-control" id="clientId" formControlName="clientId" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="clientSecret">
+                                        {{ "teams.auth.clientSecret" | sqxTranslate }}
+                                    </label>
+                                    <div class="col-9">
+                                        <sqx-control-errors for="clientSecret"></sqx-control-errors>
+                                        <input class="form-control" id="clientSecret" formControlName="clientSecret" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="authority">{{ "teams.auth.authority" | sqxTranslate }}</label>
+                                    <div class="col-9">
+                                        <sqx-control-errors for="authority"></sqx-control-errors>
+                                        <input class="form-control" id="authority" formControlName="authority" />
+                                        <sqx-form-hint>
+                                            {{ "teams.auth.authorityHint" | sqxTranslate }}
+                                        </sqx-form-hint>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="signoutRedirectUrl">
+                                        {{ "teams.auth.signoutRedirectUrl" | sqxTranslate }}
+                                    </label>
+                                    <div class="col-9">
+                                        <sqx-control-errors for="signoutRedirectUrl"></sqx-control-errors>
+                                        <input class="form-control" id="signoutRedirectUrl" formControlName="signoutRedirectUrl" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="redirectUrl">
+                                        {{ "teams.auth.redirectUrl" | sqxTranslate }}
+                                    </label>
+                                    <div class="col-9">
+                                        <div class="input-group">
+                                            <input class="form-control" #redirectUri readonly value="{{ urlToRedirect }}" />
+                                            <button class="btn btn-outline-secondary" [sqxCopy]="redirectUri" type="button">
+                                                <i class="icon-copy"></i>
+                                            </button>
+                                        </div>
+                                        <sqx-form-hint>
+                                            {{ "teams.auth.redirectUrlHint" | sqxTranslate }}
+                                        </sqx-form-hint>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                
-                        <div class="card-footer">
-                            <div class="d-flex justify-content-between">
-                                <a type="type" class="float-end btn btn-success" target="_blank" href="{{urlToTest}}?{{updateForm.url | async}}">
-                                    {{ 'teams.auth.testLogin' | sqxTranslate }}
-                                </a>
-
-                                <button type="submit" class="float-end btn btn-primary" [disabled]="!isEditable">
-                                    {{ 'common.save' | sqxTranslate }}
-                                </button>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between">
+                                    <a
+                                        class="float-end btn btn-success"
+                                        href="{{ urlToTest }}?{{ updateForm.url | async }}"
+                                        target="_blank"
+                                        type="type">
+                                        {{ "teams.auth.testLogin" | sqxTranslate }}
+                                    </a>
+                                    <button class="float-end btn btn-primary" [disabled]="!isEditable" type="submit">
+                                        {{ "common.save" | sqxTranslate }}
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    }
                 </div>
             </ng-container>
         </sqx-list-view>
     </ng-container>
-    
+
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="history"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="history"
                 title="i18n:common.history"
-                titlePosition="left"
-                sqxTourStep="history">
+                titlePosition="left">
                 <i class="icon-time"></i>
             </a>
-            <a class="panel-link"
+            <a
+                class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="help"
                 title="i18n:common.help"
-                titlePosition="left"
-                sqxTourStep="help">
+                titlePosition="left">
                 <i class="icon-help2"></i>
             </a>
         </div>

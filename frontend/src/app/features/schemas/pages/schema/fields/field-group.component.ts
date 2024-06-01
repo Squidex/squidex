@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppSettingsDto, FieldDto, FieldGroup, LanguageDto, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 import { FieldComponent } from './field.component';
@@ -26,8 +26,6 @@ interface State {
         CdkDragHandle,
         CdkDropList,
         FieldComponent,
-        NgFor,
-        NgIf,
     ],
 })
 export class FieldGroupComponent extends StatefulComponent<State> {

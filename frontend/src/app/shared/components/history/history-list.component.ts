@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FromNowPipe, TooltipDirective } from '@app/framework';
 import { HistoryEventDto } from '@app/shared/internal';
@@ -21,8 +21,6 @@ import { HistoryMessagePipe } from './pipes';
     imports: [
         FromNowPipe,
         HistoryMessagePipe,
-        NgFor,
-        NgIf,
         TooltipDirective,
         UserNameRefPipe,
         UserPictureRefPipe,
@@ -31,8 +29,4 @@ import { HistoryMessagePipe } from './pipes';
 export class HistoryListComponent {
     @Input({ required: true })
     public events: ReadonlyArray<HistoryEventDto> | undefined | null;
-
-    public trackByEvent(_index: number, event: HistoryEventDto) {
-        return event.eventId;
-    }
 }

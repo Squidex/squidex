@@ -1,11 +1,9 @@
-<ng-container *ngIf="selectedTeam | async; let team">
+@if (selectedTeam | async; as team) {
     <sqx-title [message]="team.name"></sqx-title>
-    
     <div class="sidebar">
         <sqx-left-menu [team]="team"></sqx-left-menu>
     </div>
-    
-    <div sqxLayoutContainer class="panel-container">
+    <div class="panel-container" sqxLayoutContainer>
         <router-outlet></router-outlet>
     </div>
-</ng-container>
+}

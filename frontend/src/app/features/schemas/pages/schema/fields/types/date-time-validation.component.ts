@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -24,8 +24,6 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
         FormHintComponent,
         FormsModule,
         LocalizedInputComponent,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         TranslatePipe,
     ],

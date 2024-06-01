@@ -1,13 +1,17 @@
-<div class="table-items-row  table-items-row-summary table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
-    {{ 'schemas.field.empty' | sqxTranslate }}
-    
-    <button type="button" class="btn btn-success btn-sm ms-2" (click)="fieldWizard.show()" *ngIf="schema.canAddField" sqxTourStep="addField">
-        <i class="icon icon-plus"></i> {{ 'schemas.addField' | sqxTranslate }}
-    </button>
-</div>
+@if (schema && schema.fields.length === 0) {
+    <div class="table-items-row table-items-row-summary table-items-row-empty">
+        {{ "schemas.field.empty" | sqxTranslate }}
+        @if (schema.canAddField) {
+            <button class="btn btn-success btn-sm ms-2" (click)="fieldWizard.show()" sqxTourStep="addField" type="button">
+                <i class="icon icon-plus"></i>
+                {{ "schemas.addField" | sqxTranslate }}
+            </button>
+        }
+    </div>
+}
 
-<ng-container *ngIf="appsState.selectedSettings| async; let settings">
-    <ng-container *ngIf="languageState.isoLanguages | async; let languages">
+@if (appsState.selectedSettings | async; as settings) {
+    @if (languageState.isoLanguages | async; as languages) {
         <sqx-sortable-field-list
             [fields]="schema.fields"
             [fieldsEmpty]="schema.fields.length === 0"
@@ -15,17 +19,13 @@
             [schema]="schema"
             [settings]="settings"
             [sortable]="schema.canOrderFields"
-            (sorted)="sortFields($event)">
-        </sqx-sortable-field-list>
-
-        <button type="button" class="btn btn-success field-button" (click)="fieldWizard.show()" *ngIf="schema.canAddField">
-            <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">{{ 'schemas.addFieldButton' | sqxTranslate }}</div>
-        </button>
-    </ng-container>
-
-    <sqx-field-wizard *sqxModal="fieldWizard"
-        [settings]="settings"
-        [schema]="schema"
-        (dialogClose)="fieldWizard.hide()">
-    </sqx-field-wizard>
-</ng-container>
+            (sorted)="sortFields($event)"></sqx-sortable-field-list>
+        @if (schema.canAddField) {
+            <button class="btn btn-success field-button" (click)="fieldWizard.show()" type="button">
+                <i class="icon icon-plus field-button-icon"></i>
+                <div class="field-button-text">{{ "schemas.addFieldButton" | sqxTranslate }}</div>
+            </button>
+        }
+    }
+    <sqx-field-wizard (dialogClose)="fieldWizard.hide()" [schema]="schema" [settings]="settings" *sqxModal="fieldWizard"></sqx-field-wizard>
+}

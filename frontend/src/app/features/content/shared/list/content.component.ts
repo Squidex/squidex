@@ -8,7 +8,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -31,8 +31,6 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         RouterLink,
         StopClickDirective,
         TabRouterlinkDirective,

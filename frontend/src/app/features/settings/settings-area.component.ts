@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AppsState, defined, LayoutComponent, TitleComponent } from '@app/shared';
@@ -19,7 +19,6 @@ import { SettingsMenuComponent } from './settings-menu.component';
     imports: [
         AsyncPipe,
         LayoutComponent,
-        NgIf,
         RouterOutlet,
         SettingsMenuComponent,
         TitleComponent,

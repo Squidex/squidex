@@ -1,19 +1,19 @@
 <sqx-title message="i18n:contents.calendar"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:contents.calendar" hideSidebar="true">
+<sqx-layout hideSidebar="true" layout="main" titleText="i18n:contents.calendar">
     <ng-container menu>
-        {{title}}
+        {{ title }}
 
-        <select class="form-select ms-4" [ngModel]="view" (ngModelChange)="changeView($event)" [disabled]="isLoading">
-            <option ngValue="day">{{ 'common.daily' | sqxTranslate }}</option>
-            <option ngValue="week">{{ 'common.weekly' | sqxTranslate }}</option>
-            <option ngValue="month">{{ 'common.monthly' | sqxTranslate }}</option>
+        <select class="form-select ms-4" [disabled]="isLoading" [ngModel]="view" (ngModelChange)="changeView($event)">
+            <option ngValue="day">{{ "common.daily" | sqxTranslate }}</option>
+            <option ngValue="week">{{ "common.weekly" | sqxTranslate }}</option>
+            <option ngValue="month">{{ "common.monthly" | sqxTranslate }}</option>
         </select>
 
-        <button type="button" class="btn btn-text-secondary btn-navigate ms-2" (click)="goPrev()" [disabled]="isLoading">
+        <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goPrev()" [disabled]="isLoading" type="button">
             <i class="icon-caret-left"></i>
         </button>
-        <button type="button" class="btn btn-text-secondary btn-navigate ms-2" (click)="goNext()" [disabled]="isLoading">
+        <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goNext()" [disabled]="isLoading" type="button">
             <i class="icon-caret-right"></i>
         </button>
     </ng-container>
@@ -23,106 +23,93 @@
     </ng-container>
 </sqx-layout>
 
-<sqx-modal-dialog *sqxModal="contentDialog" (dialogClose)="contentDialog.hide()">
+<sqx-modal-dialog (dialogClose)="contentDialog.hide()" *sqxModal="contentDialog">
     <ng-container title>
-        {{ 'common.content' | sqxTranslate }}
+        {{ "common.content" | sqxTranslate }}
     </ng-container>
 
     <ng-container content>
-        <div *ngIf="contentSelected && contentSelected.scheduleJob">
-            <div class="form-group row">
-                <label class="col-4 col-form-label">{{ 'common.id' | sqxTranslate }}</label>
-        
-                <div class="col-8">
-                    <div class="input-group">
-                        <input readonly class="form-control" name="id" id="id" value="{{contentSelected.id}}" #inputId>
-    
-                        <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputId">
-                            <i class="icon-copy"></i>
-                        </button>
+        @if (contentSelected && contentSelected.scheduleJob) {
+            <div>
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">{{ "common.id" | sqxTranslate }}</label>
+                    <div class="col-8">
+                        <div class="input-group">
+                            <input class="form-control" id="id" #inputId name="id" readonly value="{{ contentSelected.id }}" />
+                            <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
+                                <i class="icon-copy"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="form-group form-group-aligned row">
-                <label class="col-4 col-form-label">{{ 'common.content' | sqxTranslate }}</label>
-        
-                <div class="col-8">
-                    <a class="truncate" [routerLink]="['../', contentSelected.schemaName, contentSelected.id]">
-                        {{createContentName(contentSelected)}}
-                    </a>
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ "common.content" | sqxTranslate }}</label>
+                    <div class="col-8">
+                        <a class="truncate" [routerLink]="['../', contentSelected.schemaName, contentSelected.id]">
+                            {{ createContentName(contentSelected) }}
+                        </a>
+                    </div>
                 </div>
-            </div>
-
-            <div class="form-group form-group-aligned row">
-                <label class="col-4 col-form-label">{{ 'common.schema' | sqxTranslate }}</label>
-        
-                <div class="col-8">
-                    <a class="truncate" [routerLink]="['../', contentSelected.schemaName]">
-                        {{contentSelected.schemaDisplayName}}
-                    </a>
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ "common.schema" | sqxTranslate }}</label>
+                    <div class="col-8">
+                        <a class="truncate" [routerLink]="['../', contentSelected.schemaName]">
+                            {{ contentSelected.schemaDisplayName }}
+                        </a>
+                    </div>
                 </div>
-            </div>
-
-            <div class="form-group form-group-aligned row">
-                <label class="col-4 col-form-label">{{ 'common.status' | sqxTranslate }}</label>
-        
-                <div class="col-8">
-                    <sqx-content-status
-                        layout="text"
-                        [status]="contentSelected.status"
-                        [statusColor]="contentSelected.statusColor"
-                        small="true">
-                    </sqx-content-status>
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ "common.status" | sqxTranslate }}</label>
+                    <div class="col-8">
+                        <sqx-content-status
+                            layout="text"
+                            small="true"
+                            [status]="contentSelected.status"
+                            [statusColor]="contentSelected.statusColor"></sqx-content-status>
+                    </div>
                 </div>
-            </div>
-
-            <hr />
-
-            <div class="form-group form-group-aligned row">
-                <label class="col-4 col-form-label">{{ 'contents.scheduledToLabel' | sqxTranslate }}</label>
-        
-                <div class="col-8">
-                    <sqx-content-status
-                        layout="text"
-                        [status]="contentSelected.scheduleJob.status"
-                        [statusColor]="contentSelected.scheduleJob.color"
-                        small="true">
-                    </sqx-content-status>
-                </div>
-            </div>
-
-            <div class="form-group form-group-aligned row">
-                <label class="col-4 col-form-label">{{ 'contents.scheduledAt' | sqxTranslate }}</label>
-        
-                <div class="col-8">
-                    {{contentSelected.scheduleJob.dueTime | sqxFullDateTime}}
-                </div>
-            </div>
-
-            <div class="form-group form-group-aligned row">
-                <label class="col-4 col-form-label">{{ 'contents.scheduledBy' | sqxTranslate }}</label>
-        
-                <div class="col-8">
-                    <img class="user-picture" [src]="contentSelected.scheduleJob.scheduledBy | sqxUserPictureRef"> {{contentSelected.scheduleJob.scheduledBy | sqxUserNameRef}}
-                </div>
-            </div>
-
-            <ng-container *ngIf="contentSelected.canCancelStatus">
                 <hr />
-
-                <div class="row">
-                    <div class="col-8 offset-4">
-                        <button type="button" class="btn btn-outline-danger" [class.disabled]="!contentSelected.canCancelStatus"
-                            (sqxConfirmClick)="cancelStatus()"
-                            confirmTitle="i18n:contents.cancelStatusConfirmTitle"
-                            confirmText="i18n:contents.cancelStatusConfirmText"
-                            confirmRememberKey="cancelStatus">
-                            {{ 'contents.cancelStatus' | sqxTranslate }}
-                        </button>
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ "contents.scheduledToLabel" | sqxTranslate }}</label>
+                    <div class="col-8">
+                        <sqx-content-status
+                            layout="text"
+                            small="true"
+                            [status]="contentSelected.scheduleJob.status"
+                            [statusColor]="contentSelected.scheduleJob.color"></sqx-content-status>
                     </div>
                 </div>
-            </ng-container>
-        </div>
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ "contents.scheduledAt" | sqxTranslate }}</label>
+                    <div class="col-8">
+                        {{ contentSelected.scheduleJob.dueTime | sqxFullDateTime }}
+                    </div>
+                </div>
+                <div class="form-group form-group-aligned row">
+                    <label class="col-4 col-form-label">{{ "contents.scheduledBy" | sqxTranslate }}</label>
+                    <div class="col-8">
+                        <img class="user-picture" [src]="contentSelected.scheduleJob.scheduledBy | sqxUserPictureRef" />
+                        {{ contentSelected.scheduleJob.scheduledBy | sqxUserNameRef }}
+                    </div>
+                </div>
+                @if (contentSelected.canCancelStatus) {
+                    <hr />
+                    <div class="row">
+                        <div class="col-8 offset-4">
+                            <button
+                                class="btn btn-outline-danger"
+                                [class.disabled]="!contentSelected.canCancelStatus"
+                                confirmRememberKey="cancelStatus"
+                                confirmText="i18n:contents.cancelStatusConfirmText"
+                                confirmTitle="i18n:contents.cancelStatusConfirmTitle"
+                                (sqxConfirmClick)="cancelStatus()"
+                                type="button">
+                                {{ "contents.cancelStatus" | sqxTranslate }}
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
     </ng-container>
 </sqx-modal-dialog>

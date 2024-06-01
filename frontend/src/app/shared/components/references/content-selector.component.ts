@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, forwardRef, Input, numberAttribute, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
@@ -35,8 +35,6 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
         LanguageSelectorComponent,
         ListViewComponent,
         ModalDialogComponent,
-        NgFor,
-        NgIf,
         PagerComponent,
         SyncWidthDirective,
         TooltipDirective,
@@ -198,9 +196,5 @@ export class ContentSelectorComponent implements OnInit {
 
     private updateModel() {
         this.querySource.next(this.schema);
-    }
-
-    public trackByContent(_index: number, content: ContentDto): string {
-        return content.id;
     }
 }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AppDto, Settings, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -17,7 +17,6 @@ import { AppDto, Settings, TourStepDirective, TranslatePipe } from '@app/shared'
     templateUrl: './left-menu.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgIf,
         RouterLink,
         RouterLinkActive,
         TourStepDirective,

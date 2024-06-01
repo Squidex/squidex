@@ -1,36 +1,47 @@
-<ng-container *ngIf="languages.length > 1">
-    <ng-container *ngIf="languages.length > 3 || percents; else smallMode">
-        <button type="button" class="btn btn-outline-secondary btn-{{size}} dropdown-toggle" title="{{language.englishName}}" (click)="dropdown.toggle()" #button tabindex="-1">
-            {{language.iso2Code}}
+@if (languages.length > 1) {
+    @if (languages.length > 3 || percents) {
+        <button
+            class="btn btn-outline-secondary btn-{{ size }} dropdown-toggle"
+            #button
+            (click)="dropdown.toggle()"
+            tabindex="-1"
+            title="{{ language.englishName }}"
+            type="button">
+            {{ language.iso2Code }}
         </button>
-    
-        <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="button" scrollY="true" [position]="dropdownPosition">
+        <sqx-dropdown-menu [position]="dropdownPosition" scrollY="true" [sqxAnchoredTo]="button" *sqxModal="dropdown; closeAlways: true">
             <table>
                 <tbody>
-                    <tr class="dropdown-item" *ngFor="let supported of languages; trackBy: trackByLanguage" 
-                        [class.active]="supported === language"
-                        [class.missing]="exists && !exists[supported.iso2Code]"
-                        (click)="selectLanguage(supported)">
-                        <td class="text-language">{{supported.iso2Code}}</td>
-                        <td>({{supported.englishName}})</td>
-
-                        <td *ngIf="percents" class="text-right">
-                            {{percents[supported.iso2Code] || 0}} %
-                        </td>
-                    </tr>
+                    @for (supported of languages; track supported.iso2Code) {
+                        <tr
+                            class="dropdown-item"
+                            [class.active]="supported === language"
+                            [class.missing]="exists && !exists[supported.iso2Code]"
+                            (click)="selectLanguage(supported)">
+                            <td class="text-language">{{ supported.iso2Code }}</td>
+                            <td>({{ supported.englishName }})</td>
+                            @if (percents) {
+                                <td class="text-right">{{ percents[supported.iso2Code] || 0 }} %</td>
+                            }
+                        </tr>
+                    }
                 </tbody>
             </table>
         </sqx-dropdown-menu>
-    </ng-container>
-
-    <ng-template #smallMode>
-        <div class="btn-group btn-group-{{size}}">
-            <button type="button" class="btn btn-outline-secondary" *ngFor="let supported of languages; trackBy: trackByLanguage" title="{{supported.englishName}}" 
-                [class.active]="supported === language"
-                [class.missing]="exists && !exists[supported.iso2Code]"
-                (click)="selectLanguage(supported)" tabindex="-1">
-                <span>{{supported.iso2Code}}</span>
-            </button>
+    } @else {
+        <div class="btn-group btn-group-{{ size }}">
+            @for (supported of languages; track supported.iso2Code) {
+                <button
+                    class="btn btn-outline-secondary"
+                    [class.active]="supported === language"
+                    [class.missing]="exists && !exists[supported.iso2Code]"
+                    (click)="selectLanguage(supported)"
+                    tabindex="-1"
+                    title="{{ supported.englishName }}"
+                    type="button">
+                    <span>{{ supported.iso2Code }}</span>
+                </button>
+            }
         </div>
-    </ng-template>
-</ng-container>
+    }
+}

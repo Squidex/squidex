@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HTTP, MarkdownDirective, ResizedDirective, StatefulComponent, TranslatePipe, Types } from '@app/framework';
@@ -33,8 +33,6 @@ interface State {
     templateUrl: './chat-item.component.html',
     imports: [
         MarkdownDirective,
-        NgFor,
-        NgIf,
         ResizedDirective,
         TranslatePipe,
         UserIdPicturePipe,

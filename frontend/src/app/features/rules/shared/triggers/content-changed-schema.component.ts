@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, switchMap } from 'rxjs';
@@ -23,7 +23,6 @@ import { CompletionsCache } from './completions-cache';
         ConfirmClickDirective,
         ControlErrorsComponent,
         FormsModule,
-        NgFor,
         ReactiveFormsModule,
         TranslatePipe,
     ],
@@ -51,9 +50,5 @@ export class ContentChangedSchemaComponent {
                 value$(this.form.controls['schemaId']).pipe(
                     switchMap(x => this.completionsCache.getCompletions(x, true)));
         }
-    }
-
-    public trackBySchema(_index: number, schema: SchemaDto) {
-        return schema.id;
     }
 }

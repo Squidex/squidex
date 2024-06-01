@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -24,7 +24,6 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
         FormErrorComponent,
         FormsModule,
         ModalDialogComponent,
-        NgIf,
         ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,

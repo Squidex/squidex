@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { NgFor } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StopClickDirective } from '@app/framework';
@@ -25,7 +25,6 @@ import { ContentListFieldComponent } from '../contents/content-list-field.compon
         ContentListCellDirective,
         ContentListFieldComponent,
         FormsModule,
-        NgFor,
         StopClickDirective,
     ],
 })

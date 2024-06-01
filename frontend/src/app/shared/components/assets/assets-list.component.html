@@ -1,88 +1,84 @@
-<div class="file-drop" (sqxDropFile)="addFiles($event)" *ngIf="!isDisabled && (assetsState.canCreate | async)" sqxTourStep="upload">
-    <h3 class="file-drop-header">{{ 'assets.uploadByDrop' | sqxTranslate }}</h3>
-
-    <div class="file-drop-or">{{ 'common.or' | sqxTranslate }}</div>
-
-    <div class="file-drop-button">
-        <span class="btn btn-success" (click)="fileInput.click()">
-            <span>{{ 'assets.uploadByDialog' | sqxTranslate }})</span>
-
-            <input class="file-drop-button-input" type="file" (change)="addFiles($any($event.target!)['files'])" #fileInput multiple>
-        </span>
-    </div>
-
-    <div class="file-drop-info">{{ 'assets.uploadHint' | sqxTranslate }}</div>
-</div>
-
-<div cdkDropListGroup *ngIf="assetsState.path | async; let path">
-    <div class="folders" *ngIf="path.length > 0">
-        <ng-container *ngIf="(assetsState.hasFolders | async) || (assetsState.parentFolder | async)">
-            <h5>{{ 'common.folders' | sqxTranslate }}</h5>
-        </ng-container>
-
-        <div class="row g-0">
-            <div class="folder-container" *ngIf="assetsState.parentFolder | async; let parent"
-                cdkDropList
-                [cdkDropListData]="parent?.id"
-                (cdkDropListDropped)="move($event)">
-                <div class="folder-container-over"></div>
-    
-                <sqx-asset-folder [assetPathItem]="parent"
-                    (navigate)="assetsState.navigate($event.id)">
-                </sqx-asset-folder>
-            </div>
-            
-            <div class="folder-container" *ngFor="let assetFolder of assetsState.folders | async; trackBy: trackByAssetFolder"
-                cdkDropList 
-                cdkDropListSortingDisabled
-                [cdkDropListEnterPredicate]="canEnter"
-                [cdkDropListData]="assetFolder.id" 
-                (cdkDropListDropped)="move($event)">
-                <div class="folder-container-over"></div>
-
-                <sqx-asset-folder [assetPathItem]="assetFolder"
-                    cdkDrag
-                    [cdkDragData]="assetFolder"
-                    [cdkDragDisabled]="isDisabled || !assetFolder.canMove"
-                    (navigate)="assetsState.navigate($event.id)" (delete)="deleteAssetFolder($event)">
-                </sqx-asset-folder>
-            </div>
+@if (!isDisabled && (assetsState.canCreate | async)) {
+    <div class="file-drop" (sqxDropFile)="addFiles($event)" sqxTourStep="upload">
+        <h3 class="file-drop-header">{{ "assets.uploadByDrop" | sqxTranslate }}</h3>
+        <div class="file-drop-or">{{ "common.or" | sqxTranslate }}</div>
+        <div class="file-drop-button">
+            <span class="btn btn-success" (click)="fileInput.click()">
+                <span>{{ "assets.uploadByDialog" | sqxTranslate }})</span>
+                <input class="file-drop-button-input" #fileInput (change)="addFiles($any($event.target!)['files'])" multiple type="file" />
+            </span>
         </div>
+        <div class="file-drop-info">{{ "assets.uploadHint" | sqxTranslate }}</div>
     </div>
+}
 
-    <ng-container *ngIf="assetsState.assets | async; let assets">
-        <ng-container *ngIf="assets.length > 0 || snapshot.newFiles.length > 0">
-            <h5>{{ 'common.files' | sqxTranslate }}</h5>
-        </ng-container>
-        
-        <div class="row g-0" [class.unrow]="isListView"
-            cdkDropList
-            cdkDropListSortingDisabled>
-            <sqx-asset *ngFor="let file of snapshot.newFiles" 
-                [assetFile]="file"
-                [isDisabled]="isDisabled"
-                [isListView]="isListView"
-                (loadDone)="add(file, $event)"
-                (loadError)="remove(file)"
-                [folderId]="assetsState.parentId">
-            </sqx-asset>
-
-            <sqx-asset *ngFor="let asset of assets; trackBy: trackByAsset"
-                cdkDrag
-                [asset]="asset"
-                [cdkDragData]="asset"
-                [cdkDragDisabled]="isDisabled || !asset.canMove"
-                (delete)="deleteAsset(asset)"
-                (edit)="edit.emit($event)"
-                [folderIcon]="showFolderIcon && path.length === 0"
-                [isDisabled]="isDisabled"
-                [isListView]="isListView"
-                [isSelectable]="!!selectedIds"
-                [isSelected]="!!isSelected(asset)"
-                (loadDone)="replaceAsset($event)"
-                (selectAsset)="assetSelect.emit(asset)" 
-                (selectFolder)="selectFolder(asset)">
-            </sqx-asset>
-        </div>
-    </ng-container>
-</div>
+@if (assetsState.path | async; as path) {
+    <div cdkDropListGroup>
+        @if (path.length > 0) {
+            <div class="folders">
+                @if ((assetsState.hasFolders | async) || (assetsState.parentFolder | async)) {
+                    <h5>{{ "common.folders" | sqxTranslate }}</h5>
+                }
+                <div class="row g-0">
+                    @if (assetsState.parentFolder | async; as parent) {
+                        <div class="folder-container" cdkDropList [cdkDropListData]="parent?.id" (cdkDropListDropped)="move($event)">
+                            <div class="folder-container-over"></div>
+                            <sqx-asset-folder [assetPathItem]="parent" (navigate)="assetsState.navigate($event.id)"></sqx-asset-folder>
+                        </div>
+                    }
+                    @for (assetFolder of assetsState.folders | async; track assetFolder.id) {
+                        <div
+                            class="folder-container"
+                            cdkDropList
+                            [cdkDropListData]="assetFolder.id"
+                            (cdkDropListDropped)="move($event)"
+                            [cdkDropListEnterPredicate]="canEnter"
+                            cdkDropListSortingDisabled>
+                            <div class="folder-container-over"></div>
+                            <sqx-asset-folder
+                                [assetPathItem]="assetFolder"
+                                cdkDrag
+                                [cdkDragData]="assetFolder"
+                                [cdkDragDisabled]="isDisabled || !assetFolder.canMove"
+                                (delete)="deleteAssetFolder($event)"
+                                (navigate)="assetsState.navigate($event.id)"></sqx-asset-folder>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        @if (assetsState.assets | async; as assets) {
+            @if (assets.length > 0 || snapshot.newFiles.length > 0) {
+                <h5>{{ "common.files" | sqxTranslate }}</h5>
+            }
+            <div class="row g-0" cdkDropList cdkDropListSortingDisabled [class.unrow]="isListView">
+                @for (file of snapshot.newFiles; track file) {
+                    <sqx-asset
+                        [assetFile]="file"
+                        [folderId]="assetsState.parentId"
+                        [isDisabled]="isDisabled"
+                        [isListView]="isListView"
+                        (loadDone)="add(file, $event)"
+                        (loadError)="remove(file)"></sqx-asset>
+                }
+                @for (asset of assets; track asset.id) {
+                    <sqx-asset
+                        [asset]="asset"
+                        cdkDrag
+                        [cdkDragData]="asset"
+                        [cdkDragDisabled]="isDisabled || !asset.canMove"
+                        (delete)="deleteAsset(asset)"
+                        (edit)="edit.emit($event)"
+                        [folderIcon]="showFolderIcon && path.length === 0"
+                        [isDisabled]="isDisabled"
+                        [isListView]="isListView"
+                        [isSelectable]="!!selectedIds"
+                        [isSelected]="!!isSelected(asset)"
+                        (loadDone)="replaceAsset($event)"
+                        (selectAsset)="assetSelect.emit(asset)"
+                        (selectFolder)="selectFolder(asset)"></sqx-asset>
+                }
+            </div>
+        }
+    </div>
+}

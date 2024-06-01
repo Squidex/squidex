@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgSwitch, NgSwitchCase } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormHintComponent, SchemaDto, TranslatePipe } from '@app/shared';
@@ -39,8 +39,6 @@ import { TagsUIComponent } from '../types/tags-ui.component';
         FormsModule,
         GeolocationUIComponent,
         JsonUIComponent,
-        NgSwitch,
-        NgSwitchCase,
         NumberUIComponent,
         ReactiveFormsModule,
         RichTextUIComponent,

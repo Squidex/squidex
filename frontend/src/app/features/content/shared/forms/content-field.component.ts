@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Optional, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, AppsState, changed$, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, SchemaDto, Settings, TooltipDirective, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
@@ -24,8 +24,6 @@ import { FieldLanguagesComponent } from './field-languages.component';
         FieldEditorComponent,
         FieldLanguagesComponent,
         FocusMarkerComponent,
-        NgFor,
-        NgIf,
         TooltipDirective,
     ],
 })
@@ -180,10 +178,6 @@ export class ContentFieldComponent {
 
     public getControlCompare() {
         return this.formModelCompare?.get(this.language.iso2Code);
-    }
-
-    public trackByLanguage(_index: number, language: AppLanguageDto) {
-        return language.iso2Code;
     }
 
     private showAllControlsKey() {

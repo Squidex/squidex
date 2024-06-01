@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -45,8 +45,6 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
         ListViewComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         NotifoComponent,
         PagerComponent,
         RouterLink,
@@ -298,10 +296,6 @@ export class ContentsPageComponent implements OnInit {
                 this.selectedAll = false;
             }
         }
-    }
-
-    public trackByContent(_index: number, content: ContentDto): string {
-        return content.id;
     }
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {

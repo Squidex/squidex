@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ConfirmClickDirective, StopClickDirective, TooltipDirective, UserDtoPicture } from '@app/shared';
@@ -21,7 +21,6 @@ import { UserDto, UsersState } from '../../internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ConfirmClickDirective,
-        NgIf,
         RouterLink,
         RouterLinkActive,
         StopClickDirective,

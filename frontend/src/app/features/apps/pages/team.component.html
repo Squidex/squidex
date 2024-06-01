@@ -1,24 +1,25 @@
 <div class="team-header">
     <div class="row align-items-center">
         <div class="col">
-            <h3>{{team.name}}</h3>
+            <h3>{{ team.name }}</h3>
         </div>
         <div class="col-auto">
-            <a class="link" [routerLink]="['/app/teams', team.id]" sqxStopClick>{{ 'common.edit' | sqxTranslate }}</a>
+            <a class="link" [routerLink]="['/app/teams', team.id]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" sqxStopClick #buttonOptions>
-                <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
+            <button class="btn btn-sm btn-text-secondary" #buttonOptions (click)="dropdown.toggle()" sqxStopClick type="button">
+                <span class="hidden">{{ "common.options" | sqxTranslate }}</span>
                 <i class="icon-dots"></i>
             </button>
-    
-            <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
-                <a class="dropdown-item dropdown-item-delete"
-                    (sqxConfirmClick)="leave.emit(team)"
-                    confirmTitle="i18n:teams.leaveConfirmTitle"
+
+            <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
+                <a
+                    class="dropdown-item dropdown-item-delete"
+                    confirmRememberKey="leaveApp"
                     confirmText="i18n:teams.leaveConfirmText"
-                    confirmRememberKey="leaveApp">
-                    {{ 'teams.leave' | sqxTranslate }}
+                    confirmTitle="i18n:teams.leaveConfirmTitle"
+                    (sqxConfirmClick)="leave.emit(team)">
+                    {{ "teams.leave" | sqxTranslate }}
                 </a>
             </sqx-dropdown-menu>
         </div>

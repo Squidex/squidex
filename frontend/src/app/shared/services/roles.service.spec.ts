@@ -5,23 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, Resource, ResourceLinks, RoleDto, RolesDto, RolesPayload, RolesService, Version } from '@app/shared/internal';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('RolesService', () => {
     const version = new Version('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-            ],
-            providers: [
-                RolesService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-            ],
-        });
+    imports: [],
+    providers: [
+        RolesService,
+        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+});
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {

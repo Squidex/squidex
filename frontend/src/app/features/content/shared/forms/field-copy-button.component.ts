@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldForm, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
@@ -21,8 +21,6 @@ import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldFor
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         TooltipDirective,
         TranslatePipe,
     ],

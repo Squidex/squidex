@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { AfterViewInit, booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto, TranslatePipe } from '@app/shared';
@@ -24,7 +24,6 @@ import { FieldFormValidationComponent } from './field-form-validation.component'
         FieldFormUIComponent,
         FieldFormValidationComponent,
         JsonMoreComponent,
-        NgIf,
         TranslatePipe,
     ],
 })

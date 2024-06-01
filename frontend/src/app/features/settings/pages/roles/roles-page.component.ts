@@ -7,11 +7,11 @@
 
 /* eslint-disable no-return-assign */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { AppsState, AutocompleteSource, FormHintComponent, LayoutComponent, ListViewComponent, RoleDto, RolesService, RolesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppsState, AutocompleteSource, FormHintComponent, LayoutComponent, ListViewComponent, RolesService, RolesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { RoleAddFormComponent } from './role-add-form.component';
 import { RoleComponent } from './role.component';
 
@@ -41,8 +41,6 @@ class PermissionsAutocomplete implements AutocompleteSource {
         FormHintComponent,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
-        NgIf,
         RoleAddFormComponent,
         RoleComponent,
         RouterLink,
@@ -75,9 +73,5 @@ export class RolesPageComponent implements OnInit {
 
     public reload() {
         this.rolesState.load(true);
-    }
-
-    public trackByRole(_index: number, role: RoleDto) {
-        return role.name;
     }
 }

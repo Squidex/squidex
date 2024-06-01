@@ -1,28 +1,40 @@
-<div class="field-list field-list-assigned" #assignedList="cdkDropList"
+<div
+    class="field-list field-list-assigned"
+    #assignedList="cdkDropList"
     cdkDropList
-    [cdkDropListData]="fieldsAdded"
     [cdkDropListConnectedTo]="[availableList]"
+    [cdkDropListData]="fieldsAdded"
     (cdkDropListDropped)="drop($event)">
-    <label>{{ 'schemas.ui' | sqxTranslate }}</label>
+    <label>{{ "schemas.ui" | sqxTranslate }}</label>
 
-    <div class="empty-hint" *ngIf="fieldsAdded.length === 0">
-        <sqx-form-alert>{{emptyText}}</sqx-form-alert>
-    </div>
-
-    <div *ngFor="let field of fieldsAdded" class="table-items-row table-items-row-summary truncate" cdkDrag>
-        <i class="icon-drag2 drag-handle"></i> {{(field.title || field.label) | sqxTranslate}}: <code>{{field.name}}</code>
-    </div>
+    @for (field of fieldsAdded; track field) {
+        <div class="table-items-row table-items-row-summary truncate" cdkDrag>
+            <i class="icon-drag2 drag-handle"></i>
+            {{ field.title || field.label | sqxTranslate }}:
+            <code>{{ field.name }}</code>
+        </div>
+    } @empty {
+        <div class="empty-hint">
+            <sqx-form-alert>{{ emptyText }}</sqx-form-alert>
+        </div>
+    }
 </div>
 
-<div class="field-list field-list-available" #availableList="cdkDropList"
+<div
+    class="field-list field-list-available"
+    #availableList="cdkDropList"
     cdkDropList
-    cdkDropListSortingDisabled
-    [cdkDropListData]="fieldsNotAdded"
     [cdkDropListConnectedTo]="[assignedList]"
-    (cdkDropListDropped)="drop($event)">
-    <label>{{ 'schemas.ui.unassignedFields' | sqxTranslate }}</label>
-    
-    <div *ngFor="let field of fieldsNotAdded" class="table-items-row table-items-row-summary truncate" cdkDrag>
-        <i class="icon-drag2 drag-handle"></i> {{(field.title || field.label) | sqxTranslate}}: <code>{{field.name}}</code>
-    </div>
+    [cdkDropListData]="fieldsNotAdded"
+    (cdkDropListDropped)="drop($event)"
+    cdkDropListSortingDisabled>
+    <label>{{ "schemas.ui.unassignedFields" | sqxTranslate }}</label>
+
+    @for (field of fieldsNotAdded; track field) {
+        <div class="table-items-row table-items-row-summary truncate" cdkDrag>
+            <i class="icon-drag2 drag-handle"></i>
+            {{ field.title || field.label | sqxTranslate }}:
+            <code>{{ field.name }}</code>
+        </div>
+    }
 </div>

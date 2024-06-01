@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ClientDto, ClientsState, LayoutComponent, ListViewComponent, RolesState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ClientsState, LayoutComponent, ListViewComponent, RolesState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { ClientAddFormComponent } from './client-add-form.component';
 import { ClientComponent } from './client.component';
 
@@ -23,8 +23,6 @@ import { ClientComponent } from './client.component';
         ClientComponent,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
-        NgIf,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -51,9 +49,5 @@ export class ClientsPageComponent implements OnInit {
 
     public reload() {
         this.clientsState.load(true);
-    }
-
-    public trackByClient(_index: number, client: ClientDto) {
-        return client.id;
     }
 }

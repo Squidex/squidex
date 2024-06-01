@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { ArrayFieldPropertiesDto, FieldDto, TranslatePipe } from '@app/shared';
@@ -19,7 +19,6 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
     templateUrl: 'array-ui.component.html',
     imports: [
         FormsModule,
-        NgFor,
         ReactiveFormsModule,
         TranslatePipe,
     ],

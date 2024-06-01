@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ALL_TRIGGERS, LayoutComponent, ListViewComponent, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
@@ -20,8 +20,6 @@ import { RuleComponent } from './rule.component';
         AsyncPipe,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
-        NgIf,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -71,9 +69,5 @@ export class RulesPageComponent implements OnInit {
 
     public toggle(rule: RuleDto) {
         this.rulesState.update(rule, { isEnabled: !rule.isEnabled });
-    }
-
-    public trackByRule(_index: number, rule: RuleDto) {
-        return rule.id;
     }
 }

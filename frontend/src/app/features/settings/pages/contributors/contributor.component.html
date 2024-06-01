@@ -1,21 +1,26 @@
 <tr>
     <td class="cell-user">
-        <img class="user-picture" title="{{contributor.contributorName}}" [src]="contributor.contributorId | sqxUserPicture">
+        <img class="user-picture" [src]="contributor.contributorId | sqxUserPicture" title="{{ contributor.contributorName }}" />
     </td>
     <td class="cell-auto">
-        <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight:search"></span>
+        <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight: search"></span>
     </td>
     <td class="cell-time">
-        <select class="form-select" [ngModel]="contributor.role" (ngModelChange)="changeRole($event)" [disabled]="!contributor.canUpdate">
-            <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
+        <select class="form-select" [disabled]="!contributor.canUpdate" [ngModel]="contributor.role" (ngModelChange)="changeRole($event)">
+            @for (role of roles; track role) {
+                <option [ngValue]="role.name">{{ role.name }}</option>
+            }
         </select>
     </td>
     <td class="cell-actions">
-        <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke"
-            (sqxConfirmClick)="remove()"
-            confirmTitle="i18n:contributors.deleteConfirmTitle"
+        <button
+            class="btn btn-text-danger"
+            confirmRememberKey="removeContributor"
             confirmText="i18n:contributors.deleteConfirmText"
-            confirmRememberKey="removeContributor">
+            confirmTitle="i18n:contributors.deleteConfirmTitle"
+            [disabled]="!contributor.canRevoke"
+            (sqxConfirmClick)="remove()"
+            type="button">
             <i class="icon-bin2"></i>
         </button>
     </td>

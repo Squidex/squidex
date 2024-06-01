@@ -1,52 +1,62 @@
 <div class="container">
     <div class="header">
-        <button type="button" class="btn btn-secondary btn-sm" (click)="resetDefault()">
-            {{ 'contents.viewReset' | sqxTranslate }}
+        <button class="btn btn-secondary btn-sm" (click)="resetDefault()" type="button">
+            {{ "contents.viewReset" | sqxTranslate }}
         </button>
     </div>
-    
-    <hr>
 
-    <div
-        cdkDropList
-        [cdkDropListData]="listFields"
-        (cdkDropListDropped)="drop($event)">
-        <div *ngFor="let field of listFields" cdkDrag>
-            <i class="icon-drag2 drag-handle"></i> 
-            
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" checked (click)="removeField(field)" id="field_{{field}}" [disabled]="!field">
-                <label class="form-check-label" for="field_{{field}}">
-                    <span *ngIf="field.name">
-                        {{(field.title || field.label) | sqxTranslate}}: <code>{{field.name}}</code>
-                    </span>
-                    <span class="text-muted" *ngIf="!field.name">
-                        - Placeholder -
-                    </span>
-                </label>
-            </div>
-        </div>
-    </div>
-    
-    <ng-container *ngIf="fieldsNotAdded.length > 0">
-        <hr>
-        
-        <div >
-            <div *ngFor="let field of fieldsNotAdded">    
-                <i class="icon-drag2 drag-handle invisible"></i> 
-    
+    <hr />
+
+    <div cdkDropList [cdkDropListData]="listFields" (cdkDropListDropped)="drop($event)">
+        @for (field of listFields; track field) {
+            <div cdkDrag>
+                <i class="icon-drag2 drag-handle"></i>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" (click)="addField(field)" id="field_{{field}}">
-                    <label class="form-check-label" for="field_{{field}}">
-                        <span *ngIf="field.name">
-                            {{(field.title || field.label) | sqxTranslate}}: <code>{{field.name}}</code>
-                        </span>
-                        <span class="text-muted" *ngIf="!field.name">
-                            - Placeholder -
-                        </span>
+                    <input
+                        class="form-check-input"
+                        id="field_{{ field }}"
+                        checked
+                        (click)="removeField(field)"
+                        [disabled]="!field"
+                        type="checkbox" />
+                    <label class="form-check-label" for="field_{{ field }}">
+                        @if (field.name) {
+                            <span>
+                                {{ field.title || field.label | sqxTranslate }}:
+                                <code>{{ field.name }}</code>
+                            </span>
+                        }
+                        @if (!field.name) {
+                            <span class="text-muted">- Placeholder -</span>
+                        }
                     </label>
                 </div>
             </div>
+        }
+    </div>
+
+    @if (fieldsNotAdded.length > 0) {
+        <hr />
+        <div>
+            @for (field of fieldsNotAdded; track field) {
+                <div>
+                    <i class="icon-drag2 drag-handle invisible"></i>
+                    <div class="form-check">
+                        <input class="form-check-input" id="field_{{ field }}" (click)="addField(field)" type="checkbox" />
+                        <label class="form-check-label" for="field_{{ field }}">
+                            @if (field.name) {
+                                <span>
+                                    {{ field.title || field.label | sqxTranslate }}:
+                                    <code>{{ field.name }}</code>
+                                </span>
+                            }
+                            @if (!field.name) {
+                                <span class="text-muted">- Placeholder -</span>
+                            }
+                        </label>
+                    </div>
+                </div>
+            }
         </div>
-    </ng-container>
+    }
 </div>

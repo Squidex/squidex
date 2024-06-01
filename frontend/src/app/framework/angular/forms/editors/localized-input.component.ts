@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgSwitch, NgSwitchCase } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
@@ -39,8 +39,6 @@ interface State {
         FormsModule,
         IndeterminateValueDirective,
         LanguageSelectorComponent,
-        NgSwitch,
-        NgSwitchCase,
         TagEditorComponent,
     ],
 })

@@ -2,43 +2,48 @@
     <ng-container *ngTemplateOutlet="topHeaderTemplate"></ng-container>
 </div>
 
-<ng-container *ngIf="!syncedHeader">
-    <div class="list-header" [class.loading-indicator]="isLoading" #headerElement>
-        <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
+@if (!syncedHeader) {
+    <div class="list-header" #headerElement [class.loading-indicator]="isLoading">
+        <div class="inner" [style.maxWidth]="innerWidth" [style.minWidth]="innerWidth">
             <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
         </div>
     </div>
-    
-    <div class="list-content normal" [class.loading-indicator]="isLoading" #contentElement [sqxCompensateScrollbar]="innerWidth !== '100%'">
-        <div class="inner normal" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth" [class.tabled]="table" [class.tabled2]="noPadding">
+    <div class="list-content normal" #contentElement [class.loading-indicator]="isLoading" [sqxCompensateScrollbar]="innerWidth !== '100%'">
+        <div
+            class="inner normal"
+            [class.tabled]="table"
+            [class.tabled2]="noPadding"
+            [style.maxWidth]="innerWidth"
+            [style.minWidth]="innerWidth">
             <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
         </div>
     </div>
-</ng-container>
+}
 
-<ng-container *ngIf="syncedHeader">
-    <div class="list-header synced" [class.loading-indicator]="isLoading" #headerElement>
-        <div class="sync-inner inner" [class.tabled2]="tableNoPadding" #header>
+@if (syncedHeader) {
+    <div class="list-header synced" #headerElement [class.loading-indicator]="isLoading">
+        <div class="sync-inner inner" #header [class.tabled2]="tableNoPadding">
             <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
         </div>
     </div>
-    
     <div class="list-content synced" [class.loading-indicator]="isLoading" [sqxSyncScrolling]="header">
         <div class="inner" [class.tabled]="table" [class.tabled2]="tableNoPadding">
             <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
         </div>
     </div>
-</ng-container>
+}
 
-<div class="list-footer" [class.loading-indicator]="isLoading" #footerElement>
-    <div class="inner" [style.minWidth]="innerWidth" [style.maxWidth]="innerWidth">
+<div class="list-footer" #footerElement [class.loading-indicator]="isLoading">
+    <div class="inner" [style.maxWidth]="innerWidth" [style.minWidth]="innerWidth">
         <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
     </div>
 </div>
 
-<div class="loader text-center" *ngIf="isLoading">
-    <sqx-loader></sqx-loader>
-</div>
+@if (isLoading) {
+    <div class="loader text-center">
+        <sqx-loader></sqx-loader>
+    </div>
+}
 
 <ng-template #contentTemplate>
     <ng-content></ng-content>

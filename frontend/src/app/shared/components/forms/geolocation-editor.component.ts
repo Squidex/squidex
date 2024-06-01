@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, inject, Input, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { ControlErrorsComponent, ResizedDirective, StringHelper, TooltipDirective, TranslatePipe } from '@app/framework';
@@ -42,7 +42,6 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     imports: [
         ControlErrorsComponent,
         FormsModule,
-        NgIf,
         ReactiveFormsModule,
         ResizedDirective,
         TooltipDirective,

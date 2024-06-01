@@ -2,24 +2,26 @@
     <div class="card-header">
         <div class="row g-1">
             <div class="col col-name">
-                <sqx-editable-title 
+                <sqx-editable-title
                     [disabled]="!client.canUpdate"
-                    (inputTitleChange)="rename($event)"
                     [inputTitle]="client.name"
-                    inputTitleLength="100">
-                </sqx-editable-title>
+                    (inputTitleChange)="rename($event)"
+                    inputTitleLength="100"></sqx-editable-title>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-primary" (click)="connectDialog.show()" sqxTourStep="connect">
-                    {{ 'clients.connect' | sqxTranslate }}
+                <button class="btn btn-primary" (click)="connectDialog.show()" sqxTourStep="connect" type="button">
+                    {{ "clients.connect" | sqxTranslate }}
                 </button>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-text-danger" [disabled]="!client.canRevoke"
-                    (sqxConfirmClick)="revoke()"
-                    confirmTitle="i18n:clients.deleteConfirmTitle"
+                <button
+                    class="btn btn-text-danger"
+                    confirmRememberKey="revokeClient"
                     confirmText="i18n:clients.deleteConfirmText"
-                    confirmRememberKey="revokeClient">
+                    confirmTitle="i18n:clients.deleteConfirmTitle"
+                    [disabled]="!client.canRevoke"
+                    (sqxConfirmClick)="revoke()"
+                    type="button">
                     <i class="icon-bin2"></i>
                 </button>
             </div>
@@ -29,13 +31,13 @@
         <div class="container">
             <div class="form-group row">
                 <label class="col-3 col-form-label">
-                    {{ 'common.clientId' | sqxTranslate }}
+                    {{ "common.clientId" | sqxTranslate }}
                 </label>
                 <div class="col">
                     <div class="input-group">
-                        <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #clientId>
+                        <input class="form-control" #clientId readonly value="{{ appsState.appName }}:{{ client.id }}" />
 
-                        <button type="button" class="btn btn-outline-secondary" [sqxCopy]="clientId">
+                        <button class="btn btn-outline-secondary" [sqxCopy]="clientId" type="button">
                             <i class="icon-copy"></i>
                         </button>
                     </div>
@@ -44,13 +46,13 @@
 
             <div class="form-group row">
                 <label class="col-3 col-form-label">
-                    {{ 'common.clientSecret' | sqxTranslate }}
+                    {{ "common.clientSecret" | sqxTranslate }}
                 </label>
                 <div class="col">
                     <div class="input-group">
-                        <input readonly class="form-control" [value]="client.secret" #inputSecret>
+                        <input class="form-control" #inputSecret readonly [value]="client.secret" />
 
-                        <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputSecret">
+                        <button class="btn btn-outline-secondary" [sqxCopy]="inputSecret" type="button">
                             <i class="icon-copy"></i>
                         </button>
                     </div>
@@ -59,11 +61,13 @@
 
             <div class="form-group row">
                 <label class="col-3 col-form-label">
-                    {{ 'common.role' | sqxTranslate }}
+                    {{ "common.role" | sqxTranslate }}
                 </label>
                 <div class="col">
                     <select class="form-select" [disabled]="!client.canUpdate" [ngModel]="client.role" (ngModelChange)="updateRole($event)">
-                        <option *ngFor="let role of clientRoles; trackBy: trackByRole" [ngValue]="role.name">{{role.name}}</option>
+                        @for (role of clientRoles; track role.name) {
+                            <option [ngValue]="role.name">{{ role.name }}</option>
+                        }
                     </select>
                 </div>
             </div>
@@ -71,37 +75,45 @@
             <div class="form-group row">
                 <div class="col offset-3">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="{{client.id}}_allowAnonymous" [disabled]="!client.canUpdate" [ngModel]="client.allowAnonymous" (ngModelChange)="updateAllowAnonymous($event)">
-            
-                        <label class="form-check-label" for="{{client.id}}_allowAnonymous">
-                            {{ 'clients.allowAnonymous' | sqxTranslate }}
+                        <input
+                            class="form-check-input"
+                            id="{{ client.id }}_allowAnonymous"
+                            [disabled]="!client.canUpdate"
+                            [ngModel]="client.allowAnonymous"
+                            (ngModelChange)="updateAllowAnonymous($event)"
+                            type="checkbox" />
+
+                        <label class="form-check-label" for="{{ client.id }}_allowAnonymous">
+                            {{ "clients.allowAnonymous" | sqxTranslate }}
                         </label>
                     </div>
-        
+
                     <sqx-form-hint>
-                        {{ 'clients.allowAnonymousHint' | sqxTranslate }}
+                        {{ "clients.allowAnonymousHint" | sqxTranslate }}
                     </sqx-form-hint>
                 </div>
             </div>
 
             <div class="form-group row gx-2">
                 <label class="col-3 col-form-label">
-                    {{ 'clients.apiCallsLimit' | sqxTranslate }}
+                    {{ "clients.apiCallsLimit" | sqxTranslate }}
                 </label>
                 <div class="col">
                     <div class="row gx-2">
                         <div class="col">
-                            <input type="number" class="form-control" min="0" [disabled]="!client.canUpdate" [(ngModel)]="apiCallsLimit">
-        
+                            <input class="form-control" [disabled]="!client.canUpdate" min="0" [(ngModel)]="apiCallsLimit" type="number" />
+
                             <sqx-form-hint>
-                                {{ 'clients.apiCallsLimitHint' | sqxTranslate }}
+                                {{ "clients.apiCallsLimitHint" | sqxTranslate }}
                             </sqx-form-hint>
                         </div>
-                        <div class="col-auto" *ngIf="client.canUpdate">
-                            <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit()">
-                                {{ 'common.save' | sqxTranslate }}
-                            </button>
-                        </div>
+                        @if (client.canUpdate) {
+                            <div class="col-auto">
+                                <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit()">
+                                    {{ "common.save" | sqxTranslate }}
+                                </button>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -109,6 +121,4 @@
     </div>
 </div>
 
-<sqx-client-connect-form *sqxModal="connectDialog"
-    (dialogClose)="connectDialog.hide()" [client]="client">
-</sqx-client-connect-form>   
+<sqx-client-connect-form [client]="client" (dialogClose)="connectDialog.hide()" *sqxModal="connectDialog"></sqx-client-connect-form>

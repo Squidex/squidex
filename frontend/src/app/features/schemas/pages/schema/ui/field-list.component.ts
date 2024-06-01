@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormAlertComponent, META_FIELDS, SchemaDto, TableField, TranslatePipe } from '@app/shared';
 
@@ -22,8 +22,6 @@ const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELD
         CdkDrag,
         CdkDropList,
         FormAlertComponent,
-        NgFor,
-        NgIf,
         TranslatePipe,
     ],
 })

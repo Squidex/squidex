@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, ElementRef, forwardRef, Input, numberAttribute, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
@@ -60,8 +60,6 @@ const NO_EMIT = { emitEvent: false };
         LoaderComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         ScrollActiveDirective,
         StopClickDirective,

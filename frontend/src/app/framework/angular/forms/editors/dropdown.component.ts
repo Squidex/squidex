@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { AfterContentInit, booleanAttribute, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { map } from 'rxjs/operators';
@@ -53,8 +53,6 @@ interface State {
         LoaderComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         ScrollActiveDirective,
         TemplateWrapperDirective,

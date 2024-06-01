@@ -1,27 +1,33 @@
 <div class="card card-body mb-4">
-    <h5 class="card-title">{{ 'clients.add.title' | sqxTranslate }}</h5>
+    <h5 class="card-title">{{ "clients.add.title" | sqxTranslate }}</h5>
 
     <form [formGroup]="addClientForm.form" (ngSubmit)="addClient()">
         <div class="row gx-2">
             <div class="col">
                 <sqx-control-errors for="id"></sqx-control-errors>
 
-                <input class="form-control" formControlName="id" maxlength="40" placeholder="{{ 'clients.clientNamePlaceholder' | sqxTranslate }}" autocomplete="off" sqxTransformInput="LowerCase">
+                <input
+                    class="form-control"
+                    autocomplete="off"
+                    formControlName="id"
+                    maxlength="40"
+                    placeholder="{{ 'clients.clientNamePlaceholder' | sqxTranslate }}"
+                    sqxTransformInput="LowerCase" />
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-success" [disabled]="addClientForm.hasNoId | async">
-                    {{ 'clients.add' | sqxTranslate }}
+                <button class="btn btn-success" [disabled]="addClientForm.hasNoId | async" type="submit">
+                    {{ "clients.add" | sqxTranslate }}
                 </button>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-text-secondary" (click)="cancel()">
-                    {{ 'common.cancel' | sqxTranslate }}
+                <button class="btn btn-text-secondary" (click)="cancel()" type="button">
+                    {{ "common.cancel" | sqxTranslate }}
                 </button>
             </div>
         </div>
     </form>
 
     <sqx-form-hint>
-        {{ 'clients.add.description' | sqxTranslate }}
+        {{ "clients.add.description" | sqxTranslate }}
     </sqx-form-hint>
 </div>

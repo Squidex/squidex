@@ -1,51 +1,54 @@
-<ng-container [ngSwitch]="field">
-    <ng-container *ngSwitchCase="metaFields.id">
-        <small class="truncate">{{content.id}}</small>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.created">
-        <small class="truncate">{{content.created | sqxFromNow}}</small>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.createdByAvatar">
-        <img class="user-picture" title="{{content.createdBy | sqxUserNameRef}}" [src]="content.createdBy | sqxUserPictureRef">
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.createdByName">
-        <small class="truncate">{{content.createdBy | sqxUserNameRef}}</small>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.lastModified">
-        <small class="truncate">{{content.lastModified | sqxFromNow}}</small>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.lastModifiedByAvatar">
-        <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [src]="content.lastModifiedBy | sqxUserPictureRef">
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.lastModifiedByName">
-        <small class="truncate">{{content.lastModifiedBy | sqxUserNameRef}}</small>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.translationStatus">
+@switch (field) {
+    @case (metaFields.id) {
+        <small class="truncate">{{ content.id }}</small>
+    }
+    @case (metaFields.created) {
+        <small class="truncate">{{ content.created | sqxFromNow }}</small>
+    }
+    @case (metaFields.createdByAvatar) {
+        <img class="user-picture" [src]="content.createdBy | sqxUserPictureRef" title="{{ content.createdBy | sqxUserNameRef }}" />
+    }
+    @case (metaFields.createdByName) {
+        <small class="truncate">{{ content.createdBy | sqxUserNameRef }}</small>
+    }
+    @case (metaFields.lastModified) {
+        <small class="truncate">{{ content.lastModified | sqxFromNow }}</small>
+    }
+    @case (metaFields.lastModified) {
+        <small class="truncate">{{ content.lastModified | sqxFromNow }}</small>
+    }
+    @case (metaFields.lastModifiedByAvatar) {
+        <img
+            class="user-picture"
+            [src]="content.lastModifiedBy | sqxUserPictureRef"
+            title="{{ content.lastModifiedBy | sqxUserNameRef }}" />
+    }
+    @case (metaFields.lastModifiedByName) {
+        <small class="truncate">{{ content.lastModifiedBy | sqxUserNameRef }}</small>
+    }
+    @case (metaFields.translationStatus) {
         <sqx-translation-status
             [data]="content.data"
             [language]="language"
             [languages]="languages"
-            [schema]="schema">
-        </sqx-translation-status>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.translationStatusAverage">
+            [schema]="schema"></sqx-translation-status>
+    }
+    @case (metaFields.translationStatusAverage) {
         <sqx-translation-status
             [data]="content.data"
             [language]="undefined"
             [languages]="languages"
-            [schema]="schema">
-        </sqx-translation-status>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.status">
-        <ng-container *ngIf="content.newStatus; else singleStatus">
+            [schema]="schema"></sqx-translation-status>
+    }
+    @case (metaFields.status) {
+        @if (content.newStatus) {
             <div class="row g-0 status-grid">
                 <div class="col">
                     <sqx-content-status
                         layout="text"
                         [status]="content.status"
                         [statusColor]="content.statusColor"
-                        truncate="true">
-                    </sqx-content-status>
+                        truncate="true"></sqx-content-status>
                 </div>
                 <div class="col-auto">
                     <i class="icon-caret-right"></i>
@@ -53,71 +56,57 @@
                 <div class="col">
                     <sqx-content-status
                         layout="text"
+                        [scheduled]="content.scheduleJob"
                         [status]="content.newStatus"
                         [statusColor]="content.newStatusColor!"
-                        [scheduled]="content.scheduleJob"
-                        truncate="true">
-                    </sqx-content-status>
+                        truncate="true"></sqx-content-status>
                 </div>
             </div>
-        </ng-container>
-
-        <ng-template #singleStatus>
-            <sqx-content-status truncate="true" 
-                layout="text"
-                [status]="content.status"
-                [statusColor]="content.statusColor"
-                [scheduled]="content.scheduleJob">
-            </sqx-content-status>
-        </ng-template>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.statusNext">
-        <span class="truncate" *ngIf="content.scheduleJob">
+        } @else {
             <sqx-content-status
                 layout="text"
-                [status]="content.scheduleJob.status"
-                [statusColor]="content.scheduleJob.color">
-            </sqx-content-status>
-        
-            {{ 'contents.scheduledAt' | sqxTranslate }}&nbsp;{{content.scheduleJob.dueTime | sqxShortDate}}
-        </span>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.statusColor">
-        <ng-container *ngIf="content.newStatus; else singleStatus">
-            <span class="text-nowrap truncate">
+                [scheduled]="content.scheduleJob"
+                [status]="content.status"
+                [statusColor]="content.statusColor"
+                truncate="true"></sqx-content-status>
+        }
+    }
+    @case (metaFields.statusNext) {
+        @if (content.scheduleJob) {
+            <span class="truncate">
                 <sqx-content-status
-                    [status]="content.status"
-                    [statusColor]="content.statusColor">
-                </sqx-content-status>
-    
-                <i class="icon-caret-right"></i>
-    
-                <sqx-content-status
-                    [status]="content.newStatus"
-                    [statusColor]="content.newStatusColor!"
-                    [scheduled]="content.scheduleJob">
-                </sqx-content-status>
+                    layout="text"
+                    [status]="content.scheduleJob.status"
+                    [statusColor]="content.scheduleJob.color"></sqx-content-status>
+
+                {{ "contents.scheduledAt" | sqxTranslate }}&nbsp;{{ content.scheduleJob.dueTime | sqxShortDate }}
             </span>
-        </ng-container>
+        }
+    }
+    @case (metaFields.statusColor) {
+        @if (content.newStatus) {
+            <span class="text-nowrap truncate">
+                <sqx-content-status [status]="content.status" [statusColor]="content.statusColor"></sqx-content-status>
 
-        <ng-template #singleStatus>    
+                <i class="icon-caret-right"></i>
+
+                <sqx-content-status
+                    [scheduled]="content.scheduleJob"
+                    [status]="content.newStatus"
+                    [statusColor]="content.newStatusColor!"></sqx-content-status>
+            </span>
+        } @else {
             <sqx-content-status
+                [scheduled]="content.scheduleJob"
                 [status]="content.status"
-                [statusColor]="content.statusColor"
-                [scheduled]="content.scheduleJob">
-            </sqx-content-status>
-        </ng-template>
-    </ng-container>
-    <ng-container *ngSwitchCase="metaFields.version">
-        <small class="truncate">{{content.version.value}}</small>
-    </ng-container>
-    <ng-container *ngSwitchDefault>
-        <ng-container *ngIf="field.rootField && isInlineEditable && patchAllowed && patchForm; else displayTemplate">
-            <sqx-content-value-editor [form]="patchForm" [field]="field.rootField"></sqx-content-value-editor>
-        </ng-container>
-
-        <ng-template #displayTemplate>
-            <sqx-content-value [value]="snapshot.formatted" [field]="field" [fields]="fields"></sqx-content-value>
-        </ng-template>
-    </ng-container>
-</ng-container>
+                [statusColor]="content.statusColor"></sqx-content-status>
+        }
+    }
+    @default {
+        @if (field.rootField && isInlineEditable && patchAllowed && patchForm) {
+            <sqx-content-value-editor [field]="field.rootField" [form]="patchForm"></sqx-content-value-editor>
+        } @else {
+            <sqx-content-value [field]="field" [fields]="fields" [value]="snapshot.formatted"></sqx-content-value>
+        }
+    }
+}

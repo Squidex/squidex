@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, sorted, StatefulControlComponent, TranslatePipe, Types } from '@app/shared';
@@ -41,8 +41,6 @@ interface State {
         ContentSelectorComponent,
         ContentsColumnsPipe,
         ModalDirective,
-        NgFor,
-        NgIf,
         ReferenceItemComponent,
         ResizedDirective,
         TranslatePipe,
@@ -162,9 +160,5 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
 
     public setCompact(isCompact: boolean) {
         this.next({ isCompact });
-    }
-
-    public trackByContent(_index: number, content: ContentDto) {
-        return content.id;
     }
 }

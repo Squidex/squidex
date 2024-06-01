@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { of } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -27,8 +27,6 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
         DropdownMenuComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         TranslatePipe,
     ],
 })
@@ -57,9 +55,5 @@ export class NotificationDropdownComponent implements OnInit {
                     this.commentsState.markRead();
                 }),
             ));
-    }
-
-    public trackByComment(index: number) {
-        return index;
     }
 }

@@ -2,43 +2,47 @@
     <div class="card-body" sqxTourStep="app">
         <div class="row g-0">
             <div class="col-auto card-left">
-                <sqx-avatar [image]="app.image" [identifier]="app.name"></sqx-avatar>
+                <sqx-avatar [identifier]="app.name" [image]="app.image"></sqx-avatar>
             </div>
             <div class="col card-right">
-                <h3 class="card-title">{{app.displayName}}</h3>
+                <h3 class="card-title">{{ app.displayName }}</h3>
 
                 <div class="card-text card-links truncate">
-                    <a [routerLink]="['/app', app.name]" sqxStopClick>{{ 'common.edit' | sqxTranslate }}</a>
+                    <a [routerLink]="['/app', app.name]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
 
                     <span class="deeplinks">
                         &nbsp;|
-                        <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ 'common.content' | sqxTranslate }}</a> &middot;
-                        <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ 'common.assets' | sqxTranslate }}</a> &middot;
-                        <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ 'common.settings' | sqxTranslate }}</a>
+                        <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ "common.content" | sqxTranslate }}</a>
+                        &middot;
+                        <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ "common.assets" | sqxTranslate }}</a>
+                        &middot;
+                        <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ "common.settings" | sqxTranslate }}</a>
                     </span>
                 </div>
 
-                <div class="card-text" *ngIf="app.description">
-                    {{app.description}}
-                </div>
+                @if (app.description) {
+                    <div class="card-text">
+                        {{ app.description }}
+                    </div>
+                }
             </div>
         </div>
 
-        <ng-container *ngIf="app.canLeave">
-            <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" sqxStopClick #buttonOptions>
-                <span class="hidden">{{ 'common.options' | sqxTranslate }}</span>
+        @if (app.canLeave) {
+            <button class="btn btn-sm btn-text-secondary" #buttonOptions (click)="dropdown.toggle()" sqxStopClick type="button">
+                <span class="hidden">{{ "common.options" | sqxTranslate }}</span>
                 <i class="icon-dots"></i>
             </button>
-    
-            <sqx-dropdown-menu *sqxModal="dropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">
-                <a class="dropdown-item dropdown-item-delete"
-                    (sqxConfirmClick)="leave.emit(app)"
-                    confirmTitle="i18n:apps.leaveConfirmTitle"
+            <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
+                <a
+                    class="dropdown-item dropdown-item-delete"
+                    confirmRememberKey="leaveApp"
                     confirmText="i18n:apps.leaveConfirmText"
-                    confirmRememberKey="leaveApp">
-                    {{ 'apps.leave' | sqxTranslate }}
+                    confirmTitle="i18n:apps.leaveConfirmTitle"
+                    (sqxConfirmClick)="leave.emit(app)">
+                    {{ "apps.leave" | sqxTranslate }}
                 </a>
             </sqx-dropdown-menu>
-        </ng-container>
+        }
     </div>
 </div>

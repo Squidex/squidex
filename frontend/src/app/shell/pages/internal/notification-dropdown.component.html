@@ -2,26 +2,35 @@
     <span class="nav-link dropdown-toggle" (click)="modalMenu.show()">
         <i class="icon-comments"></i>
 
-        <span class="badge rounded-pill badge-danger" *ngIf="commentsState.unreadCountChanges| async; let unread">{{unread}}</span>
+        @if (commentsState.unreadCountChanges | async; as unread) {
+            <span class="badge rounded-pill badge-danger">{{ unread }}</span>
+        }
     </span>
 </li>
 
-<sqx-dropdown-menu *sqxModal="modalMenu;onRoot:false" [sqxAnchoredTo]="button" scrollY="true" offset="8" [scrollTop]="scrollMe.nativeElement.scrollHeight" #scrollMe>
-    <ng-container *ngIf="commentItems | async; let items">
-        <small class="text-muted" *ngIf="items.length === 0">
-            {{ 'notifications.empty' | sqxTranslate}}
-        </small>
-
-        <sqx-comment *ngFor="let item of items.slice().reverse(); trackBy: trackByComment; let i = index"
-            canAnswer="false"
-            confirmDelete="false"
-            canDelete="true"
-            canFollow="true"
-            [commentItem]="item"
-            [comments]="commentsState"
-            [mentionConfig]="{}"
-            [mentionUsers]="undefined"
-            [userToken]="commentUser">
-        </sqx-comment>
-    </ng-container>
+<sqx-dropdown-menu
+    #scrollMe
+    offset="8"
+    [scrollTop]="scrollMe.nativeElement.scrollHeight"
+    scrollY="true"
+    [sqxAnchoredTo]="button"
+    *sqxModal="modalMenu; onRoot: false">
+    @if (commentItems | async; as items) {
+        @for (item of items.slice().reverse(); track $index) {
+            <sqx-comment
+                canAnswer="false"
+                canDelete="true"
+                canFollow="true"
+                [commentItem]="item"
+                [comments]="commentsState"
+                confirmDelete="false"
+                [mentionConfig]="{}"
+                [mentionUsers]="undefined"
+                [userToken]="commentUser"></sqx-comment>
+        } @empty {
+            <small class="text-muted">
+                {{ "notifications.empty" | sqxTranslate }}
+            </small>
+        }
+    }
 </sqx-dropdown-menu>

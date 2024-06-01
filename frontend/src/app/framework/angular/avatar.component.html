@@ -1,1 +1,3 @@
-<img *ngIf="imageSource" [style.width]="imageSize" [style.height]="imageSize" [src]="imageSource | sqxSafeUrl" (error)="unsetImage()">
+@if (imageSource) {
+    <img (error)="unsetImage()" [src]="imageSource | sqxSafeUrl" [style.height]="imageSize" [style.width]="imageSize" />
+}

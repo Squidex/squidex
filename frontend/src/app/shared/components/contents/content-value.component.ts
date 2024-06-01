@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { LongHoverDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, TooltipDirective, TypedSimpleChanges } from '@app/framework';
 import { HtmlValue, TableField, TableSettings, Types } from '@app/shared/internal';
@@ -24,7 +24,6 @@ interface State {
         LongHoverDirective,
         ModalDirective,
         ModalPlacementDirective,
-        NgIf,
         StopClickDirective,
         TooltipDirective,
     ],

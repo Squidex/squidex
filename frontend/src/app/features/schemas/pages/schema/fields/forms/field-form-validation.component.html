@@ -2,9 +2,9 @@
     <div class="form-group row mb-3">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldRequired" formControlName="isRequired">
-                <label class="form-check-label" for="{{field.fieldId}}_fieldRequired">
-                    {{ 'schemas.field.required' | sqxTranslate }}
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldRequired" formControlName="isRequired" type="checkbox" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldRequired">
+                    {{ "schemas.field.required" | sqxTranslate }}
                 </label>
             </div>
         </div>
@@ -13,122 +13,95 @@
     <div class="form-group row mb-3">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldRequiredOnPublish" formControlName="isRequiredOnPublish">
-                <label class="form-check-label" for="{{field.fieldId}}_fieldRequiredOnPublish">
-                    {{ 'schemas.field.requiredOnPublish' | sqxTranslate }}
+                <input
+                    class="form-check-input"
+                    id="{{ field.fieldId }}_fieldRequiredOnPublish"
+                    formControlName="isRequiredOnPublish"
+                    type="checkbox" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldRequiredOnPublish">
+                    {{ "schemas.field.requiredOnPublish" | sqxTranslate }}
                 </label>
             </div>
         </div>
     </div>
 </div>
 
-<ng-container [ngSwitch]="field.rawProperties.fieldType">
-    <ng-container *ngSwitchCase="'Array'">
-        <sqx-array-validation
-            [fieldForm]="fieldForm"
-            [field]="field" 
-            [properties]="field.rawProperties">
-        </sqx-array-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Assets'">
+@switch (field.rawProperties.fieldType) {
+    @case ("Array") {
+        <sqx-array-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-array-validation>
+    }
+    @case ("Assets") {
         <sqx-assets-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-assets-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Boolean'">
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
+            [properties]="field.rawProperties"></sqx-assets-validation>
+    }
+    @case ("Boolean") {
         <sqx-boolean-validation
-            [languages]="languages"
+            [field]="field"
+            [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
-            [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-boolean-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Component'">
-        <sqx-component-validation
-            [fieldForm]="fieldForm"
-            [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-component-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Components'">
-        <sqx-components-validation
-            [fieldForm]="fieldForm"
-            [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-components-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'DateTime'">
+            [languages]="languages"
+            [properties]="field.rawProperties"></sqx-boolean-validation>
+    }
+    @case ("Component") {
+        <sqx-component-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-component-validation>
+    }
+    @case ("Components") {
+        <sqx-components-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-components-validation>
+    }
+    @case ("DateTime") {
         <sqx-date-time-validation
-            [languages]="languages"
+            [field]="field"
+            [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
-            [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-date-time-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Geolocation'">
-        <sqx-geolocation-validation
-            [fieldForm]="fieldForm"
-            [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-geolocation-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Json'">
-        <sqx-json-validation
-            [fieldForm]="fieldForm"
-            [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-json-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Number'">
+            [languages]="languages"
+            [properties]="field.rawProperties"></sqx-date-time-validation>
+    }
+    @case ("Geolocation") {
+        <sqx-geolocation-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-geolocation-validation>
+    }
+    @case ("Json") {
+        <sqx-json-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-json-validation>
+    }
+    @case ("Number") {
         <sqx-number-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
             [properties]="field.rawProperties"
-            [schema]="schema">
-        </sqx-number-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'References'">
+            [schema]="schema"></sqx-number-validation>
+    }
+    @case ("References") {
         <sqx-references-validation
-            [languages]="languages"
+            [field]="field"
+            [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
-            [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-references-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'RichText'">
-        <sqx-rich-text-validation
-            [fieldForm]="fieldForm"
-            [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-rich-text-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'String'">
+            [languages]="languages"
+            [properties]="field.rawProperties"></sqx-references-validation>
+    }
+    @case ("RichText") {
+        <sqx-rich-text-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-rich-text-validation>
+    }
+    @case ("String") {
         <sqx-string-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
             [properties]="field.rawProperties"
             [schema]="schema"
-            [settings]="settings">
-        </sqx-string-validation>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Tags'">
+            [settings]="settings"></sqx-string-validation>
+    }
+    @case ("Tags") {
         <sqx-tags-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
             [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-tags-validation>
-    </ng-container>
-</ng-container>
+            [fieldForm]="fieldForm"
+            [isLocalizable]="isLocalizable"
+            [languages]="languages"
+            [properties]="field.rawProperties"></sqx-tags-validation>
+    }
+}

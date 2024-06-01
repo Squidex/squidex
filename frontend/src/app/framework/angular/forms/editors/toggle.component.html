@@ -1,7 +1,9 @@
-<div class="toggle-container" (click)="changeState()"
+<div
+    class="toggle-container"
     [attr.data-state]="snapshot.isChecked ? 'checked' : snapshot.isChecked === false ? 'unchecked' : 'indeterminate'"
+    [class.checked]="snapshot.isChecked === true"
     [class.disabled]="snapshot.isDisabled"
-    [class.checked]="snapshot.isChecked === true" 
-    [class.unchecked]="snapshot.isChecked === false">
+    [class.unchecked]="snapshot.isChecked === false"
+    (click)="changeState()">
     <div class="toggle-button"></div>
 </div>

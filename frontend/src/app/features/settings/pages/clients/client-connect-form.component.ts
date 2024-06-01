@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, KeyValuePipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MarkdownInlinePipe, MarkdownPipe, MessageBus, ModalDialogComponent, SafeHtmlPipe, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
 
@@ -24,13 +24,9 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
         MarkdownInlinePipe,
         MarkdownPipe,
         ModalDialogComponent,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
         SafeHtmlPipe,
         TooltipDirective,
-        TranslatePipe,
+        TranslatePipe
     ],
 })
 export class ClientConnectFormComponent implements OnInit {

@@ -1,34 +1,38 @@
-<ng-container *ngIf="(formSection.visibleChanges | async) || formCompare">
-    <div class="header" *ngIf="formSection.separator; let separator">
-        <div class="row g-0 align">
-            <div class="col-auto">
-                <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
-                    <i [class.icon-caret-right]="snapshot.isCollapsed" [class.icon-caret-down]="!snapshot.isCollapsed"></i> 
-                </button>
-            </div>
-            <div class="col">
-                <h3>{{separator.displayName}}</h3>
-
-                <sqx-form-hint *ngIf="separator.properties.hints && separator.properties.hints.length > 0">
-                    <span [sqxMarkdown]="separator.properties.hints" optional="true" inline="true"></span>
-                </sqx-form-hint>
+@if ((formSection.visibleChanges | async) || formCompare) {
+    @if (formSection.separator; as separator) {
+        <div class="header">
+            <div class="row g-0 align">
+                <div class="col-auto">
+                    <button class="btn btn-sm btn-text-secondary" (click)="toggle()" type="button">
+                        <i [class.icon-caret-down]="!snapshot.isCollapsed" [class.icon-caret-right]="snapshot.isCollapsed"></i>
+                    </button>
+                </div>
+                <div class="col">
+                    <h3>{{ separator.displayName }}</h3>
+                    @if (separator.properties.hints && separator.properties.hints.length > 0) {
+                        <sqx-form-hint>
+                            <span inline="true" optional="true" [sqxMarkdown]="separator.properties.hints"></span>
+                        </sqx-form-hint>
+                    }
+                </div>
             </div>
         </div>
-    </div>
-</ng-container>
+    }
+}
 
 <div class="row gx-1" [class.hidden]="snapshot.isCollapsed && !formCompare">
-    <sqx-content-field *ngFor="let field of formSection.fields; trackBy: trackByField"
-        (languageChange)="languageChange.emit($event)"
-        [form]="form"
-        [formCompare]="formCompare"
-        [formContext]="formContext"
-        [formLevel]="formLevel"
-        [formModel]="field"
-        [formModelCompare]="getFieldFormCompare(field)"
-        [isCompact]="isCompact"
-        [language]="language"
-        [languages]="languages"
-        [schema]="schema">
-    </sqx-content-field>
+    @for (field of formSection.fields; track field.field.fieldId) {
+        <sqx-content-field
+            [form]="form"
+            [formCompare]="formCompare"
+            [formContext]="formContext"
+            [formLevel]="formLevel"
+            [formModel]="field"
+            [formModelCompare]="getFieldFormCompare(field)"
+            [isCompact]="isCompact"
+            [language]="language"
+            (languageChange)="languageChange.emit($event)"
+            [languages]="languages"
+            [schema]="schema"></sqx-content-field>
+    }
 </div>

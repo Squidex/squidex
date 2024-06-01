@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Keys } from '@app/framework/internal';
@@ -22,7 +22,6 @@ import { FocusOnInitDirective } from './focus-on-init.directive';
         ControlErrorsComponent,
         FocusOnInitDirective,
         FormsModule,
-        NgIf,
         ReactiveFormsModule,
         TranslatePipe,
     ],

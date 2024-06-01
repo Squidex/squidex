@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs/operators';
@@ -32,10 +32,6 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
         ListViewComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        NgSwitchDefault,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,

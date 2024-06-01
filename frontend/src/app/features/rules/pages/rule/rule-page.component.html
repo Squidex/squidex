@@ -1,195 +1,226 @@
 <sqx-title message="i18n:rules.listPageTitle" [url]="['..']"></sqx-title>
 <sqx-title message="i18n:rules.itemPageTitle"></sqx-title>
 
-<form (ngSubmit)="save()">#
-    <sqx-layout layout="main" innerWidth="54">
+<form (ngSubmit)="save()">
+    #
+    <sqx-layout innerWidth="54" layout="main">
         <ng-container title>
             <div class="d-flex align-items-center">
                 <a class="btn btn-text-secondary" attr.aria-label="{{ 'common.back' | sqxTranslate }}" (click)="back()">
                     <i class="icon-angle-left"></i>
                 </a>
-    
-                <h3 class="title">{{ 'common.rule' | sqxTranslate }}</h3>
+
+                <h3 class="title">{{ "common.rule" | sqxTranslate }}</h3>
             </div>
         </ng-container>
 
         <ng-container menu>
-            <div class="btn btn-outline-secondary btn-enabled ms-2" *ngIf="rule">
-                <span class="me-2" *ngIf="isEnabled">
-                    {{ 'common.enabled' | sqxTranslate }}
-                </span>
-    
-                <span class="me-2" *ngIf="!isEnabled">
-                    {{ 'common.disabled' | sqxTranslate }}
-                </span>
-        
-                <sqx-toggle [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }" [disabled]="!isEditable"></sqx-toggle>
-            </div>
+            @if (rule) {
+                <div class="btn btn-outline-secondary btn-enabled ms-2">
+                    @if (isEnabled) {
+                        <span class="me-2">
+                            {{ "common.enabled" | sqxTranslate }}
+                        </span>
+                    }
+                    @if (!isEnabled) {
+                        <span class="me-2">
+                            {{ "common.disabled" | sqxTranslate }}
+                        </span>
+                    }
+                    <sqx-toggle [disabled]="!isEditable" [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }"></sqx-toggle>
+                </div>
+            }
 
-            <button class="btn btn-outline-secondary btn-run ms-2" *ngIf="isManual" [disabled]="!rule?.canTrigger"
-                (sqxConfirmClick)="trigger()"
-                confirmTitle="i18n:rules.triggerConfirmTitle"
-                confirmText="i18n:rules.triggerConfirmText"
-                confirmRememberKey="triggerRule">
-                <i class="icon-play-line"></i>
-            </button>
+            @if (isManual) {
+                <button
+                    class="btn btn-outline-secondary btn-run ms-2"
+                    confirmRememberKey="triggerRule"
+                    confirmText="i18n:rules.triggerConfirmText"
+                    confirmTitle="i18n:rules.triggerConfirmTitle"
+                    [disabled]="!rule?.canTrigger"
+                    (sqxConfirmClick)="trigger()">
+                    <i class="icon-play-line"></i>
+                </button>
+            }
 
-            <button type="button" class="btn btn-primary ms-2" (click)="save()">
-                {{ 'common.save' | sqxTranslate }}
+            <button class="btn btn-primary ms-2" (click)="save()" type="button">
+                {{ "common.save" | sqxTranslate }}
             </button>
         </ng-container>
-    
+
         <ng-container>
-            <sqx-list-view innerWidth="54rem" *ngIf="supportedActions && supportedTriggers">
-                <div class="card mb-2">
-                    <div class="card-header">
-                        <div class="row align-items-center g-0 summary-row">
-                            <div class="col-auto col-syntax">
-                                <h3>{{ 'rules.ruleSyntax.if' | sqxTranslate }}</h3>
-                            </div>
-        
-                            <div class="col col-icon" *ngIf="currentTrigger">
-                                <sqx-rule-element [type]="currentTrigger.triggerType" isSmall="true" [element]="triggerElement" disabled="true"></sqx-rule-element>
-                            </div>
-
-                            <div class="col text-end" *ngIf="currentTrigger && !rule">
-                                <button type="button" class="btn btn-text-danger" (click)="resetTrigger()">
-                                    <i class="icon-bin2"></i>
-                                </button>
-                            </div>
-        
-                            <div class="col" *ngIf="!currentTrigger">
-                                <h3>...</h3>
+            @if (supportedActions && supportedTriggers) {
+                <sqx-list-view innerWidth="54rem">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <div class="row align-items-center g-0 summary-row">
+                                <div class="col-auto col-syntax">
+                                    <h3>{{ "rules.ruleSyntax.if" | sqxTranslate }}</h3>
+                                </div>
+                                @if (currentTrigger) {
+                                    <div class="col col-icon">
+                                        <sqx-rule-element
+                                            disabled="true"
+                                            [element]="triggerElement"
+                                            isSmall="true"
+                                            [type]="currentTrigger.triggerType"></sqx-rule-element>
+                                    </div>
+                                }
+                                @if (currentTrigger && !rule) {
+                                    <div class="col text-end">
+                                        <button class="btn btn-text-danger" (click)="resetTrigger()" type="button">
+                                            <i class="icon-bin2"></i>
+                                        </button>
+                                    </div>
+                                }
+                                @if (!currentTrigger) {
+                                    <div class="col">
+                                        <h3>...</h3>
+                                    </div>
+                                }
                             </div>
                         </div>
-                    </div>
-                    <div class="card-body">
-                        <ng-container *ngIf="currentTrigger; else triggerSelector">
-                            <sqx-form-alert marginTop="0" *ngIf="!rule">
-                                {{ 'rules.triggerHint' | sqxTranslate }}
-                            </sqx-form-alert>
-        
-                            <ng-container [ngSwitch]="currentTrigger.triggerType">
-                                <ng-container *ngSwitchCase="'AssetChanged'">
-                                    <sqx-asset-changed-trigger [triggerForm]="currentTrigger"></sqx-asset-changed-trigger>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'Comment'">
-                                    <sqx-comment-trigger [triggerForm]="currentTrigger"></sqx-comment-trigger>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'ContentChanged'">
-                                    <sqx-content-changed-trigger 
-                                        [schemas]="schemasState.schemas | async" 
-                                        [trigger]="currentTrigger.form.value" 
-                                        [triggerForm]="currentTrigger">
-                                    </sqx-content-changed-trigger>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'SchemaChanged'">
-                                    <sqx-schema-changed-trigger [triggerForm]="currentTrigger.form"></sqx-schema-changed-trigger>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'Usage'">
-                                    <sqx-usage-trigger [triggerForm]="currentTrigger"></sqx-usage-trigger>
-                                </ng-container>
-                            </ng-container>
-                        </ng-container>
-        
-                        <ng-template #triggerSelector>        
-                            <div class="row g-0">
-                                <div *ngFor="let triggerType of supportedTriggers | sqxKeys" class="col-12 col-md-6">
-                                    <div class="rule-element" (click)="selectTrigger(triggerType)">
-                                        <sqx-rule-element [type]="triggerType" isSmall="false" [element]="$any(supportedTriggers)[triggerType]"></sqx-rule-element>
-                                    </div>
+                        <div class="card-body">
+                            @if (currentTrigger) {
+                                @if (!rule) {
+                                    <sqx-form-alert marginTop="0">
+                                        {{ "rules.triggerHint" | sqxTranslate }}
+                                    </sqx-form-alert>
+                                }
+                                @switch (currentTrigger.triggerType) {
+                                    @case ("AssetChanged") {
+                                        <sqx-asset-changed-trigger [triggerForm]="currentTrigger"></sqx-asset-changed-trigger>
+                                    }
+                                    @case ("Comment") {
+                                        <sqx-comment-trigger [triggerForm]="currentTrigger"></sqx-comment-trigger>
+                                    }
+                                    @case ("ContentChanged") {
+                                        <sqx-content-changed-trigger
+                                            [schemas]="schemasState.schemas | async"
+                                            [trigger]="currentTrigger.form.value"
+                                            [triggerForm]="currentTrigger"></sqx-content-changed-trigger>
+                                    }
+                                    @case ("SchemaChanged") {
+                                        <sqx-schema-changed-trigger [triggerForm]="currentTrigger.form"></sqx-schema-changed-trigger>
+                                    }
+                                    @case ("Usage") {
+                                        <sqx-usage-trigger [triggerForm]="currentTrigger"></sqx-usage-trigger>
+                                    }
+                                }
+                            } @else {
+                                <div class="row g-0">
+                                    @for (triggerType of supportedTriggers | sqxKeys; track triggerType) {
+                                        <div class="col-12 col-md-6">
+                                            <div class="rule-element" (click)="selectTrigger(triggerType)">
+                                                <sqx-rule-element
+                                                    [element]="$any(supportedTriggers)[triggerType]"
+                                                    isSmall="false"
+                                                    [type]="triggerType"></sqx-rule-element>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
-                            </div>
-                        </ng-template>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">    
-                        <div class="row align-items-center g-0 summary-row">
-                            <div class="col-auto col-syntax">
-                                <h3>{{ 'rules.ruleSyntax.then' | sqxTranslate }}</h3>
-                            </div>
-
-                            <div class="col col-icon" *ngIf="currentAction">
-                                <sqx-rule-element [type]="currentAction.actionType" isSmall="true" [element]="$any(actionElement)" disabled="true"></sqx-rule-element>
-                            </div>
-
-                            <div class="col text-end" *ngIf="currentAction && !rule">
-                                <button type="button" class="btn btn-text-danger" (click)="resetAction()">
-                                    <i class="icon-bin2"></i>
-                                </button>
-                            </div>
-
-                            <div class="col" *ngIf="!currentAction">
-                                <h3>...</h3>
-                            </div>
+                            }
                         </div>
                     </div>
-
-                    <div class="card-body">
-                        <ng-container *ngIf="currentAction; else actionSelector">
-                            <sqx-form-alert marginTop="0" *ngIf="!rule">
-                                {{ 'rules.actionHint' | sqxTranslate }}
-                            </sqx-form-alert>
-        
-                            <sqx-generic-action 
-                                [actionForm]="currentAction"
-                                [trigger]="currentTrigger?.form.value"
-                                [triggerType]="currentTrigger?.triggerType"
-                                [appName]="rulesState.appName">
-                            </sqx-generic-action>
-                        </ng-container>
-                
-                        <ng-template #actionSelector>        
-                            <div class="row g-0">
-                                <div *ngFor="let actionType of supportedActions | sqxKeys" class="col-12 col-md-6">
-                                    <div class="rule-element" (click)="selectAction(actionType)">
-                                        <sqx-rule-element [type]="actionType" isSmall="false" [element]="$any(supportedActions[actionType])"></sqx-rule-element>
-                                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row align-items-center g-0 summary-row">
+                                <div class="col-auto col-syntax">
+                                    <h3>{{ "rules.ruleSyntax.then" | sqxTranslate }}</h3>
                                 </div>
+                                @if (currentAction) {
+                                    <div class="col col-icon">
+                                        <sqx-rule-element
+                                            disabled="true"
+                                            [element]="$any(actionElement)"
+                                            isSmall="true"
+                                            [type]="currentAction.actionType"></sqx-rule-element>
+                                    </div>
+                                }
+                                @if (currentAction && !rule) {
+                                    <div class="col text-end">
+                                        <button class="btn btn-text-danger" (click)="resetAction()" type="button">
+                                            <i class="icon-bin2"></i>
+                                        </button>
+                                    </div>
+                                }
+                                @if (!currentAction) {
+                                    <div class="col">
+                                        <h3>...</h3>
+                                    </div>
+                                }
                             </div>
-                        </ng-template>
+                        </div>
+                        <div class="card-body">
+                            @if (currentAction) {
+                                @if (!rule) {
+                                    <sqx-form-alert marginTop="0">
+                                        {{ "rules.actionHint" | sqxTranslate }}
+                                    </sqx-form-alert>
+                                }
+                                <sqx-generic-action
+                                    [actionForm]="currentAction"
+                                    [appName]="rulesState.appName"
+                                    [trigger]="currentTrigger?.form.value"
+                                    [triggerType]="currentTrigger?.triggerType"></sqx-generic-action>
+                            } @else {
+                                <div class="row g-0">
+                                    @for (actionType of supportedActions | sqxKeys; track actionType) {
+                                        <div class="col-12 col-md-6">
+                                            <div class="rule-element" (click)="selectAction(actionType)">
+                                                <sqx-rule-element
+                                                    [element]="$any(supportedActions[actionType])"
+                                                    isSmall="false"
+                                                    [type]="actionType"></sqx-rule-element>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>
-            </sqx-list-view>
+                </sqx-list-view>
+            }
         </ng-container>
 
         <ng-template sidebarMenu>
             <div class="panel-nav">
-                <ng-container  *ngIf="rule && (rulesState.canReadEvents | async)">
-                    <a class="panel-link panel-link-gray"
+                @if (rule && (rulesState.canReadEvents | async)) {
+                    <a
+                        class="panel-link panel-link-gray"
+                        [queryParams]="{ ruleId: rule.id }"
                         routerLink="events"
                         routerLinkActive="active"
-                        [queryParams]="{ ruleId: rule.id }"
+                        sqxTourStep="history"
                         title="i18n:common.history"
-                        titlePosition="left"
-                        sqxTourStep="history">
+                        titlePosition="left">
                         <i class="icon-time"></i>
                     </a>
-    
-                    <a class="panel-link panel-link-gray"
+                    <a
+                        class="panel-link panel-link-gray"
+                        [queryParams]="{ ruleId: rule.id }"
                         routerLink="simulator"
                         routerLinkActive="active"
-                        [queryParams]="{ ruleId: rule.id }"
+                        sqxTourStep="simulator"
                         title="i18n:rules.simulator"
-                        titlePosition="left"
-                        sqxTourStep="simulator">
+                        titlePosition="left">
                         <i class="icon-play-line"></i>
                     </a>
-                </ng-container>
-    
-                <a class="panel-link"
+                }
+
+                <a
+                    class="panel-link"
+                    #helpLink
+                    hintAfter="180000"
+                    hintText="i18n:common.helpTour"
+                    queryParamsHandling="preserve"
                     replaceUrl="true"
                     routerLink="help"
                     routerLinkActive="active"
-                    queryParamsHandling="preserve"
-                    hintText="i18n:common.helpTour"
-                    hintAfter="180000"
-                    title="i18n:common.help"
-                    titlePosition="left"
                     sqxTourStep="help"
-                    #helpLink>
+                    title="i18n:common.help"
+                    titlePosition="left">
                     <i class="icon-help2"></i>
                 </a>
             </div>

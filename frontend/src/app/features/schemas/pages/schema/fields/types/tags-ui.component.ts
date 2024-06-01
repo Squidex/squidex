@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FieldDto, FormHintComponent, TagEditorComponent, TAGS_FIELD_EDITORS, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
@@ -18,7 +18,6 @@ import { FieldDto, FormHintComponent, TagEditorComponent, TAGS_FIELD_EDITORS, Ta
     imports: [
         FormHintComponent,
         FormsModule,
-        NgFor,
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,

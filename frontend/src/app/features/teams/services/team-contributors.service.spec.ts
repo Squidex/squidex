@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, ContributorDto, ContributorsDto, ContributorsPayload, Resource, ResourceLinks, Version } from '@app/shared/internal';
 import { TeamContributorsService } from '../internal';
@@ -15,14 +16,14 @@ describe('TeamContributorsService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-            ],
-            providers: [
-                TeamContributorsService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-            ],
-        });
+    imports: [],
+    providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+        TeamContributorsService,
+        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+    ],
+});
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {

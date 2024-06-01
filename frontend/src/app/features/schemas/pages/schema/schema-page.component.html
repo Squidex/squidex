@@ -1,136 +1,146 @@
 <sqx-title [message]="schemasState.schemaName"></sqx-title>
 
-<sqx-layout layout="main"innerWidth="50" *ngIf="schemaTab | async; let tab">
-    <ng-container title>
-        <ul class="nav nav-tabs2">
-            <li class="nav-item">
-                <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'fields' }" [class.active]="tab === 'fields'">
-                    {{ 'schemas.tabFields' | sqxTranslate }}
-                </a>
-            </li>
-            <li *ngIf="schema.type !== 'Component'">
-                <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'ui' }" [class.active]="tab === 'ui'">
-                    {{ 'schemas.tabUI' | sqxTranslate }}
-                </a>
-            </li>
-            <li *ngIf="schema.type !== 'Component'">
-                <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'scripts' }" [class.active]="tab === 'scripts'">
-                    {{ 'schemas.tabScripts' | sqxTranslate }}
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'json' }" [class.active]="tab === 'json'">
-                    {{ 'schemas.tabJson' | sqxTranslate }}
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'more' }" [class.active]="tab === 'more'">
-                    {{ 'schemas.tabMore' | sqxTranslate }}
-                </a>
-            </li>
-        </ul>
-    </ng-container>
-
-    <ng-container menu>
-        <div class="btn-group me-2" #buttonPublish sqxTourStep="publishSchema">
-            <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="!schema.canPublish" (click)="publish()">
-                {{ 'schemas.published' | sqxTranslate }}
-            </button>
-            <button type="button" class="btn btn-publishing btn-toggle" [class.btn-danger]="!schema.isPublished" [disabled]="!schema.canUnpublish" (click)="unpublish()">
-                {{ 'schemas.unpublished' | sqxTranslate }}
-            </button>
-        </div>
-
-        <button type="button" class="btn btn-text-secondary me-2" attr.aria-label="{{ 'common.options' | sqxTranslate }}" (click)="editOptionsDropdown.toggle()" #buttonOptions>
-            <i class="icon-dots"></i>
-        </button>
-
-        <sqx-dropdown-menu *sqxModal="editOptionsDropdown;closeAlways:true" [sqxAnchoredTo]="buttonOptions" scrollY="true">                    
-            <ng-container *ngIf="schemasState.canCreate">
-                <div class="dropdown-divider"></div>
-
-                <a class="dropdown-item" (click)="cloneSchema()">
-                    {{ 'common.clone' | sqxTranslate }}
-                </a>
-            </ng-container>
-            
-            <ng-container>
-                <div class="dropdown-divider"></div>
-
-                <a class="dropdown-item dropdown-item-delete" [class.disabled]="!schema.canDelete"
-                    (sqxConfirmClick)="deleteSchema()"
-                    confirmTitle="i18n:schemas.deleteConfirmTitle"
-                    confirmText="i18n:schemas.deleteConfirmText"
-                    confirmRememberKey="deleteSchema">
-                    {{ 'common.delete' | sqxTranslate }}
-                </a>
-            </ng-container>
-        </sqx-dropdown-menu>
-    </ng-container>
-
-    <ng-container content>
-        <ng-container [ngSwitch]="tab">
-            <ng-container *ngSwitchCase="'ui'">
-                <sqx-schema-ui-form [schema]="schema"></sqx-schema-ui-form>
-            </ng-container>
-            <ng-container *ngSwitchCase="'scripts'">
-                <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
-            </ng-container>
-            <ng-container *ngSwitchCase="'json'">
-                <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
-            </ng-container>
-            <ng-container *ngSwitchCase="'more'">
-                <sqx-list-view innerWidth="50rem">
-                    <div>
-                        <sqx-schema-preview-urls-form *ngIf="schema.type !== 'Component'"
-                            [schema]="schema">
-                        </sqx-schema-preview-urls-form>
-
-                        <sqx-schema-field-rules-form
-                            [schema]="schema">
-                        </sqx-schema-field-rules-form>
-
-                        <sqx-schema-edit-form
-                            [schema]="schema">
-                        </sqx-schema-edit-form>
-                    </div>
-                </sqx-list-view>
-            </ng-container>
-            <ng-container *ngSwitchDefault>
-                <sqx-list-view innerWidth="50rem" table="true">
-                    <div>
-                        <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
-                    </div>
-                </sqx-list-view>
-            </ng-container>
+@if (schemaTab | async; as tab) {
+    <sqx-layout innerWidth="50" layout="main">
+        <ng-container title>
+            <ul class="nav nav-tabs2">
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="tab === 'fields'" [queryParams]="{ tab: 'fields' }" [routerLink]="[]">
+                        {{ "schemas.tabFields" | sqxTranslate }}
+                    </a>
+                </li>
+                @if (schema.type !== "Component") {
+                    <li>
+                        <a class="nav-link" [class.active]="tab === 'ui'" [queryParams]="{ tab: 'ui' }" [routerLink]="[]">
+                            {{ "schemas.tabUI" | sqxTranslate }}
+                        </a>
+                    </li>
+                }
+                @if (schema.type !== "Component") {
+                    <li>
+                        <a class="nav-link" [class.active]="tab === 'scripts'" [queryParams]="{ tab: 'scripts' }" [routerLink]="[]">
+                            {{ "schemas.tabScripts" | sqxTranslate }}
+                        </a>
+                    </li>
+                }
+                <li>
+                    <a class="nav-link" [class.active]="tab === 'json'" [queryParams]="{ tab: 'json' }" [routerLink]="[]">
+                        {{ "schemas.tabJson" | sqxTranslate }}
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" [class.active]="tab === 'more'" [queryParams]="{ tab: 'more' }" [routerLink]="[]">
+                        {{ "schemas.tabMore" | sqxTranslate }}
+                    </a>
+                </li>
+            </ul>
         </ng-container>
-    </ng-container>
-
-    <ng-template sidebarMenu>
-        <div class="panel-nav">
-            <a class="panel-link"
-                replaceUrl="true"
-                routerLink="history"
-                routerLinkActive="active"
-                queryParamsHandling="preserve"
-                title="i18n:common.history"
-                titlePosition="left"
-                sqxTourStep="history">
-                <i class="icon-time"></i>
-            </a>
-            
-            <a class="panel-link"
-                replaceUrl="true"
-                routerLink="help"
-                routerLinkActive="active"
-                queryParamsHandling="preserve"
-                title="i18n:common.help"
-                titlePosition="left"
-                sqxTourStep="help">
-                <i class="icon-help2"></i>
-            </a>
-        </div>
-    </ng-template>
-</sqx-layout>
+        <ng-container menu>
+            <div class="btn-group me-2" #buttonPublish sqxTourStep="publishSchema">
+                <button
+                    class="btn btn-publishing btn-toggle"
+                    [class.btn-success]="schema.isPublished"
+                    (click)="publish()"
+                    [disabled]="!schema.canPublish"
+                    type="button">
+                    {{ "schemas.published" | sqxTranslate }}
+                </button>
+                <button
+                    class="btn btn-publishing btn-toggle"
+                    [class.btn-danger]="!schema.isPublished"
+                    (click)="unpublish()"
+                    [disabled]="!schema.canUnpublish"
+                    type="button">
+                    {{ "schemas.unpublished" | sqxTranslate }}
+                </button>
+            </div>
+            <button
+                class="btn btn-text-secondary me-2"
+                #buttonOptions
+                attr.aria-label="{{ 'common.options' | sqxTranslate }}"
+                (click)="editOptionsDropdown.toggle()"
+                type="button">
+                <i class="icon-dots"></i>
+            </button>
+            <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="editOptionsDropdown; closeAlways: true">
+                @if (schemasState.canCreate) {
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" (click)="cloneSchema()">
+                        {{ "common.clone" | sqxTranslate }}
+                    </a>
+                }
+                <ng-container>
+                    <div class="dropdown-divider"></div>
+                    <a
+                        class="dropdown-item dropdown-item-delete"
+                        [class.disabled]="!schema.canDelete"
+                        confirmRememberKey="deleteSchema"
+                        confirmText="i18n:schemas.deleteConfirmText"
+                        confirmTitle="i18n:schemas.deleteConfirmTitle"
+                        (sqxConfirmClick)="deleteSchema()">
+                        {{ "common.delete" | sqxTranslate }}
+                    </a>
+                </ng-container>
+            </sqx-dropdown-menu>
+        </ng-container>
+        <ng-container content>
+            @switch (tab) {
+                @case ("ui") {
+                    <sqx-schema-ui-form [schema]="schema"></sqx-schema-ui-form>
+                }
+                @case ("scripts") {
+                    <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
+                }
+                @case ("json") {
+                    <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
+                }
+                @case ("more") {
+                    <sqx-list-view innerWidth="50rem">
+                        <div>
+                            @if (schema.type !== "Component") {
+                                <sqx-schema-preview-urls-form [schema]="schema"></sqx-schema-preview-urls-form>
+                            }
+                            <sqx-schema-field-rules-form [schema]="schema"></sqx-schema-field-rules-form>
+                            <sqx-schema-edit-form [schema]="schema"></sqx-schema-edit-form>
+                        </div>
+                    </sqx-list-view>
+                }
+                @default {
+                    <sqx-list-view innerWidth="50rem" table="true">
+                        <div>
+                            <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
+                        </div>
+                    </sqx-list-view>
+                }
+            }
+        </ng-container>
+        <ng-template sidebarMenu>
+            <div class="panel-nav">
+                <a
+                    class="panel-link"
+                    queryParamsHandling="preserve"
+                    replaceUrl="true"
+                    routerLink="history"
+                    routerLinkActive="active"
+                    sqxTourStep="history"
+                    title="i18n:common.history"
+                    titlePosition="left">
+                    <i class="icon-time"></i>
+                </a>
+                <a
+                    class="panel-link"
+                    queryParamsHandling="preserve"
+                    replaceUrl="true"
+                    routerLink="help"
+                    routerLinkActive="active"
+                    sqxTourStep="help"
+                    title="i18n:common.help"
+                    titlePosition="left">
+                    <i class="icon-help2"></i>
+                </a>
+            </div>
+        </ng-template>
+    </sqx-layout>
+}
 
 <router-outlet></router-outlet>

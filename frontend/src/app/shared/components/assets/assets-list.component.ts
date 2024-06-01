@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FileDropDirective, HTTP, TourStepDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, AssetFolderDto, AssetsState, getFiles, StatefulComponent, Types } from '@app/shared/internal';
@@ -32,8 +32,6 @@ interface State {
         CdkDropList,
         CdkDropListGroup,
         FileDropDirective,
-        NgFor,
-        NgIf,
         TourStepDirective,
         TranslatePipe,
     ],
@@ -128,13 +126,5 @@ export class AssetsListComponent extends StatefulComponent<State> {
 
     public canEnter(drag: CdkDrag, drop: CdkDropList) {
         return drag.data.id !== drop.data;
-    }
-
-    public trackByAssetFolder(_index: number, asset: AssetFolderDto) {
-        return asset.id;
-    }
-
-    public trackByAsset(_index: number, asset: AssetDto) {
-        return asset.id;
     }
 }

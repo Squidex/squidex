@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { timer } from 'rxjs';
@@ -46,8 +46,6 @@ interface State {
         ModalDialogComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         SafeHtmlPipe,
         TooltipDirective,
         TranslatePipe,

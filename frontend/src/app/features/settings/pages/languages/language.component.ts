@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintComponent, LanguageDto, LanguagesState, sorted, TranslatePipe } from '@app/shared';
@@ -23,8 +23,6 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintCompon
         ConfirmClickDirective,
         FormHintComponent,
         FormsModule,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         TranslatePipe,
     ],
@@ -106,9 +104,5 @@ export class LanguageComponent {
         this.fallbackLanguagesNew = this.fallbackLanguagesNew.removed(this.otherLanguage);
 
         this.otherLanguage = this.fallbackLanguagesNew[0];
-    }
-
-    public trackByLanguage(_index: number, language: LanguageDto) {
-        return language.iso2Code;
     }
 }

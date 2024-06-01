@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { QueryModel, QuerySorting, SORT_MODES } from '@app/shared/internal';
@@ -19,7 +19,6 @@ import { QueryPathComponent } from './query-path.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormsModule,
-        NgFor,
         QueryPathComponent,
     ],
 })

@@ -1,27 +1,29 @@
-<div class="modal" data-testid="dialog" @fade>
-    <div class="modal-dialog modal-{{size}}" [class.modal-fh]="fullHeight">
+<div class="modal" @fade data-testid="dialog">
+    <div class="modal-dialog modal-{{ size }}" [class.modal-fh]="fullHeight">
         <div class="modal-content" [sqxTourStep]="tourId">
-            <div class="modal-header" [class.with-tabs]="hasTabs" *ngIf="showHeader">
-                <h4 class="modal-title">
-                    <ng-content select="[title]"></ng-content>
-                </h4>
-
-                <ng-content select="[plainTitle]"></ng-content>
-
-                <button type="button" class="btn btn-close" (click)="dialogClose.emit()"></button>
-            </div>
+            @if (showHeader) {
+                <div class="modal-header" [class.with-tabs]="hasTabs">
+                    <h4 class="modal-title">
+                        <ng-content select="[title]"></ng-content>
+                    </h4>
+                    <ng-content select="[plainTitle]"></ng-content>
+                    <button class="btn btn-close" (click)="dialogClose.emit()" type="button"></button>
+                </div>
+            }
 
             <div class="modal-tabs clearfix" #tabsElement>
                 <ng-content select="[tabs]"></ng-content>
             </div>
-            
+
             <div class="modal-body" [class.flexed]="flexBody">
                 <ng-content select="[content]"></ng-content>
             </div>
 
-            <div class="modal-footer justify-content-between" #footerElement *ngIf="showFooter">
-                <ng-content select="[footer]"></ng-content>
-            </div>
+            @if (showFooter) {
+                <div class="modal-footer justify-content-between" #footerElement>
+                    <ng-content select="[footer]"></ng-content>
+                </div>
+            }
         </div>
     </div>
 </div>

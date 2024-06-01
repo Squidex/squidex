@@ -1,75 +1,88 @@
 <sqx-title message="i18n:common.subscription"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" innerWidth="63">
+<sqx-layout innerWidth="63" layout="main" titleIcon="subscription" titleText="i18n:common.subscription">
     <ng-container menu>
-        <sqx-notifo topic="apps/{{plansState.appId}}/settings/plan"></sqx-notifo>
+        <sqx-notifo topic="apps/{{ plansState.appId }}/settings/plan"></sqx-notifo>
 
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:plans.refreshTooltip" shortcut="CTRL + B">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:plans.refreshTooltip" type="button">
+            <i class="icon-reset"></i>
+            {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
 
     <ng-container>
         <sqx-list-view innerWidth="63rem" [isLoading]="plansState.isLoading | async">
-            <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
-                <div class="alert alert-danger" *ngIf="(plansState.locked | async) === 'NotOwner'">
-                    {{ 'plans.notPlanOwner' | sqxTranslate }} {{ 'plans.planOwner' | sqxTranslate }}: <strong className="no-wrap">{{plansState.planOwner | async | sqxUserName}}</strong>
-                </div>
-
-                <div class="alert alert-danger" *ngIf="(plansState.locked | async) === 'ManagedByTeam'">
-                    {{ 'plans.managedByTeam' | sqxTranslate }}
-                </div>
-
-                <div class="card card-body mb-4" *ngIf="plansState.referral | async; let referral">
-                    <h5 class="card-title">Squidex Referal Program</h5>
-                    
-                    <sqx-form-hint>
-                        <div [innerHTML]="'plans.referralHint' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
-                        <div [innerHTML]="referral.condition | sqxMarkdown | sqxSafeHtml"></div>
-                        <div [innerHTML]="'plans.referralEarned' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
-                    </sqx-form-hint>
-                </div>
-
+            @if ((plansState.isLoaded | async) && (plansState.plans | async); as plans) {
+                @if ((plansState.locked | async) === "NotOwner") {
+                    <div class="alert alert-danger">
+                        {{ "plans.notPlanOwner" | sqxTranslate }} {{ "plans.planOwner" | sqxTranslate }}:
+                        <strong className="no-wrap">{{ plansState.planOwner | async | sqxUserName }}</strong>
+                    </div>
+                }
+                @if ((plansState.locked | async) === "ManagedByTeam") {
+                    <div class="alert alert-danger">
+                        {{ "plans.managedByTeam" | sqxTranslate }}
+                    </div>
+                }
+                @if (plansState.referral | async; as referral) {
+                    <div class="card card-body mb-4">
+                        <h5 class="card-title">Squidex Referal Program</h5>
+                        <sqx-form-hint>
+                            <div [innerHTML]="'plans.referralHint' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
+                            <div [innerHTML]="referral.condition | sqxMarkdown | sqxSafeHtml"></div>
+                            <div [innerHTML]="'plans.referralEarned' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
+                        </sqx-form-hint>
+                    </div>
+                }
                 <div>
-                    <div class="text-muted text-center empty" *ngIf="plans.length === 0">
-                        {{ 'plans.noPlanConfigured' | sqxTranslate }}
-                    </div>
-
                     <div class="plans">
-                        <div class="plan" *ngFor="let planInfo of plans; trackBy: trackByPlan">
-                            <sqx-plan [planInfo]="planInfo"></sqx-plan>
-                        </div>
+                        @for (planInfo of plans; track planInfo.plan.id) {
+                            <div class="plan">
+                                <sqx-plan [planInfo]="planInfo"></sqx-plan>
+                            </div>
+                        }
                     </div>
 
-                    <div *ngIf="plansState.portalLink| async; let portalLink" class="billing-portal-link">
-                        {{ 'plans.billingPortalHint' | sqxTranslate }} <a [href]="portalLink" sqxExternalLink>{{ 'plans.billingPortal' | sqxTranslate }}</a>
-                    </div>
+                    @if (plans.length === 0) {
+                        <div class="text-muted text-center empty">
+                            {{ "plans.noPlanConfigured" | sqxTranslate }}
+                        </div>
+                    }
+
+                    @if (plansState.portalLink | async; as portalLink) {
+                        <div class="billing-portal-link">
+                            {{ "plans.billingPortalHint" | sqxTranslate }}
+                            <a [href]="portalLink" sqxExternalLink>{{ "plans.billingPortal" | sqxTranslate }}</a>
+                        </div>
+                    }
                 </div>
-            </ng-container>
+            }
         </sqx-list-view>
     </ng-container>
 
     <ng-template sidebarMenu>
         <div class="panel-nav">
-            <a class="panel-link"
+            <a
+                class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="history"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="history"
                 title="i18n:common.history"
-                titlePosition="left"
-                sqxTourStep="history">
+                titlePosition="left">
                 <i class="icon-time"></i>
             </a>
 
-            <a class="panel-link"
+            <a
+                class="panel-link"
+                queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="help"
                 routerLinkActive="active"
-                queryParamsHandling="preserve"
+                sqxTourStep="help"
                 title="i18n:common.help"
-                titlePosition="left"
-                sqxTourStep="help">
+                titlePosition="left">
                 <i class="icon-help2"></i>
             </a>
         </div>
@@ -77,4 +90,3 @@
 </sqx-layout>
 
 <router-outlet></router-outlet>
-

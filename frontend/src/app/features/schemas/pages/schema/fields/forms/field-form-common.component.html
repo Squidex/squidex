@@ -1,53 +1,58 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldName">{{ 'common.name' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldName">{{ "common.name" | sqxTranslate }}</label>
 
         <div class="col-9">
-            <input readonly class="form-control" id="{{field.fieldId}}_fieldName" [ngModel]="field.name" [ngModelOptions]="{ standalone: true }">
+            <input
+                class="form-control"
+                id="{{ field.fieldId }}_fieldName"
+                [ngModel]="field.name"
+                [ngModelOptions]="{ standalone: true }"
+                readonly />
 
             <sqx-form-hint>
-                {{ 'schemas.field.nameHint' | sqxTranslate }}
+                {{ "schemas.field.nameHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldLabel">{{ 'common.label' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldLabel">{{ "common.label" | sqxTranslate }}</label>
 
         <div class="col-9">
             <sqx-control-errors for="label"></sqx-control-errors>
 
-            <input class="form-control" id="{{field.fieldId}}_fieldLabel" maxlength="100" formControlName="label">
+            <input class="form-control" id="{{ field.fieldId }}_fieldLabel" formControlName="label" maxlength="100" />
 
             <sqx-form-hint>
-                {{ 'schemas.field.labelHint' | sqxTranslate }}
+                {{ "schemas.field.labelHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldHints">{{ 'common.hints' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldHints">{{ "common.hints" | sqxTranslate }}</label>
 
         <div class="col-9">
             <sqx-control-errors for="hints"></sqx-control-errors>
 
-            <input class="form-control" id="{{field.fieldId}}_fieldHints" maxlength="1000" formControlName="hints">
+            <input class="form-control" id="{{ field.fieldId }}_fieldHints" formControlName="hints" maxlength="1000" />
 
             <sqx-form-hint>
-                {{ 'schemas.field.hintsHint' | sqxTranslate }}
+                {{ "schemas.field.hintsHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
 
-    <div class="form-group row" *ngIf="field.properties.isContentField">
-         <label class="col-3 col-form-label">{{ 'common.tags' | sqxTranslate }}</label>
-
-        <div class="col-9">
-            <sqx-tag-editor id="schemaTags" formControlName="tags"></sqx-tag-editor>
-
-            <sqx-form-hint>
-                {{ 'schemas.field.tagsHint' | sqxTranslate }}
-            </sqx-form-hint>
+    @if (field.properties.isContentField) {
+        <div class="form-group row">
+            <label class="col-3 col-form-label">{{ "common.tags" | sqxTranslate }}</label>
+            <div class="col-9">
+                <sqx-tag-editor id="schemaTags" formControlName="tags"></sqx-tag-editor>
+                <sqx-form-hint>
+                    {{ "schemas.field.tagsHint" | sqxTranslate }}
+                </sqx-form-hint>
+            </div>
         </div>
-    </div>
+    }
 </div>

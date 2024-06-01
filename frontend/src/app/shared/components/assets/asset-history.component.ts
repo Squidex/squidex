@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -28,8 +28,6 @@ interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boo
         ExternalLinkDirective,
         FromNowPipe,
         HistoryMessagePipe,
-        NgFor,
-        NgIf,
         TooltipDirective,
         TranslatePipe,
         UserNameRefPipe,
@@ -66,9 +64,5 @@ export class AssetHistoryComponent {
                         return { event, version, canDownload };
                     });
                 }));
-    }
-
-    public trackByEvent(_index: number, assetEvent: AssetEvent) {
-        return assetEvent.event.eventId;
     }
 }

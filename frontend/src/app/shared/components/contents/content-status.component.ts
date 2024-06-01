@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/framework';
 import { ScheduleDto } from '@app/shared/internal';
@@ -18,7 +18,6 @@ import { ScheduleDto } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FullDateTimePipe,
-        NgIf,
         TooltipDirective,
         TranslatePipe,
     ],

@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ReferenceItemComponent } from '../../shared/references/reference-item.component';
 
 @Component({
@@ -28,8 +28,6 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
         LanguageSelectorComponent,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
-        NgIf,
         PagerComponent,
         ReferenceItemComponent,
         ShortcutDirective,
@@ -86,10 +84,6 @@ export class ReferencesPageComponent implements OnInit {
 
     public changeLanguage(language: AppLanguageDto) {
         this.language = language;
-    }
-
-    public trackByContent(_index: number, content: ContentDto) {
-        return content.id;
     }
 }
 

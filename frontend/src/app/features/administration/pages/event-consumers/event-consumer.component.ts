@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TooltipDirective } from '@app/shared';
 import { EventConsumerDto, EventConsumersState } from '../../internal';
@@ -19,7 +19,6 @@ import { EventConsumerDto, EventConsumersState } from '../../internal';
     templateUrl: './event-consumer.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgIf,
         TooltipDirective,
     ],
 })

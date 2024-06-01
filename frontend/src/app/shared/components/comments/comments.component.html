@@ -1,30 +1,33 @@
-<ng-container *ngIf="mentionUsers | async; let users">
-    <div class="comments-header">                
+@if (mentionUsers | async; as users) {
+    <div class="comments-header">
         <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
-            <input class="form-control" name="text" formControlName="text" placeholder="{{ 'comments.create' | sqxTranslate }}" #input
-                [mention]="$any(users)"
-                [mentionConfig]="mentionConfig"
+            <input
+                class="form-control"
+                #input
+                autocapitalize="off"
                 autocomplete="off"
                 autocorrect="off"
-                autocapitalize="off"
-                (blur)="blurComment()">
+                (blur)="blurComment()"
+                formControlName="text"
+                [mention]="$any(users)"
+                [mentionConfig]="mentionConfig"
+                name="text"
+                placeholder="{{ 'comments.create' | sqxTranslate }}" />
         </form>
     </div>
-
     <div class="comments-list" #scrollContainer>
-        <sqx-comment *ngFor="let item of commentsItems | async; trackBy: trackByComment;"
-            canAnswer="true"
-            canEdit="true"
-            canFollow="false"
-            [commentItem]="item"
-            [comments]="commentsState"
-            [currenUrl]="router.url"
-            [mentionConfig]="mentionConfig"
-            [mentionUsers]="users"
-            [scrollContainer]="'.comments-list'"
-            [userToken]="commentUser">
-        </sqx-comment>
+        @for (comment of commentsItems | async; track comment.index) {
+            <sqx-comment
+                canAnswer="true"
+                canEdit="true"
+                canFollow="false"
+                [commentItem]="comment"
+                [comments]="commentsState"
+                [currenUrl]="router.url"
+                [mentionConfig]="mentionConfig"
+                [mentionUsers]="users"
+                [scrollContainer]="'.comments-list'"
+                [userToken]="commentUser"></sqx-comment>
+        }
     </div>
-</ng-container>
-
-
+}

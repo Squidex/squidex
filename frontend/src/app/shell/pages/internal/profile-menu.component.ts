@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, TranslatePipe, UILanguages, UIOptions, UIState, UserIdPicturePipe } from '@app/shared';
@@ -39,8 +39,6 @@ interface State {
         ExternalLinkDirective,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
         RouterLink,
         StopClickDirective,
         TranslatePipe,

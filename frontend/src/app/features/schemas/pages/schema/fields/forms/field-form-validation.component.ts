@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgSwitch, NgSwitchCase } from '@angular/common';
+
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto, TranslatePipe } from '@app/shared';
@@ -38,8 +38,6 @@ import { TagsValidationComponent } from '../types/tags-validation.component';
         FormsModule,
         GeolocationValidationComponent,
         JsonValidationComponent,
-        NgSwitch,
-        NgSwitchCase,
         NumberValidationComponent,
         ReactiveFormsModule,
         ReferencesValidationComponent,

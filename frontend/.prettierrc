@@ -1,0 +1,20 @@
+{
+    "plugins": ["squidex-prettier-plugin-organize-attributes"],
+    "overrides": [
+        {
+            "files": "*.html",
+            "options": {
+                "attributeGroups": ["$ANGULAR"],
+                "attributeIgnoreChars": "[]()*",
+                "attributeSort": "ASC",
+                "parser": "angular",
+                "printWidth": 140,
+                "bracketSameLine": true,
+                "bracketSpacing": true,
+                "singleAttributePerLine": false,                                                                                       
+                "tabWidth": 4
+            }
+        }
+    ],
+    "tabWidth": 4
+}

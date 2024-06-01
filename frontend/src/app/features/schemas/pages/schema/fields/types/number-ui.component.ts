@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -20,7 +20,6 @@ import { FieldDto, FloatConverter, FormHintComponent, NUMBER_FIELD_EDITORS, Numb
         AsyncPipe,
         FormHintComponent,
         FormsModule,
-        NgFor,
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,

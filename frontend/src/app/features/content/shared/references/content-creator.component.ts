@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -27,8 +27,6 @@ import { ContentSectionComponent } from '../forms/content-section.component';
         FormsModule,
         LanguageSelectorComponent,
         ModalDialogComponent,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,

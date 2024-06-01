@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
@@ -76,14 +77,14 @@ describe('formatHistoryMessage', () => {
 describe('HistoryService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
-                HttpClientTestingModule,
-            ],
-            providers: [
-                HistoryService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-            ],
-        });
+    imports: [],
+    providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+        HistoryService,
+        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+    ],
+});
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {

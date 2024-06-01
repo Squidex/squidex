@@ -7,7 +7,7 @@
 
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { DialogModel, ModalDirective, StopClickDirective, TagItem, TagsSelected, TranslatePipe } from '@app/shared';
 import { AssetTagDialogComponent } from './asset-tag-dialog.component';
@@ -21,8 +21,6 @@ import { AssetTagDialogComponent } from './asset-tag-dialog.component';
     imports: [
         AssetTagDialogComponent,
         ModalDirective,
-        NgFor,
-        NgIf,
         StopClickDirective,
         TranslatePipe,
     ],
@@ -57,9 +55,5 @@ export class AssetTagsComponent {
     public renameTag(tag: TagItem) {
         this.tagRenaming = tag;
         this.tagRenameDialog.show();
-    }
-
-    public trackByTag(_index: number, tag: TagItem) {
-        return tag.name;
     }
 }

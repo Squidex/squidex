@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormHintComponent, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues } from '@app/shared';
@@ -23,8 +23,6 @@ import { WorkflowStepComponent } from './workflow-step.component';
         FormErrorComponent,
         FormHintComponent,
         FormsModule,
-        NgFor,
-        NgIf,
         TagEditorComponent,
         TranslatePipe,
         WorkflowDiagramComponent,
@@ -134,9 +132,5 @@ export class WorkflowComponent {
 
     public selectTab(tab: number) {
         this.selectedTab = tab;
-    }
-
-    public trackByStep(_index: number, step: WorkflowStep) {
-        return step.name;
     }
 }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -44,10 +44,6 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         IndeterminateValueDirective,
         MarkdownDirective,
         ModalDirective,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
         RadioGroupComponent,
         ReactiveFormsModule,
         ReferenceDropdownComponent,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -37,10 +37,6 @@ import { RuleConfigured } from '../messages';
         KeysPipe,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,

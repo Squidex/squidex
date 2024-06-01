@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, numberAttribute, Output } from '@angular/core';
 import { FilterComparison, FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
 import { FilterComparisonComponent } from './filter-comparison.component';
@@ -18,7 +18,6 @@ import { FilterLogicalComponent } from './filter-logical.component';
     templateUrl: './filter-node.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        NgIf,
         forwardRef(() => FilterComparisonComponent),
         forwardRef(() => FilterLogicalComponent),
     ],

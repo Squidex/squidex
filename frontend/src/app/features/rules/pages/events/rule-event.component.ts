@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent, ConfirmClickDirective, FromNowPipe, RuleEventDto, TranslatePipe } from '@app/shared';
@@ -24,7 +24,6 @@ import { RuleClassPipe } from '../../shared/pipes';
         ConfirmClickDirective,
         FormsModule,
         FromNowPipe,
-        NgIf,
         RuleClassPipe,
         TranslatePipe,
     ],

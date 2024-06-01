@@ -1,297 +1,345 @@
-<div class="field" [class.expanded]="isExpanded" *ngIf="formModel">
-    <fieldset class="buttons-container" [disabled]="isDisabled | async">
-        <div class="buttons">
-            <button type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="chatDialog.show()" [disabled]="!hasChatBot || !isString" tabindex="-1">
-                AI
-            </button>
-
-            <button type="button" class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1" title="i18n:contents.fieldFullscreen" (click)="toggleExpanded()" tabindex="-1">
-                <i class="icon-fullscreen"></i>
-            </button>
-    
-            <button type="button" class="btn btn-sm btn-outline-secondary btn-clear force no-focus-shadow ms-1" [disabled]="isEmpty | async" tabindex="-1"
-                (sqxConfirmClick)="unset()"
-                confirmTitle="i18n:contents.unsetValueConfirmTitle"
-                confirmText="i18n:contents.unsetValueConfirmText"
-                confirmRememberKey="unsetValue"
-                title="i18n:contents.unsetValue">
-                <i class="icon-close"></i>
-            </button>
+@if (formModel) {
+    <div class="field" [class.expanded]="isExpanded">
+        <fieldset class="buttons-container" [disabled]="isDisabled | async">
+            <div class="buttons">
+                <button
+                    class="btn btn-sm btn-outline-secondary force no-focus-shadow"
+                    (click)="chatDialog.show()"
+                    [disabled]="!hasChatBot || !isString"
+                    tabindex="-1"
+                    type="button">
+                    AI
+                </button>
+                <button
+                    class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1"
+                    (click)="toggleExpanded()"
+                    tabindex="-1"
+                    title="i18n:contents.fieldFullscreen"
+                    type="button">
+                    <i class="icon-fullscreen"></i>
+                </button>
+                <button
+                    class="btn btn-sm btn-outline-secondary btn-clear force no-focus-shadow ms-1"
+                    confirmRememberKey="unsetValue"
+                    confirmText="i18n:contents.unsetValueConfirmText"
+                    confirmTitle="i18n:contents.unsetValueConfirmTitle"
+                    [disabled]="isEmpty | async"
+                    (sqxConfirmClick)="unset()"
+                    tabindex="-1"
+                    title="i18n:contents.unsetValue"
+                    type="button">
+                    <i class="icon-close"></i>
+                </button>
+            </div>
+        </fieldset>
+        <label>
+            {{ field.displayName }} {{ displaySuffix }}
+            <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+        </label>
+        @if (field.isDisabled) {
+            <small class="field-disabled ps-1">Disabled</small>
+        }
+        @if (form) {
+            <sqx-control-errors [fieldName]="field.displayName" [for]="$any(fieldForm)"></sqx-control-errors>
+        }
+        <div>
+            @if (field.properties.editorUrl) {
+                <sqx-iframe-editor
+                    #editor
+                    [context]="formContext"
+                    [formControlBinding]="$any(fieldForm)"
+                    [formField]="formModel.field.name"
+                    [formIndex]="index"
+                    [formValue]="form.valueChanges | async"
+                    [isExpanded]="isExpanded"
+                    (isExpandedChange)="toggleExpanded()"
+                    [language]="language"
+                    [languages]="languages"
+                    [schemaIds]="field.rawProperties.schemaIds"
+                    [url]="field.properties.editorUrl"></sqx-iframe-editor>
+            } @else {
+                @switch (field.properties.fieldType) {
+                    @case ("Array") {
+                        <sqx-array-editor
+                            [form]="form"
+                            [formContext]="formContext"
+                            [formLevel]="formLevel"
+                            [formModel]="$any(formModel)"
+                            [hasChatBot]="hasChatBot"
+                            [isComparing]="isComparing"
+                            [isExpanded]="isExpanded"
+                            [language]="language"
+                            [languages]="languages"></sqx-array-editor>
+                    }
+                    @case ("Assets") {
+                        <sqx-assets-editor
+                            [folderId]="field.rawProperties.folderId"
+                            [formControl]="$any(fieldForm)"
+                            [hasChatBot]="hasChatBot"
+                            [isExpanded]="isExpanded"></sqx-assets-editor>
+                    }
+                    @case ("Boolean") {
+                        @switch (field.rawProperties.editor) {
+                            @case ("Toggle") {
+                                <sqx-toggle [formControl]="$any(fieldForm)" [threeStates]="!field.properties.isRequired"></sqx-toggle>
+                            }
+                            @case ("Checkbox") {
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        id="{{ uniqueId }}"
+                                        [formControl]="$any(fieldForm)"
+                                        sqxIndeterminateValue
+                                        [threeStates]="!field.properties.isRequired"
+                                        type="checkbox" />
+                                    <label class="form-check-label" for="{{ uniqueId }}"></label>
+                                </div>
+                            }
+                        }
+                    }
+                    @case ("Component") {
+                        <sqx-component
+                            [form]="form"
+                            [formContext]="formContext"
+                            [formLevel]="formLevel"
+                            [formModel]="$any(formModel)"
+                            [hasChatBot]="hasChatBot"
+                            [isComparing]="isComparing"
+                            [language]="language"
+                            [languages]="languages"></sqx-component>
+                    }
+                    @case ("Components") {
+                        <sqx-array-editor
+                            [form]="form"
+                            [formContext]="formContext"
+                            [formLevel]="formLevel"
+                            [formModel]="$any(formModel)"
+                            [hasChatBot]="hasChatBot"
+                            [isComparing]="isComparing"
+                            [isExpanded]="isExpanded"
+                            [language]="language"
+                            [languages]="languages"></sqx-array-editor>
+                    }
+                    @case ("DateTime") {
+                        <sqx-date-time-editor
+                            enforceTime="true"
+                            [formControl]="$any(fieldForm)"
+                            [mode]="field.rawProperties.editor"></sqx-date-time-editor>
+                    }
+                    @case ("Geolocation") {
+                        <sqx-geolocation-editor [formControl]="$any(fieldForm)"></sqx-geolocation-editor>
+                    }
+                    @case ("Json") {
+                        <sqx-code-editor [formControl]="$any(fieldForm)" [height]="350" valueMode="Json"></sqx-code-editor>
+                    }
+                    @case ("Number") {
+                        @switch (field.rawProperties.editor) {
+                            @case ("Input") {
+                                <input
+                                    class="form-control"
+                                    [formControl]="$any(fieldForm)"
+                                    [placeholder]="field.displayPlaceholder"
+                                    type="number" />
+                            }
+                            @case ("Stars") {
+                                <sqx-stars [formControl]="$any(fieldForm)" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
+                            }
+                            @case ("Radio") {
+                                <sqx-radio-group
+                                    [formControl]="$any(fieldForm)"
+                                    unsorted="true"
+                                    [values]="field.rawProperties.allowedValues"></sqx-radio-group>
+                            }
+                            @case ("Dropdown") {
+                                <select class="form-select" [formControl]="$any(fieldForm)">
+                                    <option [ngValue]="null"></option>
+                                    @for (value of field.rawProperties.allowedValues; track value) {
+                                        <option [ngValue]="value">{{ value }}</option>
+                                    }
+                                </select>
+                            }
+                        }
+                    }
+                    @case ("References") {
+                        @switch (field.rawProperties.editor) {
+                            @case ("List") {
+                                <sqx-references-editor
+                                    [allowDuplicates]="field.rawProperties.allowDuplicated"
+                                    [formContext]="formContext"
+                                    [formControl]="$any(fieldForm)"
+                                    [isExpanded]="isExpanded"
+                                    [language]="language"
+                                    [languages]="languages"
+                                    [query]="field.rawProperties.query"
+                                    [schemaIds]="field.rawProperties.schemaIds"></sqx-references-editor>
+                            }
+                            @case ("Dropdown") {
+                                <sqx-reference-dropdown
+                                    [formControl]="$any(fieldForm)"
+                                    [language]="language"
+                                    [languages]="languages"
+                                    mode="Array"
+                                    [schemaId]="field.rawProperties.singleId"></sqx-reference-dropdown>
+                            }
+                            @case ("Input") {
+                                <sqx-reference-input
+                                    [formControl]="$any(fieldForm)"
+                                    [language]="language"
+                                    [languages]="languages"
+                                    mode="Array"
+                                    [query]="field.rawProperties.query"
+                                    [schemaIds]="field.rawProperties.schemaIds"></sqx-reference-input>
+                            }
+                            @case ("Tags") {
+                                <sqx-references-tags
+                                    [formControl]="$any(fieldForm)"
+                                    [language]="language"
+                                    [languages]="languages"
+                                    [schemaId]="field.rawProperties.singleId"></sqx-references-tags>
+                            }
+                            @case ("Checkboxes") {
+                                <sqx-references-checkboxes
+                                    [formControl]="$any(fieldForm)"
+                                    [language]="language"
+                                    [schemaId]="field.rawProperties.singleId"></sqx-references-checkboxes>
+                            }
+                        }
+                    }
+                    @case ("String") {
+                        @switch (field.rawProperties.editor) {
+                            @case ("Input") {
+                                <input class="form-control" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" />
+                            }
+                            @case ("Slug") {
+                                <input
+                                    class="form-control"
+                                    [formControl]="$any(fieldForm)"
+                                    [placeholder]="field.displayPlaceholder"
+                                    sqxTransformInput="Slugify" />
+                            }
+                            @case ("TextArea") {
+                                <textarea
+                                    class="form-control"
+                                    [formControl]="$any(fieldForm)"
+                                    [placeholder]="field.displayPlaceholder"
+                                    rows="5"></textarea>
+                            }
+                            @case ("RichText") {
+                                <sqx-rich-editor
+                                    #editor
+                                    [annotations]="annotations | async"
+                                    (annotationsCreate)="annotationCreate($event)"
+                                    (annotationsSelect)="annotationsSelect($event)"
+                                    (annotationsUpdate)="annotationsUpdate($event)"
+                                    [classNames]="field.rawProperties.classNames"
+                                    [folderId]="field.rawProperties.folderId"
+                                    [formControl]="$any(fieldForm)"
+                                    [hasAnnotations]="!!comments"
+                                    [hasChatBot]="hasChatBot"
+                                    [language]="language"
+                                    [languages]="languages"
+                                    mode="Html"
+                                    [schemaIds]="field.rawProperties.schemaIds"></sqx-rich-editor>
+                            }
+                            @case ("Html") {
+                                <sqx-code-editor
+                                    #editor
+                                    [formControl]="$any(fieldForm)"
+                                    [height]="350"
+                                    mode="ace/mode/html"></sqx-code-editor>
+                            }
+                            @case ("Markdown") {
+                                <sqx-rich-editor
+                                    #editor
+                                    [annotations]="annotations | async"
+                                    (annotationsCreate)="annotationCreate($event)"
+                                    (annotationsSelect)="annotationsSelect($event)"
+                                    (annotationsUpdate)="annotationsUpdate($event)"
+                                    [classNames]="undefined"
+                                    [folderId]="field.rawProperties.folderId"
+                                    [formControl]="$any(fieldForm)"
+                                    [hasAnnotations]="!!comments"
+                                    [hasChatBot]="hasChatBot"
+                                    [language]="language"
+                                    [languages]="languages"
+                                    mode="Markdown"
+                                    [schemaIds]="field.rawProperties.schemaIds"></sqx-rich-editor>
+                            }
+                            @case ("StockPhoto") {
+                                <sqx-stock-photo-editor [formControl]="$any(fieldForm)"></sqx-stock-photo-editor>
+                            }
+                            @case ("Dropdown") {
+                                <select class="form-select" [formControl]="$any(fieldForm)">
+                                    <option [ngValue]="null"></option>
+                                    @for (value of field.rawProperties.allowedValues; track value) {
+                                        <option [ngValue]="value">{{ value }}</option>
+                                    }
+                                </select>
+                            }
+                            @case ("Radio") {
+                                <sqx-radio-group
+                                    [formControl]="$any(fieldForm)"
+                                    unsorted="true"
+                                    [values]="field.rawProperties.allowedValues"></sqx-radio-group>
+                            }
+                            @case ("Color") {
+                                <sqx-color-picker
+                                    [formControl]="$any(fieldForm)"
+                                    [placeholder]="field.displayPlaceholder"></sqx-color-picker>
+                            }
+                        }
+                    }
+                    @case ("RichText") {
+                        <sqx-rich-editor
+                            #editor
+                            [annotations]="annotations | async"
+                            (annotationsCreate)="annotationCreate($event)"
+                            (annotationsSelect)="annotationsSelect($event)"
+                            (annotationsUpdate)="annotationsUpdate($event)"
+                            [classNames]="field.rawProperties.classNames"
+                            [folderId]="field.rawProperties.folderId"
+                            [formControl]="$any(fieldForm)"
+                            [hasAnnotations]="!!comments"
+                            [hasChatBot]="hasChatBot"
+                            [language]="language"
+                            [languages]="languages"
+                            mode="State"
+                            [schemaIds]="field.rawProperties.schemaIds"></sqx-rich-editor>
+                    }
+                    @case ("Tags") {
+                        @switch (field.rawProperties.editor) {
+                            @case ("Tags") {
+                                <sqx-tag-editor
+                                    [formControl]="$any(fieldForm)"
+                                    [itemsSource]="field.rawProperties.allowedValues"
+                                    [placeholder]="field.displayPlaceholder"></sqx-tag-editor>
+                            }
+                            @case ("Checkboxes") {
+                                <sqx-checkbox-group
+                                    [formControl]="$any(fieldForm)"
+                                    [values]="field.rawProperties.allowedValues"></sqx-checkbox-group>
+                            }
+                            @case ("Dropdown") {
+                                <select class="form-select" [formControl]="$any(fieldForm)" multiple>
+                                    @for (value of field.rawProperties.allowedValues; track value) {
+                                        <option [ngValue]="value">{{ value }}</option>
+                                    }
+                                </select>
+                            }
+                        }
+                    }
+                    @case ("UI") {
+                        <h4 class="ui-separator">{{ field.displayName }}</h4>
+                    }
+                }
+            }
         </div>
-    </fieldset>
-
-    <label>
-        {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
-    </label> 
-
-    <small class="field-disabled ps-1" *ngIf="field.isDisabled">Disabled</small>
-
-    <sqx-control-errors *ngIf="form" [for]="$any(fieldForm)" [fieldName]="field.displayName"></sqx-control-errors>
-
-	<div>
-		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
-            <sqx-iframe-editor [url]="field.properties.editorUrl" #editor
-                [context]="formContext"
-                [isExpanded]="isExpanded"
-                (isExpandedChange)="toggleExpanded()"
-                [formControlBinding]="$any(fieldForm)"
-                [formValue]="form.valueChanges | async"
-                [formIndex]="index"
-                [formField]="formModel.field.name"
-                [language]="language"
-                [languages]="languages"
-                [schemaIds]="field.rawProperties.schemaIds">
-            </sqx-iframe-editor>
-		</ng-container>
-
-		<ng-template #noEditor>
-			<ng-container [ngSwitch]="field.properties.fieldType">
-                <ng-container *ngSwitchCase="'Array'">
-                    <sqx-array-editor
-                        [form]="form"
-                        [formLevel]="formLevel"
-                        [formModel]="$any(formModel)"
-                        [formContext]="formContext"
-                        [isComparing]="isComparing"
-                        [isExpanded]="isExpanded"
-                        [hasChatBot]="hasChatBot"
-                        [language]="language"
-                        [languages]="languages">
-                    </sqx-array-editor>
-                </ng-container>
-                <ng-container *ngSwitchCase="'Assets'">
-                    <sqx-assets-editor
-                        [formControl]="$any(fieldForm)"
-                        [folderId]="field.rawProperties.folderId"
-                        [hasChatBot]="hasChatBot"
-                        [isExpanded]="isExpanded">
-                    </sqx-assets-editor>
-                </ng-container>
-                <ng-container *ngSwitchCase="'Boolean'">
-                    <ng-container [ngSwitch]="field.rawProperties.editor">
-                        <ng-container *ngSwitchCase="'Toggle'">
-                            <sqx-toggle [formControl]="$any(fieldForm)" [threeStates]="!field.properties.isRequired"></sqx-toggle>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'Checkbox'">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" [formControl]="$any(fieldForm)" id="{{uniqueId}}" sqxIndeterminateValue [threeStates]="!field.properties.isRequired">
-                                <label class="form-check-label" for="{{uniqueId}}"></label>
-                            </div>
-                        </ng-container>
-                    </ng-container>
-                </ng-container>
-                <ng-container *ngSwitchCase="'Component'">
-                    <sqx-component
-                        [form]="form"
-                        [formContext]="formContext"
-                        [formLevel]="formLevel"
-                        [formModel]="$any(formModel)"
-                        [isComparing]="isComparing"
-                        [hasChatBot]="hasChatBot"
-                        [language]="language"
-                        [languages]="languages">
-                    </sqx-component>
-                </ng-container>
-                <ng-container *ngSwitchCase="'Components'">
-                    <sqx-array-editor
-                        [form]="form"
-                        [formLevel]="formLevel"
-                        [formModel]="$any(formModel)"
-                        [formContext]="formContext"
-                        [isComparing]="isComparing"
-                        [isExpanded]="isExpanded"
-                        [hasChatBot]="hasChatBot"
-                        [language]="language"
-                        [languages]="languages">
-                    </sqx-array-editor>
-                </ng-container>
-                <ng-container *ngSwitchCase="'DateTime'">
-                    <sqx-date-time-editor [formControl]="$any(fieldForm)" [mode]="field.rawProperties.editor" enforceTime="true"></sqx-date-time-editor>
-                </ng-container>
-				<ng-container *ngSwitchCase="'Geolocation'">
-					<sqx-geolocation-editor [formControl]="$any(fieldForm)"></sqx-geolocation-editor>
-				</ng-container>
-				<ng-container *ngSwitchCase="'Json'">
-					<sqx-code-editor [formControl]="$any(fieldForm)" valueMode="Json" [height]="350"></sqx-code-editor>
-				</ng-container>
-				<ng-container *ngSwitchCase="'Number'">
-					<ng-container [ngSwitch]="field.rawProperties.editor">
-						<ng-container *ngSwitchCase="'Input'">
-							<input class="form-control" type="number" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder">
-						</ng-container>
-						<ng-container *ngSwitchCase="'Stars'">
-							<sqx-stars [formControl]="$any(fieldForm)" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
-						</ng-container>
-						<ng-container *ngSwitchCase="'Radio'">
-                            <sqx-radio-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues" unsorted="true"></sqx-radio-group>
-						</ng-container>
-						<ng-container *ngSwitchCase="'Dropdown'">
-							<select class="form-select" [formControl]="$any(fieldForm)">
-								<option [ngValue]="null"></option>
-								<option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
-							</select>
-						</ng-container>
-					</ng-container>
-				</ng-container>
-				<ng-container *ngSwitchCase="'References'">
-                    <ng-container [ngSwitch]="field.rawProperties.editor">
-                        <ng-container *ngSwitchCase="'List'">
-                            <sqx-references-editor
-                                [allowDuplicates]="field.rawProperties.allowDuplicated"
-                                [formContext]="formContext"
-                                [formControl]="$any(fieldForm)"
-                                [isExpanded]="isExpanded"
-                                [language]="language"
-                                [languages]="languages"
-                                [query]="field.rawProperties.query"
-                                [schemaIds]="field.rawProperties.schemaIds">
-                            </sqx-references-editor>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'Dropdown'">
-                            <sqx-reference-dropdown
-                                mode="Array"
-                                [formControl]="$any(fieldForm)" 
-                                [language]="language"
-                                [languages]="languages"
-								[schemaId]="field.rawProperties.singleId">
-                            </sqx-reference-dropdown>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'Input'">
-                            <sqx-reference-input
-                                mode="Array"
-                                [formControl]="$any(fieldForm)"
-                                [language]="language"
-                                [languages]="languages"
-                                [query]="field.rawProperties.query"
-                                [schemaIds]="field.rawProperties.schemaIds">
-                            </sqx-reference-input>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'Tags'">
-                            <sqx-references-tags
-                                [formControl]="$any(fieldForm)" 
-                                [language]="language"
-                                [languages]="languages"
-								[schemaId]="field.rawProperties.singleId">
-                            </sqx-references-tags>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'Checkboxes'">
-                            <sqx-references-checkboxes
-                                [formControl]="$any(fieldForm)" 
-                                [language]="language"
-								[schemaId]="field.rawProperties.singleId">
-                            </sqx-references-checkboxes>
-                        </ng-container>
-                    </ng-container>
-				</ng-container>
-				<ng-container *ngSwitchCase="'String'">
-					<ng-container [ngSwitch]="field.rawProperties.editor">
-						<ng-container *ngSwitchCase="'Input'">
-							<input class="form-control" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder">
-						</ng-container>
-						<ng-container *ngSwitchCase="'Slug'">
-							<input class="form-control" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify">
-						</ng-container>
-						<ng-container *ngSwitchCase="'TextArea'">
-							<textarea class="form-control" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" rows="5"></textarea>
-						</ng-container>
-						<ng-container *ngSwitchCase="'RichText'">
-							<sqx-rich-editor #editor
-                                mode="Html"
-                                [annotations]="annotations | async"
-                                (annotationsCreate)="annotationCreate($event)"
-                                (annotationsSelect)="annotationsSelect($event)"
-                                (annotationsUpdate)="annotationsUpdate($event)"
-                                [classNames]="field.rawProperties.classNames"
-                                [formControl]="$any(fieldForm)"
-                                [folderId]="field.rawProperties.folderId"
-                                [hasAnnotations]="!!comments"
-                                [hasChatBot]="hasChatBot"
-                                [language]="language"
-                                [languages]="languages"
-                                [schemaIds]="field.rawProperties.schemaIds">
-                            </sqx-rich-editor>
-						</ng-container>
-						<ng-container *ngSwitchCase="'Html'">
-							<sqx-code-editor [formControl]="$any(fieldForm)" #editor mode="ace/mode/html" [height]="350"  ></sqx-code-editor>
-						</ng-container>
-						<ng-container *ngSwitchCase="'Markdown'">
-							<sqx-rich-editor #editor
-                                mode="Markdown"
-                                [annotations]="annotations | async"
-                                (annotationsCreate)="annotationCreate($event)"
-                                (annotationsSelect)="annotationsSelect($event)"
-                                (annotationsUpdate)="annotationsUpdate($event)"
-                                [classNames]="undefined"
-                                [formControl]="$any(fieldForm)"
-                                [folderId]="field.rawProperties.folderId"
-                                [hasAnnotations]="!!comments"
-                                [hasChatBot]="hasChatBot"
-                                [language]="language"
-                                [languages]="languages"
-                                [schemaIds]="field.rawProperties.schemaIds">
-                            </sqx-rich-editor>
-						</ng-container>
-						<ng-container *ngSwitchCase="'StockPhoto'">
-							<sqx-stock-photo-editor [formControl]="$any(fieldForm)"></sqx-stock-photo-editor>
-						</ng-container>
-						<ng-container *ngSwitchCase="'Dropdown'">
-							<select class="form-select" [formControl]="$any(fieldForm)">
-								<option [ngValue]="null"></option>
-								<option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
-							</select>
-						</ng-container>
-						<ng-container *ngSwitchCase="'Radio'">
-                            <sqx-radio-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues" unsorted="true"></sqx-radio-group>
-						</ng-container>
-						<ng-container *ngSwitchCase="'Color'">
-                            <sqx-color-picker [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder"></sqx-color-picker>
-						</ng-container>
-					</ng-container>
-				</ng-container>
-                <ng-container *ngSwitchCase="'RichText'">
-                    <sqx-rich-editor #editor
-                        mode="State"
-                        [annotations]="annotations | async"
-                        (annotationsCreate)="annotationCreate($event)"
-                        (annotationsSelect)="annotationsSelect($event)"
-                        (annotationsUpdate)="annotationsUpdate($event)"
-                        [classNames]="field.rawProperties.classNames"
-                        [formControl]="$any(fieldForm)"
-                        [folderId]="field.rawProperties.folderId"
-                        [hasAnnotations]="!!comments"
-                        [hasChatBot]="hasChatBot"
-                        [language]="language"
-                        [languages]="languages"
-                        [schemaIds]="field.rawProperties.schemaIds">
-                    </sqx-rich-editor>
-                </ng-container>
-				<ng-container *ngSwitchCase="'Tags'">
-                    <ng-container [ngSwitch]="field.rawProperties.editor">
-                        <ng-container *ngSwitchCase="'Tags'">
-                            <sqx-tag-editor [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" [itemsSource]="field.rawProperties.allowedValues"></sqx-tag-editor>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'Checkboxes'">
-                            <sqx-checkbox-group [formControl]="$any(fieldForm)" [values]="field.rawProperties.allowedValues"></sqx-checkbox-group>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'Dropdown'">
-                            <select multiple class="form-select" [formControl]="$any(fieldForm)">
-                                <option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
-                            </select>
-                        </ng-container>
-                    </ng-container>
-                </ng-container>
-                <ng-container *ngSwitchCase="'UI'">
-                    <h4 class="ui-separator">{{field.displayName}}</h4>
-                </ng-container>
-			</ng-container>
-		</ng-template>
+        @if (field.properties.hints && field.properties.hints.length > 0) {
+            <sqx-form-hint>
+                <span inline="true" optional="true" [sqxMarkdown]="field.properties.hints"></span>
+            </sqx-form-hint>
+        }
     </div>
+}
 
-    <sqx-form-hint *ngIf="field.properties.hints && field.properties.hints.length > 0">
-        <span [sqxMarkdown]="field.properties.hints" optional="true" inline="true"></span>
-    </sqx-form-hint>
-</div>
-
-<sqx-chat-dialog *sqxModal="chatDialog"
-    (contentSelect)="setValue($event)">
-</sqx-chat-dialog>
+<sqx-chat-dialog (contentSelect)="setValue($event)" *sqxModal="chatDialog"></sqx-chat-dialog>

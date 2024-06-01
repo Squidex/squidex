@@ -4,38 +4,42 @@
     </div>
     <div class="col col-step">
         <div class="transition-to">
-            <i class="icon-circle" [style.color]="transition.step.color"></i> {{transition.to}}
+            <i class="icon-circle" [style.color]="transition.step.color"></i>
+            {{ transition.to }}
         </div>
     </div>
     <div class="col-auto col-label">
-        <span class="text-decent">{{ 'workflows.syntax.when' | sqxTranslate }}</span>
+        <span class="text-decent">{{ "workflows.syntax.when" | sqxTranslate }}</span>
     </div>
     <div class="col">
-        <input class="form-control" [class.dashed]="!transition.expression" spellcheck="false"
-            [disabled]="!!disabled" 
-            [ngModelOptions]="onBlur" 
-            [ngModel]="transition.expression" 
-            (ngModelChange)="changeExpression($event)" 
-            placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"> 
+        <input
+            class="form-control"
+            [class.dashed]="!transition.expression"
+            [disabled]="!!disabled"
+            [ngModel]="transition.expression"
+            (ngModelChange)="changeExpression($event)"
+            [ngModelOptions]="onBlur"
+            placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
+            spellcheck="false" />
     </div>
     <div class="col-auto col-label">
-        <span class="text-decent">{{ 'workflows.syntax.for' | sqxTranslate }}</span>
+        <span class="text-decent">{{ "workflows.syntax.for" | sqxTranslate }}</span>
     </div>
     <div class="col col-roles">
-        <sqx-tag-editor placeholder="{{ 'common.role' | sqxTranslate }}"
-            allowDuplicates="false" 
-            [disabled]="!!disabled" 
+        <sqx-tag-editor
+            allowDuplicates="false"
+            [disabled]="!!disabled"
             [itemsSource]="roles"
+            [ngModel]="transition.roles"
+            (ngModelChange)="changeRole($event)"
             [ngModelOptions]="onBlur"
-            [ngModel]="transition.roles" 
-            (ngModelChange)="changeRole($event)" 
+            placeholder="{{ 'common.role' | sqxTranslate }}"
             styleDashed="true"
-            styleScrollable="true">
-        </sqx-tag-editor>
+            styleScrollable="true"></sqx-tag-editor>
     </div>
 
     <div class="col col-button ps-2">
-        <button type="button" class="btn btn-text-danger" (click)="remove.emit()" [disabled]="disabled">
+        <button class="btn btn-text-danger" (click)="remove.emit()" [disabled]="disabled" type="button">
             <i class="icon-bin2"></i>
         </button>
     </div>

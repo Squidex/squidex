@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf, NgTemplateOutlet } from '@angular/common';
+import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, Input, numberAttribute, OnDestroy, OnInit, Optional, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router, RouterLink } from '@angular/router';
 import { concat, defer, filter, map, of } from 'rxjs';
@@ -22,7 +22,6 @@ import { SidebarMenuDirective } from './template.directive';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
-        NgIf,
         NgTemplateOutlet,
         RouterLink,
         StopClickDirective,

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -25,7 +25,6 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
-        NgIf,
         RouterLink,
         RuleElementComponent,
         ToggleComponent,

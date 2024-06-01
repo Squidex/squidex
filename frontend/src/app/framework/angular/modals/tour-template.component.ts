@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { AfterContentInit, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { fadeAnimation, StatefulComponent } from '@app/framework/internal';
 import { MarkdownInlinePipe, MarkdownPipe } from '../pipes/markdown.pipe';
@@ -29,7 +29,6 @@ import { StepDefinition, TourService } from './tour.service';
         MarkdownPipe,
         ModalDirective,
         ModalPlacementDirective,
-        NgIf,
         SafeHtmlPipe,
         TranslatePipe,
     ],

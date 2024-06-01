@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DropdownMenuComponent, FileDropDirective, HTTP, ModalDirective, ModalPlacementDirective, ProgressBarComponent, TranslatePipe } from '@app/framework';
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
@@ -22,11 +22,6 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
         FileDropDirective,
         ModalDirective,
         ModalPlacementDirective,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
-        NgSwitchDefault,
         ProgressBarComponent,
         TranslatePipe,
     ],
@@ -58,9 +53,5 @@ export class AssetUploaderComponent {
 
     public stopUpload(upload: Upload) {
         this.assetUploader.stopUpload(upload);
-    }
-
-    public trackByUpload(_index: number, upload: Upload) {
-        return upload.id;
     }
 }

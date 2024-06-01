@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf, SlicePipe } from '@angular/common';
+import { SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, ControlErrorsComponent, EditRoleForm, FormAlertComponent, FormHintComponent, RoleDto, RolesState, SchemaDto, Settings, TranslatePipe, TypedSimpleChanges } from '@app/shared';
@@ -46,8 +46,6 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
         FormAlertComponent,
         FormHintComponent,
         FormsModule,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         SlicePipe,
         TranslatePipe,
@@ -131,13 +129,5 @@ export class RoleComponent {
                     },
                 });
         }
-    }
-
-    public trackByProperty(_index: number, property: Property) {
-        return property.key;
-    }
-
-    public trackBySchema(_index: number, schema: SchemaDto) {
-        return schema.id;
     }
 }

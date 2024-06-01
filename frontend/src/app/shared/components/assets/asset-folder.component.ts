@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalPlacementDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetFolderDto, AssetPathItem, DialogModel, ModalModel, Types } from '@app/shared/internal';
@@ -23,7 +23,6 @@ import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
         DropdownMenuComponent,
         ModalDirective,
         ModalPlacementDirective,
-        NgIf,
         TooltipDirective,
         TranslatePipe,
     ],

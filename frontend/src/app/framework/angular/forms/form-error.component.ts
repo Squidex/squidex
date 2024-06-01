@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ErrorDto, TypedSimpleChanges } from '@app/framework/internal';
 import { MarkdownPipe } from '../pipes/markdown.pipe';
@@ -20,7 +20,6 @@ import { SafeHtmlPipe } from '../safe-html.pipe';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         MarkdownPipe,
-        NgIf,
         SafeHtmlPipe,
         TranslatePipe,
     ],

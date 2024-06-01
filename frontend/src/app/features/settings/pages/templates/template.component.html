@@ -1,32 +1,35 @@
-<div class="table-items-row table-items-row-expandable"> 
+<div class="table-items-row table-items-row-expandable">
     <div class="table-items-row-summary row gx-2 align-items-center">
         <div class="col">
-            {{template.title}}
+            {{ template.title }}
 
-            <sqx-form-hint class="truncate">{{template.description}}</sqx-form-hint>
+            <sqx-form-hint class="truncate">{{ template.description }}</sqx-form-hint>
         </div>
         <div class="col-auto">
             <div class="float-end">
-                <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isExpanded" (click)="toggleExpanded()">
+                <button
+                    class="btn btn-outline-secondary btn-expand me-1"
+                    [class.expanded]="isExpanded"
+                    (click)="toggleExpanded()"
+                    type="button">
                     <i class="icon-download"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="table-items-row-details" *ngIf="isExpanded">
-        <div class="table-items-row-details-tabs clearfix">
-            <h4>{{ 'common.details' | sqxTranslate }}</h4>
+    @if (isExpanded) {
+        <div class="table-items-row-details">
+            <div class="table-items-row-details-tabs clearfix">
+                <h4>{{ "common.details" | sqxTranslate }}</h4>
+            </div>
+            <div class="table-items-row-details-tab">
+                @if (details | async; as loadedDetails) {
+                    <div class="help" [innerHTML]="loadedDetails | sqxMarkdown | sqxSafeHtml"></div>
+                } @else {
+                    <sqx-loader></sqx-loader>
+                }
+            </div>
         </div>
-
-        <div class="table-items-row-details-tab">
-            <ng-container *ngIf="details | async; let loadedDetails; else loading">
-                <div class="help" [innerHTML]="loadedDetails | sqxMarkdown | sqxSafeHtml"></div>
-            </ng-container>
-
-            <ng-template #loading>
-                <sqx-loader></sqx-loader>
-            </ng-template>
-        </div>
-    </div>
+    }
 </div>

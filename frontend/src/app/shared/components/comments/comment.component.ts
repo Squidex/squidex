@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgForOf, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -34,8 +34,6 @@ interface State {
         FromNowPipe,
         MarkdownPipe,
         MentionModule,
-        NgIf,
-        NgForOf,
         ReactiveFormsModule,
         RouterLink,
         SafeHtmlPipe,
@@ -175,9 +173,5 @@ export class CommentComponent extends StatefulComponent<State> {
             event.preventDefault();
             this.update();
         }
-    }
-
-    public trackByComment(_: number, item: { index: number }) {
-        return item.index;
     }
 }

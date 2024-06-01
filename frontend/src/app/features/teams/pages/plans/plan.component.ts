@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, TranslatePipe } from '@app/shared';
 import { TeamPlansState } from '../../internal';
@@ -22,7 +22,6 @@ import { TeamPlansState } from '../../internal';
         FileSizePipe,
         FormHintComponent,
         KNumberPipe,
-        NgIf,
         TranslatePipe,
     ],
 })

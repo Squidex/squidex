@@ -20,6 +20,8 @@ public static class Constants
 
     public const string PrefixIdentityServer = "/identity-server";
 
+    public const string PrefixSignin = "/signin";
+
     public const string ScopePermissions = "permissions";
 
     public const string ScopeProfile = "squidex-profile";

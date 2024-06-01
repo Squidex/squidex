@@ -1,71 +1,71 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row mb-3">
-        <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">{{ 'schemas.field.editorUrl' | sqxTranslate }}</label>
+        <label class="col-3 col-form-label" for="{{ field.fieldId }}_editorUrl">{{ "schemas.field.editorUrl" | sqxTranslate }}</label>
 
         <div class="col-9">
-            <input type="url" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl">
+            <input class="form-control" id="{{ field.fieldId }}_editorUrl" formControlName="editorUrl" type="url" />
 
             <sqx-form-hint>
-                {{ 'schemas.field.editorUrlHint' | sqxTranslate }}
+                {{ "schemas.field.editorUrlHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>
 </div>
 
-<ng-container [ngSwitch]="field.rawProperties.fieldType">
-    <ng-container *ngSwitchCase="'Array'">
-        <sqx-array-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-array-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Assets'">
-        <sqx-assets-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-assets-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Boolean'">
-        <sqx-boolean-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-boolean-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Component'">
-        <sqx-component-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-component-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Components'">
-        <sqx-components-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-components-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'DateTime'">
-        <sqx-date-time-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-date-time-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Geolocation'">
-        <sqx-geolocation-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-geolocation-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Json'">
-        <sqx-json-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-json-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Number'">
-        <sqx-number-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-number-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'References'">
-        <sqx-references-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-references-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'RichText'">
-        <sqx-rich-text-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-rich-text-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'String'">
-        <sqx-string-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-string-ui>
-    </ng-container>
-    <ng-container *ngSwitchCase="'Tags'">
-        <sqx-tags-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-tags-ui>
-    </ng-container>
-</ng-container>
+@switch (field.rawProperties.fieldType) {
+    @case ("Array") {
+        <sqx-array-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-array-ui>
+    }
+    @case ("Assets") {
+        <sqx-assets-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-assets-ui>
+    }
+    @case ("Boolean") {
+        <sqx-boolean-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-boolean-ui>
+    }
+    @case ("Component") {
+        <sqx-component-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-component-ui>
+    }
+    @case ("Components") {
+        <sqx-components-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-components-ui>
+    }
+    @case ("DateTime") {
+        <sqx-date-time-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-date-time-ui>
+    }
+    @case ("Geolocation") {
+        <sqx-geolocation-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-geolocation-ui>
+    }
+    @case ("Json") {
+        <sqx-json-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-json-ui>
+    }
+    @case ("Number") {
+        <sqx-number-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-number-ui>
+    }
+    @case ("References") {
+        <sqx-references-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-references-ui>
+    }
+    @case ("RichText") {
+        <sqx-rich-text-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-rich-text-ui>
+    }
+    @case ("String") {
+        <sqx-string-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-string-ui>
+    }
+    @case ("Tags") {
+        <sqx-tags-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties"></sqx-tags-ui>
+    }
+}
 
 <div [formGroup]="fieldForm">
     <div class="form-group row mt-3">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldHalfWidth" formControlName="isHalfWidth">
-                <label class="form-check-label" for="{{field.fieldId}}_fieldHalfWidth">
-                    {{ 'schemas.field.halfWidth' | sqxTranslate }}
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldHalfWidth" formControlName="isHalfWidth" type="checkbox" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldHalfWidth">
+                    {{ "schemas.field.halfWidth" | sqxTranslate }}
                 </label>
             </div>
 
             <sqx-form-hint>
-                {{ 'schemas.field.halfWidthHint' | sqxTranslate }}
+                {{ "schemas.field.halfWidthHint" | sqxTranslate }}
             </sqx-form-hint>
         </div>
     </div>

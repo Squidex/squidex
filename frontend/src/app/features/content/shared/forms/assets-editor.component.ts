@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, ChatDialogComponent, DialogModel, FileDropDirective, HTTP, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, sorted, StatefulControlComponent, Subscriptions, TranslatePipe, Types } from '@app/shared';
@@ -58,8 +58,6 @@ interface State {
         ChatDialogComponent,
         FileDropDirective,
         ModalDirective,
-        NgFor,
-        NgIf,
         ResizedDirective,
         TranslatePipe,
     ],
@@ -236,9 +234,5 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         }
 
         this.callTouched();
-    }
-
-    public trackByAsset(_index: number, asset: AssetDto) {
-        return asset.id;
     }
 }

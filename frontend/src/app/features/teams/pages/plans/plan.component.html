@@ -1,60 +1,65 @@
 <div class="card plan" [class.border-primary]="planInfo.isSelected || planInfo.isYearlySelected">
     <div class="card-header text-center">
-        <h4 class="card-title">{{planInfo.plan.name}}</h4>
-        <h5 class="plan-price">{{planInfo.plan.costs}}</h5>
+        <h4 class="card-title">{{ planInfo.plan.name }}</h4>
+        <h5 class="plan-price">{{ planInfo.plan.costs }}</h5>
 
         <sqx-form-hint>
-            {{ 'plans.perMonth' | sqxTranslate }}
+            {{ "plans.perMonth" | sqxTranslate }}
         </sqx-form-hint>
     </div>
     <div class="card-body">
         <div class="plan-fact text-center">
             <div>
-                <strong>{{planInfo.plan.maxApiCalls | sqxKNumber}}</strong> {{ 'plans.includedCalls' | sqxTranslate }}
+                <strong>{{ planInfo.plan.maxApiCalls | sqxKNumber }}</strong>
+                {{ "plans.includedCalls" | sqxTranslate }}
             </div>
             <div>
-                <strong>{{planInfo.plan.maxApiBytes | sqxFileSize}}</strong> {{ 'plans.includedTraffic' | sqxTranslate }}
+                <strong>{{ planInfo.plan.maxApiBytes | sqxFileSize }}</strong>
+                {{ "plans.includedTraffic" | sqxTranslate }}
             </div>
-            <div>
-                {{planInfo.plan.maxAssetSize | sqxFileSize}} {{ 'plans.includedStorage' | sqxTranslate }}
-            </div>
-            <div>
-                {{planInfo.plan.maxContributors}} {{ 'plans.includedContributors' | sqxTranslate }}
-            </div>
-        </div>
-    
-        <button *ngIf="planInfo.isSelected" class="btn btn-block btn-text-success plan-selected">
-            &#10003; {{ 'plans.selected' | sqxTranslate }}
-        </button>
-        
-        <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success" [disabled]="(plansState.locked| async) !== 'None'"
-            (sqxConfirmClick)="changeMonthly()"
-            confirmRememberKey="changePlan"
-            confirmTitle="i18n:plans.changeConfirmTitle"
-            [confirmText]="planInfo.plan.confirmText"
-            [confirmRequired]="!!planInfo.plan.confirmText">
-            {{ 'plans.change' | sqxTranslate }}
-        </button>
-    </div>
-    <div class="card-footer" *ngIf="planInfo.plan.yearlyId">
-        <div class="text-center">
-            <h5 class="plan-price">{{planInfo.plan.yearlyCosts}}</h5>
-
-            <sqx-form-hint>
-                {{ 'plans.perYear' | sqxTranslate }}
-            </sqx-form-hint>
+            <div>{{ planInfo.plan.maxAssetSize | sqxFileSize }} {{ "plans.includedStorage" | sqxTranslate }}</div>
+            <div>{{ planInfo.plan.maxContributors }} {{ "plans.includedContributors" | sqxTranslate }}</div>
         </div>
 
-        <button *ngIf="planInfo.isYearlySelected" class="btn btn-block btn-text-success plan-selected">
-            &#10003; {{ 'plans.selected' | sqxTranslate }}
-        </button>
-        
-        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="(plansState.locked| async) !== 'None'"
-            (sqxConfirmClick)="changeYearly()"
-            confirmTitle="i18n:plans.changeConfirmTitle"
-            [confirmText]="planInfo.plan.yearlyConfirmText!"
-            [confirmRequired]="!!planInfo.plan.yearlyConfirmText">
-            {{ 'plans.change' | sqxTranslate }}
-        </button>
+        @if (planInfo.isSelected) {
+            <button class="btn btn-block btn-text-success plan-selected">&#10003; {{ "plans.selected" | sqxTranslate }}</button>
+        }
+
+        @if (!planInfo.isSelected) {
+            <button
+                class="btn btn-block btn-success"
+                confirmRememberKey="changePlan"
+                [confirmRequired]="!!planInfo.plan.confirmText"
+                [confirmText]="planInfo.plan.confirmText"
+                confirmTitle="i18n:plans.changeConfirmTitle"
+                [disabled]="(plansState.locked | async) !== 'None'"
+                (sqxConfirmClick)="changeMonthly()">
+                {{ "plans.change" | sqxTranslate }}
+            </button>
+        }
     </div>
+    @if (planInfo.plan.yearlyId) {
+        <div class="card-footer">
+            <div class="text-center">
+                <h5 class="plan-price">{{ planInfo.plan.yearlyCosts }}</h5>
+                <sqx-form-hint>
+                    {{ "plans.perYear" | sqxTranslate }}
+                </sqx-form-hint>
+            </div>
+            @if (planInfo.isYearlySelected) {
+                <button class="btn btn-block btn-text-success plan-selected">&#10003; {{ "plans.selected" | sqxTranslate }}</button>
+            }
+            @if (!planInfo.isYearlySelected) {
+                <button
+                    class="btn btn-block btn-success"
+                    [confirmRequired]="!!planInfo.plan.yearlyConfirmText"
+                    [confirmText]="planInfo.plan.yearlyConfirmText!"
+                    confirmTitle="i18n:plans.changeConfirmTitle"
+                    [disabled]="(plansState.locked | async) !== 'None'"
+                    (sqxConfirmClick)="changeYearly()">
+                    {{ "plans.change" | sqxTranslate }}
+                </button>
+            }
+        </div>
+    }
 </div>

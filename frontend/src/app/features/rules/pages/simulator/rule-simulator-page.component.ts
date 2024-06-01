@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent, ListViewComponent, MessageBus, RuleSimulatorState, SimulatedRuleEventDto, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -21,7 +21,6 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
         AsyncPipe,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
         SimulatedRuleEventComponent,
         TitleComponent,
         TooltipDirective,
@@ -64,9 +63,5 @@ export class RuleSimulatorPageComponent implements OnInit {
         } else {
             this.selectedRuleEvent = event.uniqueId;
         }
-    }
-
-    public trackByEvent(_index: number, event: SimulatedRuleEventDto) {
-        return event.uniqueId;
     }
 }

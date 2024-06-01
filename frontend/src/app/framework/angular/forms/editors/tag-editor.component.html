@@ -1,84 +1,108 @@
 <div class="form-container">
-    <div class="form-control tags" tabindex="0" #form 
-        (focus)="focusInput($event)" (mousedown)="focusInput($event)"
-        [class.blank]="styleBlank" 
+    <div
+        class="form-control tags"
+        #form
+        [class.blank]="styleBlank"
         [class.dashed]="styleDashed && !(snapshot.tags.length > 0)"
         [class.disabled]="snapshot.isDisabled"
-        [class.focus]="snapshot.hasFocus" 
+        [class.focus]="snapshot.hasFocus"
         [class.multiline]="!styleScrollable"
         [class.readonly]="readonly"
         [class.singleline]="styleScrollable"
-        [class.suggested]="itemsSorted.length > 0">
-        <span class="item" *ngFor="let tag of snapshot.tags; let i = index" [class.disabled]="addInput.disabled">
-            {{tag}} <i class="icon-close" (click)="remove(i)"></i>
-        </span>
+        [class.suggested]="itemsSorted.length > 0"
+        (focus)="focusInput($event)"
+        (mousedown)="focusInput($event)"
+        tabindex="0">
+        @for (tag of snapshot.tags; track tag; let i = $index) {
+            <span class="item" [class.disabled]="addInput.disabled">
+                {{ tag }}
+                <i class="icon-close" (click)="remove(i)"></i>
+            </span>
+        }
 
-        <input class="blank text-input" #input
-            (blur)="markTouched()" 
+        <input
+            class="blank text-input"
+            #input
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+            (blur)="markTouched()"
             (copy)="onCopy($event)"
             (cut)="onCut($event)"
             (focus)="focus()"
+            [formControl]="addInput"
             (keydown)="onKeyDown($event)"
             (paste)="onPaste($event)"
             [placeholder]="placeholder | sqxTranslate"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-            [formControl]="addInput">
+            spellcheck="false" />
     </div>
 
-    <div class="btn btn-sm" (click)="openModal()" sqxStopClick *ngIf="!readonly && (allowOpen || itemsSorted.length > 0)">
-        <i class="icon-caret-down"></i>
-    </div>
-
-    <sqx-dropdown-menu *sqxModal="snapshot.suggestedItems.length > 0" [sqxAnchoredTo]="form" class="control-dropdown" 
-        adjustWidth="true"
-        adjustHeight="false"
-        scrollX="false"
-        scrollY="true" 
-        [style.minWidth]="dropdownWidth"
-        position="bottom-end" #container>
-        <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
-            [class.active]="i === snapshot.suggestedIndex"
-            [class.separated]="itemSeparator"
-            (mousedown)="selectValue(item)" 
-            (mouseover)="selectIndex(i)"
-            [sqxScrollActive]="i === snapshot.suggestedIndex"
-            [sqxScrollContainer]="container.nativeElement">
-            <ng-container>{{item}}</ng-container>
+    @if (!readonly && (allowOpen || itemsSorted.length > 0)) {
+        <div class="btn btn-sm" (click)="openModal()" sqxStopClick>
+            <i class="icon-caret-down"></i>
         </div>
-    </sqx-dropdown-menu>
+    }
 
-    <sqx-dropdown-menu *sqxModal="itemsModal" [sqxAnchoredTo]="form" class="control-dropdown suggestions-dropdown"
-        adjustWidth="false"
+    <sqx-dropdown-menu
+        class="control-dropdown"
+        #container
         adjustHeight="false"
+        adjustWidth="true"
+        position="bottom-end"
         scrollX="false"
         scrollY="true"
-        position="bottom-end">
-        <div class="row">
-            <div class=" col-6" *ngFor="let item of itemsSorted; let i = index">
-                <div class="form-check form-check">
-                    <input class="form-check-input" type="checkbox" id="tag_{{i}}"
-                        [ngModel]="isSelected(item)"
-                        (ngModelChange)="toggleValue($event, item)"
-                    />
-
-                    <label class="form-check-label" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-start">
-                        <span class="truncate">{{item.name}}</span>
-                    </label>
-                </div>
+        [sqxAnchoredTo]="form"
+        *sqxModal="snapshot.suggestedItems.length > 0"
+        [style.minWidth]="dropdownWidth">
+        @for (item of snapshot.suggestedItems; track item; let i = $index) {
+            <div
+                class="control-dropdown-item control-dropdown-item-selectable"
+                [class.active]="i === snapshot.suggestedIndex"
+                [class.separated]="itemSeparator"
+                (mousedown)="selectValue(item)"
+                (mouseover)="selectIndex(i)"
+                [sqxScrollActive]="i === snapshot.suggestedIndex"
+                [sqxScrollContainer]="container.nativeElement">
+                <ng-container>{{ item }}</ng-container>
             </div>
+        }
+    </sqx-dropdown-menu>
+
+    <sqx-dropdown-menu
+        class="control-dropdown suggestions-dropdown"
+        adjustHeight="false"
+        adjustWidth="false"
+        position="bottom-end"
+        scrollX="false"
+        scrollY="true"
+        [sqxAnchoredTo]="form"
+        *sqxModal="itemsModal">
+        <div class="row">
+            @for (item of itemsSorted; track item; let i = $index) {
+                <div class="col-6">
+                    <div class="form-check form-check">
+                        <input
+                            class="form-check-input"
+                            id="tag_{{ i }}"
+                            [ngModel]="isSelected(item)"
+                            (ngModelChange)="toggleValue($event, item)"
+                            type="checkbox" />
+                        <label class="form-check-label" for="tag_{{ i }}" title="{{ item.name }}" titlePosition="top-start">
+                            <span class="truncate">{{ item.name }}</span>
+                        </label>
+                    </div>
+                </div>
+            }
         </div>
 
-        <div class="text-decent" *ngIf="itemsSorted.length === 0">
-            <ng-container *ngIf="itemsSourceLoading; else notLoading">
-                <sqx-loader color="input"></sqx-loader>
-            </ng-container>
-
-            <ng-template #notLoading>
-                <small>{{itemsSourceEmptyText | sqxTranslate}}</small>
-            </ng-template>
-        </div>
+        @if (itemsSorted.length === 0) {
+            <div class="text-decent">
+                @if (itemsSourceLoading) {
+                    <sqx-loader color="input"></sqx-loader>
+                } @else {
+                    <small>{{ itemsSourceEmptyText | sqxTranslate }}</small>
+                }
+            </div>
+        }
     </sqx-dropdown-menu>
 </div>

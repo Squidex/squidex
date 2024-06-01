@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleEventDto, RuleEventsState, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
@@ -24,8 +24,6 @@ import { RuleEventComponent } from './rule-event.component';
         ConfirmClickDirective,
         LayoutComponent,
         ListViewComponent,
-        NgFor,
-        NgIf,
         PagerComponent,
         RuleEventComponent,
         ShortcutDirective,
@@ -83,9 +81,5 @@ export class RuleEventsPageComponent implements OnInit {
         } else {
             this.selectedEventId = id;
         }
-    }
-
-    public trackByRuleEvent(_index: number, ruleEvent: RuleEventDto) {
-        return ruleEvent.id;
     }
 }

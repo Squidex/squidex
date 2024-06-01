@@ -6,13 +6,13 @@
  */
 
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, SchemaCategory, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, value$ } from '@app/shared';
+import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, value$ } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaFormComponent } from './schema-form.component';
 
@@ -27,8 +27,6 @@ import { SchemaFormComponent } from './schema-form.component';
         FormsModule,
         LayoutComponent,
         ModalDirective,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         RouterOutlet,
         SchemaCategoryComponent,
@@ -111,9 +109,5 @@ export class SchemasPageComponent implements OnInit {
         this.import = importing;
 
         this.addSchemaDialog.show();
-    }
-
-    public trackByCategory(_index: number, category: SchemaCategory) {
-        return category.name;
     }
 }

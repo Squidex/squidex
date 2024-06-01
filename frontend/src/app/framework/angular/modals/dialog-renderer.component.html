@@ -1,50 +1,53 @@
 <ng-content></ng-content>
 
 <ng-container *sqxModal="dialogView">
-    <sqx-modal-dialog [showClose]="false" (dialogClose)="cancel()" *ngIf="snapshot.dialogRequest; let request">
-        <ng-container title>
-            {{request.title | sqxTranslate}}
-        </ng-container>
-    
-        <ng-container content>
-            <span [innerHTML]="request.text | sqxTranslate | sqxMarkdown | sqxSafeHtml"></span>
-
-            <div class="form-check mt-4" *ngIf="request.canRemember">
-                <input class="form-check-input" type="checkbox" id="remember" [(ngModel)]="request.remember">
-
-                <label class="form-check-label" for="remember">
-                    {{ 'common.remember' | sqxTranslate}}
-                </label>
-            </div>
-        </ng-container>
-    
-        <ng-container footer>
-            <button type="button" class="btn btn-text-secondary" (click)="cancel()">
-                {{ 'common.no' | sqxTranslate }}
-            </button>
-
-            <button type="button" class="btn btn-danger" (click)="confirm()" sqxFocusOnInit>
-                {{ 'common.yes' | sqxTranslate }}
-            </button>
-        </ng-container>
-    </sqx-modal-dialog>
+    @if (snapshot.dialogRequest; as request) {
+        <sqx-modal-dialog (dialogClose)="cancel()" [showClose]="false">
+            <ng-container title>
+                {{ request.title | sqxTranslate }}
+            </ng-container>
+            <ng-container content>
+                <span [innerHTML]="request.text | sqxTranslate | sqxMarkdown | sqxSafeHtml"></span>
+                @if (request.canRemember) {
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" id="remember" [(ngModel)]="request.remember" type="checkbox" />
+                        <label class="form-check-label" for="remember">
+                            {{ "common.remember" | sqxTranslate }}
+                        </label>
+                    </div>
+                }
+            </ng-container>
+            <ng-container footer>
+                <button class="btn btn-text-secondary" (click)="cancel()" type="button">
+                    {{ "common.no" | sqxTranslate }}
+                </button>
+                <button class="btn btn-danger" (click)="confirm()" sqxFocusOnInit type="button">
+                    {{ "common.yes" | sqxTranslate }}
+                </button>
+            </ng-container>
+        </sqx-modal-dialog>
+    }
 </ng-container>
 
 <div class="notification-container notification-container-bottom-right">
-    <div class="alert alert-dismissible alert-{{notification.messageType}} shadowed" *ngFor="let notification of snapshot.notifications" (click)="close(notification)" @fade>
-        <button type="button" class="btn-close" data-dismiss="alert" (dialogClose)="close(notification)"></button>
-
-        <div class="shadow"></div>
-        <div class="shadowed" [innerHTML]="notification.message | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-    </div>
+    @for (notification of snapshot.notifications; track notification) {
+        <div class="alert alert-dismissible alert-{{ notification.messageType }} shadowed" @fade (click)="close(notification)">
+            <button class="btn-close" data-dismiss="alert" (dialogClose)="close(notification)" type="button"></button>
+            <div class="shadow"></div>
+            <div class="shadowed" [innerHTML]="notification.message | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+        </div>
+    }
 </div>
 
-<ng-container *ngFor="let tooltip of snapshot.tooltips">
-    <div class="tooltip2 tooltip2-{{tooltip.textPosition}}" [sqxAnchoredTo]="tooltip.target" [position]="tooltip.textPosition"[offset]="6">
-        {{tooltip.text | sqxTranslate}}
-
-        <ng-container *ngIf="tooltip.shortcut">
-            &nbsp;({{tooltip.shortcut}})
-        </ng-container>
+@for (tooltip of snapshot.tooltips; track tooltip) {
+    <div
+        class="tooltip2 tooltip2-{{ tooltip.textPosition }}"
+        [offset]="6"
+        [position]="tooltip.textPosition"
+        [sqxAnchoredTo]="tooltip.target">
+        {{ tooltip.text | sqxTranslate }}
+        @if (tooltip.shortcut) {
+            &nbsp;({{ tooltip.shortcut }})
+        }
     </div>
-</ng-container>
+}

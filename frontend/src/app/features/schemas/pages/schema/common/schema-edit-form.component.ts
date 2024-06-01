@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgIf } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ControlErrorsComponent, EditSchemaForm, FormAlertComponent, FormHintComponent, SchemaDto, SchemasState, TagEditorComponent, TranslatePipe } from '@app/shared';
@@ -20,7 +20,6 @@ import { ControlErrorsComponent, EditSchemaForm, FormAlertComponent, FormHintCom
         FormAlertComponent,
         FormHintComponent,
         FormsModule,
-        NgIf,
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,

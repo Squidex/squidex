@@ -1,61 +1,67 @@
 <div class="row mb-1">
     <div class="col">
-        <sqx-language-selector size="sm" 
-            (languageChange)="setLanguage($event)"
+        <sqx-language-selector
             [language]="snapshot.language"
-            [languages]="languages">
-        </sqx-language-selector>
+            (languageChange)="setLanguage($event)"
+            [languages]="languages"
+            size="sm"></sqx-language-selector>
     </div>
     <div class="col-auto">
-        <button type="button" class="btn btn-sm btn-secondary" [disabled]="isEmpty" (click)="unset()">
+        <button class="btn btn-sm btn-secondary" (click)="unset()" [disabled]="isEmpty" type="button">
             <i class="icon-close"></i>
         </button>
     </div>
 </div>
 
-<ng-container [ngSwitch]="type">
-    <ng-container *ngSwitchCase="'text'">
-        <input class="form-control" [attr.type]="type" [attr.id]="id" [attr.name]="name"
+@switch (type) {
+    @case ("text") {
+        <input
+            class="form-control"
+            [attr.id]="id"
+            [attr.name]="name"
+            [attr.type]="type"
+            (blur)="callTouched()"
             [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)"
-            (blur)="callTouched()" />
-    </ng-container>
-    <ng-container *ngSwitchCase="'number'">
-        <input class="form-control" [attr.type]="type" [attr.id]="id" [attr.name]="name"
+            (ngModelChange)="setValue($event)" />
+    }
+    @case ("number") {
+        <input
+            class="form-control"
+            [attr.id]="id"
+            [attr.name]="name"
+            [attr.type]="type"
+            (blur)="callTouched()"
             [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)"
-            (blur)="callTouched()" />
-    </ng-container>
-    <ng-container *ngSwitchCase="'tags'">
-        <sqx-tag-editor
+            (ngModelChange)="setValue($event)" />
+    }
+    @case ("tags") {
+        <sqx-tag-editor (editorBlur)="callTouched()" [ngModel]="currentValue" (ngModelChange)="setValue($event)"></sqx-tag-editor>
+    }
+    @case ("datetime") {
+        <sqx-date-time-editor
+            (editorBlur)="callTouched()"
+            mode="DateTime"
             [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)"
-            (editorBlur)="callTouched()">
-        </sqx-tag-editor>
-    </ng-container>
-    <ng-container *ngSwitchCase="'datetime'">
-        <sqx-date-time-editor mode="DateTime"
+            (ngModelChange)="setValue($event)"></sqx-date-time-editor>
+    }
+    @case ("date") {
+        <sqx-date-time-editor
+            (editorBlur)="callTouched()"
+            mode="Date"
             [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)"
-            (editorBlur)="callTouched()">
-        </sqx-date-time-editor>
-    </ng-container>
-    <ng-container *ngSwitchCase="'date'">
-        <sqx-date-time-editor mode="Date"
-            [ngModel]="currentValue"
-            (ngModelChange)="setValue($event)"
-            (editorBlur)="callTouched()">
-        </sqx-date-time-editor>
-    </ng-container>
-    <ng-container *ngSwitchCase="'boolean'">
+            (ngModelChange)="setValue($event)"></sqx-date-time-editor>
+    }
+    @case ("boolean") {
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" [attr.id]="id"
-                sqxIndeterminateValue
-                [ngModel]="currentValue" 
+            <input
+                class="form-check-input"
+                [attr.id]="id"
+                (blur)="callTouched()"
+                [ngModel]="currentValue"
                 (ngModelChange)="setValue($event)"
-                (blur)="callTouched()">
-
+                sqxIndeterminateValue
+                type="checkbox" />
             <label class="form-check-label" [attr.for]="id"></label>
         </div>
-    </ng-container>
-</ng-container>
+    }
+}

@@ -1,38 +1,47 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createTeam()">
     <sqx-modal-dialog (dialogClose)="emitClose()">
         <ng-container title>
-            {{ 'teams.create' | sqxTranslate }}
+            {{ "teams.create" | sqxTranslate }}
         </ng-container>
 
         <ng-container content>
             <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
-        
+
             <div class="form-group mt-2">
-                <label for="teamName">{{ 'common.name' | sqxTranslate }} <small class="hint">({{ 'common.requiredHint' | sqxTranslate }})</small></label>
-                
+                <label for="teamName">
+                    {{ "common.name" | sqxTranslate }}
+                    <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+                </label>
+
                 <sqx-control-errors for="name"></sqx-control-errors>
-        
-                <input class="form-control" id="name" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit>
-                    
+
+                <input
+                    class="form-control"
+                    id="name"
+                    autocomplete="off"
+                    formControlName="name"
+                    sqxFocusOnInit
+                    sqxTransformInput="LowerCase" />
+
                 <sqx-form-hint>
-                    {{ 'teams.teamNameHint' | sqxTranslate }}
+                    {{ "teams.teamNameHint" | sqxTranslate }}
                 </sqx-form-hint>
             </div>
 
             <div class="form-group">
-                <sqx-form-alert marginTop="2" marginBottom="0">
-                    {{ 'teams.teamNameWarning' | sqxTranslate }}
+                <sqx-form-alert marginBottom="0" marginTop="2">
+                    {{ "teams.teamNameWarning" | sqxTranslate }}
                 </sqx-form-alert>
             </div>
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-secondary" (click)="emitClose()">
-                {{ 'common.cancel' | sqxTranslate }}
+            <button class="btn btn-secondary" (click)="emitClose()" type="button">
+                {{ "common.cancel" | sqxTranslate }}
             </button>
 
-            <button type="submit" class="btn btn-success">
-                {{ 'common.create' | sqxTranslate }}
+            <button class="btn btn-success" type="submit">
+                {{ "common.create" | sqxTranslate }}
             </button>
         </ng-container>
     </sqx-modal-dialog>

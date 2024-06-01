@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, FieldForm, FieldSection, FormErrorComponent, ListViewComponent, MarkdownInlinePipe, RootFieldDto, SafeHtmlPipe, SchemaDto, TranslatePipe, Version } from '@app/shared';
+import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, FormErrorComponent, ListViewComponent, MarkdownInlinePipe, SafeHtmlPipe, SchemaDto, TranslatePipe, Version } from '@app/shared';
 import { ContentSectionComponent } from '../../../shared/forms/content-section.component';
 
 @Component({
@@ -25,8 +25,6 @@ import { ContentSectionComponent } from '../../../shared/forms/content-section.c
         FormsModule,
         ListViewComponent,
         MarkdownInlinePipe,
-        NgFor,
-        NgIf,
         SafeHtmlPipe,
         TranslatePipe,
     ],
@@ -73,8 +71,4 @@ export class ContentEditorComponent {
 
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
-
-    public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {
-        return section.separator?.fieldId;
-    }
 }

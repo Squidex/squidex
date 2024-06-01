@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor } from '@angular/common';
+
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { BOOLEAN_FIELD_EDITORS, BooleanFieldPropertiesDto, FieldDto, FormHintComponent, TranslatePipe } from '@app/shared';
@@ -18,7 +18,6 @@ import { BOOLEAN_FIELD_EDITORS, BooleanFieldPropertiesDto, FieldDto, FormHintCom
     imports: [
         FormHintComponent,
         FormsModule,
-        NgFor,
         ReactiveFormsModule,
         TranslatePipe,
     ],

@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output, QueryList, ViewChildren } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, FormHintComponent, IfOnceDirective, invalid$, ObjectFormBase, RootFieldDto, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, invalid$, ObjectFormBase, RootFieldDto, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -23,8 +23,6 @@ import { ComponentSectionComponent } from './component-section.component';
         ComponentSectionComponent,
         FormHintComponent,
         IfOnceDirective,
-        NgFor,
-        NgIf,
         TooltipDirective,
         TranslatePipe,
     ],
@@ -145,10 +143,6 @@ export class ArrayItemComponent {
         this.sections.forEach(section => {
             section.reset();
         });
-    }
-
-    public trackBySection(_index: number, section: FieldSection<FieldDto, any>) {
-        return section.separator?.fieldId;
     }
 }
 

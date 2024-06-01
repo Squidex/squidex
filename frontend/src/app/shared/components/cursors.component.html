@@ -1,10 +1,12 @@
-<div *ngFor="let cursor of otherCursor | async; trackBy: trackByUser" class="cursor"
-    [style.left]="sizeInPx(cursor.cursor.x)"
-    [style.top]="sizeInPx(cursor.cursor.y)"
-    [class.hidden]="cursor.cursor.x < 0">
-    <div class="user" [style.background]="cursor.user.id | sqxStringColor">
-        {{cursor.user.displayName}}
+@for (cursor of otherCursor | async; track cursor.user.id) {
+    <div
+        class="cursor"
+        [class.hidden]="cursor.cursor.x < 0"
+        [style.left]="sizeInPx(cursor.cursor.x)"
+        [style.top]="sizeInPx(cursor.cursor.y)">
+        <div class="user" [style.background]="cursor.user.id | sqxStringColor">
+            {{ cursor.user.displayName }}
+        </div>
+        <i class="icon-mouse-pointer" [style.color]="cursor.user.id | sqxStringColor"></i>
     </div>
-
-    <i [style.color]="cursor.user.id | sqxStringColor" class="icon-mouse-pointer"></i>
-</div>
+}

@@ -1,22 +1,27 @@
-<ng-container *ngIf="queries && queries.length > 0; else noQuery">
+@if (queries && queries.length > 0) {
     <ul class="nav nav-light flex-column">
-        <li class="nav-item" *ngFor="let saved of queries; trackBy: trackByQuery">
-            <a class="nav-link" (click)="search.emit(saved.query)" [class.active]="isSelectedQuery(saved)">
-                <div class="row g-0">
-                    <div class="col truncate">
-                        <i class="icon-circle" [style.color]="saved.color" [class.hidden]="!saved.color"></i> {{saved.name | sqxTranslate}}
+        @for (saved of queries; track saved.name) {
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="isSelectedQuery(saved)" (click)="search.emit(saved.query)">
+                    <div class="row g-0">
+                        <div class="col truncate">
+                            <i class="icon-circle" [class.hidden]="!saved.color" [style.color]="saved.color"></i>
+                            {{ saved.name | sqxTranslate }}
+                        </div>
+                        <div class="col-auto">
+                            @if (canRemove) {
+                                <a class="btn-sm btn-text-danger btn-remove" (click)="remove.emit(saved)" sqxStopClick>
+                                    <i class="icon-close"></i>
+                                </a>
+                            }
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        <a class="btn-sm btn-text-danger btn-remove" (click)="remove.emit(saved)" *ngIf="canRemove" sqxStopClick>
-                            <i class="icon-close"></i>
-                        </a>
-                    </div>
-                </div>     
-            </a>
-        </li>
+                </a>
+            </li>
+        }
     </ul>
-</ng-container>
-
-<ng-template #noQuery>
-    <div class="text-muted small" *ngIf="canRemove" [innerHTML]="'search.queriesEmpty' | sqxTranslate: { types: types }"></div>
-</ng-template>
+} @else {
+    @if (canRemove) {
+        <div class="text-muted small" [innerHTML]="'search.queriesEmpty' | sqxTranslate: { types: types }"></div>
+    }
+}

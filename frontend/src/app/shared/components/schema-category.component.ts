@@ -6,7 +6,7 @@
  */
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragStart, CdkDropList } from '@angular/cdk/drag-drop';
-import { NgFor, NgIf } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { EditableTitleComponent, StopDragDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
@@ -25,8 +25,6 @@ const ITEM_HEIGHT = 2.5;
         CdkDragHandle,
         CdkDropList,
         EditableTitleComponent,
-        NgFor,
-        NgIf,
         RouterLink,
         RouterLinkActive,
         StopDragDirective,
@@ -112,14 +110,6 @@ export class SchemaCategoryComponent {
 
     public getContainerHeight() {
         return `${ITEM_HEIGHT * this.schemas.length}rem`;
-    }
-
-    public trackBySchema(_index: number, schema: SchemaDto) {
-        return schema.id;
-    }
-
-    public trackByCategory(_index: number, category: SchemaCategory) {
-        return category.name;
     }
 
     private isCollapsedKey(): string {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgFor, NgIf } from '@angular/common';
+
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, TypedSimpleChanges, WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
@@ -21,8 +21,6 @@ import { WorkflowTransitionComponent } from './workflow-transition.component';
         DropdownComponent,
         EditableTitleComponent,
         FormsModule,
-        NgFor,
-        NgIf,
         TagEditorComponent,
         TranslatePipe,
         WorkflowTransitionComponent,
@@ -104,9 +102,5 @@ export class WorkflowStepComponent {
 
     public changeNoUpdateRoles(noUpdateRoles?: ReadonlyArray<string>) {
         this.update.emit({ noUpdateRoles });
-    }
-
-    public trackByTransition(_index: number, transition: WorkflowTransitionView) {
-        return transition.to;
     }
 }

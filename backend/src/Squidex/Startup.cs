@@ -94,15 +94,15 @@ public sealed class Startup
             options.Path = "/api/swagger/v1/swagger.json";
         });
 
-        if (app.ApplicationServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
-        {
-            app.UseWhenPath(Constants.PrefixIdentityServer, builder =>
+        app.UseWhen(c =>
+            c.Request.Path.Value?.StartsWith(Constants.PrefixIdentityServer, StringComparison.OrdinalIgnoreCase) == true ||
+            c.Request.Path.Value?.StartsWith(Constants.PrefixSignin, StringComparison.OrdinalIgnoreCase) == true,
+            builder =>
             {
                 builder.UseExceptionHandler("/identity-server/error");
             });
-        }
 
-        app.UseWhenPath(Constants.PrefixApi, builder =>
+        app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixApi, StringComparison.OrdinalIgnoreCase), builder =>
         {
             builder.UseSquidexCacheKeys();
             builder.UseSquidexExceptionHandling();

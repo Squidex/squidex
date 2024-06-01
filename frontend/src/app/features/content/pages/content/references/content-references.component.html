@@ -1,29 +1,37 @@
 <sqx-list-view [isLoading]="contentsState.isLoading | async" table="true">
     <ng-container>
-        <table class="table table-items table-fixed" *ngIf="contentsState.contents | async; let contents">
-            <tbody *ngFor="let content of contents; trackBy: trackByContent"
-                [sqxReferenceItem]="content"
-                [canRemove]="false"
-                [columns]="contents | sqxContentsColumns"
-                [isCompact]="false"
-                [isDisabled]="false"
-                [language]="language"
-                [languages]="languages"
-                [validations]="(contentsState.validationResults | async)!"
-                [validityVisible]="true">
-            </tbody>
-
-            <tbody *ngIf="(contentsState.isLoaded | async) && contents.length === 0">
-                <tr>
-                    <td class="table-items-row-empty" *ngIf="mode === 'references'">
-                        {{ 'contents.noReferences' | sqxTranslate }}
-                    </td>
-                    <td class="table-items-row-empty"  *ngIf="mode === 'referencing'">
-                        {{ 'contents.noReferencing' | sqxTranslate }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        @if (contentsState.contents | async; as contents) {
+            <table class="table table-items table-fixed">
+                @for (content of contents; track content.id) {
+                    <tbody
+                        [canRemove]="false"
+                        [columns]="contents | sqxContentsColumns"
+                        [isCompact]="false"
+                        [isDisabled]="false"
+                        [language]="language"
+                        [languages]="languages"
+                        [sqxReferenceItem]="content"
+                        [validations]="(contentsState.validationResults | async)!"
+                        [validityVisible]="true"></tbody>
+                }
+                @if ((contentsState.isLoaded | async) && contents.length === 0) {
+                    <tbody>
+                        <tr>
+                            @if (mode === "references") {
+                                <td class="table-items-row-empty">
+                                    {{ "contents.noReferences" | sqxTranslate }}
+                                </td>
+                            }
+                            @if (mode === "referencing") {
+                                <td class="table-items-row-empty">
+                                    {{ "contents.noReferencing" | sqxTranslate }}
+                                </td>
+                            }
+                        </tr>
+                    </tbody>
+                }
+            </table>
+        }
     </ng-container>
 
     <ng-container footer>

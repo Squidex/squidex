@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppsState, getCategoryTree, LayoutComponent, SchemaCategory, SchemaCategoryComponent, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions, value$ } from '@app/shared';
+import { AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions, value$ } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -22,8 +22,6 @@ import { AppsState, getCategoryTree, LayoutComponent, SchemaCategory, SchemaCate
         AsyncPipe,
         FormsModule,
         LayoutComponent,
-        NgFor,
-        NgIf,
         ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
@@ -32,7 +30,7 @@ import { AppsState, getCategoryTree, LayoutComponent, SchemaCategory, SchemaCate
         TitleComponent,
         TranslatePipe,
     ],
-})
+        })
 export class SchemasPageComponent {
     public schemasFilter = new UntypedFormControl();
 
@@ -62,9 +60,5 @@ export class SchemasPageComponent {
         public readonly schemasState: SchemasState,
         private readonly appsState: AppsState,
     ) {
-    }
-
-    public trackByCategory(_index: number, category: SchemaCategory) {
-        return category.name;
     }
 }

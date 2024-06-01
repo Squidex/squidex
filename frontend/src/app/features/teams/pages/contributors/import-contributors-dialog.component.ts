@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, of } from 'rxjs';
@@ -30,10 +30,6 @@ type ImportStatus = {
         FormHintComponent,
         FormsModule,
         ModalDialogComponent,
-        NgFor,
-        NgIf,
-        NgSwitch,
-        NgSwitchCase,
         ReactiveFormsModule,
         StatusIconComponent,
         TooltipDirective,
