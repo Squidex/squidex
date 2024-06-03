@@ -253,6 +253,12 @@
   <data name="common.httpContentTypeNotDefined" xml:space="preserve">
     <value>Bestandstype inhoud is niet gedefinieerd.</value>
   </data>
+  <data name="common.httpDownloadFailed" xml:space="preserve">
+    <value>Failed to download file.</value>
+  </data>
+  <data name="common.httpDownloadRequestSize" xml:space="preserve">
+    <value>File exceeded maximum request size.</value>
+  </data>
   <data name="common.httpFileNameNotDefined" xml:space="preserve">
     <value>Bestandsnaam is niet gedefinieerd.</value>
   </data>

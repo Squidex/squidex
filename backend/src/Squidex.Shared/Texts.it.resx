@@ -253,6 +253,12 @@
   <data name="common.httpContentTypeNotDefined" xml:space="preserve">
     <value>Il content-type del file non è definito.</value>
   </data>
+  <data name="common.httpDownloadFailed" xml:space="preserve">
+    <value>Failed to download file.</value>
+  </data>
+  <data name="common.httpDownloadRequestSize" xml:space="preserve">
+    <value>File exceeded maximum request size.</value>
+  </data>
   <data name="common.httpFileNameNotDefined" xml:space="preserve">
     <value>Il nome del file name non è definito.</value>
   </data>
