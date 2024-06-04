@@ -140,15 +140,6 @@ jobs:
         run: |
           echo "BUILD_NUMBER=$(($BUILD_NUMBER + 6000))" >> $GITHUB_ENV
 
-      - name: Publish - Build for Multi-Platforms
-        uses: docker/build-push-action@v5.3.0
-        with:
-          build-args: "SQUIDEX__RUNTIME__VERSION=7.0.0-dev-${{ env.BUILD_NUMBER }}"
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
-          tags: squidex-local
-
       - name: Publish - Login to Docker Hub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3.1.0
@@ -156,14 +147,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Publish - Rename Tags
+      - name: Publish - Build & Push for Multi-Platforms
         if: github.event_name != 'pull_request'
-        run: |
-          docker tag squidex-local squidex/squidex:dev
-          docker tag squidex-local squidex/squidex:dev-${{ env.BUILD_NUMBER }}
-    
-      - name: Publish - Push Tags
-        if: github.event_name != 'pull_request'
-        run: |
-          docker push squidex/squidex:dev
-          docker push squidex/squidex:dev-${{ env.BUILD_NUMBER }}
+        uses: docker/build-push-action@v5.3.0
+        with:
+          build-args: "SQUIDEX__RUNTIME__VERSION=7.0.0-dev-${{ env.BUILD_NUMBER }}"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+          tags: squidex/squidex:dev,squidex/squidex:dev-${{ env.BUILD_NUMBER }}
+          push: true
+
