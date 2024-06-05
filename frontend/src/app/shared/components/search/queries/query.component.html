@@ -1,17 +1,20 @@
 <sqx-filter-logical
-    [filter]="queryValue.filter"
-    (filterChange)="emitQueryChange()"
+    [filter]="actualQuery.filter"
+    (filterChange)="changeFilter($event)"
     isRoot="true"
     [language]="language"
     [languages]="languages"
-    [model]="model"
-    [statuses]="statuses"></sqx-filter-logical>
+    [model]="model"></sqx-filter-logical>
 
 <h4 class="mt-4">{{ "search.sorting" | sqxTranslate }}</h4>
 
-@for (sorting of queryValue.sort; track sorting; let i = $index) {
+@for (sorting of actualQuery.sort; track sorting; let i = $index) {
     <div class="mb-2">
-        <sqx-sorting [model]="model" (remove)="removeSorting(i)" [sorting]="sorting" (sortingChange)="emitQueryChange()"></sqx-sorting>
+        <sqx-sorting
+            [model]="model"
+            (remove)="removeSorting(i)"
+            [sorting]="sorting"
+            (sortingChange)="replaceSorting(i, $event)"></sqx-sorting>
     </div>
 }
 

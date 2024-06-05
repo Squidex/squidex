@@ -6,6 +6,7 @@
  */
 
 import { QueryParams, RouteSynchronizer, Types } from '@app/framework';
+import { StatusInfo } from './contents.service';
 
 export type FilterSchemaType =
     'Any' |
@@ -92,13 +93,17 @@ export interface QueryModel {
     // All available fields.
     readonly schema: FilterSchema;
 
+    // All available statuses.
+    readonly statuses: ReadonlyArray<StatusInfo>;
+
     // The allowed operators.
     readonly operators: Readonly<{ [type: string]: ReadonlyArray<string> }>;
 }
 
-export type FilterNode = FilterComparison | FilterLogical;
+export type FilterNode = FilterComparison | FilterLogical | FilterNegation;
+export type FilterLogical = FilterAnd | FilterOr;
 
-export interface FilterComparison {
+export type FilterComparison = Readonly<{
     // The full path to the property.
     path: string;
 
@@ -107,14 +112,41 @@ export interface FilterComparison {
 
     // The value.
     value: any;
+}>;
+
+export type FilterNegation = Readonly<{
+    // The negated filter.
+    not: FilterComparison;
+}>;
+
+export type FilterAnd =  Readonly<{
+    // The child filters if the logical filter is a conjunction (AND).
+    and: FilterNode[];
+}>;
+
+export type FilterOr =  Readonly<{
+    // The child filters if the logical filter is a disjunction (OR).
+    or: FilterNode[];
+}>;
+
+export function isNegation(input: FilterNode): input is FilterNegation {
+    return !!(input as any)['not'];
 }
 
-export interface FilterLogical {
-    // The child filters if the logical filter is a conjunction (AND).
-    and?: FilterNode[];
+export function isLogicalOr(input: FilterNode): input is FilterOr {
+    return !!(input as any)['or'];
+}
 
-    // The child filters if the logical filter is a conjunction (AND).
-    or?: FilterNode[];
+export function isLogicalAnd(input: FilterNode): input is FilterAnd {
+    return !!(input as any)['and'];
+}
+
+export function isLogical(input: FilterNode): input is FilterLogical {
+    return isLogicalAnd(input) || isLogicalOr(input);
+}
+
+export function isComparison(input: FilterNode): input is FilterComparison {
+    return !isNegation(input) &&! isComparison(input);
 }
 
 export interface QuerySorting {

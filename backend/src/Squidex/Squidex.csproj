@@ -127,7 +127,7 @@
     <Content Remove="Assets\**" />
     <Content Remove="wwwroot\build\**" />
   </ItemGroup>
-
+	
   <ItemGroup>
     <Folder Include="Areas\Frontend\Resources\" />
   </ItemGroup>

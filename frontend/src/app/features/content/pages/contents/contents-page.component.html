@@ -27,8 +27,7 @@
                     [queriesTypes]="'common.contents' | sqxTranslate"
                     [query]="contentsState.query | async"
                     (queryChange)="search($event)"
-                    [queryModel]="queryModel | async"
-                    [statuses]="contentsState.statuses | async"></sqx-search-form>
+                    [queryModel]="queryModel | async"></sqx-search-form>
             </div>
             @if (languages.length > 1) {
                 <div class="col-auto">

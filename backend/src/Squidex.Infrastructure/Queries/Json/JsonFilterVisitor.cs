@@ -40,7 +40,7 @@ public sealed class JsonFilterVisitor : FilterNodeVisitor<FilterNode<ClrValue>, 
 
     public override FilterNode<ClrValue> Visit(NegateFilter<JsonValue> nodeIn, Args args)
     {
-        return new NegateFilter<ClrValue>(nodeIn.Accept(this, args));
+        return new NegateFilter<ClrValue>(nodeIn.Filter.Accept(this, args));
     }
 
     public override FilterNode<ClrValue> Visit(LogicalFilter<JsonValue> nodeIn, Args args)

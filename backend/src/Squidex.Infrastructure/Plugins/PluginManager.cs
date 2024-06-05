@@ -17,7 +17,7 @@ public sealed class PluginManager : DisposableObjectBase
 {
     private readonly HashSet<PluginLoader> pluginLoaders = [];
     private readonly HashSet<IPlugin> loadedPlugins = [];
-    private readonly List<(string Plugin, string Action, Exception Exception)> exceptions = new List<(string, string, Exception)>();
+    private readonly List<(string Plugin, string Action, Exception Exception)> exceptions = [];
 
     public static readonly PluginManager Instance = new PluginManager();
 

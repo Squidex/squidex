@@ -12,15 +12,15 @@ public sealed class QueryModel
     public static readonly IReadOnlyDictionary<FilterSchemaType, IReadOnlyList<CompareOperator>> DefaultOperators = new Dictionary<FilterSchemaType, IReadOnlyList<CompareOperator>>
     {
         [FilterSchemaType.Any] = Enum.GetValues(typeof(CompareOperator)).OfType<CompareOperator>().ToList(),
-        [FilterSchemaType.Boolean] = new List<CompareOperator>
-        {
+        [FilterSchemaType.Boolean] =
+        [
             CompareOperator.Equals,
             CompareOperator.Exists,
             CompareOperator.In,
             CompareOperator.NotEquals
-        },
-        [FilterSchemaType.DateTime] = new List<CompareOperator>
-        {
+        ],
+        [FilterSchemaType.DateTime] =
+        [
             CompareOperator.Contains,
             CompareOperator.Empty,
             CompareOperator.Exists,
@@ -34,14 +34,14 @@ public sealed class QueryModel
             CompareOperator.Matchs,
             CompareOperator.NotEquals,
             CompareOperator.StartsWith
-        },
-        [FilterSchemaType.GeoObject] = new List<CompareOperator>
-        {
+        ],
+        [FilterSchemaType.GeoObject] =
+        [
             CompareOperator.LessThan,
             CompareOperator.Exists
-        },
-        [FilterSchemaType.Guid] = new List<CompareOperator>
-        {
+        ],
+        [FilterSchemaType.Guid] =
+        [
             CompareOperator.Contains,
             CompareOperator.Empty,
             CompareOperator.Exists,
@@ -55,18 +55,18 @@ public sealed class QueryModel
             CompareOperator.Matchs,
             CompareOperator.NotEquals,
             CompareOperator.StartsWith
-        },
-        [FilterSchemaType.Object] = new List<CompareOperator>(),
-        [FilterSchemaType.ObjectArray] = new List<CompareOperator>
-        {
+        ],
+        [FilterSchemaType.Object] = [],
+        [FilterSchemaType.ObjectArray] =
+        [
             CompareOperator.Empty,
             CompareOperator.Exists,
             CompareOperator.Equals,
             CompareOperator.In,
             CompareOperator.NotEquals
-        },
-        [FilterSchemaType.Number] = new List<CompareOperator>
-        {
+        ],
+        [FilterSchemaType.Number] =
+        [
             CompareOperator.Equals,
             CompareOperator.Exists,
             CompareOperator.LessThan,
@@ -75,9 +75,9 @@ public sealed class QueryModel
             CompareOperator.GreaterThanOrEqual,
             CompareOperator.In,
             CompareOperator.NotEquals
-        },
-        [FilterSchemaType.String] = new List<CompareOperator>
-        {
+        ],
+        [FilterSchemaType.String] =
+        [
             CompareOperator.Contains,
             CompareOperator.Empty,
             CompareOperator.Exists,
@@ -91,9 +91,9 @@ public sealed class QueryModel
             CompareOperator.Matchs,
             CompareOperator.NotEquals,
             CompareOperator.StartsWith
-        },
-        [FilterSchemaType.StringArray] = new List<CompareOperator>
-        {
+        ],
+        [FilterSchemaType.StringArray] =
+        [
             CompareOperator.Contains,
             CompareOperator.Empty,
             CompareOperator.Exists,
@@ -107,7 +107,7 @@ public sealed class QueryModel
             CompareOperator.Matchs,
             CompareOperator.NotEquals,
             CompareOperator.StartsWith
-        }
+        ]
     };
 
     public FilterSchema Schema { get; init; } = FilterSchema.Any;

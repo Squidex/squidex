@@ -41,7 +41,6 @@ public sealed class ContentsDto : Resource
         if (schema != null)
         {
             await result.AssignStatusesAsync(workflow, schema);
-
             await result.CreateLinksAsync(resources, workflow, schema);
         }
 

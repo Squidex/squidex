@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DateTimeEditorComponent, DropdownComponent, HighlightPipe, TranslatePipe } from '@app/framework';
-import { ContributorsState, FilterableField, FilterComparison, FilterFieldUI, getFilterUI, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
+import { ContributorsState, FilterableField, FilterComparison, FilterFieldUI, FilterNegation, getFilterUI, isNegation, LanguageDto, QueryModel } from '@app/shared/internal';
 import { UserDtoPicture } from '../../pipes';
 import { ReferenceInputComponent } from '../../references/reference-input.component';
 import { QueryPathComponent } from './query-path.component';
@@ -36,7 +36,7 @@ import { FilterOperatorPipe } from './query.pipes';
 })
 export class FilterComparisonComponent {
     @Output()
-    public filterChange = new EventEmitter();
+    public filterChange = new EventEmitter<FilterComparison | FilterNegation>();
 
     @Output()
     public remove = new EventEmitter();
@@ -48,13 +48,13 @@ export class FilterComparisonComponent {
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input({ required: true })
-    public statuses?: ReadonlyArray<StatusInfo> | null;
-
-    @Input({ required: true })
     public model!: QueryModel;
 
     @Input({ required: true })
-    public filter!: FilterComparison;
+    public filter!: FilterComparison | FilterNegation;
+
+    public actualComparison!: FilterComparison;
+    public actualNegated = false;
 
     public field?: FilterableField;
     public fieldUI?: FilterFieldUI;
@@ -66,48 +66,45 @@ export class FilterComparisonComponent {
     }
 
     public ngOnChanges() {
-        this.updatePath(false);
-    }
+        if (isNegation(this.filter)) {
+            this.actualComparison = this.filter.not;
+            this.actualNegated = true;
+        } else {
+            this.actualComparison = this.filter;
+            this.actualNegated = false;
+        }
 
-    public changeValue(value: any) {
-        this.filter.value = value;
-
-        this.emitChange();
-    }
-
-    public changeOp(op: string) {
-        this.filter.op = op;
-
-        this.updatePath(false);
-
-        this.emitChange();
-    }
-
-    public changePath(path: string) {
-        this.filter.path = path;
-
-        this.updatePath(true);
-
-        this.emitChange();
-    }
-
-    private updatePath(updateValue: boolean) {
-        this.field = this.model.schema.fields.find(x => x.path === this.filter.path);
+        this.field = this.model.schema.fields.find(x => x.path === this.actualComparison.path);
+        this.fieldUI = getFilterUI(this.actualComparison, this.field!);
 
         this.operators = this.model.operators[this.field?.schema.type!] || [];
 
-        if (!this.operators.includes(this.filter.op)) {
-            this.filter.op = this.operators[0];
+        if (!this.operators.includes(this.actualComparison.op)) {
+            this.actualComparison = { ...this.actualComparison, op: this.operators[0] };
         }
-
-        if (updateValue) {
-            this.filter.value = null;
-        }
-
-        this.fieldUI = getFilterUI(this.filter, this.field!);
     }
 
-    public emitChange() {
-        this.filterChange.emit();
+    public changeValue(value: any) {
+        this.change({ value });
+    }
+
+    public changeOp(op: string) {
+        this.change({ op });
+    }
+
+    public changePath(path: string) {
+        this.change({ path, value: null });
+    }
+
+    private change(update: Partial<FilterComparison>) {
+        this.emitChange({ ...this.actualComparison, ...update }, this.actualNegated);
+    }
+
+    public toggleNot() {
+        this.emitChange(this.actualComparison, !this.actualNegated);
+    }
+
+    private emitChange(filter: FilterComparison, not: boolean) {
+        this.filterChange.emit(not ? { not: filter } : filter);
     }
 }

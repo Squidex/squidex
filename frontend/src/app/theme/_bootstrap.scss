@@ -335,6 +335,10 @@ a {
         box-shadow: none;
     }
 
+    &-code {
+        @include text-code;
+    }
+
     &-outline-secondary {
         color: $color-text-decent;
 

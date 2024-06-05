@@ -37,7 +37,7 @@
     "ace-builds": "^1.34.2",
     "angular-gridster2": "18.0.1",
     "angular-mentions": "1.5.0",
-    "bootstrap": "5.3.3",
+    "bootstrap": "5.2.3",
     "copy-webpack-plugin": "^12.0.2",
     "core-js": "3.37.1",
     "cropperjs": "2.0.0-alpha.1",

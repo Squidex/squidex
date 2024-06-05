@@ -256,6 +256,30 @@ public class MongoQueryTests
     }
 
     [Fact]
+    public void Should_make_query_with_and()
+    {
+        var filter = ClrFilter.And(ClrFilter.Eq("A", 1), ClrFilter.Eq("B", 2));
+
+        AssertQuery("{ 'A' : 1, 'B' : 2 }", filter);
+    }
+
+    [Fact]
+    public void Should_make_query_with_or()
+    {
+        var filter = ClrFilter.Or(ClrFilter.Eq("A", 1), ClrFilter.Eq("B", 2));
+
+        AssertQuery("{ '$or' : [{ 'A' : 1 }, { 'B' : 2 }] }", filter);
+    }
+
+    [Fact]
+    public void Should_make_query_with_not()
+    {
+        var filter = ClrFilter.Not(ClrFilter.Lt("A", 1));
+
+        AssertQuery("{ 'A' : { '$not' : { '$lt' : 1 } } }", filter);
+    }
+
+    [Fact]
     public void Should_make_query_with_full_text()
     {
         var query = new ClrQuery { FullText = "Hello my World" };

@@ -3,7 +3,7 @@
         <div class="col">
             <div class="btn-group">
                 <button
-                    class="btn btn-secondary btn-toggle"
+                    class="btn btn-secondary btn-toggle btn-code"
                     [class.btn-primary]="isAnd"
                     (click)="toggleType()"
                     [disabled]="isAnd"
@@ -11,7 +11,7 @@
                     AND
                 </button>
                 <button
-                    class="btn btn-secondary btn-toggle"
+                    class="btn btn-secondary btn-toggle btn-code"
                     [class.btn-primary]="isOr"
                     (click)="toggleType()"
                     [disabled]="isOr"
@@ -33,18 +33,17 @@
     <div class="filters">
         <span class="filter-line-v"></span>
 
-        @for (filter of filters; track filter; let i = $index) {
+        @for (filter of filters; track $index; let i = $index) {
             <div class="filter mt-3">
                 <span class="filter-line-h"></span>
                 <sqx-filter-node
                     [filter]="filter"
-                    (filterChange)="emitChange()"
+                    (filterChange)="replaceNode(i, $event)"
                     [language]="language"
                     [languages]="languages"
                     [level]="level + 1"
                     [model]="model"
-                    (remove)="removeFilter(i)"
-                    [statuses]="statuses"></sqx-filter-node>
+                    (remove)="removeNode(i)"></sqx-filter-node>
             </div>
         }
 
