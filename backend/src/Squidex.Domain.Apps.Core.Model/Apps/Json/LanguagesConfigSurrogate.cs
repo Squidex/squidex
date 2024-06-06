@@ -17,7 +17,7 @@ public sealed class LanguagesConfigSurrogate : ISurrogate<LanguagesConfig>
 
     public void FromSource(LanguagesConfig source)
     {
-        Languages = source.Languages.ToDictionary(x => x.Key, source =>
+        Languages = source.Values.ToDictionary(x => x.Key, source =>
         {
             var surrogate = new LanguageConfigSurrogate();
 

@@ -90,7 +90,7 @@
           en,
           de
         ],
-        Languages: {
+        Values: {
           de: {
             IsOptional: false,
             Fallbacks: [

@@ -86,7 +86,7 @@
         AllKeys: [
           en
         ],
-        Languages: {
+        Values: {
           en: {
             IsOptional: false
           }

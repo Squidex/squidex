@@ -20,7 +20,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
         },
         Language.EN);
 
-    private readonly Dictionary<string, LanguageConfig> languages;
+    private readonly Dictionary<string, LanguageConfig> values;
     private readonly string master;
 
     public string Master
@@ -30,23 +30,22 @@ public sealed class LanguagesConfig : IFieldPartitioning
 
     public IEnumerable<string> AllKeys
     {
-        get => languages.Keys;
+        get => values.Keys;
     }
 
-    public IReadOnlyDictionary<string, LanguageConfig> Languages
+    public IReadOnlyDictionary<string, LanguageConfig> Values
     {
-        get => languages;
+        get => values;
     }
 
-    public LanguagesConfig(Dictionary<string, LanguageConfig> languages, string master)
+    public LanguagesConfig(Dictionary<string, LanguageConfig> values, string master)
     {
-        Guard.NotNull(languages);
+        Guard.NotNull(values);
         Guard.NotNullOrEmpty(master);
 
-        Cleanup(languages, ref master);
+        Cleanup(values, ref master);
 
-        this.languages = languages;
-
+        this.values = values;
         this.master = master;
     }
 
@@ -55,7 +54,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
     {
         Guard.NotNull(language);
 
-        return Build(languages, language);
+        return Build(values, language);
     }
 
     [Pure]
@@ -63,7 +62,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
     {
         Guard.NotNull(language);
 
-        var newLanguages = new Dictionary<string, LanguageConfig>(languages)
+        var newLanguages = new Dictionary<string, LanguageConfig>(values)
         {
             [language] = new LanguageConfig(isOptional, ReadonlyList.Create(fallbacks))
         };
@@ -76,7 +75,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
     {
         Guard.NotNull(language);
 
-        var newLanguages = new Dictionary<string, LanguageConfig>(languages);
+        var newLanguages = new Dictionary<string, LanguageConfig>(values);
 
         newLanguages.Remove(language);
 
@@ -102,7 +101,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
 
     private bool EqualLanguages(Dictionary<string, LanguageConfig> newLanguages)
     {
-        return newLanguages.EqualsDictionary(languages);
+        return newLanguages.EqualsDictionary(values);
     }
 
     private void Cleanup(Dictionary<string, LanguageConfig> newLanguages, ref string newMaster)
@@ -152,7 +151,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
 
     public string? GetName(string key)
     {
-        if (key != null && languages.ContainsKey(key))
+        if (key != null && values.ContainsKey(key))
         {
             return Language.GetLanguage(key).EnglishName;
         }
@@ -162,7 +161,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
 
     public bool IsOptional(string key)
     {
-        if (key != null && languages.TryGetValue(key, out var value))
+        if (key != null && values.TryGetValue(key, out var value))
         {
             return value.IsOptional;
         }
@@ -178,7 +177,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
             {
                 yield return key;
             }
-            else if (languages.TryGetValue(key, out var config))
+            else if (values.TryGetValue(key, out var config))
             {
                 yield return key;
 
@@ -197,7 +196,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
 
     public bool Contains(string key)
     {
-        return key != null && languages.ContainsKey(key);
+        return key != null && values.ContainsKey(key);
     }
 
     public override string ToString()
