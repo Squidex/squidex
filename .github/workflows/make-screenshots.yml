@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v4.1.6
+        uses: actions/checkout@v4.1.7
 
       - name: Prepare - Setup QEMU
         uses: docker/setup-qemu-action@v3.0.0
@@ -23,7 +23,7 @@ jobs:
           node-version: 18
 
       - name: Build - BUILD
-        uses: docker/build-push-action@v5.3.0
+        uses: docker/build-push-action@v5.4.0
         with:
           load: true
           cache-from: type=gha
