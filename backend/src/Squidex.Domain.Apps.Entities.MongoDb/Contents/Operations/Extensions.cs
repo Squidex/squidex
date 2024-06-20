@@ -29,11 +29,11 @@ public static class Extensions
             .Add("$expr", new BsonDocument()
                 .Add("$eq", new BsonArray { "$_id", "$$id" }));
 
-    private static Dictionary<string, string> propertyMap;
+    private static Dictionary<string, string> metaFields;
 
-    public static IReadOnlyDictionary<string, string> PropertyMap
+    private static IReadOnlyDictionary<string, string> MetaFields
     {
-        get => propertyMap ??=
+        get => metaFields ??=
             BsonClassMap.LookupClassMap(typeof(MongoContentEntity)).AllMemberMaps
                 .Where(x =>
                     x.MemberName != nameof(MongoContentEntity.NewData) &&
@@ -173,30 +173,44 @@ public static class Extensions
         return find.Project<T>(BuildProjection2<T>(fields));
     }
 
-    private static ProjectionDefinition<T, T> BuildProjection2<T>(IEnumerable<string>? fields)
+    public static ProjectionDefinition<T, T> BuildProjection2<T>(IEnumerable<string>? fields)
     {
         var projector = Builders<T>.Projection;
         var projections = new List<ProjectionDefinition<T>>();
 
         if (fields?.Any() == true)
         {
-            var dataPrefix = Field.Of<MongoContentEntity>(x => nameof(x.Data));
-
-            foreach (var field in fields)
+            static IEnumerable<string> GetDataFields(IEnumerable<string> fields)
             {
-                var dataField = field;
+                var dataPrefix = Field.Of<MongoContentEntity>(x => nameof(x.Data));
 
-                if (FieldNames.IsDataField(field, out var fieldName))
+                foreach (var field in fields)
                 {
-                    dataField = fieldName;
-                }
+                    var dataField =
+                        FieldNames.IsDataField(field, out var fieldName) ?
+                        fieldName :
+                        field;
 
-                projections.Add(projector.Include($"{dataPrefix}.{dataField}"));
+                    yield return $"{dataPrefix}.{dataField}";
+                }
             }
 
-            foreach (var field in PropertyMap.Values)
+            var addedFields = new List<string>();
+
+            // Sort the fields to start with prefixes first.
+            var allFields = GetDataFields(fields).Union(MetaFields.Values).OrderBy(x => x);
+
+            foreach (var field in allFields)
             {
+                // If there is at least one field that is a prefix of the current field, we cannot add that.
+                if (addedFields.Exists(x => field.StartsWith(x, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
                 projections.Add(projector.Include(field));
+
+                addedFields.Add(field);
             }
         }
         else

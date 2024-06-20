@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Reflection;
 
 public sealed class TypeConfig
 {
-    private readonly List<(Type DerivedType, string TypeName)> derivedTypes = new List<(Type DervicedType, string TypeName)>();
+    private readonly List<(Type DerivedType, string TypeName)> derivedTypes = [];
     private Dictionary<string, Type>? mapByName;
     private Dictionary<Type, string>? mapByType;
 

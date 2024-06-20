@@ -36,7 +36,9 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
     {
         var properties = field.Properties;
 
-        if (IsRequired(properties, args.Context, out var r) || properties.MinItems != null || properties.MaxItems != null)
+        if (IsRequired(properties, args.Context, out var r) ||
+            properties.MinItems != null ||
+            properties.MaxItems != null)
         {
             yield return new CollectionValidator(r, properties.MinItems, properties.MaxItems);
         }

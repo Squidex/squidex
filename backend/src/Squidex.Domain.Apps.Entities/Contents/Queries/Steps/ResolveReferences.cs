@@ -74,7 +74,7 @@ public sealed class ResolveReferences : IContentEnricherStep
             {
                 content.ReferenceData ??= [];
 
-                var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData())!;
+                var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => [])!;
 
                 try
                 {

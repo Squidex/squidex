@@ -23,13 +23,9 @@ public sealed class ContentFieldData : Dictionary<string, JsonValue>, IEquatable
     {
     }
 
-    public ContentFieldData(ContentFieldData source)
-        : base(source.Count, StringComparer.OrdinalIgnoreCase)
+    public ContentFieldData(IDictionary<string, JsonValue> source)
+        : base(source, StringComparer.Ordinal)
     {
-        foreach (var (key, value) in source)
-        {
-            this[key] = value;
-        }
     }
 
     public bool TryGetNonNull(string key, [MaybeNullWhen(false)] out JsonValue result)

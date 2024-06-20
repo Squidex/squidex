@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
@@ -25,6 +26,8 @@ public sealed class ObjectValidator<TValue> : IValidator
 
     public void Validate(object? value, ValidationContext context)
     {
+        var originalValue = value;
+
         if (value.IsNullOrUndefined())
         {
             value = DefaultValue;
@@ -48,14 +51,21 @@ public sealed class ObjectValidator<TValue> : IValidator
 
                 if (!values.TryGetValue(name, out var nestedValue))
                 {
-                    if (isPartial)
+                    // If the original value was unset, we have to validate the children for required values.
+                    if (isPartial && !originalValue.IsUnset())
                     {
-                        return;
+                        continue;
                     }
                 }
                 else
                 {
                     fieldValue = nestedValue!;
+                }
+
+                // Use a special null values for unsets so we can treat them as null for required validators.
+                if (Updates.IsUnset(fieldValue))
+                {
+                    fieldValue = Undefined.Unset;
                 }
 
                 var fieldContext = context.Nested(name, field.IsOptional);

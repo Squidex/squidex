@@ -110,13 +110,13 @@ public sealed class ContentValidator
         var valueValidator = CreateValueValidator(field);
 
         var partitioning = partitionResolver(field.Partitioning);
-        var partitioningValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
+        var partitions = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
 
         foreach (var partitionKey in partitioning.AllKeys)
         {
             var optional = partitioning.IsOptional(partitionKey);
 
-            partitioningValidators[partitionKey] = (optional, valueValidator);
+            partitions[partitionKey] = (optional, valueValidator);
         }
 
         var typeName = partitioning.ToString()!;
@@ -124,7 +124,7 @@ public sealed class ContentValidator
         return new AggregateValidator(
             CreateFieldValidators(field)
                 .Union(Enumerable.Repeat(
-                    new ObjectValidator<JsonValue>(partitioningValidators, isPartial, typeName), 1)));
+                    new ObjectValidator<JsonValue>(partitions, isPartial, typeName), 1)));
     }
 
     private IValidator CreateValueValidator(IField field)

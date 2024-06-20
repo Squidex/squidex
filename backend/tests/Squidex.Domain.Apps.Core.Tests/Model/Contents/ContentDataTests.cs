@@ -6,13 +6,14 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents;
 
 public class ContentDataTests
 {
     [Fact]
-    public void Should_return_same_content_if_merging_same_references()
+    public void Should_return_same_data_if_merging_same_references()
     {
         var source =
             new ContentData()
@@ -29,7 +30,7 @@ public class ContentDataTests
     }
 
     [Fact]
-    public void Should_merge_two_name_models()
+    public void Should_merge_data()
     {
         var lhs =
             new ContentData()
@@ -73,9 +74,86 @@ public class ContentDataTests
     }
 
     [Fact]
+    public void Should_unset_field_value_when_merging()
+    {
+        var rhs =
+            new ContentData()
+                .AddField("field1",
+                    new ContentFieldData()
+                        .AddInvariant(1))
+                .AddField("field2",
+                    new ContentFieldData()
+                        .AddLocalized("de", 2)
+                        .AddLocalized("it", 2));
+
+        var lhs =
+            new ContentData()
+                .AddField("field2",
+                    new ContentFieldData()
+                        .AddLocalized("it",
+                            JsonValue.Object()
+                                .Add("$unset", true))
+                        .AddLocalized("en", 3));
+
+        var expected =
+            new ContentData()
+                .AddField("field1",
+                    new ContentFieldData()
+                        .AddInvariant(1))
+                .AddField("field2",
+                    new ContentFieldData()
+                        .AddLocalized("de", 2)
+                        .AddLocalized("en", 3));
+
+        var actual = lhs.MergeInto(rhs);
+
+        Assert.Equal(expected, actual);
+        Assert.NotSame(expected, rhs);
+        Assert.NotSame(expected, lhs);
+    }
+
+    [Fact]
+    public void Should_unset_field_when_merging()
+    {
+        var rhs =
+            new ContentData()
+                .AddField("field1",
+                    new ContentFieldData()
+                        .AddInvariant(1))
+                .AddField("field2",
+                    new ContentFieldData()
+                        .AddLocalized("de", 2)
+                        .AddLocalized("it", 2));
+
+        var lhs =
+            new ContentData()
+                .AddField("field2",
+                    new ContentFieldData()
+                        .AddLocalized("$unset", true))
+                .AddField("field3",
+                    new ContentFieldData()
+                        .AddInvariant(4));
+
+        var expected =
+            new ContentData()
+                .AddField("field1",
+                    new ContentFieldData()
+                        .AddInvariant(1))
+                .AddField("field3",
+                    new ContentFieldData()
+                        .AddInvariant(4));
+
+        var actual = lhs.MergeInto(rhs);
+
+        Assert.Equal(expected, actual);
+        Assert.NotSame(expected, rhs);
+        Assert.NotSame(expected, lhs);
+    }
+
+    [Fact]
     public void Should_be_equal_if_data_have_same_structure()
     {
-        var lhs =
+        var rhs =
             new ContentData()
                 .AddField("field1",
                     new ContentFieldData()
@@ -84,7 +162,7 @@ public class ContentDataTests
                     new ContentFieldData()
                         .AddInvariant(2));
 
-        var rhs =
+        var lhs =
             new ContentData()
                 .AddField("field1",
                     new ContentFieldData()

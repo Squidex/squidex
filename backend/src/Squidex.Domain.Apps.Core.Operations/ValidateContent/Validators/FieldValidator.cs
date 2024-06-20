@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -34,7 +35,7 @@ public sealed class FieldValidator : IValidator
         {
             if (value is JsonValue jsonValue)
             {
-                if (jsonValue == default)
+                if (jsonValue == default || Updates.IsUnset(jsonValue))
                 {
                     typedValue = null;
                 }
@@ -42,7 +43,7 @@ public sealed class FieldValidator : IValidator
                 {
                     typedValue = jsonValue.Value;
 
-                    var (json, error) = JsonValueConverter.ConvertValue(field, jsonValue,
+                    var (typed, error) = JsonValueConverter.ConvertValue(field, jsonValue,
                         context.Root.Serializer,
                         context.Root.Components);
 
@@ -52,7 +53,7 @@ public sealed class FieldValidator : IValidator
                     }
                     else
                     {
-                        typedValue = json;
+                        typedValue = typed;
                     }
                 }
             }

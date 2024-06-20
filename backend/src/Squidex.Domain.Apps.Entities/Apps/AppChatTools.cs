@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using Squidex.AI;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Shared;
 

@@ -36,12 +36,12 @@
 .btn {
     &-clear {
         @include absolute(auto, 4px, 3px, auto);
-        z-index: 100;
+        z-index: 1;
     }
 
     &-time-mode {
         @include absolute(1px, auto, -1px, auto);
-        z-index: 100;
+        z-index: 1;
     }
 
     &:focus {

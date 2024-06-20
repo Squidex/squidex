@@ -74,7 +74,7 @@ public class DefaultValuesTests
                         .AddInvariant(now.ToString()))
                 .AddField("myBoolean",
                     new ContentFieldData()
-                        .AddInvariant(JsonValue.True))
+                        .AddInvariant(true))
                 .AddField("myArray",
                     new ContentFieldData()
                         .AddInvariant(
@@ -154,7 +154,7 @@ public class DefaultValuesTests
                         .AddInvariant(now.ToString()))
                 .AddField("myBoolean",
                     new ContentFieldData()
-                        .AddInvariant(JsonValue.True))
+                        .AddInvariant(true))
                 .AddField("myArray",
                     new ContentFieldData()
                         .AddInvariant(
@@ -196,7 +196,7 @@ public class DefaultValuesTests
                         .AddInvariant(now.ToString()))
                 .AddField("myBoolean",
                     new ContentFieldData()
-                        .AddInvariant(JsonValue.True))
+                        .AddInvariant(true))
                 .AddField("myArray",
                     new ContentFieldData()
                         .AddInvariant(

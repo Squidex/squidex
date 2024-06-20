@@ -453,4 +453,92 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
 
         Assert.Empty(errors);
     }
+
+    [Fact]
+    public async Task Should_validate_partial_unset_field_as_null()
+    {
+        schema = schema.AddString(1, "myField", Partitioning.Invariant,
+            new StringFieldProperties { IsRequired = true });
+
+        var data =
+            new ContentData()
+                .AddField("myField",
+                    new ContentFieldData()
+                        .AddLocalized("$unset", true));
+
+        await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
+
+        errors.Should().BeEquivalentTo(
+            new List<ValidationError>
+            {
+                new ValidationError("Field is required.", "myField.iv")
+            });
+    }
+
+    [Fact]
+    public async Task Should_handle_partial_unset_field_value_as_null()
+    {
+        schema = schema.AddString(1, "myField", Partitioning.Invariant,
+            new StringFieldProperties { IsRequired = true });
+
+        var data =
+            new ContentData()
+                .AddField("myField",
+                    new ContentFieldData()
+                        .AddLocalized("iv",
+                            JsonValue.Object()
+                                .Add("$unset", true)));
+
+        await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
+
+        errors.Should().BeEquivalentTo(
+            new List<ValidationError>
+            {
+                new ValidationError("Field is required.", "myField.iv")
+            });
+    }
+
+    [Fact]
+    public async Task Should_validate_unset_field_as_null()
+    {
+        schema = schema.AddString(1, "myField", Partitioning.Invariant,
+            new StringFieldProperties { IsRequired = true });
+
+        var data =
+            new ContentData()
+                .AddField("myField",
+                    new ContentFieldData()
+                        .AddLocalized("$unset", true));
+
+        await data.ValidateAsync(languages.ToResolver(), errors, schema);
+
+        errors.Should().BeEquivalentTo(
+            new List<ValidationError>
+            {
+                new ValidationError("Field is required.", "myField.iv")
+            });
+    }
+
+    [Fact]
+    public async Task Should_handle_unset_field_value_as_null()
+    {
+        schema = schema.AddString(1, "myField", Partitioning.Invariant,
+            new StringFieldProperties { IsRequired = true });
+
+        var data =
+            new ContentData()
+                .AddField("myField",
+                    new ContentFieldData()
+                        .AddLocalized("iv",
+                            JsonValue.Object()
+                                .Add("$unset", true)));
+
+        await data.ValidateAsync(languages.ToResolver(), errors, schema);
+
+        errors.Should().BeEquivalentTo(
+            new List<ValidationError>
+            {
+                new ValidationError("Field is required.", "myField.iv")
+            });
+    }
 }
