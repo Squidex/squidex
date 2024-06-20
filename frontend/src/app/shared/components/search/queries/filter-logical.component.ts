@@ -8,7 +8,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
-import { FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
+import { FilterLogical, FilterNode, isLogicalAnd, isLogicalOr, LanguageDto, QueryModel } from '@app/shared/internal';
 import { FilterNodeComponent } from './filter-node.component';
 
 @Component({
@@ -23,10 +23,8 @@ import { FilterNodeComponent } from './filter-node.component';
     ],
 })
 export class FilterLogicalComponent {
-    private filterValue!: FilterLogical;
-
     @Output()
-    public filterChange = new EventEmitter();
+    public filterChange = new EventEmitter<FilterLogical>();
 
     @Output()
     public remove = new EventEmitter();
@@ -36,9 +34,6 @@ export class FilterLogicalComponent {
 
     @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
-
-    @Input({ required: true })
-    public statuses?: ReadonlyArray<StatusInfo> | null;
 
     @Input({ transform: numberAttribute })
     public level = 0;
@@ -50,67 +45,69 @@ export class FilterLogicalComponent {
     public model!: QueryModel;
 
     @Input({ required: true })
-    public set filter(filter: FilterLogical | undefined | null) {
-        this.filterValue = filter || {};
+    public filter!: FilterLogical;
 
-        this.updateFilters(this.filterValue);
-    }
-
-    public filters: FilterNode[] = [];
-
-    public get filter() {
-        return this.filterValue;
+    public get filters() {
+        return isLogicalAnd(this.filter) ? this.filter.and : this.filter.or;
     }
 
     public get isAnd() {
-        return !!this.filterValue.and;
+        return isLogicalAnd(this.filter);
     }
 
     public get isOr() {
-        return !!this.filterValue.or;
+        return isLogicalOr(this.filter);
     }
 
     public addComparison() {
-        this.filters.push(<any>{ path: this.model.schema.fields[0].path });
-
-        this.emitChange();
+        this.addNode({ path: this.model.schema.fields[0].path } as any);
     }
 
     public addLogical() {
-        this.filters.push({ and: [] });
-
-        this.emitChange();
+        this.addNode({ and: [] });
     }
 
-    public removeFilter(index: number) {
-        this.filters.splice(index, 1);
+    public addNode(node: FilterNode) {
+        const filter = this.filter;
 
-        this.emitChange();
+        if (isLogicalAnd(filter)) {
+            this.emitChange({ and: [...filter.and, node] });
+        } else {
+            this.emitChange({ or: [...filter.or, node] });
+        }
+    }
+
+    public removeNode(index: number) {
+        const filter = this.filter;
+
+        if (isLogicalAnd(filter)) {
+            this.filter = { and: filter.and.filter((_, i) => i !== index) };
+        } else {
+            this.filter = { or: filter.or.filter((_, i) => i !== index) };
+        }
+    }
+
+    public replaceNode(index: number, node: FilterNode) {
+        const filter = this.filter;
+
+        if (isLogicalAnd(filter)) {
+            this.emitChange({ and: filter.and.map((x, i) => i === index ? node : x) });
+        } else {
+            this.emitChange({ or: filter.or.map((x, i) => i === index ? node : x) });
+        }
     }
 
     public toggleType() {
-        if (this.filterValue.and) {
-            this.filterValue.or = this.filterValue.and;
+        const filter = this.filter;
 
-            delete this.filterValue.and;
+        if (isLogicalAnd(filter)) {
+            this.emitChange({ or: filter.and });
         } else {
-            this.filterValue.and = this.filterValue.or;
-
-            delete this.filterValue.or;
-        }
-
-        this.emitChange();
-    }
-
-    private updateFilters(filter: FilterLogical) {
-        if (filter) {
-            this.filters = filter.and || filter.or || [];
-        } else {
-            this.filters = [];
+            this.emitChange({ and: filter.or });
         }
     }
 
-    public emitChange() {
-        this.filterChange.emit();
+    private emitChange(filter: FilterLogical) {
+        this.filterChange.emit(filter);
     }
 }

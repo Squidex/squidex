@@ -23,8 +23,10 @@ import { QueryPathComponent } from './query-path.component';
     ],
 })
 export class SortingComponent {
+    public readonly modes = SORT_MODES;
+
     @Output()
-    public sortingChange = new EventEmitter();
+    public sortingChange = new EventEmitter<QuerySorting>();
 
     @Output()
     public remove = new EventEmitter();
@@ -35,21 +37,17 @@ export class SortingComponent {
     @Input({ required: true })
     public sorting!: QuerySorting;
 
-    public modes = SORT_MODES;
-
     public changeOrder(order: any) {
-        this.sorting.order = order;
-
-        this.emitChange();
+        this.change({ order });
     }
 
     public changePath(path: string) {
-        this.sorting.path = path;
-
-        this.emitChange();
+        this.change({ path });
     }
 
-    private emitChange() {
-        this.sortingChange.emit();
+    private change(update: Partial<QuerySorting>) {
+        this.sorting = { ...this.sorting, ...update };
+
+        this.sortingChange.emit(this.sorting);
     }
 }

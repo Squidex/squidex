@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -29,11 +30,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas;
 public sealed class SchemasController : ApiController
 {
     private readonly IAppProvider appProvider;
+    private readonly IContentWorkflow workflow;
 
-    public SchemasController(ICommandBus commandBus, IAppProvider appProvider)
+    public SchemasController(ICommandBus commandBus, IAppProvider appProvider, IContentWorkflow workflow)
         : base(commandBus)
     {
         this.appProvider = appProvider;
+        this.workflow = workflow;
     }
 
     /// <summary>
@@ -369,9 +372,10 @@ public sealed class SchemasController : ApiController
     {
         var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
 
-        var filters = ContentQueryModel.Build(Schema, App.PartitionResolver(), components).Flatten();
+        var result = ContentQueryModel.Build(Schema, App.PartitionResolver(), components).Flatten();
+        var response = await QueryModelDto.FromModelAsync(result, Schema, workflow);
 
-        return Ok(filters);
+        return Ok(response);
     }
 
     private async Task<FilterSchema> BuildModel()

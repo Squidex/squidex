@@ -7,7 +7,7 @@
 
 
 import { ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, numberAttribute, Output } from '@angular/core';
-import { FilterComparison, FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
+import { FilterComparison, FilterLogical, FilterNegation, FilterNode, isLogical, LanguageDto, QueryModel } from '@app/shared/internal';
 import { FilterComparisonComponent } from './filter-comparison.component';
 import { FilterLogicalComponent } from './filter-logical.component';
 
@@ -23,8 +23,6 @@ import { FilterLogicalComponent } from './filter-logical.component';
     ],
 })
 export class FilterNodeComponent {
-    public comparison?: FilterComparison;
-
     @Output()
     public filterChange = new EventEmitter();
 
@@ -37,9 +35,6 @@ export class FilterNodeComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<LanguageDto>;
 
-    @Input({ required: true })
-    public statuses?: ReadonlyArray<StatusInfo> | null;
-
     @Input({ transform: numberAttribute })
     public level = 0;
 
@@ -48,12 +43,13 @@ export class FilterNodeComponent {
 
     @Input()
     public set filter(value: FilterNode) {
-        if ((value as any)['and'] || (value as any)['or']) {
-            this.logical = <FilterLogical>value;
+        if (isLogical(value)) {
+            this.actualLogical = value;
         } else {
-            this.comparison = <FilterComparison>value;
+            this.actualComparison = value;
         }
     }
 
-    public logical?: FilterLogical;
+    public actualComparison?: FilterComparison | FilterNegation;
+    public actualLogical?: FilterLogical;
 }

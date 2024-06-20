@@ -9,16 +9,13 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
-import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService } from '../services/contents.service';
+import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService, StatusInfo } from '../services/contents.service';
 import { Query } from '../services/query';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { SchemasState } from './schemas.state';
 
 /* eslint-disable @typescript-eslint/no-throw-literal */
-
-export type StatusInfo =
-    Readonly<{ status: string; color: string }>;
 
 interface Snapshot extends ListState<Query> {
     // The current contents.

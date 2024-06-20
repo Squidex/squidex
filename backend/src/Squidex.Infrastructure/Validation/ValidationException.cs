@@ -22,7 +22,7 @@ public class ValidationException : DomainException
     }
 
     public ValidationException(ValidationError error, Exception? inner = null)
-        : this(new List<ValidationError> { error }, inner)
+        : this([error], inner)
     {
     }
 

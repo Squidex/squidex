@@ -7,7 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Contents;
 
-namespace Squidex.Areas.Api.Controllers.Contents.Models;
+namespace Squidex.Areas.Api.Controllers;
 
 public sealed class StatusInfoDto
 {

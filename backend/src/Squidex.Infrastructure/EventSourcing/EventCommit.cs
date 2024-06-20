@@ -13,7 +13,7 @@ public sealed record EventCommit(Guid Id, string StreamName, long Offset, IColle
 {
     public static EventCommit Create(Guid id, string streamName, long offset, EventData @event)
     {
-        return new EventCommit(id, streamName, offset, new List<EventData> { @event });
+        return new EventCommit(id, streamName, offset, [@event]);
     }
 
     public static EventCommit Create(string streamName, long offset, Envelope<IEvent> envelope, IEventFormatter eventFormatter)
@@ -22,6 +22,6 @@ public sealed record EventCommit(Guid Id, string StreamName, long Offset, IColle
 
         var eventData = eventFormatter.ToEventData(envelope, id);
 
-        return new EventCommit(id, streamName, offset, new List<EventData> { eventData });
+        return new EventCommit(id, streamName, offset, [eventData]);
     }
 }

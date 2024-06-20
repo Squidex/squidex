@@ -66,17 +66,17 @@
                 <div class="btn-group ms-2">
                     <button
                         class="btn btn-sm btn-secondary btn-toggle"
-                        [class.btn-primary]="!showQueries"
-                        (click)="changeView(false)"
-                        [disabled]="!showQueries"
+                        [class.btn-primary]="showQueries"
+                        (click)="changeView(true)"
+                        [disabled]="showQueries"
                         type="button">
                         {{ "common.designer" | sqxTranslate }}
                     </button>
                     <button
                         class="btn btn-sm btn-secondary btn-toggle"
-                        [class.btn-primary]="showQueries"
-                        (click)="changeView(true)"
-                        [disabled]="showQueries"
+                        [class.btn-primary]="!showQueries"
+                        (click)="changeView(false)"
+                        [disabled]="!showQueries"
                         type="button">
                         {{ "common.bookmarks" | sqxTranslate }}
                     </button>
@@ -84,15 +84,14 @@
             </div>
 
             @if (showQueries) {
-                @if (queryModel && statuses) {
+                @if (queryModel) {
                     <div class="form-horizontal">
                         <sqx-query
                             [language]="language"
                             [languages]="languages"
                             [model]="queryModel"
                             [query]="query"
-                            (queryChange)="changeQuery($event)"
-                            [statuses]="statuses"></sqx-query>
+                            (queryChange)="changeQuery($event)"></sqx-query>
 
                         <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
                     </div>

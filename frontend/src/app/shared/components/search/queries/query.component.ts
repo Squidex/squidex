@@ -8,7 +8,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
-import { LanguageDto, Query, QueryModel, StatusInfo } from '@app/shared/internal';
+import { FilterLogical, LanguageDto, Query, QueryModel, QuerySorting } from '@app/shared/internal';
 import { FilterLogicalComponent } from './filter-logical.component';
 import { SortingComponent } from './sorting.component';
 
@@ -35,9 +35,6 @@ export class QueryComponent {
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input({ required: true })
-    public statuses?: ReadonlyArray<StatusInfo> | null;
-
-    @Input({ required: true })
     public model!: QueryModel;
 
     @Input()
@@ -47,37 +44,41 @@ export class QueryComponent {
         }
 
         if (!query.filter) {
-            query.filter = { and: [] };
+            query = { ...query, filter: { and: [] } };
         }
 
         if (!query.sort) {
-            query.sort = [];
+            query = { ...query, sort: [] };
         }
 
-        this.queryValue = query;
+        this.actualQuery = query as any;
     }
 
-    public queryValue: Query = {};
+    public actualQuery!: RequireKeys<Query, 'sort' | 'filter'>;
 
     public addSorting() {
         const path = Object.keys(this.model.schema.fields)[0];
 
-        if (this.queryValue.sort) {
-            this.queryValue.sort.push({ path, order: 'ascending' });
-        }
+        this.change({ sort: [...this.actualQuery.sort, { path, order: 'ascending' }] });
+    }
 
-        this.emitQueryChange();
+    public replaceSorting(index: number, sorting: QuerySorting) {
+        this.change({ sort: this.actualQuery.sort.map((x, i) => i === index ? sorting : x) });
     }
 
     public removeSorting(index: number) {
-        if (this.queryValue.sort) {
-            this.queryValue.sort.splice(index, 1);
-        }
-
-        this.emitQueryChange();
+        this.change({ sort: this.actualQuery.sort.filter((_, i) => i !== index) });
     }
 
-    public emitQueryChange() {
-        this.queryChange.emit(this.queryValue);
+    public changeFilter(filter: FilterLogical ) {
+        this.change({ filter });
+    }
+
+    private change(update: Partial<Query>) {
+        this.actualQuery = { ...this.actualQuery, ...update };
+
+        this.queryChange.emit(this.actualQuery);
     }
 }
+
+type RequireKeys<T extends object, K extends keyof T> = Required<Pick<T, K>> & Omit<T, K>;

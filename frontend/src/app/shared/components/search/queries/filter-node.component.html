@@ -1,22 +1,18 @@
-@if (logical) {
+@if (actualLogical) {
     <sqx-filter-logical
-        [filter]="logical"
-        (filterChange)="filterChange.emit()"
+        [filter]="actualLogical"
+        (filterChange)="filterChange.emit($event)"
         [language]="language"
         [languages]="languages"
         [level]="level"
         [model]="model"
-        (remove)="remove.emit()"
-        [statuses]="statuses"></sqx-filter-logical>
-}
-
-@if (comparison) {
+        (remove)="remove.emit()"></sqx-filter-logical>
+} @else if (actualComparison) {
     <sqx-filter-comparison
-        [filter]="comparison"
-        (filterChange)="filterChange.emit()"
+        [filter]="actualComparison"
+        (filterChange)="filterChange.emit($event)"
         [language]="language"
         [languages]="languages"
         [model]="model"
-        (remove)="remove.emit()"
-        [statuses]="statuses"></sqx-filter-comparison>
+        (remove)="remove.emit()"></sqx-filter-comparison>
 }

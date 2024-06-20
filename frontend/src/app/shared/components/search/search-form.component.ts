@@ -10,7 +10,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Inp
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ControlErrorsComponent, FocusOnInitDirective, MarkdownPipe, ModalDialogComponent, ModalDirective, SafeHtmlPipe, ShortcutComponent, ShortcutDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
-import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, StatusInfo, TypedSimpleChanges, Types } from '@app/shared/internal';
+import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
 import { TourHintDirective } from '../tour-hint.directive';
 import { QueryComponent } from './queries/query.component';
 import { SavedQueriesComponent } from './shared-queries.component';
@@ -57,9 +57,6 @@ export class SearchFormComponent {
     public languages: ReadonlyArray<LanguageDto> = [];
 
     @Input()
-    public statuses?: ReadonlyArray<StatusInfo> | null;
-
-    @Input()
     public queryModel?: QueryModel | null;
 
     @Input()
@@ -77,7 +74,7 @@ export class SearchFormComponent {
     @Input()
     public formClass = 'form-inline search-form';
 
-    public showQueries = false;
+    public showQueries = true;
 
     public saveKey!: Observable<string | undefined>;
     public saveQueryDialog = new DialogModel();
@@ -93,19 +90,17 @@ export class SearchFormComponent {
         }
 
         if (changes.query) {
-            this.previousQuery = Types.clone(this.query);
-
-            this.hasFilter = hasFilter(this.query);
+            this.previousQuery = this.query;
         }
+
+        this.hasFilter = hasFilter(this.query);
     }
 
     public search(close = false) {
         this.hasFilter = hasFilter(this.query);
 
         if (this.query && !equalsQuery(this.query, this.previousQuery)) {
-            const clone = Types.clone(this.query);
-
-            this.queryChange.emit(clone);
+            this.queryChange.emit(this.query);
 
             this.previousQuery = this.query;
         }
