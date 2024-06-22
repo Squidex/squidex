@@ -12,6 +12,7 @@ using NSwag.Annotations;
 using Squidex.AI;
 using Squidex.Areas.Api.Controllers.Translations.Models;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Text.Translations;
@@ -92,9 +93,11 @@ public sealed class TranslationsController : ApiController
             Prompt = request.Prompt
         };
 
-        var context = new ChatContext
+        var context = new AppChatContext
         {
-            User = User
+            User = User,
+            // Use a special context to provide access to the app.
+            BaseContext = Context,
         };
 
         return new FileCallbackResult("text/event-stream", async (body, range, ct) =>

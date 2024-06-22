@@ -64,7 +64,7 @@ public sealed class AppLanguageDto : Resource
                     resources.Url<AppLanguagesController>(x => nameof(x.PutLanguage), values));
             }
 
-            if (resources.CanDeleteLanguage && app.Languages.Languages.Count > 1)
+            if (resources.CanDeleteLanguage && app.Languages.Values.Count > 1)
             {
                 AddDeleteLink("delete",
                     resources.Url<AppLanguagesController>(x => nameof(x.DeleteLanguage), values));

@@ -160,6 +160,9 @@ public abstract class GivenContext
         A.CallTo(() => result.GetSchemaAsync(AppId.Id, SchemaId.Name, A<bool>._, A<CancellationToken>._))
             .ReturnsLazily(() => Schema);
 
+        A.CallTo(() => result.GetSchemasAsync(AppId.Id, A<CancellationToken>._))
+            .ReturnsLazily(() => [Schema]);
+
         A.CallTo(() => result.GetAppWithSchemaAsync(AppId.Id, SchemaId.Id, A<bool>._, A<CancellationToken>._))
             .ReturnsLazily(() => (App, Schema));
 

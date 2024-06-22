@@ -16,6 +16,7 @@ import { LogoComponent } from './logo.component';
 import { NotificationsMenuComponent } from './notifications-menu.component';
 import { ProfileMenuComponent } from './profile-menu.component';
 import { SearchMenuComponent } from './search-menu.component';
+import { ChatMenuComponent } from './chat-menu.component';
 
 @Component({
     standalone: true,
@@ -26,6 +27,7 @@ import { SearchMenuComponent } from './search-menu.component';
         AppsMenuComponent,
         AssetUploaderComponent,
         AsyncPipe,
+        ChatMenuComponent,
         FeedbackMenuComponent,
         LogoComponent,
         NotificationsMenuComponent,

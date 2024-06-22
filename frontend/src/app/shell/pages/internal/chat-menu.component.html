@@ -1,0 +1,9 @@
+@if ((appsState.selectedApp | async) && hasChatBot) {
+    <ul class="nav navbar-nav align-items-center">
+        <li class="nav-item nav-icon" (click)="chatDialog.show()">
+            <span class="nav-link">AI</span>
+        </li>
+    </ul>
+}
+
+<sqx-chat-dialog (contentSelect)="chatDialog.hide()" *sqxModal="chatDialog"></sqx-chat-dialog>

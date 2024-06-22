@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -72,7 +71,7 @@ public sealed class ResolveAssets : IContentEnricherStep
             {
                 content.ReferenceData ??= [];
 
-                var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData())!;
+                var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => [])!;
 
                 if (content.Data.TryGetValue(field.Name, out var fieldData) && fieldData != null)
                 {

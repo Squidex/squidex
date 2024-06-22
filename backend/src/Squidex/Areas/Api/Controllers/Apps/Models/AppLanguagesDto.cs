@@ -23,7 +23,7 @@ public sealed class AppLanguagesDto : Resource
 
         var result = new AppLanguagesDto
         {
-            Items = config.Languages
+            Items = config.Values
                 .Select(x => AppLanguageDto.FromDomain(x.Key, x.Value, config))
                 .Select(x => x.CreateLinks(resources, app))
                 .OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code)

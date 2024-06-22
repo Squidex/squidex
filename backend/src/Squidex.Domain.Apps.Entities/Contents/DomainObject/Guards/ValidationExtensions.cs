@@ -98,13 +98,13 @@ public static class ValidationExtensions
         return converter.Convert(data);
     }
 
-    public static ContentData InvokeUpdates(this ContentOperation operation, ContentData data, ContentData currentData)
+    public static ContentData InvokeUpdates(this ContentOperation operation, ContentData data, ContentData currentData, bool canUnset)
     {
         var converter =
             new ContentConverter(
                 operation.Components,
                 operation.Schema);
-        converter.Add(new UpdateValues(currentData, operation.Resolve<IScriptEngine>()));
+        converter.Add(new UpdateValues(currentData, operation.Resolve<IScriptEngine>(), canUnset));
 
         return converter.Convert(data);
     }

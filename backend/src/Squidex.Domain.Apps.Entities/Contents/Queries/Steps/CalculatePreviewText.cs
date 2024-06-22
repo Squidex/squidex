@@ -41,7 +41,7 @@ public sealed class CalculatePreviewText : IContentEnricherStep
 
                 content.ReferenceData ??= [];
 
-                var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => new ContentFieldData())!;
+                var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => [])!;
 
                 foreach (var (partitionKey, partitionValue) in fieldData)
                 {

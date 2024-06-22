@@ -623,7 +623,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 A<ChatRequest>.That.Matches(x => x.Prompt == "prompt"),
                 A<ChatContext>._,
                 A<CancellationToken>._))
-            .Returns(new ChatResult { Content = "Generated", Metadata = new ChatMetadata() });
+            .Returns(new ChatResult { Content = "Generated", Metadata = new ChatMetadata(), Tools = [] });
 
         var vars = new ScriptVars
         {
@@ -639,7 +639,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
         Assert.Equal("Generated", actual.ToString());
 
-        A.CallTo(() => chatAgent.StopConversationAsync(A<string>._, A<CancellationToken>._))
+        A.CallTo(() => chatAgent.StopConversationAsync(A<string>._, A<ChatContext>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -666,7 +666,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         A.CallTo(() => chatAgent.PromptAsync(A<ChatRequest>._, A<ChatContext>._, A<CancellationToken>._))
             .MustNotHaveHappened();
 
-        A.CallTo(() => chatAgent.StopConversationAsync(A<string>._, A<CancellationToken>._))
+        A.CallTo(() => chatAgent.StopConversationAsync(A<string>._, A<ChatContext>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 

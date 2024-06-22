@@ -16,7 +16,7 @@ namespace Squidex.Web;
 
 public sealed class Resources
 {
-    private readonly Dictionary<(string Id, string Schema), bool> permissions = new Dictionary<(string, string), bool>();
+    private readonly Dictionary<(string Id, string Schema), bool> permissions = [];
 
     // Contents
     public bool CanReadContent(string schema) => Can(PermissionIds.AppContentsReadOwn, schema);

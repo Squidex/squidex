@@ -16,13 +16,13 @@ public sealed class ContentData : Dictionary<string, ContentFieldData?>, IEquata
     {
     }
 
-    public ContentData(ContentData source)
-        : base(source, StringComparer.Ordinal)
+    public ContentData(int capacity)
+        : base(capacity, StringComparer.Ordinal)
     {
     }
 
-    public ContentData(int capacity)
-        : base(capacity, StringComparer.Ordinal)
+    public ContentData(IDictionary<string, ContentFieldData?> source)
+        : base(source, StringComparer.Ordinal)
     {
     }
 
@@ -96,16 +96,29 @@ public sealed class ContentData : Dictionary<string, ContentFieldData?>, IEquata
                     continue;
                 }
 
-                var targetFieldData = target.GetOrAdd(fieldName, _ => new ContentFieldData());
+                if (Updates.IsUnset(sourceFieldData))
+                {
+                    target.Remove(fieldName);
+                    continue;
+                }
+
+                var targetFieldData = target.GetOrAdd(fieldName, _ => []);
 
                 if (targetFieldData == null)
                 {
                     continue;
                 }
 
-                foreach (var (partition, value) in sourceFieldData)
+                foreach (var (partition, sourceValue) in sourceFieldData)
                 {
-                    targetFieldData[partition] = value;
+                    if (Updates.IsUnset(sourceValue))
+                    {
+                        targetFieldData.Remove(partition);
+                    }
+                    else
+                    {
+                        targetFieldData[partition] = sourceValue;
+                    }
                 }
             }
         }

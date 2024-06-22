@@ -87,7 +87,7 @@ public class LanguagesConfigTests
     [Fact]
     public void Should_create_initial_config()
     {
-        config_0.Languages.Should().BeEquivalentTo(
+        config_0.Values.Should().BeEquivalentTo(
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig()
@@ -106,7 +106,7 @@ public class LanguagesConfigTests
                 .Set(Language.IT, true, Language.ES)
                 .MakeMaster(Language.DE);
 
-        config.Languages.Should().BeEquivalentTo(
+        config.Values.Should().BeEquivalentTo(
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),
@@ -141,7 +141,7 @@ public class LanguagesConfigTests
                 .Set(Language.IT, true, Language.ES)
                 .MakeMaster(Language.IT);
 
-        config.Languages.Should().BeEquivalentTo(
+        config.Values.Should().BeEquivalentTo(
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),
@@ -182,7 +182,7 @@ public class LanguagesConfigTests
         var config_2 = config_1.Set(Language.IT);
         var config_3 = config_2.Remove(Language.DE);
 
-        config_3.Languages.Should().BeEquivalentTo(
+        config_3.Values.Should().BeEquivalentTo(
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),
@@ -199,7 +199,7 @@ public class LanguagesConfigTests
         var config_2 = config_1.Set(Language.IT, true, Language.UK);
         var config_3 = config_2.Remove(Language.DE);
 
-        config_3.Languages.Should().BeEquivalentTo(
+        config_3.Values.Should().BeEquivalentTo(
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),
@@ -224,7 +224,7 @@ public class LanguagesConfigTests
         var config_2 = config_1.Set(Language.IT);
         var config_3 = config_2.Remove(Language.EN);
 
-        config_3.Languages.Should().BeEquivalentTo(
+        config_3.Values.Should().BeEquivalentTo(
             new Dictionary<string, LanguageConfig>
             {
                 [Language.DE] = new LanguageConfig(),
@@ -248,7 +248,7 @@ public class LanguagesConfigTests
         var config_1 = config_0.Set(Language.IT);
         var config_2 = config_1.Set(Language.IT, true, Language.EN);
 
-        config_2.Languages.Should().BeEquivalentTo(
+        config_2.Values.Should().BeEquivalentTo(
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),
@@ -265,7 +265,7 @@ public class LanguagesConfigTests
         var config_2 = config_1.Set(Language.IT);
         var config_3 = config_2.Set(Language.IT, true, Language.EN, Language.IT, Language.DE);
 
-        config_3.Languages.Should().BeEquivalentTo(
+        config_3.Values.Should().BeEquivalentTo(
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),

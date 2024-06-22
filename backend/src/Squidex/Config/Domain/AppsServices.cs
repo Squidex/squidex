@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
+using Squidex.AI;
 using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
@@ -50,6 +51,9 @@ public static class AppsServices
 
         services.AddSingletonAs<AppUISettings>()
             .As<IAppUISettings>().As<IDeleter>();
+
+        services.AddSingletonAs<AppChatTools>()
+            .As<IChatToolProvider>();
 
         services.AddSingletonAs<AppSettingsSearchSource>()
             .As<ISearchSource>();

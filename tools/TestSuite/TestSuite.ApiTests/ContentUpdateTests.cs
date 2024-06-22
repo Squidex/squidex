@@ -413,6 +413,63 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         Assert.Null(updated.Data.String);
     }
 
+    [Fact]
+    public async Task Should_unset_field_with_patch()
+    {
+        // STEP 1: Create a new item.
+        var content = await _.Contents.CreateAsync(new TestEntityData
+        {
+            String = "Hello",
+            // Not relevant for the test, but required in the schema.
+            Number = 100
+        }, ContentCreateOptions.AsPublish);
+
+
+        // STEP 2: Update content with script.
+        await _.Client.DynamicContents(_.SchemaName).PatchAsync(content.Id,
+            new DynamicData
+            {
+                [TestEntityData.StringField] = new JObject
+                {
+                    ["$unset"] = true
+                }
+            });
+
+        var updated = await _.Contents.GetAsync(content.Id);
+
+        Assert.Null(updated.Data.String);
+    }
+
+    [Fact]
+    public async Task Should_unset_field_value_with_patch()
+    {
+        // STEP 1: Create a new item.
+        var content = await _.Contents.CreateAsync(new TestEntityData
+        {
+            String = "Hello",
+            // Not relevant for the test, but required in the schema.
+            Number = 100
+        }, ContentCreateOptions.AsPublish);
+
+
+        // STEP 2: Update content with script.
+        await _.Client.DynamicContents(_.SchemaName).PatchAsync(content.Id,
+            new DynamicData
+            {
+                [TestEntityData.StringField] = new JObject
+                {
+                    ["iv"] = new JObject
+                    {
+                        ["$unset"] = true
+                    }
+                }
+            });
+
+        var updated = await _.Contents.GetAsync(content.Id);
+
+        Assert.Null(updated.Data.String);
+    }
+
     [Theory]
     [InlineData(ContentStrategies.Update.Normal)]
     [InlineData(ContentStrategies.Update.Upsert)]

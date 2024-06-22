@@ -322,7 +322,7 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
         operation.MustHavePermission(PermissionIds.AppContentsUpdate);
         operation.MustHaveData(c.Data);
 
-        var newData = operation.InvokeUpdates(c.Data, Snapshot.EditingData);
+        var newData = operation.InvokeUpdates(c.Data, Snapshot.EditingData, true);
 
         if (!c.DoNotValidate)
         {
@@ -363,7 +363,7 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
         operation.MustHavePermission(PermissionIds.AppContentsUpdate);
         operation.MustHaveData(c.Data);
 
-        c.Data = operation.InvokeUpdates(c.Data, Snapshot.EditingData);
+        c.Data = operation.InvokeUpdates(c.Data, Snapshot.EditingData, false);
 
         if (!c.DoNotValidate)
         {

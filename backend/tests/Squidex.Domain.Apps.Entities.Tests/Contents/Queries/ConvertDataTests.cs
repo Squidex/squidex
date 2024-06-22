@@ -46,7 +46,7 @@ public class ConvertDataTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.NotNull(content.Data);
     }
@@ -82,7 +82,7 @@ public class ConvertDataTests : GivenContext
                                 JsonValue.Object()
                                     .Add("nested", JsonValue.Array("default3")))));
 
-        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.Equal(expected, content.Data);
     }
@@ -116,12 +116,12 @@ public class ConvertDataTests : GivenContext
                                     .Add("nested", JsonValue.Array(id2)))));
 
         A.CallTo(() => assetRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), CancellationToken))
-            .Returns(new List<DomainId> { id2 });
+            .Returns([id2]);
 
         A.CallTo(() => contentRepository.QueryIdsAsync(App, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, CancellationToken))
-            .Returns(new List<ContentIdStatus> { new ContentIdStatus(id2, id2, Status.Published) });
+            .Returns([new ContentIdStatus(id2, id2, Status.Published)]);
 
-        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.Equal(expected, content.Data);
     }
@@ -155,12 +155,12 @@ public class ConvertDataTests : GivenContext
                                     .Add("nested", JsonValue.Array()))));
 
         A.CallTo(() => assetRepository.QueryIdsAsync(AppId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), CancellationToken))
-            .Returns(new List<DomainId>());
+            .Returns([]);
 
         A.CallTo(() => contentRepository.QueryIdsAsync(App, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, CancellationToken))
-            .Returns(new List<ContentIdStatus>());
+            .Returns([]);
 
-        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.Equal(expected, content.Data);
     }

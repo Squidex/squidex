@@ -29,7 +29,7 @@ public class TranslationStatus : Dictionary<string, int>
         Guard.NotNull(schema);
         Guard.NotNull(languages);
 
-        var result = new TranslationStatus(languages.Languages.Count);
+        var result = new TranslationStatus(languages.Values.Count);
 
         var localizedFields = schema.Fields.Where(x => x.Partitioning == Partitioning.Language).ToList();
 
