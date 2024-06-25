@@ -9,7 +9,6 @@
 
 export module Keys {
     const ALT = 18;
-    const COMMA = 188;
     const CONTROL = 17;
     const DELETE = 8;
     const ENTER = 13;
@@ -32,7 +31,7 @@ export module Keys {
     export function isComma(event: KeyboardEvent) {
         const key = event.key?.toUpperCase();
 
-        return key === ',' || event.keyCode === COMMA;
+        return key === ',';
     }
 
     export function isDelete(event: KeyboardEvent) {
