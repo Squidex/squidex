@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.AI;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -36,7 +37,7 @@ public class SchemasChatToolTests : GivenContext
         Assert.Equal("schemas", tool.Spec.Name);
         Assert.Equal("Schemas", tool.Spec.DisplayName);
 
-        var result = await tool.ExecuteAsync(null!, default);
+        var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
         Assert.Contains(Schema.Name, result);
 

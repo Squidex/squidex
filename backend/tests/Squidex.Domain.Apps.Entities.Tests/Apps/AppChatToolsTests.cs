@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.AI;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -42,7 +43,7 @@ public class AppChatToolsTests : GivenContext
         Assert.Equal("clients", tool.Spec.Name);
         Assert.Equal("Clients", tool.Spec.DisplayName);
 
-        var result = await tool.ExecuteAsync(null!, default);
+        var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
         Assert.Contains($"{App.Name}:default", result);
 
@@ -69,7 +70,7 @@ public class AppChatToolsTests : GivenContext
         Assert.Equal("languages", tool.Spec.Name);
         Assert.Equal("Languages", tool.Spec.DisplayName);
 
-        var result = await tool.ExecuteAsync(null!, default);
+        var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
         Assert.Contains($"\"de\"", result);
 
@@ -96,7 +97,7 @@ public class AppChatToolsTests : GivenContext
         Assert.Equal("roles", tool.Spec.Name);
         Assert.Equal("Roles", tool.Spec.DisplayName);
 
-        var result = await tool.ExecuteAsync(null!, default);
+        var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
         Assert.Contains($"viewers", result);
 
@@ -123,7 +124,7 @@ public class AppChatToolsTests : GivenContext
         Assert.Equal("plan", tool.Spec.Name);
         Assert.Equal("Plan", tool.Spec.DisplayName);
 
-        var result = await tool.ExecuteAsync(null!, default);
+        var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
         Assert.Contains($"Business", result);
 
