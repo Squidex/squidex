@@ -39,7 +39,7 @@ public class SchemasChatToolTests : GivenContext
 
         var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
-        Assert.Contains(Schema.Name, result);
+        Assert.Contains(Schema.Name, result, StringComparison.Ordinal);
 
         A.CallTo(() => urlGenerator.SchemasUI(AppId))
             .MustHaveHappened();

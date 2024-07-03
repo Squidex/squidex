@@ -14,4 +14,8 @@
     [schemaIdentifiers]="schemaIds"
     *sqxModal="contentsDialog"></sqx-content-selector>
 
-<sqx-chat-dialog (contentSelect)="insertText($event)" *sqxModal="chatDialog"></sqx-chat-dialog>
+<sqx-chat-dialog
+    [configuration]="'text'"
+    (contentSelect)="insertText($event)"
+    [folderId]="folderId"
+    *sqxModal="chatDialog"></sqx-chat-dialog>

@@ -17,24 +17,23 @@ module.exports = {
     "plugins": [
         "deprecation",
         "eslint-plugin-import",
-        "@typescript-eslint",
+        "@typescript-eslint"
     ],
     "rules": {
-        "deprecation/deprecation": "warn",
-        "@angular-eslint/directive-selector": [
-            "error",
-            {
-                "type": "attribute",
-                "prefix": "sqx",
-                "style": "camelCase"
-            }
-        ],
         "@angular-eslint/component-selector": [
             "error",
             {
-                "type": "element",
                 "prefix": "sqx",
-                "style": "kebab-case"
+                "style": "kebab-case",
+                "type": "element"
+            }
+        ],
+        "@angular-eslint/directive-selector": [
+            "error",
+            {
+                "prefix": "sqx",
+                "style": "camelCase",
+                "type": "attribute"
             }
         ],
         "@angular-eslint/use-lifecycle-interface": [
@@ -59,27 +58,26 @@ module.exports = {
         "@typescript-eslint/naming-convention": [
             "error",
             {
-                "selector": "variable",
                 "format": [
                     "camelCase",
                     "PascalCase",
-                    "UPPER_CASE",
+                    "UPPER_CASE"
                 ],
                 "leadingUnderscore": "allow",
-                "trailingUnderscore": "allow",
+                "selector": "variable",
+                "trailingUnderscore": "allow"
             },
             {
-                "selector": "typeLike",
                 "format": [
                     "PascalCase"
                 ],
+                "selector": "typeLike"
             }
         ],
+        "@typescript-eslint/no-shadow": "off",
         "@typescript-eslint/no-this-alias": "error",
         "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
         "@typescript-eslint/no-unused-expressions": "off",
-        "@typescript-eslint/no-use-before-define": "off",
-        "@typescript-eslint/no-shadow": "off",
         "@typescript-eslint/no-unused-vars": [
             "error",
             {
@@ -87,11 +85,12 @@ module.exports = {
                 "varsIgnorePattern": "^_"
             }
         ],
-        "@typescript-eslint/return-await": "off",
+        "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/quotes": [
             "error",
             "single"
         ],
+        "@typescript-eslint/return-await": "off",
         "@typescript-eslint/semi": [
             "error",
             "always"
@@ -100,22 +99,30 @@ module.exports = {
         "arrow-parens": "off",
         "class-methods-use-this": "off",
         "default-case": "off",
+        "deprecation/deprecation": "warn",
         "function-paren-newline": "off",
         "implicit-arrow-linebreak": "off",
         "import/extensions": "off",
         "import/no-extraneous-dependencies": "off",
         "import/no-useless-path-segments": "off",
-        "import/order": ["error", {
-            "pathGroupsExcludedImportTypes": ["builtin"],
-            "pathGroups": [{
-                "pattern": "@app/**",
-                "group": "external",
-                "position": "after"
-            }],
-            "alphabetize": {
-                "order": "asc"
+        "import/order": [
+            "error",
+            {
+                "alphabetize": {
+                    "order": "asc"
+                },
+                "pathGroups": [
+                    {
+                        "group": "external",
+                        "pattern": "@app/**",
+                        "position": "after"
+                    }
+                ],
+                "pathGroupsExcludedImportTypes": [
+                    "builtin"
+                ]
             }
-        }],
+        ],
         "import/prefer-default-export": "off",
         "linebreak-style": "off",
         "max-classes-per-file": "off",
@@ -133,14 +140,14 @@ module.exports = {
         "object-curly-newline": [
             "error",
             {
+                "ExportDeclaration": "never",
+                "ImportDeclaration": "never",
                 "ObjectExpression": {
                     "consistent": true
                 },
                 "ObjectPattern": {
                     "consistent": true
-                },
-                "ImportDeclaration": "never",
-                "ExportDeclaration": "never"
+                }
             }
         ],
         "operator-linebreak": "off",
@@ -151,6 +158,6 @@ module.exports = {
                 "ignoreCase": true,
                 "ignoreDeclarationSort": true
             }
-        ],
+        ]
     }
 };

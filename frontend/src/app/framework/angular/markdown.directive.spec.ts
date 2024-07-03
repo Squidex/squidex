@@ -52,6 +52,13 @@ describe('MarkdownDirective', () => {
         verifyHtmlRender('<strong>bold</strong>');
     });
 
+    it('should render with exclamation if not optional', () => {
+        markdownDirective.markdown = '!text';
+        markdownDirective.ngOnChanges();
+
+        verifyTextRender('!text');
+    });
+
     it('should render as HTML if it has encoded characters', () => {
         markdownDirective.inline = false;
         markdownDirective.markdown = '\'Example\'';
@@ -69,7 +76,7 @@ describe('MarkdownDirective', () => {
     });
 
     it('should render as inline HTML if it has tags', () => {
-        markdownDirective.markdown = '!**bold**';
+        markdownDirective.markdown = '**bold**';
         markdownDirective.ngOnChanges();
 
         verifyHtmlRender('<strong>bold</strong>');

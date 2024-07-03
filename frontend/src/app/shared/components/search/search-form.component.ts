@@ -38,7 +38,7 @@ import { SavedQueriesComponent } from './shared-queries.component';
         TooltipDirective,
         TourHintDirective,
         TourStepDirective,
-        TranslatePipe
+        TranslatePipe,
     ],
 })
 export class SearchFormComponent {

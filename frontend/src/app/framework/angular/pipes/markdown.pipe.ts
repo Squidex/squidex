@@ -6,7 +6,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { renderMarkdown } from '@app/framework/internal';
+import { markdownRender } from '@app/framework/internal';
 
 @Pipe({
     name: 'sqxMarkdown',
@@ -15,7 +15,7 @@ import { renderMarkdown } from '@app/framework/internal';
 })
 export class MarkdownPipe implements PipeTransform {
     public transform(text: string | undefined | null, trusted = false): string {
-        return renderMarkdown(text, false, trusted);
+        return markdownRender(text, false, trusted);
     }
 }
 
@@ -26,6 +26,6 @@ export class MarkdownPipe implements PipeTransform {
 })
 export class MarkdownInlinePipe implements PipeTransform {
     public transform(text: string | undefined | null, trusted = false): string {
-        return renderMarkdown(text, true, trusted);
+        return markdownRender(text, true, trusted);
     }
 }

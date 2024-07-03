@@ -18,7 +18,7 @@ import { AppsState, ChatDialogComponent, DialogModel, ModalDirective, UIOptions 
     imports: [
         AsyncPipe,
         ChatDialogComponent,
-        ModalDirective
+        ModalDirective,
     ],
 })
 export class ChatMenuComponent {
@@ -27,7 +27,7 @@ export class ChatMenuComponent {
     public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
 
     constructor(
-        public readonly appsState: AppsState
+        public readonly appsState: AppsState,
     ) {
     }
 }

@@ -342,4 +342,8 @@
     </div>
 }
 
-<sqx-chat-dialog (contentSelect)="setValue($event)" *sqxModal="chatDialog"></sqx-chat-dialog>
+<sqx-chat-dialog
+    [configuration]="'text'"
+    (contentSelect)="setValue($event)"
+    [folderId]="field.rawProperties['folderId']"
+    *sqxModal="chatDialog"></sqx-chat-dialog>

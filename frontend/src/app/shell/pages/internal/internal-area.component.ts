@@ -11,12 +11,12 @@ import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { DialogService, LoadingService, Notification, Subscriptions, UIOptions } from '@app/shared';
 import { AssetUploaderComponent } from '@app/shared/components/assets/asset-uploader.component';
 import { AppsMenuComponent } from './apps-menu.component';
+import { ChatMenuComponent } from './chat-menu.component';
 import { FeedbackMenuComponent } from './feedback-menu.component';
 import { LogoComponent } from './logo.component';
 import { NotificationsMenuComponent } from './notifications-menu.component';
 import { ProfileMenuComponent } from './profile-menu.component';
 import { SearchMenuComponent } from './search-menu.component';
-import { ChatMenuComponent } from './chat-menu.component';
 
 @Component({
     standalone: true,
