@@ -4,6 +4,49 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.14.0] - 2024-07-03
+
+### Fixed
+
+* **AI**: Add article generation with embedded images using Open-AI and Dall-E.
+* **AI**: Add image generation with Dall-E.
+* **AI**: Add streaming to AI tools.
+* **AI**: Show used tools in the AI chat.
+* **API**: Fixes some type in OpenAPI.
+* **Assets**: Make `sourceUrl` in GraphQL nullable.
+* **Contents**: Fixed sharding for very long content IDs.
+* **Contents**: Fixes to inline editor in content list.
+* **Contents**: Improve translation for `IN` operator.
+* **Contents**: Proper positioning of cursors in content view.
+* **Contents**: Use correct name for reference fields.
+* **Contents**: Use the correct version (normal vs draft) for workflows.
+* **GraphQL**: Use proper JSON type in GraphQL to allow mutations with variables.
+* **Monitoring**: Use correct version of Google Traces.
+* **Sharding**: Use deterministic hash codes for content items.
+* **UI**: Add support for `NOT` operator in filter UI.
+* **UI**: Fix layout of modal dialogs with proper alignment.
+* **UI**: Fix positioning of buttons on the top right of each content field.
+* **UI**: Several fixes to text and translations.
+* **UI**: Show a correct name if a language has no display name.
+
+### Changed
+
+* **UI**: Improve error messages for background jobs.
+* **UI**: Improvements to the navigation to keep the browser history intact.
+* **UI**: Update to Angular 18.
+* **UI**: Update to Angular control flow syntax.
+
+### Added
+
+* **Assets**: Make file hash optional in MongoDB to be more compatible with old installations.
+* **Assets**: New metadata for SVG dimensions (`svgWidth`, `svgHeight`, `viewBox`).
+* **Contents**: Added menu item to content list item to open content in new tab.
+* **Contents**: New update statements for Upsert, Update and Patch.
+* **Docker**: Build ARM images.
+* **Identity**: Added prompt parameter for OIDC authentication.
+* **Identity**: Allow custom OIDC servers for teams.
+* **Rules**: Make fluid extensions more flexible.
+
 ## [7.13.0] - 2024-01-24
 
 ### Fixed
