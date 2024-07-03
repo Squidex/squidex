@@ -6,7 +6,7 @@
  */
 
 import { booleanAttribute, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
-import { renderMarkdown } from '@app/framework/internal';
+import { markdownRender } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxMarkdown]',
@@ -38,7 +38,7 @@ export class MarkdownDirective {
 
         const hasExclamation = markdown.indexOf('!') === 0;
 
-        if (hasExclamation) {
+        if (hasExclamation && this.optional) {
             markdown = markdown.substring(1);
         }
 
@@ -47,7 +47,7 @@ export class MarkdownDirective {
         } else if (this.optional && !hasExclamation) {
             html = markdown;
         } else if (this.markdown) {
-            html = renderMarkdown(markdown, this.inline, this.trusted);
+            html = markdownRender(markdown, this.inline, this.trusted);
         }
 
         const hasHtml = html.indexOf('<') >= 0 || html.indexOf('&') >= 0;

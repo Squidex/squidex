@@ -103,6 +103,7 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit {
             subscriptionUrl,
         });
 
+        // eslint-disable-next-line deprecation/deprecation
         ReactDOM.render(
             React.createElement(GraphiQL, {
                 fetcher,

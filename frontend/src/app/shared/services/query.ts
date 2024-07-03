@@ -146,7 +146,7 @@ export function isLogical(input: FilterNode): input is FilterLogical {
 }
 
 export function isComparison(input: FilterNode): input is FilterComparison {
-    return !isNegation(input) &&! isComparison(input);
+    return !isNegation(input) && !isComparison(input);
 }
 
 export interface QuerySorting {

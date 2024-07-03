@@ -7,9 +7,10 @@
 
 
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HTTP, MarkdownDirective, ResizedDirective, StatefulComponent, TranslatePipe, Types } from '@app/framework';
-import { ChatEventDto, Profile } from '../internal';
+import { lastValueFrom, Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { ApiUrlConfig, HTTP, LoaderComponent, MarkdownDirective, markdownExtractImage, markdownHasImage, markdownTransformImages, ResizedDirective, StatefulComponent, TranslatePipe, Types } from '@app/framework';
+import { AssetDto, AssetUploaderState, ChatEventDto, Profile } from '../internal';
 import { UserIdPicturePipe } from './pipes';
 
 interface State {
@@ -18,6 +19,9 @@ interface State {
 
     // True, when failed
     isFailed: boolean;
+
+    // True, when a copy is in process.
+    isCopying: boolean;
 
     // The content.
     content: string;
@@ -32,6 +36,7 @@ interface State {
     styleUrls: ['./chat-item.component.scss'],
     templateUrl: './chat-item.component.html',
     imports: [
+        LoaderComponent,
         MarkdownDirective,
         ResizedDirective,
         TranslatePipe,
@@ -43,11 +48,11 @@ export class ChatItemComponent extends StatefulComponent<State> {
     @ViewChild('focusElement', { static: false })
     public focusElement!: ElementRef<HTMLElement>;
 
-    @ViewChild('contentElement', { static: false })
-    public contentElement!: ElementRef<HTMLElement>;
-
     @Input({ required: true })
     public type: 'Bot' | 'User' | 'System' = 'Bot';
+
+    @Input({ required: true })
+    public folderId?: string;
 
     @Input({ required: true })
     public user!: Profile;
@@ -105,9 +110,13 @@ export class ChatItemComponent extends StatefulComponent<State> {
     @Output()
     public contentSelect = new EventEmitter<string | HTTP.UploadFile | undefined | null>();
 
-    constructor() {
+    constructor(
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly assetUploader: AssetUploaderState,
+    ) {
         super({
             content: '',
+            isCopying: false,
             isFailed: false,
             isRunning: false,
             runningTools: [],
@@ -122,19 +131,36 @@ export class ChatItemComponent extends StatefulComponent<State> {
         this.focusElement.nativeElement?.scrollIntoView();
     }
 
-    public selectContent() {
-        this.contentSelect.emit(this.snapshot.content);
+    public async selectContent() {
+        let markdown = this.snapshot.content;
+
+        if (!markdownHasImage(markdown)) {
+            this.contentSelect.emit(markdown);
+        }
+
+        this.next({ isCopying: true });
+        try {
+            markdown = await markdownTransformImages(markdown, async img => {
+                const asset = await lastValueFrom(
+                    this.assetUploader.uploadFile(img, this.folderId)
+                        .pipe(filter(x => Types.is(x, AssetDto)))) as AssetDto;
+
+                return asset.fullUrl(this.apiUrl);
+            });
+
+            this.contentSelect.emit(markdown);
+        } finally {
+            this.next({ isCopying: false });
+        }
     }
 
     public selectImage() {
-        const image = this.contentElement.nativeElement?.querySelector('img');
+        const image = markdownExtractImage(this.snapshot.content);
 
         if (!image) {
             return;
         }
 
-        const name = image.alt || 'image.webp';
-
-        this.contentSelect.emit({ url: image.src, name });
+        this.contentSelect.emit(image);
     }
 }

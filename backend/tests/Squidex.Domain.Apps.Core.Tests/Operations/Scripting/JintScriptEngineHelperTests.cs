@@ -623,7 +623,13 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 A<ChatRequest>.That.Matches(x => x.Prompt == "prompt"),
                 A<ChatContext>._,
                 A<CancellationToken>._))
-            .Returns(new ChatResult { Content = "Generated", Metadata = new ChatMetadata(), Tools = [] });
+            .Returns(new ChatResult
+            {
+                Content = "Generated",
+                ToolStarts = [],
+                ToolEnds = [],
+                Metadata = new ChatMetadata(),
+            });
 
         var vars = new ScriptVars
         {

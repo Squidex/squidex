@@ -26,7 +26,7 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
         ModalDialogComponent,
         SafeHtmlPipe,
         TooltipDirective,
-        TranslatePipe
+        TranslatePipe,
     ],
 })
 export class ClientConnectFormComponent implements OnInit {

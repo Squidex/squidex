@@ -37,7 +37,7 @@ interface State {
         TranslatePipe,
         TranslationStatusComponent,
         UserNameRefPipe,
-        UserPictureRefPipe
+        UserPictureRefPipe,
     ],
 })
 export class ContentListFieldComponent extends StatefulComponent<State> {

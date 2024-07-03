@@ -35,7 +35,7 @@
         </div>
         <div class="col">
             <div class="bubble bubble-right use-container">
-                <div class="content" #contentElement (sqxResized)="scrollIntoView()">
+                <div class="content" (sqxResized)="scrollIntoView()">
                     @if (snapshot.runningTools.length > 0) {
                         <div class="mb-2">
                             @for (tool of snapshot.runningTools; track tool) {
@@ -54,8 +54,11 @@
                         </span>
                     }
                     @if (!snapshot.isRunning && !isFirst && type === "Bot") {
-                        <button class="btn btn-secondary btn-sm btn-text" (click)="selectContent()" type="button">
+                        <button class="btn btn-secondary btn-sm btn-text" (click)="selectContent()" [disabled]="snapshot.isCopying" type="button">
                             {{ "chat.use" | sqxTranslate }}
+                            @if (snapshot.isCopying) {
+                                <sqx-loader></sqx-loader>
+                            }
                         </button>
                     }
                 </div>

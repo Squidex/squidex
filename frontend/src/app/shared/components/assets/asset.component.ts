@@ -37,7 +37,7 @@ interface State {
         TooltipDirective,
         TranslatePipe,
         UserNameRefPipe,
-        UserPictureRefPipe
+        UserPictureRefPipe,
     ],
 })
 export class AssetComponent extends StatefulComponent<State> implements OnInit {

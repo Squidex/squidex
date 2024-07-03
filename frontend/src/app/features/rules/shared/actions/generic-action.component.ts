@@ -29,7 +29,7 @@ import { FormattableInputComponent } from './formattable-input.component';
         LowerCasePipe,
         MarkdownDirective,
         ReactiveFormsModule,
-        TranslatePipe
+        TranslatePipe,
     ],
 })
 export class GenericActionComponent {

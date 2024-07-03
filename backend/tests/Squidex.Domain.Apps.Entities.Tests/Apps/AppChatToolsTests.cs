@@ -45,7 +45,7 @@ public class AppChatToolsTests : GivenContext
 
         var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
-        Assert.Contains($"{App.Name}:default", result);
+        Assert.Contains($"{App.Name}:default", result, StringComparison.Ordinal);
 
         A.CallTo(() => urlGenerator.ClientsUI(AppId))
             .MustHaveHappened();
@@ -72,7 +72,7 @@ public class AppChatToolsTests : GivenContext
 
         var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
-        Assert.Contains($"\"de\"", result);
+        Assert.Contains($"\"de\"", result, StringComparison.Ordinal);
 
         A.CallTo(() => urlGenerator.LanguagesUI(AppId))
             .MustHaveHappened();
@@ -99,7 +99,7 @@ public class AppChatToolsTests : GivenContext
 
         var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
-        Assert.Contains($"viewers", result);
+        Assert.Contains($"viewers", result, StringComparison.Ordinal);
 
         A.CallTo(() => urlGenerator.RolesUI(AppId))
             .MustHaveHappened();
@@ -126,7 +126,7 @@ public class AppChatToolsTests : GivenContext
 
         var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
 
-        Assert.Contains($"Business", result);
+        Assert.Contains($"Business", result, StringComparison.Ordinal);
 
         A.CallTo(() => urlGenerator.PlansUI(AppId))
             .MustHaveHappened();

@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, StringHelper, pretifyError } from '@app/framework';
+import { ApiUrlConfig, pretifyError, StringHelper } from '@app/framework';
 import { AuthService } from './auth.service';
 
 export class TranslationDto {

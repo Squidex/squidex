@@ -48,6 +48,9 @@ export class ChatDialogComponent extends StatefulComponent<State> {
     public configuration?: string;
 
     @Input()
+    public folderId?: string;
+
+    @Input()
     public copyMode?: 'Text' | 'Image';
 
     @ViewChild('input', { static: false })

@@ -140,6 +140,7 @@ public static class InfrastructureServices
         if (!string.IsNullOrWhiteSpace(apiKey))
         {
             services.AddOpenAIChat(config);
+            services.AddAIImagePipe();
             services.AddDallE(config, options =>
             {
                 options.DownloadImage = true;
