@@ -95,33 +95,31 @@
                         <div class="drop-overlay-text">{{ "assets.dropToUpdate" | sqxTranslate }}</div>
                     </div>
                 </div>
-
-                @if (snapshot.progress > 0) {
-                    <div class="upload-progress">
-                        <sqx-progress-bar mode="Circle" [value]="snapshot.progress"></sqx-progress-bar>
-                    </div>
-                }
+            } @else if (snapshot.progress > 0) {
+                <div class="upload-progress">
+                    <sqx-progress-bar mode="Circle" [value]="snapshot.progress"></sqx-progress-bar>
+                </div>
             }
+        </div>
 
+        <div class="card-footer" (dblclick)="emitEdit()">
             @if (asset) {
-                <div class="card-footer" (dblclick)="emitEdit()">
-                    <div>
-                        <div class="file-name truncate editable" (click)="emitEdit()">
-                            @if (asset.isProtected) {
-                                <i class="icon-lock"></i>
-                            }
-
-                            {{ asset.fileName }}
-                        </div>
-                    </div>
-                    <div class="file-tags tags">
-                        @for (tag of asset.tags; track tag) {
-                            <div class="tag">{{ tag }}</div>
+                <div>
+                    <div class="file-name truncate editable" (click)="emitEdit()">
+                        @if (asset.isProtected) {
+                            <i class="icon-lock"></i>
                         }
+
+                        {{ asset.fileName }}
                     </div>
-                    <div class="file-info">
-                        {{ asset.metadataText }}
-                    </div>
+                </div>
+                <div class="file-tags tags">
+                    @for (tag of asset.tags; track tag) {
+                        <div class="tag">{{ tag }}</div>
+                    }
+                </div>
+                <div class="file-info">
+                    {{ asset.metadataText }}
                 </div>
             }
         </div>
