@@ -120,15 +120,6 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          
-      - name: Publish - Build for Multi-Platforms
-        uses: docker/build-push-action@v5.4.0
-        with:
-          build-args: "SQUIDEX__BUILD__VERSION=${{ env.GITHUB_REF_SLUG }},SQUIDEX__RUNTIME__VERSION=${{ env.GITHUB_REF_SLUG }}"
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
-          tags: squidex-local
 
       - name: Publish - Get Major Version
         id: version
@@ -144,21 +135,20 @@ jobs:
               echo "STABLE_VERSION=true" >> $GITHUB_ENV
           fi
 
-      - name: Publish - Rename Tags
-        run: |
-          docker tag squidex-local squidex/squidex:latest
-          docker tag squidex-local squidex/squidex:${{ env.GITHUB_REF_SLUG }}
-          docker tag squidex-local squidex/squidex:${{ steps.version.outputs._0 }}
-    
-      - name: Publish - Push Tags
-        run: |
-          docker push squidex/squidex:${{ env.GITHUB_REF_SLUG }}
-          docker push squidex/squidex:${{ steps.version.outputs._0 }}
-    
-      - name: Publish - Push Tags Latest
-        if: env.STABLE_VERSION == 'true'
-        run: |
-          docker push squidex/squidex:latest
+      - name: Publish - Login to Docker Hub
+        uses: docker/login-action@v3.2.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Publish - Build & Push for Multi-Platforms
+        uses: docker/build-push-action@v5.3.0
+        with:
+          build-args: "SQUIDEX__BUILD__VERSION=${{ env.GITHUB_REF_SLUG }},SQUIDEX__RUNTIME__VERSION=${{ env.GITHUB_REF_SLUG }}"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+          tags: squidex/squidex:${{ env.GITHUB_REF_SLUG }},squidex/squidex:${{ steps.version.outputs._0 }}${{env.STABLE_VERSION == 'true' && ',squidex/squidex:latest'}}
 
       - name: Release - Make directories
         run: sudo mkdir /build /release
