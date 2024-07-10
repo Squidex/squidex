@@ -149,7 +149,7 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
           tags: squidex/squidex:${{ env.GITHUB_REF_SLUG }},squidex/squidex:${{ steps.version.outputs._0 }}
-          push: {{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name != 'pull_request' }}
     
       - name: Publish - Push Tags Latest
         if: env.STABLE_VERSION == 'true'
