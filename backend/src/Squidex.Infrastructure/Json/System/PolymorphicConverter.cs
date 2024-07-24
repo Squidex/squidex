@@ -10,6 +10,8 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Squidex.Infrastructure.Reflection;
 
+#pragma warning disable MA0084 // Local variables should not hide other symbols
+
 namespace Squidex.Infrastructure.Json.System;
 
 public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
@@ -38,8 +40,8 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
             {
                 if (typeRegistry.TryGetConfig(baseType, out var config) && config.TryGetName(typeInfo.Type, out var typeName))
                 {
-                    var discriminiatorName = config.DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
-                    var discriminatorField = typeInfo.CreateJsonPropertyInfo(typeof(string), discriminiatorName);
+                    var discriminatorName = config.DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
+                    var discriminatorField = typeInfo.CreateJsonPropertyInfo(typeof(string), discriminatorName);
 
                     discriminatorField.Get = x =>
                     {

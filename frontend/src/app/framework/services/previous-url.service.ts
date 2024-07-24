@@ -6,18 +6,28 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Router, RoutesRecognized } from '@angular/router';
+import { filter, pairwise } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PreviousUrl {
-    public pathStartsWith(path: string) {
-        try {
-            const url = new URL(document.referrer);
+    private previousPath = '';
 
-            return url.pathname.startsWith(path);
-        } catch {
-            return false;
-        }
+    constructor(
+        private readonly router: Router,
+    ) {
+        this.previousPath = router.url;
+
+        this.router.events
+            .pipe(filter(e => e instanceof RoutesRecognized), pairwise())
+            .subscribe((event: any[]) => {
+                this.previousPath = event[0].urlAfterRedirects;
+            });
+    }
+
+    public pathStartsWith(path: string) {
+        return this.previousPath && this.previousPath.startsWith(path);
     }
 }
