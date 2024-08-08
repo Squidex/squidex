@@ -126,6 +126,10 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
             this.sendLanguage();
         }
 
+        if (changes.context) {
+            this.sendContext();
+        }
+
         if (changes.formControlBinding) {
             this.subscriptions.unsubscribeAll();
 
@@ -298,6 +302,10 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
 
     private sendExpanded() {
         this.sendMessage('expandedChanged', { expanded: this.isExpanded });
+    }
+
+    private sendContext() {
+        this.sendMessage('contextChanged', { context: this.context });
     }
 
     private sendDisabled() {

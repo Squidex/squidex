@@ -259,6 +259,7 @@ function SquidexWidget(options) {
  */
 function SquidexFormField(options) {
     var context;
+    var contextHandler;
     var currentConfirm;
     var currentPickAssets;
     var currentPickContents;
@@ -324,6 +325,12 @@ function SquidexFormField(options) {
         }
     }
 
+    function raiseContextChanged() {
+        if (contextHandler && context) {
+            contextHandler(context);
+        }
+    }
+
     function raisedMoved() {
         if (movedHandler && isNumber(index)) {
             movedHandler(index);
@@ -386,6 +393,10 @@ function SquidexFormField(options) {
             context = event.data.context;
 
             raiseInit();
+        } else if (type === 'contextChanged') {
+            context = event.data.context;
+
+            raiseContextChanged();
         } else if (type === 'confirmResult') {
             var correlationId = event.data.correlationId;
 
@@ -631,7 +642,6 @@ function SquidexFormField(options) {
             }
 
             initHandler = callback;
-
             raiseInit();
         },
 
@@ -661,8 +671,21 @@ function SquidexFormField(options) {
             }
 
             disabledHandler = callback;
-
             raiseDisabled();
+        },
+
+        /**
+         * Register an function that is called whenever the context has been changed.
+         *
+         * @param {function} callback: The callback to invoke. Argument 1: New context.
+         */
+        onContextChanged: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
+            contextHandler = callback;
+            raiseContextChanged();
         },
 
         /**
@@ -676,7 +699,6 @@ function SquidexFormField(options) {
             }
 
             languageHandler = callback;
-
             raiseLanguageChanged();
         },
 
@@ -691,7 +713,6 @@ function SquidexFormField(options) {
             }
 
             valueHandler = callback;
-
             raiseValueChanged();
         },
 
@@ -706,7 +727,6 @@ function SquidexFormField(options) {
             }
 
             formValueHandler = callback;
-
             raiseFormValueChanged();
         },
 
@@ -721,7 +741,6 @@ function SquidexFormField(options) {
             }
 
             fullscreenHandler = callback;
-
             raiseFullscreen();
         },
 
@@ -736,7 +755,6 @@ function SquidexFormField(options) {
             }
 
             expandedHandler = callback;
-
             raiseExpanded();
         },
 

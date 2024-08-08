@@ -447,7 +447,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         schemasFiltered: [],
         countSchemasInSubtree: 0,
         countSchemasInSubtreeFiltered: 0,
-        categories: [],
+        categories: []
     };
 
     const components: SchemaCategory = {
@@ -456,7 +456,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         schemasFiltered: [],
         countSchemasInSubtree: 0,
         countSchemasInSubtreeFiltered: 0,
-        categories: [],
+        categories: []
     };
 
     const categoryCache: { [name: string]: SchemaCategory } = {};

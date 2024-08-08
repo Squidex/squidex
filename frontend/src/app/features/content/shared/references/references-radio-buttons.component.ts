@@ -7,11 +7,11 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, Input } from '@angular/core';
 import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, CheckboxGroupComponent, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, RadioGroupComponent, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
-export const SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesCheckboxesComponent), multi: true,
+export const SQX_REFERENCES_RADIO_BUTTONS_CONTROL_VALUE_ACCESSOR: any = {
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesRadioButtonsComponent), multi: true,
 };
 
 interface State {
@@ -23,20 +23,20 @@ const NO_EMIT = { emitEvent: false };
 
 @Component({
     standalone: true,
-    selector: 'sqx-references-checkboxes',
-    styleUrls: ['./references-checkboxes.component.scss'],
-    templateUrl: './references-checkboxes.component.html',
+    selector: 'sqx-references-radio-buttons',
+    styleUrls: ['./references-radio-buttons.component.scss'],
+    templateUrl: './references-radio-buttons.component.html',
     providers: [
-        SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR,
+        SQX_REFERENCES_RADIO_BUTTONS_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        CheckboxGroupComponent,
         FormsModule,
+        RadioGroupComponent,
         ReactiveFormsModule,
     ],
 })
-export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string> | null | undefined> {
+export class ReferencesRadioButtonsComponent extends StatefulControlComponent<State, ReadonlyArray<string> | null | undefined> {
     private readonly subscriptions = new Subscriptions();
     private readonly itemCount: number = inject(UIOptions).value.referencesDropdownItemCount;
     private contentItems: ReadonlyArray<ContentDto> | null = null;
@@ -52,7 +52,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         this.setDisabledState(value === true);
     }
 
-    public control = new FormControl<ReadonlyArray<string> | null | undefined>([]);
+    public control = new FormControl<string | null | undefined>(undefined);
 
     public get isValid() {
         return !!this.schemaId && !!this.language;
@@ -68,9 +68,9 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         this.subscriptions.add(
             this.control.valueChanges
                 .subscribe(value => {
-                    if (value && value.length > 0) {
+                    if (value) {
                         this.callTouched();
-                        this.callChange(value);
+                        this.callChange([value]);
                     } else {
                         this.callTouched();
                         this.callChange(null);
@@ -114,8 +114,8 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         }
     }
 
-    public writeValue(obj: ReadonlyArray<string>) {
-        this.control.setValue(obj, NO_EMIT);
+    public writeValue(obj: ReadonlyArray<string> | null | undefined) {
+        this.control.setValue(obj?.[0], NO_EMIT);
     }
 
     private resetConverterState() {

@@ -62,6 +62,7 @@ import { ContentReferencesComponent } from './references/content-references.comp
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     private readonly subscriptions = new Subscriptions();
+    private readonly mutableContext: Record<string, any>;
     private autoSaveKey!: AutoSaveKey;
 
     public schema!: SchemaDto;
@@ -69,8 +70,8 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     public formContext: any;
 
     public contentTab = this.route.queryParams.pipe(map(x => x['tab'] || 'editor'));
-    public content?: ContentDto | null;
     public contentId = '';
+    public content?: ContentDto | null;
     public contentVersion: Version | null = null;
     public contentForm!: EditContentForm;
     public contentFormCompare: EditContentForm | null = null;
@@ -103,7 +104,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     ) {
         const role = appsState.snapshot.selectedApp?.roleName;
 
-        this.formContext = {
+        this.mutableContext = {
             apiUrl: apiUrl.buildUrl('api'),
             appId: contentsState.appId,
             appName: contentsState.appName,
@@ -158,10 +159,10 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
                     this.schema = schema;
 
                     const languageKey = this.localStore.get(this.languageKey());
-                    const language = this.languages.find(x => x.iso2Code === languageKey);
+                    const languageItem = this.languages.find(x => x.iso2Code === languageKey);
 
-                    if (language) {
-                        this.language = language;
+                    if (languageItem) {
+                        this.language = languageItem;
                     }
 
                     this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, this.formContext);
@@ -172,12 +173,9 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
                 .subscribe(content => {
                     const isNewContent = isOtherContent(content, this.content);
 
-                    this.formContext['languages'] = this.languages;
-                    this.formContext['schema'] = this.schema;
-                    this.formContext['initialContent'] = content;
-                    this.contentForm.setContext(this.formContext);
-
                     this.content = content;
+                    this.updateContext();
+                    this.contentForm.setContext(this.formContext);
 
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
@@ -219,6 +217,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
                         this.autoSaveService.remove(this.autoSaveKey);
                     }
                 }));
+    }
+
+    private updateContext() {
+        this.mutableContext['initialContent'] = this.content;
+        this.mutableContext['language'] = this.language;
+        this.mutableContext['languages'] = this.languages;
+        this.mutableContext['schema'] = this.schema;
+        this.formContext = { ...this.mutableContext };
     }
 
     public canDeactivate(): Observable<boolean> {
@@ -308,6 +314,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
 
     public changeLanguage(language: AppLanguageDto) {
         this.language = language;
+        this.updateContext();
 
         this.localStore.set(this.languageKey(), language.iso2Code);
     }

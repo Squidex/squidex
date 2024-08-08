@@ -13,6 +13,7 @@ import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AppLanguageDt
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
+import { ReferencesRadioButtonsComponent } from '../references/references-radio-buttons.component';
 import { ReferencesTagsComponent } from '../references/references-tags.component';
 import { ArrayEditorComponent } from './array-editor.component';
 import { AssetsEditorComponent } from './assets-editor.component';
@@ -50,6 +51,7 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         ReferenceInputComponent,
         ReferencesCheckboxesComponent,
         ReferencesEditorComponent,
+        ReferencesRadioButtonsComponent,
         ReferencesTagsComponent,
         RichEditorComponent,
         StarsComponent,

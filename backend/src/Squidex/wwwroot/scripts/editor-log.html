@@ -78,7 +78,7 @@
             appendLabel('Value of Form');
             appendLine(`<${JSON.stringify(field.getFormValue(), 2)}>`);
 
-            appendLabel('Disabled: ');
+            appendLabel('Disabled');
             appendLine(field.isDisabled());
 
             console.log(text);
@@ -122,6 +122,10 @@
 
         field.onLanguageChanged(function () {
             logState('Field language changed');
+        });
+
+        field.onContextChanged(function () {
+            logState('Context changed');
         });
 
         field.onExpanded(function () {

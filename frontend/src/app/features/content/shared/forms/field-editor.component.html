@@ -203,6 +203,12 @@
                                     [language]="language"
                                     [schemaId]="field.rawProperties.singleId"></sqx-references-checkboxes>
                             }
+                            @case ("Radio") {
+                                <sqx-references-radio-buttons
+                                    [formControl]="$any(fieldForm)"
+                                    [language]="language"
+                                    [schemaId]="field.rawProperties.singleId"></sqx-references-radio-buttons>
+                            }
                         }
                     }
                     @case ("String") {
