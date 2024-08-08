@@ -49,9 +49,12 @@
 
     @if (Model.HasPasswordAuth)
     {
-        <div class="profile-separator">
-            <div class="profile-separator-text">@T.Get("users.login.separator")</div>
-        </div>
+        @if (Model.HasExternalLogin && Model.IsLogin)
+        {
+            <div class="profile-separator">
+                <div class="profile-separator-text">@T.Get("users.login.separator")</div>
+            </div>
+        }
 
         if (Model.IsLogin)
         {
@@ -84,9 +87,12 @@
 
     @if (Model.HasCustomAuth && Model.IsLogin)
     {
-        <div class="profile-separator">
-            <div class="profile-separator-text">@T.Get("users.login.separator")</div>
-        </div>
+        @if ((Model.HasExternalLogin || Model.HasPasswordAuth) && Model.IsLogin)
+        {
+            <div class="profile-separator">
+                <div class="profile-separator-text">@T.Get("users.login.separator")</div>
+            </div>
+        }
 
         @if (Model.RequestType == RequestType.LoginCustom)
         {
