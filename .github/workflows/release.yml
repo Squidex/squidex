@@ -37,7 +37,7 @@ jobs:
           tags: squidex-local
 
       - name: Test - Start Compose
-        run: docker-compose up -d
+        run: docker compose up -d
         working-directory: tools/TestSuite
 
       - name: Test - RUN
@@ -113,7 +113,7 @@ jobs:
 
       - name: Test - Cleanup
         if: always()
-        run: docker-compose down
+        run: docker compose down
         working-directory: tools/TestSuite
 
       - name: Publish - Remove unnecessary files
