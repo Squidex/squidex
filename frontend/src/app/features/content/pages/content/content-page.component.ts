@@ -295,7 +295,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     }
 
     public back() {
-        if (this.previousUrl.pathStartsWith(`/app/${this.contentsState.appName}/content/${this.schema.name}`)) {
+        if (this.previousUrl.isPath(`/app/${this.contentsState.appName}/content/${this.schema.name}`)) {
             this.location.back();
         } else {
             this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });

@@ -158,7 +158,7 @@ public class PermissionTests
             new Permission("a")
         };
 
-        var sorted = source.OrderBy(x => x).ToList();
+        var sorted = source.Order().ToList();
 
         Assert.Equal([source[2], source[1], source[0]], sorted);
     }

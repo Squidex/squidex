@@ -82,29 +82,29 @@
                     </button>
                 </div>
             </div>
+        }
 
-            @if (showQueries) {
-                @if (queryModel) {
-                    <div class="form-horizontal">
-                        <sqx-query
-                            [language]="language"
-                            [languages]="languages"
-                            [model]="queryModel"
-                            [query]="query"
-                            (queryChange)="changeQuery($event)"></sqx-query>
+        @if (showQueries) {
+            @if (queryModel) {
+                <div class="form-horizontal">
+                    <sqx-query
+                        [language]="language"
+                        [languages]="languages"
+                        [model]="queryModel"
+                        [query]="query"
+                        (queryChange)="changeQuery($event)"></sqx-query>
 
-                        <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
-                    </div>
-                }
-            } @else if (queries && queriesTypes) {
-                <div class="mt-4">
-                    <sqx-shared-queries
-                        [queries]="queries"
-                        [queryUsed]="query"
-                        (search)="changeQuery($event)"
-                        [types]="queriesTypes"></sqx-shared-queries>
+                    <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
                 </div>
             }
+        } @else if (queries && queriesTypes) {
+            <div class="mt-4">
+                <sqx-shared-queries
+                    [queries]="queries"
+                    [queryUsed]="query"
+                    (search)="changeQuery($event)"
+                    [types]="queriesTypes"></sqx-shared-queries>
+            </div>
         }
     </ng-container>
 

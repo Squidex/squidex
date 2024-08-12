@@ -34,7 +34,7 @@ public class ReflectionExtensionTests
     [Fact]
     public void Should_find_all_public_properties_of_interfaces()
     {
-        var properties = typeof(IMyMain).GetPublicProperties().Select(x => x.Name).OrderBy(x => x).ToArray();
+        var properties = typeof(IMyMain).GetPublicProperties().Select(x => x.Name).Order().ToArray();
 
         Assert.Equal(new[] { "MainProp", "Sub1Prop", "Sub2Prop" }, properties);
     }
@@ -42,7 +42,7 @@ public class ReflectionExtensionTests
     [Fact]
     public void Should_find_all_public_properties_of_classes()
     {
-        var properties = typeof(MyMain).GetPublicProperties().Select(x => x.Name).OrderBy(x => x).ToArray();
+        var properties = typeof(MyMain).GetPublicProperties().Select(x => x.Name).Order().ToArray();
 
         Assert.Equal(new[] { "MainProp" }, properties);
     }

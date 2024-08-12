@@ -27,7 +27,22 @@ export class PreviousUrl {
             });
     }
 
-    public pathStartsWith(path: string) {
-        return this.previousPath && this.previousPath.startsWith(path);
+    public isPath(path: string) {
+        const trim = (value: string) => {
+            if (!value) {
+                return value;
+            }
+
+            if (value.indexOf('?') > 0) {
+                value = value.split('?')[0];
+            }
+
+            value = value.replace(TRIM_REGEX, '');
+            return value;
+        };
+
+        return trim(this.previousPath) === trim(path);
     }
 }
+
+const TRIM_REGEX = /^[\s\/]+|[\s\/]+$/g;

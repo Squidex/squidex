@@ -198,7 +198,7 @@ public static class Extensions
             var addedFields = new List<string>();
 
             // Sort the fields to start with prefixes first.
-            var allFields = GetDataFields(fields).Union(MetaFields.Values).OrderBy(x => x);
+            var allFields = GetDataFields(fields).Union(MetaFields.Values).Order();
 
             foreach (var field in allFields)
             {
