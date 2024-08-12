@@ -31,7 +31,7 @@ jobs:
           tags: squidex-local
 
       - name: Test - Start Compose
-        run: docker-compose up -d
+        run: docker compose up -d
         working-directory: tools/TestSuite
 
       - name: Test - Install Playwright Dependencies
