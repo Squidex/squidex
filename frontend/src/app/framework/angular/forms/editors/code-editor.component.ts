@@ -156,8 +156,8 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
 
         this.aceEditor = ace.edit(this.editor.nativeElement);
         this.aceEditor.setFontSize('14px');
-        this.aceModes = ace.require('ace/ext-modelist');
-        this.aceTools = !!ace.require('ace/ext-language_tools');
+        this.aceModes = ace.require('ace/ext/modelist');
+        this.aceTools = !!ace.require('ace/ext/language_tools');
 
         this.setValue(this.value);
         this.setMode();
