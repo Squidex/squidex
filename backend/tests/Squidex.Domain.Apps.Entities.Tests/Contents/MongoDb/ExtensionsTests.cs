@@ -51,6 +51,22 @@ public class ExtensionsTests
         AssertProjection(projection, "{ '_ai' : 1, '_id' : 1, '_si' : 1, 'ai' : 1, 'cb' : 1, 'ct' : 1, 'dl' : 1, 'do.myField' : 1, 'id' : 1, 'is' : 1, 'mb' : 1, 'mt' : 1, 'ns' : 1, 'rf' : 1, 'sa' : 1, 'si' : 1, 'sj' : 1, 'ss' : 1, 'ts' : 1, 'vs' : 1 }");
     }
 
+    [Fact]
+    public void Should_build_projection_with_status_data_field()
+    {
+        var projection = ExtensionSut.BuildProjection2<MongoContentEntity>(["data.Status"]);
+
+        AssertProjection(projection, "{ '_ai' : 1, '_id' : 1, '_si' : 1, 'ai' : 1, 'cb' : 1, 'ct' : 1, 'dl' : 1, 'do.Status' : 1, 'id' : 1, 'is' : 1, 'mb' : 1, 'mt' : 1, 'ns' : 1, 'rf' : 1, 'sa' : 1, 'si' : 1, 'sj' : 1, 'ss' : 1, 'ts' : 1, 'vs' : 1 }");
+    }
+
+    [Fact]
+    public void Should_build_projection_with_meta_status_field()
+    {
+        var projection = ExtensionSut.BuildProjection2<MongoContentEntity>(["status"]);
+
+        AssertProjection(projection, "{ '_ai' : 1, '_id' : 1, '_si' : 1, 'ai' : 1, 'cb' : 1, 'ct' : 1, 'dl' : 1, 'do.status' : 1, 'id' : 1, 'is' : 1, 'mb' : 1, 'mt' : 1, 'ns' : 1, 'rf' : 1, 'sa' : 1, 'si' : 1, 'sj' : 1, 'ss' : 1, 'ts' : 1, 'vs' : 1 }");
+    }
+
     private static void AssertProjection(ProjectionDefinition<MongoContentEntity, MongoContentEntity> projection, string expected)
     {
         var rendered =

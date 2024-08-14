@@ -186,12 +186,19 @@ public static class Extensions
 
                 foreach (var field in fields)
                 {
-                    var dataField =
-                        FieldNames.IsDataField(field, out var fieldName) ?
-                        fieldName :
-                        field;
+                    var actualFieldName = field;
+                    // Only add data fields, because we add all meta fields anyway.
+                    if (FieldNames.IsDataField(field, out var dataField))
+                    {
+                        actualFieldName = dataField;
+                    }
 
-                    yield return $"{dataPrefix}.{dataField}";
+                    var fullName = $"{dataPrefix}.{actualFieldName}";
+
+                    if (!MetaFields.ContainsKey(fullName))
+                    {
+                        yield return fullName;
+                    }
                 }
             }
 
@@ -203,13 +210,14 @@ public static class Extensions
             foreach (var field in allFields)
             {
                 // If there is at least one field that is a prefix of the current field, we cannot add that.
-                if (addedFields.Exists(x => field.StartsWith(x, StringComparison.OrdinalIgnoreCase)))
+                if (addedFields.Exists(x => field.StartsWith(x, StringComparison.Ordinal)))
                 {
                     continue;
                 }
 
                 projections.Add(projector.Include(field));
 
+                // Track added prefixes.
                 addedFields.Add(field);
             }
         }
