@@ -29,12 +29,6 @@ public class UpdateContentDto
     [FromQuery(Name = "enrichDefaults")]
     public bool EnrichDefaults { get; set; }
 
-    /// <summary>
-    ///  True, to also enrich required fields. Default: false.
-    /// </summary>
-    [FromQuery(Name = "enrichRequiredFields")]
-    public bool EnrichRequiredFields { get; set; }
-
     public UpdateContent ToCommand(DomainId id)
     {
         return SimpleMapper.Map(this, new UpdateContent { ContentId = id });

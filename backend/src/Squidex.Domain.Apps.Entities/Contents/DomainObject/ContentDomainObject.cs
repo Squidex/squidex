@@ -336,7 +336,7 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
 
         if (c.EnrichDefaults)
         {
-            newData = operation.GenerateDefaultValues(newData, !c.EnrichRequiredFields);
+            newData = operation.GenerateDefaultValues(newData, true);
         }
 
         if (newData.Equals(Snapshot.EditingData))

@@ -10,6 +10,4 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands;
 public class UpdateContent : ContentDataCommand
 {
     public bool EnrichDefaults { get; set; }
-
-    public bool EnrichRequiredFields { get; set; }
 }
