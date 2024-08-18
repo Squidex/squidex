@@ -67,6 +67,7 @@ public sealed class ContentEnricher : IContentEnricher
             {
                 var result = SimpleMapper.Map(content, new EnrichedContent());
 
+                // Clone the data to keep the existing value intact (for example when cached in memory).
                 if (cloneData)
                 {
                     using (Telemetry.Activities.StartActivity("ContentEnricher/CloneData"))
@@ -86,12 +87,8 @@ public sealed class ContentEnricher : IContentEnricher
                 {
                     return schemaCache.GetOrAdd(id, async x =>
                     {
-                        var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false, ct);
-
-                        if (schema == null)
-                        {
-                            throw new DomainObjectNotFoundException(x.ToString());
-                        }
+                        var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false, ct)
+                            ?? throw new DomainObjectNotFoundException(x.ToString());
 
                         var components = await appProvider.GetComponentsAsync(schema, ct);
 

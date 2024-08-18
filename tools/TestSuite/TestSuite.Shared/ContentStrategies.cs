@@ -21,7 +21,8 @@ public static partial class ContentStrategies
         BulkPermanent
     }
 
-    public static Task DeleteAsync(this ISquidexClient client, ContentBase content, Deletion strategy)
+    public static Task DeleteAsync(this ISquidexClient client, ContentBase content,
+        Deletion strategy)
     {
         IContentsClient<MyContent, object> GetClient()
         {
@@ -75,7 +76,8 @@ public static partial class ContentStrategies
         BulkShared
     }
 
-    public static Task UpdateAsync(this ISquidexClient client, ContentBase content, object data, Update strategy)
+    public static Task UpdateAsync(this ISquidexClient client, ContentBase content, object data,
+        Update strategy)
     {
         IContentsClient<MyContent, object> GetClient()
         {
@@ -157,7 +159,8 @@ public static partial class ContentStrategies
         BulkShared
     }
 
-    public static Task PatchAsync(this ISquidexClient client, ContentBase content, object data, Patch strategy)
+    public static Task PatchAsync(this ISquidexClient client, ContentBase content, object data,
+        Patch strategy)
     {
         IContentsClient<MyContent, object> GetClient()
         {
@@ -242,7 +245,8 @@ public static partial class ContentStrategies
         UpdateBulk
     }
 
-    public static Task EnrichDefaultsAsync(this ISquidexClient client, ContentBase content, object data, EnrichDefaults strategy)
+    public static Task EnrichDefaultsAsync(this ISquidexClient client, ContentBase content, object data,
+        EnrichDefaults strategy, bool requiredFields)
     {
         IContentsClient<MyContent, object> GetClient()
         {
@@ -252,11 +256,27 @@ public static partial class ContentStrategies
         switch (strategy)
         {
             case EnrichDefaults.Normal:
-                return GetClient().EnrichDefaultsAsync(content.Id);
+                var createOptions = new ContentEnrichDefaultsOptions
+                {
+                    EnrichRequiredFields = requiredFields
+                };
+
+                return GetClient().EnrichDefaultsAsync(content.Id, createOptions);
             case EnrichDefaults.Update:
-                return GetClient().UpdateAsync(content.Id, data, ContentUpdateOptions.AsEnrichDefaults);
+                var updateOptions = new ContentUpdateOptions
+                {
+                    EnrichDefaults = true
+                };
+
+                return GetClient().UpdateAsync(content.Id, data, updateOptions);
             case EnrichDefaults.Upsert:
-                return GetClient().UpsertAsync(content.Id, data, ContentUpsertOptions.AsEnrichDefaults);
+                var upsertOptions = new ContentUpsertOptions
+                {
+                    EnrichDefaults = true,
+                    EnrichRequiredFields = requiredFields
+                };
+
+                return GetClient().UpsertAsync(content.Id, data, upsertOptions);
             case EnrichDefaults.Bulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
                 {
@@ -267,7 +287,8 @@ public static partial class ContentStrategies
                             Type = BulkUpdateType.EnrichDefaults,
                             Id = content.Id
                         },
-                    ]
+                    ],
+                    EnrichRequiredFields = requiredFields
                 });
             case EnrichDefaults.UpdateBulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -281,7 +302,8 @@ public static partial class ContentStrategies
                             Data = data,
                             EnrichDefaults = true,
                         },
-                    ]
+                    ],
+                    EnrichRequiredFields = requiredFields
                 });
             case EnrichDefaults.UpsertBulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -295,7 +317,8 @@ public static partial class ContentStrategies
                             Data = data,
                             EnrichDefaults = true,
                         },
-                    ]
+                    ],
+                    EnrichRequiredFields = requiredFields
                 });
             case EnrichDefaults.BulkWithSchema:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -308,7 +331,8 @@ public static partial class ContentStrategies
                             Id = content.Id,
                             Schema = content.SchemaName
                         },
-                    ]
+                    ],
+                    EnrichRequiredFields = requiredFields
                 });
             case EnrichDefaults.BulkShared:
                 return GetSharedClient(client).BulkUpdateAsync(new BulkUpdate
@@ -321,7 +345,8 @@ public static partial class ContentStrategies
                             Id = content.Id,
                             Schema = content.SchemaName
                         },
-                    ]
+                    ],
+                    EnrichRequiredFields = requiredFields
                 });
             default:
                 return Task.CompletedTask;

@@ -29,5 +29,7 @@ public sealed class BulkUpdateContents : SquidexCommand, IAppCommand, ISchemaCom
 
     public bool OptimizeValidation { get; set; }
 
+    public bool EnrichRequiredFields { get; set; }
+
     public BulkUpdateJob[]? Jobs { get; set; }
 }

@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public static class AssetSlug
 {
-    private static readonly HashSet<char> Dot = new HashSet<char>(new[] { '.' });
+    private static readonly HashSet<char> Dot = new HashSet<char>(['.']);
 
     public static string ToAssetSlug(this string value)
     {

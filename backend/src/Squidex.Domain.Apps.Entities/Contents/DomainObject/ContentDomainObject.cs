@@ -211,7 +211,7 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    var newData = operation.GenerateDefaultValues(Snapshot.EditingData.Clone());
+                    var newData = operation.GenerateDefaultValues(Snapshot.EditingData.Clone(), !c.EnrichRequiredFields);
 
                     if (!newData.Equals(Snapshot.EditingData))
                     {
@@ -263,7 +263,7 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
             c.Data = await operation.ExecuteCreateScriptAsync(c.Data, status, ct);
         }
 
-        c.Data = operation.GenerateDefaultValues(c.Data);
+        c.Data = operation.GenerateDefaultValues(c.Data, false);
 
         if (!c.DoNotValidate)
         {
@@ -336,7 +336,7 @@ public partial class ContentDomainObject : DomainObject<WriteContent>
 
         if (c.EnrichDefaults)
         {
-            newData = operation.GenerateDefaultValues(newData);
+            newData = operation.GenerateDefaultValues(newData, !c.EnrichRequiredFields);
         }
 
         if (newData.Equals(Snapshot.EditingData))
