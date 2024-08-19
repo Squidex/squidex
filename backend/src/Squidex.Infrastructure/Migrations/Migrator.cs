@@ -86,7 +86,7 @@ public sealed class Migrator
         {
             while (!await migrationStatus.TryLockAsync(ct))
             {
-                log.LogInformation("Could not acquire lock to start migrating. Tryping again in {time}ms.", LockWaitMs);
+                log.LogInformation("Could not acquire lock to start migrating. Trying again in {time}ms.", LockWaitMs);
                 await Task.Delay(LockWaitMs, ct);
             }
         }
