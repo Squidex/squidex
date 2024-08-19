@@ -9,6 +9,9 @@ service:
   ## @param service.port Kubernetes Service port
   ##
   port: 80
+  ## @param service.port Kubernetes Service port
+  ##
+  nodePort: null
 deployment:
   ## @param deployment.replicaCount Number of instances.
   ##
