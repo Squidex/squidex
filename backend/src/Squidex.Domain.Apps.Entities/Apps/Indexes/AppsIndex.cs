@@ -227,11 +227,11 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         }
 
         // Do not use cancellation here as we already so far.
-        await appCache.AddAsync(new[]
-        {
+        await appCache.AddAsync(
+        [
             new KeyValuePair<string, object?>(GetCacheKey(app.Id), app),
             new KeyValuePair<string, object?>(GetCacheKey(app.Name), app),
-        }, options.CacheDuration);
+        ], options.CacheDuration);
 
         return app;
     }
@@ -244,10 +244,10 @@ public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
         }
 
         // Do not use cancellation here as we already so far.
-        return appCache.RemoveAsync(new[]
-        {
+        return appCache.RemoveAsync(
+        [
             GetCacheKey(id),
             GetCacheKey(name)
-        });
+        ]);
     }
 }

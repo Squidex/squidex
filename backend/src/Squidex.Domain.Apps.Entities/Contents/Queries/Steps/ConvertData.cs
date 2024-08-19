@@ -133,7 +133,7 @@ public sealed class ConvertData : IContentEnricherStep
 
         converter.Add(new ResolveFromPreviousPartitioning(context.App.Languages));
 
-        if (!context.IsFrontendClient)
+        if (!context.IsFrontendClient && !context.NoDefaults())
         {
             converter.Add(new AddDefaultValues(context.App.PartitionResolver())
             {

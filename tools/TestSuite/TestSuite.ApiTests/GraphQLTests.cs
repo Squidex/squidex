@@ -239,7 +239,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x.Data.Name)
                 .Order();
 
-        Assert.Equal(new[] { "Leipzig", "Munich" }, cityNames);
+        Assert.Equal(["Leipzig", "Munich"], cityNames);
     }
 
     [Fact]
@@ -276,7 +276,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x["data"]!["name"]!.Value<string>())
                 .Order();
 
-        Assert.Equal(new[] { "Leipzig", "Munich" }, cityNames);
+        Assert.Equal(["Leipzig", "Munich"], cityNames);
     }
 
     [Fact]
@@ -313,7 +313,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x["data"]!["name"]!.Value<string>())
                 .Order();
 
-        Assert.Equal(new[] { "Leipzig" }, cityNames);
+        Assert.Equal(["Leipzig"], cityNames);
     }
 
     [Fact]
@@ -341,7 +341,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x["data"]!["name"]!.Value<string>())
                 .Order();
 
-        Assert.Equal(new[] { "Bavaria", "Saxony" }, stateNames);
+        Assert.Equal(["Bavaria", "Saxony"], stateNames);
     }
 
     [Fact]
@@ -369,7 +369,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x!["data"]!["name"]!.Value<string>())
                 .Order();
 
-        Assert.Equal(new[] { "Saxony" }, stateNames);
+        Assert.Equal(["Saxony"], stateNames);
     }
 
     [Fact]
@@ -392,7 +392,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x["data__dynamic"]!["name"]!["iv"]!.Value<string>())
                 .Order();
 
-        Assert.Equal(new[] { "Leipzig", "Munich" }, cityNames);
+        Assert.Equal(["Leipzig", "Munich"], cityNames);
     }
 
     [Fact]
@@ -458,7 +458,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
                 .Select(x => x["data"]!["name"]!.Value<string>())
                 .Order();
 
-        Assert.Equal(new[] { "Bavaria", "Leipzig", "Munich", "Saxony" }, names);
+        Assert.Equal(["Bavaria", "Leipzig", "Munich", "Saxony"], names);
     }
 
     [Fact]
@@ -523,6 +523,7 @@ public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
             "X-Flatten",
             "X-Languages",
             "X-NoCleanup",
+            "X-NoDefaults",
             "X-NoEnrichment",
             "X-NoResolveLanguages",
             "X-ResolveFlow",

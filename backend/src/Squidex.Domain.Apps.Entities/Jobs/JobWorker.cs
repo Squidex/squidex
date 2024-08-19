@@ -27,7 +27,7 @@ public sealed class JobWorker :
 
         processorFactory = key =>
         {
-            return (JobProcessor)objectFactory(serviceProvider, new object[] { key });
+            return (JobProcessor)objectFactory(serviceProvider, [key]);
         };
     }
 

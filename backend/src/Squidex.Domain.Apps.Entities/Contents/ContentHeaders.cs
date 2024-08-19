@@ -19,6 +19,7 @@ public static class ContentHeaders
     public const string KeyLanguages = "X-Languages";
     public const string KeyNoCleanup = "X-NoCleanup";
     public const string KeyNoEnrichment = "X-NoEnrichment";
+    public const string KeyNoDefaults = "X-NoDefaults";
     public const string KeyNoResolveLanguages = "X-NoResolveLanguages";
     public const string KeyResolveFlow = "X-ResolveFlow";
     public const string KeyResolveUrls = "X-ResolveUrls";
@@ -32,6 +33,7 @@ public static class ContentHeaders
         cache.AddHeader(KeyLanguages);
         cache.AddHeader(KeyNoCleanup);
         cache.AddHeader(KeyNoEnrichment);
+        cache.AddHeader(KeyNoDefaults);
         cache.AddHeader(KeyNoResolveLanguages);
         cache.AddHeader(KeyResolveFlow);
         cache.AddHeader(KeyResolveUrls);
@@ -61,6 +63,16 @@ public static class ContentHeaders
     public static ICloneBuilder WithNoEnrichment(this ICloneBuilder builder, bool value = true)
     {
         return builder.WithBoolean(KeyNoEnrichment, value);
+    }
+
+    public static bool NoDefaults(this Context context)
+    {
+        return context.AsBoolean(KeyNoDefaults);
+    }
+
+    public static ICloneBuilder WithNoDefaults(this ICloneBuilder builder, bool value = true)
+    {
+        return builder.WithBoolean(KeyNoDefaults, value);
     }
 
     public static bool Unpublished(this Context context)
