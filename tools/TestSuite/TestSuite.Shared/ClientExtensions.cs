@@ -338,7 +338,7 @@ public static class ClientExtensions
         return temp;
     }
 
-    public static async Task UploadInChunksAsync(this IAssetsClient client, ProgressHandler progress,  FileParameter fileParameter, string? id = null)
+    public static async Task UploadInChunksAsync(this IAssetsClient client, ProgressHandler progress, FileParameter fileParameter, string? id = null)
     {
         var pausingStream = new PauseStream(fileParameter.Data, 0.25);
         var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType)
