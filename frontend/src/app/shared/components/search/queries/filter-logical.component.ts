@@ -81,9 +81,9 @@ export class FilterLogicalComponent {
         const filter = this.filter;
 
         if (isLogicalAnd(filter)) {
-            this.filter = { and: filter.and.filter((_, i) => i !== index) };
+            this.emitChange({ and: filter.and.filter((_, i) => i !== index) });
         } else {
-            this.filter = { or: filter.or.filter((_, i) => i !== index) };
+            this.emitChange({ or: filter.or.filter((_, i) => i !== index) });
         }
     }
 
