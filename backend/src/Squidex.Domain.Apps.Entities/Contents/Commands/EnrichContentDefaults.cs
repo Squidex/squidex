@@ -9,4 +9,5 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands;
 
 public sealed class EnrichContentDefaults : ContentCommand
 {
+    public bool EnrichRequiredFields { get; set; }
 }

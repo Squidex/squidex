@@ -47,7 +47,8 @@ public static class ValidationExtensions
         operation.ThrowOnErrors();
     }
 
-    public static async Task ValidateInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published,
+    public static async Task ValidateInputAsync(this ContentOperation operation,
+        ContentData data, bool optimize, bool published,
         CancellationToken ct)
     {
         var validator = GetValidator(operation, optimize, published);
@@ -57,7 +58,8 @@ public static class ValidationExtensions
         operation.AddErrors(validator.Errors).ThrowOnErrors();
     }
 
-    public static async Task ValidateInputPartialAsync(this ContentOperation operation, ContentData data, bool optimize, bool published,
+    public static async Task ValidateInputPartialAsync(this ContentOperation operation,
+        ContentData data, bool optimize, bool published,
         CancellationToken ct)
     {
         var validator = GetValidator(operation, optimize, published);
@@ -67,7 +69,8 @@ public static class ValidationExtensions
         operation.AddErrors(validator.Errors).ThrowOnErrors();
     }
 
-    public static async Task ValidateContentAsync(this ContentOperation operation, ContentData data, bool optimize, bool published,
+    public static async Task ValidateContentAsync(this ContentOperation operation,
+        ContentData data, bool optimize, bool published,
         CancellationToken ct)
     {
         var validator = GetValidator(operation, optimize, published);
@@ -77,7 +80,8 @@ public static class ValidationExtensions
         operation.AddErrors(validator.Errors).ThrowOnErrors();
     }
 
-    public static async Task ValidateContentAndInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published,
+    public static async Task ValidateContentAndInputAsync(this ContentOperation operation,
+        ContentData data, bool optimize, bool published,
         CancellationToken ct)
     {
         var validator = GetValidator(operation, optimize, published);
@@ -87,18 +91,20 @@ public static class ValidationExtensions
         operation.AddErrors(validator.Errors).ThrowOnErrors();
     }
 
-    public static ContentData GenerateDefaultValues(this ContentOperation operation, ContentData data)
+    public static ContentData GenerateDefaultValues(this ContentOperation operation,
+        ContentData data, bool ignoreRequired)
     {
         var converter =
             new ContentConverter(
                 operation.Components,
                 operation.Schema);
-        converter.Add(new AddDefaultValues(operation.Partition()) { IgnoreRequiredFields = true });
+        converter.Add(new AddDefaultValues(operation.Partition()) { IgnoreRequiredFields = ignoreRequired });
 
         return converter.Convert(data);
     }
 
-    public static ContentData InvokeUpdates(this ContentOperation operation, ContentData data, ContentData currentData, bool canUnset)
+    public static ContentData InvokeUpdates(this ContentOperation operation, ContentData data,
+        ContentData currentData, bool canUnset)
     {
         var converter =
             new ContentConverter(

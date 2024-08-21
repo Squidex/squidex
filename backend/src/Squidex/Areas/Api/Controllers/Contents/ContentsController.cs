@@ -464,9 +464,9 @@ public sealed class ContentsController : ApiController
     [AcceptHeader.Unpublished]
     [AcceptHeader.Languages]
     [ApiCosts(1)]
-    public async Task<IActionResult> PutContentDefaults(string app, string schema, DomainId id)
+    public async Task<IActionResult> PutContentDefaults(string app, string schema, DomainId id, EnrichContentDefaultsDto request)
     {
-        var command = new EnrichContentDefaults { ContentId = id };
+        var command = request.ToCommand(id);
 
         var response = await InvokeCommandAsync(command);
 

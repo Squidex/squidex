@@ -34,6 +34,11 @@ public sealed class BulkUpdateContentsDto
     public bool DoNotScript { get; set; } = true;
 
     /// <summary>
+    ///  True, to also enrich required fields. Default: false.
+    /// </summary>
+    public bool EnrichRequiredFields { get; set; }
+
+    /// <summary>
     /// True to turn off validation for faster inserts. Default: false.
     /// </summary>
     public bool DoNotValidate { get; set; }

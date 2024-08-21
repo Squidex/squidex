@@ -39,6 +39,7 @@ public class EnrichForCachingTests : GivenContext
             "X-Languages",
             "X-NoCleanup",
             "X-NoEnrichment",
+            "X-NoDefaults",
             "X-NoResolveLanguages",
             "X-ResolveFlow",
             "X-ResolveUrls",

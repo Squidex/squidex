@@ -633,7 +633,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             }
         };
 
-        var results = await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>(new[] { query1, query2 });
+        var results = await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>([query1, query2]);
 
         var items1 = results.ElementAt(0).Data.Items;
         var items2 = results.ElementAt(1).Data.Items;
