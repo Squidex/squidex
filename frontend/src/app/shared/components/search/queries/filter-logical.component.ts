@@ -70,41 +70,53 @@ export class FilterLogicalComponent {
     public addNode(node: FilterNode) {
         const filter = this.filter;
 
+        let change: FilterLogical;
         if (isLogicalAnd(filter)) {
-            this.emitChange({ and: [...filter.and, node] });
+            change = { and: [...filter.and, node] };
         } else {
-            this.emitChange({ or: [...filter.or, node] });
+            change = { or: [...filter.or, node] };
         }
+
+        this.emitChange(change);
     }
 
     public removeNode(index: number) {
         const filter = this.filter;
 
+        let change: FilterLogical;
         if (isLogicalAnd(filter)) {
-            this.filter = { and: filter.and.filter((_, i) => i !== index) };
+            change = { and: filter.and.filter((_, i) => i !== index) };
         } else {
-            this.filter = { or: filter.or.filter((_, i) => i !== index) };
+            change = { or: filter.or.filter((_, i) => i !== index) };
         }
+
+        this.emitChange(change);
     }
 
     public replaceNode(index: number, node: FilterNode) {
         const filter = this.filter;
 
+        let change: FilterLogical;
         if (isLogicalAnd(filter)) {
-            this.emitChange({ and: filter.and.map((x, i) => i === index ? node : x) });
+            change = { and: filter.and.map((x, i) => i === index ? node : x) };
         } else {
-            this.emitChange({ or: filter.or.map((x, i) => i === index ? node : x) });
+            change = { or: filter.or.map((x, i) => i === index ? node : x) };
         }
+
+        this.emitChange(change);
     }
 
     public toggleType() {
         const filter = this.filter;
 
+        let change: FilterLogical;
         if (isLogicalAnd(filter)) {
-            this.emitChange({ or: filter.and });
+            change = { or: filter.and };
         } else {
-            this.emitChange({ and: filter.or });
+            change = { and: filter.or };
         }
+
+        this.emitChange(change);
     }
 
     private emitChange(filter: FilterLogical) {
