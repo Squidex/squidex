@@ -149,6 +149,7 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
           tags: squidex/squidex:${{ env.GITHUB_REF_SLUG }},squidex/squidex:${{ steps.version.outputs._0 }}${{env.STABLE_VERSION == 'true' && ',squidex/squidex:latest'}}
+          push: true
 
       - name: Release - Make directories
         run: sudo mkdir /build /release
