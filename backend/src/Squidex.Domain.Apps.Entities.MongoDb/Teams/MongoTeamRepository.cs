@@ -28,12 +28,12 @@ public sealed class MongoTeamRepository : MongoSnapshotStoreBase<Team, MongoTeam
     protected override Task SetupCollectionAsync(IMongoCollection<MongoTeamEntity> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoTeamEntity>(
                 Index
                     .Ascending(x => x.IndexedUserIds))
-        }, ct);
+        ], ct);
     }
 
     public async Task<List<Team>> QueryAllAsync(string contributorId,

@@ -151,7 +151,7 @@ internal sealed class OperationBuilder
         {
             new OpenApiSecurityRequirement
             {
-                [Constants.SecurityDefinition] = new[] { fullId }
+                [Constants.SecurityDefinition] = [fullId]
             }
         };
 

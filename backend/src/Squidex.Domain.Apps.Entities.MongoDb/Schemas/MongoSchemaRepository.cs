@@ -29,13 +29,13 @@ public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<Schema, Mongo
     protected override Task SetupCollectionAsync(IMongoCollection<MongoSchemaEntity> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoSchemaEntity>(
                 Index
                     .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.IndexedName))
-        }, ct);
+        ], ct);
     }
 
     Task IDeleter.DeleteAppAsync(App app,
