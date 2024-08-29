@@ -15,11 +15,10 @@ public static class ResizeServices
     public static void AddSquidexImageResizing(this IServiceCollection services, IConfiguration config)
     {
         var thumbnailGenerator = new CompositeThumbnailGenerator(
-            new IAssetThumbnailGenerator[]
-            {
+            [
                 new ImageSharpThumbnailGenerator(),
                 new ImageMagickThumbnailGenerator()
-            });
+            ]);
 
         var resizerUrl = config.GetValue<string>("assets:resizerUrl");
 

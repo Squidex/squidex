@@ -33,14 +33,14 @@ public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<Mon
     protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetFolderEntity> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoAssetFolderEntity>(
                 Index
                     .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.ParentId)
                     .Ascending(x => x.IsDeleted))
-        }, ct);
+        ], ct);
     }
 
     public async Task<IResultList<AssetFolder>> QueryAsync(DomainId appId, DomainId? parentId,

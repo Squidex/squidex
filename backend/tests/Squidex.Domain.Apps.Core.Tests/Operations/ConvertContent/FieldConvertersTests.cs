@@ -13,6 +13,8 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable xUnit1044 // Avoid using TheoryData type arguments that are not serializable
+
 namespace Squidex.Domain.Apps.Core.Operations.ConvertContent;
 
 public class FieldConvertersTests
@@ -625,7 +627,7 @@ public class FieldConvertersTests
 
         var actual =
             new AddSchemaNames(components)
-                .ConvertItemAfter(field, source, Enumerable.Empty<IField>());
+                .ConvertItemAfter(field, source, []);
 
         Assert.Equal(expected, actual);
     }

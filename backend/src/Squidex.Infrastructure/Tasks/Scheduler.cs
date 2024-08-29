@@ -41,7 +41,7 @@ public sealed class Scheduler
         if (pendingTasks >= 1)
         {
             // If we already in a tasks we just queue it with the semaphore.
-            ScheduleTasks(new[] { task }, default);
+            ScheduleTasks([task], default);
             return;
         }
 

@@ -32,8 +32,8 @@ public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest
     protected override Task SetupCollectionAsync(IMongoCollection<MongoRequest> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoRequest>(
                 Index
                     .Ascending(x => x.Key)
@@ -45,7 +45,7 @@ public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest
                 {
                     ExpireAfter = TimeSpan.FromDays(options.StoreRetentionInDays)
                 })
-        }, ct);
+        ], ct);
     }
 
     public Task InsertManyAsync(IEnumerable<Request> items,

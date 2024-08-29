@@ -33,7 +33,7 @@ public sealed class MissingKeys
         {
             if (!missingTranslations.Add(key))
             {
-                File.AppendAllLines(MissingFileName, new[] { key });
+                File.AppendAllLines(MissingFileName, [key]);
             }
         }
     }

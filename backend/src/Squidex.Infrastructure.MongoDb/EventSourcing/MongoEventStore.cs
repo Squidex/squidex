@@ -44,8 +44,8 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
     protected override async Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection,
         CancellationToken ct)
     {
-        await collection.Indexes.CreateManyAsync(new[]
-        {
+        await collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoEventCommit>(
                 Index
                     .Ascending(x => x.EventStream)
@@ -62,7 +62,7 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
                 {
                     Unique = true
                 })
-        }, ct);
+        ], ct);
 
         var clusterVersion = await Database.GetMajorVersionAsync(ct);
         var clusteredAsReplica = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
