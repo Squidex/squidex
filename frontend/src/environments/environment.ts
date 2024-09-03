@@ -5,7 +5,6 @@ declare var require: any;
 
 export const environment = {
     production: false,
-    textLogger: true,
     textResolver: () => {
         const culture = (window as any)['options']?.culture || 'en';
 

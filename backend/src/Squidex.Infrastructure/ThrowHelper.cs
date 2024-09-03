@@ -45,4 +45,9 @@ public static class ThrowHelper
     {
         throw new NotSupportedException(message);
     }
+
+    public static void JsonSystemException(string? message = null, Exception? ex = null)
+    {
+        throw new System.Text.Json.JsonException(message, ex);
+    }
 }

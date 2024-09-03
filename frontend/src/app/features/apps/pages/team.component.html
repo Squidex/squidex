@@ -7,8 +7,13 @@
             <a class="link" [routerLink]="['/app/teams', team.id]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
         </div>
         <div class="col-auto">
-            <button class="btn btn-sm btn-text-secondary" #buttonOptions (click)="dropdown.toggle()" sqxStopClick type="button">
-                <span class="hidden">{{ "common.options" | sqxTranslate }}</span>
+            <button
+                class="btn btn-sm btn-text-secondary"
+                #buttonOptions
+                attr.aria-label="{{ 'common.options' | sqxTranslate }}"
+                (click)="dropdown.toggle()"
+                sqxStopClick
+                type="button">
                 <i class="icon-dots"></i>
             </button>
 

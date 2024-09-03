@@ -9,8 +9,12 @@
             </div>
             <div class="col-auto">
                 @if ((canDelete || canUpdate) && !isDisabled) {
-                    <button class="btn btn-sm btn-text-secondary" #buttonOptions (click)="editDropdown.toggle()" type="button">
-                        <span class="hidden">{{ "common.options" | sqxTranslate }}</span>
+                    <button
+                        class="btn btn-sm btn-text-secondary"
+                        #buttonOptions
+                        attr.aria-label="{{ 'common.options' | sqxTranslate }}"
+                        (click)="editDropdown.toggle()"
+                        type="button">
                         <i class="icon-dots"></i>
                     </button>
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="editDropdown; closeAlways: true">
