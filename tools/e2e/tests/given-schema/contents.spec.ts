@@ -11,6 +11,7 @@ import { expect, test } from './_fixture';
 
 test.beforeEach(async ({ page, appName, schemaName }) => {
     await page.goto(`/app/${appName}/content/${schemaName}`);
+    await page.getByRole('combobox').selectOption('3: 50');
 });
 
 test('create content and close', async ({ page }) => {
