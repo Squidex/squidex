@@ -33,7 +33,6 @@ public static class TelemetryServices
 
             builder.AddAspNetCoreInstrumentation();
             builder.AddHttpClientInstrumentation();
-            builder.AddMongoDBInstrumentation();
 
             var sampling = config.GetValue<double>("logging:otlp:sampling");
 

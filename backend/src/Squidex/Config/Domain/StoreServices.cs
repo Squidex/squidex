@@ -123,7 +123,7 @@ public static class StoreServices
                     .As<IDistributedCache>();
 
                 services.AddHealthChecks()
-                    .AddCheck<MongoHealthCheck>("MongoDB", tags: new[] { "node" });
+                    .AddCheck<MongoHealthCheck>("MongoDB", tags: ["node"]);
 
                 services.AddSingletonAs<MongoRequestLogRepository>()
                     .As<IRequestLogRepository>();

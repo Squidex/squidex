@@ -24,6 +24,13 @@ namespace Squidex.Areas.Api.Controllers.Contents;
 [ApiExplorerSettings(GroupName = nameof(Contents))]
 public sealed class ContentsSharedController : ApiController
 {
+    private static readonly GraphQLHttpMiddlewareOptions GraphQLOptions = new GraphQLHttpMiddlewareOptions
+    {
+        DefaultResponseContentType = new MediaTypeHeaderValue("application/json"),
+        CsrfProtectionEnabled = false,
+        CsrfProtectionHeaders = []
+    };
+
     private readonly IContentQueryService contentQuery;
     private readonly IContentWorkflow contentWorkflow;
 
@@ -54,12 +61,7 @@ public sealed class ContentsSharedController : ApiController
     [IgnoreCacheFilter]
     public IActionResult GetGraphQL(string app, GraphQLQueryDto request)
     {
-        var options = new GraphQLHttpMiddlewareOptions
-        {
-            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
-        };
-
-        return new GraphQLExecutionActionResult<DummySchema>(options);
+        return new GraphQLExecutionActionResult<DummySchema>(GraphQLOptions);
     }
 
     /// <summary>
@@ -80,12 +82,7 @@ public sealed class ContentsSharedController : ApiController
     [IgnoreCacheFilter]
     public IActionResult PostGraphQL(string app)
     {
-        var options = new GraphQLHttpMiddlewareOptions
-        {
-            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
-        };
-
-        return new GraphQLExecutionActionResult<DummySchema>(options);
+        return new GraphQLExecutionActionResult<DummySchema>(GraphQLOptions);
     }
 
     /// <summary>
@@ -106,12 +103,7 @@ public sealed class ContentsSharedController : ApiController
     [IgnoreCacheFilter]
     public IActionResult GetGraphQLBatch(string app, GraphQLQueryDto request)
     {
-        var options = new GraphQLHttpMiddlewareOptions
-        {
-            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
-        };
-
-        return new GraphQLExecutionActionResult<DummySchema>(options);
+        return new GraphQLExecutionActionResult<DummySchema>(GraphQLOptions);
     }
 
     /// <summary>
@@ -132,12 +124,7 @@ public sealed class ContentsSharedController : ApiController
     [IgnoreCacheFilter]
     public IActionResult PostGraphQLBatch(string app)
     {
-        var options = new GraphQLHttpMiddlewareOptions
-        {
-            DefaultResponseContentType = new MediaTypeHeaderValue("application/json")
-        };
-
-        return new GraphQLExecutionActionResult<DummySchema>(options);
+        return new GraphQLExecutionActionResult<DummySchema>(GraphQLOptions);
     }
 
     /// <summary>

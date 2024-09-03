@@ -136,8 +136,8 @@ public sealed class MongoUserStore :
     protected override Task SetupCollectionAsync(IMongoCollection<MongoUser> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoUser>(
                 Index
                     .Ascending("Logins.LoginProvider")
@@ -156,7 +156,7 @@ public sealed class MongoUserStore :
                 {
                     Unique = true
                 })
-        }, ct);
+        ], ct);
     }
 
     protected override MongoCollectionSettings CollectionSettings()

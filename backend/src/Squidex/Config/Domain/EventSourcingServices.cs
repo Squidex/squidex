@@ -45,7 +45,7 @@ public static class EventSourcingServices
                     .As<IEventStore>();
 
                 services.AddHealthChecks()
-                    .AddCheck<GetEventStoreHealthCheck>("EventStore", tags: new[] { "node" });
+                    .AddCheck<GetEventStoreHealthCheck>("EventStore", tags: ["node"]);
             }
         });
 

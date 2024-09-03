@@ -28,8 +28,8 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEnt
     protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoAppEntity>(
                 Index
                     .Ascending(x => x.IndexedName)),
@@ -39,7 +39,7 @@ public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEnt
             new CreateIndexModel<MongoAppEntity>(
                 Index
                     .Ascending(x => x.IndexedTeamId))
-        }, ct);
+        ], ct);
     }
 
     Task IDeleter.DeleteAppAsync(App app,

@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Diagnostics;
-using Esprima;
+using Acornima;
 using Jint;
 using Jint.Native;
 using Jint.Runtime;
@@ -26,13 +26,13 @@ namespace Squidex.Domain.Apps.Core.Scripting;
 public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
 {
     private readonly IJintExtension[] extensions;
-    private readonly Parser parser;
+    private readonly CacheParser parser;
     private readonly TimeSpan timeoutScript;
     private readonly TimeSpan timeoutExecution;
 
     public JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOptions> options, IEnumerable<IJintExtension>? extensions = null)
     {
-        parser = new Parser(cache);
+        parser = new CacheParser(cache);
 
         timeoutScript = options.Value.TimeoutScript;
         timeoutExecution = options.Value.TimeoutExecution;
@@ -203,7 +203,7 @@ public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
                 return BuildException("common.jsParseError", inner.Message);
             case JavaScriptException:
                 return BuildException("common.jsError", inner.Message);
-            case ParserException:
+            case ParseErrorException:
                 return BuildException("common.jsError", inner.Message);
             case DomainException:
                 return inner;

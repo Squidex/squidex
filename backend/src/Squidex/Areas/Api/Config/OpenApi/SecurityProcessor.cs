@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Config.OpenApi;
 public sealed class SecurityProcessor : SecurityDefinitionAppender
 {
     public SecurityProcessor(IUrlGenerator urlGenerator)
-        : base(Constants.SecurityDefinition, new[] { Constants.ScopeApi }, CreateOAuthSchema(urlGenerator))
+        : base(Constants.SecurityDefinition, [Constants.ScopeApi], CreateOAuthSchema(urlGenerator))
     {
     }
 

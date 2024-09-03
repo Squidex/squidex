@@ -23,7 +23,7 @@ public sealed class DefaultDomainObjectFactory : IDomainObjectFactory
 
         public static T Create(IServiceProvider serviceProvider, DomainId id)
         {
-            return (T)ObjectFactory(serviceProvider, new object[] { id });
+            return (T)ObjectFactory(serviceProvider, [id]);
         }
     }
 
@@ -34,7 +34,7 @@ public sealed class DefaultDomainObjectFactory : IDomainObjectFactory
 
         public static T Create(IServiceProvider serviceProvider, DomainId id, IPersistenceFactory<TState> persistenceFactory)
         {
-            return (T)ObjectFactory(serviceProvider, new object[] { id, persistenceFactory });
+            return (T)ObjectFactory(serviceProvider, [id, persistenceFactory]);
         }
     }
 

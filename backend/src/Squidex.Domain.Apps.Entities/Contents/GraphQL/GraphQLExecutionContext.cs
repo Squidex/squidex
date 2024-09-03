@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using GraphQL;
 using GraphQL.DataLoader;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets;

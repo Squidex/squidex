@@ -452,6 +452,7 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to update.</param>
+    /// <param name="request">The request parameters.</param>
     /// <response code="200">Content updated.</response>
     /// <response code="404">Content references, schema or app not found.</response>
     /// <remarks>
