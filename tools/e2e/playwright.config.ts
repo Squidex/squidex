@@ -31,7 +31,7 @@ export default defineConfig({
         trace: 'on-first-retry',
 
         /* Keep the test report small. See https://playwright.dev/docs/api/class-testoptions#test-options-screenshot */
-        screenshot: 'off',
+        screenshot: 'only-on-failure',
     },
 
     /* Configure projects for major browsers */
