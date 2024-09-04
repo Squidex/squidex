@@ -68,7 +68,7 @@ async function createRandomField(page: Page) {
     await page.getByPlaceholder('Enter field name').fill(fieldName);
 
     // Save field.
-    await page.getByRole('button', { name: 'Create and close' }).click();
+    await page.getByTestId('dialog').getByRole('button', { name: 'Create' }).click();
 
     return fieldName;
 }

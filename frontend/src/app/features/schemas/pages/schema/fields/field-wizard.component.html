@@ -88,26 +88,64 @@
 
         @if (!editForm) {
             <div>
-                <button class="btn btn-outline-success" (click)="addField(false)" type="button">
-                    {{ "schemas.addFieldAndClose" | sqxTranslate }}
-                </button>
-                <button class="btn btn-success ms-2" (click)="addField(true)" type="button">
-                    {{ "schemas.addFieldAndCreate" | sqxTranslate }}
-                </button>
-                <button class="btn btn-success ms-2" (click)="addField(false, true)" type="button">
-                    {{ "schemas.addFieldAndEdit" | sqxTranslate }}
-                </button>
+                <div class="btn-group ms-2" attr.aria-label="{{ 'schemas.addFieldAndClose' | sqxTranslate }}" role="group">
+                    <button class="btn btn-success" (click)="addField(false)" shortcut="CTRL + SHIFT + S">
+                        {{ "schemas.addFieldAndClose" | sqxTranslate }}
+                    </button>
+                    <button
+                        class="btn btn-success"
+                        #buttonSave
+                        attr.aria-label="{{ 'common.more' | sqxTranslate }}"
+                        (click)="addFieldModal.toggle()"
+                        type="button">
+                        <i class="icon-angle-down"></i>
+                    </button>
+
+                    <sqx-dropdown-menu
+                        position="top-end"
+                        scrollY="true"
+                        [sqxAnchoredTo]="buttonSave"
+                        *sqxModal="addFieldModal; closeAlways: true">
+                        <a class="dropdown-item" (click)="addField(true)">
+                            {{ "schemas.addFieldAndCreate" | sqxTranslate }}
+                        </a>
+                        <a class="dropdown-item" (click)="addField(false, true)">
+                            {{ "schemas.addFieldAndEdit" | sqxTranslate }}
+                        </a>
+                    </sqx-dropdown-menu>
+                </div>
             </div>
         }
 
         @if (editForm) {
             <div>
-                <button class="btn btn-success" (click)="save(true)" type="button">
-                    {{ "schemas.saveFieldAndNew" | sqxTranslate }}
-                </button>
-                <button class="btn btn-primary ms-2" (click)="save()" type="button">
-                    {{ "schemas.saveFieldAndClose" | sqxTranslate }}
-                </button>
+                <div
+                    class="btn-group ms-2"
+                    attr.aria-label="{{ 'schemas.addFieldAndClose' | sqxTranslate }}"
+                    position="top-end"
+                    role="group">
+                    <button class="btn btn-primary" (click)="save(true)" shortcut="CTRL + SHIFT + S">
+                        {{ "schemas.saveFieldAndNew" | sqxTranslate }}
+                    </button>
+                    <button
+                        class="btn btn-primary"
+                        #buttonSave
+                        attr.aria-label="{{ 'common.more' | sqxTranslate }}"
+                        (click)="addFieldModal.toggle()"
+                        type="button">
+                        <i class="icon-angle-down"></i>
+                    </button>
+
+                    <sqx-dropdown-menu
+                        position="bottom-end"
+                        scrollY="true"
+                        [sqxAnchoredTo]="buttonSave"
+                        *sqxModal="addFieldModal; closeAlways: true">
+                        <a class="dropdown-item" (click)="save()">
+                            {{ "schemas.saveFieldAndClose" | sqxTranslate }}
+                        </a>
+                    </sqx-dropdown-menu>
+                </div>
             </div>
         }
     </ng-container>

@@ -11,12 +11,12 @@ import { enableProdMode, ErrorHandler } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, provideRouter, RouteReuseStrategy } from '@angular/router';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { TourService as BaseTourService } from 'ngx-ui-tour-core';
 import { APP_ROUTES } from '@app/app.routes';
 import { ApiUrlConfig, authInterceptor, buildTasks, cachingInterceptor, DateHelper, GlobalErrorHandler, loadingInterceptor, LocalizerService, TASK_CONFIGURATION, TitlesConfig, TourService, UIOptions } from '@app/shared';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
-import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 const options = (window as any)['options'] || {};
 
@@ -77,7 +77,7 @@ function configTitles() {
 }
 
 function configLocalizerService() {
-    return new LocalizerService(environment.textResolver()).logMissingKeys(environment.textLogger);
+    return new LocalizerService(environment.textResolver());
 }
 
 export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {

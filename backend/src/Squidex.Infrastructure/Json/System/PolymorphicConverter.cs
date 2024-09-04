@@ -63,7 +63,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
 
         if (typeReader.TokenType != JsonTokenType.StartObject)
         {
-            throw new JsonException();
+            ThrowHelper.JsonSystemException($"Expected Object, got '{reader.TokenType}'");
         }
 
         while (typeReader.Read())
@@ -75,7 +75,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
 
                 if (typeReader.TokenType != JsonTokenType.String)
                 {
-                    ThrowHelper.JsonException($"Expected string discriminator value, got '{reader.TokenType}'");
+                    ThrowHelper.JsonSystemException($"Expected string discriminator value, got '{reader.TokenType}'");
                     return default!;
                 }
 
@@ -94,7 +94,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
             }
         }
 
-        ThrowHelper.JsonException($"Object has no discriminator '{discriminatorName}'.");
+        ThrowHelper.JsonSystemException($"Object has no discriminator '{discriminatorName}'.");
         return default!;
     }
 
@@ -114,7 +114,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
     {
         if (!typeRegistry.TryGetType<T>(name, out var type))
         {
-            ThrowHelper.JsonException($"Object has invalid discriminator '{name}'.");
+            ThrowHelper.JsonSystemException($"Object has invalid discriminator '{name}'.");
             return default!;
         }
 

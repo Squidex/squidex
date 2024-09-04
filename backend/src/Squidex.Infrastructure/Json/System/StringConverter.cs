@@ -43,7 +43,7 @@ public sealed class StringConverter<T> : JsonConverter<T> where T : notnull
                 }
                 catch (Exception ex)
                 {
-                    ThrowHelper.JsonException("Error while converting from string.", ex);
+                    ThrowHelper.JsonSystemException("Error while converting from string.", ex);
                     return default;
                 }
 
@@ -53,7 +53,7 @@ public sealed class StringConverter<T> : JsonConverter<T> where T : notnull
                 return JsonSerializer.Deserialize<T>(ref reader, optionsWithoutSelf);
 
             default:
-                ThrowHelper.JsonException($"Expected string or object, got {reader.TokenType}.");
+                ThrowHelper.JsonSystemException($"Expected string or object, got {reader.TokenType}.");
                 return default;
         }
     }

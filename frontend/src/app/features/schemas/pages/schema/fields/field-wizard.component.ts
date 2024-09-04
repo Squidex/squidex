@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AddFieldForm, AppSettingsDto, ControlErrorsComponent, createProperties, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, LanguagesState, ModalDialogComponent, RootFieldDto, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types } from '@app/shared';
+import { AddFieldForm, AppSettingsDto, ControlErrorsComponent, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, RootFieldDto, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
 
 const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
@@ -21,6 +21,7 @@ const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createP
     imports: [
         AsyncPipe,
         ControlErrorsComponent,
+        DropdownMenuComponent,
         FieldFormComponent,
         FocusOnInitDirective,
         FormAlertComponent,
@@ -28,6 +29,8 @@ const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createP
         FormHintComponent,
         FormsModule,
         ModalDialogComponent,
+        ModalDirective,
+        ModalPlacementDirective,
         ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
@@ -53,6 +56,7 @@ export class FieldWizardComponent implements OnInit {
     public field!: FieldDto;
 
     public addFieldForm = new AddFieldForm();
+    public addFieldModal = new ModalModel();
 
     public editForm?: EditFieldForm;
 

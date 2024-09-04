@@ -31,7 +31,7 @@
 
 <div class="notification-container notification-container-bottom-right">
     @for (notification of snapshot.notifications; track notification) {
-        <div class="alert alert-dismissible alert-{{ notification.messageType }} shadowed" @fade (click)="close(notification)">
+        <div class="alert alert-dismissible alert-{{ notification.messageType }} shadowed" @fade (click)="close(notification)" role="alert">
             <button class="btn-close" data-dismiss="alert" (dialogClose)="close(notification)" type="button"></button>
             <div class="shadow"></div>
             <div class="shadowed" [innerHTML]="notification.message | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>

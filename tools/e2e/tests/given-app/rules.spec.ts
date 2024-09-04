@@ -2,6 +2,9 @@ import { expect, Page } from '@playwright/test';
 import { escapeRegex, getRandomId } from '../utils';
 import { test } from './_fixture';
 
+// We have no easy way to identity rules. Therefore run them sequentially.
+test.describe.configure({ mode: 'serial' });
+
 test.beforeEach(async ({ page, appName }) => {
     await page.goto(`/app/${appName}/rules`);
 });

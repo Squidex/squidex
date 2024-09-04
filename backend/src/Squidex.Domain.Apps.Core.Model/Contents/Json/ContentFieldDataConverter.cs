@@ -27,7 +27,8 @@ public sealed class ContentFieldDataConverter : JsonConverter<ContentFieldData>
 
                     if (!reader.Read())
                     {
-                        throw new JsonException("Unexpected end when reading Object.");
+                        ThrowHelper.JsonSystemException("Unexpected end when reading Object.");
+                        return result;
                     }
 
                     var value = JsonSerializer.Deserialize<JsonValue>(ref reader, options)!;
@@ -48,7 +49,8 @@ public sealed class ContentFieldDataConverter : JsonConverter<ContentFieldData>
             }
         }
 
-        throw new JsonException("Unexpected end when reading Object.");
+        ThrowHelper.JsonSystemException("Unexpected end when reading Object.");
+        return result;
     }
 
     public override void Write(Utf8JsonWriter writer, ContentFieldData value, JsonSerializerOptions options)

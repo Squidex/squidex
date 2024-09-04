@@ -1,6 +1,6 @@
 <sqx-title [message]="schema.displayName" [url]="['..']"></sqx-title>
 
-<form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
+<form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish('Edit')">
     <sqx-layout [hideSidebar]="!content" layout="main">
         <ng-container title>
             <div class="d-flex align-items-center">
@@ -76,8 +76,12 @@
                         [languages]="languages"
                         [percents]="contentForm.translationStatus | async"></sqx-language-selector>
                     @if (content.canDelete) {
-                        <button class="btn btn-outline-secondary ms-2" #buttonOptions (click)="dropdown.toggle()" type="button">
-                            <span class="hidden">{{ "common.options" | sqxTranslate }}</span>
+                        <button
+                            class="btn btn-outline-secondary ms-2"
+                            #buttonOptions
+                            attr.aria-label="{{ 'common.options' | sqxTranslate }}"
+                            (click)="dropdown.toggle()"
+                            type="button">
                             <i class="icon-dots"></i>
                         </button>
                         <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
@@ -115,14 +119,60 @@
                         [percents]="contentForm.translationStatus | async"></sqx-language-selector>
                     <div sqxTourStep="saveContent">
                         @if (contentsState.canCreate | async) {
-                            <button class="btn btn-primary ms-2" (click)="save()" type="button">
-                                {{ "common.save" | sqxTranslate }}
-                            </button>
+                            <div class="btn-group ms-2" attr.aria-label="{{ 'common.save' | sqxTranslate }}" role="group">
+                                <button class="btn btn-primary" (click)="saveAsDraft('Edit')" type="button">
+                                    {{ "common.save" | sqxTranslate }}
+                                </button>
+                                <button
+                                    class="btn btn-primary"
+                                    #buttonSave
+                                    attr.aria-label="{{ 'common.more' | sqxTranslate }}"
+                                    (click)="saveOnlyDropdown.toggle()"
+                                    type="button">
+                                    <i class="icon-angle-down"></i>
+                                </button>
+
+                                <sqx-dropdown-menu
+                                    position="bottom-end"
+                                    scrollY="true"
+                                    [sqxAnchoredTo]="buttonSave"
+                                    *sqxModal="saveOnlyDropdown; closeAlways: true">
+                                    <a class="dropdown-item" (click)="saveAsDraft('Add')">
+                                        {{ "common.saveAdd" | sqxTranslate }}
+                                    </a>
+                                    <a class="dropdown-item" (click)="saveAsDraft('Close')">
+                                        {{ "common.saveClose" | sqxTranslate }}
+                                    </a>
+                                </sqx-dropdown-menu>
+                            </div>
                         }
                         @if (contentsState.canCreateAndPublish | async) {
-                            <button class="btn btn-success ms-2" shortcut="CTRL + SHIFT + S" type="submit">
-                                {{ "contents.saveAndPublish" | sqxTranslate }}
-                            </button>
+                            <div class="btn-group ms-2" attr.aria-label="{{ 'contents.saveAndPublish' | sqxTranslate }}" role="group">
+                                <button class="btn btn-success" shortcut="CTRL + SHIFT + S" type="submit">
+                                    {{ "contents.saveAndPublish" | sqxTranslate }}
+                                </button>
+                                <button
+                                    class="btn btn-success"
+                                    #buttonSave
+                                    attr.aria-label="{{ 'common.more' | sqxTranslate }}"
+                                    (click)="savePublishDropdown.toggle()"
+                                    type="button">
+                                    <i class="icon-angle-down"></i>
+                                </button>
+
+                                <sqx-dropdown-menu
+                                    position="bottom-end"
+                                    scrollY="true"
+                                    [sqxAnchoredTo]="buttonSave"
+                                    *sqxModal="savePublishDropdown; closeAlways: true">
+                                    <a class="dropdown-item" (click)="saveAndPublish('Add')">
+                                        {{ "contents.saveAndPublishAdd" | sqxTranslate }}
+                                    </a>
+                                    <a class="dropdown-item" (click)="saveAndPublish('Close')">
+                                        {{ "contents.saveAndPublishClose" | sqxTranslate }}
+                                    </a>
+                                </sqx-dropdown-menu>
+                            </div>
                         }
                     </div>
                 }

@@ -18,6 +18,8 @@ import { ContentEditorComponent } from './editor/content-editor.component';
 import { ContentInspectionComponent } from './inspecting/content-inspection.component';
 import { ContentReferencesComponent } from './references/content-references.component';
 
+type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
+
 @Component({
     standalone: true,
     selector: 'sqx-content-page',
@@ -64,6 +66,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     private readonly subscriptions = new Subscriptions();
     private readonly mutableContext: Record<string, any>;
     private autoSaveKey!: AutoSaveKey;
+    private autoSaveIgnore = false;
 
     public schema!: SchemaDto;
 
@@ -75,6 +78,8 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     public contentVersion: Version | null = null;
     public contentForm!: EditContentForm;
     public contentFormCompare: EditContentForm | null = null;
+    public saveOnlyDropdown = new ModalModel();
+    public savePublishDropdown = new ModalModel();
 
     public dropdown = new ModalModel();
 
@@ -237,52 +242,61 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
         );
     }
 
-    public saveAndPublish() {
-        this.saveContent(true);
+    public saveAndPublish(navigationMode: SaveNavigationMode) {
+        this.saveContent(true, navigationMode);
     }
 
-    public save() {
-        this.saveContent(false);
+    public saveAsDraft(navigationMode: SaveNavigationMode) {
+        this.saveContent(false, navigationMode);
     }
 
-    private saveContent(publish: boolean) {
+    private saveContent(publish: boolean, navigationMode: SaveNavigationMode) {
         const value = this.contentForm.submit();
 
-        if (value) {
-            if (this.content) {
-                if (!this.content.canUpdate) {
-                    return;
-                }
+        if (!value) {
+            this.contentForm.submitFailed('i18n:contents.contentNotValid', false);
+            return;
+        }
 
-                this.contentsState.update(this.content, value)
-                    .subscribe({
-                        next: () => {
-                            this.contentForm.submitCompleted({ noReset: true });
-                        },
-                        error: error => {
-                            this.contentForm.submitFailed(error);
-                        },
-                    });
-            } else {
-                if (!this.canCreate(publish)) {
-                    return;
-                }
+        if (this.content) {
+            if (!this.content.canUpdate) {
+                return;
+            }
 
-                this.contentsState.create(value, publish, this.contentId)
-                    .subscribe({
-                        next: content => {
+            this.contentsState.update(this.content, value)
+                .subscribe({
+                    next: () => {
+                        this.contentForm.submitCompleted({ noReset: true });
+                    },
+                    error: error => {
+                        this.contentForm.submitFailed(error);
+                    },
+                });
+        } else {
+            if (!this.canCreate(publish)) {
+                return;
+            }
+
+            this.contentsState.create(value, publish, this.contentId)
+                .subscribe({
+                    next: content => {
+                        if (navigationMode == 'Edit') {
                             this.contentForm.submitCompleted({ noReset: true });
                             this.contentForm.load(content.data, true);
 
                             this.router.navigate([content.id, 'history'], { relativeTo: this.route.parent! });
-                        },
-                        error: error => {
-                            this.contentForm.submitFailed(error);
-                        },
-                    });
-            }
-        } else {
-            this.contentForm.submitFailed('i18n:contents.contentNotValid', false);
+                        } else if (navigationMode === 'Close') {
+                            this.autoSaveIgnore = true;
+
+                            this.router.navigate(['./'], { relativeTo: this.route.parent! });
+                        } else {
+                            this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, this.formContext);
+                        }
+                    },
+                    error: error => {
+                        this.contentForm.submitFailed(error);
+                    },
+                });
         }
     }
 
@@ -314,9 +328,9 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
 
     public changeLanguage(language: AppLanguageDto) {
         this.language = language;
-        this.updateContext();
-
         this.localStore.set(this.languageKey(), language.iso2Code);
+
+        this.updateContext();
     }
 
     public checkPendingChangesBeforePreview() {
@@ -332,7 +346,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     }
 
     private checkPendingChanges(text: string) {
-        if (this.content && !this.content.canUpdate) {
+        if ((this.content && !this.content.canUpdate) || this.autoSaveIgnore) {
             return of(true);
         }
 
