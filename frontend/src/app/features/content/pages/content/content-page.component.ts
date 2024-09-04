@@ -66,6 +66,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     private readonly subscriptions = new Subscriptions();
     private readonly mutableContext: Record<string, any>;
     private autoSaveKey!: AutoSaveKey;
+    private autoSaveIgnore = false;
 
     public schema!: SchemaDto;
 
@@ -285,7 +286,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
 
                             this.router.navigate([content.id, 'history'], { relativeTo: this.route.parent! });
                         } else if (navigationMode === 'Close') {
-                            this.contentForm.submitCompleted({ noReset: true });
+                            this.autoSaveIgnore = true;
 
                             this.router.navigate(['./'], { relativeTo: this.route.parent! });
                         } else {
@@ -327,9 +328,9 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
 
     public changeLanguage(language: AppLanguageDto) {
         this.language = language;
-        this.updateContext();
-
         this.localStore.set(this.languageKey(), language.iso2Code);
+
+        this.updateContext();
     }
 
     public checkPendingChangesBeforePreview() {
@@ -345,7 +346,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     }
 
     private checkPendingChanges(text: string) {
-        if (this.content && !this.content.canUpdate) {
+        if ((this.content && !this.content.canUpdate) || this.autoSaveIgnore) {
             return of(true);
         }
 

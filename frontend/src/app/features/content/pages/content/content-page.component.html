@@ -123,8 +123,12 @@
                                 <button class="btn btn-primary" (click)="saveAsDraft('Edit')" type="button">
                                     {{ "common.save" | sqxTranslate }}
                                 </button>
-                                <button class="btn btn-primary" #buttonSave (click)="saveOnlyDropdown.toggle()" type="button"
-                                attr.aria-label="{{ 'common.more' | sqxTranslate }}">
+                                <button
+                                    class="btn btn-primary"
+                                    #buttonSave
+                                    attr.aria-label="{{ 'common.more' | sqxTranslate }}"
+                                    (click)="saveOnlyDropdown.toggle()"
+                                    type="button">
                                     <i class="icon-angle-down"></i>
                                 </button>
 
@@ -147,8 +151,12 @@
                                 <button class="btn btn-success" shortcut="CTRL + SHIFT + S" type="submit">
                                     {{ "contents.saveAndPublish" | sqxTranslate }}
                                 </button>
-                                <button class="btn btn-success" #buttonSave (click)="savePublishDropdown.toggle()" type="button"
-                                attr.aria-label="{{ 'common.more' | sqxTranslate }}">
+                                <button
+                                    class="btn btn-success"
+                                    #buttonSave
+                                    attr.aria-label="{{ 'common.more' | sqxTranslate }}"
+                                    (click)="savePublishDropdown.toggle()"
+                                    type="button">
                                     <i class="icon-angle-down"></i>
                                 </button>
 
