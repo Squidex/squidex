@@ -60,7 +60,7 @@ spec:
           {{- end }}
 
             - name: CLUSTERING__WORKER
-              value: "true"
+              value: "false"
           
           {{- $mongoDefaultConnectionString := printf "mongodb://%s" (include "squidex.mongoDefaultHostname" .) }}
           {{- if (not .Values.env.EVENTSTORE__MONGODB__CONFIGURATION) }}
