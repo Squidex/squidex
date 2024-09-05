@@ -23,9 +23,9 @@ export default {
         singleLine: {
             control: false,
         },
-    },
-    args: {
-        ngModelChange: action('ngModelChange'),
+        change: {
+            action: 'ngModelChange',
+        },
     },
     render: args => ({
         props: args,
@@ -36,7 +36,7 @@ export default {
                     [disabled]="disabled"
                     [height]="height"
                     [maxLines]="maxLines"
-                    (ngModelChange)="ngModelChange"
+                    (ngModelChange)="change($event)"
                     [ngModel]="ngModel"
                     [singleLine]="singleLine"
                     [valueFile]="valueFile"
