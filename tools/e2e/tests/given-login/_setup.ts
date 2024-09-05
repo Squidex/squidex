@@ -10,10 +10,10 @@ import { test as setup } from './_fixture';
 
 setup('prepare login', async ({ page, userEmail, userPassword, loginPage }) => {
     await loginPage.goto();
-    
+
     const popup = await loginPage.openPopup();
     await popup.enterEmail(userEmail);
-    await popup.enterPassword('1q2w3e$R'),
+    await popup.enterPassword(userPassword),
     await popup.login();
 
     await page.waitForURL(/app/);
