@@ -5,31 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { expect, test as setup } from '../given-app/_fixture';
-import { createField, createSchema, getRandomId, writeJsonAsync } from '../utils';
+import { test as setup } from '../given-app/_fixture';
+import { getRandomId, writeJsonAsync } from '../utils';
 
-setup('prepare schema', async ({ page, appName }) => {
+const fields = [{
+    name: 'my-string',
+}];
+
+setup('prepare schema', async ({ appName, schemasPage, schemaPage }) => {
     const schemaName = `my-schema-${getRandomId()}`;
 
-    const fields = [{
-        name: 'my-string',
-    }];
+    await schemasPage.goto(appName);
 
-    await page.goto(`/app/${appName}/schemas`);
+    const createDialog = await schemasPage.createSchema();
+    await createDialog.enterName(schemaName);
+    await createDialog.save();
 
-    // Add schema.
-    await createSchema(page, { name: schemaName });
+    await schemaPage.publish();
 
-    // Add fields.
     for (const field of fields) {
-        await createField(page, { name: field.name });
+        const fieldDialog = await schemaPage.addField();
+        await fieldDialog.enterName(field.name);
+        await fieldDialog.enterType('String');
+        await fieldDialog.createAndClose();
     }
-
-    // Publish schema.
-    await page.getByRole('button', { name: 'Published', exact: true }).click();
-
-    // Just wait for the publish operation to complete.
-    await expect(page.getByRole('button', { name: 'Published', exact: true })).toBeDisabled();
 
     await writeJsonAsync('schema', { schemaName });
     await writeJsonAsync('fields', { fields });
