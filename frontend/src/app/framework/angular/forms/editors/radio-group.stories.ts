@@ -36,8 +36,7 @@ export default {
     }),
     decorators: [
         moduleMetadata({
-            imports: [
-            ],
+            imports: [],
         }),
     ],
 } as Meta;

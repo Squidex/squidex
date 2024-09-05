@@ -6,7 +6,7 @@
  */
 
 import { expect, test as setup } from '../given-app/_fixture';
-import { getRandomId, writeJsonAsync } from '../utils';
+import { createField, createSchema, getRandomId, writeJsonAsync } from '../utils';
 
 setup('prepare schema', async ({ page, appName }) => {
     const schemaName = `my-schema-${getRandomId()}`;
@@ -17,22 +17,12 @@ setup('prepare schema', async ({ page, appName }) => {
 
     await page.goto(`/app/${appName}/schemas`);
 
-    await page.getByLabel('Create Schema').click();
+    // Add schema.
+    await createSchema(page, { name: schemaName });
 
-    // Define schema name.
-    await page.getByLabel('Name (required)').fill(schemaName);
-
-    // Save schema.
-    await page.getByRole('button', { name: 'Create', exact: true }).click();
-
+    // Add fields.
     for (const field of fields) {
-        await page.locator('button').filter({ hasText: /^Add Field$/ }).click();
-
-        // Define field name.
-        await page.getByPlaceholder('Enter field name').fill(field.name);
-
-        // Save field.
-        await page.getByTestId('dialog').getByRole('button', { name: 'Create' }).click();
+        await createField(page, { name: field.name });
     }
 
     // Publish schema.

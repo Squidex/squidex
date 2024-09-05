@@ -11,7 +11,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddFieldForm, AppSettingsDto, ControlErrorsComponent, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, RootFieldDto, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
 
-const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
+
+type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
 
 @Component({
     standalone: true,
@@ -80,60 +81,73 @@ export class FieldWizardComponent implements OnInit {
         this.dialogClose.emit();
     }
 
-    public addField(addNew: boolean, edit = false) {
+    public addField(navigationMode: SaveNavigationMode) {
         const value = this.addFieldForm.submit();
 
-        if (value) {
-            this.schemasState.addField(this.schema, value, this.parent)
-                .subscribe({
-                    next: dto => {
-                        this.field = dto;
+        if (!value) {
+            return;
+        }
 
-                        this.addFieldForm.submitCompleted({ newValue: { ...DEFAULT_FIELD } });
+        this.schemasState.addField(this.schema, value, this.parent)
+            .subscribe({
+                next: dto => {
+                    switch (navigationMode) {
+                        case 'Add':
+                            this.addFieldForm.submitCompleted({ newValue: { ...DEFAULT_FIELD } });
 
-                        if (addNew) {
                             if (Types.isFunction(this.nameInput.nativeElement.focus)) {
                                 this.nameInput.nativeElement.focus();
                             }
-                        } else if (edit) {
+
+                            break;
+
+                        case 'Edit':
+                            this.field = dto;
+
                             this.editForm = new EditFieldForm(this.field.properties);
                             this.editForm.load(this.field.properties);
-                        } else {
+                            break;
+
+                        case 'Close':
                             this.emitClose();
-                        }
-                    },
-                    error: error => {
-                        this.addFieldForm.submitFailed(error);
-                    },
-                });
-        }
+                    }
+                },
+                error: error => {
+                    this.addFieldForm.submitFailed(error);
+                },
+            });
     }
 
-    public save(addNew = false) {
+    public save(navigationMode: SaveNavigationMode) {
         if (!this.editForm) {
             return;
         }
 
         const value = this.editForm.submit();
 
-        if (value) {
-            const properties = createProperties(this.field.properties.fieldType, value);
+        if (!value) {
+            return;
+        }
 
-            this.schemasState.updateField(this.schema, this.field as RootFieldDto, { properties })
-                .subscribe({
-                    next: () => {
-                        this.editForm!.submitCompleted();
+        const properties = createProperties(this.field.properties.fieldType, value);
 
-                        if (addNew) {
+        this.schemasState.updateField(this.schema, this.field as RootFieldDto, { properties })
+            .subscribe({
+                next: () => {
+                    switch (navigationMode) {
+                        case 'Add':
                             this.editForm = undefined;
-                        } else {
+                            break;
+                        case 'Close': {
                             this.emitClose();
                         }
-                    },
-                    error: error => {
-                        this.editForm!.submitFailed(error);
-                    },
-                });
-        }
+                    }
+                },
+                error: error => {
+                    this.editForm!.submitFailed(error);
+                },
+            });
     }
 }
+
+const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
