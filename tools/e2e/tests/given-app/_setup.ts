@@ -6,7 +6,7 @@
  */
 
 import { getRandomId, writeJsonAsync } from '../utils';
-import { test as setup } from './_fixture';
+import { test as setup } from './../given-login/_fixture';
 
 setup('prepare app', async ({ appsPage }) => {
     const appName = `my-app-${getRandomId()}`;
