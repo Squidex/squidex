@@ -251,6 +251,7 @@
   "common.disabled": "已禁用",
   "common.displayName": "显示名称",
   "common.documentation": "Documentation",
+  "common.download": "Download",
   "common.edit": "编辑",
   "common.editing": "Editing",
   "common.editInNewTab": "Open in new tab",

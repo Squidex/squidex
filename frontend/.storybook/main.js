@@ -24,9 +24,11 @@ module.exports = {
      */
     config.plugins.push(new CopyPlugin({
         patterns: [
-            { from: './node_modules/ace-builds/src-min/', to: 'dependencies/ace/' },
+            { from: './node_modules/ace-builds/src-min/', to: './dependencies/ace/' },
         ]
     }));
+
+    config.resolve?.extensions?.push('.d.ts');
     return config;
   },
   docs: {

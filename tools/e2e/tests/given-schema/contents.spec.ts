@@ -5,206 +5,199 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Page } from '@playwright/test';
-import { escapeRegex, getRandomId } from '../utils';
+import { ContentPage, ContentsPage } from '../pages';
+import { getRandomId } from '../utils';
 import { expect, test } from './_fixture';
 
-test.beforeEach(async ({ page, appName, schemaName }) => {
-    await page.goto(`/app/${appName}/content/${schemaName}`);
-    await page.getByRole('combobox').selectOption('3: 50');
+test.beforeEach(async ({ appName, schemaName, contentsPage }) => {
+    await contentsPage.goto(appName, schemaName);
+    await contentsPage.increasePageSize();
 });
 
-test('create content and close', async ({ page }) => {
-    const contentText = await createRandomContent(page, 'SaveAndClose');
-    const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
+test('create content and close', async ({ contentsPage, contentPage }) => {
+    await contentsPage.addContent();
 
-    await expect(contentRow).toBeVisible();
+    const contentText = `content-${getRandomId()}`;
+    await contentPage.enterField(contentText);
+    await contentPage.saveAndClose();
+
+    const contentRow = await contentsPage.getContentRow(contentText);
+
+    await expect(contentRow.root.getByLabel('Draft')).toBeVisible();
 });
 
-test('create content and edit', async ({ page }) => {
-    await createRandomContent(page, 'SaveAndEdit');
+test('create content and edit', async ({ page, contentsPage, contentPage }) => {
+    await contentsPage.addContent();
+
+    const contentText = `content-${getRandomId()}`;
+    await contentPage.enterField(contentText);
+    await contentPage.saveAndEdit();
 
     await expect(page.getByRole('button', { name: /Draft/ })).toBeVisible();
     await expect(page.getByLabel('Identity')).toBeVisible();
 });
 
-test('create content and add another', async ({ page }) => {
-    await createRandomContent(page, 'SaveAndAdd');
+test('create content and add another', async ({ page, contentsPage, contentPage }) => {
+    await contentsPage.addContent();
+
+    const contentText = `content-${getRandomId()}`;
+    await contentPage.enterField(contentText);
+    await contentPage.saveAndAdd();
 
     await expect(page.locator('sqx-field-editor').getByRole('textbox')).toBeEmpty();
 });
 
-test('create content as published and edit', async ({ page }) => {
-    await createRandomContent(page, 'SavePublishAndEdit');
+test('create content as published and edit', async ({ page, contentsPage, contentPage }) => {
+    await contentsPage.addContent();
+
+    const contentText = `content-${getRandomId()}`;
+    await contentPage.enterField(contentText);
+    await contentPage.savePublishAndEdit();
 
     await expect(page.getByRole('button', { name: /Published/ })).toBeVisible();
     await expect(page.getByLabel('Identity')).toBeVisible();
 });
 
-test('create content as published and close', async ({ page }) => {
-    const contentText = await createRandomContent(page, 'SavePublishAndClose');
-    const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
+test('create content as published and close', async ({ contentsPage, contentPage }) => {
+    await contentsPage.addContent();
 
-    await expect(contentRow.getByLabel('Published')).toBeVisible();
+    const contentText = `content-${getRandomId()}`;
+    await contentPage.enterField(contentText);
+    await contentPage.savePublishAndClose();
+
+    const contentRow = await contentsPage.getContentRow(contentText);
+
+    await expect(contentRow.root.getByLabel('Published')).toBeVisible();
 });
 
-test('update content', async ({ page }) => {
-    const contentText = await createRandomContent(page, 'SaveAndClose');
-    const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
-
-    await contentRow.click();
+test('update content', async ({ page, contentsPage, contentPage }) => {
+    const contentText = await createRandomContent(contentsPage, contentPage);
+    const contentRow = await contentsPage.getContentRow(contentText);
+    await contentRow.edit();
 
     const contentUpdate = `content-${getRandomId()}`;
 
-    // Define content value.
-    await page.locator('sqx-field-editor').getByRole('textbox').fill(contentUpdate);
-    await saveContent(page, 'Save');
+    await contentPage.enterField(contentUpdate);
+    await contentPage.save();
 
-    await page.getByRole('button', { name: 'Save', exact: true }).click();
-
-    // Wait for update of the version
     await page.getByText('Version: 1').waitFor({ state: 'visible' });
+    await contentPage.back();
 
-    // Go back
-    await page.getByLabel('Back').click();
+    const updateRow = await contentsPage.getContentRow(contentUpdate);
 
-    const updateRow = page.locator('tr', { hasText: escapeRegex(contentUpdate) });
-
-    await expect(updateRow).toBeVisible();
+    await expect(updateRow.root).toBeVisible();
 });
 
 const states = [{
-    state: 'Archived',
-    currentState: 'Draft',
-    initialPublished: false,
+    status: 'Archived',
+    currentStatus: 'Draft',
 }, {
-    state: 'Draft',
-    currentState: 'Published',
-    initialPublished: true,
+    status: 'Draft',
+    currentStatus: 'Published',
 }, {
-    state: 'Published',
-    currentState: 'Draft',
-    initialPublished: false,
+    status: 'Published',
+    currentStatus: 'Draft',
 }];
 
-states.forEach(({ state, currentState, initialPublished }) => {
-    const mode: SaveMode = initialPublished ? 'SavePublishAndClose' : 'SaveAndClose';
+states.forEach(({ status, currentStatus }) => {
+    test(`change content from <${currentStatus}> to <${status}>`, async ({ contentsPage, contentPage }) => {
+        await contentsPage.addContent();
 
-    test(`change content to ${state}`, async ({ dropdown, page }) => {
-        const contentText = await createRandomContent(page, mode);
-        const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
+        const contentText = `content-${getRandomId()}`;
+        await contentPage.enterField(contentText);
 
-        await contentRow.getByLabel('Options').click();
-        await dropdown.action(`Change to ${state}`);
-        await page.getByRole('button', { name: 'Confirm' }).click();
+        if (currentStatus === 'Published') {
+            await contentPage.savePublishAndClose();
+        } else {
+            await contentPage.saveAndClose();
+        }
 
-        await expect(contentRow.getByLabel(state)).toBeVisible();
+        const contentRow = await contentsPage.getContentRow(contentText);
+        const dropdown = await contentRow.openOptionsDropdown();
+        await dropdown.actionConfirm(`Change to ${status}`);
+
+        await expect(contentRow.root.getByLabel(status)).toBeVisible();
     });
 
-    test(`change content to ${state} by checkbox`, async ({ page }) => {
-        const contentText = await createRandomContent(page, mode);
-        const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
+    test(`change content from <${currentStatus}> to <${status}> by checkbox`, async ({ contentsPage, contentPage }) => {
+        await contentsPage.addContent();
 
-        await contentRow.getByRole('checkbox').click();
-        await page.getByRole('button', { name: state }).click();
-        await page.getByRole('button', { name: 'Confirm' }).click();
+        const contentText = `content-${getRandomId()}`;
+        await contentPage.enterField(contentText);
 
-        await expect(contentRow.getByLabel(state)).toBeVisible();
+        if (currentStatus === 'Published') {
+            await contentPage.savePublishAndClose();
+        } else {
+            await contentPage.saveAndClose();
+        }
+
+        const contentRow = await contentsPage.getContentRow(contentText);
+        await contentRow.select();
+        await contentsPage.changeSelectedStatus(status);
+
+        await expect(contentRow.root.getByLabel(status)).toBeVisible();
     });
 
-    test(`change content to ${state} by detail page`, async ({ page }) => {
-        const contentText = await createRandomContent(page, mode);
-        const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
+    test(`change content from <${currentStatus}> to <${status}> by detail page`, async ({ page, contentsPage, contentPage }) => {
+        await contentsPage.addContent();
 
-        await contentRow.click();
-        await page.getByRole('button', { name: currentState }).click();
-        await page.getByText(`Change to ${state}`).click();
-        await page.getByRole('button', { name: 'Confirm' }).click();
+        const contentText = `content-${getRandomId()}`;
+        await contentPage.enterField(contentText);
 
-        await expect(page.getByRole('button', { name: state })).toBeVisible();
+        if (currentStatus === 'Published') {
+            await contentPage.savePublishAndEdit();
+        } else {
+            await contentPage.saveAndEdit();
+        }
+
+        const dropdown = await contentPage.openStatusDropdown(currentStatus);
+        await dropdown.actionConfirm(`Change to ${status}`);
+
+        await expect(page.getByRole('button', { name: status })).toBeVisible();
     });
 });
 
-test('delete content', async ({ dropdown, page }) => {
-    await createRandomContent(page, 'SaveAndEdit');
+test('delete content by details', async ({ page, contentsPage, contentPage }) => {
+    const contentText = `field-${getRandomId()}`;
 
-    await page.getByLabel('Options').click();
+    await contentsPage.addContent();
+
+    await contentPage.enterField(contentText);
+    await contentPage.saveAndEdit();
+
+    const dropdown = await contentPage.openOptionsDropdown();
     await dropdown.delete();
 
     await expect(page.getByLabel('Identity')).not.toBeVisible();
 });
 
-test('delete content by options', async ({ dropdown, page }) => {
-    const contentText = await createRandomContent(page, 'SaveAndClose');
-    const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
+test('delete content by options', async ({ contentsPage, contentPage }) => {
+    const contentText = await createRandomContent(contentsPage, contentPage);
+    const contentRow = await contentsPage.getContentRow(contentText);
 
-    await contentRow.getByLabel('Options').click();
+    const dropdown = await contentRow.openOptionsDropdown();
     await dropdown.delete();
 
-    await expect(contentRow).not.toBeVisible();
+    await expect(contentRow.root).not.toBeVisible();
 });
 
-test('delete content by checkbox', async ({  page }) => {
-    const contentText = await createRandomContent(page, 'SaveAndClose');
-    const contentRow = page.locator('tr', { hasText: escapeRegex(contentText) });
+test('delete content by checkbox', async ({ contentsPage, contentPage }) => {
+    const contentText = await createRandomContent(contentsPage, contentPage);
+    const contentRow = await contentsPage.getContentRow(contentText);
 
-    await contentRow.getByRole('checkbox').click();
-    await page.getByRole('button', { name: 'Delete' }).click();
-    await page.getByRole('button', { name: 'Yes' }).click();
+    await contentRow.select();
+    await contentsPage.deleteSelected();
 
-    await expect(contentRow).not.toBeVisible();
+    await expect(contentRow.root).not.toBeVisible();
 });
 
-async function createRandomContent(page: Page, mode: SaveMode) {
+async function createRandomContent(contentsPage: ContentsPage, contentPage: ContentPage) {
     const contentText = `content-${getRandomId()}`;
 
-    await page.getByRole('button', { name: /New/ }).click();
+    await contentsPage.addContent();
 
-    // Define content value.
-    await page.locator('sqx-field-editor').getByRole('textbox').fill(contentText);
-    await saveContent(page, mode);
-
-    // Wait for the success alert.
-    await page.getByRole('alert').getByText('Content created successfully.').waitFor({ state: 'visible' });
+    await contentPage.enterField(contentText);
+    await contentPage.saveAndClose();
 
     return contentText;
-}
-
-type SaveMode =
-    'Save' |
-    'SaveAndAdd' |
-    'SaveAndClose' |
-    'SaveAndEdit' |
-    'SavePublishAndAdd' |
-    'SavePublishAndClose' |
-    'SavePublishAndEdit';
-
-async function saveContent(page: Page, mode: SaveMode) {
-    switch (mode) {
-        case 'SaveAndAdd':
-            await page.getByLabel('Save', { exact: true }).getByLabel('More').click();
-            await page.getByText('Save & add another').click();
-            break;
-        case 'SaveAndClose':
-            await page.getByLabel('Save', { exact: true }).getByLabel('More').click();
-            await page.getByText('Save & close').click();
-            break;
-        case 'SaveAndEdit':
-            await page.getByRole('button', { name: 'Save', exact: true }).click();
-            break;
-        case 'SavePublishAndAdd':
-            await page.getByLabel('Save and Publish').getByLabel('More').click();
-            await page.getByText('Save and Publish & add another').click();
-            break;
-        case 'SavePublishAndClose':
-            await page.getByLabel('Save and Publish').getByLabel('More').click();
-            await page.getByText('Save and Publish & close').click();
-            break;
-        case 'SavePublishAndEdit':
-            await page.getByRole('button', { name: 'Save and Publish' }).click();
-            break;
-        case 'Save':
-            await page.getByRole('button', { name: 'Save', exact: true }).click();
-            break;
-    }
 }

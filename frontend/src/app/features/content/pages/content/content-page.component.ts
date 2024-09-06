@@ -280,17 +280,23 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
             this.contentsState.create(value, publish, this.contentId)
                 .subscribe({
                     next: content => {
-                        if (navigationMode == 'Edit') {
-                            this.contentForm.submitCompleted({ noReset: true });
-                            this.contentForm.load(content.data, true);
+                        switch (navigationMode) {
+                            case 'Add':
+                                this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, this.formContext);
+                                break;
 
-                            this.router.navigate([content.id, 'history'], { relativeTo: this.route.parent! });
-                        } else if (navigationMode === 'Close') {
-                            this.autoSaveIgnore = true;
+                            case 'Edit':
+                                this.contentForm.submitCompleted({ noReset: true });
+                                this.contentForm.load(content.data, true);
 
-                            this.router.navigate(['./'], { relativeTo: this.route.parent! });
-                        } else {
-                            this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, this.formContext);
+                                this.router.navigate([content.id, 'history'], { relativeTo: this.route.parent! });
+                                break;
+
+                            case 'Close':
+                                this.autoSaveIgnore = true;
+
+                                this.router.navigate(['./'], { relativeTo: this.route.parent! });
+                                break;
                         }
                     },
                     error: error => {

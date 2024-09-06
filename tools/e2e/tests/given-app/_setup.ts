@@ -5,20 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { test as setup } from '@playwright/test';
 import { getRandomId, writeJsonAsync } from '../utils';
+import { test as setup } from './../given-login/_fixture';
 
-setup('prepare app', async ({ page }) => {
+setup('prepare app', async ({ appsPage }) => {
     const appName = `my-app-${getRandomId()}`;
 
-    await page.goto('/app');
+    await appsPage.goto();
 
-    await page.getByTestId('new-app').click();
+    const dialog = await appsPage.openAppDialog();
+    await dialog.enterName(appName);
+    await dialog.save();
 
-    await page.locator('#name').fill(appName);
-    await page.getByRole('button', { name: 'Create' }).click();
-
-    await page.getByRole('heading', { name: appName }).click();
+    await appsPage.gotoApp(appName);
 
     await writeJsonAsync('app', { appName });
 });

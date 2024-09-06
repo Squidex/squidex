@@ -8,17 +8,16 @@
 import { getRandomId } from '../utils';
 import { expect, test } from './_fixture';
 
-test.beforeEach(async ({ page }) => {
-    await page.goto('/app');
+test.beforeEach(async ({ appsPage }) => {
+    await appsPage.goto();
 });
 
-test('create app', async ({ page }) => {
+test('create app', async ({ page, appsPage }) => {
     const appName = `my-app-${getRandomId()}`;
 
-    await page.getByTestId('new-app').click();
-
-    await page.locator('#name').fill(appName);
-    await page.getByRole('button', { name: 'Create' }).click();
+    const appDialog = await appsPage.openAppDialog();
+    await appDialog.enterName(appName);
+    await appDialog.save();
 
     const newApp = page.getByRole('heading', { name: appName });
 

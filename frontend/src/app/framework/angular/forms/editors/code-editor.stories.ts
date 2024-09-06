@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { FormsModule } from '@angular/forms';
+import { action } from '@storybook/addon-actions';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { CodeEditorComponent, ScriptCompletions } from '@app/framework';
 
@@ -18,6 +20,12 @@ export default {
         dropdownFullWidth: {
             control: 'boolean',
         },
+        singleLine: {
+            control: false,
+        },
+        change: {
+            action: 'ngModelChange',
+        },
     },
     render: args => ({
         props: args,
@@ -28,6 +36,8 @@ export default {
                     [disabled]="disabled"
                     [height]="height"
                     [maxLines]="maxLines"
+                    (ngModelChange)="change($event)"
+                    [ngModel]="ngModel"
                     [singleLine]="singleLine"
                     [valueFile]="valueFile"
                     [valueMode]="valueMode"
@@ -39,6 +49,7 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
+                FormsModule,
             ],
         }),
     ],
@@ -63,11 +74,13 @@ type Story = StoryObj<CodeEditorComponent>;
 export const Default: Story = {
     args: {
         height: 'auto',
-    },
+        ngModel: 'Value',
+    } as any,
 };
 
 export const Completions: Story = {
     args: {
+        height: 200,
         completion: COMPLETIONS,
     },
 };
@@ -84,6 +97,8 @@ export const SingleLine: Story = {
                         [disabled]="disabled"
                         [height]="height"
                         [maxLines]="maxLines"
+                        (ngModelChange)="ngModelChange"
+                        [ngModel]="ngModel"
                         [singleLine]="singleLine"
                         [valueFile]="valueFile"
                         [valueMode]="valueMode"
@@ -98,5 +113,6 @@ export const SingleLine: Story = {
     }),
     args: {
         singleLine: true,
-    },
+        ngModelChange: action('ngModelChange'),
+    } as any,
 };

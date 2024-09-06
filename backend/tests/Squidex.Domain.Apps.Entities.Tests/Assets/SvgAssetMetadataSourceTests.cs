@@ -66,8 +66,24 @@ public class SvgAssetMetadataSourceTests : GivenContext
         Assert.Equal(20, command.Metadata[KnownMetadataKeys.PixelWidth].AsNumber);
         Assert.Equal(30, command.Metadata[KnownMetadataKeys.PixelHeight].AsNumber);
 
-        Assert.Equal("20", command.Metadata[KnownMetadataKeys.SvgWidth].AsString);
-        Assert.Equal("30", command.Metadata[KnownMetadataKeys.SvgHeight].AsString);
+        Assert.Equal(20, command.Metadata[KnownMetadataKeys.SvgWidth].AsNumber);
+        Assert.Equal(30, command.Metadata[KnownMetadataKeys.SvgHeight].AsNumber);
+
+        Assert.Equal("0 0 100 100", command.Metadata[KnownMetadataKeys.SvgViewBox].AsString);
+    }
+
+    [Fact]
+    public async Task Should_annote_with_non_numeric_dimensions()
+    {
+        var command = Command("SvgValidNonNumberSizes.svg");
+
+        await sut.EnhanceAsync(command, default);
+
+        Assert.DoesNotContain(KnownMetadataKeys.PixelWidth, command.Metadata);
+        Assert.DoesNotContain(KnownMetadataKeys.PixelHeight, command.Metadata);
+
+        Assert.Equal("20%", command.Metadata[KnownMetadataKeys.SvgWidth].AsString);
+        Assert.Equal("30%", command.Metadata[KnownMetadataKeys.SvgHeight].AsString);
 
         Assert.Equal("0 0 100 100", command.Metadata[KnownMetadataKeys.SvgViewBox].AsString);
     }
@@ -103,7 +119,25 @@ public class SvgAssetMetadataSourceTests : GivenContext
 
         var formatted = sut.Format(source);
 
-        Assert.Equal(new[] { "128x55" }, formatted);
+        Assert.Equal(["128x55"], formatted);
+    }
+
+    [Fact]
+    public void Should_describe_metadata_with_number()
+    {
+        var source = CreateAsset() with
+        {
+            Metadata = new AssetMetadata
+            {
+                [KnownMetadataKeys.SvgWidth] = 128,
+                [KnownMetadataKeys.SvgHeight] = 55
+            },
+            MimeType = "image/svg+xml"
+        };
+
+        var formatted = sut.Format(source);
+
+        Assert.Equal(["128x55"], formatted);
     }
 
     private static UploadAssetCommand Command(string path)

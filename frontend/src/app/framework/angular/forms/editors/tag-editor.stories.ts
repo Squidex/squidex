@@ -6,6 +6,7 @@
  */
 
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { LocalizerService, RootViewComponent, TagEditorComponent } from '@app/framework';
 
@@ -52,6 +53,9 @@ export default {
         disabled: {
             control: 'boolean',
         },
+        change: {
+            action:'ngModelChange',
+        },
     },
     render: args => ({
         props: args,
@@ -62,6 +66,7 @@ export default {
                     [disabled]="disabled"
                     [itemsSource]="itemsSource"
                     [itemsSourceLoading]="itemsSourceLoading"
+                    (ngModelChange)="change($event)"
                     [ngModel]="model"
                     [styleScrollable]="styleScrollable"
                     [styleBlank]="styleBlank"
@@ -76,6 +81,7 @@ export default {
                 TestComponent,
             ],
             imports: [
+                FormsModule,
                 RootViewComponent,
             ],
             providers: [

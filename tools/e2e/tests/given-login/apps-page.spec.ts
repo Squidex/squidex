@@ -7,8 +7,8 @@
 
 import { expect, test } from './_fixture';
 
-test.beforeEach(async ({ page }) => {
-    await page.goto('/app');
+test.beforeEach(async ({ appsPage }) => {
+    await appsPage.goto();
 });
 
 test('has title', async ({ page }) => {

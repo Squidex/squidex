@@ -9,8 +9,10 @@ import fs from 'fs/promises';
 import path from 'path';
 import { TEMPORARY_PATH } from '../playwright.config';
 
+let COUNTER = 0;
+
 export function getRandomId() {
-    const result = new Date().getTime().toString();
+    const result = `${new Date().getTime()}-${COUNTER++}`;
 
     return result;
 }

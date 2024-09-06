@@ -14,7 +14,7 @@ export default {
     component: EditableTitleComponent,
     argTypes: {
         inputTitle: {
-            control: 'inputTitle',
+            control: 'text',
         },
         closeButton: {
             control: 'boolean',

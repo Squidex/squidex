@@ -31,13 +31,14 @@
 
                         <div class="overlay-menu">
                             @if (!isDisabled) {
-                                <a class="file-edit ms-2" (click)="emitEdit()">
+                                <a class="file-edit ms-2" attr.aria-label="{{ 'common.edit' | sqxTranslate }}" (click)="emitEdit()">
                                     <i class="icon-pencil"></i>
                                 </a>
                             }
 
                             <a
                                 class="file-download ms-2"
+                                attr.aria-label="{{ 'common.download' | sqxTranslate }}"
                                 [href]="asset | sqxAssetUrl: asset.version : false"
                                 sqxExternalLink="noicon"
                                 sqxStopClick>
@@ -53,6 +54,7 @@
                             @if (!isDisabled && !removeMode && asset.canDelete) {
                                 <a
                                     class="file-delete ms-2"
+                                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                                     confirmRememberKey="deleteAsset"
                                     confirmText="i18n:assets.deleteConfirmText"
                                     confirmTitle="i18n:assets.deleteConfirmTitle"
@@ -64,6 +66,7 @@
                             @if (!isDisabled && removeMode) {
                                 <a
                                     class="file-delete ms-2"
+                                    attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                                     confirmRememberKey="removeAsset"
                                     confirmText="i18n:assets.removeConfirmText"
                                     confirmTitle="i18n:assets.removeConfirmTitle"

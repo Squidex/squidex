@@ -8,6 +8,7 @@
 
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
 import { fadeAnimation } from '@app/framework/internal';
+import { TranslatePipe } from '../pipes/translate.pipe';
 import { ShortcutComponent } from '../shortcut.component';
 import { TourStepDirective } from './tour-step.directive';
 
@@ -22,6 +23,7 @@ import { TourStepDirective } from './tour-step.directive';
     changeDetection: ChangeDetectionStrategy.Default,
     imports: [
         ShortcutComponent,
+        TranslatePipe,
         TourStepDirective,
     ],
 })

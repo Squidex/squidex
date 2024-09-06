@@ -53,27 +53,27 @@ public record Asset : AssetItem
 
         if (fileName != null && !string.Equals(FileName, fileName, StringComparison.OrdinalIgnoreCase))
         {
-            result = this with { FileName = fileName };
+            result = result with { FileName = fileName };
         }
 
         if (slug != null && !string.Equals(Slug, slug, StringComparison.OrdinalIgnoreCase))
         {
-            result = this with { Slug = slug };
+            result = result with { Slug = slug };
         }
 
         if (isProtected != null && IsProtected != isProtected.Value)
         {
-            result = this with { IsProtected = isProtected.Value };
+            result = result with { IsProtected = isProtected.Value };
         }
 
         if (tags != null && !Tags.SetEquals(tags))
         {
-            result = this with { Tags = tags };
+            result = result with { Tags = tags };
         }
 
         if (metadata != null && !Metadata.EqualsDictionary(metadata))
         {
-            result = this with { Metadata = metadata };
+            result = result with { Metadata = metadata };
         }
 
         return result;
