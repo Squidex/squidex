@@ -19,13 +19,13 @@ export class SchemaPage {
     public async openFieldWizard() {
         await this.page.locator('button').filter({ hasText: /^Add Field$/ }).click();
 
-        return new FieldDialog(this.page);
+        return new FieldDialog(this.page, this.page.getByTestId('dialog'));
     }
 
     public async openNestedFieldWizard() {
         await this.page.locator('button').filter({ hasText: /Add Nested Field/ }).click();
 
-        return new FieldDialog(this.page);
+        return new FieldDialog(this.page, this.page.getByTestId('dialog'));
     }
 
     public async openOptionsDropdown() {
@@ -69,44 +69,46 @@ export class FieldRow {
 }
 
 export class FieldDialog {
-    constructor(private readonly page: Page) {}
+    constructor(private readonly page: Page,
+        public readonly root: Locator,
+    ) {}
 
     public async enterName(name: string) {
-        await this.page.getByPlaceholder('Enter field name').fill(name);
+        await this.root.getByPlaceholder('Enter field name').fill(name);
     }
 
     public async enterType(type: string) {
-        await this.page.getByText(type, { exact: true }).click();
+        await this.root.getByText(type, { exact: true }).click();
     }
 
     public async enterLabel(label: string) {
-        await this.page.getByLabel('Label').fill(label);
+        await this.root.getByLabel('Label').fill(label);
     }
 
     public async createAndClose() {
-        await this.page.getByTestId('dialog').getByRole('button', { name: 'Create' }).click();
+        await this.root.getByRole('button', { name: 'Create' }).click();
     }
 
     public async createAndAdd() {
-        await this.page.getByTestId('dialog').getByLabel('Add field').getByLabel('More').click();
+        await this.root.getByLabel('Add field').getByLabel('More').click();
 
         const dropdown = new Dropdown(this.page);
         await dropdown.action('Create & add another');
     }
 
     public async createAndEdit() {
-        await this.page.getByTestId('dialog').getByLabel('Add field').getByLabel('More').click();
+        await this.root.getByLabel('Add field').getByLabel('More').click();
 
         const dropdown = new Dropdown(this.page);
         await dropdown.action('Create & edit properties');
     }
 
     public async saveAndClose() {
-        await this.page.getByTestId('dialog').getByRole('button', { name: 'Save and close' }).click();
+        await this.root.getByRole('button', { name: 'Save and close' }).click();
     }
 
     public async saveAndAdd() {
-        await this.page.getByTestId('dialog').getByLabel('Save field').getByLabel('More').click();
+        await this.root.getByLabel('Save field').getByLabel('More').click();
 
         const dropdown = new Dropdown(this.page);
         await dropdown.action('Save and add field');

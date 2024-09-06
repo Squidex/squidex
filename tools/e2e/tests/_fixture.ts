@@ -6,11 +6,12 @@
  */
 
 import { test as base } from '@playwright/test';
-import { ContentPage, ContentsPage, LoginPage, RulePage, RulesPage, SchemaPage, SchemasPage } from './pages';
+import { AssetsPage, ContentPage, ContentsPage, LoginPage, RulePage, RulesPage, SchemaPage, SchemasPage } from './pages';
 import { AppsPage } from './pages/apps';
 
 export type BaseFixture = {
     appsPage: AppsPage;
+    assetsPage: AssetsPage;
     contentPage: ContentPage;
     contentsPage: ContentsPage;
     loginPage: LoginPage;
@@ -23,6 +24,9 @@ export type BaseFixture = {
 export const test = base.extend<BaseFixture>({
     appsPage: async ({ page }, use) => {
         await use(new AppsPage(page));
+    },
+    assetsPage: async ({ page }, use) => {
+        await use(new AssetsPage(page));
     },
     contentPage: async ({ page }, use) => {
         await use(new ContentPage(page));

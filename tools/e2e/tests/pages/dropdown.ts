@@ -10,9 +10,14 @@ import { Page } from '@playwright/test';
 export class Dropdown {
     constructor(private readonly page: Page) {}
 
-    public async delete() {
+    public async delete(cancel = false) {
         await this.page.getByText('Delete').click();
-        await this.page.getByRole('button', { name: /Yes/ }).click();
+
+        if (cancel) {
+            await this.page.getByRole('button', { name: /No/ }).click();
+        } else {
+            await this.page.getByRole('button', { name: /Yes/ }).click();
+        }
     }
 
     public async action(name: string) {

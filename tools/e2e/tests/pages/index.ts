@@ -6,6 +6,7 @@
  */
 
 export * from './apps';
+export * from './assets';
 export * from './content';
 export * from './contents';
 export * from './login';

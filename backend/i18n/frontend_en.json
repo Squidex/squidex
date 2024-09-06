@@ -251,6 +251,7 @@
   "common.disabled": "Disabled",
   "common.displayName": "Display Name",
   "common.documentation": "Documentation",
+  "common.download": "Download",
   "common.edit": "Edit",
   "common.editing": "Editing",
   "common.editInNewTab": "Open in new tab",

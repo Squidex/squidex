@@ -52,11 +52,28 @@ public sealed class SvgAssetMetadataSource : IAssetMetadataSource
 
                 if (!string.IsNullOrWhiteSpace(width) && !string.IsNullOrWhiteSpace(height))
                 {
-                    command.Metadata[KnownMetadataKeys.SvgWidth] = width;
-                    command.Metadata[KnownMetadataKeys.SvgHeight] = height;
+                    var hasNumericWidth = TryParseInt(width, out var w);
+                    var hasNumericHeight = TryParseInt(height, out var h);
 
-                    if (int.TryParse(width, NumberStyles.Integer, CultureInfo.InvariantCulture, out var w) &&
-                        int.TryParse(height, NumberStyles.Integer, CultureInfo.InvariantCulture, out var h))
+                    if (hasNumericWidth)
+                    {
+                        command.Metadata[KnownMetadataKeys.SvgWidth] = w;
+                    }
+                    else
+                    {
+                        command.Metadata[KnownMetadataKeys.SvgWidth] = width;
+                    }
+
+                    if (hasNumericWidth)
+                    {
+                        command.Metadata[KnownMetadataKeys.SvgHeight] = h;
+                    }
+                    else
+                    {
+                        command.Metadata[KnownMetadataKeys.SvgHeight] = height;
+                    }
+
+                    if (hasNumericWidth && hasNumericHeight)
                     {
                         command.Metadata[KnownMetadataKeys.PixelWidth] = w;
                         command.Metadata[KnownMetadataKeys.PixelHeight] = h;
@@ -79,6 +96,11 @@ public sealed class SvgAssetMetadataSource : IAssetMetadataSource
         }
     }
 
+    private static bool TryParseInt(string value, out int result)
+    {
+        return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out result);
+    }
+
     public IEnumerable<string> Format(Asset asset)
     {
         var isSvg =
@@ -90,8 +112,8 @@ public sealed class SvgAssetMetadataSource : IAssetMetadataSource
             yield break;
         }
 
-        if (asset.Metadata.TryGetString(KnownMetadataKeys.SvgWidth, out var w) &&
-            asset.Metadata.TryGetString(KnownMetadataKeys.SvgHeight, out var h))
+        if (asset.Metadata.TryGetValue(KnownMetadataKeys.SvgWidth, out var w) &&
+            asset.Metadata.TryGetValue(KnownMetadataKeys.SvgHeight, out var h))
         {
             yield return $"{w}x{h}";
         }
