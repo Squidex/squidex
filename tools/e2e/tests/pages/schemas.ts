@@ -21,7 +21,7 @@ export class SchemasPage {
         return new SchemaLink(this.page, locator);
     }
 
-    public async createSchema() {
+    public async openSchemaDialog() {
         await this.page.getByLabel('Create Schema').click();
 
         return new CreateDialog(this.page);

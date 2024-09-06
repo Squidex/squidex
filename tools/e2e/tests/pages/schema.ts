@@ -16,13 +16,13 @@ export class SchemaPage {
         await this.page.goto(`/app/${appName}/schemas/${schemaName}`);
     }
 
-    public async addField() {
+    public async openFieldWizard() {
         await this.page.locator('button').filter({ hasText: /^Add Field$/ }).click();
 
         return new FieldDialog(this.page);
     }
 
-    public async addNestedField() {
+    public async openNestedFieldWizard() {
         await this.page.locator('button').filter({ hasText: /Add Nested Field/ }).click();
 
         return new FieldDialog(this.page);

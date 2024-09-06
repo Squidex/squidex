@@ -58,7 +58,7 @@ test('add field and edit', async ({ schemasPage, schemaPage }) => {
     const fieldName = `field-${getRandomId()}`;
     const fieldLabel = `field-${getRandomId()}`;
 
-    const fieldDialog = await schemaPage.addField();
+    const fieldDialog = await schemaPage.openFieldWizard();
     await fieldDialog.enterName(fieldName);
     await fieldDialog.createAndEdit();
 
@@ -76,7 +76,7 @@ test('add field and add another', async ({ schemasPage, schemaPage }) => {
     const fieldName1 = `field-${getRandomId()}`;
     const fieldName2 = `field-${getRandomId()}`;
 
-    const fieldDialog = await schemaPage.addField();
+    const fieldDialog = await schemaPage.openFieldWizard();
     await fieldDialog.enterName(fieldName1);
     await fieldDialog.createAndAdd();
 
@@ -95,14 +95,14 @@ test('add field to array', async ({ schemasPage, schemaPage }) => {
 
     const rootFieldName = `field-${getRandomId()}`;
 
-    const rootDialog = await schemaPage.addField();
+    const rootDialog = await schemaPage.openFieldWizard();
     await rootDialog.enterName(rootFieldName);
     await rootDialog.enterType('Array');
     await rootDialog.createAndClose();
 
     const nestedFieldName = `field-${getRandomId()}`;
 
-    const nestedDialog = await schemaPage.addNestedField();
+    const nestedDialog = await schemaPage.openNestedFieldWizard();
     await nestedDialog.enterName(nestedFieldName);
     await nestedDialog.createAndClose();
 
@@ -116,7 +116,7 @@ test('add field to array and ed', async ({ schemasPage, schemaPage }) => {
 
     const rootFieldName = `field-${getRandomId()}`;
 
-    const rootDialog = await schemaPage.addField();
+    const rootDialog = await schemaPage.openFieldWizard();
     await rootDialog.enterName(rootFieldName);
     await rootDialog.enterType('Array');
     await rootDialog.createAndClose();
@@ -124,7 +124,7 @@ test('add field to array and ed', async ({ schemasPage, schemaPage }) => {
     const nestedFieldName = `field-${getRandomId()}`;
     const nestedFieldLabel = `field-${getRandomId()}`;
 
-    const nestedDialog = await schemaPage.addNestedField();
+    const nestedDialog = await schemaPage.openNestedFieldWizard();
     await nestedDialog.enterName(nestedFieldName);
     await nestedDialog.createAndEdit();
 
@@ -141,7 +141,7 @@ test('add field to array and another', async ({ schemasPage, schemaPage }) => {
 
     const rootFieldName = `field-${getRandomId()}`;
 
-    const rootDialog = await schemaPage.addField();
+    const rootDialog = await schemaPage.openFieldWizard();
     await rootDialog.enterName(rootFieldName);
     await rootDialog.enterType('Array');
     await rootDialog.createAndClose();
@@ -149,7 +149,7 @@ test('add field to array and another', async ({ schemasPage, schemaPage }) => {
     const nestedFieldName1 = `field-${getRandomId()}`;
     const nestedFieldName2 = `field-${getRandomId()}`;
 
-    const nestedDialog = await schemaPage.addNestedField();
+    const nestedDialog = await schemaPage.openNestedFieldWizard();
     await nestedDialog.enterName(nestedFieldName1);
     await nestedDialog.createAndAdd();
 
@@ -178,7 +178,7 @@ test('delete field', async ({ schemasPage, schemaPage }) => {
 async function createRandomField(schemaPage: SchemaPage) {
     const name = `field-${getRandomId()}`;
 
-    const fieldDialog = await schemaPage.addField();
+    const fieldDialog = await schemaPage.openFieldWizard();
     await fieldDialog.enterName(name);
     await fieldDialog.enterType('String');
     await fieldDialog.createAndClose();
@@ -189,7 +189,7 @@ async function createRandomField(schemaPage: SchemaPage) {
 async function createRandomSchema(schemasPage: SchemasPage) {
     const name = `schema-${getRandomId()}`;
 
-    const schemaDialog = await schemasPage.createSchema();
+    const schemaDialog = await schemasPage.openSchemaDialog();
     await schemaDialog.enterName(name);
     await schemaDialog.save();
 
