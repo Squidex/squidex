@@ -21,13 +21,19 @@ export class ContentPage {
 
     public async saveAndAdd() {
         await this.page.getByLabel('Save', { exact: true }).getByLabel('More').click();
-        await this.page.getByText('Save & add another').click();
+
+        const dropdown = new Dropdown(this.page);
+        await dropdown.action('Save & add another');
+
         await this.waitForCreation();
     }
 
     public async saveAndClose() {
         await this.page.getByLabel('Save', { exact: true }).getByLabel('More').click();
-        await this.page.getByText('Save & close').click();
+
+        const dropdown = new Dropdown(this.page);
+        await dropdown.action('Save & close');
+
         await this.waitForCreation();
     }
 
@@ -38,13 +44,19 @@ export class ContentPage {
 
     public async savePublishAndAdd() {
         await this.page.getByLabel('Save and Publish').getByLabel('More').click();
-        await this.page.getByText('Save and Publish & add another').click();
+
+        const dropdown = new Dropdown(this.page);
+        await dropdown.action('Save and Publish & add another');
+
         await this.waitForCreation();
     }
 
     public async savePublishAndClose() {
         await this.page.getByLabel('Save and Publish').getByLabel('More').click();
-        await this.page.getByText('Save and Publish & close').click();
+
+        const dropdown = new Dropdown(this.page);
+        await dropdown.action('Save and Publish & close');
+
         await this.waitForCreation();
     }
 

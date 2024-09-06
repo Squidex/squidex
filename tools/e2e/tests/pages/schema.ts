@@ -89,12 +89,16 @@ export class FieldDialog {
 
     public async createAndAdd() {
         await this.page.getByTestId('dialog').getByLabel('Add field').getByLabel('More').click();
-        await this.page.getByText('Create & add another').click();
+
+        const dropdown = new Dropdown(this.page);
+        await dropdown.action('Create & add another');
     }
 
     public async createAndEdit() {
         await this.page.getByTestId('dialog').getByLabel('Add field').getByLabel('More').click();
-        await this.page.getByText('Create & edit properties').click();
+
+        const dropdown = new Dropdown(this.page);
+        await dropdown.action('Create & edit properties');
     }
 
     public async saveAndClose() {
@@ -103,6 +107,8 @@ export class FieldDialog {
 
     public async saveAndAdd() {
         await this.page.getByTestId('dialog').getByLabel('Save field').getByLabel('More').click();
-        await this.page.getByText('Save and add field').click();
+
+        const dropdown = new Dropdown(this.page);
+        await dropdown.action('Save and add field');
     }
 }

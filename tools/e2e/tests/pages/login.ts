@@ -23,12 +23,12 @@ export class LoginPage {
         await popup.waitForLoadState();
 
         await popup.getByTestId('login-button').waitFor();
-        return new LoginPopup(this.page, popup);
+        return new LoginPopup(popup);
     }
 }
 
 export class LoginPopup {
-    constructor(private readonly page: Page,
+    constructor(
         public readonly root: Page,
     ) {
     }

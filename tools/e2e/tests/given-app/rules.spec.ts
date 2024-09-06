@@ -24,7 +24,7 @@ test('delete rule', async ({ rulesPage, rulePage }) => {
     const dropdown = await ruleCard.openOptionsDropdown();
     await dropdown.delete();
 
-    await expect(ruleCard.root).toBeVisible();
+    await expect(ruleCard.root).not.toBeVisible();
 });
 
 test('disable rule', async ({ rulePage, rulesPage }) => {
