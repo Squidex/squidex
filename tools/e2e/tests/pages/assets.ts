@@ -50,14 +50,9 @@ export class AssetCard {
     ) {
     }
 
-    public async delete(cancel = false) {
+    public async delete(button = /Yes/) {
         await this.root.getByLabel('Delete').click();
-
-        if (cancel) {
-            await this.page.getByRole('button', { name: /No/ }).click();
-        } else {
-            await this.page.getByRole('button', { name: /Yes/ }).click();
-        }
+        await this.page.getByRole('button', { name: button }).click();
     }
 
     public async edit() {

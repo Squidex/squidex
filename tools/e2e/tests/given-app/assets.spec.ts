@@ -15,14 +15,14 @@ test.beforeEach(async ({ appName, assetsPage }) => {
     await assetsPage.goto(appName);
 });
 
-test('should upload asset', async ({ assetsPage }) => {
+test('upload asset', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
 
     expect(assetCard.root).toBeVisible();
 });
 
-test('should delete asset', async ({ assetsPage }) => {
+test('delete asset', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
     await assetCard.delete();
@@ -30,16 +30,16 @@ test('should delete asset', async ({ assetsPage }) => {
     expect(assetCard.root).not.toBeVisible();
 });
 
-test('should not delete asset if cancelled', async ({ assetsPage }) => {
+test('not delete asset if cancelled', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
 
-    await assetCard.delete(true);
+    await assetCard.delete(/Cancel/);
 
     expect(assetCard.root).toBeVisible();
 });
 
-test('should edit asset name', async ({ assetsPage }) => {
+test('edit asset name', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
 
@@ -53,7 +53,7 @@ test('should edit asset name', async ({ assetsPage }) => {
     expect(newCard.root).toBeVisible();
 });
 
-test('should edit asset metadata', async ({ assetsPage }) => {
+test('edit asset metadata', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
 
@@ -70,7 +70,7 @@ test('should edit asset metadata', async ({ assetsPage }) => {
     expect(newCard.root).toBeVisible();
 });
 
-test('should add asset folder', async ({ assetsPage }) => {
+test('add asset folder', async ({ assetsPage }) => {
     const folderName = `folder-${getRandomId()}`;
 
     const folderDialog = await assetsPage.openAssetFolderDialog();
@@ -82,7 +82,7 @@ test('should add asset folder', async ({ assetsPage }) => {
     expect(folderCard.root).toBeVisible();
 });
 
-test('should open asset folder', async ({ assetsPage }) => {
+test('open asset folder', async ({ assetsPage }) => {
     const folderName = `folder-${getRandomId()}`;
 
     const folderDialog = await assetsPage.openAssetFolderDialog();
@@ -97,7 +97,7 @@ test('should open asset folder', async ({ assetsPage }) => {
     expect(moveUpCard.root).toBeVisible();
 });
 
-test('should rename asset folder', async ({ assetsPage }) => {
+test('rename asset folder', async ({ assetsPage }) => {
     const folderName = `folder-${getRandomId()}`;
 
     const folderDialog = await assetsPage.openAssetFolderDialog();
@@ -115,7 +115,7 @@ test('should rename asset folder', async ({ assetsPage }) => {
     expect(renamedCard.root).toBeVisible();
 });
 
-test('should delete asset folder', async ({ assetsPage }) => {
+test('delete asset folder', async ({ assetsPage }) => {
     const folderName = `folder-${getRandomId()}`;
 
     const folderDialog = await assetsPage.openAssetFolderDialog();
@@ -130,7 +130,7 @@ test('should delete asset folder', async ({ assetsPage }) => {
     expect(folderCard.root).not.toBeVisible();
 });
 
-test('should add asset folder to parent', async ({ assetsPage }) => {
+test('add asset folder to parent', async ({ assetsPage }) => {
     const parentName = `folder-${getRandomId()}`;
 
     const parentDialog = await assetsPage.openAssetFolderDialog();
@@ -141,6 +141,7 @@ test('should add asset folder to parent', async ({ assetsPage }) => {
     await parentcard.open();
 
     const childName = `folder-${getRandomId()}`;
+
     const childDialog = await assetsPage.openAssetFolderDialog();
     await childDialog.enterName(childName);
     await childDialog.save();
