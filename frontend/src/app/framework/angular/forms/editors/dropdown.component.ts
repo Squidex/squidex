@@ -82,6 +82,12 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     public itemSeparator?: boolean | null;
 
     @Input()
+    public formId?: string;
+
+    @Input()
+    public formName?: string;
+
+    @Input()
     public searchProperty = 'name';
 
     @Input()

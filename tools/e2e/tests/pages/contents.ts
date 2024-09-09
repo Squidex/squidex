@@ -17,7 +17,7 @@ export class ContentsPage {
     }
 
     public async increasePageSize() {
-        await this.page.getByRole('combobox').selectOption('3: 50');
+        await this.page.getByLabel('Page Size').selectOption({ label: '50' });
     }
 
     public async addContent() {

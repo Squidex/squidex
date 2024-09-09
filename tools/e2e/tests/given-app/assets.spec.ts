@@ -33,8 +33,7 @@ test('delete asset', async ({ assetsPage }) => {
 test('not delete asset if cancelled', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
-
-    await assetCard.delete(/Cancel/);
+    await assetCard.delete(/No/);
 
     expect(assetCard.root).toBeVisible();
 });

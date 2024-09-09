@@ -9,6 +9,7 @@ export * from './apps';
 export * from './assets';
 export * from './content';
 export * from './contents';
+export * from './languages';
 export * from './login';
 export * from './rule';
 export * from './rule';
