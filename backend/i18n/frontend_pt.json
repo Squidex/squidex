@@ -180,6 +180,8 @@
   "clients.connectWizard.step0Title": "Cliente de configuração",
   "clients.connectWizard.step1Title": "Escolha o método de ligação",
   "clients.connectWizard.step2Title": "Ligar",
+  "clients.copyClientId": "Copy Client ID",
+  "clients.copyClientSecret": "Copy Client Secret",
   "clients.deleteConfirmText": "Quer mesmo revogar o cliente?",
   "clients.deleteConfirmTitle": "Revogar cliente",
   "clients.empty": "Nenhum cliente foi criado ainda.",

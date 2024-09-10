@@ -238,6 +238,7 @@
                 <a
                     class="panel-link"
                     #linkHistory
+                    attr.aria-label="{{ 'common.workflow' | sqxTranslate }}"
                     queryParamsHandling="preserve"
                     replaceUrl="true"
                     routerLink="history"
@@ -250,6 +251,7 @@
 
                 <a
                     class="panel-link"
+                    attr.aria-label="{{ 'common.comments' | sqxTranslate }}"
                     hintAfter="120000"
                     hintText="i18n:common.sidebarTour"
                     queryParamsHandling="preserve"
@@ -265,6 +267,7 @@
                 @if (schema.properties.contentSidebarUrl) {
                     <a
                         class="panel-link"
+                        attr.aria-label="{{ 'common.sidebar' | sqxTranslate }}"
                         queryParamsHandling="preserve"
                         replaceUrl="true"
                         routerLink="sidebar"

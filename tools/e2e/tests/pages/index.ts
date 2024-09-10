@@ -7,6 +7,7 @@
 
 export * from './apps';
 export * from './assets';
+export * from './clients';
 export * from './content';
 export * from './contents';
 export * from './languages';

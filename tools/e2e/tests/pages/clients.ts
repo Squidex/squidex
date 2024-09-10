@@ -7,37 +7,42 @@
 
 import { Locator, Page } from '@playwright/test';
 import { escapeRegex } from '../utils';
-import { Dropdown } from './dropdown';
 import { RenameDialog } from './rename';
 
-export class RulesPage {
+export class ClientsPage {
     constructor(private readonly page: Page) {}
 
     public async goto(appName: string) {
-        await this.page.goto(`/app/${appName}/rules`);
+        await this.page.goto(`/app/${appName}/settings/clients`);
     }
 
-    public async addRule() {
-        await this.page.getByRole('link', { name: /New Rule/ }).click();
+    public async enterClientId(input: string) {
+        await this.page.getByPlaceholder('Enter client name').fill(input);
     }
 
-    public async getRuleCard(name: string) {
-        const locator = this.page.locator('div.card', { hasText: escapeRegex(name) });
+    public async save() {
+        await this.page.getByRole('button', { name: 'Add Client' }).click();
+    }
 
-        return new RuleCard(this.page, locator);
+    public async getClientCard(name: string) {
+        const locator = this.page.locator('sqx-client', { hasText: escapeRegex(name) });
+
+        return new ClientCard(this.page, locator);
     }
 }
 
-export class RuleCard {
+class ClientCard {
     constructor(private readonly page: Page,
         public readonly root: Locator,
     ) {
     }
 
-    public async openOptionsDropdown() {
-        await this.root.getByLabel('Options').click();
+    public async copyClientId() {
+        await this.root.getByLabel('Copy Client ID').click();
+    }
 
-        return new Dropdown(this.page);
+    public async copyClientSecret() {
+        await this.root.getByLabel('Copy Client Secret').click();
     }
 
     public async startRenameDblClick() {

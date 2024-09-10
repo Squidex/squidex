@@ -180,6 +180,8 @@
   "clients.connectWizard.step0Title": "设置客户端",
   "clients.connectWizard.step1Title": "选择连接方式",
   "clients.connectWizard.step2Title": "连接",
+  "clients.copyClientId": "Copy Client ID",
+  "clients.copyClientSecret": "Copy Client Secret",
   "clients.deleteConfirmText": "你真的要撤销客户端吗？",
   "clients.deleteConfirmTitle": "撤销客户端",
   "clients.empty": "尚未创建客户端。",

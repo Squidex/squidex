@@ -30,14 +30,24 @@
     <div class="card-body">
         <div class="container">
             <div class="form-group row">
-                <label class="col-3 col-form-label">
+                <label class="col-3 col-form-label" for="{{ client.id }}_clientId">
                     {{ "common.clientId" | sqxTranslate }}
                 </label>
                 <div class="col">
                     <div class="input-group">
-                        <input class="form-control" #clientId readonly value="{{ appsState.appName }}:{{ client.id }}" />
+                        <input
+                            class="form-control"
+                            id="{{ client.id }}_clientId"
+                            #clientId
+                            readonly
+                            value="{{ appsState.appName }}:{{ client.id }}" />
 
-                        <button class="btn btn-outline-secondary" [sqxCopy]="clientId" type="button">
+                        <button
+                            class="btn btn-outline-secondary"
+                            attr.aria-label="{{ 'i18n:clients.copyClientId' | sqxTranslate }}"
+                            [sqxCopy]="clientId"
+                            title="i18n:clients.copyClientId"
+                            type="button">
                             <i class="icon-copy"></i>
                         </button>
                     </div>
@@ -45,14 +55,19 @@
             </div>
 
             <div class="form-group row">
-                <label class="col-3 col-form-label">
+                <label class="col-3 col-form-label" for="{{ client.id }}_clientSecret">
                     {{ "common.clientSecret" | sqxTranslate }}
                 </label>
                 <div class="col">
                     <div class="input-group">
-                        <input class="form-control" #inputSecret readonly [value]="client.secret" />
+                        <input class="form-control" id="{{ client.id }}_clientSecret" #inputSecret readonly [value]="client.secret" />
 
-                        <button class="btn btn-outline-secondary" [sqxCopy]="inputSecret" type="button">
+                        <button
+                            class="btn btn-outline-secondary"
+                            attr.aria-label="{{ 'i18n:clients.copyClientSecret' | sqxTranslate }}"
+                            [sqxCopy]="inputSecret"
+                            title="i18n:clients.copyClientSecret"
+                            type="button">
                             <i class="icon-copy"></i>
                         </button>
                     </div>
