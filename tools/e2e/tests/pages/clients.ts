@@ -52,6 +52,7 @@ class ClientCard {
     }
 
     public async startRenameButton() {
+        await this.root.getByRole('heading').hover();
         await this.root.getByLabel('Rename').click();
 
         return new RenameDialog(this.page);
