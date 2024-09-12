@@ -17,3 +17,4 @@ export * from './rule';
 export * from './rules';
 export * from './schema';
 export * from './schemas';
+export * from './settings';

@@ -13,6 +13,12 @@ test.beforeEach(async ({ appName, schemasPage }) => {
     await schemasPage.goto(appName);
 });
 
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Schemas/ });
+
+    expect(header).toBeVisible();
+});
+
 test('create schema', async ({ schemasPage }) => {
     const schemaName = await createRandomSchema(schemasPage);
     const schemaLink = await schemasPage.getSchemaLink(schemaName);

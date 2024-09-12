@@ -10,6 +10,12 @@ test.beforeEach(async ({ appName, rulesPage }) => {
     await rulesPage.goto(appName);
 });
 
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Rules/ });
+
+    expect(header).toBeVisible();
+});
+
 test('create rule', async ({ rulesPage, rulePage }) => {
     const ruleName = await createRandomRule(rulesPage, rulePage);
     const ruleCard = await rulesPage.getRuleCard(ruleName);

@@ -15,6 +15,12 @@ test.beforeEach(async ({ appName, assetsPage }) => {
     await assetsPage.goto(appName);
 });
 
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Assets/ });
+
+    expect(header).toBeVisible();
+});
+
 test('upload asset', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);

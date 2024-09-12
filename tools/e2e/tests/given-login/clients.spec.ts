@@ -22,6 +22,12 @@ test.beforeEach(async ({ context, appsPage, clientsPage }) => {
     await clientsPage.goto(appName);
 });
 
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Clients/ });
+
+    expect(header).toBeVisible();
+});
+
 test('add client', async ({ clientsPage }) => {
     const clientId = await createRandomClient(clientsPage);
     const clientCard = await clientsPage.getClientCard(clientId);

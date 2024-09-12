@@ -20,6 +20,12 @@ test.beforeEach(async ({ languagesPage, appsPage }) => {
     await languagesPage.goto(appName);
 });
 
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Languages/ });
+
+    expect(header).toBeVisible();
+});
+
 test('add random language', async ({ languagesPage }) => {
     const randomName = `language-${getRandomId()}`;
 
