@@ -405,8 +405,8 @@ public static class TestContent
             createdByUser = new
             {
                 id = content.CreatedBy.Identifier,
-                email = $"{content.CreatedBy.Identifier}@email.com",
-                displayName = $"{content.CreatedBy.Identifier}name"
+                email = "Hidden",
+                displayName = "Hidden"
             },
             editToken = $"token_{content.Id}",
             lastModified = content.LastModified,
@@ -414,8 +414,8 @@ public static class TestContent
             lastModifiedByUser = new
             {
                 id = content.LastModifiedBy.Identifier,
-                email = $"{content.LastModifiedBy}",
-                displayName = content.LastModifiedBy.Identifier
+                email = "Hidden",
+                displayName = "Hidden"
             },
             status = "DRAFT",
             statusColor = "red",
@@ -437,8 +437,8 @@ public static class TestContent
             createdByUser = new
             {
                 id = content.CreatedBy.Identifier,
-                email = $"{content.CreatedBy.Identifier}@email.com",
-                displayName = $"{content.CreatedBy.Identifier}name"
+                email = "Hidden",
+                displayName = "Hidden",
             },
             editToken = $"token_{content.Id}",
             lastModified = content.LastModified,
@@ -446,8 +446,8 @@ public static class TestContent
             lastModifiedByUser = new
             {
                 id = content.LastModifiedBy.Identifier,
-                email = $"{content.LastModifiedBy}",
-                displayName = content.LastModifiedBy.Identifier
+                email = "Hidden",
+                displayName = "Hidden",
             },
             status = "DRAFT",
             statusColor = "red",

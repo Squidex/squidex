@@ -103,6 +103,9 @@ public static class PermissionIds
     // App Usage
     public const string AppUsage = "squidex.apps.{app}.usage";
 
+    // App Expose Users
+    public const string AppPii = "squidex.apps.{app}.pii";
+
     // App Comments
     public const string AppComments = "squidex.apps.{app}.comments";
     public const string AppCommentsRead = "squidex.apps.{app}.comments.read";

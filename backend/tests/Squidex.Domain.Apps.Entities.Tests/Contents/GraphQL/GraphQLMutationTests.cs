@@ -104,7 +104,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             {
                 data = TestContent.Input(content),
             },
-            Permission = PermissionIds.AppContentsCreate
+            Permissions = [PermissionIds.AppContentsCreate]
         });
 
         var expected = new
@@ -156,7 +156,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                     longitude = 13
                 }
             },
-            Permission = PermissionIds.AppContentsCreate
+            Permissions = [PermissionIds.AppContentsCreate]
         });
 
         var expected = new
@@ -202,7 +202,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             {
                 data = TestContent.Input(content)
             },
-            Permission = PermissionIds.AppContentsCreate
+            Permissions = [PermissionIds.AppContentsCreate]
         });
 
         var expected = new
@@ -306,7 +306,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             {
                 data = TestContent.Input(content)
             },
-            Permission = PermissionIds.AppContentsUpdateOwn
+            Permissions = [PermissionIds.AppContentsUpdateOwn]
         });
 
         var expected = new
@@ -405,7 +405,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             {
                 data = TestContent.Input(content)
             },
-            Permission = PermissionIds.AppContentsUpsert
+            Permissions = [PermissionIds.AppContentsUpsert]
         });
 
         var expected = new
@@ -509,7 +509,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             {
                 data = TestContent.Input(content)
             },
-            Permission = PermissionIds.AppContentsUpdateOwn
+            Permissions = [PermissionIds.AppContentsUpdateOwn]
         });
 
         var expected = new
@@ -610,7 +610,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 contentId,
                 fields = TestContent.AllFields
             },
-            Permission = PermissionIds.AppContentsChangeStatusOwn
+            Permissions = [PermissionIds.AppContentsChangeStatusOwn]
         });
 
         var expected = new
@@ -652,7 +652,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 contentId,
                 fields = TestContent.AllFields
             },
-            Permission = PermissionIds.AppContentsChangeStatusOwn
+            Permissions = [PermissionIds.AppContentsChangeStatusOwn]
         });
 
         var expected = new
@@ -694,7 +694,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 contentId,
                 fields = TestContent.AllFields
             },
-            Permission = PermissionIds.AppContentsChangeStatusOwn
+            Permissions = [PermissionIds.AppContentsChangeStatusOwn]
         });
 
         var expected = new
@@ -790,7 +790,7 @@ public class GraphQLMutationTests : GraphQLTestBase
             {
                 contentId
             },
-            Permission = PermissionIds.AppContentsDeleteOwn
+            Permissions = [PermissionIds.AppContentsDeleteOwn]
         });
 
         var expected = new
