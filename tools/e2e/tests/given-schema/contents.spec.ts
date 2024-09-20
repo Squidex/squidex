@@ -6,7 +6,7 @@
  */
 
 import { ContentPage, ContentsPage } from '../pages';
-import { escapeRegex, getRandomId } from '../utils';
+import { getRandomId } from '../utils';
 import { expect, test } from './_fixture';
 
 test.beforeEach(async ({ appName, schemaName, contentsPage }) => {
@@ -14,8 +14,8 @@ test.beforeEach(async ({ appName, schemaName, contentsPage }) => {
     await contentsPage.increasePageSize();
 });
 
-test('has header', async ({ page, schemaName }) => {
-    const header = page.getByRole('heading', { name: escapeRegex(schemaName) });
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: 'Contents' });
 
     expect(header).toBeVisible();
 });
