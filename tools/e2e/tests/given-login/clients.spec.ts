@@ -12,7 +12,7 @@ import { getRandomId } from '../utils';
 test.beforeEach(async ({ context, appsPage, clientsPage }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
-    const appName = `my-app-${getRandomId()}`;
+    const appName = `app-${getRandomId()}`;
     await appsPage.createNewApp(appName);
 
     await clientsPage.goto(appName);
@@ -21,7 +21,8 @@ test.beforeEach(async ({ context, appsPage, clientsPage }) => {
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /Clients/ });
 
-    expect(header).toBeVisible();
+    // See: https://viralsfire.com/post/playwright-to-be-visible-timeout-is-ignored
+    expect(header).toBeVisible({ timeout: 5000 });
 });
 
 test('add client', async ({ clientsPage }) => {

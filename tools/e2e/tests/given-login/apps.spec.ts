@@ -13,7 +13,7 @@ test.beforeEach(async ({ appsPage }) => {
 });
 
 test('create app', async ({ page, appsPage }) => {
-    const appName = `my-app-${getRandomId()}`;
+    const appName = `app-${getRandomId()}`;
 
     const appDialog = await appsPage.openAppDialog();
     await appDialog.enterName(appName);

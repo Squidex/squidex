@@ -10,7 +10,7 @@ import { getRandomId } from '../utils';
 import { expect, test } from './_fixture';
 
 test.beforeEach(async ({ languagesPage, appsPage }) => {
-    const appName = `my-app-${getRandomId()}`;
+    const appName = `app-${getRandomId()}`;
     await appsPage.createNewApp(appName);
 
     await languagesPage.goto(appName);
@@ -19,7 +19,8 @@ test.beforeEach(async ({ languagesPage, appsPage }) => {
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /Languages/ });
 
-    expect(header).toBeVisible();
+    // See: https://viralsfire.com/post/playwright-to-be-visible-timeout-is-ignored
+    expect(header).toBeVisible({ timeout: 5000 });
 });
 
 test('add random language', async ({ languagesPage }) => {

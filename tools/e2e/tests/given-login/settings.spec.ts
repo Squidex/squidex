@@ -9,7 +9,7 @@ import { expect, test } from '../_fixture';
 import { getRandomId } from '../utils';
 
 test.beforeEach(async ({ appsPage, settingsPage }) => {
-    const appName = `my-app-${getRandomId()}`;
+    const appName = `app-${getRandomId()}`;
     await appsPage.createNewApp(appName);
 
     await settingsPage.goto(appName);
@@ -18,7 +18,8 @@ test.beforeEach(async ({ appsPage, settingsPage }) => {
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /UI Settings/ });
 
-    expect(header).toBeVisible();
+    // See: https://viralsfire.com/post/playwright-to-be-visible-timeout-is-ignored
+    expect(header).toBeVisible({ timeout: 5000 });
 });
 
 test('add pattern', async ({ settingsPage })=> {
