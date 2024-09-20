@@ -18,9 +18,9 @@ test.beforeEach(async ({ languagesPage, appsPage }) => {
 
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /Languages/ });
+    await header.click();
 
-    // See: https://viralsfire.com/post/playwright-to-be-visible-timeout-is-ignored
-    expect(header).toBeVisible({ timeout: 5000 });
+    expect(header).toBeVisible();
 });
 
 test('add random language', async ({ languagesPage }) => {

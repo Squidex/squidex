@@ -17,9 +17,9 @@ test.beforeEach(async ({ appName, assetsPage }) => {
 
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /Assets/ });
+    await header.click();
 
-    // See: https://viralsfire.com/post/playwright-to-be-visible-timeout-is-ignored
-    expect(header).toBeVisible({ timeout: 5000 });
+    expect(header).toBeVisible();
 });
 
 test('upload asset', async ({ assetsPage }) => {

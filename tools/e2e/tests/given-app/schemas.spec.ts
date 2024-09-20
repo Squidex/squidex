@@ -15,9 +15,9 @@ test.beforeEach(async ({ appName, schemasPage }) => {
 
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /Schemas/ });
+    await header.click();
 
-    // See: https://viralsfire.com/post/playwright-to-be-visible-timeout-is-ignored
-    expect(header).toBeVisible({ timeout: 5000 });
+    expect(header).toBeVisible();
 });
 
 test('create schema', async ({ schemasPage }) => {
