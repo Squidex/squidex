@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
 export class AppsPage {
     constructor(private readonly page: Page) {}
@@ -22,6 +22,16 @@ export class AppsPage {
         await this.page.getByTestId('new-app').click();
 
         return new AppDialog(this.page);
+    }
+
+    public async createNewApp(appName: string) {
+        await this.goto();
+        const appDialog = await this.openAppDialog();
+        await appDialog.enterName(appName);
+        await appDialog.save();
+
+        const newApp = this.page.getByRole('heading', { name: appName });
+        await expect(newApp).toBeVisible();
     }
 }
 

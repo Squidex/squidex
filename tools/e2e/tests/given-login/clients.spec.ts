@@ -13,11 +13,7 @@ test.beforeEach(async ({ context, appsPage, clientsPage }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
     const appName = `my-app-${getRandomId()}`;
-
-    await appsPage.goto();
-    const appDialog = await appsPage.openAppDialog();
-    await appDialog.enterName(appName);
-    await appDialog.save();
+    await appsPage.createNewApp(appName);
 
     await clientsPage.goto(appName);
 });

@@ -11,11 +11,7 @@ import { expect, test } from './_fixture';
 
 test.beforeEach(async ({ languagesPage, appsPage }) => {
     const appName = `my-app-${getRandomId()}`;
-
-    await appsPage.goto();
-    const appDialog = await appsPage.openAppDialog();
-    await appDialog.enterName(appName);
-    await appDialog.save();
+    await appsPage.createNewApp(appName);
 
     await languagesPage.goto(appName);
 });

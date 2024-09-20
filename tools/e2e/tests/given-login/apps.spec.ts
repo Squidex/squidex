@@ -20,6 +20,5 @@ test('create app', async ({ page, appsPage }) => {
     await appDialog.save();
 
     const newApp = page.getByRole('heading', { name: appName });
-
     await expect(newApp).toBeVisible();
 });

@@ -10,11 +10,7 @@ import { getRandomId } from '../utils';
 
 test.beforeEach(async ({ appsPage, settingsPage }) => {
     const appName = `my-app-${getRandomId()}`;
-
-    await appsPage.goto();
-    const appDialog = await appsPage.openAppDialog();
-    await appDialog.enterName(appName);
-    await appDialog.save();
+    await appsPage.createNewApp(appName);
 
     await settingsPage.goto(appName);
 });
