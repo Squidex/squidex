@@ -15,9 +15,8 @@ test.beforeEach(async ({ appName, schemasPage }) => {
 
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /Schemas/ });
-    await header.click();
 
-    expect(header).toBeVisible();
+    await expect(header).toBeVisible();
 });
 
 test('create schema', async ({ schemasPage }) => {

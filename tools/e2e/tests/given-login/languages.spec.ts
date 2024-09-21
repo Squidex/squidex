@@ -18,9 +18,8 @@ test.beforeEach(async ({ languagesPage, appsPage }) => {
 
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /Languages/ });
-    await header.click();
 
-    expect(header).toBeVisible();
+    await expect(header).toBeVisible();
 });
 
 test('add random language', async ({ languagesPage }) => {
@@ -31,17 +30,17 @@ test('add random language', async ({ languagesPage }) => {
 
     const languagesCard = await languagesPage.getLanguageCard(randomName);
 
-    expect(languagesCard.root).toBeVisible();
+    await expect(languagesCard.root).toBeVisible();
 });
 
-test('add language with from dropdown', async ({ languagesPage }) => {
+test('add language with dropdown', async ({ languagesPage }) => {
     await languagesPage.enterLanguage('de-');
     await languagesPage.selectLanguage('de-DE (German (Germany))');
     await languagesPage.save();
 
     const languagesCard = await languagesPage.getLanguageCard('German (Germany)');
 
-    expect(languagesCard.root).toBeVisible();
+    await expect(languagesCard.root).toBeVisible();
 });
 
 test('delete language', async ({ languagesPage }) => {
@@ -52,10 +51,10 @@ test('delete language', async ({ languagesPage }) => {
 
     const languagesCard = await languagesPage.getLanguageCard(randomName);
 
-    expect(languagesCard.root).toBeVisible();
+    await expect(languagesCard.root).toBeVisible();
 
     await languagesCard.delete();
-    expect(languagesCard.root).not.toBeVisible();
+    await expect(languagesCard.root).not.toBeVisible();
 });
 
 test('add default language', async ({ languagesPage }) => {
@@ -66,7 +65,7 @@ test('add default language', async ({ languagesPage }) => {
     await languagesPage.save();
 
     const languagesCard1 = await languagesPage.getLanguageCard(randomName1);
-    expect(languagesCard1.root).toBeVisible();
+    await expect(languagesCard1.root).toBeVisible();
 
     await languagesPage.enterLanguage(randomName2);
     await languagesPage.save();
@@ -76,7 +75,7 @@ test('add default language', async ({ languagesPage }) => {
     await languagesCard2.addFallbackLanguage(randomName1);
     await languagesCard2.save();
 
-    expect(languagesCard2.root.getByText(randomName2)).toBeVisible();
+    await expect(languagesCard2.root.getByText(randomName2)).toBeVisible();
 });
 
 test('make master', async ({ languagesPage }) => {
@@ -90,5 +89,5 @@ test('make master', async ({ languagesPage }) => {
     await languagesCard.makeMaster();
     await languagesCard.save();
 
-    expect(languagesCard.root.getByLabel('Delete')).toBeDisabled();
+    await expect(languagesCard.root.getByLabel('Delete')).toBeDisabled();
 });

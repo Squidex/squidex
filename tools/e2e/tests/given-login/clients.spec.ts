@@ -20,9 +20,8 @@ test.beforeEach(async ({ context, appsPage, clientsPage }) => {
 
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /Clients/ });
-    await header.click();
 
-    expect(header).toBeVisible();
+    await expect(header).toBeVisible();
 });
 
 test('add client', async ({ clientsPage }) => {
@@ -39,7 +38,7 @@ test('copy client ID', async ({ page, clientsPage }) => {
     const handle = await page.evaluateHandle(() => navigator.clipboard.readText());
     const clipboardContent = await handle.jsonValue();
 
-    expect(clipboardContent).toContain(':default');
+    await expect(clipboardContent).toContain(':default');
 });
 
 test('copy client Secret', async ({ page, clientsPage }) => {
@@ -49,7 +48,7 @@ test('copy client Secret', async ({ page, clientsPage }) => {
     const handle = await page.evaluateHandle(() => navigator.clipboard.readText());
     const clipboardContent = await handle.jsonValue();
 
-    expect(clipboardContent.length).toBeGreaterThan(40);
+    await expect(clipboardContent.length).toBeGreaterThan(40);
 });
 
 test('rename rule with dbclick', async ({ clientsPage }) => {

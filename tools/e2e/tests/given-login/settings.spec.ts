@@ -17,9 +17,8 @@ test.beforeEach(async ({ appsPage, settingsPage }) => {
 
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /UI Settings/ });
-    await header.click();
 
-    expect(header).toBeVisible();
+    await expect(header).toBeVisible();
 });
 
 test('add pattern', async ({ settingsPage })=> {
@@ -33,7 +32,7 @@ test('add pattern', async ({ settingsPage })=> {
 
     const patternRow = await settingsPage.getPatternRow(patternName);
 
-    expect(patternRow.root).toBeVisible();
+    await expect(patternRow.root).toBeVisible();
 });
 
 test('delete pattern', async ({ settingsPage })=> {
@@ -41,5 +40,5 @@ test('delete pattern', async ({ settingsPage })=> {
     await patternRow.delete();
     await settingsPage.save();
 
-    expect(patternRow.root).not.toBeVisible();
+    await expect(patternRow.root).not.toBeVisible();
 });

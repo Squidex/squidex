@@ -12,9 +12,8 @@ test.beforeEach(async ({ appName, rulesPage }) => {
 
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: /Rules/ });
-    await header.click();
 
-    expect(header).toBeVisible();
+    await expect(header).toBeVisible();
 });
 
 test('create rule', async ({ rulesPage, rulePage }) => {

@@ -16,9 +16,8 @@ test.beforeEach(async ({ appName, schemaName, contentsPage }) => {
 
 test('has header', async ({ page }) => {
     const header = page.getByRole('heading', { name: 'Contents' });
-    await header.click();
 
-    expect(header).toBeVisible();
+    await expect(header).toBeVisible();
 });
 
 test('create content and close', async ({ contentsPage, contentPage }) => {
