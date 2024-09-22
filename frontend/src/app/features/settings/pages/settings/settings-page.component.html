@@ -25,7 +25,7 @@
                 {{ "appSettings.patterns.description" | sqxTranslate }}
             </sqx-form-hint>
 
-            <div class="card card-body mb-4">
+            <div class="card card-body mb-4" data-testid="patterns">
                 <div class="content">
                     @if (!isEditable && editForm.patternsControls.length === 0) {
                         <div class="mt-4">
@@ -34,7 +34,7 @@
                     }
 
                     @for (form of editForm.patternsControls; track form; let i = $index) {
-                        <div class="form-group row gx-2" [formGroup]="form">
+                        <div class="form-group row gx-2" attr.data-testid="pattern_{{ form.get('name')?.value }}" [formGroup]="form">
                             <div class="col-3">
                                 <sqx-control-errors for="name"></sqx-control-errors>
                                 <input
@@ -62,6 +62,7 @@
                             <div class="col-auto">
                                 <button
                                     class="btn btn-text-danger"
+                                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                                     confirmRememberKey="deletePattern"
                                     confirmText="i18n:appSettings.patterns.deleteConfirmText"
                                     confirmTitle="i18n:appSettings.patterns.deleteConfirmTitle"
@@ -86,7 +87,11 @@
                                 <div class="form-control preview">{{ "common.message" | sqxTranslate }}</div>
                             </div>
                             <div class="col-auto">
-                                <button class="btn btn-success" (click)="editForm.patterns.add()" type="button">
+                                <button
+                                    class="btn btn-success"
+                                    attr.aria-label="{{ 'common.add' | sqxTranslate }}"
+                                    (click)="editForm.patterns.add()"
+                                    type="button">
                                     <i class="icon-add"></i>
                                 </button>
                             </div>
@@ -102,7 +107,7 @@
             </sqx-form-hint>
 
             <div class="card card-body mb-4">
-                <div class="content">
+                <div class="content" data-testid="pattern">
                     @if (!isEditable && editForm.editorsControls.length === 0) {
                         <div class="mt-4">
                             {{ "appSettings.editors.empty" | sqxTranslate }}
@@ -130,6 +135,7 @@
                             <div class="col-auto">
                                 <button
                                     class="btn btn-text-danger"
+                                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                                     confirmRememberKey="deleteEditor"
                                     confirmText="i18n:appSettings.editors.deleteConfirmText"
                                     confirmTitle="i18n:appSettings.editors.deleteConfirmTitle"
@@ -151,7 +157,11 @@
                                 <div class="form-control preview">{{ "common.url" | sqxTranslate }}</div>
                             </div>
                             <div class="col-auto">
-                                <button class="btn btn-success" (click)="editForm.editors.add()" type="button">
+                                <button
+                                    class="btn btn-success"
+                                    attr.aria-label="{{ 'common.add' | sqxTranslate }}"
+                                    (click)="editForm.editors.add()"
+                                    type="button">
                                     <i class="icon-add"></i>
                                 </button>
                             </div>
@@ -180,6 +190,7 @@
         <div class="panel-nav">
             <a
                 class="panel-link"
+                attr.aria-label="{{ 'common.history' | sqxTranslate }}"
                 queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="history"
@@ -192,6 +203,7 @@
 
             <a
                 class="panel-link"
+                attr.aria-label="{{ 'common.help' | sqxTranslate }}"
                 queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="help"

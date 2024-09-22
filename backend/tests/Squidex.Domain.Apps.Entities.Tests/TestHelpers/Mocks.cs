@@ -19,19 +19,9 @@ public static class Mocks
         return CreateUser(false, role, permissions);
     }
 
-    public static ClaimsPrincipal ApiUser(string? role = null, string? permission = null)
-    {
-        return CreateUser(false, role, permission);
-    }
-
     public static ClaimsPrincipal FrontendUser(string? role = null, params string[] permissions)
     {
         return CreateUser(true, role, permissions);
-    }
-
-    public static ClaimsPrincipal FrontendUser(string? role = null, string? permission = null)
-    {
-        return CreateUser(true, role, permission);
     }
 
     public static ClaimsPrincipal CreateUser(bool isFrontend, string? role, params string?[] permissions)

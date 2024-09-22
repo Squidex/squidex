@@ -78,9 +78,9 @@ internal sealed class MongoCountCollection : MongoRepositoryBase<MongoCountEntit
 
         await Collection.UpdateOneAsync(x => x.Key == key,
             Update
-                .Set(x => x.Key, key)
-                .SetOnInsert(x => x.Count, actualCount)
-                .SetOnInsert(x => x.Created, now),
+                .SetOnInsert(x => x.Key, key)
+                .Set(x => x.Count, actualCount)
+                .Set(x => x.Created, now),
             Upsert, ct);
 
         return actualCount;

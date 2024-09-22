@@ -5,51 +5,89 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Page } from '@playwright/test';
+
+import { getRandomId } from '../utils';
 import { expect, test } from './_fixture';
 
-test.beforeEach(async ({ page }) => {
-    await page.goto('/app');
+test.beforeEach(async ({ languagesPage, appsPage }) => {
+    const appName = `app-${getRandomId()}`;
+    await appsPage.createNewApp(appName);
+
+    await languagesPage.goto(appName);
 });
 
-test('show proper English frontend', async ({ page }) => {
-    await changeLanguage(page, 'English');
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Languages/ });
 
-    await expect(page.getByText('Welcome to Squidex')).toBeVisible();
+    await expect(header).toBeVisible();
 });
 
-test('show proper French frontend', async ({ page }) => {
-    await changeLanguage(page, 'Français');
+test('add random language', async ({ languagesPage }) => {
+    const randomName = `language-${getRandomId()}`;
 
-    await expect(page.getByText('Bienvenue sur Squidex.')).toBeVisible();
+    await languagesPage.enterLanguage(randomName);
+    await languagesPage.save();
+
+    const languagesCard = await languagesPage.getLanguageCard(randomName);
+
+    await expect(languagesCard.root).toBeVisible();
 });
 
-test('show proper Dutch frontend', async ({ page }) => {
-    await changeLanguage(page, 'Nederlands');
+test('add language with dropdown', async ({ languagesPage }) => {
+    await languagesPage.enterLanguage('de-');
+    await languagesPage.selectLanguage('de-DE (German (Germany))');
+    await languagesPage.save();
 
-    await expect(page.getByText('Welkom bij Squidex.')).toBeVisible();
+    const languagesCard = await languagesPage.getLanguageCard('German (Germany)');
+
+    await expect(languagesCard.root).toBeVisible();
 });
 
-test('show proper Italian frontend', async ({ page }) => {
-    await changeLanguage(page, 'Italiano');
+test('delete language', async ({ languagesPage }) => {
+    const randomName = `language-${getRandomId()}`;
 
-    await expect(page.getByText('Benvenuto su Squidex.')).toBeVisible();
+    await languagesPage.enterLanguage(randomName);
+    await languagesPage.save();
+
+    const languagesCard = await languagesPage.getLanguageCard(randomName);
+
+    await expect(languagesCard.root).toBeVisible();
+
+    await languagesCard.delete();
+    await expect(languagesCard.root).not.toBeVisible();
 });
 
-test('show proper Portugese frontend', async ({ page }) => {
-    await changeLanguage(page, 'Portuguese');
+test('add default language', async ({ languagesPage }) => {
+    const randomName1 = `language-${getRandomId()}`;
+    const randomName2 = `language-${getRandomId()}`;
 
-    await expect(page.getByText('Bem-vindo a Squidex.')).toBeVisible();
+    await languagesPage.enterLanguage(randomName1);
+    await languagesPage.save();
+
+    const languagesCard1 = await languagesPage.getLanguageCard(randomName1);
+    await expect(languagesCard1.root).toBeVisible();
+
+    await languagesPage.enterLanguage(randomName2);
+    await languagesPage.save();
+
+    const languagesCard2 = await languagesPage.getLanguageCard(randomName2);
+    await languagesCard2.toggle();
+    await languagesCard2.addFallbackLanguage(randomName1);
+    await languagesCard2.save();
+
+    await expect(languagesCard2.root.getByText(randomName2)).toBeVisible();
 });
 
-test('show proper Chinese frontend', async ({ page }) => {
-    await changeLanguage(page, '简体中文');
+test('make master', async ({ languagesPage }) => {
+    const randomName = `language-${getRandomId()}`;
 
-    await expect(page.getByText('欢迎来到 Squidex。')).toBeVisible();
+    await languagesPage.enterLanguage(randomName);
+    await languagesPage.save();
+
+    const languagesCard = await languagesPage.getLanguageCard(randomName);
+    await languagesCard.toggle();
+    await languagesCard.makeMaster();
+    await languagesCard.save();
+
+    await expect(languagesCard.root.getByLabel('Delete')).toBeDisabled();
 });
-
-async function changeLanguage(page: Page, name: string) {
-    await page.locator('sqx-profile-menu span').first().click();
-    await page.getByText('Language').click();
-    await page.getByText(name).click();
-}

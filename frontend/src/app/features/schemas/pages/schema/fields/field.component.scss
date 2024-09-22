@@ -90,7 +90,7 @@ $padding: 1rem;
     }
 
     &-hidden {
-        color: $color-text-decent;
+        color: lighten($color-text-decent, 40%);
     }
 
     &-partitioning {

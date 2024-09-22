@@ -26,7 +26,7 @@ public sealed class TestQuery
 
     public object? Args { get; set; }
 
-    public string? Permission { get; set; }
+    public string[] Permissions { get; set; } = [];
 
     public string? OperationName { get; set; }
 
@@ -42,15 +42,20 @@ public sealed class TestQuery
             }
         }
 
+        query = query.Replace('\'', '\"');
+
+        var userPermissions = Permissions.Select(p => PermissionIds.ForApp(p, TestApp.Default.Name, TestSchemas.Default.Name).Id);
+        var userPrincipal = Mocks.FrontendUser(null, userPermissions.ToArray());
+
+        var context = new Context(userPrincipal, TestApp.Default);
+
         var options = new ExecutionOptions
         {
-            Query = query.Replace('\'', '\"')
+            Query = query,
+            User = userPrincipal,
+            UserContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(services, context),
+            OperationName = OperationName,
         };
-
-        if (OperationName != null)
-        {
-            options.OperationName = OperationName;
-        }
 
         if (Variables != null)
         {
@@ -62,25 +67,11 @@ public sealed class TestQuery
             options.Listeners.Add(listener);
         }
 
-        options.UserContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(services, BuildContext(Permission));
-
         return options;
+    }
 
-        static Context BuildContext(string? permissionId)
-        {
-            if (permissionId == null)
-            {
-                return new Context(Mocks.FrontendUser(), TestApp.Default);
-            }
-
-            var permission = PermissionIds.ForApp(permissionId, TestApp.Default.Name, TestSchemas.Default.Name).Id;
-
-            return new Context(Mocks.FrontendUser(permission: permission), TestApp.Default);
-        }
-
-        static JsonElement Serialize(object value)
-        {
-            return JsonSerializer.SerializeToElement(value, TestUtils.DefaultOptions());
-        }
+    private static JsonElement Serialize(object value)
+    {
+        return JsonSerializer.SerializeToElement(value, TestUtils.DefaultOptions());
     }
 }

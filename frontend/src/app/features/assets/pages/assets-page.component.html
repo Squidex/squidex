@@ -62,6 +62,7 @@
             <div class="col-auto">
                 <button
                     class="btn btn-success"
+                    attr.aria-label="{{ 'i18n:assets.createFolder' | sqxTranslate }}"
                     (click)="addAssetFolderDialog.show()"
                     shortcut="CTRL + U"
                     title="i18n:assets.createFolderTooltip"
@@ -102,6 +103,7 @@
         <div class="panel-nav">
             <a
                 class="panel-link"
+                attr.aria-label="{{ 'common.filters' | sqxTranslate }}"
                 queryParamsHandling="preserve"
                 replaceUrl="true"
                 routerLink="filters"

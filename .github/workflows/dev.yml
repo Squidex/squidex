@@ -96,7 +96,7 @@ jobs:
         working-directory: './tools/e2e'
 
       - name: Test - Run Playwright Tests
-        run: npx playwright test
+        run: npx playwright test --retries=3
         working-directory: './tools/e2e'
         env:
           BASE__URL: http://localhost:8080

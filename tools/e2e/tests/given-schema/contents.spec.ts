@@ -14,6 +14,12 @@ test.beforeEach(async ({ appName, schemaName, contentsPage }) => {
     await contentsPage.increasePageSize();
 });
 
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: 'Contents' });
+
+    await expect(header).toBeVisible();
+});
+
 test('create content and close', async ({ contentsPage, contentPage }) => {
     await contentsPage.addContent();
 
@@ -114,7 +120,7 @@ states.forEach(({ status, currentStatus }) => {
 
         const contentRow = await contentsPage.getContentRow(contentText);
         const dropdown = await contentRow.openOptionsDropdown();
-        await dropdown.actionConfirm(`Change to ${status}`);
+        await dropdown.actionAndConfirm(`Change to ${status}`, /Confirm/);
 
         await expect(contentRow.root.getByLabel(status)).toBeVisible();
     });
@@ -151,7 +157,7 @@ states.forEach(({ status, currentStatus }) => {
         }
 
         const dropdown = await contentPage.openStatusDropdown(currentStatus);
-        await dropdown.actionConfirm(`Change to ${status}`);
+        await dropdown.actionAndConfirm(`Change to ${status}`, /Confirm/);
 
         await expect(page.getByRole('button', { name: status })).toBeVisible();
     });

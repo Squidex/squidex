@@ -6,19 +6,22 @@
  */
 
 import { test as base } from '@playwright/test';
-import { AssetsPage, ContentPage, ContentsPage, LoginPage, RulePage, RulesPage, SchemaPage, SchemasPage } from './pages';
+import { AssetsPage, ClientsPage, ContentPage, ContentsPage, LanguagesPage, LoginPage, RulePage, RulesPage, SchemaPage, SchemasPage, SettingsPage } from './pages';
 import { AppsPage } from './pages/apps';
 
 export type BaseFixture = {
     appsPage: AppsPage;
     assetsPage: AssetsPage;
+    clientsPage: ClientsPage;
     contentPage: ContentPage;
     contentsPage: ContentsPage;
+    languagesPage: LanguagesPage;
     loginPage: LoginPage;
     rulePage: RulePage;
     rulesPage: RulesPage;
     schemaPage: SchemaPage;
     schemasPage: SchemasPage;
+    settingsPage: SettingsPage;
 };
 
 export const test = base.extend<BaseFixture>({
@@ -28,11 +31,17 @@ export const test = base.extend<BaseFixture>({
     assetsPage: async ({ page }, use) => {
         await use(new AssetsPage(page));
     },
+    clientsPage: async ({ page }, use) => {
+        await use(new ClientsPage(page));
+    },
     contentPage: async ({ page }, use) => {
         await use(new ContentPage(page));
     },
     contentsPage: async ({ page }, use) => {
         await use(new ContentsPage(page));
+    },
+    languagesPage: async ({ page }, use) => {
+        await use(new LanguagesPage(page));
     },
     loginPage: async ({ page }, use) => {
         await use(new LoginPage(page));
@@ -48,6 +57,9 @@ export const test = base.extend<BaseFixture>({
     },
     schemasPage: async ({ page }, use) => {
         await use(new SchemasPage(page));
+    },
+    settingsPage: async ({ page }, use) => {
+        await use(new SettingsPage(page));
     },
 });
 

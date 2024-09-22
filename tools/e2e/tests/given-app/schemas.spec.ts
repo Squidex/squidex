@@ -13,6 +13,12 @@ test.beforeEach(async ({ appName, schemasPage }) => {
     await schemasPage.goto(appName);
 });
 
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Schemas/ });
+
+    await expect(header).toBeVisible();
+});
+
 test('create schema', async ({ schemasPage }) => {
     const schemaName = await createRandomSchema(schemasPage);
     const schemaLink = await schemasPage.getSchemaLink(schemaName);
@@ -173,6 +179,72 @@ test('delete field', async ({ schemasPage, schemaPage }) => {
     await dropdown.delete();
 
     await expect(fieldRow.root).not.toBeVisible();
+});
+
+test('disable field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown = await fieldRow.openOptionsDropdown();
+    await dropdown.action('Disable in UI');
+
+    await expect(fieldRow.root.getByText('Disabled')).toBeVisible();
+});
+
+test('enable field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown1 = await fieldRow.openOptionsDropdown();
+    await dropdown1.action('Disable in UI');
+
+    const dropdown2 = await fieldRow.openOptionsDropdown();
+    await dropdown2.action('Enable in UI');
+
+    await expect(fieldRow.root.getByText('Enabled')).toBeVisible();
+});
+
+test('hide field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown = await fieldRow.openOptionsDropdown();
+    await dropdown.action('Hide in API');
+
+    await expect(fieldRow.root.getByText(fieldName)).toHaveCSS('color', 'rgb(166, 170, 179)');
+});
+
+test('show field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown1 = await fieldRow.openOptionsDropdown();
+    await dropdown1.action('Hide in API');
+
+    const dropdown2 = await fieldRow.openOptionsDropdown();
+    await dropdown2.action('Show in API');
+
+    await expect(fieldRow.root.getByText(fieldName)).not.toHaveCSS('color', 'rgb(166, 170, 179)');
+});
+
+test('lock field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown = await fieldRow.openOptionsDropdown();
+    await dropdown.actionAndConfirm('Lock and prevent changes');
+
+    await expect(fieldRow.root.getByText('Locked')).toBeVisible();
 });
 
 async function createRandomField(schemaPage: SchemaPage) {

@@ -113,6 +113,13 @@ export const Default: Story = {
     },
 };
 
+export const Long: Story = {
+    args: {
+        items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'],
+        model: 'B',
+    },
+};
+
 export const WrongModel: Story = {
     args: {
         items: ['A', 'B', 'C'],

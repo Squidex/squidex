@@ -13,7 +13,7 @@ const fields = [{
 }];
 
 setup('prepare schema', async ({ appName, schemasPage, schemaPage }) => {
-    const schemaName = `my-schema-${getRandomId()}`;
+    const schemaName = `schema-${getRandomId()}`;
 
     await schemasPage.goto(appName);
 

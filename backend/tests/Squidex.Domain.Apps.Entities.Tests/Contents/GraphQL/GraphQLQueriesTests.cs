@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
@@ -1972,5 +1973,65 @@ public class GraphQLQueriesTests : GraphQLTestBase
 
         A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
             .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_expose_user_information_if_user_has_permission()
+    {
+        var assetId = DomainId.NewGuid();
+        var asset = TestAsset.Create(assetId);
+
+        A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
+                A<Q>.That.HasIdsWithoutTotal(assetId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, asset));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findAsset(id: '{assetId}') {
+                    createdByUser {
+                      id,
+                      email,
+                      displayName
+                    },
+                    lastModifiedByUser {
+                      id,
+                      email,
+                      displayName
+                    }
+                  }
+                }",
+            Args = new
+            {
+                assetId
+            },
+            Permissions = [PermissionIds.AppPii]
+        });
+
+        var expected = new
+        {
+            data = new
+            {
+                findAsset = new
+                {
+                    createdByUser = new
+                    {
+                        id = asset.CreatedBy.Identifier,
+                        email = $"{asset.CreatedBy.Identifier}@email.com",
+                        displayName = $"{asset.CreatedBy.Identifier}name"
+                    },
+                    lastModifiedByUser = new
+                    {
+                        id = asset.LastModifiedBy.Identifier,
+                        email = $"{asset.LastModifiedBy}",
+                        displayName = asset.LastModifiedBy.Identifier
+                    }
+                }
+            }
+        };
+
+        AssertResult(expected, actual);
     }
 }

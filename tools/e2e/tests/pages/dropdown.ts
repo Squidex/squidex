@@ -10,14 +10,8 @@ import { Page } from '@playwright/test';
 export class Dropdown {
     constructor(private readonly page: Page) {}
 
-    public async delete(cancel = false) {
-        await this.page.getByText('Delete').click();
-
-        if (cancel) {
-            await this.page.getByRole('button', { name: /No/ }).click();
-        } else {
-            await this.page.getByRole('button', { name: /Yes/ }).click();
-        }
+    public async delete(button = /Yes/) {
+        await this.actionAndConfirm('Delete', button);
     }
 
     public async action(name: string) {
@@ -25,8 +19,8 @@ export class Dropdown {
         await this.page.locator('sqx-dropdown-menu').waitFor({ state: 'hidden' });
     }
 
-    public async actionConfirm(name: string) {
+    public async actionAndConfirm(name: string, button = /Yes/) {
         await this.action(name);
-        await this.page.getByRole('button', { name: 'Confirm' }).click();
+        await this.page.getByRole('button', { name: button }).click();
     }
 }

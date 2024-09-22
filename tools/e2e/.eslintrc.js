@@ -54,11 +54,12 @@ module.exports = {
                 ],
             }
         ],
+        "@typescript-eslint/no-floating-promises": "error",
+        "@typescript-eslint/no-shadow": "off",
         "@typescript-eslint/no-this-alias": "error",
         "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
         "@typescript-eslint/no-unused-expressions": "off",
         "@typescript-eslint/no-use-before-define": "off",
-        "@typescript-eslint/no-shadow": "off",
         "@typescript-eslint/no-unused-vars": [
             "error",
             {

@@ -15,31 +15,36 @@ test.beforeEach(async ({ appName, assetsPage }) => {
     await assetsPage.goto(appName);
 });
 
-test('should upload asset', async ({ assetsPage }) => {
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Assets/ });
+
+    await expect(header).toBeVisible();
+});
+
+test('upload asset', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
 
-    expect(assetCard.root).toBeVisible();
+    await expect(assetCard.root).toBeVisible();
 });
 
-test('should delete asset', async ({ assetsPage }) => {
+test('delete asset', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
     await assetCard.delete();
 
-    expect(assetCard.root).not.toBeVisible();
+    await expect(assetCard.root).not.toBeVisible();
 });
 
-test('should not delete asset if cancelled', async ({ assetsPage }) => {
+test('not delete asset if cancelled', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
+    await assetCard.delete(/No/);
 
-    await assetCard.delete(true);
-
-    expect(assetCard.root).toBeVisible();
+    await expect(assetCard.root).toBeVisible();
 });
 
-test('should edit asset name', async ({ assetsPage }) => {
+test('edit asset name', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
 
@@ -50,10 +55,10 @@ test('should edit asset name', async ({ assetsPage }) => {
 
     const newCard = await assetsPage.getAssetCard(newName);
 
-    expect(newCard.root).toBeVisible();
+    await expect(newCard.root).toBeVisible();
 });
 
-test('should edit asset metadata', async ({ assetsPage }) => {
+test('edit asset metadata', async ({ assetsPage }) => {
     const assetName = await uploadRandomAsset(assetsPage);
     const assetCard = await assetsPage.getAssetCard(assetName);
 
@@ -67,7 +72,95 @@ test('should edit asset metadata', async ({ assetsPage }) => {
 
     const newCard = await assetsPage.getAssetCard(`${w}x${h}px`);
 
-    expect(newCard.root).toBeVisible();
+    await expect(newCard.root).toBeVisible();
+});
+
+test('add asset folder', async ({ assetsPage }) => {
+    const folderName = `folder-${getRandomId()}`;
+
+    const folderDialog = await assetsPage.openAssetFolderDialog();
+    await folderDialog.enterName(folderName);
+    await folderDialog.save();
+
+    const folderCard = await assetsPage.getAssetFolderCard(folderName);
+
+    await expect(folderCard.root).toBeVisible();
+});
+
+test('open asset folder', async ({ assetsPage }) => {
+    const folderName = `folder-${getRandomId()}`;
+
+    const folderDialog = await assetsPage.openAssetFolderDialog();
+    await folderDialog.enterName(folderName);
+    await folderDialog.save();
+
+    const folderCard = await assetsPage.getAssetFolderCard(folderName);
+    await folderCard.open();
+
+    const moveUpCard = await assetsPage.getAssetFolderCard('<Parent>');
+
+    await expect(moveUpCard.root).toBeVisible();
+});
+
+test('rename asset folder', async ({ assetsPage }) => {
+    const folderName = `folder-${getRandomId()}`;
+
+    const folderDialog = await assetsPage.openAssetFolderDialog();
+    await folderDialog.enterName(folderName);
+    await folderDialog.save();
+    const folderCard = await assetsPage.getAssetFolderCard(folderName);
+
+    const newName = `folder-${getRandomId()}`;
+
+    const renameDialog = await folderCard.rename();
+    await renameDialog.enterName(newName);
+    await renameDialog.rename();
+    const renamedCard = await assetsPage.getAssetFolderCard(newName);
+
+    await expect(renamedCard.root).toBeVisible();
+});
+
+test('delete asset folder', async ({ assetsPage }) => {
+    const folderName = `folder-${getRandomId()}`;
+
+    const folderDialog = await assetsPage.openAssetFolderDialog();
+    await folderDialog.enterName(folderName);
+    await folderDialog.save();
+
+    const folderCard = await assetsPage.getAssetFolderCard(folderName);
+
+    const dropdown = await folderCard.openOptionsDropdown();
+    await dropdown.delete();
+
+    await expect(folderCard.root).not.toBeVisible();
+});
+
+test('add asset folder to parent', async ({ assetsPage }) => {
+    const parentName = `folder-${getRandomId()}`;
+
+    const parentDialog = await assetsPage.openAssetFolderDialog();
+    await parentDialog.enterName(parentName);
+    await parentDialog.save();
+
+    const parentcard = await assetsPage.getAssetFolderCard(parentName);
+    await parentcard.open();
+
+    const childName = `folder-${getRandomId()}`;
+
+    const childDialog = await assetsPage.openAssetFolderDialog();
+    await childDialog.enterName(childName);
+    await childDialog.save();
+
+    const childCard = await assetsPage.getAssetFolderCard(childName);
+
+    const moveUpCard = await assetsPage.getAssetFolderCard('<Parent>');
+    await moveUpCard.open();
+
+    await expect(childCard.root).not.toBeVisible();
+
+    await parentcard.open();
+
+    await expect(childCard.root).toBeVisible();
 });
 
 async function uploadRandomAsset(assetsPage: AssetsPage) {

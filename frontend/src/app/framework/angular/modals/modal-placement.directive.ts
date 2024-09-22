@@ -20,11 +20,11 @@ export class ModalPlacementDirective implements AfterViewInit, OnDestroy {
     @Input('sqxAnchoredTo')
     public target?: Element;
 
-    @Input({ transform: booleanAttribute })
-    public scrollX = false;
+    @Input()
+    public scrollX?: Scroll;
 
-    @Input({ transform: booleanAttribute })
-    public scrollY = false;
+    @Input()
+    public scrollY?: Scroll;
 
     @Input({ transform: numberAttribute })
     public scrollMargin = 10;
@@ -131,21 +131,24 @@ export class ModalPlacementDirective implements AfterViewInit, OnDestroy {
 
         middleware.push(size({
             apply: ({ availableWidth, availableHeight, rects }) => {
-                if (this.scrollX) {
-                    const maxWidth = availableWidth > 0 ? `${availableWidth - this.scrollMargin}px` : 'none';
+                const overflowX = parseScroll(this.scrollX);
+                const overflowY = parseScroll(this.scrollY);
 
-                    this.renderer.setStyle(modalRef, 'overflow-x', 'auto');
-                    this.renderer.setStyle(modalRef, 'overflow-y', 'none');
-                    this.renderer.setStyle(modalRef, 'max-width', maxWidth);
-                }
+                const maxWidth =
+                    overflowX !== 'none'
+                    ? availableWidth > 0 ? `${availableWidth - this.scrollMargin}px` : 'none'
+                    : undefined;
 
-                if (this.scrollY) {
-                    const maxHeight = availableHeight > 0 ? `${availableHeight - this.scrollMargin}px` : 'none';
+                const maxHeight =
+                    overflowY !== 'none'
+                    ? availableHeight > 0 ? `${availableHeight - this.scrollMargin}px` : 'none'
+                    : undefined;
 
-                    this.renderer.setStyle(modalRef, 'overflow-x', 'none');
-                    this.renderer.setStyle(modalRef, 'overflow-y', 'auto');
-                    this.renderer.setStyle(modalRef, 'max-height', maxHeight);
-                }
+                this.renderer.setStyle(modalRef, 'overflow-x', overflowX);
+                this.renderer.setStyle(modalRef, 'overflow-y', overflowY);
+
+                this.renderer.setStyle(modalRef, 'max-width', maxWidth);
+                this.renderer.setStyle(modalRef, 'max-height', maxHeight);
 
                 if (this.adjustWidth) {
                     const width = rects.reference.width + 2 * this.spaceX;
@@ -168,4 +171,18 @@ export class ModalPlacementDirective implements AfterViewInit, OnDestroy {
         this.renderer.setStyle(modalRef, 'top', `${computedSize.y}px`);
         this.renderer.setStyle(modalRef, 'visibility', 'visible');
     }
+}
+
+type Scroll = 'hidden' | 'scroll' | 'auto' | 'true' | 'false' | true | undefined;
+
+function parseScroll(source: Scroll): string {
+    if (source === 'true' || source === 'auto' || source === true) {
+        return 'auto';
+    }
+
+    if (!source || source === 'false') {
+        return 'none';
+    }
+
+    return source;
 }

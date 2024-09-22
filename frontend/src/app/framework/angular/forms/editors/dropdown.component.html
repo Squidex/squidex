@@ -1,6 +1,7 @@
 <div class="selection">
     <input
         class="form-select"
+        [id]="formId"
         #input
         autocapitalize="off"
         autocomplete="off"
@@ -8,6 +9,7 @@
         (click)="openModal()"
         [disabled]="snapshot.isDisabled"
         (keydown)="onKeyDown($event)"
+        [name]="formName"
         readonly />
 
     @if (snapshot.selectedItem; as selectedItem) {
@@ -30,7 +32,7 @@
         [adjustWidth]="dropdownFullWidth"
         [position]="dropdownPosition"
         scrollX="false"
-        scrollY="true"
+        scrollY="hidden"
         [sqxAnchoredTo]="input"
         *sqxModal="dropdown"
         [style]="dropdownStyles">

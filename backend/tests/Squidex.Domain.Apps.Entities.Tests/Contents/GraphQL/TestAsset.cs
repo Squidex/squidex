@@ -102,8 +102,8 @@ public static class TestAsset
             createdByUser = new
             {
                 id = asset.CreatedBy.Identifier,
-                email = $"{asset.CreatedBy.Identifier}@email.com",
-                displayName = $"{asset.CreatedBy.Identifier}name"
+                email = "Hidden",
+                displayName = "Hidden"
             },
             editToken = $"token_{asset.Id}",
             lastModified = asset.LastModified,
@@ -111,8 +111,8 @@ public static class TestAsset
             lastModifiedByUser = new
             {
                 id = asset.LastModifiedBy.Identifier,
-                email = $"{asset.LastModifiedBy}",
-                displayName = asset.LastModifiedBy.Identifier
+                email = "Hidden",
+                displayName = "Hidden"
             },
             url = $"assets/{asset.AppId.Name}/{asset.Id}",
             thumbnailUrl = $"assets/{asset.AppId.Name}/{asset.Id}?width=100",

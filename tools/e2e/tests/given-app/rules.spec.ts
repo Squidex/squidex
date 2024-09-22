@@ -10,16 +10,22 @@ test.beforeEach(async ({ appName, rulesPage }) => {
     await rulesPage.goto(appName);
 });
 
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Rules/ });
+
+    await expect(header).toBeVisible();
+});
+
 test('create rule', async ({ rulesPage, rulePage }) => {
     const ruleName = await createRandomRule(rulesPage, rulePage);
-    const ruleCard = await rulesPage.getRule(ruleName);
+    const ruleCard = await rulesPage.getRuleCard(ruleName);
 
     await expect(ruleCard.root).toBeVisible();
 });
 
 test('delete rule', async ({ rulesPage, rulePage }) => {
     const ruleName = await createRandomRule(rulesPage, rulePage);
-    const ruleCard = await rulesPage.getRule(ruleName);
+    const ruleCard = await rulesPage.getRuleCard(ruleName);
 
     const dropdown = await ruleCard.openOptionsDropdown();
     await dropdown.delete();
@@ -29,7 +35,7 @@ test('delete rule', async ({ rulesPage, rulePage }) => {
 
 test('disable rule', async ({ rulePage, rulesPage }) => {
     const ruleName = await createRandomRule(rulesPage, rulePage);
-    const ruleCard = await rulesPage.getRule(ruleName);
+    const ruleCard = await rulesPage.getRuleCard(ruleName);
 
     const dropdown = await ruleCard.openOptionsDropdown();
     await dropdown.action('Disable');
@@ -39,7 +45,7 @@ test('disable rule', async ({ rulePage, rulesPage }) => {
 
 test('enable rule', async ({ rulePage, rulesPage }) => {
     const ruleName = await createRandomRule(rulesPage, rulePage);
-    const ruleCard = await rulesPage.getRule(ruleName);
+    const ruleCard = await rulesPage.getRuleCard(ruleName);
 
     const dropdown1 = await ruleCard.openOptionsDropdown();
     await dropdown1.action('Disable');
@@ -54,7 +60,7 @@ test('enable rule', async ({ rulePage, rulesPage }) => {
 
 test('edit rule', async ({ page, rulePage, rulesPage }) => {
     const ruleName = await createRandomRule(rulesPage, rulePage);
-    const ruleCard = await rulesPage.getRule(ruleName);
+    const ruleCard = await rulesPage.getRuleCard(ruleName);
 
     const dropdown = await ruleCard.openOptionsDropdown();
     await dropdown.action('Edit');
@@ -72,9 +78,11 @@ async function createRandomRule(rulesPage: RulesPage, rulePage: RulePage) {
     await rulePage.save();
     await rulePage.back();
 
-    const rename = await rulesPage.renameRule(/Unnamed Rule/);
-    await rename.enterName(ruleName);
-    await rename.save();
+    const ruleCard = await rulesPage.getRuleCard('Unnamed Rule');
+
+    const renameDialog = await ruleCard.startRenameDblClick();
+    await renameDialog.enterName(ruleName);
+    await renameDialog.save();
 
     return ruleName;
 }

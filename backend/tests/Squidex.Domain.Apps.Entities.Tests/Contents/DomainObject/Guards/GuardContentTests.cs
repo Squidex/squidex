@@ -311,10 +311,10 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     [Fact]
     public void Should_not_throw_exception_if_content_is_from_another_user_but_user_has_permission()
     {
-        var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsDelete, AppId.Name, SchemaId.Name).Id;
-        var userObject = Mocks.FrontendUser(permission: userPermission);
+        var userPermissions = PermissionIds.ForApp(PermissionIds.AppContentsDelete, AppId.Name, SchemaId.Name).Id;
+        var userPrincipal = Mocks.FrontendUser(permissions: [userPermissions]);
 
-        var operation = Operation(CreateContent(Status.Draft) with { CreatedBy = RefToken.User("invalid") }, normalSchema, userObject);
+        var operation = Operation(CreateContent(Status.Draft) with { CreatedBy = RefToken.User("invalid") }, normalSchema, userPrincipal);
 
         operation.MustHavePermission(PermissionIds.AppContentsDelete);
     }

@@ -189,6 +189,7 @@
                 @if (rule && (rulesState.canReadEvents | async)) {
                     <a
                         class="panel-link panel-link-gray"
+                        attr.aria-label="{{ 'common.history' | sqxTranslate }}"
                         [queryParams]="{ ruleId: rule.id }"
                         routerLink="events"
                         routerLinkActive="active"
@@ -199,6 +200,7 @@
                     </a>
                     <a
                         class="panel-link panel-link-gray"
+                        attr.aria-label="{{ 'rules.simulator' | sqxTranslate }}"
                         [queryParams]="{ ruleId: rule.id }"
                         routerLink="simulator"
                         routerLinkActive="active"
@@ -212,6 +214,7 @@
                 <a
                     class="panel-link"
                     #helpLink
+                    attr.aria-label="{{ 'common.help' | sqxTranslate }}"
                     hintAfter="180000"
                     hintText="i18n:common.helpTour"
                     queryParamsHandling="preserve"
