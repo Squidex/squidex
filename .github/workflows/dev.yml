@@ -36,7 +36,6 @@ jobs:
         uses: docker/build-push-action@v6.7.0
         with:
           load: true
-          build-args: "SQUIDEX__RUNTIME__VERSION=7.0.0-dev-${{ env.BUILD_NUMBER }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: squidex-local

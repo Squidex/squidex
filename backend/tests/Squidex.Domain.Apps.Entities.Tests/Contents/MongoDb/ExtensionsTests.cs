@@ -22,7 +22,7 @@ public class ExtensionsTests
     [Fact]
     public void Should_build_projection_without_fields()
     {
-        var projection = ExtensionSut.BuildProjection2<MongoContentEntity>(null);
+        var projection = ExtensionSut.BuildProjection<MongoContentEntity>(null);
 
         AssertProjection(projection, "{ 'dd' : 0 }");
     }
@@ -30,7 +30,7 @@ public class ExtensionsTests
     [Fact]
     public void Should_build_projection_with_data_prefix()
     {
-        var projection = ExtensionSut.BuildProjection2<MongoContentEntity>(["data.myField"]);
+        var projection = ExtensionSut.BuildProjection<MongoContentEntity>(["data.myField"]);
 
         AssertProjection(projection, "{ '_ai' : 1, '_id' : 1, '_si' : 1, 'ai' : 1, 'cb' : 1, 'ct' : 1, 'dl' : 1, 'do.myField' : 1, 'id' : 1, 'is' : 1, 'mb' : 1, 'mt' : 1, 'ns' : 1, 'rf' : 1, 'sa' : 1, 'si' : 1, 'sj' : 1, 'ss' : 1, 'ts' : 1, 'vs' : 1 }");
     }
@@ -38,7 +38,7 @@ public class ExtensionsTests
     [Fact]
     public void Should_build_projection_without_data_prefix()
     {
-        var projection = ExtensionSut.BuildProjection2<MongoContentEntity>(["myField"]);
+        var projection = ExtensionSut.BuildProjection<MongoContentEntity>(["myField"]);
 
         AssertProjection(projection, "{ '_ai' : 1, '_id' : 1, '_si' : 1, 'ai' : 1, 'cb' : 1, 'ct' : 1, 'dl' : 1, 'do.myField' : 1, 'id' : 1, 'is' : 1, 'mb' : 1, 'mt' : 1, 'ns' : 1, 'rf' : 1, 'sa' : 1, 'si' : 1, 'sj' : 1, 'ss' : 1, 'ts' : 1, 'vs' : 1 }");
     }
@@ -46,15 +46,23 @@ public class ExtensionsTests
     [Fact]
     public void Should_build_projection_without_included_field()
     {
-        var projection = ExtensionSut.BuildProjection2<MongoContentEntity>(["myField.special", "myField"]);
+        var projection = ExtensionSut.BuildProjection<MongoContentEntity>(["myField.special", "myField"]);
 
         AssertProjection(projection, "{ '_ai' : 1, '_id' : 1, '_si' : 1, 'ai' : 1, 'cb' : 1, 'ct' : 1, 'dl' : 1, 'do.myField' : 1, 'id' : 1, 'is' : 1, 'mb' : 1, 'mt' : 1, 'ns' : 1, 'rf' : 1, 'sa' : 1, 'si' : 1, 'sj' : 1, 'ss' : 1, 'ts' : 1, 'vs' : 1 }");
     }
 
     [Fact]
+    public void Should_build_projection_with_prefix_field()
+    {
+        var projection = ExtensionSut.BuildProjection<MongoContentEntity>(["myField", "myField2"]);
+
+        AssertProjection(projection, "{ '_ai' : 1, '_id' : 1, '_si' : 1, 'ai' : 1, 'cb' : 1, 'ct' : 1, 'dl' : 1, 'do.myField' : 1, 'do.myField2' : 1, 'id' : 1, 'is' : 1, 'mb' : 1, 'mt' : 1, 'ns' : 1, 'rf' : 1, 'sa' : 1, 'si' : 1, 'sj' : 1, 'ss' : 1, 'ts' : 1, 'vs' : 1 }");
+    }
+
+    [Fact]
     public void Should_build_projection_with_status_data_field()
     {
-        var projection = ExtensionSut.BuildProjection2<MongoContentEntity>(["data.Status"]);
+        var projection = ExtensionSut.BuildProjection<MongoContentEntity>(["data.Status"]);
 
         AssertProjection(projection, "{ '_ai' : 1, '_id' : 1, '_si' : 1, 'ai' : 1, 'cb' : 1, 'ct' : 1, 'dl' : 1, 'do.Status' : 1, 'id' : 1, 'is' : 1, 'mb' : 1, 'mt' : 1, 'ns' : 1, 'rf' : 1, 'sa' : 1, 'si' : 1, 'sj' : 1, 'ss' : 1, 'ts' : 1, 'vs' : 1 }");
     }
@@ -62,7 +70,7 @@ public class ExtensionsTests
     [Fact]
     public void Should_build_projection_with_meta_status_field()
     {
-        var projection = ExtensionSut.BuildProjection2<MongoContentEntity>(["status"]);
+        var projection = ExtensionSut.BuildProjection<MongoContentEntity>(["status"]);
 
         AssertProjection(projection, "{ '_ai' : 1, '_id' : 1, '_si' : 1, 'ai' : 1, 'cb' : 1, 'ct' : 1, 'dl' : 1, 'do.status' : 1, 'id' : 1, 'is' : 1, 'mb' : 1, 'mt' : 1, 'ns' : 1, 'rf' : 1, 'sa' : 1, 'si' : 1, 'sj' : 1, 'ss' : 1, 'ts' : 1, 'vs' : 1 }");
     }
