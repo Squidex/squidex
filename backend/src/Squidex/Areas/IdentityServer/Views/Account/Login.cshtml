@@ -32,101 +32,110 @@
         </div>
     </div>
 
-    <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
-        @Html.AntiForgeryToken()
-
-        @foreach (var provider in Model.ExternalProviders)
+    <div>
+        @if (Model.HasExternalLogin)
         {
-            var schema = provider.AuthenticationScheme.ToLowerInvariant();
+            <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
+                @Html.AntiForgeryToken()
 
-            <div class="form-group mb-2">
-                <button class="btn external-button btn-block btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
-                    <i class="icon-@schema external-icon"></i> @Html.Raw(T.Get("users.login.loginWith", new { action, provider = provider.DisplayName }))
-                </button>
-            </div>
+                @foreach (var provider in Model.ExternalProviders)
+                {
+                    var schema = provider.AuthenticationScheme.ToLowerInvariant();
+
+                    <div class="form-group mb-2">
+                        <button class="btn external-button btn-block btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
+                            <i class="icon-@schema external-icon"></i> @Html.Raw(T.Get("users.login.loginWith", new { action, provider = provider.DisplayName }))
+                        </button>
+                    </div>
+                }
+            </form>
         }
-    </form>
 
-    @if (Model.HasPasswordAuth)
-    {
         <div class="profile-separator">
             <div class="profile-separator-text">@T.Get("users.login.separator")</div>
         </div>
 
-        if (Model.IsLogin)
+        @if (Model.HasPasswordAuth)
         {
-            @if (Model.RequestType == RequestType.Login)
-            {
-                <div asp-validation-summary="ModelOnly" class="form-alert form-alert-error"></div>
-            }
+            <div>
+                @if (Model.IsLogin)
+                {
+                    @if (Model.RequestType == RequestType.Login)
+                    {
+                        <div asp-validation-summary="ModelOnly" class="form-alert form-alert-error"></div>
+                    }
 
-            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
-                @Html.AntiForgeryToken()
+                    <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
+                        @Html.AntiForgeryToken()
 
-                <div class="form-group">
-                    <div error-for="Email"></div>
-                    <input asp-for="Email" type="email" class="form-control" placeholder="@T.Get("users.login.emailPlaceholder")" />
+                        <div class="form-group">
+                            <div error-for="Email"></div>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="@T.Get("users.login.emailPlaceholder")" />
+                        </div>
+
+                        <div class="form-group">
+                            <div error-for="Password"></div>
+                            <input asp-for="Password" type="password" class="form-control" placeholder="@T.Get("users.login.passwordPlaceholder")" />
+                        </div>
+
+                        <button type="submit" data-testid="login-button" class="btn btn-block btn-primary">@action</button>
+                    </form>
+                }
+                else
+                {
+                    <div class="profile-password-signup text-center">@T.Get("users.login.askAdmin")</div>
+                }
+            </div>
+        }
+
+        <div class="profile-separator">
+            <div class="profile-separator-text">@T.Get("users.login.separator")</div>
+        </div>
+
+        @if (Model.HasCustomAuth && Model.IsLogin)
+        {
+            <div>
+                @if (Model.RequestType == RequestType.LoginCustom)
+                {
+                    <div asp-validation-summary="ModelOnly" class="form-alert form-alert-error"></div>
+                }
+
+                <div class="mb-2">
+                    <small class="text-muted form-text">@T.Get("users.login.custom")</small>
                 </div>
 
-                <div class="form-group">
-                    <div error-for="Password"></div>
-                    <input asp-for="Password" type="password" class="form-control" placeholder="@T.Get("users.login.passwordPlaceholder")" />
-                </div>
+                <form asp-controller="Account" asp-action="LoginDynamic" asp-route-returnurl="@Model.ReturnUrl" method="post">
+                    @Html.AntiForgeryToken()
 
-                <button type="submit" data-testid="login-button" class="btn btn-block btn-primary">@action</button>
-            </form>
+                    <div class="form-group">
+                        <div error-for="DynamicEmail"></div>
+                        <input asp-for="DynamicEmail" type="email" class="form-control" placeholder="@T.Get("users.login.emailBusinessPlaceholder")" />
+                    </div>
+
+                    <button type="submit" data-testid="dynamic-button" class="btn btn-block btn-primary">@action</button>
+                </form>
+            </div>
+        }
+
+        @if (Model.IsLogin)
+        {
+            <p class="profile-footer">
+                @T.Get("users.login.noAccountSignupQuestion")
+
+                <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">
+                    @T.Get("users.login.noAccountSignupAction")
+                </a>
+            </p>
         }
         else
         {
-            <div class="profile-password-signup text-center">@T.Get("users.login.askAdmin")</div>
+            <p class="profile-footer">
+                @T.Get("users.login.noAccountLoginQuestion")
+
+                <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">
+                    @T.Get("users.login.noAccountLoginAction")
+                </a>
+            </p>
         }
-    }
-
-    @if (Model.HasCustomAuth && Model.IsLogin)
-    {
-        <div class="profile-separator">
-            <div class="profile-separator-text">@T.Get("users.login.separator")</div>
-        </div>
-
-        @if (Model.RequestType == RequestType.LoginCustom)
-        {
-            <div asp-validation-summary="ModelOnly" class="form-alert form-alert-error"></div>
-        }
-
-        <div class="mb-2">
-            <small class="text-muted form-text">@T.Get("users.login.custom")</small>
-        </div>
-
-        <form asp-controller="Account" asp-action="LoginDynamic" asp-route-returnurl="@Model.ReturnUrl" method="post">
-            @Html.AntiForgeryToken()
-
-            <div class="form-group">
-                <div error-for="DynamicEmail"></div>
-                <input asp-for="DynamicEmail" type="email" class="form-control" placeholder="@T.Get("users.login.emailBusinessPlaceholder")" />
-            </div>
-
-            <button type="submit" data-testid="dynamic-button" class="btn btn-block btn-primary">@action</button>
-        </form>
-    }
-
-    @if (Model.IsLogin)
-    {
-        <p class="profile-footer">
-            @T.Get("users.login.noAccountSignupQuestion")
-
-            <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">
-                @T.Get("users.login.noAccountSignupAction")
-            </a>
-        </p>
-    }
-    else
-    {
-        <p class="profile-footer">
-            @T.Get("users.login.noAccountLoginQuestion")
-
-            <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">
-                @T.Get("users.login.noAccountLoginAction")
-            </a>
-        </p>
-    }
+    </div>
 </div>

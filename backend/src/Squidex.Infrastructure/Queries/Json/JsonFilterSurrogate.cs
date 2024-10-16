@@ -50,7 +50,7 @@ public sealed class JsonFilterSurrogate : ISurrogate<FilterNode<JsonValue>>
             return new CompareFilter<JsonValue>(Path, Op ?? CompareOperator.Equals, Value);
         }
 
-        ThrowHelper.JsonException(Errors.InvalidJsonStructure());
+        ThrowHelper.JsonSystemException(Errors.InvalidJsonStructure());
         return default!;
     }
 }

@@ -40,14 +40,18 @@ public sealed class ContentsDto : Resource
 
         if (schema != null)
         {
-            await result.AssignStatusesAsync(workflow, schema);
+            await result.CreateStatusesAsync(workflow, schema);
             await result.CreateLinksAsync(resources, workflow, schema);
+        }
+        else
+        {
+            result.Statuses = [];
         }
 
         return result;
     }
 
-    private async Task AssignStatusesAsync(IContentWorkflow workflow, Schema schema)
+    private async Task CreateStatusesAsync(IContentWorkflow workflow, Schema schema)
     {
         var allStatuses = await workflow.GetAllAsync(schema);
 

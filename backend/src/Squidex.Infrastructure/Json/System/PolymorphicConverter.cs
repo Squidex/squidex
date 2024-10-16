@@ -10,6 +10,8 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Squidex.Infrastructure.Reflection;
 
+#pragma warning disable MA0084 // Local variables should not hide other symbols
+
 namespace Squidex.Infrastructure.Json.System;
 
 public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
@@ -38,8 +40,8 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
             {
                 if (typeRegistry.TryGetConfig(baseType, out var config) && config.TryGetName(typeInfo.Type, out var typeName))
                 {
-                    var discriminiatorName = config.DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
-                    var discriminatorField = typeInfo.CreateJsonPropertyInfo(typeof(string), discriminiatorName);
+                    var discriminatorName = config.DiscriminatorProperty ?? Constants.DefaultDiscriminatorProperty;
+                    var discriminatorField = typeInfo.CreateJsonPropertyInfo(typeof(string), discriminatorName);
 
                     discriminatorField.Get = x =>
                     {
@@ -61,7 +63,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
 
         if (typeReader.TokenType != JsonTokenType.StartObject)
         {
-            throw new JsonException();
+            ThrowHelper.JsonSystemException($"Expected Object, got '{reader.TokenType}'");
         }
 
         while (typeReader.Read())
@@ -73,7 +75,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
 
                 if (typeReader.TokenType != JsonTokenType.String)
                 {
-                    ThrowHelper.JsonException($"Expected string discriminator value, got '{reader.TokenType}'");
+                    ThrowHelper.JsonSystemException($"Expected string discriminator value, got '{reader.TokenType}'");
                     return default!;
                 }
 
@@ -92,7 +94,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
             }
         }
 
-        ThrowHelper.JsonException($"Object has no discriminator '{discriminatorName}'.");
+        ThrowHelper.JsonSystemException($"Object has no discriminator '{discriminatorName}'.");
         return default!;
     }
 
@@ -112,7 +114,7 @@ public sealed class PolymorphicConverter<T> : JsonConverter<T> where T : class
     {
         if (!typeRegistry.TryGetType<T>(name, out var type))
         {
-            ThrowHelper.JsonException($"Object has invalid discriminator '{name}'.");
+            ThrowHelper.JsonSystemException($"Object has invalid discriminator '{name}'.");
             return default!;
         }
 

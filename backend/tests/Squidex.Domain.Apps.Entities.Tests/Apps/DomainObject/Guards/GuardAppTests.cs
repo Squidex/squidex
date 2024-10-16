@@ -163,7 +163,7 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
     [Fact]
     public async Task CanTransfer_should_not_throw_exception_if_user_has_transfer_permission()
     {
-        var admin = Mocks.ApiUser(permission: PermissionIds.Transfer);
+        var admin = Mocks.ApiUser(permissions: [PermissionIds.Transfer]);
 
         var command = new TransferToTeam { TeamId = TeamId, Actor = User, User = admin };
 

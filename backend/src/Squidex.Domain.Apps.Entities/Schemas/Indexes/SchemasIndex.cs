@@ -218,11 +218,11 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         }
 
         // Do not use cancellation here as we already so far.
-        await schemaCache.AddAsync(new[]
-        {
+        await schemaCache.AddAsync(
+        [
             new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Id), schema),
             new KeyValuePair<string, object?>(GetCacheKey(schema.AppId.Id, schema.Name), schema),
-        }, options.CacheDuration);
+        ], options.CacheDuration);
 
         return schema;
     }
@@ -235,10 +235,10 @@ public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
         }
 
         // Do not use cancellation here as we already so far.
-        return schemaCache.RemoveAsync(new[]
-        {
+        return schemaCache.RemoveAsync(
+        [
             GetCacheKey(appId, id),
             GetCacheKey(appId, name)
-        });
+        ]);
     }
 }

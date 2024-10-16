@@ -44,7 +44,11 @@
         </div>
         @if (!disabled) {
             <div class="col-auto title-edit">
-                <button class="btn btn-text-secondary btn-{{ size }}" (click)="toggleRename()" type="button">
+                <button
+                    class="btn btn-text-secondary btn-{{ size }}"
+                    attr.aria-label="{{ 'common.rename' | sqxTranslate }}"
+                    (click)="toggleRename()"
+                    type="button">
                     <i class="icon-pencil text-decent"></i>
                 </button>
             </div>

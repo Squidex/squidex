@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.15.0] - 2024-08-23
+
+### Fixed
+
+* **Contents**: Fix to also deliver fields that have the same name as meta fields.
+* **Contents**: Never return null statuses for content queries.
+* **Migration**: Fix log message in migration.
+* **UI**: Correctly remove the filter row, when the delete button is returned.
+* **UI**: Fix autocompletion for code editors.
+* **UI**: Fix clipboard behavior for rich text editor.
+* **UI**: Fix seperator in login screen.
+* **UI**: Navigate to the correct page when the back button on the content page is fixed.
+* **UI**: Show filters in query dialog when selecting references.
+* **UI**: Use correct npm packages to prevent version conflicts.
+
+### Added
+
+* **Contents**: New flag to also enrich required fields.
+* **Contents**: New header flag to not enrich queried content items with default values.
+* **UI**: Make the code editor editable in the markdown mode of the rich text editor.
+* **UI**: New event for editor extensions when the context has been changed.
+* **UI**: Support data attributes for Squidex tokens in embed SDK.
+
 ## [7.14.0] - 2024-07-03
 
 ### Fixed

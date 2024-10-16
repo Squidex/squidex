@@ -6,6 +6,8 @@
  */
 
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { DropdownComponent, LocalizerService, RootViewComponent } from '@app/framework';
 
@@ -52,6 +54,19 @@ export default {
         dropdownFullWidth: {
             control: 'boolean',
         },
+        change: {
+            action:'ngModelChange',
+        },
+        position: {
+            control: 'radio',
+            options: [
+                'bottom-start',
+                'bottom-end',
+            ],
+        },
+    },
+    args: {
+        position: 'bottom-start',
     },
     render: args => ({
         props: args,
@@ -59,10 +74,11 @@ export default {
             <sqx-root-view>
                 <sqx-dropdown 
                     [disabled]="disabled"
-                    [dropdownPosition]="'bottom-left'"
+                    [dropdownPosition]="position"
                     [dropdownFullWidth]="dropdownFullWidth"
                     [items]="items"
                     [itemsLoading]="itemsLoading"
+                    (ngModelChange)="change($event)"
                     [ngModel]="model">
                 </sqx-dropdown>
             </sqx-root-view>
@@ -74,6 +90,8 @@ export default {
                 TestComponent,
             ],
             imports: [
+                BrowserAnimationsModule,
+                FormsModule,
                 RootViewComponent,
             ],
             providers: [
@@ -91,6 +109,13 @@ type Story = StoryObj<DropdownComponent & { model: any }>;
 export const Default: Story = {
     args: {
         items: ['A', 'B', 'C'],
+        model: 'B',
+    },
+};
+
+export const Long: Story = {
+    args: {
+        items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'],
         model: 'B',
     },
 };
@@ -146,7 +171,7 @@ export const ComplexValues: Story = {
             <sqx-root-view>
                 <sqx-dropdown
                     [disabled]="disabled"
-                    [dropdownPosition]="'bottom-left'"
+                    [dropdownPosition]="'bottom-start'"
                     [dropdownFullWidth]="dropdownFullWidth"
                     [items]="items"
                     [itemsLoading]="itemsLoading"

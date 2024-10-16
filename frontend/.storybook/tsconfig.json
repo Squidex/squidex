@@ -1,9 +1,6 @@
 {
   "extends": "../tsconfig.app.json",
   "compilerOptions": {
-    "types": [
-      "node"
-    ],
     "allowSyntheticDefaultImports": true
   },
   "exclude": [

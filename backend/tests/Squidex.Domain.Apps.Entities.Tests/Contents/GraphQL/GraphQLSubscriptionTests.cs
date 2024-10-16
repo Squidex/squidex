@@ -43,7 +43,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     fileSize
                   }
                 }",
-            Permission = PermissionIds.AppAssetsRead
+            Permissions = [PermissionIds.AppAssetsRead]
         });
 
         var expected = new
@@ -140,7 +140,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     data
                   }
                 }",
-            Permission = PermissionIds.AppContentsRead
+            Permissions = [PermissionIds.AppContentsRead]
         });
 
         var expected = new

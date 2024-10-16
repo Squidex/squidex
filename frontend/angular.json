@@ -127,7 +127,7 @@
                   "inlineCritical": false
                 },
                 "fonts": true
-              },
+              }
             },
             "development": {
               "extractLicenses": false,

@@ -52,6 +52,7 @@
             @if (rulesState.canReadEvents | async) {
                 <a
                     class="panel-link panel-link-gray"
+                    attr.aria-label="{{ 'common.history' | sqxTranslate }}"
                     routerLink="events"
                     routerLinkActive="active"
                     sqxTourStep="history"
@@ -64,6 +65,7 @@
             <a
                 class="panel-link"
                 #helpLink
+                attr.aria-label="{{ 'common.help' | sqxTranslate }}"
                 hintAfter="180000"
                 hintText="i18n:common.helpTour"
                 queryParamsHandling="preserve"

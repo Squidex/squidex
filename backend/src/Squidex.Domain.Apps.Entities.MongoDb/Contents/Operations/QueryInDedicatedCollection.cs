@@ -45,8 +45,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
             var schemaCollection = schemaDatabase.GetCollection<MongoContentEntity>($"{prefixCollection}_{schemaId}");
 
             await schemaCollection.Indexes.CreateManyAsync(
-                new[]
-                {
+                [
                     new CreateIndexModel<MongoContentEntity>(Index
                         .Descending(x => x.LastModified)
                         .Ascending(x => x.Id)
@@ -56,7 +55,7 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
                         .Ascending(x => x.IndexedSchemaId)
                         .Ascending(x => x.IsDeleted)
                         .Descending(x => x.LastModified))
-                });
+                ]);
 
             return schemaCollection;
         });

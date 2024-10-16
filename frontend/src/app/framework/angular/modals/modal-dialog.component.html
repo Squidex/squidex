@@ -7,7 +7,7 @@
                         <ng-content select="[title]"></ng-content>
                     </h4>
                     <ng-content select="[plainTitle]"></ng-content>
-                    <button class="btn btn-close" (click)="dialogClose.emit()" type="button"></button>
+                    <button class="btn btn-close" attr.aria-label="{{ 'common.close' | sqxTranslate }}" (click)="dialogClose.emit()" type="button"></button>
                 </div>
             }
 

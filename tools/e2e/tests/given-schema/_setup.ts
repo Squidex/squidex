@@ -5,41 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { expect, test as setup } from '../given-app/_fixture';
+import { test as setup } from '../given-app/_fixture';
 import { getRandomId, writeJsonAsync } from '../utils';
 
-setup('prepare schema', async ({ page, appName }) => {
-    const schemaName = `my-schema-${getRandomId()}`;
+const fields = [{
+    name: 'my-string',
+}];
 
-    const fields = [{
-        name: 'my-string',
-    }];
+setup('prepare schema', async ({ appName, schemasPage, schemaPage }) => {
+    const schemaName = `schema-${getRandomId()}`;
 
-    await page.goto(`/app/${appName}/schemas`);
+    await schemasPage.goto(appName);
 
-    await page.getByLabel('Create Schema').click();
+    const createDialog = await schemasPage.openSchemaDialog();
+    await createDialog.enterName(schemaName);
+    await createDialog.save();
 
-    // Define schema name.
-    await page.getByLabel('Name (required)').fill(schemaName);
-
-    // Save schema.
-    await page.getByRole('button', { name: 'Create', exact: true }).click();
+    await schemaPage.publish();
 
     for (const field of fields) {
-        await page.locator('button').filter({ hasText: /^Add Field$/ }).click();
-
-        // Define field name.
-        await page.getByPlaceholder('Enter field name').fill(field.name);
-
-        // Save field.
-        await page.getByRole('button', { name: 'Create and close' }).click();
+        const fieldDialog = await schemaPage.openFieldWizard();
+        await fieldDialog.enterName(field.name);
+        await fieldDialog.enterType('String');
+        await fieldDialog.createAndClose();
     }
-
-    // Publish schema.
-    await page.getByRole('button', { name: 'Published', exact: true }).click();
-
-    // Just wait for the publish operation to complete.
-    await expect(page.getByRole('button', { name: 'Published', exact: true })).toBeDisabled();
 
     await writeJsonAsync('schema', { schemaName });
     await writeJsonAsync('fields', { fields });

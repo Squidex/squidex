@@ -452,6 +452,7 @@ public sealed class ContentsController : ApiController
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="id">The ID of the content item to update.</param>
+    /// <param name="request">The request parameters.</param>
     /// <response code="200">Content updated.</response>
     /// <response code="404">Content references, schema or app not found.</response>
     /// <remarks>
@@ -464,9 +465,9 @@ public sealed class ContentsController : ApiController
     [AcceptHeader.Unpublished]
     [AcceptHeader.Languages]
     [ApiCosts(1)]
-    public async Task<IActionResult> PutContentDefaults(string app, string schema, DomainId id)
+    public async Task<IActionResult> PutContentDefaults(string app, string schema, DomainId id, EnrichContentDefaultsDto request)
     {
-        var command = new EnrichContentDefaults { ContentId = id };
+        var command = request.ToCommand(id);
 
         var response = await InvokeCommandAsync(command);
 

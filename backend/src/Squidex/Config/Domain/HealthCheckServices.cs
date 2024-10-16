@@ -18,7 +18,7 @@ public static class HealthCheckServices
             "diagnostics:gc");
 
         services.AddHealthChecks()
-            .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })
-            .AddCheck<EventConsumersHealthCheck>("EventConsumers", tags: new[] { "background" });
+            .AddCheck<GCHealthCheck>("GC", tags: ["node"])
+            .AddCheck<EventConsumersHealthCheck>("EventConsumers", tags: ["background"]);
     }
 }

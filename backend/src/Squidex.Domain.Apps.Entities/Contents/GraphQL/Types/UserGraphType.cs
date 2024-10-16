@@ -35,7 +35,7 @@ internal sealed class UserGraphType : SharedObjectGraphType<IUser>
         AddField(new FieldType
         {
             Name = "displayName",
-            Resolver = Resolve(x => x.Claims.DisplayName()),
+            Resolver = ResolveOrHide(x => x.Claims.DisplayName()),
             ResolvedType = Scalars.String,
             Description = FieldDescriptions.UserDisplayName
         });
@@ -43,7 +43,7 @@ internal sealed class UserGraphType : SharedObjectGraphType<IUser>
         AddField(new FieldType
         {
             Name = "email",
-            Resolver = Resolve(x => x.Email),
+            Resolver = ResolveOrHide(x => x.Email),
             ResolvedType = Scalars.String,
             Description = FieldDescriptions.UserEmail
         });
@@ -54,5 +54,18 @@ internal sealed class UserGraphType : SharedObjectGraphType<IUser>
     private static IFieldResolver Resolve<T>(Func<IUser, T> resolver)
     {
         return Resolvers.Sync(resolver);
+    }
+
+    private static IFieldResolver ResolveOrHide(Func<IUser, string?> resolver)
+    {
+        return Resolvers.Sync<IUser, string?>((source, _, context) =>
+        {
+            if (context.CanExposePII)
+            {
+                return resolver(source);
+            }
+
+            return "Hidden";
+        });
     }
 }

@@ -43,6 +43,13 @@
 
             grow(element);
         });
+
+        // Init is called once with a context that contains the app name, schema name and authentication information.
+        field.onContextChanged(function (context) {
+            element.innerHTML = JSON.stringify(context, null, 2);
+
+            grow(element);
+        });
     </script>
 </body>
 

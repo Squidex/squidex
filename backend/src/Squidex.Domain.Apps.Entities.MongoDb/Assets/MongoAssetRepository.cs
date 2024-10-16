@@ -49,8 +49,8 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
     protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoAssetEntity>(
                 Index
                     .Descending(x => x.LastModified)
@@ -71,7 +71,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
                 Index
                     .Ascending(x => x.Id)
                     .Ascending(x => x.IsDeleted))
-        }, ct);
+        ], ct);
     }
 
     public async IAsyncEnumerable<Asset> StreamAll(DomainId appId,

@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import { IFrame } from './iframe';
-import { Overlay } from './Overlay';
+import { Overlay } from './overlay';
 import { TokenInfo } from './shared';
 
 export interface OverlayContainerProps {
@@ -165,7 +165,11 @@ function parseTokenInPath(target: HTMLElement, baseUrls: string[]): { token?: To
 }
 
 function parseToken(target: HTMLElement, baseUrls: string[]): TokenInfo | null {
-    const value = target.getAttribute('squidex-token');
+    const value = 
+        target.getAttribute('sq-token') || 
+        target.getAttribute('squidex-token') || 
+        target.getAttribute('data-sq-token') || 
+        target.getAttribute('data-squidex-token');
 
     if (!value && target.nodeName === 'IMG') {
         const src = (target as any)['src'] as string;

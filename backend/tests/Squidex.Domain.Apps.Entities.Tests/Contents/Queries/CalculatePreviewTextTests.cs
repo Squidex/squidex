@@ -30,7 +30,7 @@ public class CalculatePreviewTextTests : GivenContext
     {
         var content = CreateContentWithData();
 
-        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.Equal("Text1Text2", content.ReferenceData!["richText"]!["en"]);
         Assert.Equal("Text3Text4", content.ReferenceData!["richText"]!["de"]);
@@ -41,7 +41,7 @@ public class CalculatePreviewTextTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.Null(content.ReferenceData);
     }

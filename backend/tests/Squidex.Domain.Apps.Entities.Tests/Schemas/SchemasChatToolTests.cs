@@ -31,13 +31,13 @@ public class SchemasChatToolTests : GivenContext
             BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppSchemasRead, App.Name).Id)
         };
 
-        var tool = await sut.GetToolsAsync(chatContext, default).FirstOrDefaultAsync();
+        var tool = await sut.GetToolsAsync(chatContext, CancellationToken).FirstOrDefaultAsync(CancellationToken);
 
         Assert.NotNull(tool);
         Assert.Equal("schemas", tool.Spec.Name);
         Assert.Equal("Schemas", tool.Spec.DisplayName);
 
-        var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), default);
+        var result = await tool.ExecuteAsync(Activator.CreateInstance<ToolContext>(), CancellationToken);
 
         Assert.Contains(Schema.Name, result, StringComparison.Ordinal);
 
@@ -56,7 +56,7 @@ public class SchemasChatToolTests : GivenContext
             BaseContext = FrontendContext
         };
 
-        var tool = await sut.GetToolsAsync(chatContext, default).FirstOrDefaultAsync();
+        var tool = await sut.GetToolsAsync(chatContext, CancellationToken).FirstOrDefaultAsync(CancellationToken);
 
         Assert.Null(tool);
     }

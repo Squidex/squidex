@@ -98,6 +98,13 @@ public sealed class JsonArrayFluidValue : FluidValue
         }
     }
 
+    public override ValueTask WriteToAsync(TextWriter writer, TextEncoder encoder, CultureInfo cultureInfo)
+    {
+        writer.Write(value);
+        return default;
+    }
+
+    [Obsolete("Made obsolete in base library.")]
     public override void WriteTo(TextWriter writer, TextEncoder encoder, CultureInfo cultureInfo)
     {
         writer.Write(value);

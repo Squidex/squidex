@@ -87,7 +87,7 @@
     </div>
 
     <div class="categories" [hidden]="isCollapsed">
-        @for (category of schemaCategory.categories; track category.name) {
+        @for (category of schemaCategory.categories; track category.displayName) {
             <sqx-schema-category
                 (remove)="remove.emit($event)"
                 [schemaCategory]="category"

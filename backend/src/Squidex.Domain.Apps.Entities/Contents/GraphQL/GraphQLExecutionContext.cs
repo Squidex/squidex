@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using GraphQL;
 using GraphQL.DataLoader;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Cache;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure;
+using Squidex.Shared;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
@@ -26,6 +28,8 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
     private readonly int batchSize;
 
     public override Context Context { get; }
+
+    public bool CanExposePII { get; }
 
     public GraphQLExecutionContext(
         IDataLoaderContextAccessor dataLoaders,
@@ -57,6 +61,8 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         {
             batchSize = Math.Max(MinBatchSize, Math.Min(MaxBatchSize, batchSize));
         }
+
+        CanExposePII = Context.UserPermissions.Allows(PermissionIds.ForApp(PermissionIds.AppPii, context.App.Name));
     }
 
     public async ValueTask<IUser?> FindUserAsync(RefToken refToken,

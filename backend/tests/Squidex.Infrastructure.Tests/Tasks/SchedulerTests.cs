@@ -38,7 +38,7 @@ public class SchedulerTests
 
         await limited.CompleteAsync();
 
-        Assert.Equal(Enumerable.Range(1, 10).ToArray(), actuals.OrderBy(x => x).ToArray());
+        Assert.Equal(Enumerable.Range(1, 10).ToArray(), actuals.Order().ToArray());
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public class SchedulerTests
 
         await sut.CompleteAsync();
 
-        Assert.Equal(new[] { 1, 2 }, actuals.OrderBy(x => x).ToArray());
+        Assert.Equal(new[] { 1, 2 }, actuals.Order().ToArray());
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class SchedulerTests
 
         await sut.CompleteAsync();
 
-        Assert.Equal(new[] { 1, 2 }, actuals.OrderBy(x => x).ToArray());
+        Assert.Equal(new[] { 1, 2 }, actuals.Order().ToArray());
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class SchedulerTests
 
         await sut.CompleteAsync();
 
-        Assert.Equal(new[] { 1, 2, 3 }, actuals.OrderBy(x => x).ToArray());
+        Assert.Equal(new[] { 1, 2, 3 }, actuals.Order().ToArray());
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class SchedulerTests
 
         ScheduleAsync(3, sut);
 
-        Assert.Equal(new[] { 1 }, actuals.OrderBy(x => x).ToArray());
+        Assert.Equal(new[] { 1 }, actuals.Order().ToArray());
     }
 
     private void ScheduleAsync(int value, Scheduler target)

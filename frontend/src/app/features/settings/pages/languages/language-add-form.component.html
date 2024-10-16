@@ -7,6 +7,8 @@
                 <sqx-autocomplete
                     displayProperty="iso2Code"
                     formControlName="language"
+                    formId="language"
+                    formName="{{ 'common.language' | sqxTranslate }}"
                     [itemsSource]="addLanguagesSource"
                     valueProperty="iso2Code">
                     <ng-template let-language="$implicit">{{ language.iso2Code }} ({{ language.englishName }})</ng-template>

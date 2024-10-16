@@ -23,14 +23,14 @@ public class UploadModel
     /// <summary>
     /// The alternative URL to download from.
     /// </summary>
-    [FromForm(Name = "fileUrl")]
-    public string? FileUrl { get; set; }
+    [FromForm(Name = "url")]
+    public string? Url { get; set; }
 
     /// <summary>
     /// The file name if the URL is specified.
     /// </summary>
-    [FromForm(Name = "fileName")]
-    public string? FileName { get; set; }
+    [FromForm(Name = "name")]
+    public string? Name { get; set; }
 
     public Task<IAssetFile> ToFileAsync(HttpContext httpContext, App? app)
     {

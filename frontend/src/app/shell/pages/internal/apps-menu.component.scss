@@ -27,9 +27,12 @@ h3 {
 }
 
 .apps-list {
-    max-height: 600px;
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+.dropdown-menu {
+    overflow-y: hidden !important;
 }
 
 .breadcrumb {

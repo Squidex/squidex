@@ -10,17 +10,9 @@ import { compareStrings } from '../utils/array-helper';
 
 @Injectable()
 export class LocalizerService {
-    private shouldLog = false;
-
     constructor(
         private readonly translations: Object,
     ) {
-    }
-
-    public logMissingKeys(shouldLog = true) {
-        this.shouldLog = shouldLog;
-
-        return this;
     }
 
     public getOrKey(key: string | undefined, args?: any): string {
@@ -39,11 +31,6 @@ export class LocalizerService {
         let text = (this.translations as any)[key];
 
         if (!text) {
-            if (this.shouldLog && !key.includes(' ')) {
-                // eslint-disable-next-line no-console
-                console.warn(`Missing i18n key: ${key}`);
-            }
-
             return null;
         }
 

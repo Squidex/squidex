@@ -44,8 +44,8 @@ public sealed class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEve
     protected override Task SetupCollectionAsync(IMongoCollection<HistoryEvent> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<HistoryEvent>(
                 Index
                     .Ascending(x => x.OwnerId)
@@ -57,7 +57,7 @@ public sealed class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEve
                     .Ascending(x => x.OwnerId)
                     .Descending(x => x.Created)
                     .Descending(x => x.Version))
-        }, ct);
+        ], ct);
     }
 
     async Task IDeleter.DeleteAppAsync(App app,

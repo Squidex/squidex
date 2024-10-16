@@ -1,16 +1,17 @@
 <div class="table-items-row table-items-row-expandable language">
     <div class="table-items-row-summary row gx-2 align-items-center">
         <div class="col-2" [class.language-master]="language.isMaster" [class.language-optional]="language.isOptional">
-            {{ language.iso2Code }}
+            <span class="truncate">{{ language.iso2Code }}</span>
         </div>
         <div class="col" [class.language-master]="language.isMaster" [class.language-optional]="language.isOptional">
-            {{ language.englishName }}
+            <span class="truncate">{{ language.englishName }}</span>
         </div>
         <div class="col-auto">
             <div class="float-end">
                 @if (!language.isMaster) {
                     <button
                         class="btn btn-outline-secondary btn-expand me-1"
+                        attr.aria-label="{{ 'common.options' | sqxTranslate }}"
                         [class.expanded]="isEditing"
                         (click)="toggleEditing()"
                         type="button">
@@ -21,6 +22,7 @@
 
                 <button
                     class="btn btn-text-danger"
+                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                     confirmRememberKey="removeLanguage"
                     confirmText="i18n:languages.deleteConfirmText"
                     confirmTitle="i18n:languages.deleteConfirmTitle"
@@ -51,7 +53,9 @@
                 <div class="table-items-row-details-tab">
                     @if (isEditable || fallbackLanguages.length > 0) {
                         <div class="form-group row">
-                            <label class="col-3 col-form-label fallback-label">{{ "common.fallback" | sqxTranslate }}</label>
+                            <label class="col-3 col-form-label fallback-label" for="{{ language.iso2Code }}_fallback">{{
+                                "common.fallback" | sqxTranslate
+                            }}</label>
                             <div class="col-9">
                                 @if (fallbackLanguages.length > 0) {
                                     <div
@@ -92,6 +96,7 @@
                                             <div class="col">
                                                 <select
                                                     class="form-select fallback-select"
+                                                    id="{{ language.iso2Code }}_fallback"
                                                     name="otherLanguage"
                                                     [(ngModel)]="otherLanguage">
                                                     @for (otherLanguage of fallbackLanguagesNew; track language.iso2Code) {

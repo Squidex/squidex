@@ -29,12 +29,12 @@ public sealed class MongoRuleRepository : MongoSnapshotStoreBase<Rule, MongoRule
     protected override Task SetupCollectionAsync(IMongoCollection<MongoRuleEntity> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoRuleEntity>(
                 Index
                     .Ascending(x => x.IndexedAppId))
-        }, ct);
+        ], ct);
     }
 
     Task IDeleter.DeleteAppAsync(App app,

@@ -149,7 +149,7 @@ export function getTableConfig(source: TableSettings) {
         const result: string[] = [];
 
         for (const field of fields) {
-            if (field.name && field.name.indexOf('meta') < 0) {
+            if (field.name && field.name.indexOf('meta.') < 0) {
                 result.push(field.name);
             }
         }

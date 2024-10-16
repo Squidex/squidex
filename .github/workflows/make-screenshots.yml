@@ -12,18 +12,18 @@ jobs:
         uses: actions/checkout@v4.1.7
 
       - name: Prepare - Setup QEMU
-        uses: docker/setup-qemu-action@v3.0.0
+        uses: docker/setup-qemu-action@v3.2.0
 
       - name: Prepare - Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3.3.0
+        uses: docker/setup-buildx-action@v3.6.1
 
       - name: Prepare - Setup Node
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4.0.4
         with:
           node-version: 18
 
       - name: Build - BUILD
-        uses: docker/build-push-action@v5.4.0
+        uses: docker/build-push-action@v6.7.0
         with:
           load: true
           cache-from: type=gha
@@ -31,7 +31,7 @@ jobs:
           tags: squidex-local
 
       - name: Test - Start Compose
-        run: docker-compose up -d
+        run: docker compose up -d
         working-directory: tools/TestSuite
 
       - name: Test - Install Playwright Dependencies
@@ -50,7 +50,7 @@ jobs:
 
       - name: Test - Upload Playwright Artifacts
         if: always()
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: snapshots
           path: tools/e2e/snapshots/

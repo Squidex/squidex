@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { RadioGroupComponent } from '@app/framework';
 
@@ -18,6 +19,9 @@ export default {
         unsorted: {
             control: 'boolean',
         },
+        change: {
+            action:'ngModelChange',
+        },
     },
     render: args => ({
         props: args,
@@ -26,7 +30,7 @@ export default {
                 <sqx-radio-group
                     [disabled]="disabled"
                     [layout]="layout"
-                    (ngModelChange)="ngModelChange"
+                    (ngModelChange)="change($event)"
                     [ngModel]="model"
                     [unsorted]="unsorted"
                     [values]="values">
@@ -37,6 +41,7 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
+                FormsModule,
             ],
         }),
     ],

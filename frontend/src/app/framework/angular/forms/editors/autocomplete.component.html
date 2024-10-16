@@ -1,6 +1,7 @@
 <div class="control-container">
     <input
         class="form-control"
+        [id]="formId"
         #input
         autocapitalize="off"
         autocomplete="off"
@@ -11,6 +12,7 @@
         [class.form-underlined]="inputStyle === 'underlined'"
         [formControl]="queryInput"
         (keydown)="onKeyDown($event)"
+        [name]="formName"
         [placeholder]="placeholder"
         [sqxFocusOnInit]="autoFocus" />
 

@@ -19,7 +19,7 @@ public sealed class DynamicUserContextBuilder : IUserContextBuilder
 
     public ValueTask<IDictionary<string, object?>?> BuildUserContextAsync(HttpContext context, object? payload)
     {
-        var executionContext = (GraphQLExecutionContext)factory(context.RequestServices, new object[] { context.Context() });
+        var executionContext = (GraphQLExecutionContext)factory(context.RequestServices, [context.Context()]);
 
         return new ValueTask<IDictionary<string, object?>?>(executionContext);
     }

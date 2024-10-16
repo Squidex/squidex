@@ -18,6 +18,8 @@ import { ContentEditorComponent } from './editor/content-editor.component';
 import { ContentInspectionComponent } from './inspecting/content-inspection.component';
 import { ContentReferencesComponent } from './references/content-references.component';
 
+type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
+
 @Component({
     standalone: true,
     selector: 'sqx-content-page',
@@ -62,18 +64,22 @@ import { ContentReferencesComponent } from './references/content-references.comp
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     private readonly subscriptions = new Subscriptions();
+    private readonly mutableContext: Record<string, any>;
     private autoSaveKey!: AutoSaveKey;
+    private autoSaveIgnore = false;
 
     public schema!: SchemaDto;
 
     public formContext: any;
 
     public contentTab = this.route.queryParams.pipe(map(x => x['tab'] || 'editor'));
-    public content?: ContentDto | null;
     public contentId = '';
+    public content?: ContentDto | null;
     public contentVersion: Version | null = null;
     public contentForm!: EditContentForm;
     public contentFormCompare: EditContentForm | null = null;
+    public saveOnlyDropdown = new ModalModel();
+    public savePublishDropdown = new ModalModel();
 
     public dropdown = new ModalModel();
 
@@ -103,7 +109,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     ) {
         const role = appsState.snapshot.selectedApp?.roleName;
 
-        this.formContext = {
+        this.mutableContext = {
             apiUrl: apiUrl.buildUrl('api'),
             appId: contentsState.appId,
             appName: contentsState.appName,
@@ -158,10 +164,10 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
                     this.schema = schema;
 
                     const languageKey = this.localStore.get(this.languageKey());
-                    const language = this.languages.find(x => x.iso2Code === languageKey);
+                    const languageItem = this.languages.find(x => x.iso2Code === languageKey);
 
-                    if (language) {
-                        this.language = language;
+                    if (languageItem) {
+                        this.language = languageItem;
                     }
 
                     this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, this.formContext);
@@ -172,12 +178,9 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
                 .subscribe(content => {
                     const isNewContent = isOtherContent(content, this.content);
 
-                    this.formContext['languages'] = this.languages;
-                    this.formContext['schema'] = this.schema;
-                    this.formContext['initialContent'] = content;
-                    this.contentForm.setContext(this.formContext);
-
                     this.content = content;
+                    this.updateContext();
+                    this.contentForm.setContext(this.formContext);
 
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
@@ -221,6 +224,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
                 }));
     }
 
+    private updateContext() {
+        this.mutableContext['initialContent'] = this.content;
+        this.mutableContext['language'] = this.language;
+        this.mutableContext['languages'] = this.languages;
+        this.mutableContext['schema'] = this.schema;
+        this.formContext = { ...this.mutableContext };
+    }
+
     public canDeactivate(): Observable<boolean> {
         return this.checkPendingChangesBeforeClose().pipe(
             tap(confirmed => {
@@ -231,52 +242,67 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
         );
     }
 
-    public saveAndPublish() {
-        this.saveContent(true);
+    public saveAndPublish(navigationMode: SaveNavigationMode) {
+        this.saveContent(true, navigationMode);
     }
 
-    public save() {
-        this.saveContent(false);
+    public saveAsDraft(navigationMode: SaveNavigationMode) {
+        this.saveContent(false, navigationMode);
     }
 
-    private saveContent(publish: boolean) {
+    private saveContent(publish: boolean, navigationMode: SaveNavigationMode) {
         const value = this.contentForm.submit();
 
-        if (value) {
-            if (this.content) {
-                if (!this.content.canUpdate) {
-                    return;
-                }
-
-                this.contentsState.update(this.content, value)
-                    .subscribe({
-                        next: () => {
-                            this.contentForm.submitCompleted({ noReset: true });
-                        },
-                        error: error => {
-                            this.contentForm.submitFailed(error);
-                        },
-                    });
-            } else {
-                if (!this.canCreate(publish)) {
-                    return;
-                }
-
-                this.contentsState.create(value, publish, this.contentId)
-                    .subscribe({
-                        next: content => {
-                            this.contentForm.submitCompleted({ noReset: true });
-                            this.contentForm.load(content.data, true);
-
-                            this.router.navigate([content.id, 'history'], { relativeTo: this.route.parent! });
-                        },
-                        error: error => {
-                            this.contentForm.submitFailed(error);
-                        },
-                    });
-            }
-        } else {
+        if (!value) {
             this.contentForm.submitFailed('i18n:contents.contentNotValid', false);
+            return;
+        }
+
+        if (this.content) {
+            if (!this.content.canUpdate) {
+                return;
+            }
+
+            this.contentsState.update(this.content, value)
+                .subscribe({
+                    next: () => {
+                        this.contentForm.submitCompleted({ noReset: true });
+                    },
+                    error: error => {
+                        this.contentForm.submitFailed(error);
+                    },
+                });
+        } else {
+            if (!this.canCreate(publish)) {
+                return;
+            }
+
+            this.contentsState.create(value, publish, this.contentId)
+                .subscribe({
+                    next: content => {
+                        switch (navigationMode) {
+                            case 'Add':
+                                this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, this.formContext);
+                                break;
+
+                            case 'Edit':
+                                this.contentForm.submitCompleted({ noReset: true });
+                                this.contentForm.load(content.data, true);
+
+                                this.router.navigate([content.id, 'history'], { relativeTo: this.route.parent! });
+                                break;
+
+                            case 'Close':
+                                this.autoSaveIgnore = true;
+
+                                this.router.navigate(['./'], { relativeTo: this.route.parent! });
+                                break;
+                        }
+                    },
+                    error: error => {
+                        this.contentForm.submitFailed(error);
+                    },
+                });
         }
     }
 
@@ -289,7 +315,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     }
 
     public back() {
-        if (this.previousUrl.pathStartsWith(`/app/${this.contentsState.appName}/content/${this.schema.name}`)) {
+        if (this.previousUrl.isPath(`/app/${this.contentsState.appName}/content/${this.schema.name}`)) {
             this.location.back();
         } else {
             this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });
@@ -308,8 +334,9 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
 
     public changeLanguage(language: AppLanguageDto) {
         this.language = language;
-
         this.localStore.set(this.languageKey(), language.iso2Code);
+
+        this.updateContext();
     }
 
     public checkPendingChangesBeforePreview() {
@@ -325,7 +352,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     }
 
     private checkPendingChanges(text: string) {
-        if (this.content && !this.content.canUpdate) {
+        if ((this.content && !this.content.canUpdate) || this.autoSaveIgnore) {
             return of(true);
         }
 

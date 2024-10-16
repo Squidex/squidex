@@ -6,9 +6,8 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, Input } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { CheckboxGroupComponent } from '@app/shared';
-import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared/internal';
+import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { AppsState, CheckboxGroupComponent, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR: any = {
@@ -37,7 +36,7 @@ const NO_EMIT = { emitEvent: false };
         ReactiveFormsModule,
     ],
 })
-export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
+export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string> | null | undefined> {
     private readonly subscriptions = new Subscriptions();
     private readonly itemCount: number = inject(UIOptions).value.referencesDropdownItemCount;
     private contentItems: ReadonlyArray<ContentDto> | null = null;
@@ -53,7 +52,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         this.setDisabledState(value === true);
     }
 
-    public control = new UntypedFormControl([]);
+    public control = new FormControl<ReadonlyArray<string> | null | undefined>([]);
 
     public get isValid() {
         return !!this.schemaId && !!this.language;
@@ -68,7 +67,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
 
         this.subscriptions.add(
             this.control.valueChanges
-                .subscribe((value: string[]) => {
+                .subscribe(value => {
                     if (value && value.length > 0) {
                         this.callTouched();
                         this.callChange(value);
@@ -125,7 +124,6 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
         this.onDisabled(!success || this.snapshot.isDisabled);
 
         let converter: ReferencesTagsConverter;
-
         if (success) {
             converter = new ReferencesTagsConverter(this.language, this.contentItems!, this.localizer);
         } else {

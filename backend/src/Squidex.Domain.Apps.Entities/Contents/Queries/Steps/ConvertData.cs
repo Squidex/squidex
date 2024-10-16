@@ -16,8 +16,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Tasks;
 
-#pragma warning disable MA0073 // Avoid comparison with bool constant
-
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
 public sealed class ConvertData : IContentEnricherStep
@@ -133,7 +131,7 @@ public sealed class ConvertData : IContentEnricherStep
 
         converter.Add(new ResolveFromPreviousPartitioning(context.App.Languages));
 
-        if (!context.IsFrontendClient)
+        if (!context.IsFrontendClient && !context.NoDefaults())
         {
             converter.Add(new AddDefaultValues(context.App.PartitionResolver())
             {

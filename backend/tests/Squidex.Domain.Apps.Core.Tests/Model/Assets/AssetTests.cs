@@ -144,6 +144,23 @@ public class AssetTests
     }
 
     [Fact]
+    public void Should_annotate_with_multiple_properties()
+    {
+        var newSlug = "my-file.png";
+        var newFile = "My File";
+
+        var asset_1 = asset_0.Annotate(fileName: newFile, slug: newSlug);
+        var asset_2 = asset_1.Annotate(fileName: newFile, slug: newSlug);
+
+        Assert.NotSame(asset_0, asset_1);
+        Assert.Equal(newSlug, asset_1.Slug);
+        Assert.Equal(newSlug, asset_2.Slug);
+        Assert.Equal(newFile, asset_1.FileName);
+        Assert.Equal(newFile, asset_2.FileName);
+        Assert.Same(asset_1, asset_2);
+    }
+
+    [Fact]
     public void Should_deserialize_state()
     {
         var json = File.ReadAllText("Model/Assets/Asset.json");

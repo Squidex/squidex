@@ -27,6 +27,11 @@ $color-input-disabled: #eef1f4;
     padding: .5rem;
 }
 
+.items-container {
+    display: flex;
+    flex-direction: column;
+}
+
 .control-dropdown {
     max-height: none;
     max-width: 40rem;
@@ -37,6 +42,7 @@ $color-input-disabled: #eef1f4;
     max-height: 15rem;
     overflow-x: hidden;
     overflow-y: auto;
+    padding-bottom: .5rem;
 }
 
 .selection {
@@ -65,4 +71,11 @@ $color-input-disabled: #eef1f4;
 
 sqx-loader {
     margin-top: .25rem;
+}
+
+sqx-dropdown-menu {
+    display: flex !important;
+    flex-direction: column;
+    flex-grow: 0;
+    padding-bottom: 0;
 }

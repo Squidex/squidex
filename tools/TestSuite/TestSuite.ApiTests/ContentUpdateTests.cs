@@ -941,7 +941,7 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
     [InlineData(ContentStrategies.EnrichDefaults.Bulk)]
     [InlineData(ContentStrategies.EnrichDefaults.BulkWithSchema)]
     [InlineData(ContentStrategies.EnrichDefaults.BulkShared)]
-    public async Task Should_enrich_defaults(ContentStrategies.EnrichDefaults strategy)
+    public async Task Should_enrich_default_fields(ContentStrategies.EnrichDefaults strategy)
     {
         var schemaName = $"schema-{Guid.NewGuid()}";
 
@@ -949,14 +949,6 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         var schemaRequest = new CreateSchemaDto
         {
             Name = schemaName,
-            Fields =
-            [
-                new UpsertSchemaFieldDto
-                {
-                    Name = TestEntityData.NumberField,
-                    Properties = new NumberFieldPropertiesDto()
-                },
-            ],
             IsPublished = true
         };
 
@@ -968,16 +960,17 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
         // STEP 1: Create a new item.
         var content_0 = await contents.CreateAsync([], ContentCreateOptions.AsPublish);
 
-        Assert.Null(content_0.Data.GetValueOrDefault(TestEntityData.StringField));
+        Assert.Null(content_0.Data.GetValueOrDefault("fieldDefault"));
 
 
-        // STEP 2: Add required field.
+        // STEP 2: Add new fields.
         var fieldRequest = new AddFieldDto
         {
-            Name = TestEntityData.StringField,
+            Name = "fieldDefault",
             Properties = new StringFieldPropertiesDto
             {
-                DefaultValue = "Hello Squidex"
+                DefaultValue = "Hello Squidex",
+                IsRequired = false
             }
         };
 
@@ -985,13 +978,143 @@ public class ContentUpdateTests : IClassFixture<ContentFixture>
 
 
         // STEP 3: Create required field.
-        await _.Client.EnrichDefaultsAsync(content_0, content_0.Data, strategy);
+        await _.Client.EnrichDefaultsAsync(content_0, content_0.Data, strategy, false);
 
 
         // STEP 4: Get content.
-        var content_1 = await contents.GetAsync(content_0.Id);
+        var context = QueryContext.Default.WithHeaderHandler(request =>
+        {
+            request.Headers.TryAddWithoutValidation("X-NoDefaults", "1");
+        });
 
-        Assert.Equal("Hello Squidex", content_1.Data[TestEntityData.StringField]!["iv"]!.ToString());
+        var content_1 = await contents.GetAsync(content_0.Id, context);
+
+        Assert.Equal("Hello Squidex", content_1.Data["fieldDefault"]!["iv"]!.ToString());
+    }
+
+    [Theory]
+    [InlineData(ContentStrategies.EnrichDefaults.Normal)]
+    [InlineData(ContentStrategies.EnrichDefaults.Bulk)]
+    [InlineData(ContentStrategies.EnrichDefaults.BulkWithSchema)]
+    [InlineData(ContentStrategies.EnrichDefaults.BulkShared)]
+    public async Task Should_enrich_non_required_default_fields(ContentStrategies.EnrichDefaults strategy)
+    {
+        var schemaName = $"schema-{Guid.NewGuid()}";
+
+        // STEP 0: Create initial schema.
+        var schemaRequest = new CreateSchemaDto
+        {
+            Name = schemaName,
+            IsPublished = true
+        };
+
+        await _.Client.Schemas.PostSchemaAsync(schemaRequest);
+
+        var contents = _.Client.DynamicContents(schemaName);
+
+
+        // STEP 1: Create a new item.
+        var content_0 = await contents.CreateAsync([], ContentCreateOptions.AsPublish);
+
+        Assert.Null(content_0.Data.GetValueOrDefault("fieldDefault"));
+        Assert.Null(content_0.Data.GetValueOrDefault("fieldRequired"));
+
+
+        // STEP 2: Add new fields.
+        var fieldRequest1 = new AddFieldDto
+        {
+            Name = "fieldDefault",
+            Properties = new StringFieldPropertiesDto
+            {
+                DefaultValue = "Hello Squidex",
+                IsRequired = false
+            }
+        };
+
+        var fieldRequest2 = new AddFieldDto
+        {
+            Name = "fieldRequired",
+            Properties = new StringFieldPropertiesDto
+            {
+                DefaultValue = "Hello Required",
+                IsRequired = true
+            }
+        };
+
+        await _.Client.Schemas.PostFieldAsync(schemaName, fieldRequest1);
+        await _.Client.Schemas.PostFieldAsync(schemaName, fieldRequest2);
+
+
+        // STEP 3: Create required field.
+        await _.Client.EnrichDefaultsAsync(content_0, content_0.Data, strategy, false);
+
+
+        // STEP 4: Get content.
+        var context = QueryContext.Default.WithHeaderHandler(request =>
+        {
+            request.Headers.TryAddWithoutValidation("X-NoDefaults", "1");
+        });
+
+        var content_1 = await contents.GetAsync(content_0.Id, context);
+
+        Assert.Equal("Hello Squidex", content_1.Data["fieldDefault"]!["iv"]!.ToString());
+        Assert.Null(content_0.Data.GetValueOrDefault("fieldRequired"));
+    }
+
+    [Theory]
+    [InlineData(ContentStrategies.EnrichDefaults.Normal)]
+    [InlineData(ContentStrategies.EnrichDefaults.Bulk)]
+    [InlineData(ContentStrategies.EnrichDefaults.BulkWithSchema)]
+    [InlineData(ContentStrategies.EnrichDefaults.BulkShared)]
+    public async Task Should_enrich_required_default_field_if_flag_is_true(ContentStrategies.EnrichDefaults strategy)
+    {
+        var schemaName = $"schema-{Guid.NewGuid()}";
+
+        // STEP 0: Create initial schema.
+        var schemaRequest = new CreateSchemaDto
+        {
+            Name = schemaName,
+            IsPublished = true
+        };
+
+        await _.Client.Schemas.PostSchemaAsync(schemaRequest);
+
+        var contents = _.Client.DynamicContents(schemaName);
+
+
+        // STEP 1: Create a new item.
+        var content_0 = await contents.CreateAsync([], ContentCreateOptions.AsPublish);
+
+        Assert.Null(content_0.Data.GetValueOrDefault("fieldDefault"));
+        Assert.Null(content_0.Data.GetValueOrDefault("fieldRequired"));
+
+
+        // STEP 2: Add new field.
+        var fieldRequest = new AddFieldDto
+        {
+            Name = "fieldRequired",
+            Properties = new StringFieldPropertiesDto
+            {
+                DefaultValue = "Hello Required",
+                IsRequired = true
+            }
+        };
+        await _.Client.Schemas.PostFieldAsync(schemaName, fieldRequest);
+
+
+        // STEP 3: Create required field.
+        await _.Client.EnrichDefaultsAsync(content_0, content_0.Data, strategy, true);
+
+
+        // STEP 4: Get content.
+        var context = QueryContext.Default.WithHeaderHandler(request =>
+        {
+            request.Headers.TryAddWithoutValidation("X-NoDefaults", "1");
+        });
+
+        var content_1 = await contents.GetAsync(content_0.Id, context);
+
+        Assert.Equal("Hello Required", content_1.Data["fieldRequired"]!["iv"]!.ToString());
     }
 
     [Fact]

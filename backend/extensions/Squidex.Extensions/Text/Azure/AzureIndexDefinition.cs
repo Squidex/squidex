@@ -25,7 +25,7 @@ public static class AzureIndexDefinition
                 .GetProperties(BindingFlags.Public | BindingFlags.Static)
                 .Select(x => x.GetValue(null)!)
                 .Select(x => x.ToString()!)
-                .OrderBy(x => x)
+                .Order()
                 .ToList();
 
         var addedLanguage = new HashSet<string>();

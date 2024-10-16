@@ -24,7 +24,7 @@ public class IPAddressComparerTests
             IPAddress.Parse("127.0.0.200")
         };
 
-        var sorted = source.OrderBy(x => x, IPAddressComparer.Instance);
+        var sorted = source.Order(IPAddressComparer.Instance);
 
         var expected = new[]
         {

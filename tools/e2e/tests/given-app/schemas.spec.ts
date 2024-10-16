@@ -5,84 +5,265 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Page } from '@playwright/test';
-import { escapeRegex, getRandomId } from '../utils';
+import { SchemaPage, SchemasPage } from '../pages';
+import { getRandomId } from '../utils';
 import { expect, test } from './_fixture';
 
-test.beforeEach(async ({ page, appName }) => {
-    await page.goto(`/app/${appName}/schemas`);
+test.beforeEach(async ({ appName, schemasPage }) => {
+    await schemasPage.goto(appName);
 });
 
-test('create schema', async ({ page }) => {
-    const schemaName = await createRandomSchema(page);
-    const schemaLink = page.locator('a.nav-link', { hasText: escapeRegex(schemaName) });
+test('has header', async ({ page }) => {
+    const header = page.getByRole('heading', { name: /Schemas/ });
 
-    await expect(schemaLink).toBeVisible();
+    await expect(header).toBeVisible();
 });
 
-test('delete schema', async ({ dropdown, page }) => {
-    const schemaName = await createRandomSchema(page);
-    const schemaLink = page.locator('a.nav-link', { hasText: escapeRegex(schemaName) });
+test('create schema', async ({ schemasPage }) => {
+    const schemaName = await createRandomSchema(schemasPage);
+    const schemaLink = await schemasPage.getSchemaLink(schemaName);
 
-    await page.getByLabel('Options').click();
+    await expect(schemaLink.root).toBeVisible();
+});
+
+test('delete schema', async ({ schemasPage, schemaPage }) => {
+    const schemaName = await createRandomSchema(schemasPage);
+    const schemaLink = await schemasPage.getSchemaLink(schemaName);
+
+    const dropdown = await schemaPage.openOptionsDropdown();
     await dropdown.delete();
 
-    await expect(schemaLink).not.toBeVisible();
+    await expect(schemaLink.root).not.toBeVisible();
 });
 
-test('publish schema', async ({ page }) => {
-    await createRandomSchema(page);
+test('publish schema', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
 
-    await page.getByRole('button', { name: 'Published', exact: true }).click();
-
-    await expect(page.getByRole('button', { name: 'Published', exact: true })).toBeDisabled();
+    await schemaPage.publish();
 });
 
-test('add field', async ({ page }) => {
-    await createRandomSchema(page);
+test('unpublish schema', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
 
-    const fieldName = await createRandomField(page);
-    const fieldRow = page.getByText(fieldName);
-
-    await expect(fieldRow).toBeVisible();
+    await schemaPage.publish();
+    await schemaPage.unpublish();
 });
 
-test('delete field', async ({ dropdown, page }) => {
-    await createRandomSchema(page);
+test('add field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
 
-    const fieldName = await createRandomField(page);
-    const fieldRow = page.locator('div.table-items-row-summary', { hasText: escapeRegex(fieldName) });
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
 
-    await fieldRow.getByLabel('Options').click();
-    await dropdown.delete();
-
-    await expect(fieldRow).not.toBeVisible();
+    await expect(fieldRow.root).toBeVisible();
 });
 
-async function createRandomField(page: Page) {
+test('add field and edit', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
     const fieldName = `field-${getRandomId()}`;
+    const fieldLabel = `field-${getRandomId()}`;
 
-    await page.locator('button').filter({ hasText: /^Add Field$/ }).click();
+    const fieldDialog = await schemaPage.openFieldWizard();
+    await fieldDialog.enterName(fieldName);
+    await fieldDialog.createAndEdit();
 
-    // Define field name.
-    await page.getByPlaceholder('Enter field name').fill(fieldName);
+    await fieldDialog.enterLabel(fieldLabel);
+    await fieldDialog.saveAndClose();
 
-    // Save field.
-    await page.getByRole('button', { name: 'Create and close' }).click();
+    const fieldRow = await schemaPage.getFieldRow(fieldLabel);
 
-    return fieldName;
+    await expect(fieldRow.root).toBeVisible();
+});
+
+test('add field and add another', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName1 = `field-${getRandomId()}`;
+    const fieldName2 = `field-${getRandomId()}`;
+
+    const fieldDialog = await schemaPage.openFieldWizard();
+    await fieldDialog.enterName(fieldName1);
+    await fieldDialog.createAndAdd();
+
+    await fieldDialog.enterName(fieldName2);
+    await fieldDialog.createAndAdd();
+
+    const fieldRow1 = await schemaPage.getFieldRow(fieldName1);
+    const fieldRow2 = await schemaPage.getFieldRow(fieldName2);
+
+    await expect(fieldRow1.root).toBeVisible();
+    await expect(fieldRow2.root).toBeVisible();
+});
+
+test('add field to array', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const rootFieldName = `field-${getRandomId()}`;
+
+    const rootDialog = await schemaPage.openFieldWizard();
+    await rootDialog.enterName(rootFieldName);
+    await rootDialog.enterType('Array');
+    await rootDialog.createAndClose();
+
+    const nestedFieldName = `field-${getRandomId()}`;
+
+    const nestedDialog = await schemaPage.openNestedFieldWizard();
+    await nestedDialog.enterName(nestedFieldName);
+    await nestedDialog.createAndClose();
+
+    const fieldRow = await schemaPage.getFieldRow(nestedFieldName);
+
+    await expect(fieldRow.root).toBeVisible();
+});
+
+test('add field to array and ed', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema(schemasPage);
+
+    const rootFieldName = `field-${getRandomId()}`;
+
+    const rootDialog = await schemaPage.openFieldWizard();
+    await rootDialog.enterName(rootFieldName);
+    await rootDialog.enterType('Array');
+    await rootDialog.createAndClose();
+
+    const nestedFieldName = `field-${getRandomId()}`;
+    const nestedFieldLabel = `field-${getRandomId()}`;
+
+    const nestedDialog = await schemaPage.openNestedFieldWizard();
+    await nestedDialog.enterName(nestedFieldName);
+    await nestedDialog.createAndEdit();
+
+    await nestedDialog.enterLabel(nestedFieldLabel);
+    await nestedDialog.saveAndClose();
+
+    const fieldRow = await schemaPage.getFieldRow(nestedFieldLabel);
+
+    await expect(fieldRow.root).toBeVisible();
+});
+
+test('add field to array and another', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema(schemasPage);
+
+    const rootFieldName = `field-${getRandomId()}`;
+
+    const rootDialog = await schemaPage.openFieldWizard();
+    await rootDialog.enterName(rootFieldName);
+    await rootDialog.enterType('Array');
+    await rootDialog.createAndClose();
+
+    const nestedFieldName1 = `field-${getRandomId()}`;
+    const nestedFieldName2 = `field-${getRandomId()}`;
+
+    const nestedDialog = await schemaPage.openNestedFieldWizard();
+    await nestedDialog.enterName(nestedFieldName1);
+    await nestedDialog.createAndAdd();
+
+    await nestedDialog.enterName(nestedFieldName2);
+    await nestedDialog.createAndClose();
+
+    const fieldRow1 = await schemaPage.getFieldRow(nestedFieldName1);
+    const fieldRow2 = await schemaPage.getFieldRow(nestedFieldName2);
+
+    await expect(fieldRow1.root).toBeVisible();
+    await expect(fieldRow2.root).toBeVisible();
+});
+
+test('delete field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema(schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown = await fieldRow.openOptionsDropdown();
+    await dropdown.delete();
+
+    await expect(fieldRow.root).not.toBeVisible();
+});
+
+test('disable field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown = await fieldRow.openOptionsDropdown();
+    await dropdown.action('Disable in UI');
+
+    await expect(fieldRow.root.getByText('Disabled')).toBeVisible();
+});
+
+test('enable field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown1 = await fieldRow.openOptionsDropdown();
+    await dropdown1.action('Disable in UI');
+
+    const dropdown2 = await fieldRow.openOptionsDropdown();
+    await dropdown2.action('Enable in UI');
+
+    await expect(fieldRow.root.getByText('Enabled')).toBeVisible();
+});
+
+test('hide field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown = await fieldRow.openOptionsDropdown();
+    await dropdown.action('Hide in API');
+
+    await expect(fieldRow.root.getByText(fieldName)).toHaveCSS('color', 'rgb(166, 170, 179)');
+});
+
+test('show field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown1 = await fieldRow.openOptionsDropdown();
+    await dropdown1.action('Hide in API');
+
+    const dropdown2 = await fieldRow.openOptionsDropdown();
+    await dropdown2.action('Show in API');
+
+    await expect(fieldRow.root.getByText(fieldName)).not.toHaveCSS('color', 'rgb(166, 170, 179)');
+});
+
+test('lock field', async ({ schemasPage, schemaPage }) => {
+    await createRandomSchema( schemasPage);
+
+    const fieldName = await createRandomField(schemaPage);
+    const fieldRow = await schemaPage.getFieldRow(fieldName);
+
+    const dropdown = await fieldRow.openOptionsDropdown();
+    await dropdown.actionAndConfirm('Lock and prevent changes');
+
+    await expect(fieldRow.root.getByText('Locked')).toBeVisible();
+});
+
+async function createRandomField(schemaPage: SchemaPage) {
+    const name = `field-${getRandomId()}`;
+
+    const fieldDialog = await schemaPage.openFieldWizard();
+    await fieldDialog.enterName(name);
+    await fieldDialog.enterType('String');
+    await fieldDialog.createAndClose();
+
+    return name;
 }
 
-async function createRandomSchema(page: Page) {
-    const schemaName = `schema-${getRandomId()}`;
+async function createRandomSchema(schemasPage: SchemasPage) {
+    const name = `schema-${getRandomId()}`;
 
-    await page.getByLabel('Create Schema').click();
+    const schemaDialog = await schemasPage.openSchemaDialog();
+    await schemaDialog.enterName(name);
+    await schemaDialog.save();
 
-    // Define schema name.
-    await page.getByLabel('Name (required)').fill(schemaName);
-
-    // Save schema.
-    await page.getByRole('button', { name: 'Create', exact: true }).click();
-
-    return schemaName;
+    return name;
 }

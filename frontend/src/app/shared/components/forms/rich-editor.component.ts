@@ -133,7 +133,6 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
 
     public async ngAfterViewInit() {
         await Promise.all([
-            this.resourceLoader.loadLocalStyle('editor/squidex-editor.css'),
             this.resourceLoader.loadLocalScript('editor/squidex-editor.js'),
         ]);
 

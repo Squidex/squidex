@@ -46,8 +46,8 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
     protected override Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<T>> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(new[]
-        {
+        return collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoTextIndexEntity<T>>(
                 Index
                     .Ascending(x => x.AppId)
@@ -59,7 +59,7 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
                     .Ascending(x => x.SchemaId)
                     .Ascending(x => x.GeoField)
                     .Geo2DSphere(x => x.GeoObject))
-        }, ct);
+        ], ct);
     }
 
     protected override string CollectionName()

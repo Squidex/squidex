@@ -2,7 +2,11 @@
     <div class="d-flex align-items-center justify-content-end">
         @if (paging) {
             <div class="float-end pagination">
-                <select class="form-select form-select-sm" [ngModel]="paging.pageSize" (ngModelChange)="setPageSize($event)">
+                <select
+                    class="form-select form-select-sm"
+                    attr.aria-label="{{ 'common.pageSize' | sqxTranslate }}"
+                    [ngModel]="paging.pageSize"
+                    (ngModelChange)="setPageSize($event)">
                     @for (pageSize of pageSizes; track pageSize) {
                         <option [ngValue]="pageSize">{{ pageSize }}</option>
                     }
@@ -20,10 +24,20 @@
                             {{ "common.pagerInfoNoTotal" | sqxTranslate: translationInfo }}
                         </button>
                     }
-                    <button class="btn btn-sm btn-text-secondary ms-2" (click)="goPrev()" [disabled]="!canGoPrev" type="button">
+                    <button
+                        class="btn btn-sm btn-text-secondary ms-2"
+                        attr.aria-label="{{ 'common.prevPage' | sqxTranslate }}"
+                        (click)="goPrev()"
+                        [disabled]="!canGoPrev"
+                        type="button">
                         <i class="icon-angle-left"></i>
                     </button>
-                    <button class="btn btn-sm btn-text-secondary ms-2" (click)="goNext()" [disabled]="!canGoNext" type="button">
+                    <button
+                        class="btn btn-sm btn-text-secondary ms-2"
+                        attr.aria-label="{{ 'common.nextPage' | sqxTranslate }}"
+                        (click)="goNext()"
+                        [disabled]="!canGoNext"
+                        type="button">
                         <i class="icon-angle-right"></i>
                     </button>
                 </span>

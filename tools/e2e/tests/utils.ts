@@ -7,12 +7,11 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import { TEMPORARY_PATH } from '../playwright.config';
 
 export function getRandomId() {
-    const result = new Date().getTime().toString();
-
-    return result;
+    return uuidv4().replace(/-/g, '');
 }
 
 export function escapeRegex(string: string) {

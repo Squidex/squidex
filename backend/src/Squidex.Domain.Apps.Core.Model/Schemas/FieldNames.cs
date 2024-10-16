@@ -32,7 +32,7 @@ public sealed class FieldNames : ReadonlyList<string>
         "translationStatusAverage"
     ];
 
-    public static readonly new FieldNames Empty = new FieldNames(new List<string>());
+    public static readonly new FieldNames Empty = new FieldNames([]);
 
     private FieldNames()
     {

@@ -28,7 +28,7 @@ entries:
     version: 1.3.0
   squidex7:
   - apiVersion: v2
-    appVersion: 7.0.2
+    appVersion: 7.15.0
     created: "2022-08-10T10:38:40.2995659+02:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
@@ -51,6 +51,6 @@ entries:
     - https://github.com/Squidex/squidex
     type: application
     urls:
-    - squidex7-1.0.1.tgz
-    version: 1.0.1
+    - squidex7-1.0.2.tgz
+    version: 1.0.2
 generated: "2022-08-10T10:38:40.2965702+02:00"

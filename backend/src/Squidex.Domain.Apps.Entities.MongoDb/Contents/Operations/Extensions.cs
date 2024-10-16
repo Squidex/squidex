@@ -129,7 +129,7 @@ public static class Extensions
                         PipelineDefinitionBuilder.For<MongoContentEntity>()
                             .Match(LookupMatch)
                             .Project(
-                                BuildProjection2<MongoContentEntity>(q.Fields)),
+                                BuildProjection<MongoContentEntity>(q.Fields)),
                         x => x.Joined)
                     .Project<IdOnly>(
                         Builders<IdOnly>.Projection.Include(x => x.Joined))
@@ -165,15 +165,15 @@ public static class Extensions
 
     public static IFindFluent<T, T> SelectFields<T>(this IFindFluent<T, T> find, IEnumerable<string>? fields)
     {
-        return find.Project<T>(BuildProjection2<T>(fields));
+        return find.Project<T>(BuildProjection<T>(fields));
     }
 
     public static IAggregateFluent<T> SelectFields<T>(this IAggregateFluent<T> find, IEnumerable<string>? fields)
     {
-        return find.Project<T>(BuildProjection2<T>(fields));
+        return find.Project<T>(BuildProjection<T>(fields));
     }
 
-    public static ProjectionDefinition<T, T> BuildProjection2<T>(IEnumerable<string>? fields)
+    public static ProjectionDefinition<T, T> BuildProjection<T>(IEnumerable<string>? fields)
     {
         var projector = Builders<T>.Projection;
         var projections = new List<ProjectionDefinition<T>>();
@@ -186,30 +186,38 @@ public static class Extensions
 
                 foreach (var field in fields)
                 {
-                    var dataField =
-                        FieldNames.IsDataField(field, out var fieldName) ?
-                        fieldName :
-                        field;
+                    var actualFieldName = field;
+                    // Only add data fields, because we add all meta fields anyway.
+                    if (FieldNames.IsDataField(field, out var dataField))
+                    {
+                        actualFieldName = dataField;
+                    }
 
-                    yield return $"{dataPrefix}.{dataField}";
+                    var fullName = $"{dataPrefix}.{actualFieldName}";
+
+                    if (!MetaFields.ContainsKey(fullName))
+                    {
+                        yield return fullName;
+                    }
                 }
             }
 
             var addedFields = new List<string>();
 
             // Sort the fields to start with prefixes first.
-            var allFields = GetDataFields(fields).Union(MetaFields.Values).OrderBy(x => x);
+            var allFields = GetDataFields(fields).Union(MetaFields.Values).Order();
 
             foreach (var field in allFields)
             {
                 // If there is at least one field that is a prefix of the current field, we cannot add that.
-                if (addedFields.Exists(x => field.StartsWith(x, StringComparison.OrdinalIgnoreCase)))
+                if (addedFields.Exists(x => IsPrefix(field, x)))
                 {
                     continue;
                 }
 
                 projections.Add(projector.Include(field));
 
+                // Track added prefixes.
                 addedFields.Add(field);
             }
         }
@@ -219,5 +227,15 @@ public static class Extensions
         }
 
         return projector.Combine(projections);
+
+        static bool IsPrefix(string field, string prefix)
+        {
+            if (!field.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return field.Length == prefix.Length || field[prefix.Length] == '.';
+        }
     }
 }

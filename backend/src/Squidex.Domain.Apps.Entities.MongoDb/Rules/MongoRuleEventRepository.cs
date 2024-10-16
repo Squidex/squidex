@@ -31,8 +31,8 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
     protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection,
         CancellationToken ct)
     {
-        await collection.Indexes.CreateManyAsync(new[]
-        {
+        await collection.Indexes.CreateManyAsync(
+        [
             new CreateIndexModel<MongoRuleEventEntity>(
                 Index.Ascending(x => x.NextAttempt)),
 
@@ -46,7 +46,7 @@ public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEven
                 {
                     ExpireAfter = TimeSpan.Zero
                 })
-        }, ct);
+        ], ct);
     }
 
     async Task IDeleter.DeleteAppAsync(App app,

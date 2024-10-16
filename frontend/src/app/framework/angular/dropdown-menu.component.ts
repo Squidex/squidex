@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/no-host-metadata-property */
 
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input } from '@angular/core';
 import { fadeAnimation } from './animations';
 
 @Component({
@@ -28,6 +28,10 @@ export class DropdownMenuComponent {
     public get fade() {
         return true;
     }
+
+    @HostBinding('class')
+    @Input()
+    public class?: string;
 
     public get nativeElement() {
         return this.element.nativeElement;

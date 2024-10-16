@@ -13,5 +13,6 @@ public enum ReferencesFieldEditor
     Dropdown,
     Tags,
     Checkboxes,
-    Input
+    Input,
+    Radio
 }

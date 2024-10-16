@@ -145,7 +145,7 @@ public class AssetFoldersTests : IClassFixture<CreatedAppFixture>
         // STEP 3: Query by nested id.
         var folders2 = await _.Client.Assets.GetAssetFoldersAsync(folder1.Id);
 
-        Assert.Equal(new[] { folder2.Id }, folders2.Items.Select(x => x.Id));
+        Assert.Equal([folder2.Id], folders2.Items.Select(x => x.Id));
 
 
         // STEP 3: Query all

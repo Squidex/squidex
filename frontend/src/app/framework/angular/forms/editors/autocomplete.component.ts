@@ -81,6 +81,12 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public allowOpen?: boolean | null = false;
 
     @Input()
+    public formId?: string;
+
+    @Input()
+    public formName?: string;
+
+    @Input()
     public displayProperty = '';
 
     @Input()
