@@ -36,7 +36,7 @@ public sealed class EmailActionHandler : RuleActionHandler<EmailAction, EmailJob
             MessageBody = (await FormatAsync(action.MessageBody, @event))!
         };
 
-        var description = $"Send an email to {action.MessageTo}";
+        var description = $"Send an email to {ruleJob.MessageTo}";
 
         return (description, ruleJob);
     }

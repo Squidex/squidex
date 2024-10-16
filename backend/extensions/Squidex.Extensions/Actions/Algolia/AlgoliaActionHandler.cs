@@ -50,14 +50,15 @@ public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, Algo
         var ruleDescription = string.Empty;
         var contentId = entityEvent.Id.ToString();
         var content = (AlgoliaContent?)null;
+        var indexName = (await FormatAsync(action.IndexName, @event))!;
 
         if (delete)
         {
-            ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
+            ruleDescription = $"Delete entry from Algolia index: {indexName}";
         }
         else
         {
-            ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
+            ruleDescription = $"Add entry to Algolia index: {indexName}";
 
             try
             {
@@ -95,7 +96,7 @@ public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, Algo
             ApiKey = action.ApiKey,
             Content = serializer.Serialize(content, true),
             ContentId = contentId,
-            IndexName = (await FormatAsync(action.IndexName, @event))!
+            IndexName = indexName
         };
 
         return (ruleDescription, ruleJob);

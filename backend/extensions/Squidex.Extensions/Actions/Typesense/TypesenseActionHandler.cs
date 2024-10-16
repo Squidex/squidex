@@ -48,7 +48,6 @@ public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, 
         }
 
         var indexName = await FormatAsync(action.IndexName, @event);
-
         var ruleText = string.Empty;
         var ruleJob = new TypesenseJob
         {
@@ -59,11 +58,11 @@ public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, 
 
         if (delete)
         {
-            ruleText = $"Delete entry index: {action.IndexName}";
+            ruleText = $"Delete entry index: {indexName}";
         }
         else
         {
-            ruleText = $"Upsert to index: {action.IndexName}";
+            ruleText = $"Upsert to index: {indexName}";
 
             TypesenseContent content;
             try
