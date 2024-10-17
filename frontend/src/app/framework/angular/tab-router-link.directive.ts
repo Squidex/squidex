@@ -30,7 +30,7 @@ export class TabRouterlinkDirective {
             relativeTo: this.route,
         });
 
-        if (event.ctrlKey) {
+        if (event.ctrlKey || event.metaKey) {
             const url = this.router.serializeUrl(urlTree);
 
             window.open(url, '_blank');
