@@ -70,11 +70,11 @@ public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearch
 
         if (delete)
         {
-            ruleText = $"Delete entry index: {action.IndexName}";
+            ruleText = $"Delete entry index: {ruleJob.IndexName}";
         }
         else
         {
-            ruleText = $"Upsert to index: {action.IndexName}";
+            ruleText = $"Upsert to index: {ruleJob.IndexName}";
 
             ElasticSearchContent content;
             try
