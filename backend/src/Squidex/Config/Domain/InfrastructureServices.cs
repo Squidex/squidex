@@ -28,6 +28,7 @@ using Squidex.Pipeline.Robots;
 using Squidex.Shared;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
+using Squidex.Web.Scripting;
 
 namespace Squidex.Config.Domain;
 
@@ -69,6 +70,9 @@ public static class InfrastructureServices
             .As<ITagService>();
 
         services.AddSingletonAs<CounterJintExtension>()
+            .As<IJintExtension>().As<IScriptDescriptor>();
+
+        services.AddSingletonAs<HttpRequestJintExtension>()
             .As<IJintExtension>().As<IScriptDescriptor>();
 
         services.AddSingletonAs<DateTimeJintExtension>()
