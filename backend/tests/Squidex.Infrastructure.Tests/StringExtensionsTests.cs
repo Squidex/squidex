@@ -78,6 +78,14 @@ public class StringExtensionsTests
         Assert.Equal("Hello \\\"World\\\"", actual);
     }
 
+    [Fact]
+    public void Should_unescape_json()
+    {
+        var actual = StringExtensions.JsonUnescape("Hello \\\"World\\\"");
+
+        Assert.Equal("Hello \"World\"", actual);
+    }
+
     [Theory]
     [InlineData("", "")]
     [InlineData(" ", "")]

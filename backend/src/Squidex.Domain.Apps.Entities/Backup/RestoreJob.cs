@@ -79,6 +79,9 @@ public sealed class RestoreJob : IJobRunner
 
     public static JobRequest BuildRequest(RefToken actor, Uri url, string? appName)
     {
+        Guard.NotNull(actor);
+        Guard.NotNull(url);
+
         return JobRequest.Create(
             actor,
             TaskName,
@@ -92,9 +95,14 @@ public sealed class RestoreJob : IJobRunner
     public async Task RunAsync(JobRunContext context,
         CancellationToken ct)
     {
-        if (!context.Job.Arguments.TryGetValue(ArgUrl, out var urlValue) || !Uri.TryCreate(urlValue, UriKind.Absolute, out var url))
+        if (!context.Job.Arguments.TryGetValue(ArgUrl, out var urlValue))
         {
-            throw new DomainException("Argument missing.");
+            throw new DomainException($"Argument '{ArgUrl}' missing.");
+        }
+
+        if (!Uri.TryCreate(urlValue, UriKind.Absolute, out var url))
+        {
+            throw new DomainException($"Argument '{ArgUrl}' is not a valid URL.");
         }
 
         var state = new State

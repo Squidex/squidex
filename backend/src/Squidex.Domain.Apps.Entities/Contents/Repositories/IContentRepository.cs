@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Repositories;
 
@@ -44,5 +45,14 @@ public interface IContentRepository
         CancellationToken ct = default);
 
     Task ResetScheduledAsync(DomainId appId, DomainId contentId, SearchScope scope,
+        CancellationToken ct = default);
+
+    Task CreateIndexAsync(DomainId appId, DomainId schemaId, IndexDefinition index,
+        CancellationToken ct = default);
+
+    Task DropIndexAsync(DomainId appId, DomainId schemaId, string name,
+        CancellationToken ct = default);
+
+    Task<List<IndexDefinition>> GetIndexesAsync(DomainId appId, DomainId schemaId,
         CancellationToken ct = default);
 }

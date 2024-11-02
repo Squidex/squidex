@@ -128,7 +128,7 @@ public sealed class AppsController : ApiController
     /// </remarks>
     [HttpPost]
     [Route("apps/")]
-    [ProducesResponseType(typeof(AppDto), 201)]
+    [ProducesResponseType(typeof(AppDto), StatusCodes.Status201Created)]
     [ApiPermission]
     [ApiCosts(0)]
     public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)

@@ -61,7 +61,7 @@ public sealed class AppLanguagesController : ApiController
     /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/languages/")]
-    [ProducesResponseType(typeof(AppLanguagesDto), 201)]
+    [ProducesResponseType(typeof(AppLanguagesDto), StatusCodes.Status201Created)]
     [ApiPermissionOrAnonymous(PermissionIds.AppLanguagesCreate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PostLanguage(string app, [FromBody] AddLanguageDto request)

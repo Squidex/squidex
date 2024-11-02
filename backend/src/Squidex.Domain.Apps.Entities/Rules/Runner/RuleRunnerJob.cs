@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -69,6 +70,9 @@ public sealed class RuleRunnerJob : IJobRunner
 
     public static JobRequest BuildRequest(RefToken actor, App app, DomainId ruleId, bool snapshot)
     {
+        Guard.NotNull(actor);
+        Guard.NotNull(app);
+
         return JobRequest.Create(
             actor,
             TaskName,
@@ -87,16 +91,17 @@ public sealed class RuleRunnerJob : IJobRunner
     {
         if (!context.Job.Arguments.TryGetValue(ArgRuleId, out var ruleId))
         {
-            throw new DomainException("Argument missing.");
+            throw new DomainException($"Argument '{ArgRuleId}' missing.");
         }
 
         var rule = await appProvider.GetRuleAsync(context.OwnerId, DomainId.Create(ruleId), ct)
             ?? throw new DomainObjectNotFoundException(ruleId);
 
-        var fromSnapshot = string.Equals(context.Job.Arguments.GetValueOrDefault(ArgSnapshot), "true", StringComparison.OrdinalIgnoreCase);
+        var fromSnapshotArg = context.Job.Arguments.GetValueOrDefault(ArgSnapshot);
+        var fromSnapshotValue = string.Equals(fromSnapshotArg, "true", StringComparison.OrdinalIgnoreCase);
 
         // Use a readable name to describe the job.
-        SetDescription(context, rule, fromSnapshot);
+        SetDescription(context, rule, fromSnapshotValue);
 
         // Also run disabled rules, because we want to enable rules to be only used with manual trigger.
         var ruleContext = new RuleContext
@@ -107,7 +112,7 @@ public sealed class RuleRunnerJob : IJobRunner
             Rule = rule,
         };
 
-        if (fromSnapshot && ruleService.CanCreateSnapshotEvents(rule))
+        if (fromSnapshotValue && ruleService.CanCreateSnapshotEvents(rule))
         {
             await EnqueueFromSnapshotsAsync(ruleContext, ct);
         }
@@ -166,7 +171,8 @@ public sealed class RuleRunnerJob : IJobRunner
                     throw result.EnrichmentError;
                 }
 
-                log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.Rule?.Id);
+                log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.",
+                    result.Rule?.Id);
             }
         }
     }
@@ -206,7 +212,8 @@ public sealed class RuleRunnerJob : IJobRunner
                         throw result.EnrichmentError;
                     }
 
-                    log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", result.Rule?.Id);
+                    log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.",
+                        result.Rule?.Id);
                 }
             }
         }

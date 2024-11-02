@@ -44,6 +44,8 @@ public sealed class Resources
 
     public bool CanDeleteSchema(string schema) => Can(PermissionIds.AppSchemasDelete, schema);
 
+    public bool CanManageIndexes(string schema) => Can(PermissionIds.AppSchemasIndexes, schema);
+
     public bool CanCreateSchema => Can(PermissionIds.AppSchemasCreate);
 
     public bool CanUpdateSettings => Can(PermissionIds.AppUpdateSettings);
