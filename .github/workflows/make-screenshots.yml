@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v4.2.1
+        uses: actions/checkout@v4.2.2
 
       - name: Prepare - Setup QEMU
         uses: docker/setup-qemu-action@v3.2.0
@@ -18,7 +18,7 @@ jobs:
         uses: docker/setup-buildx-action@v3.7.1
 
       - name: Prepare - Setup Node
-        uses: actions/setup-node@v4.0.4
+        uses: actions/setup-node@v4.1.0
         with:
           node-version: 18
 
