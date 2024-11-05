@@ -218,7 +218,6 @@ public sealed class AccountController : IdentityServerController
         var vm = new LoginVM
         {
             ExternalProviders = externalProviders,
-            IsLogin = HttpContext.Request.Query["signup"] != "true",
             HasPasswordAuth = allowPasswordAuth,
             HasCustomAuth = allowCustomDomains,
             RequestType = requestType,
