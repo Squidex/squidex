@@ -138,12 +138,8 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
     {
         var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
 
-        var app = await appProvider.GetAppAsync(appId);
-
-        if (app == null)
-        {
+        var app = await appProvider.GetAppAsync(appId) ??
             throw new JavaScriptException("App does not exist.");
-        }
 
         return app;
     }
