@@ -19,8 +19,6 @@ public class LoginVM
 
     public string? Password { get; set; }
 
-    public bool IsLogin { get; set; }
-
     public bool HasPasswordAuth { get; set; }
 
     public bool HasCustomAuth { get; set; }

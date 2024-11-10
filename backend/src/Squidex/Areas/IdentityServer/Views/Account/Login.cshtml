@@ -2,36 +2,10 @@
 @model Squidex.Areas.IdentityServer.Controllers.Account.LoginVM
 
 @{
-    var action = Model.IsLogin ? T.Get("common.login") : T.Get("common.signup");
-
-    ViewBag.Title = action;
+    ViewBag.Title = T.Get("common.login");
 }
 
 <div class="login-container">
-    <div class="container">
-        <div class="row text-center">
-            <div class="btn-group profile-headline">
-                @if (Model.IsLogin)
-                {
-                    <a class="btn btn-toggle btn-primary">@T.Get("common.login")</a>
-                }
-                else
-                {
-                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">@T.Get("common.login")</a>
-                }
-
-                @if (!Model.IsLogin)
-                {
-                    <a class="btn btn-toggle btn-primary">@T.Get("common.signup")</a>
-                }
-                else
-                {
-                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" asp-route-signup="true">@T.Get("common.signup")</a>
-                }
-            </div>
-        </div>
-    </div>
-
     <div>
         @if (Model.HasExternalLogin)
         {
@@ -44,7 +18,7 @@
 
                     <div class="form-group mb-2">
                         <button class="btn external-button btn-block btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
-                            <i class="icon-@schema external-icon"></i> @Html.Raw(T.Get("users.login.loginWith", new { action, provider = provider.DisplayName }))
+                            <i class="icon-@schema external-icon"></i> @Html.Raw(T.Get("users.login.loginWith", new { action = T.Get("common.login"), provider = provider.DisplayName }))
                         </button>
                     </div>
                 }
@@ -58,33 +32,26 @@
         @if (Model.HasPasswordAuth)
         {
             <div>
-                @if (Model.IsLogin)
+                @if (Model.RequestType == RequestType.Login)
                 {
-                    @if (Model.RequestType == RequestType.Login)
-                    {
-                        <div asp-validation-summary="ModelOnly" class="form-alert form-alert-error"></div>
-                    }
-
-                    <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
-                        @Html.AntiForgeryToken()
-
-                        <div class="form-group">
-                            <div error-for="Email"></div>
-                            <input asp-for="Email" type="email" class="form-control" placeholder="@T.Get("users.login.emailPlaceholder")" />
-                        </div>
-
-                        <div class="form-group">
-                            <div error-for="Password"></div>
-                            <input asp-for="Password" type="password" class="form-control" placeholder="@T.Get("users.login.passwordPlaceholder")" />
-                        </div>
-
-                        <button type="submit" data-testid="login-button" class="btn btn-block btn-primary">@action</button>
-                    </form>
+                    <div asp-validation-summary="ModelOnly" class="form-alert form-alert-error"></div>
                 }
-                else
-                {
-                    <div class="profile-password-signup text-center">@T.Get("users.login.askAdmin")</div>
-                }
+
+                <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <div error-for="Email"></div>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="@T.Get("users.login.emailPlaceholder")" />
+                    </div>
+
+                    <div class="form-group">
+                        <div error-for="Password"></div>
+                        <input asp-for="Password" type="password" class="form-control" placeholder="@T.Get("users.login.passwordPlaceholder")" />
+                    </div>
+
+                    <button type="submit" data-testid="login-button" class="btn btn-block btn-primary">@T.Get("common.login")</button>
+                </form>
             </div>
         }
 
@@ -92,7 +59,7 @@
             <div class="profile-separator-text">@T.Get("users.login.separator")</div>
         </div>
 
-        @if (Model.HasCustomAuth && Model.IsLogin)
+        @if (Model.HasCustomAuth)
         {
             <div>
                 @if (Model.RequestType == RequestType.LoginCustom)
@@ -112,30 +79,9 @@
                         <input asp-for="DynamicEmail" type="email" class="form-control" placeholder="@T.Get("users.login.emailBusinessPlaceholder")" />
                     </div>
 
-                    <button type="submit" data-testid="dynamic-button" class="btn btn-block btn-primary">@action</button>
+                    <button type="submit" data-testid="dynamic-button" class="btn btn-block btn-primary">@T.Get("common.login")</button>
                 </form>
             </div>
-        }
-
-        @if (Model.IsLogin)
-        {
-            <p class="profile-footer">
-                @T.Get("users.login.noAccountSignupQuestion")
-
-                <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">
-                    @T.Get("users.login.noAccountSignupAction")
-                </a>
-            </p>
-        }
-        else
-        {
-            <p class="profile-footer">
-                @T.Get("users.login.noAccountLoginQuestion")
-
-                <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">
-                    @T.Get("users.login.noAccountLoginAction")
-                </a>
-            </p>
         }
     </div>
 </div>
