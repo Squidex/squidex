@@ -18,6 +18,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
+using System.Diagnostics;
 
 namespace Squidex.Areas.Api.Controllers.Contents;
 
@@ -56,6 +57,10 @@ public sealed class ContentsController : ApiController
     [OpenApiIgnore]
     public IActionResult StreamContents(string app, string schema, [FromQuery] int skip = 0)
     {
+        if (schema.Equals("de-studyprogram-details"))
+        {
+            Debugger.Break();
+        }
         var contents = contentQuery.StreamAsync(Context, schema, skip, HttpContext.RequestAborted);
 
         return new JsonStreamResult<EnrichedContent>(contents);

@@ -57,7 +57,7 @@ public sealed class ContentsJintExtension : IJintExtension, IScriptDescriptor
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule((Func<IScheduler, CancellationToken, Task>)(async (scheduler, ct) =>
+        context.Schedule(async (scheduler, ct) =>
         {
             var app = await GetAppAsync(appId);
 
@@ -92,7 +92,7 @@ public sealed class ContentsJintExtension : IJintExtension, IScriptDescriptor
             var contents = await contentQuery.QueryAsync(requestContext, schema, q, ct);
 
             scheduler.Run(callback, JsValue.FromObject(context.Engine, contents.ToArray()));
-        }));
+        });
     }
 
     private async Task<App> GetAppAsync(DomainId appId)
