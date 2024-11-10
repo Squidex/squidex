@@ -5,11 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Net.Http.Json;
 using System.Text;
 using Jint;
 using Jint.Native;
 using Jint.Native.Json;
+using Jint.Native.Object;
 using Jint.Runtime;
+using Org.BouncyCastle.Utilities.IO;
 using Squidex.Domain.Apps.Core.Properties;
 using Squidex.Infrastructure;
 
@@ -18,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions;
 public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
 {
     private delegate void HttpJsonDelegate(string url, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
-    private delegate void HttpJsonWithBodyDelegate(string url, JsValue post, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
+    private delegate void HttpJsonWithBodyDelegate(string url, JsValue body, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
     private readonly IHttpClientFactory httpClientFactory;
 
     public HttpJintExtension(IHttpClientFactory httpClientFactory)
@@ -117,30 +120,39 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
     {
         var request = new HttpRequestMessage(method, uri);
 
-        if (body != null)
-        {
-            var jsonWriter = new JsonSerializer(context.Engine);
-            var jsonContent = jsonWriter.Serialize(body, JsValue.Undefined, JsValue.Undefined)?.ToString();
+        var contentType = string.Empty;
 
-            if (jsonContent != null)
+        foreach (var (name, value) in GetNonEmptyProperties(headers))
+        {
+            request.Headers.TryAddWithoutValidation(name, value ?? string.Empty);
+
+            if (string.Equals(name, "Content-Type", StringComparison.OrdinalIgnoreCase))
             {
-                request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                contentType = value ?? string.Empty;
             }
         }
 
-        if (headers != null && headers.Type == Types.Object)
+        if (body != null)
         {
-            var obj = headers.AsObject();
-
-            foreach (var (key, property) in obj.GetOwnProperties())
+            if (string.Equals(contentType, "application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
             {
-                var value = TypeConverter.ToString(property.Value);
+                var formValues = new List<KeyValuePair<string, string>>();
 
-                var keyString = key.AsString();
-
-                if (!string.IsNullOrWhiteSpace(keyString))
+                foreach (var (name, value) in GetNonEmptyProperties(body))
                 {
-                    request.Headers.TryAddWithoutValidation(keyString, value ?? string.Empty);
+                    formValues.Add(new (name, value));
+                }
+
+                request.Content = new FormUrlEncodedContent(formValues);
+            }
+            else
+            {
+                var jsonWriter = new JsonSerializer(context.Engine);
+                var jsonContent = jsonWriter.Serialize(body, JsValue.Undefined, JsValue.Undefined)?.ToString();
+
+                if (jsonContent != null)
+                {
+                    request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 }
             }
         }
@@ -184,5 +196,23 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
 
         describe(JsonType.Function, "deleteJSON(url, callback, headers?, ignoreError?)",
             Resources.ScriptingDeleteJson);
+    }
+
+    private static IEnumerable<(string, string)> GetNonEmptyProperties(JsValue? source)
+    {
+        if (source?.IsObject() != true || source.AsObject() is not ObjectInstance obj)
+        {
+            yield break;
+        }
+
+        foreach (var (key, property) in obj.GetOwnProperties())
+        {
+            if (key.ToString() is string name && !string.IsNullOrWhiteSpace(name))
+            {
+                var value = TypeConverter.ToString(property.Value) ?? string.Empty;
+
+                yield return (name, value);
+            }
+        }
     }
 }
