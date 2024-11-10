@@ -19,12 +19,12 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class ReferencesJintExtensionTests : GivenContext, IClassFixture<TranslationsFixture>
+public class ContentsJintExtensionTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
     private readonly JintScriptEngine sut;
 
-    public ReferencesJintExtensionTests()
+    public ContentsJintExtensionTests()
     {
         var serviceProvider =
             new ServiceCollection()
@@ -34,7 +34,7 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
 
         var extensions = new IJintExtension[]
         {
-            new ReferencesJintExtension(serviceProvider)
+            new ContentsJintExtension(serviceProvider)
         };
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
@@ -47,26 +47,26 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
     }
 
     [Fact]
-    public async Task Should_throw_exception_if_callback_is_null_on_getReference()
+    public async Task Should_throw_exception_if_callback_is_null()
     {
-        var (vars, _) = SetupReferenceVars(1);
+        var (vars, _) = SetupQueryVars("my-schema", "$filter=data/field/iv eq 42", 2);
 
-        var script = @"getReference('id')";
+        var script = @"getContents('my-schema', '$filter=data/field/iv eq 42')";
 
         await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
     }
 
     [Fact]
-    public async Task Should_resolve_reference()
+    public async Task Should_query_contents()
     {
-        var (vars, _) = SetupReferenceVars(1);
+        var (vars, _) = SetupQueryVars("my-schema", "$filter=data/field/iv eq 42", 2);
 
         var expected = @"
                 Text: Hello 1 World 1
             ";
 
         var script = @"
-                getReference(data.references.iv[0], function (references) {
+                getContents('my-schema', { query: '$filter=data/field/iv eq 42' }, function (references) {
                     var actual1 = `Text: ${references[0].data.field1.iv} ${references[0].data.field2.iv}`;
 
                     complete(`${actual1}`);
@@ -78,27 +78,17 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
     }
 
     [Fact]
-    public async Task Should_throw_exception_if_callback_is_null_on_getReferenceV2()
+    public async Task Should_query_contents_with_string()
     {
-        var (vars, _) = SetupReferenceVars(1);
-
-        var script = @"getReferenceV2('id')";
-
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
-    }
-
-    [Fact]
-    public async Task Should_resolve_reference_v2()
-    {
-        var (vars, _) = SetupReferenceVars(1);
+        var (vars, _) = SetupQueryVars("my-schema", "$filter=data/field/iv eq 42", 2);
 
         var expected = @"
                 Text: Hello 1 World 1
             ";
 
         var script = @"
-                getReferenceV2(data.references.iv[0], function (reference) {
-                    var actual1 = `Text: ${reference.data.field1.iv} ${reference.data.field2.iv}`;
+                getContents('my-schema', '$filter=data/field/iv eq 42', function (references) {
+                    var actual1 = `Text: ${references[0].data.field1.iv} ${references[0].data.field2.iv}`;
 
                     complete(`${actual1}`);
                 })";
@@ -108,69 +98,31 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
         Assert.Equal(Cleanup(expected), Cleanup(actual));
     }
 
-    [Fact]
-    public async Task Should_throw_exception_if_callback_is_null_on_getReferences()
+    private (ScriptVars, EnrichedContent[]) SetupQueryVars(string schema, string filter, int count)
     {
-        var (vars, _) = SetupReferenceVars(1);
-
-        var script = @"getReferences('id')";
-
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
-    }
-
-    [Fact]
-    public async Task Should_resolve_references()
-    {
-        var (vars, _) = SetupReferenceVars(2);
-
-        var expected = @"
-                Text: Hello 1 World 1
-                Text: Hello 2 World 2
-            ";
-
-        var script = @"
-                getReferences(data.references.iv, function (references) {
-                    var actual1 = `Text: ${references[0].data.field1.iv} ${references[0].data.field2.iv}`;
-                    var actual2 = `Text: ${references[1].data.field1.iv} ${references[1].data.field2.iv}`;
-
-                    complete(`${actual1}\n${actual2}`);
-                })";
-
-        var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
-
-        Assert.Equal(Cleanup(expected), Cleanup(actual));
-    }
-
-    private (ScriptVars, EnrichedContent[]) SetupReferenceVars(int count)
-    {
-        var references = Enumerable.Range(0, count).Select((x, i) => CreateReference(i + 1)).ToArray();
+        var references = Enumerable.Range(0, count).Select((x, i) => CreateContent(i + 1)).ToArray();
         var referenceIds = references.Select(x => x.Id);
 
         var user = new ClaimsPrincipal();
 
-        var data =
-            new ContentData()
-                .AddField("references",
-                    new ContentFieldData()
-                        .AddInvariant(JsonValue.Array(referenceIds)));
-
         A.CallTo(() => contentQuery.QueryAsync(
-                A<Context>.That.Matches(x => x.App == App && x.UserPrincipal == user), A<Q>.That.HasIds(referenceIds), A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(2, references));
+                A<Context>.That.Matches(x => x.App == App && x.UserPrincipal == user),
+                schema,
+                A<Q>.That.Matches(x => x.QueryAsOdata == filter),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(2, [CreateContent(1)]));
 
         var vars = new ScriptVars
         {
             ["appId"] = AppId.Id,
             ["appName"] = AppId.Name,
-            ["data"] = data,
-            ["dataOld"] = null,
             ["user"] = user
         };
 
         return (vars, references);
     }
 
-    private EnrichedContent CreateReference(int index)
+    private EnrichedContent CreateContent(int index)
     {
         return CreateContent() with
         {

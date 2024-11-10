@@ -17,18 +17,15 @@ public static class JintExtensions
     {
         var ids = new List<DomainId>();
 
-        if (value?.IsString() == true)
+        if (value is JsString s)
         {
-            ids.Add(DomainId.Create(value.ToString()));
+            ids.Add(DomainId.Create(s.AsString()));
         }
-        else if (value?.IsArray() == true)
+        else if (value is JsArray a)
         {
-            foreach (var item in value.AsArray())
+            foreach (var item in a.OfType<JsString>())
             {
-                if (item.IsString())
-                {
-                    ids.Add(DomainId.Create(item.ToString()));
-                }
+                ids.Add(DomainId.Create(item.AsString()));
             }
         }
 
