@@ -30,6 +30,13 @@ public static partial class StringExtensions
         return value;
     }
 
+    public static string JsonUnescape(this string value)
+    {
+        value = JsonSerializer.Deserialize<string>($"\"{value}\"", JsonEscapeOptions)!;
+
+        return value;
+    }
+
     public static bool IsEmail(this string? value)
     {
         return value != null && RegexEmail.IsMatch(value);

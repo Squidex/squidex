@@ -50,6 +50,9 @@ public sealed class BackupJob : IJobRunner
 
     public static JobRequest BuildRequest(RefToken actor, App app)
     {
+        Guard.NotNull(actor);
+        Guard.NotNull(app);
+
         return JobRequest.Create(
             actor,
             TaskName,

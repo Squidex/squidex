@@ -204,6 +204,7 @@ public static class PermissionIds
     public const string AppSchemasScripts = "squidex.apps.{app}.schemas.{schema}.scripts";
     public const string AppSchemasPublish = "squidex.apps.{app}.schemas.{schema}.publish";
     public const string AppSchemasDelete = "squidex.apps.{app}.schemas.{schema}.delete";
+    public const string AppSchemasIndexes = "squidex.apps.{app}.schemas.{schema}.indexes";
 
     // App Contents
     public const string AppContents = "squidex.apps.{app}.contents.{schema}";

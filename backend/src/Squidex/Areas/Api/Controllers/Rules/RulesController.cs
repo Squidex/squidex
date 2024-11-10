@@ -112,7 +112,7 @@ public sealed class RulesController : ApiController
     /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/rules/")]
-    [ProducesResponseType(typeof(RuleDto), 201)]
+    [ProducesResponseType(typeof(RuleDto), StatusCodes.Status201Created)]
     [ApiPermissionOrAnonymous(PermissionIds.AppRulesCreate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PostRule(string app, [FromBody] CreateRuleDto request)

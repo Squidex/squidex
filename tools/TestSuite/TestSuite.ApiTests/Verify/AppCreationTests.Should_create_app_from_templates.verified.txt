@@ -161,6 +161,9 @@
         fields/ui: {
           Method: PUT
         },
+        indexes: {
+          Method: GET
+        },
         self: {
           Method: GET
         },
@@ -347,6 +350,9 @@
         },
         fields/ui: {
           Method: PUT
+        },
+        indexes: {
+          Method: GET
         },
         self: {
           Method: GET

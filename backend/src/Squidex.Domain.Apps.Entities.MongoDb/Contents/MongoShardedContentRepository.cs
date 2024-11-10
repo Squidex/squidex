@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -77,6 +78,24 @@ public sealed class MongoShardedContentRepository : ShardedSnapshotStore<MongoCo
         CancellationToken ct = default)
     {
         return Shard(appId).StreamReferencing(appId, references, take, scope, ct);
+    }
+
+    public Task CreateIndexAsync(DomainId appId, DomainId schemaId, IndexDefinition index,
+        CancellationToken ct = default)
+    {
+        return Shard(appId).CreateIndexAsync(appId, schemaId, index, ct);
+    }
+
+    public Task DropIndexAsync(DomainId appId, DomainId schemaId, string name,
+        CancellationToken ct = default)
+    {
+        return Shard(appId).DropIndexAsync(appId, schemaId, name, ct);
+    }
+
+    public Task<List<IndexDefinition>> GetIndexesAsync(DomainId appId, DomainId schemaId,
+        CancellationToken ct = default)
+    {
+        return Shard(appId).GetIndexesAsync(appId, schemaId, ct);
     }
 
     public async IAsyncEnumerable<Content> StreamScheduledWithoutDataAsync(Instant now, SearchScope scope,

@@ -88,7 +88,7 @@ public sealed class AppRolesController : ApiController
     /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/roles/")]
-    [ProducesResponseType(typeof(RolesDto), 201)]
+    [ProducesResponseType(typeof(RolesDto), StatusCodes.Status201Created)]
     [ApiPermissionOrAnonymous(PermissionIds.AppRolesCreate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PostRole(string app, [FromBody] AddRoleDto request)
