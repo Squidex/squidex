@@ -114,6 +114,10 @@
     ul {
         margin: 0;
     }
+
+    li {
+        word-wrap: break-word;
+    }
 }
 
 .form-bubble {

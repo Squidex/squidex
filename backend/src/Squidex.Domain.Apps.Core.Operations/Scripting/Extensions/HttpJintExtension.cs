@@ -5,14 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Net.Http.Json;
 using System.Text;
 using Jint;
 using Jint.Native;
 using Jint.Native.Json;
 using Jint.Native.Object;
 using Jint.Runtime;
-using Org.BouncyCastle.Utilities.IO;
 using Squidex.Domain.Apps.Core.Properties;
 using Squidex.Infrastructure;
 
@@ -116,7 +114,11 @@ public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
         });
     }
 
-    private static HttpRequestMessage CreateRequest(ScriptExecutionContext context, HttpMethod method, Uri uri, JsValue? body, JsValue? headers)
+    private static HttpRequestMessage CreateRequest(ScriptExecutionContext context,
+        HttpMethod method,
+        Uri uri,
+        JsValue? body,
+        JsValue? headers)
     {
         var request = new HttpRequestMessage(method, uri);
 
