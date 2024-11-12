@@ -25,7 +25,7 @@ public static class TelemetryServices
 
         services.AddOpenTelemetry();
 
-        // configure logging
+        // Configure logging
         services.AddLogging(builder =>
         {
             builder.AddOpenTelemetry(options =>
@@ -33,7 +33,7 @@ public static class TelemetryServices
                 options.SetResourceBuilder(resourceBuilder);
                 options.IncludeFormattedMessage = true;
 
-                // add OTLP exporter and bind options directly. Sadly not possible
+                // Add OTLP exporter and bind options directly. Sadly not possible
                 // to do it through ITelemetryConfigurator as it is not possible to
                 // get IServiceProvider here. Later when OpenTelemetry.Sdk.CreateLoggerProviderBuilder()
                 // is available and no longer expermential, we can do it the same way as with tracing and metrics...
@@ -47,7 +47,7 @@ public static class TelemetryServices
             });
         });
 
-        // configure tracing
+        // Configure tracing
         services.AddSingleton(serviceProvider =>
         {
             var builder = Sdk.CreateTracerProviderBuilder();
@@ -74,7 +74,7 @@ public static class TelemetryServices
             return builder.Build()!;
         });
 
-        // configure metrics
+        // Configure metrics
         services.AddSingleton(serviceProvider =>
         {
             var builder = Sdk.CreateMeterProviderBuilder();
