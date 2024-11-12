@@ -7,6 +7,8 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Plugins;
@@ -26,9 +28,14 @@ public sealed class OtlpPlugin : IPlugin
 
         public void Configure(TracerProviderBuilder builder)
         {
-            // See: https://docs.microsoft.com/aspnet/core/grpc/troubleshoot#call-insecure-grpc-services-with-net-core-client
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            builder.AddOtlpExporter(options =>
+            {
+                config.GetSection("logging:otlp").Bind(options);
+            });
+        }
 
+        public void Configure(MeterProviderBuilder builder)
+        {
             builder.AddOtlpExporter(options =>
             {
                 config.GetSection("logging:otlp").Bind(options);
@@ -40,8 +47,7 @@ public sealed class OtlpPlugin : IPlugin
     {
         if (config.GetValue<bool>("logging:otlp:enabled"))
         {
-            services.AddSingleton<ITelemetryConfigurator,
-                Configurator>();
+            services.AddSingleton<ITelemetryConfigurator, Configurator>();
         }
     }
 }
