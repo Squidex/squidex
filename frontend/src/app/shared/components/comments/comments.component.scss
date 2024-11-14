@@ -4,6 +4,7 @@
 :host ::ng-deep {
     .mention-menu {
         border-color: $color-border !important;
+        max-width: 290px;
     }
 
     .mention-active > a {

@@ -70,7 +70,7 @@ export class CommentComponent extends StatefulComponent<State> {
     public userToken = '';
 
     @Input()
-    public currenUrl = '';
+    public currentUrl = '';
 
     @Input({ required: true })
     public mentionUsers?: ReadonlyArray<ContributorDto>;
@@ -133,7 +133,7 @@ export class CommentComponent extends StatefulComponent<State> {
         if (text && text.length > 0 && this.commentItem.comment.id) {
             const replyTo = this.commentItem.comment.id!;
 
-            this.comments.create(this.userToken, text, this.currenUrl, { replyTo });
+            this.comments.create(this.userToken, text, this.currentUrl, { replyTo });
         }
 
         this.replyForm.submitCompleted();

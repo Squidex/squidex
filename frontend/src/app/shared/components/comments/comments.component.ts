@@ -11,7 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MentionConfig, MentionModule } from 'angular-mentions';
 import { BehaviorSubject } from 'rxjs';
-import { MessageBus, ResizedDirective, Subscriptions, TranslatePipe } from '@app/framework';
+import { MessageBus, Subscriptions, TranslatePipe } from '@app/framework';
 import { AnnotationCreateAfterNavigate, AnnotationsSelectAfterNavigate, AuthService, CommentsState, ContributorsState, UpsertCommentForm } from '@app/shared/internal';
 import { CommentComponent } from './comment.component';
 
@@ -26,7 +26,6 @@ import { CommentComponent } from './comment.component';
         FormsModule,
         MentionModule,
         ReactiveFormsModule,
-        ResizedDirective,
         TranslatePipe,
     ],
 })
@@ -42,7 +41,7 @@ export class CommentsComponent implements OnInit {
     public commentsId = '';
 
     public mentionUsers = this.contributorsState.contributors;
-    public mentionConfig: MentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
+    public mentionConfig: MentionConfig = { dropUp: false, labelKey: 'contributorEmail' };
 
     public commentForm = new UpsertCommentForm();
     public commentsItems = this.commentsState.getGroupedComments(this.selection);
@@ -58,6 +57,8 @@ export class CommentsComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.contributorsState.loadIfNotLoaded();
+
         this.subscriptions.add(
             this.messageBus.of(AnnotationsSelectAfterNavigate)
                 .subscribe(message => {
