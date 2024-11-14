@@ -98,7 +98,7 @@ public sealed class SchemasController : ApiController
     /// <response code="409">Schema name already in use.</response>
     [HttpPost]
     [Route("apps/{app}/schemas/")]
-    [ProducesResponseType(typeof(SchemaDto), 201)]
+    [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status201Created)]
     [ApiPermissionOrAnonymous(PermissionIds.AppSchemasCreate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto request)

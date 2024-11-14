@@ -51,6 +51,7 @@ public sealed class JsonStreamResult<T> : ActionResult
 
             // Write the separator after a every json object to simplify deserialization.
             await body.WriteAsync(Separator, ct);
+            await body.FlushAsync(ct);
         }
     }
 

@@ -159,6 +159,12 @@ public class SchemaDto : Resource
                 resources.Url<ContentsController>(x => nameof(x.GetContents), values));
         }
 
+        if (resources.CanManageIndexes(Name) && Type == SchemaType.Default)
+        {
+            AddGetLink("indexes",
+                resources.Url<SchemaIndexesController>(x => nameof(x.GetIndexes), values));
+        }
+
         if (resources.CanCreateContent(Name) && Type == SchemaType.Default)
         {
             AddPostLink("contents/create",

@@ -115,6 +115,15 @@ namespace Squidex.Domain.Apps.Entities.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Queries contents by schema and query..
+        /// </summary>
+        internal static string ScriptingGetContents {
+            get {
+                return ResourceManager.GetString("ScriptingGetContents", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Queries the content item with the specified ID and invokes the callback with an array of contents..
         /// </summary>
         internal static string ScriptingGetReference {

@@ -20,6 +20,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
 
@@ -128,6 +129,24 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         CancellationToken ct = default)
     {
         return GetCollection(SearchScope.All).ResetScheduledAsync(appId, contentId, ct);
+    }
+
+    public Task CreateIndexAsync(DomainId appId, DomainId schemaId, IndexDefinition index,
+        CancellationToken ct = default)
+    {
+        return GetCollection(SearchScope.All).CreateIndexAsync(appId, schemaId, index, ct);
+    }
+
+    public Task<List<IndexDefinition>> GetIndexesAsync(DomainId appId, DomainId schemaId,
+        CancellationToken ct = default)
+    {
+        return GetCollection(SearchScope.All).GetIndexesAsync(appId, schemaId, ct);
+    }
+
+    public Task DropIndexAsync(DomainId appId, DomainId schemaId, string name,
+        CancellationToken ct = default)
+    {
+        return GetCollection(SearchScope.All).DropIndexAsync(appId, schemaId, name, ct);
     }
 
     private MongoContentCollection GetCollection(SearchScope scope)

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -139,6 +140,63 @@ internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
         var collection = await GetCollectionAsync(value.AppId.Id, value.SchemaId.Id);
 
         await collection.DeleteOneAsync(session, x => x.DocumentId == value.DocumentId, null, ct);
+    }
+
+    public async Task DropIndexAsync(DomainId appId, DomainId schemaId, string name,
+        CancellationToken ct)
+    {
+        var collection = await GetCollectionAsync(appId, schemaId);
+
+        await collection.Indexes.DropOneAsync(name, ct);
+    }
+
+    public async Task<List<IndexDefinition>> GetIndexesAsync(DomainId appId, DomainId schemaId,
+        CancellationToken ct = default)
+    {
+        var result = new List<IndexDefinition>();
+
+        var collection = await GetCollectionAsync(appId, schemaId);
+        var colIndexes = await collection.Indexes.ListAsync(ct);
+
+        foreach (var index in await colIndexes.ToListAsync(ct))
+        {
+            if (IndexParser.TryParse(index, "custom_", out var definition))
+            {
+                result.Add(definition);
+            }
+        }
+
+        return result;
+    }
+
+    public async Task CreateIndexAsync(DomainId appId, DomainId schemaId, IndexDefinition index,
+        CancellationToken ct)
+    {
+        var collection = await GetCollectionAsync(appId, schemaId);
+
+        var definition = Index.Combine(
+            index.Select(field =>
+            {
+                var path = Adapt.MapPath(field.Name).ToString();
+
+                if (field.Order == SortOrder.Ascending)
+                {
+                    return Index.Ascending(path);
+                }
+
+                return Index.Descending(path);
+            }));
+
+        var name = $"custom_{index.ToName()}";
+
+        await collection.Indexes.CreateOneAsync(
+            new CreateIndexModel<MongoContentEntity>(
+                definition,
+                new CreateIndexOptions
+                {
+                    Name = name,
+                }),
+            cancellationToken: ct);
     }
 
     private static FilterDefinition<MongoContentEntity> BuildFilter(FilterNode<ClrValue>? filter)

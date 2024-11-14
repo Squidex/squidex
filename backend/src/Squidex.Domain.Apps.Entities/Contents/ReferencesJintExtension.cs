@@ -54,7 +54,8 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
         context.Engine.SetValue("getReferences", getReferences);
     }
 
-    private void GetReferences(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+    private void GetReferences(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user,
+        JsValue references, Action<JsValue> callback)
     {
         if (callback == null)
         {
@@ -94,7 +95,8 @@ public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
         });
     }
 
-    private void GetReference(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+    private void GetReference(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user,
+        JsValue references, Action<JsValue> callback)
     {
         if (callback == null)
         {

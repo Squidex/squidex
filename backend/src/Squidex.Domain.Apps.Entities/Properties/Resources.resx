@@ -135,6 +135,9 @@
   <data name="ScriptingGetBlurHash" xml:space="preserve">
     <value>Gets the blur hash of an asset if it is an image or null otherwise.</value>
   </data>
+  <data name="ScriptingGetContents" xml:space="preserve">
+    <value>Queries contents by schema and query.</value>
+  </data>
   <data name="ScriptingGetReference" xml:space="preserve">
     <value>Queries the content item with the specified ID and invokes the callback with an array of contents.</value>
   </data>

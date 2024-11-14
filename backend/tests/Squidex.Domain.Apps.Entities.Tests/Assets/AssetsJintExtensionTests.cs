@@ -21,6 +21,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
@@ -76,6 +77,16 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
     }
 
     [Fact]
+    public async Task Should_throw_exception_if_callback_is_null_on_getAsset()
+    {
+        var (vars, _) = SetupAssetsVars(1);
+
+        var script = @"getAsset('id')";
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
+    }
+
+    [Fact]
     public async Task Should_resolve_asset()
     {
         var (vars, assets) = SetupAssetsVars(1);
@@ -97,6 +108,16 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
     }
 
     [Fact]
+    public async Task Should_throw_exception_if_callback_is_null_on_getAssetV2()
+    {
+        var (vars, _) = SetupAssetsVars(1);
+
+        var script = @"getAssetV2('id')";
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
+    }
+
+    [Fact]
     public async Task Should_resolve_asset_v2()
     {
         var (vars, assets) = SetupAssetsVars(1);
@@ -115,6 +136,16 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
         var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
 
         Assert.Equal(Cleanup(expected), Cleanup(actual));
+    }
+
+    [Fact]
+    public async Task Should_throw_exception_if_callback_is_null_on_getAssets()
+    {
+        var (vars, _) = SetupAssetsVars(1);
+
+        var script = @"getAssetV2('id')";
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
     }
 
     [Fact]

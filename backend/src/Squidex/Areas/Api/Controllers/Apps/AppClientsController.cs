@@ -67,7 +67,7 @@ public sealed class AppClientsController : ApiController
     /// </remarks>
     [HttpPost]
     [Route("apps/{app}/clients/")]
-    [ProducesResponseType(typeof(ClientsDto), 201)]
+    [ProducesResponseType(typeof(ClientsDto), StatusCodes.Status201Created)]
     [ApiPermissionOrAnonymous(PermissionIds.AppClientsCreate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PostClient(string app, [FromBody] CreateClientDto request)

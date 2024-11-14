@@ -39,6 +39,10 @@ $toggle-button-size: $toggle-height - .25rem;
             .toggle-button {
                 left: $toggle-height * .5;
             }
+
+            .icon-checkmark {
+                display: block;
+            }
         }
 
         &.unchecked {
@@ -46,6 +50,10 @@ $toggle-button-size: $toggle-height - .25rem;
 
             .toggle-button {
                 left: $toggle-width - $toggle-height * .5;
+            }
+
+            .icon-close {
+                display: block;
             }
         }
 
@@ -55,4 +63,24 @@ $toggle-button-size: $toggle-height - .25rem;
             cursor: not-allowed;
         }
     }
+}
+
+.icon-close {
+    @include absolute(50%, null, null, 4px);
+    color: $color-white;
+    display: none;
+    font-size: 60%;
+    font-weight: normal;
+    margin-top: -5px;
+    user-select: none;
+}
+
+.icon-checkmark {
+    @include absolute(50%, 4px);
+    color: $color-white;
+    display: none;
+    font-size: 70%;
+    font-weight: normal;
+    margin-top: -5px;
+    user-select: none;
 }

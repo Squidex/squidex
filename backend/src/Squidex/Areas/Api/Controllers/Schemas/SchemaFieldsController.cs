@@ -38,7 +38,7 @@ public sealed class SchemaFieldsController : ApiController
     /// <response code="409">Schema field name already in use.</response>
     [HttpPost]
     [Route("apps/{app}/schemas/{schema}/fields/")]
-    [ProducesResponseType(typeof(SchemaDto), 201)]
+    [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status201Created)]
     [ApiPermissionOrAnonymous(PermissionIds.AppSchemasUpdate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PostField(string app, string schema, [FromBody] AddFieldDto request)
@@ -63,7 +63,7 @@ public sealed class SchemaFieldsController : ApiController
     /// <response code="404">Schema, field or app not found.</response>
     [HttpPost]
     [Route("apps/{app}/schemas/{schema}/fields/{parentId:long}/nested/")]
-    [ProducesResponseType(typeof(SchemaDto), 201)]
+    [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status201Created)]
     [ApiPermissionOrAnonymous(PermissionIds.AppSchemasUpdate)]
     [ApiCosts(1)]
     public async Task<IActionResult> PostNestedField(string app, string schema, long parentId, [FromBody] AddFieldDto request)

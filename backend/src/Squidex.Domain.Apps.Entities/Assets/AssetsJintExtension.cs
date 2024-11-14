@@ -140,7 +140,8 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         context.Engine.SetValue("getAssetBlurHash", getBlurHash);
     }
 
-    private void GetText(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue? encoding)
+    private void GetText(ScriptExecutionContext context,
+        JsValue input, Action<JsValue> callback, JsValue? encoding)
     {
         if (callback == null)
         {
@@ -163,7 +164,8 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         });
     }
 
-    private void GetBlurHash(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue? componentX, JsValue? componentY)
+    private void GetBlurHash(ScriptExecutionContext context,
+        JsValue input, Action<JsValue> callback, JsValue? componentX, JsValue? componentY)
     {
         if (callback == null)
         {
@@ -199,7 +201,8 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         });
     }
 
-    private void GetAssets(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+    private void GetAssets(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user,
+        JsValue references, Action<JsValue> callback)
     {
         if (callback == null)
         {
@@ -237,7 +240,8 @@ public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
         });
     }
 
-    private void GetAsset(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+    private void GetAsset(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user,
+        JsValue references, Action<JsValue> callback)
     {
         Guard.NotNull(callback);
 

@@ -93,7 +93,7 @@ public sealed class TeamsController : ApiController
     /// </remarks>
     [HttpPost]
     [Route("teams/")]
-    [ProducesResponseType(typeof(TeamDto), 201)]
+    [ProducesResponseType(typeof(TeamDto), StatusCodes.Status201Created)]
     [ApiPermission]
     [ApiCosts(0)]
     public async Task<IActionResult> PostTeam([FromBody] CreateTeamDto request)

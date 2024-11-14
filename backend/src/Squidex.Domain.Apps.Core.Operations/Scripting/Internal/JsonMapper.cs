@@ -113,15 +113,13 @@ public static class JsonMapper
             return number;
         }
 
-        if (value.IsArray())
+        if (value is JsArray a)
         {
-            var arr = value.AsArray();
+            var result = new JsonArray((int)a.Length);
 
-            var result = new JsonArray((int)arr.Length);
-
-            for (var i = 0; i < arr.Length; i++)
+            for (var i = 0; i < a.Length; i++)
             {
-                result.Add(Map(arr.Get(i.ToString(CultureInfo.InvariantCulture))));
+                result.Add(Map(a.Get(i.ToString(CultureInfo.InvariantCulture))));
             }
 
             return result;
@@ -132,10 +130,8 @@ public static class JsonMapper
             return JsonValue.Create(wrapper.Target);
         }
 
-        if (value.IsObject())
+        if (value is ObjectInstance obj)
         {
-            var obj = value.AsObject();
-
             var result = new JsonObject();
 
             foreach (var (key, propertyDescriptor) in obj.GetOwnProperties())
