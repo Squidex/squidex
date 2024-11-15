@@ -450,6 +450,24 @@ public class QueryFromODataTests
     }
 
     [Fact]
+    public void Should_parse_collation1()
+    {
+        var i = _Q("collation=Collation");
+        var o = _C("Collation: 'Collation'");
+
+        Assert.Equal(o, i);
+    }
+
+    [Fact]
+    public void Should_parse_collation2()
+    {
+        var i = _Q("$collation=Collation");
+        var o = _C("Collation: 'Collation'");
+
+        Assert.Equal(o, i);
+    }
+
+    [Fact]
     public void Should_text_and_multiple_terms()
     {
         var i = _Q("$search=Dagobert or Donald");

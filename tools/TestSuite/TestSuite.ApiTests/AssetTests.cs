@@ -441,7 +441,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
         {
             var downloaded = new MemoryStream();
 
-            using (var assetStream = await _.Client.Assets.GetAssetContentBySlugAsync(asset_2.Id, string.Empty))
+            using (var assetStream = await _.Client.Assets.GetAssetContentBySlugAsync(asset_2.Id))
             {
                 await assetStream.Stream.CopyToAsync(downloaded);
             }
@@ -796,7 +796,7 @@ public class AssetTests : IClassFixture<CreatedAppFixture>
 
         foreach (var asset in assets.Items)
         {
-            var content = await client.Assets.GetAssetContentBySlugAsync(asset.Id, string.Empty, deleted: true);
+            var content = await client.Assets.GetAssetContentBySlugAsync(asset.Id, deleted: true);
 
             await client.Assets.PostAssetAsync(id: asset.Id, file: new FileParameter(content.Stream, asset.FileName, asset.MimeType));
         }

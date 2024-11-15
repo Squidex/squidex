@@ -70,6 +70,7 @@ public static class EdmModelExtensions
             parser.ParseFilter(query);
             parser.ParseSort(query);
             parser.ParseRandom(query);
+            parser.ParseCollation(query);
         }
 
         return query;
