@@ -844,6 +844,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The collation or language code that should be used to compare strings, e.g. for sorting..
+        /// </summary>
+        public static string QueryCollation {
+            get {
+                return ResourceManager.GetString("QueryCollation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Optional OData filter..
         /// </summary>
         public static string QueryFilter {
@@ -876,6 +885,15 @@ namespace Squidex.Domain.Apps.Core {
         public static string QueryQ {
             get {
                 return ResourceManager.GetString("QueryQ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Picks N random of elements from the schema..
+        /// </summary>
+        public static string QueryRandom {
+            get {
+                return ResourceManager.GetString("QueryRandom", resourceCulture);
             }
         }
         

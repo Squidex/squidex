@@ -86,6 +86,13 @@ public static class Extensions
     public static async Task<List<MongoContentEntity>> QueryContentsAsync(this IMongoCollection<MongoContentEntity> collection, FilterDefinition<MongoContentEntity> filter, ClrQuery query, Q q,
         CancellationToken ct)
     {
+        Collation? collation = null;
+
+        if (query.Collation != null)
+        {
+            collation = new Collation(query.Collation);
+        }
+
         if (query.Skip > 0 && !query.IsSatisfiedByIndex())
         {
             // If we have to skip over items, we could reach the limit of the sort buffer, therefore get the ids and all filter fields only
@@ -97,10 +104,15 @@ public static class Extensions
                 projection = projection.Include(field);
             }
 
+            var aggregateOptions = new AggregateOptions
+            {
+                Collation = collation,
+            };
+
             if (query.Random > 0)
             {
                 var ids =
-                    await collection.Aggregate()
+                    await collection.Aggregate(aggregateOptions)
                         .Match(filter)
                         .Project<IdOnly>(projection)
                         .QuerySort(query)
@@ -118,7 +130,7 @@ public static class Extensions
             }
 
             var joined =
-                await collection.Aggregate()
+                await collection.Aggregate(aggregateOptions)
                     .Match(filter)
                     .Project<IdOnly>(projection)
                     .QuerySort(query)
@@ -138,8 +150,13 @@ public static class Extensions
             return joined.Select(x => x.Joined[0]).ToList();
         }
 
+        var findOptions = new FindOptions
+        {
+            Collation = collation,
+        };
+
         var result =
-            collection.Find(filter)
+            collection.Find(filter, findOptions)
                 .QuerySort(query)
                 .QuerySkip(query)
                 .QueryLimit(query)

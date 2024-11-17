@@ -15,6 +15,8 @@ public class Query<TValue>
 
     public string? FullText { get; set; }
 
+    public string? Collation { get; set; }
+
     public long Skip { get; set; }
 
     public long Take { get; set; } = long.MaxValue;
@@ -59,6 +61,12 @@ public class Query<TValue>
         {
             sb.AppendIfNotEmpty("; ");
             sb.Append($"FullText: '{FullText.Replace('\'', '\'')}'");
+        }
+
+        if (Collation != null)
+        {
+            sb.AppendIfNotEmpty("; ");
+            sb.Append($"Collation: '{Collation}'");
         }
 
         if (Skip > 0)

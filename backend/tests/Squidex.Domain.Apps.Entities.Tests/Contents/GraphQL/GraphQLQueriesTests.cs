@@ -51,13 +51,13 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
-    public async Task Should_query_contents_with_full_text()
+    public async Task Should_query_contents_with_full_text_and_collation()
     {
         var contentId = DomainId.NewGuid();
         var content = TestContent.Create(contentId);
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
-                A<Q>.That.Matches(x => x.QueryAsOdata == "?$skip=0&$search=\"Hello\"" && x.NoTotal),
+                A<Q>.That.Matches(x => x.QueryAsOdata == "?$skip=0&$search=\"Hello\"&$collation=tr" && x.NoTotal),
                 A<CancellationToken>._))
             .Returns(ResultList.CreateFrom(0, content));
 
@@ -65,7 +65,46 @@ public class GraphQLQueriesTests : GraphQLTestBase
         {
             Query = @"
                 query {
-                  queryMySchemaContents(search: 'Hello') {
+                  queryMySchemaContents(search: 'Hello', collation: 'tr') {
+                    {fields}
+                  }
+                }",
+            Args = new
+            {
+                fields = TestContent.AllFlatFields
+            }
+        });
+
+        var expected = new
+        {
+            data = new
+            {
+                queryMySchemaContents = new[]
+                {
+                    TestContent.FlatResponse(content)
+                }
+            }
+        };
+
+        AssertResult(expected, actual);
+    }
+
+    [Fact]
+    public async Task Should_query_contents_with_random()
+    {
+        var contentId = DomainId.NewGuid();
+        var content = TestContent.Create(contentId);
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
+                A<Q>.That.Matches(x => x.QueryAsOdata == "?$skip=0&$random=42" && x.NoTotal),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  queryMySchemaContents(random: 42) {
                     {fields}
                   }
                 }",

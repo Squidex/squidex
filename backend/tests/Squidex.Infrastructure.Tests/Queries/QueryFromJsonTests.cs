@@ -591,6 +591,14 @@ public sealed class QueryFromJsonTests
     }
 
     [Fact]
+    public void Should_parse_collation()
+    {
+        var json = new { Collation = "Collation" };
+
+        AssertQuery(json, "Collation: 'Collation'");
+    }
+
+    [Fact]
     public void Should_parse_sort()
     {
         var json = new { sort = new[] { new { path = "string", order = "ascending" } } };

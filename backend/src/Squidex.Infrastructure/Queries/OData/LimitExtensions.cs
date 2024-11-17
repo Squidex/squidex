@@ -47,4 +47,16 @@ public static class LimitExtensions
             result.Random = random;
         }
     }
+
+    public static void ParseCollation(this ODataUriParser query, ClrQuery result)
+    {
+        var customQueries = query.CustomQueryOptions;
+
+        var randomQuery = customQueries.FirstOrDefault(x =>
+            string.Equals(x.Key, "collation", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(x.Key, "collate", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(x.Key, "$collation", StringComparison.OrdinalIgnoreCase));
+
+        result.Collation = randomQuery.Value;
+    }
 }

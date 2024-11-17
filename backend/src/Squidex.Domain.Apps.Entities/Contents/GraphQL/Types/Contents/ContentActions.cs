@@ -185,6 +185,18 @@ internal static class ContentActions
                 Description = FieldDescriptions.QuerySearch,
                 DefaultValue = null
             },
+            new QueryArgument(Scalars.String)
+            {
+                Name = "collation",
+                Description = FieldDescriptions.QueryCollation,
+                DefaultValue = null
+            },
+            new QueryArgument(Scalars.Int)
+            {
+                Name = "random",
+                Description = FieldDescriptions.QueryRandom,
+                DefaultValue = null
+            },
         ];
 
         public static readonly IFieldResolver Query = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
