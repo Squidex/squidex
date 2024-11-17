@@ -587,6 +587,38 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     }
 
     [Fact]
+    public async Task Should_make_postJson_as_form_values()
+    {
+        var httpHandler = SetupRequest();
+
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                var url = 'http://squidex.io';
+
+                var body = { key: 42 };
+
+                postJSON(url, body, function(actual) {
+                    complete(actual);
+                }, {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                });
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        httpHandler.ShouldBeMethod(HttpMethod.Post);
+        httpHandler.ShouldBeUrl("http://squidex.io/");
+        httpHandler.ShouldBeBody("key=42", "application/x-www-form-urlencoded");
+
+        var expectedResult = JsonValue.Object().Add("key", 42);
+
+        Assert.Equal(expectedResult, actual);
+    }
+
+    [Fact]
     public async Task Should_make_putJson_request()
     {
         var httpHandler = SetupRequest();

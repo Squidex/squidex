@@ -47,7 +47,7 @@ internal sealed class MockupHttpHandler : HttpMessageHandler
 
         currentRequest = request;
 
-        if (request.Content is StringContent body)
+        if (request.Content is HttpContent body)
         {
             currentContent = await body.ReadAsStringAsync(cancellationToken);
             currentContentType = body.Headers.ContentType?.MediaType;
