@@ -3,11 +3,14 @@
 
 .references-container {
     background: $color-background;
-    max-height: 20rem;
-    min-height: 6rem;
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    height: 12rem;
+    margin-top: .5rem;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
     padding: 1rem;
+    padding-bottom: 0;
 
     &.expanded {
         @include absolute(3rem, 1.25rem, .75rem, 1.25rem);
@@ -27,24 +30,6 @@
     text-align: center;
 }
 
-.drop-area {
-    border: 2px dashed darken($color-border, 10%);
-    border-radius: $border-radius;
-    color: darken($color-border, 30%);
-    cursor: pointer;
-    padding: 1rem;
-    text-align: center;
-    text-decoration: none;
-    transition: border-color .4s ease;
-
-    a {
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-}
-
 .table {
     margin-bottom: -.25rem;
-    margin-top: 1rem;
 }

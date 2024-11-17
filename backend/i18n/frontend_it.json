@@ -422,6 +422,7 @@
   "contents.arrayMoveTop": "Sposta in cima questo elemento",
   "contents.arrayMoveUp": "Sposta su questo elemento",
   "contents.arrayNoFields": "Aggiungi un primo campo annidato agli elementi.",
+  "contents.assetsSelect": "Select existing Asset",
   "contents.assetsUpload": "Trascina i file o clicca",
   "contents.autotranslate": "Traduci in automatico dalla lingua principale",
   "contents.bulkFailed": "Non è stato possibile eliminare il contenuto. Per favore ricarica.",

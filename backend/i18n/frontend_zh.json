@@ -422,6 +422,7 @@
   "contents.arrayMoveTop": "将此项移至顶部",
   "contents.arrayMoveUp": "将此项向上移动",
   "contents.arrayNoFields": "先添加一个嵌套字段来添加项目。",
+  "contents.assetsSelect": "Select existing Asset",
   "contents.assetsUpload": "删除文件或点击",
   "contents.autotranslate": "从母语自动翻译",
   "contents.bulkFailed": "删除或更新内容失败。请重新加载。",

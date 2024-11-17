@@ -90,11 +90,11 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         super({
             assetItems: [],
             assetFiles: [],
-            isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
+            isListView: !localStore.getBoolean(Settings.Local.ASSETS_MODE),
         });
 
         this.project(x => x.isListView).subscribe(isListView => {
-            localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
+            localStore.setBoolean(Settings.Local.ASSETS_MODE, !isListView);
         });
     }
 

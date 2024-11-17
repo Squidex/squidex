@@ -422,6 +422,7 @@
   "contents.arrayMoveTop": "Mova este item para cima",
   "contents.arrayMoveUp": "Mova este item para cima",
   "contents.arrayNoFields": "Adicione primeiro um campo aninhado para adicionar itens.",
+  "contents.assetsSelect": "Select existing Asset",
   "contents.assetsUpload": "Deixe cair ficheiros ou clique",
   "contents.autotranslate": "Transtração automática da linguagem mestra",
   "contents.bulkFailed": "Falhou em eliminar ou atualizar o conteúdo. Por favor, recarregue.",

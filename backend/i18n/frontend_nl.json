@@ -422,6 +422,7 @@
   "contents.arrayMoveTop": "Verplaats dit item naar boven",
   "contents.arrayMoveUp": "Verplaats dit item omhoog",
   "contents.arrayNoFields": "Voeg eerst een genest veld toe om items toe te voegen.",
+  "contents.assetsSelect": "Select existing Asset",
   "contents.assetsUpload": "Zet bestanden neer of klik",
   "contents.autotranslate": "Automatisch vertalen vanuit de hoofdtaal",
   "contents.bulkFailed": "Verwijderen van inhoud is mislukt. Laad opnieuw.",

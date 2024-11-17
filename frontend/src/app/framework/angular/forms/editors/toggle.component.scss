@@ -37,7 +37,7 @@ $toggle-button-size: $toggle-height - .25rem;
             background: $color-theme-success-dark;
 
             .toggle-button {
-                left: $toggle-height * .5;
+                left: $toggle-width - $toggle-height * .5;
             }
 
             .icon-checkmark {
@@ -49,7 +49,7 @@ $toggle-button-size: $toggle-height - .25rem;
             background: $color-theme-error;
 
             .toggle-button {
-                left: $toggle-width - $toggle-height * .5;
+                left: $toggle-height * .5;
             }
 
             .icon-close {
@@ -66,7 +66,7 @@ $toggle-button-size: $toggle-height - .25rem;
 }
 
 .icon-close {
-    @include absolute(50%, null, null, 4px);
+    @include absolute(50%, 4px);
     color: $color-white;
     display: none;
     font-size: 60%;
@@ -76,7 +76,7 @@ $toggle-button-size: $toggle-height - .25rem;
 }
 
 .icon-checkmark {
-    @include absolute(50%, 4px);
+    @include absolute(50%, null, null, 4px);
     color: $color-white;
     display: none;
     font-size: 70%;

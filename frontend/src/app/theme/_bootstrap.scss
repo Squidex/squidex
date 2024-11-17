@@ -455,6 +455,10 @@ a {
             &.btn-warning {
                 @include build-toggle-button($color-theme-warning, $color-badge-warning-background);
             }
+
+            &.btn-secondary {
+                color: $color-text-decent;
+            }
         }
 
         .btn + .btn-toggle {
@@ -495,6 +499,13 @@ a {
 
     &-outline-secondary {
         color: $color-text-decent;
+    }
+
+    &-dashed {
+        @include truncate-nowidth;
+        border-style: dashed;
+        border-color: darken($color-theme-secondary, 10%);
+        color: lighten($color-text-decent, 20%);
     }
 
     &-decent {

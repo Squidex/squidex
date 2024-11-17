@@ -422,6 +422,7 @@
   "contents.arrayMoveTop": "Déplacer cet élément vers le haut",
   "contents.arrayMoveUp": "Déplacez cet élément vers le haut",
   "contents.arrayNoFields": "Ajoutez d'abord un champ imbriqué pour ajouter des éléments.",
+  "contents.assetsSelect": "Select existing Asset",
   "contents.assetsUpload": "Déposez des fichiers ou cliquez sur",
   "contents.autotranslate": "Traduire automatiquement à partir de la langue principale",
   "contents.bulkFailed": "Échec de la suppression ou de la mise à jour du contenu. Veuillez recharger.",
