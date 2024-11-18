@@ -15,16 +15,11 @@ using TestSuite.Utils;
 
 namespace TestSuite.ApiTests;
 
-public class AssetTests : IClassFixture<CreatedAppFixture>
+public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
     private ProgressHandler progress = new ProgressHandler();
 
-    public CreatedAppFixture _ { get; }
-
-    public AssetTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_upload_asset()

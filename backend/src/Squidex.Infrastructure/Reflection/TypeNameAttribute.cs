@@ -8,12 +8,7 @@
 namespace Squidex.Infrastructure.Reflection;
 
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-public class TypeNameAttribute : Attribute
+public class TypeNameAttribute(string typeName) : Attribute
 {
-    public string TypeName { get; }
-
-    public TypeNameAttribute(string typeName)
-    {
-        TypeName = typeName;
-    }
+    public string TypeName { get; } = typeName;
 }

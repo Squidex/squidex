@@ -17,16 +17,9 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Areas.IdentityServer.Config;
 
-public sealed class CreateAdminInitializer : IInitializable
+public sealed class CreateAdminInitializer(IServiceProvider serviceProvider) : IInitializable
 {
-    private readonly IServiceProvider serviceProvider;
-
     public int Order => int.MaxValue;
-
-    public CreateAdminInitializer(IServiceProvider serviceProvider)
-    {
-        this.serviceProvider = serviceProvider;
-    }
 
     public async Task InitializeAsync(
         CancellationToken ct)

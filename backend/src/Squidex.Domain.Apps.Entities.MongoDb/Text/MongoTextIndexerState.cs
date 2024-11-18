@@ -15,7 +15,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState>, ITextIndexerState, IDeleter
+public sealed class MongoTextIndexerState(IMongoDatabase database) : MongoRepositoryBase<TextContentState>(database), ITextIndexerState, IDeleter
 {
     static MongoTextIndexerState()
     {
@@ -28,11 +28,6 @@ public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState
             cm.MapProperty(x => x.State)
                 .SetElementName("s");
         });
-    }
-
-    public MongoTextIndexerState(IMongoDatabase database)
-        : base(database)
-    {
     }
 
     protected override string CollectionName()

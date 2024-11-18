@@ -16,18 +16,9 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class UsageMiddleware : IMiddleware
+public sealed class UsageMiddleware(IAppLogStore usageLog, IUsageGate usageGate) : IMiddleware
 {
-    private readonly IAppLogStore usageLog;
-    private readonly IUsageGate usageGate;
-
     public IClock Clock { get; set; } = SystemClock.Instance;
-
-    public UsageMiddleware(IAppLogStore usageLog, IUsageGate usageGate)
-    {
-        this.usageLog = usageLog;
-        this.usageGate = usageGate;
-    }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {

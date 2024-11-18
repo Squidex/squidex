@@ -13,14 +13,9 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-public class ContentReferencesTests : IClassFixture<ContentReferencesFixture>
+public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFixture<ContentReferencesFixture>
 {
-    public ContentReferencesFixture _ { get; }
-
-    public ContentReferencesTests(ContentReferencesFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ContentReferencesFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_not_deliver_unpublished_references()

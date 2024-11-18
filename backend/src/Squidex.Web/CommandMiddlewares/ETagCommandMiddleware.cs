@@ -13,15 +13,8 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Web.CommandMiddlewares;
 
-public class ETagCommandMiddleware : ICommandMiddleware
+public class ETagCommandMiddleware(IHttpContextAccessor httpContextAccessor) : ICommandMiddleware
 {
-    private readonly IHttpContextAccessor httpContextAccessor;
-
-    public ETagCommandMiddleware(IHttpContextAccessor httpContextAccessor)
-    {
-        this.httpContextAccessor = httpContextAccessor;
-    }
-
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {

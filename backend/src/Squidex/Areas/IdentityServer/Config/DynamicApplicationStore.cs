@@ -20,16 +20,8 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Squidex.Areas.IdentityServer.Config;
 
-public class DynamicApplicationStore : InMemoryApplicationStore
+public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemoryApplicationStore(CreateStaticClients(serviceProvider))
 {
-    private readonly IServiceProvider serviceProvider;
-
-    public DynamicApplicationStore(IServiceProvider serviceProvider)
-        : base(CreateStaticClients(serviceProvider))
-    {
-        this.serviceProvider = serviceProvider;
-    }
-
     public override async ValueTask<ImmutableApplication?> FindByIdAsync(string identifier,
         CancellationToken cancellationToken)
     {

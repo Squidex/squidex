@@ -14,19 +14,9 @@ using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Jobs;
 
-public sealed class DefaultJobService : IJobService, IDeleter
+public sealed class DefaultJobService(IMessageBus messaging, IEnumerable<IJobRunner> runners, IPersistenceFactory<JobsState> persistence) : IJobService, IDeleter
 {
     private readonly ConcurrentDictionary<DomainId, bool> wokenUp = [];
-    private readonly IMessageBus messaging;
-    private readonly IEnumerable<IJobRunner> runners;
-    private readonly IPersistenceFactory<JobsState> persistence;
-
-    public DefaultJobService(IMessageBus messaging, IEnumerable<IJobRunner> runners, IPersistenceFactory<JobsState> persistence)
-    {
-        this.messaging = messaging;
-        this.runners = runners;
-        this.persistence = persistence;
-    }
 
     Task IDeleter.DeleteAppAsync(App app, CancellationToken ct)
     {

@@ -14,16 +14,11 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-public class ContentCleanupTests : IClassFixture<CreatedAppFixture>
+public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
 
-    public CreatedAppFixture _ { get; }
-
-    public ContentCleanupTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_cleanup_old_data_from_update_response()

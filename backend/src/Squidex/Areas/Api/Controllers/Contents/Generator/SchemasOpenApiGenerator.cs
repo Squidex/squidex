@@ -21,28 +21,13 @@ using SchemaDefType = Squidex.Domain.Apps.Core.Schemas.SchemaType;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator;
 
-public sealed class SchemasOpenApiGenerator
+public sealed class SchemasOpenApiGenerator(
+    IAppProvider appProvider,
+    OpenApiDocumentGeneratorSettings openApiSettings,
+    OpenApiSchemaGenerator openApiGenerator,
+    IRequestUrlGenerator urlGenerator,
+    IRequestCache requestCache)
 {
-    private readonly IAppProvider appProvider;
-    private readonly OpenApiDocumentGeneratorSettings openApiSettings;
-    private readonly OpenApiSchemaGenerator openApiGenerator;
-    private readonly IRequestUrlGenerator urlGenerator;
-    private readonly IRequestCache requestCache;
-
-    public SchemasOpenApiGenerator(
-        IAppProvider appProvider,
-        OpenApiDocumentGeneratorSettings openApiSettings,
-        OpenApiSchemaGenerator openApiGenerator,
-        IRequestUrlGenerator urlGenerator,
-        IRequestCache requestCache)
-    {
-        this.appProvider = appProvider;
-        this.urlGenerator = urlGenerator;
-        this.openApiSettings = openApiSettings;
-        this.openApiGenerator = openApiGenerator;
-        this.requestCache = requestCache;
-    }
-
     public async Task<OpenApiDocument> GenerateAsync(HttpContext httpContext, App app, IEnumerable<Schema> schemas, bool flat)
     {
         var document = CreateApiDocument(httpContext, app);

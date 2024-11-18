@@ -11,12 +11,8 @@ namespace Squidex.Infrastructure.Collections;
 
 public class ReadonlyDictionaryTests
 {
-    internal sealed class Inherited : ReadonlyDictionary<int, int>
+    internal sealed class Inherited(IDictionary<int, int> inner) : ReadonlyDictionary<int, int>(inner)
     {
-        public Inherited(IDictionary<int, int> inner)
-            : base(inner)
-        {
-        }
     }
 
     [Fact]

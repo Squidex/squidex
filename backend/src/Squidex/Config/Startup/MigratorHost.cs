@@ -9,15 +9,8 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Squidex.Config.Startup;
 
-public sealed class MigratorHost : IHostedService
+public sealed class MigratorHost(Migrator migrator) : IHostedService
 {
-    private readonly Migrator migrator;
-
-    public MigratorHost(Migrator migrator)
-    {
-        this.migrator = migrator;
-    }
-
     public Task StartAsync(
         CancellationToken cancellationToken)
     {

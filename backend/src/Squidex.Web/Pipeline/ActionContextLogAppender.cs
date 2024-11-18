@@ -12,17 +12,8 @@ using Squidex.Log;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class ActionContextLogAppender : ILogAppender
+public sealed class ActionContextLogAppender(IHttpContextAccessor httpContextAccessor, IActionContextAccessor actionContextAccessor) : ILogAppender
 {
-    private readonly IHttpContextAccessor httpContextAccessor;
-    private readonly IActionContextAccessor actionContextAccessor;
-
-    public ActionContextLogAppender(IHttpContextAccessor httpContextAccessor, IActionContextAccessor actionContextAccessor)
-    {
-        this.httpContextAccessor = httpContextAccessor;
-        this.actionContextAccessor = actionContextAccessor;
-    }
-
     public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
     {
         var httpContext = httpContextAccessor.HttpContext;

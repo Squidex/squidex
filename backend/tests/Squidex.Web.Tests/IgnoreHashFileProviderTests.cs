@@ -230,13 +230,8 @@ public class IgnoreHashFileProviderTests
         }
     }
 
-    private sealed class DirectoryContents : List<IFileInfo>, IDirectoryContents
+    private sealed class DirectoryContents(IEnumerable<IFileInfo> files) : List<IFileInfo>(files), IDirectoryContents
     {
         bool IDirectoryContents.Exists => true;
-
-        public DirectoryContents(IEnumerable<IFileInfo> files)
-            : base(files)
-        {
-        }
     }
 }

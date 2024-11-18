@@ -13,18 +13,8 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class AssetsSearchSource : ISearchSource
+public sealed class AssetsSearchSource(IAssetQueryService assetQuery, IUrlGenerator urlGenerator) : ISearchSource
 {
-    private readonly IAssetQueryService assetQuery;
-    private readonly IUrlGenerator urlGenerator;
-
-    public AssetsSearchSource(IAssetQueryService assetQuery, IUrlGenerator urlGenerator)
-    {
-        this.assetQuery = assetQuery;
-
-        this.urlGenerator = urlGenerator;
-    }
-
     public async Task<SearchResults> SearchAsync(string query, Context context,
         CancellationToken ct)
     {

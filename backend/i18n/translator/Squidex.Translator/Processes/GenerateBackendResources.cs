@@ -11,17 +11,9 @@ using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes;
 
-public sealed class GenerateBackendResources
+public sealed class GenerateBackendResources(DirectoryInfo folder, TranslationService service)
 {
-    private readonly TranslationService service;
-    private readonly DirectoryInfo folder;
-
-    public GenerateBackendResources(DirectoryInfo folder, TranslationService service)
-    {
-        this.folder = new DirectoryInfo(Path.Combine(folder.FullName, "backend", "src", "Squidex.Shared"));
-
-        this.service = service;
-    }
+    private readonly DirectoryInfo folder = new DirectoryInfo(Path.Combine(folder.FullName, "backend", "src", "Squidex.Shared"));
 
     public void Run()
     {

@@ -7,21 +7,13 @@
 
 namespace Squidex.Infrastructure.UsageTracking;
 
-public struct UsageUpdate
+public struct UsageUpdate(DateOnly date, string key, string category, Counters counters)
 {
-    public DateOnly Date;
+    public DateOnly Date = date;
 
-    public string Key;
+    public string Key = key;
 
-    public string Category;
+    public string Category = category;
 
-    public Counters Counters;
-
-    public UsageUpdate(DateOnly date, string key, string category, Counters counters)
-    {
-        Key = key;
-        Category = category;
-        Counters = counters;
-        Date = date;
-    }
+    public Counters Counters = counters;
 }

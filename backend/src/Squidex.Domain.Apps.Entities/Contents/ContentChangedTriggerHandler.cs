@@ -26,12 +26,11 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscriptionEventCreator
+public sealed class ContentChangedTriggerHandler(
+    IScriptEngine scriptEngine,
+    IContentLoader contentLoader,
+    IContentRepository contentRepository) : IRuleTriggerHandler, ISubscriptionEventCreator
 {
-    private readonly IScriptEngine scriptEngine;
-    private readonly IContentLoader contentLoader;
-    private readonly IContentRepository contentRepository;
-
     public bool CanCreateSnapshotEvents => true;
 
     public Type TriggerType => typeof(ContentChangedTriggerV2);
@@ -39,16 +38,6 @@ public sealed class ContentChangedTriggerHandler : IRuleTriggerHandler, ISubscri
     public bool Handles(AppEvent appEvent)
     {
         return appEvent is ContentEvent;
-    }
-
-    public ContentChangedTriggerHandler(
-        IScriptEngine scriptEngine,
-        IContentLoader contentLoader,
-        IContentRepository contentRepository)
-    {
-        this.scriptEngine = scriptEngine;
-        this.contentLoader = contentLoader;
-        this.contentRepository = contentRepository;
     }
 
     public async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,

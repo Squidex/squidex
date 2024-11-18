@@ -22,20 +22,19 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 
-public sealed class RestoreJob : IJobRunner
+public sealed class RestoreJob(
+    IBackupArchiveLocation backupArchiveLocation,
+    IBackupHandlerFactory backupHandlerFactory,
+    ICommandBus commandBus,
+    IEventFormatter eventFormatter,
+    IEventStore eventStore,
+    IEventStreamNames eventStreamNames,
+    IUserResolver userResolver,
+    ILogger<RestoreJob> log) : IJobRunner
 {
     public const string TaskName = "restore";
     public const string ArgUrl = "url";
     public const string ArgName = "name";
-
-    private readonly IBackupArchiveLocation backupArchiveLocation;
-    private readonly IBackupHandlerFactory backupHandlerFactory;
-    private readonly ICommandBus commandBus;
-    private readonly IEventFormatter eventFormatter;
-    private readonly IEventStore eventStore;
-    private readonly IEventStreamNames eventStreamNames;
-    private readonly IUserResolver userResolver;
-    private readonly ILogger<RestoreJob> log;
 
     // Use a run to store all state that is necessary for a single run.
     private sealed class State
@@ -56,26 +55,6 @@ public sealed class RestoreJob : IJobRunner
     }
 
     public string Name => TaskName;
-
-    public RestoreJob(
-        IBackupArchiveLocation backupArchiveLocation,
-        IBackupHandlerFactory backupHandlerFactory,
-        ICommandBus commandBus,
-        IEventFormatter eventFormatter,
-        IEventStore eventStore,
-        IEventStreamNames eventStreamNames,
-        IUserResolver userResolver,
-        ILogger<RestoreJob> log)
-    {
-        this.backupArchiveLocation = backupArchiveLocation;
-        this.backupHandlerFactory = backupHandlerFactory;
-        this.commandBus = commandBus;
-        this.eventFormatter = eventFormatter;
-        this.eventStore = eventStore;
-        this.eventStreamNames = eventStreamNames;
-        this.userResolver = userResolver;
-        this.log = log;
-    }
 
     public static JobRequest BuildRequest(RefToken actor, Uri url, string? appName)
     {

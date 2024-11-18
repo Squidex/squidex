@@ -11,19 +11,10 @@ using Squidex.Infrastructure.States;
 
 namespace Migrations.Migrations.Backup;
 
-public sealed class ConvertBackup : IMigration
+public sealed class ConvertBackup(
+    ISnapshotStore<BackupState> stateBackups,
+    ISnapshotStore<JobsState> stateJobs) : IMigration
 {
-    private readonly ISnapshotStore<BackupState> stateBackups;
-    private readonly ISnapshotStore<JobsState> stateJobs;
-
-    public ConvertBackup(
-        ISnapshotStore<BackupState> stateBackups,
-        ISnapshotStore<JobsState> stateJobs)
-    {
-        this.stateBackups = stateBackups;
-        this.stateJobs = stateJobs;
-    }
-
     public async Task UpdateAsync(
         CancellationToken ct)
     {

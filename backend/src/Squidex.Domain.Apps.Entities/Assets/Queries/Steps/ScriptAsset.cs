@@ -11,15 +11,8 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 
-public sealed class ScriptAsset : IAssetEnricherStep
+public sealed class ScriptAsset(IScriptEngine scriptEngine) : IAssetEnricherStep
 {
-    private readonly IScriptEngine scriptEngine;
-
-    public ScriptAsset(IScriptEngine scriptEngine)
-    {
-        this.scriptEngine = scriptEngine;
-    }
-
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {

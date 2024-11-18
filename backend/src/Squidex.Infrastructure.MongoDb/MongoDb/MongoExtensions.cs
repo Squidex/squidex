@@ -180,12 +180,6 @@ public static class MongoExtensions
                 filter = filters.And(filter, filters.Eq(versionField, oldVersion));
             }
 
-            var rendered =
-                filter.Render(
-                    BsonSerializer.SerializerRegistry.GetSerializer<T>(),
-                    BsonSerializer.SerializerRegistry)
-                .ToString();
-
             var result = await collection.ReplaceOneAsync(filter, job.Value, UpsertReplace, ct);
 
             return result.IsAcknowledged && result.ModifiedCount == 1;

@@ -11,16 +11,9 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
-internal sealed class CacheParser
+internal sealed class CacheParser(IMemoryCache cache)
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
-
-    private readonly IMemoryCache cache;
-
-    public CacheParser(IMemoryCache cache)
-    {
-        this.cache = cache;
-    }
 
     public Prepared<Script> Parse(string script)
     {

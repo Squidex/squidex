@@ -20,23 +20,11 @@ namespace Squidex.Areas.Api.Controllers.Apps;
 /// Update and query apps.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Apps))]
-public sealed class AppImageController : ApiController
+public sealed class AppImageController(ICommandBus commandBus,
+    IAppImageStore appImageStore,
+    IAssetStore assetStore,
+    IAssetThumbnailGenerator assetGenerator) : ApiController(commandBus)
 {
-    private readonly IAppImageStore appImageStore;
-    private readonly IAssetStore assetStore;
-    private readonly IAssetThumbnailGenerator assetGenerator;
-
-    public AppImageController(ICommandBus commandBus,
-        IAppImageStore appImageStore,
-        IAssetStore assetStore,
-        IAssetThumbnailGenerator assetGenerator)
-        : base(commandBus)
-    {
-        this.appImageStore = appImageStore;
-        this.assetStore = assetStore;
-        this.assetGenerator = assetGenerator;
-    }
-
     /// <summary>
     /// Get the app image.
     /// </summary>

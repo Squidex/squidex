@@ -14,26 +14,16 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppPermanentDeleter : IEventConsumer
+public sealed class AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainObjectFactory factory, TypeRegistry typeRegistry) : IEventConsumer
 {
-    private readonly IEnumerable<IDeleter> deleters;
-    private readonly IDomainObjectFactory factory;
-    private readonly HashSet<string> consumingTypes;
-
-    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("app-");
-
-    public AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainObjectFactory factory, TypeRegistry typeRegistry)
-    {
-        this.deleters = deleters.OrderBy(x => x.Order).ToList();
-        this.factory = factory;
-
-        // Compute the event types names once for performance reasons and use hashset for extensibility.
-        consumingTypes =
+    private readonly IEnumerable<IDeleter> deleters = deleters.OrderBy(x => x.Order).ToList();
+    private readonly HashSet<string> consumingTypes =
         [
             typeRegistry.GetName<IEvent, AppDeleted>(),
             typeRegistry.GetName<IEvent, AppContributorRemoved>()
         ];
-    }
+
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("app-");
 
     public ValueTask<bool> HandlesAsync(StoredEvent @event)
     {

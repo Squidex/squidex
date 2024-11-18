@@ -16,12 +16,8 @@ public class RuleTypeProviderTests
 {
     private readonly RuleTypeProvider sut = new RuleTypeProvider();
 
-    private abstract class MyRuleActionHandler : RuleActionHandler<MyRuleAction, string>
+    private abstract class MyRuleActionHandler(RuleEventFormatter formatter) : RuleActionHandler<MyRuleAction, string>(formatter)
     {
-        protected MyRuleActionHandler(RuleEventFormatter formatter)
-            : base(formatter)
-        {
-        }
     }
 
     public enum ActionEnum

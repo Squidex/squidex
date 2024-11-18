@@ -22,7 +22,9 @@ namespace Squidex.Areas.Api.Controllers.Contents;
 
 [SchemaMustBePublished]
 [ApiExplorerSettings(GroupName = nameof(Contents))]
-public sealed class ContentsSharedController : ApiController
+public sealed class ContentsSharedController(ICommandBus commandBus,
+    IContentQueryService contentQuery,
+    IContentWorkflow contentWorkflow) : ApiController(commandBus)
 {
     private static readonly GraphQLHttpMiddlewareOptions GraphQLOptions = new GraphQLHttpMiddlewareOptions
     {
@@ -30,18 +32,6 @@ public sealed class ContentsSharedController : ApiController
         CsrfProtectionEnabled = false,
         CsrfProtectionHeaders = []
     };
-
-    private readonly IContentQueryService contentQuery;
-    private readonly IContentWorkflow contentWorkflow;
-
-    public ContentsSharedController(ICommandBus commandBus,
-        IContentQueryService contentQuery,
-        IContentWorkflow contentWorkflow)
-        : base(commandBus)
-    {
-        this.contentQuery = contentQuery;
-        this.contentWorkflow = contentWorkflow;
-    }
 
     /// <summary>
     /// GraphQL endpoint.

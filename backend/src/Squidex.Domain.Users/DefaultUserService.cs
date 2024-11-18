@@ -16,23 +16,9 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users;
 
-public sealed class DefaultUserService : IUserService
+public sealed class DefaultUserService(UserManager<IdentityUser> userManager, IUserFactory userFactory,
+    IEnumerable<IUserEvents> userEvents, ILogger<DefaultUserService> log) : IUserService
 {
-    private readonly UserManager<IdentityUser> userManager;
-    private readonly IUserFactory userFactory;
-    private readonly IEnumerable<IUserEvents> userEvents;
-    private readonly ILogger<DefaultUserService> log;
-
-    public DefaultUserService(UserManager<IdentityUser> userManager, IUserFactory userFactory,
-        IEnumerable<IUserEvents> userEvents, ILogger<DefaultUserService> log)
-    {
-        this.userManager = userManager;
-        this.userFactory = userFactory;
-        this.userEvents = userEvents;
-
-        this.log = log;
-    }
-
     public async Task<bool> IsEmptyAsync(
         CancellationToken ct = default)
     {

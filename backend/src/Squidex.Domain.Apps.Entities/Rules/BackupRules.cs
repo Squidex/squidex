@@ -15,18 +15,12 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-public sealed class BackupRules : IBackupHandler
+public sealed class BackupRules(Rebuilder rebuilder) : IBackupHandler
 {
     private const int BatchSize = 100;
     private readonly HashSet<DomainId> ruleIds = [];
-    private readonly Rebuilder rebuilder;
 
     public string Name { get; } = "Rules";
-
-    public BackupRules(Rebuilder rebuilder)
-    {
-        this.rebuilder = rebuilder;
-    }
 
     public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
         CancellationToken ct)

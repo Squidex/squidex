@@ -10,7 +10,7 @@
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class AtlasTextIndexTests : TextIndexerTestsBase, IClassFixture<AtlasTextIndexFixture>
+public class AtlasTextIndexTests(AtlasTextIndexFixture fixture) : TextIndexerTestsBase, IClassFixture<AtlasTextIndexFixture>
 {
     public override bool SupportsQuerySyntax => true;
 
@@ -18,12 +18,7 @@ public class AtlasTextIndexTests : TextIndexerTestsBase, IClassFixture<AtlasText
 
     public override int WaitAfterUpdate => 2000;
 
-    public AtlasTextIndexFixture _ { get; }
-
-    public AtlasTextIndexTests(AtlasTextIndexFixture fixture)
-    {
-        _ = fixture;
-    }
+    public AtlasTextIndexFixture _ { get; } = fixture;
 
     public override ITextIndex CreateIndex()
     {

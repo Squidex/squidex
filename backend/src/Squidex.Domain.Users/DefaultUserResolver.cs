@@ -15,15 +15,8 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users;
 
-public sealed class DefaultUserResolver : IUserResolver
+public sealed class DefaultUserResolver(IServiceProvider serviceProvider) : IUserResolver
 {
-    private readonly IServiceProvider serviceProvider;
-
-    public DefaultUserResolver(IServiceProvider serviceProvider)
-    {
-        this.serviceProvider = serviceProvider;
-    }
-
     public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited = false,
         CancellationToken ct = default)
     {

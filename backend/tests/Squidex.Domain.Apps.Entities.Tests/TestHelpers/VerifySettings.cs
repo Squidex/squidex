@@ -75,15 +75,8 @@ public static partial class VerifySettings
         }
     }
 
-    private sealed class ContractResolver : IContractResolver
+    private sealed class ContractResolver(IContractResolver inner) : IContractResolver
     {
-        private readonly IContractResolver inner;
-
-        public ContractResolver(IContractResolver inner)
-        {
-            this.inner = inner;
-        }
-
         public JsonNameTable GetNameTable()
         {
             return inner.GetNameTable();

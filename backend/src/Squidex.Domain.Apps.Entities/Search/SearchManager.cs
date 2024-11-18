@@ -9,18 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Squidex.Domain.Apps.Entities.Search;
 
-public sealed class SearchManager : ISearchManager
+public sealed class SearchManager(IEnumerable<ISearchSource> searchSources, ILogger<SearchManager> log) : ISearchManager
 {
     private static readonly SearchResults Empty = [];
-    private readonly IEnumerable<ISearchSource> searchSources;
-    private readonly ILogger<SearchManager> log;
-
-    public SearchManager(IEnumerable<ISearchSource> searchSources, ILogger<SearchManager> log)
-    {
-        this.searchSources = searchSources;
-
-        this.log = log;
-    }
 
     public async Task<SearchResults> SearchAsync(string? query, Context context,
         CancellationToken ct = default)

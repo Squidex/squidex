@@ -14,19 +14,9 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents;
 
-public sealed class ContentOpenApiController : ApiController
+public sealed class ContentOpenApiController(ICommandBus commandBus, IAppProvider appProvider,
+    SchemasOpenApiGenerator schemasOpenApiGenerator) : ApiController(commandBus)
 {
-    private readonly IAppProvider appProvider;
-    private readonly SchemasOpenApiGenerator schemasOpenApiGenerator;
-
-    public ContentOpenApiController(ICommandBus commandBus, IAppProvider appProvider,
-        SchemasOpenApiGenerator schemasOpenApiGenerator)
-        : base(commandBus)
-    {
-        this.appProvider = appProvider;
-        this.schemasOpenApiGenerator = schemasOpenApiGenerator;
-    }
-
     [HttpGet]
     [Route("content/{app}/docs/")]
     [ApiCosts(0)]

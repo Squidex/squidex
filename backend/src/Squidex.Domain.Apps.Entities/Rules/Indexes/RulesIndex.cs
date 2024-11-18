@@ -11,15 +11,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes;
 
-public sealed class RulesIndex : IRulesIndex
+public sealed class RulesIndex(IRuleRepository ruleRepository) : IRulesIndex
 {
-    private readonly IRuleRepository ruleRepository;
-
-    public RulesIndex(IRuleRepository ruleRepository)
-    {
-        this.ruleRepository = ruleRepository;
-    }
-
     public async Task<List<Rule>> GetRulesAsync(DomainId appId,
         CancellationToken ct = default)
     {

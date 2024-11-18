@@ -29,20 +29,14 @@ public sealed class CachingManager : IRequestCache
     private readonly CachingOptions cachingOptions;
     private readonly IHttpContextAccessor httpContextAccessor;
 
-    internal sealed class CacheContext : IDisposable
+    internal sealed class CacheContext(int maxKeysSize) : IDisposable
     {
         private readonly IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         private readonly HashSet<string> keys = [];
         private readonly HashSet<string> headers = [];
         private readonly ReaderWriterLockSlim slimLock = new ReaderWriterLockSlim();
-        private readonly int maxKeysSize;
         private bool hasDependency;
         private bool isFinished;
-
-        public CacheContext(int maxKeysSize)
-        {
-            this.maxKeysSize = maxKeysSize;
-        }
 
         public void Dispose()
         {

@@ -7,15 +7,8 @@
 
 namespace Squidex.Areas.Frontend.Middlewares;
 
-public sealed class EmbedMiddleware
+public sealed class EmbedMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
-    public EmbedMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
-
     public Task InvokeAsync(HttpContext context)
     {
         var request = context.Request;

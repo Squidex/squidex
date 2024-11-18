@@ -227,8 +227,9 @@ public class ContentQueryTests : GivenContext
 
         var rendered =
             filter.Render(
-                BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
-                BsonSerializer.SerializerRegistry)
+                new RenderArgs<MongoContentEntity>(
+                    BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
+                    BsonSerializer.SerializerRegistry))
             .ToString();
 
         Assert.Equal(Cleanup(expected, arg), rendered);
@@ -243,11 +244,11 @@ public class ContentQueryTests : GivenContext
         A.CallTo(() => cursor.Sort(A<SortDefinition<MongoContentEntity>>._))
             .Invokes((SortDefinition<MongoContentEntity> sortDefinition) =>
             {
-                rendered =
-                   sortDefinition.Render(
-                       BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
-                       BsonSerializer.SerializerRegistry)
-                   .ToString();
+                rendered = sortDefinition.Render(
+                    new RenderArgs<MongoContentEntity>(
+                        BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
+                        BsonSerializer.SerializerRegistry))
+                    .ToString();
             });
 
         cursor.QuerySort(new ClrQuery { Sort = sort.ToList() }.AdjustToModel(AppId.Id));

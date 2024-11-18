@@ -13,16 +13,11 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class AppCreationTests : IClassFixture<ClientFixture>
+public class AppCreationTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
     private readonly string appName = Guid.NewGuid().ToString();
 
-    public ClientFixture _ { get; }
-
-    public AppCreationTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_app()

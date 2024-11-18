@@ -9,21 +9,13 @@ using System.Globalization;
 
 namespace Squidex.Infrastructure.Commands;
 
-public sealed class CommandRequest
+public sealed class CommandRequest(IAggregateCommand command, string culture, string cultureUI)
 {
-    public IAggregateCommand Command { get; }
+    public IAggregateCommand Command { get; } = command;
 
-    public string Culture { get; }
+    public string Culture { get; } = culture;
 
-    public string CultureUI { get; }
-
-    public CommandRequest(IAggregateCommand command, string culture, string cultureUI)
-    {
-        Command = command;
-
-        Culture = culture;
-        CultureUI = cultureUI;
-    }
+    public string CultureUI { get; } = cultureUI;
 
     public static CommandRequest Create(IAggregateCommand command)
     {

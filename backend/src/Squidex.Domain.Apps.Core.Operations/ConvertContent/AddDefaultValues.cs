@@ -12,10 +12,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class AddDefaultValues : IContentDataConverter, IContentItemConverter, IContentFieldConverter
+public sealed class AddDefaultValues(PartitionResolver partitionResolver, IClock? clock = null) : IContentDataConverter, IContentItemConverter, IContentFieldConverter
 {
-    private readonly PartitionResolver partitionResolver;
-    private readonly IClock clock;
+    private readonly IClock clock = clock ?? SystemClock.Instance;
     private Instant now;
 
     public bool IgnoreRequiredFields { get; init; }
@@ -23,13 +22,6 @@ public sealed class AddDefaultValues : IContentDataConverter, IContentItemConver
     public bool IgnoreNonMasterFields { get; init; }
 
     public HashSet<string>? FieldNames { get; init; }
-
-    public AddDefaultValues(PartitionResolver partitionResolver, IClock? clock = null)
-    {
-        this.partitionResolver = partitionResolver;
-
-        this.clock = clock ?? SystemClock.Instance;
-    }
 
     public void ConvertDataBefore(Schema schema, ContentData data)
     {

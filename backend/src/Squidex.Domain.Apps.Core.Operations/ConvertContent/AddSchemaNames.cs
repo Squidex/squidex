@@ -12,15 +12,8 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class AddSchemaNames : IContentItemConverter
+public sealed class AddSchemaNames(ResolvedComponents components) : IContentItemConverter
 {
-    private readonly ResolvedComponents components;
-
-    public AddSchemaNames(ResolvedComponents components)
-    {
-        this.components = components;
-    }
-
     public JsonObject ConvertItemAfter(IField parentField, JsonObject source, IEnumerable<IField> schema)
     {
         if (parentField is IArrayField)

@@ -17,10 +17,8 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public sealed class AssetsBulkUpdateCommandMiddleware : ICommandMiddleware
+public sealed class AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider) : ICommandMiddleware
 {
-    private readonly IContextProvider contextProvider;
-
     private sealed record BulkTask(
         BulkUpdateJob BulkJob,
         BulkUpdateAssets Bulk,
@@ -41,11 +39,6 @@ public sealed class AssetsBulkUpdateCommandMiddleware : ICommandMiddleware
         {
             return new BulkTask(bulkJob, bulk, jobIndex, null).SetResult(exception);
         }
-    }
-
-    public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider)
-    {
-        this.contextProvider = contextProvider;
     }
 
     public async Task HandleAsync(CommandContext context, NextDelegate next,

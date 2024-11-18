@@ -14,11 +14,19 @@ public static class ResizeServices
 {
     public static void AddSquidexImageResizing(this IServiceCollection services, IConfiguration config)
     {
-        var thumbnailGenerator = new CompositeThumbnailGenerator(
+        services.AddSingletonAs<ImageSharpThumbnailGenerator>()
+            .AsSelf();
+
+        services.AddSingletonAs<ImageMagickThumbnailGenerator>()
+            .AsSelf();
+
+        services.AddSingletonAs(c =>
+            new CompositeThumbnailGenerator(
             [
-                new ImageSharpThumbnailGenerator(),
-                new ImageMagickThumbnailGenerator()
-            ]);
+                c.GetRequiredService<ImageSharpThumbnailGenerator>(),
+                c.GetRequiredService<ImageMagickThumbnailGenerator>()
+            ]))
+            .AsSelf();
 
         var resizerUrl = config.GetValue<string>("assets:resizerUrl");
 
@@ -29,12 +37,15 @@ public static class ResizeServices
                 options.BaseAddress = new Uri(resizerUrl);
             });
 
-            services.AddSingletonAs(c => new RemoteThumbnailGenerator(c.GetRequiredService<IHttpClientFactory>(), thumbnailGenerator))
+            services.AddSingletonAs(c =>
+                    new RemoteThumbnailGenerator(
+                        c.GetRequiredService<IHttpClientFactory>(),
+                        c.GetRequiredService<CompositeThumbnailGenerator>()))
                 .As<IAssetThumbnailGenerator>();
         }
         else
         {
-            services.AddSingletonAs(c => thumbnailGenerator)
+            services.AddSingletonAs(c => c.GetRequiredService<CompositeThumbnailGenerator>())
                 .As<IAssetThumbnailGenerator>();
         }
     }

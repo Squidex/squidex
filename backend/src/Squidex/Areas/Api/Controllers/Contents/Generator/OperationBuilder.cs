@@ -16,17 +16,8 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator;
 
-internal sealed class OperationBuilder
+internal sealed class OperationBuilder(OperationsBuilder operations, OpenApiOperation operation)
 {
-    private readonly OpenApiOperation operation = new OpenApiOperation();
-    private readonly OperationsBuilder operations;
-
-    public OperationBuilder(OperationsBuilder operations, OpenApiOperation operation)
-    {
-        this.operations = operations;
-        this.operation = operation;
-    }
-
     public OperationBuilder Operation(string name)
     {
         operation.OperationId = $"{name}{operations.SchemaTypeName}Content";

@@ -13,13 +13,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Apps;
 
-public sealed class MongoAppRepository : MongoSnapshotStoreBase<App, MongoAppEntity>, IAppRepository, IDeleter
+public sealed class MongoAppRepository(IMongoDatabase database) : MongoSnapshotStoreBase<App, MongoAppEntity>(database), IAppRepository, IDeleter
 {
-    public MongoAppRepository(IMongoDatabase database)
-        : base(database)
-    {
-    }
-
     protected override string CollectionName()
     {
         return "States_Apps";

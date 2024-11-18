@@ -21,17 +21,9 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public sealed partial class AssetFolderDomainObject : DomainObject<AssetFolder>
+public sealed partial class AssetFolderDomainObject(DomainId id, IPersistenceFactory<AssetFolder> persistence, ILogger<AssetFolderDomainObject> log,
+    IServiceProvider serviceProvider) : DomainObject<AssetFolder>(id, persistence, log)
 {
-    private readonly IServiceProvider serviceProvider;
-
-    public AssetFolderDomainObject(DomainId id, IPersistenceFactory<AssetFolder> persistence, ILogger<AssetFolderDomainObject> log,
-        IServiceProvider serviceProvider)
-        : base(id, persistence, log)
-    {
-        this.serviceProvider = serviceProvider;
-    }
-
     protected override bool IsDeleted(AssetFolder snapshot)
     {
         return Snapshot.IsDeleted;

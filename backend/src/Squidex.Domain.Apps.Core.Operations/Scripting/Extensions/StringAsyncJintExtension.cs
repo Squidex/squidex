@@ -15,18 +15,10 @@ using Squidex.Text.Translations;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions;
 
-public sealed class StringAsyncJintExtension : IJintExtension, IScriptDescriptor
+public sealed class StringAsyncJintExtension(ITranslator translator, IChatAgent chatAgent) : IJintExtension, IScriptDescriptor
 {
     private delegate void TextGenerateDelegate(string prompt, Action<JsValue> callback);
     private delegate void TextTranslateDelegate(string text, string language, Action<JsValue> callback, string sourceLanguage);
-    private readonly ITranslator translator;
-    private readonly IChatAgent chatAgent;
-
-    public StringAsyncJintExtension(ITranslator translator, IChatAgent chatAgent)
-    {
-        this.translator = translator;
-        this.chatAgent = chatAgent;
-    }
 
     public void ExtendAsync(ScriptExecutionContext context)
     {

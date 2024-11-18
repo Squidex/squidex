@@ -11,15 +11,8 @@ using Squidex.Infrastructure.States;
 
 namespace Migrations.Migrations;
 
-public sealed class ClearSchemas : IMigration
+public sealed class ClearSchemas(IStore<Schema> store) : IMigration
 {
-    private readonly IStore<Schema> store;
-
-    public ClearSchemas(IStore<Schema> store)
-    {
-        this.store = store;
-    }
-
     public Task UpdateAsync(
         CancellationToken ct)
     {

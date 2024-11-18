@@ -15,8 +15,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Users.MongoDb;
 
-public sealed class MongoUserStore :
-    MongoRepositoryBase<MongoUser>,
+public sealed class MongoUserStore(IMongoDatabase database) :
+    MongoRepositoryBase<MongoUser>(database),
     IUserAuthenticationTokenStore<IdentityUser>,
     IUserAuthenticatorKeyStore<IdentityUser>,
     IUserClaimStore<IdentityUser>,
@@ -121,11 +121,6 @@ public sealed class MongoUserStore :
             cm.MapMember(x => x.TwoFactorEnabled)
                 .SetIgnoreIfDefault(true);
         });
-    }
-
-    public MongoUserStore(IMongoDatabase database)
-        : base(database)
-    {
     }
 
     protected override string CollectionName()

@@ -12,15 +12,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb;
 
-public sealed class RestructureContentCollection : MongoBase<BsonDocument>, IMigration
+public sealed class RestructureContentCollection(IMongoDatabase contentDatabase) : MongoBase<BsonDocument>, IMigration
 {
-    private readonly IMongoDatabase contentDatabase;
-
-    public RestructureContentCollection(IMongoDatabase contentDatabase)
-    {
-        this.contentDatabase = contentDatabase;
-    }
-
     public async Task UpdateAsync(
         CancellationToken ct)
     {

@@ -22,20 +22,14 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
-public sealed partial class ScriptingCompleter
+public sealed partial class ScriptingCompleter(IEnumerable<IScriptDescriptor> descriptors)
 {
-    private readonly IEnumerable<IScriptDescriptor> descriptors;
     private static readonly FilterSchema DynamicData = new FilterSchema(FilterSchemaType.Object)
     {
         Fields = ReadonlyList.Create(
             new FilterField(new FilterSchema(FilterSchemaType.Object), "my-field"),
             new FilterField(FilterSchema.String, "my-field.iv"))
     };
-
-    public ScriptingCompleter(IEnumerable<IScriptDescriptor> descriptors)
-    {
-        this.descriptors = descriptors;
-    }
 
     public IReadOnlyList<ScriptingValue> Trigger(string type)
     {
@@ -111,19 +105,11 @@ public sealed partial class ScriptingCompleter
         return new Process(descriptors).UsageTrigger();
     }
 
-    private sealed partial class Process
+    private sealed partial class Process(IEnumerable<IScriptDescriptor> descriptors, FilterSchema? dataSchema = null)
     {
         private static readonly Regex RegexProperty = BuildPropertyRegex();
         private readonly Stack<string> prefixes = new Stack<string>();
         private readonly Dictionary<string, ScriptingValue> result = [];
-        private readonly IEnumerable<IScriptDescriptor> descriptors;
-        private readonly FilterSchema? dataSchema;
-
-        public Process(IEnumerable<IScriptDescriptor> descriptors, FilterSchema? dataSchema = null)
-        {
-            this.descriptors = descriptors;
-            this.dataSchema = dataSchema;
-        }
 
         public IReadOnlyList<ScriptingValue> SchemaTrigger()
         {

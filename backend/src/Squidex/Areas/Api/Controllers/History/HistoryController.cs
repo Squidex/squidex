@@ -18,16 +18,8 @@ namespace Squidex.Areas.Api.Controllers.History;
 /// Readonly API to get an event stream.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(History))]
-public sealed class HistoryController : ApiController
+public sealed class HistoryController(ICommandBus commandBus, IHistoryService historyService) : ApiController(commandBus)
 {
-    private readonly IHistoryService historyService;
-
-    public HistoryController(ICommandBus commandBus, IHistoryService historyService)
-        : base(commandBus)
-    {
-        this.historyService = historyService;
-    }
-
     /// <summary>
     /// Get the app history.
     /// </summary>

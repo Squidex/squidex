@@ -22,7 +22,7 @@ public delegate T ValueResolver<out T>(JsonValue value, IResolveFieldContext fie
 
 public delegate Task<T> AsyncValueResolver<T>(JsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
-internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
+internal sealed class FieldVisitor(Builder builder) : IFieldVisitor<FieldGraphSchema, FieldInfo>
 {
     public static readonly IFieldResolver JsonScalar = CreateValueResolver((value, fieldContext, contex) => value.Value);
     public static readonly IFieldResolver JsonPath = CreateValueResolver(ContentActions.Json.Resolver);
@@ -127,13 +127,6 @@ internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
             fieldContext.FieldNames(),
             fieldContext.CacheDuration());
     });
-
-    private readonly Builder builder;
-
-    public FieldVisitor(Builder builder)
-    {
-        this.builder = builder;
-    }
 
     public FieldGraphSchema Visit(IArrayField field, FieldInfo args)
     {

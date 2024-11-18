@@ -7,9 +7,8 @@
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting;
 
-internal sealed class MockupHttpHandler : HttpMessageHandler
+internal sealed class MockupHttpHandler(HttpResponseMessage response) : HttpMessageHandler
 {
-    private readonly HttpResponseMessage response;
     private HttpRequestMessage currentRequest;
     private string? currentContent;
     private string? currentContentType;
@@ -33,11 +32,6 @@ internal sealed class MockupHttpHandler : HttpMessageHandler
     {
         Assert.Equal(content, currentContent);
         Assert.Equal(contentType, currentContentType);
-    }
-
-    public MockupHttpHandler(HttpResponseMessage response)
-    {
-        this.response = response;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,

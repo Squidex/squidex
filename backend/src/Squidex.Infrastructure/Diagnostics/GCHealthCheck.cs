@@ -11,14 +11,9 @@ using Microsoft.Extensions.Options;
 
 namespace Squidex.Infrastructure.Diagnostics;
 
-public sealed class GCHealthCheck : IHealthCheck
+public sealed class GCHealthCheck(IOptions<GCHealthCheckOptions> options) : IHealthCheck
 {
-    private readonly long threshold;
-
-    public GCHealthCheck(IOptions<GCHealthCheckOptions> options)
-    {
-        threshold = 1024 * 1024 * options.Value.ThresholdInMB;
-    }
+    private readonly long threshold = 1024 * 1024 * options.Value.ThresholdInMB;
 
     public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
         CancellationToken cancellationToken = default)

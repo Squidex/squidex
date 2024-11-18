@@ -13,15 +13,8 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class ExcludeChangedTypes : IContentFieldConverter, IContentValueConverter
+public sealed class ExcludeChangedTypes(IJsonSerializer serializer) : IContentFieldConverter, IContentValueConverter
 {
-    private readonly IJsonSerializer serializer;
-
-    public ExcludeChangedTypes(IJsonSerializer serializer)
-    {
-        this.serializer = serializer;
-    }
-
     public ContentFieldData? ConvertFieldBefore(IRootField field, ContentFieldData source)
     {
         foreach (var (_, value) in source)

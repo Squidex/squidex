@@ -13,17 +13,9 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.Slack;
 
-public sealed class SlackActionHandler : RuleActionHandler<SlackAction, SlackJob>
+public sealed class SlackActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory) : RuleActionHandler<SlackAction, SlackJob>(formatter)
 {
     private const string Description = "Send message to slack";
-
-    private readonly IHttpClientFactory httpClientFactory;
-
-    public SlackActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
-        : base(formatter)
-    {
-        this.httpClientFactory = httpClientFactory;
-    }
 
     protected override async Task<(string Description, SlackJob Data)> CreateJobAsync(EnrichedEvent @event, SlackAction action)
     {

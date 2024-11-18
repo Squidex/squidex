@@ -12,15 +12,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb;
 
-public sealed class RenameAssetSlugField : MongoBase<BsonDocument>, IMigration
+public sealed class RenameAssetSlugField(IMongoDatabase database) : MongoBase<BsonDocument>, IMigration
 {
-    private readonly IMongoDatabase database;
-
-    public RenameAssetSlugField(IMongoDatabase database)
-    {
-        this.database = database;
-    }
-
     public Task UpdateAsync(
         CancellationToken ct)
     {

@@ -105,6 +105,24 @@ public sealed class AssetContentQueryDto
     [FromQuery(Name = "format")]
     public ImageFormat? Format { get; set; }
 
+    /// <summary>
+    /// Adds the image with the given URL on to of your image. If the watermark cannot be loaded or found, the watermark is just ignored.
+    /// </summary>
+    [FromQuery(Name = "watermarkUrl")]
+    public string? WatermarkUrl { get; set; }
+
+    /// <summary>
+    /// The opacity of the watermark image.
+    /// </summary>
+    [FromQuery(Name = "watermarkOpacity")]
+    public float WatermarkOpacity { get; set; } = 1;
+
+    /// <summary>
+    /// The anchor where the watermark should be placed.
+    /// </summary>
+    [FromQuery(Name = "watermarkAnchor")]
+    public WatermarkAnchor WatermarkAnchor { get; set; }
+
     public ResizeOptions ToResizeOptions(
         Asset asset,
         bool allowAvifAuto,

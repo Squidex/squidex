@@ -25,29 +25,15 @@ namespace Squidex.Areas.Api.Controllers.Assets;
 /// Uploads and retrieves assets.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Assets))]
-public sealed class AssetContentController : ApiController
+public sealed class AssetContentController(
+    ICommandBus commandBus,
+    IAssetFileStore assetFileStore,
+    IAssetQueryService assetQuery,
+    IAssetLoader assetLoader,
+    IAssetThumbnailGenerator assetGenerator,
+    IOptions<AssetOptions> assetOptions) : ApiController(commandBus)
 {
-    private readonly IAssetFileStore assetFileStore;
-    private readonly IAssetQueryService assetQuery;
-    private readonly IAssetLoader assetLoader;
-    private readonly IAssetThumbnailGenerator assetGenerator;
-    private readonly AssetOptions assetOptions;
-
-    public AssetContentController(
-        ICommandBus commandBus,
-        IAssetFileStore assetFileStore,
-        IAssetQueryService assetQuery,
-        IAssetLoader assetLoader,
-        IAssetThumbnailGenerator assetGenerator,
-        IOptions<AssetOptions> assetOptions)
-        : base(commandBus)
-    {
-        this.assetFileStore = assetFileStore;
-        this.assetQuery = assetQuery;
-        this.assetLoader = assetLoader;
-        this.assetGenerator = assetGenerator;
-        this.assetOptions = assetOptions.Value;
-    }
+    private readonly AssetOptions assetOptions = assetOptions.Value;
 
     /// <summary>
     /// Get the asset content.

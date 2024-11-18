@@ -25,18 +25,12 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
+public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJintExtension, IScriptDescriptor
 {
     private delegate void UpdateAssetDelegate(JsValue asset, JsValue metadata);
     private delegate void GetAssetsDelegate(JsValue references, Action<JsValue> callback);
     private delegate void GetAssetTextDelegate(JsValue asset, Action<JsValue> callback, JsValue? encoding);
     private delegate void GetBlurHashDelegate(JsValue asset, Action<JsValue> callback, JsValue? componentX, JsValue? componentY);
-    private readonly IServiceProvider serviceProvider;
-
-    public AssetsJintExtension(IServiceProvider serviceProvider)
-    {
-        this.serviceProvider = serviceProvider;
-    }
 
     public void ExtendAsync(ScriptExecutionContext context)
     {

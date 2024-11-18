@@ -15,15 +15,9 @@ using Squidex.Text;
 
 namespace Squidex.Web;
 
-public sealed class ApiModelValidationAttribute : ActionFilterAttribute
+public sealed class ApiModelValidationAttribute(bool allErrors) : ActionFilterAttribute
 {
     private const string RequestBodyTooLarge = "Request body too large.";
-    private readonly bool allErrors;
-
-    public ApiModelValidationAttribute(bool allErrors)
-    {
-        this.allErrors = allErrors;
-    }
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {

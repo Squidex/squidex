@@ -14,14 +14,9 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 
-public sealed class RuleTriggerValidator : IRuleTriggerVisitor<Task<IEnumerable<ValidationError>>>
+public sealed class RuleTriggerValidator(Func<DomainId, Task<Schema?>> schemaProvider) : IRuleTriggerVisitor<Task<IEnumerable<ValidationError>>>
 {
-    public Func<DomainId, Task<Schema?>> SchemaProvider { get; }
-
-    public RuleTriggerValidator(Func<DomainId, Task<Schema?>> schemaProvider)
-    {
-        SchemaProvider = schemaProvider;
-    }
+    public Func<DomainId, Task<Schema?>> SchemaProvider { get; } = schemaProvider;
 
     public static Task<IEnumerable<ValidationError>> ValidateAsync(DomainId appId, RuleTrigger trigger, IAppProvider appProvider)
     {

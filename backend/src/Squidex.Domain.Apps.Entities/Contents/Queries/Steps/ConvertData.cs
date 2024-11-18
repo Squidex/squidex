@@ -18,22 +18,10 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
-public sealed class ConvertData : IContentEnricherStep
+public sealed class ConvertData(IUrlGenerator urlGenerator, IJsonSerializer serializer,
+    IAssetRepository assetRepository, IContentRepository contentRepository) : IContentEnricherStep
 {
-    private readonly IUrlGenerator urlGenerator;
-    private readonly IAssetRepository assetRepository;
-    private readonly IContentRepository contentRepository;
-    private readonly ExcludeChangedTypes excludeChangedTypes;
-
-    public ConvertData(IUrlGenerator urlGenerator, IJsonSerializer serializer,
-        IAssetRepository assetRepository, IContentRepository contentRepository)
-    {
-        this.urlGenerator = urlGenerator;
-        this.assetRepository = assetRepository;
-        this.contentRepository = contentRepository;
-
-        excludeChangedTypes = new ExcludeChangedTypes(serializer);
-    }
+    private readonly ExcludeChangedTypes excludeChangedTypes = new ExcludeChangedTypes(serializer);
 
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)

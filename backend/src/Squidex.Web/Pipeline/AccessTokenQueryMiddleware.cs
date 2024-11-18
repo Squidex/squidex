@@ -10,15 +10,8 @@ using Microsoft.Net.Http.Headers;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class AccessTokenQueryMiddleware
+public sealed class AccessTokenQueryMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
-    public AccessTokenQueryMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
-
     public Task InvokeAsync(HttpContext context)
     {
         var request = context.Request;

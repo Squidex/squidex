@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntityText>>
+public sealed class MongoTextIndex(IMongoDatabase database, string shardKey) : MongoTextIndexBase<List<MongoTextIndexEntityText>>(database, shardKey, new CommandFactory<List<MongoTextIndexEntityText>>(BuildTexts))
 {
     private record struct SearchOperation
     {
@@ -26,11 +26,6 @@ public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntit
         required public int Take { get; set; }
 
         required public SearchScope SearchScope { get; init; }
-    }
-
-    public MongoTextIndex(IMongoDatabase database, string shardKey)
-        : base(database, shardKey, new CommandFactory<List<MongoTextIndexEntityText>>(BuildTexts))
-    {
     }
 
     protected override async Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<List<MongoTextIndexEntityText>>> collection,

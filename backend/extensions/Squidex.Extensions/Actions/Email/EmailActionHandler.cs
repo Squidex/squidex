@@ -15,13 +15,8 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.Email;
 
-public sealed class EmailActionHandler : RuleActionHandler<EmailAction, EmailJob>
+public sealed class EmailActionHandler(RuleEventFormatter formatter) : RuleActionHandler<EmailAction, EmailJob>(formatter)
 {
-    public EmailActionHandler(RuleEventFormatter formatter)
-        : base(formatter)
-    {
-    }
-
     protected override async Task<(string Description, EmailJob Data)> CreateJobAsync(EnrichedEvent @event, EmailAction action)
     {
         var ruleJob = new EmailJob

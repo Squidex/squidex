@@ -12,19 +12,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-public sealed class RuleQueueWriter : IAsyncDisposable
+public sealed class RuleQueueWriter(IRuleEventRepository ruleEventRepository, IRuleUsageTracker ruleUsageTracker, ILogger? log) : IAsyncDisposable
 {
     private readonly List<RuleEventWrite> writes = [];
-    private readonly IRuleEventRepository ruleEventRepository;
-    private readonly IRuleUsageTracker ruleUsageTracker;
-    private readonly ILogger? log;
-
-    public RuleQueueWriter(IRuleEventRepository ruleEventRepository, IRuleUsageTracker ruleUsageTracker, ILogger? log)
-    {
-        this.ruleEventRepository = ruleEventRepository;
-        this.ruleUsageTracker = ruleUsageTracker;
-        this.log = log;
-    }
 
     public async Task<bool> WriteAsync(JobResult result)
     {

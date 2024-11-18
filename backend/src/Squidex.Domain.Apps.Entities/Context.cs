@@ -74,15 +74,9 @@ public sealed class Context
         return UserPermissions.Allows(permissionId, App.Name, schema);
     }
 
-    private sealed class HeaderBuilder : ICloneBuilder
+    private sealed class HeaderBuilder(Context context) : ICloneBuilder
     {
-        private readonly Context context;
         private Dictionary<string, string>? headers;
-
-        public HeaderBuilder(Context context)
-        {
-            this.context = context;
-        }
 
         public Context Build()
         {

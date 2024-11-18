@@ -18,17 +18,9 @@ namespace Squidex.Areas.Api.Controllers.Jobs;
 /// Update and query jobs for app.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Jobs))]
-public class JobsContentController : ApiController
+public class JobsContentController(ICommandBus commandBus,
+    IJobService jobService) : ApiController(commandBus)
 {
-    private readonly IJobService jobService;
-
-    public JobsContentController(ICommandBus commandBus,
-        IJobService jobService)
-        : base(commandBus)
-    {
-        this.jobService = jobService;
-    }
-
     /// <summary>
     /// Get the job content.
     /// </summary>

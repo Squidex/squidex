@@ -16,16 +16,8 @@ namespace Squidex.Areas.Api.Controllers.Ping;
 /// Makes a ping request.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Ping))]
-public sealed class PingController : ApiController
+public sealed class PingController(ICommandBus commandBus, ExposedValues exposedValues) : ApiController(commandBus)
 {
-    private readonly ExposedValues exposedValues;
-
-    public PingController(ICommandBus commandBus, ExposedValues exposedValues)
-        : base(commandBus)
-    {
-        this.exposedValues = exposedValues;
-    }
-
     /// <summary>
     /// Get API information.
     /// </summary>

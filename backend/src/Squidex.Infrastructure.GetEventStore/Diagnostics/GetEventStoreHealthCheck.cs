@@ -10,14 +10,9 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Squidex.Infrastructure.Diagnostics;
 
-public sealed class GetEventStoreHealthCheck : IHealthCheck
+public sealed class GetEventStoreHealthCheck(EventStoreClientSettings settings) : IHealthCheck
 {
-    private readonly EventStoreClient client;
-
-    public GetEventStoreHealthCheck(EventStoreClientSettings settings)
-    {
-        client = new EventStoreClient(settings);
-    }
+    private readonly EventStoreClient client = new EventStoreClient(settings);
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
         CancellationToken cancellationToken = default)

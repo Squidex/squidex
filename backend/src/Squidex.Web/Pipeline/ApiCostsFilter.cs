@@ -13,15 +13,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class ApiCostsFilter : IAsyncActionFilter, IFilterContainer
+public sealed class ApiCostsFilter(IUsageGate usageGate) : IAsyncActionFilter, IFilterContainer
 {
-    private readonly IUsageGate usageGate;
-
-    public ApiCostsFilter(IUsageGate usageGate)
-    {
-        this.usageGate = usageGate;
-    }
-
     IFilterMetadata IFilterContainer.FilterDefinition { get; set; }
 
     public ApiCostsAttribute FilterDefinition

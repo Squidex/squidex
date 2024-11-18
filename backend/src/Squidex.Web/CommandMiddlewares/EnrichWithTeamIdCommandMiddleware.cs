@@ -13,15 +13,8 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Web.CommandMiddlewares;
 
-public sealed class EnrichWithTeamIdCommandMiddleware : ICommandMiddleware
+public sealed class EnrichWithTeamIdCommandMiddleware(IHttpContextAccessor httpContextAccessor) : ICommandMiddleware
 {
-    private readonly IHttpContextAccessor httpContextAccessor;
-
-    public EnrichWithTeamIdCommandMiddleware(IHttpContextAccessor httpContextAccessor)
-    {
-        this.httpContextAccessor = httpContextAccessor;
-    }
-
     public Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {

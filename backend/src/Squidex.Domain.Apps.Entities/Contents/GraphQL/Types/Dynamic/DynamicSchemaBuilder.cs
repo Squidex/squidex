@@ -37,9 +37,9 @@ internal static class DynamicSchemaBuilder
                 case GraphQLTypeReference reference:
                     return map.GetValueOrDefault(reference.TypeName) ?? reference;
                 case NonNullGraphType nonNull:
-                    return new NonNullGraphType(Convert(nonNull.ResolvedType));
+                    return new NonNullGraphType(Convert(nonNull.ResolvedType)!);
                 case ListGraphType list:
-                    return new ListGraphType(Convert(list.ResolvedType));
+                    return new ListGraphType(Convert(list.ResolvedType)!);
                 default:
                     return type;
             }

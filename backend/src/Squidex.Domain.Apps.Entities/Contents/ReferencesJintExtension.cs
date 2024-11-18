@@ -17,15 +17,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
+public sealed class ReferencesJintExtension(IServiceProvider serviceProvider) : IJintExtension, IScriptDescriptor
 {
     private delegate void GetReferencesDelegate(JsValue references, Action<JsValue> callback);
-    private readonly IServiceProvider serviceProvider;
-
-    public ReferencesJintExtension(IServiceProvider serviceProvider)
-    {
-        this.serviceProvider = serviceProvider;
-    }
 
     public void ExtendAsync(ScriptExecutionContext context)
     {

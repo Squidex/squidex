@@ -13,14 +13,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class AssetScriptingTests : IClassFixture<ClientFixture>
+public class AssetScriptingTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
-    public ClientFixture _ { get; }
-
-    public AssetScriptingTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_disallow_jpeg_file_on_create()

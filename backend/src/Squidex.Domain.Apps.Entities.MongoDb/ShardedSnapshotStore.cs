@@ -12,16 +12,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb;
 
-public abstract class ShardedSnapshotStore<TStore, TState> : ShardedService<DomainId, TStore>, ISnapshotStore<TState>, IDeleter where TStore : ISnapshotStore<TState>, IDeleter
+public abstract class ShardedSnapshotStore<TStore, TState>(IShardingStrategy sharding, Func<string, TStore> factory, Func<TState, DomainId> getShardKey) : ShardedService<DomainId, TStore>(sharding, factory), ISnapshotStore<TState>, IDeleter where TStore : ISnapshotStore<TState>, IDeleter
 {
-    private readonly Func<TState, DomainId> getShardKey;
-
-    protected ShardedSnapshotStore(IShardingStrategy sharding, Func<string, TStore> factory, Func<TState, DomainId> getShardKey)
-        : base(sharding, factory)
-    {
-        this.getShardKey = getShardKey;
-    }
-
     public Task WriteAsync(SnapshotWriteJob<TState> job,
         CancellationToken ct = default)
     {

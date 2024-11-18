@@ -11,10 +11,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter;
 
-public sealed class CounterService : ICounterService, IDeleter
+public sealed class CounterService(IPersistenceFactory<CounterService.State> persistenceFactory) : ICounterService, IDeleter
 {
-    private readonly IPersistenceFactory<State> persistenceFactory;
-
     [CollectionName("Counters")]
     public sealed class State
     {
@@ -33,11 +31,6 @@ public sealed class CounterService : ICounterService, IDeleter
 
             return true;
         }
-    }
-
-    public CounterService(IPersistenceFactory<State> persistenceFactory)
-    {
-        this.persistenceFactory = persistenceFactory;
     }
 
     async Task IDeleter.DeleteAppAsync(App app,

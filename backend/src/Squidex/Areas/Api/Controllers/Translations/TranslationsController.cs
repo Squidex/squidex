@@ -25,21 +25,10 @@ namespace Squidex.Areas.Api.Controllers.Translations;
 /// </summary>
 [ApiModelValidation(true)]
 [ApiExplorerSettings(GroupName = nameof(Translations))]
-public sealed class TranslationsController : ApiController
+public sealed class TranslationsController(ICommandBus commandBus, IAssetStore assetStore, ITranslator translator, IChatAgent chatAgent) : ApiController(commandBus)
 {
     private static readonly byte[] LineStart = Encoding.UTF8.GetBytes("data: ");
     private static readonly byte[] LineEnd = Encoding.UTF8.GetBytes("\r\r");
-    private readonly IAssetStore assetStore;
-    private readonly ITranslator translator;
-    private readonly IChatAgent chatAgent;
-
-    public TranslationsController(ICommandBus commandBus, IAssetStore assetStore, ITranslator translator, IChatAgent chatAgent)
-        : base(commandBus)
-    {
-        this.assetStore = assetStore;
-        this.translator = translator;
-        this.chatAgent = chatAgent;
-    }
 
     [OpenApiIgnore]
     [HttpGet("/ai-images/{*path}")]

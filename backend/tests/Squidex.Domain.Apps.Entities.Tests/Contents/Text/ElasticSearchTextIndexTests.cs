@@ -10,18 +10,13 @@
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class ElasticSearchTextIndexTests : TextIndexerTestsBase, IClassFixture<ElasticSearchTextIndexFixture>
+public class ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture) : TextIndexerTestsBase, IClassFixture<ElasticSearchTextIndexFixture>
 {
     public override bool SupportsGeo => true;
 
     public override int WaitAfterUpdate => 2000;
 
-    public ElasticSearchTextIndexFixture _ { get; }
-
-    public ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ElasticSearchTextIndexFixture _ { get; } = fixture;
 
     public override ITextIndex CreateIndex()
     {

@@ -18,20 +18,8 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Actions.Typesense;
 
-public sealed class TypesenseActionHandler : RuleActionHandler<TypesenseAction, TypesenseJob>
+public sealed class TypesenseActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory, IScriptEngine scriptEngine, IJsonSerializer serializer) : RuleActionHandler<TypesenseAction, TypesenseJob>(formatter)
 {
-    private readonly IScriptEngine scriptEngine;
-    private readonly IHttpClientFactory httpClientFactory;
-    private readonly IJsonSerializer serializer;
-
-    public TypesenseActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory, IScriptEngine scriptEngine, IJsonSerializer serializer)
-        : base(formatter)
-    {
-        this.scriptEngine = scriptEngine;
-        this.httpClientFactory = httpClientFactory;
-        this.serializer = serializer;
-    }
-
     protected override async Task<(string Description, TypesenseJob Data)> CreateJobAsync(EnrichedEvent @event, TypesenseAction action)
     {
         var delete = @event.ShouldDelete(scriptEngine, action.Delete);

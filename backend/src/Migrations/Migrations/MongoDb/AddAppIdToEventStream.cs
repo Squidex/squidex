@@ -15,15 +15,8 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb;
 
-public sealed class AddAppIdToEventStream : MongoBase<BsonDocument>, IMigration
+public sealed class AddAppIdToEventStream(IMongoDatabase database) : MongoBase<BsonDocument>, IMigration
 {
-    private readonly IMongoDatabase database;
-
-    public AddAppIdToEventStream(IMongoDatabase database)
-    {
-        this.database = database;
-    }
-
     public async Task UpdateAsync(
         CancellationToken ct)
     {

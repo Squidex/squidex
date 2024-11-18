@@ -14,13 +14,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 
-public sealed class MongoSchemaRepository : MongoSnapshotStoreBase<Schema, MongoSchemaEntity>, ISchemaRepository, IDeleter
+public sealed class MongoSchemaRepository(IMongoDatabase database) : MongoSnapshotStoreBase<Schema, MongoSchemaEntity>(database), ISchemaRepository, IDeleter
 {
-    public MongoSchemaRepository(IMongoDatabase database)
-        : base(database)
-    {
-    }
-
     protected override string CollectionName()
     {
         return "States_Schemas";

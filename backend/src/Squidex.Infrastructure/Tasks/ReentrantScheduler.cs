@@ -11,14 +11,9 @@ namespace Squidex.Infrastructure.Tasks;
 public delegate Task ReentrantSchedulerTask(CancellationToken ct);
 #pragma warning restore MA0048 // File name must match type name
 
-public sealed class ReentrantScheduler
+public sealed class ReentrantScheduler(int maxDegreeOfParallelism)
 {
-    private readonly TaskScheduler taskScheduler;
-
-    public ReentrantScheduler(int maxDegreeOfParallelism)
-    {
-        taskScheduler = new LimitedConcurrencyLevelTaskScheduler(maxDegreeOfParallelism);
-    }
+    private readonly TaskScheduler taskScheduler = new LimitedConcurrencyLevelTaskScheduler(maxDegreeOfParallelism);
 
     public Task ScheduleAsync(ReentrantSchedulerTask action,
         CancellationToken ct = default)

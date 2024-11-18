@@ -11,13 +11,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.Caching;
 
-public sealed class MongoDistributedCache : MongoRepositoryBase<MongoCacheEntry>, IDistributedCache
+public sealed class MongoDistributedCache(IMongoDatabase database) : MongoRepositoryBase<MongoCacheEntry>(database), IDistributedCache
 {
-    public MongoDistributedCache(IMongoDatabase database)
-        : base(database)
-    {
-    }
-
     protected override string CollectionName()
     {
         return "Cache";

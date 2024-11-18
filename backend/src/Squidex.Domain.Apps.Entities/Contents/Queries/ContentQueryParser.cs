@@ -24,24 +24,11 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class ContentQueryParser
+public class ContentQueryParser(IAppProvider appprovider, ITextIndex textIndex, IOptions<ContentOptions> options,
+    IMemoryCache cache, IJsonSerializer serializer)
 {
     private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
-    private readonly IMemoryCache cache;
-    private readonly IJsonSerializer serializer;
-    private readonly IAppProvider appProvider;
-    private readonly ITextIndex textIndex;
-    private readonly ContentOptions options;
-
-    public ContentQueryParser(IAppProvider appprovider, ITextIndex textIndex, IOptions<ContentOptions> options,
-        IMemoryCache cache, IJsonSerializer serializer)
-    {
-        this.serializer = serializer;
-        this.appProvider = appprovider;
-        this.textIndex = textIndex;
-        this.cache = cache;
-        this.options = options.Value;
-    }
+    private readonly ContentOptions options = options.Value;
 
     public virtual async Task<Q> ParseAsync(Context context, Q q, Schema? schema = null,
         CancellationToken ct = default)
@@ -125,7 +112,7 @@ public class ContentQueryParser
 
         if (schema != null)
         {
-            components = await appProvider.GetComponentsAsync(schema, ct);
+            components = await appprovider.GetComponentsAsync(schema, ct);
         }
 
         var query = q.Query;

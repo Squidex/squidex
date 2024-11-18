@@ -22,16 +22,8 @@ namespace Squidex.Areas.Api.Controllers.Apps;
 /// Update and query apps.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Apps))]
-public sealed class AppWorkflowsController : ApiController
+public sealed class AppWorkflowsController(ICommandBus commandBus, IWorkflowsValidator workflowsValidator) : ApiController(commandBus)
 {
-    private readonly IWorkflowsValidator workflowsValidator;
-
-    public AppWorkflowsController(ICommandBus commandBus, IWorkflowsValidator workflowsValidator)
-        : base(commandBus)
-    {
-        this.workflowsValidator = workflowsValidator;
-    }
-
     /// <summary>
     /// Get app workflow.
     /// </summary>

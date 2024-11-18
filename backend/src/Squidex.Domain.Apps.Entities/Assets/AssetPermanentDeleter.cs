@@ -12,23 +12,14 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class AssetPermanentDeleter : IEventConsumer
+public sealed class AssetPermanentDeleter(IAssetFileStore assetFileStore, TypeRegistry typeRegistry) : IEventConsumer
 {
-    private readonly IAssetFileStore assetFileStore;
-    private readonly HashSet<string> consumingTypes;
-
-    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("asset-");
-
-    public AssetPermanentDeleter(IAssetFileStore assetFileStore, TypeRegistry typeRegistry)
-    {
-        this.assetFileStore = assetFileStore;
-
-        // Compute the event types names once for performance reasons and use hashset for extensibility.
-        consumingTypes =
+    private readonly HashSet<string> consumingTypes =
         [
             typeRegistry.GetName<IEvent, AssetDeleted>()
         ];
-    }
+
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("asset-");
 
     public ValueTask<bool> HandlesAsync(StoredEvent @event)
     {

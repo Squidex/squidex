@@ -10,17 +10,9 @@ using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes;
 
-public class TranslateBackend
+public class TranslateBackend(DirectoryInfo folder, TranslationService service)
 {
-    private readonly TranslationService service;
-    private readonly DirectoryInfo folder;
-
-    public TranslateBackend(DirectoryInfo folder, TranslationService service)
-    {
-        this.folder = Backend.GetFolder(folder);
-
-        this.service = service;
-    }
+    private readonly DirectoryInfo folder = Backend.GetFolder(folder);
 
     public void Run()
     {

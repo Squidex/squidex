@@ -13,54 +13,35 @@ using OpenIddict.Abstractions;
 
 namespace Squidex.Domain.Users.InMemory;
 
-public sealed class ImmutableApplication
+public sealed class ImmutableApplication(string id, OpenIddictApplicationDescriptor descriptor)
 {
-    public string Id { get; }
+    public string Id { get; } = id;
 
-    public string? ClientId { get; }
+    public string? ClientId { get; } = descriptor.ClientId;
 
-    public string? ClientSecret { get; }
+    public string? ClientSecret { get; } = descriptor.ClientSecret;
 
-    public string? ClientType { get; }
+    public string? ClientType { get; } = descriptor.ClientType;
 
-    public string? ConsentType { get; }
+    public string? ConsentType { get; } = descriptor.ConsentType;
 
-    public string? DisplayName { get; }
+    public string? DisplayName { get; } = descriptor.DisplayName;
 
-    public string? ApplicationType { get; }
+    public string? ApplicationType { get; } = descriptor.ApplicationType;
 
-    public JsonWebKeySet? JsonWebKeySet { get; }
+    public JsonWebKeySet? JsonWebKeySet { get; } = descriptor.JsonWebKeySet;
 
-    public ImmutableDictionary<CultureInfo, string> DisplayNames { get; }
+    public ImmutableDictionary<CultureInfo, string> DisplayNames { get; } = descriptor.DisplayNames.ToImmutableDictionary();
 
-    public ImmutableArray<string> Permissions { get; }
+    public ImmutableArray<string> Permissions { get; } = descriptor.Permissions.ToImmutableArray();
 
-    public ImmutableArray<string> PostLogoutRedirectUris { get; }
+    public ImmutableArray<string> PostLogoutRedirectUris { get; } = descriptor.PostLogoutRedirectUris.Select(x => x.ToString()).ToImmutableArray();
 
-    public ImmutableArray<string> RedirectUris { get; }
+    public ImmutableArray<string> RedirectUris { get; } = descriptor.RedirectUris.Select(x => x.ToString()).ToImmutableArray();
 
-    public ImmutableArray<string> Requirements { get; }
+    public ImmutableArray<string> Requirements { get; } = descriptor.Requirements.ToImmutableArray();
 
-    public ImmutableDictionary<string, JsonElement> Properties { get; }
+    public ImmutableDictionary<string, JsonElement> Properties { get; } = descriptor.Properties.ToImmutableDictionary();
 
-    public ImmutableDictionary<string, string> Settings { get; }
-
-    public ImmutableApplication(string id, OpenIddictApplicationDescriptor descriptor)
-    {
-        Id = id;
-        ApplicationType = descriptor.ApplicationType;
-        ClientId = descriptor.ClientId;
-        ClientSecret = descriptor.ClientSecret;
-        ClientType = descriptor.ClientType;
-        ConsentType = descriptor.ConsentType;
-        DisplayName = descriptor.DisplayName;
-        DisplayNames = descriptor.DisplayNames.ToImmutableDictionary();
-        JsonWebKeySet = descriptor.JsonWebKeySet;
-        Permissions = descriptor.Permissions.ToImmutableArray();
-        PostLogoutRedirectUris = descriptor.PostLogoutRedirectUris.Select(x => x.ToString()).ToImmutableArray();
-        Properties = descriptor.Properties.ToImmutableDictionary();
-        RedirectUris = descriptor.RedirectUris.Select(x => x.ToString()).ToImmutableArray();
-        Requirements = descriptor.Requirements.ToImmutableArray();
-        Settings = descriptor.Settings.ToImmutableDictionary();
-    }
+    public ImmutableDictionary<string, string> Settings { get; } = descriptor.Settings.ToImmutableDictionary();
 }

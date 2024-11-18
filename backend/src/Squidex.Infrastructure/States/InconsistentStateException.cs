@@ -8,18 +8,11 @@
 namespace Squidex.Infrastructure.States;
 
 [Serializable]
-public class InconsistentStateException : Exception
+public class InconsistentStateException(long current, long expected, Exception? inner = null) : Exception(FormatMessage(current, expected), inner)
 {
-    public long VersionCurrent { get; }
+    public long VersionCurrent { get; } = current;
 
-    public long VersionExpected { get; }
-
-    public InconsistentStateException(long current, long expected, Exception? inner = null)
-        : base(FormatMessage(current, expected), inner)
-    {
-        VersionCurrent = current;
-        VersionExpected = expected;
-    }
+    public long VersionExpected { get; } = expected;
 
     private static string FormatMessage(long current, long expected)
     {

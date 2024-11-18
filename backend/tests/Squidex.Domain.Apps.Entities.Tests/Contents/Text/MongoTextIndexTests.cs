@@ -10,18 +10,13 @@
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class MongoTextIndexTests : TextIndexerTestsBase, IClassFixture<MongoTextIndexFixture>
+public class MongoTextIndexTests(MongoTextIndexFixture fixture) : TextIndexerTestsBase, IClassFixture<MongoTextIndexFixture>
 {
     public override bool SupportsQuerySyntax => false;
 
     public override bool SupportsGeo => true;
 
-    public MongoTextIndexFixture _ { get; }
-
-    public MongoTextIndexTests(MongoTextIndexFixture fixture)
-    {
-        _ = fixture;
-    }
+    public MongoTextIndexFixture _ { get; } = fixture;
 
     public override ITextIndex CreateIndex()
     {

@@ -15,19 +15,8 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Schemas;
 
-public sealed class SchemasChatTool : IChatToolProvider
+public sealed class SchemasChatTool(IAppProvider appProvider, IJsonSerializer serializer, IUrlGenerator urlGenerator) : IChatToolProvider
 {
-    private readonly IAppProvider appProvider;
-    private readonly IJsonSerializer serializer;
-    private readonly IUrlGenerator urlGenerator;
-
-    public SchemasChatTool(IAppProvider appProvider, IJsonSerializer serializer, IUrlGenerator urlGenerator)
-    {
-        this.appProvider = appProvider;
-        this.serializer = serializer;
-        this.urlGenerator = urlGenerator;
-    }
-
     public async IAsyncEnumerable<IChatTool> GetToolsAsync(ChatContext chatContext,
         [EnumeratorCancellation] CancellationToken ct)
     {

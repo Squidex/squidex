@@ -22,16 +22,8 @@ namespace Squidex.Areas.Api.Controllers.Teams;
 /// Update and query teams.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Teams))]
-public sealed class TeamContributorsController : ApiController
+public sealed class TeamContributorsController(ICommandBus commandBus, IUserResolver userResolver) : ApiController(commandBus)
 {
-    private readonly IUserResolver userResolver;
-
-    public TeamContributorsController(ICommandBus commandBus, IUserResolver userResolver)
-        : base(commandBus)
-    {
-        this.userResolver = userResolver;
-    }
-
     /// <summary>
     /// Get team contributors.
     /// </summary>

@@ -16,15 +16,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 public delegate Task<IReadOnlyList<ContentIdStatus>> CheckUniqueness(FilterNode<ClrValue> filter,
     CancellationToken ct);
 
-public sealed class UniqueValidator : IValidator
+public sealed class UniqueValidator(CheckUniqueness checkUniqueness) : IValidator
 {
-    private readonly CheckUniqueness checkUniqueness;
-
-    public UniqueValidator(CheckUniqueness checkUniqueness)
-    {
-        this.checkUniqueness = checkUniqueness;
-    }
-
     public void Validate(object? value, ValidationContext context)
     {
         var count = context.Path.Count();

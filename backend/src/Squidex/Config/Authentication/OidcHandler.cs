@@ -11,15 +11,8 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Config.Authentication;
 
-public sealed class OidcHandler : OpenIdConnectEvents
+public sealed class OidcHandler(MyIdentityOptions options) : OpenIdConnectEvents
 {
-    private readonly MyIdentityOptions options;
-
-    public OidcHandler(MyIdentityOptions options)
-    {
-        this.options = options;
-    }
-
     public override Task TokenValidated(TokenValidatedContext context)
     {
         var identity = (ClaimsIdentity)context.Principal!.Identity!;

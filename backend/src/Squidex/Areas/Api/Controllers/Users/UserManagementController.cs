@@ -21,16 +21,8 @@ namespace Squidex.Areas.Api.Controllers.Users;
 /// </summary>
 [ApiModelValidation(true)]
 [ApiExplorerSettings(GroupName = "UserManagement")]
-public sealed class UserManagementController : ApiController
+public sealed class UserManagementController(ICommandBus commandBus, IUserService userService) : ApiController(commandBus)
 {
-    private readonly IUserService userService;
-
-    public UserManagementController(ICommandBus commandBus, IUserService userService)
-        : base(commandBus)
-    {
-        this.userService = userService;
-    }
-
     /// <summary>
     /// Get users by query.
     /// </summary>

@@ -15,20 +15,13 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 
-public sealed class ContentDataObject : ObjectInstance
+public sealed class ContentDataObject(Engine engine, ContentData contentData) : ObjectInstance(engine)
 {
-    private readonly ContentData contentData;
     private HashSet<string> fieldsToDelete;
     private Dictionary<string, PropertyDescriptor> fieldProperties;
     private bool isChanged;
 
     public override bool Extensible => true;
-
-    public ContentDataObject(Engine engine, ContentData contentData)
-        : base(engine)
-    {
-        this.contentData = contentData;
-    }
 
     public void MarkChanged()
     {

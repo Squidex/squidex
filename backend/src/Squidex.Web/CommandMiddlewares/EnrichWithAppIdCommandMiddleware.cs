@@ -12,15 +12,8 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Web.CommandMiddlewares;
 
-public sealed class EnrichWithAppIdCommandMiddleware : ICommandMiddleware
+public sealed class EnrichWithAppIdCommandMiddleware(IContextProvider contextProvider) : ICommandMiddleware
 {
-    private readonly IContextProvider contextProvider;
-
-    public EnrichWithAppIdCommandMiddleware(IContextProvider contextProvider)
-    {
-        this.contextProvider = contextProvider;
-    }
-
     public Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {

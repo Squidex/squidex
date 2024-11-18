@@ -19,13 +19,8 @@ public class ShardedServiceTests
     {
     }
 
-    private class TestSut : ShardedService<DomainId, IInner>
+    private class TestSut(IShardingStrategy sharding, Func<string, ShardedServiceTests.IInner> factory) : ShardedService<DomainId, IInner>(sharding, factory)
     {
-        public TestSut(IShardingStrategy sharding, Func<string, IInner> factory)
-            : base(sharding, factory)
-        {
-        }
-
         public IInner ExposeShard(DomainId key)
         {
             return Shard(key);

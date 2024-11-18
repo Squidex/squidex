@@ -15,21 +15,13 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
-public sealed class ResolveReferences : IContentEnricherStep
+public sealed class ResolveReferences(Lazy<IContentQueryService> contentQuery, IRequestCache requestCache) : IContentEnricherStep
 {
     private static readonly ILookup<DomainId, EnrichedContent> EmptyContents = Enumerable.Empty<EnrichedContent>().ToLookup(x => x.Id);
-    private readonly Lazy<IContentQueryService> contentQuery;
-    private readonly IRequestCache requestCache;
 
     private IContentQueryService ContentQuery
     {
         get => contentQuery.Value;
-    }
-
-    public ResolveReferences(Lazy<IContentQueryService> contentQuery, IRequestCache requestCache)
-    {
-        this.contentQuery = contentQuery;
-        this.requestCache = requestCache;
     }
 
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,

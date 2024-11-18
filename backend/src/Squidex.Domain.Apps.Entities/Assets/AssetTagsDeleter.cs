@@ -10,15 +10,8 @@ using Squidex.Domain.Apps.Core.Tags;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class AssetTagsDeleter : IDeleter
+public sealed class AssetTagsDeleter(ITagService tagService) : IDeleter
 {
-    private readonly ITagService tagService;
-
-    public AssetTagsDeleter(ITagService tagService)
-    {
-        this.tagService = tagService;
-    }
-
     public Task DeleteAppAsync(App app,
         CancellationToken ct)
     {

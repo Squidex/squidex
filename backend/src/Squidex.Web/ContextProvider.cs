@@ -10,9 +10,8 @@ using Squidex.Domain.Apps.Entities;
 
 namespace Squidex.Web;
 
-public sealed class ContextProvider : IContextProvider
+public sealed class ContextProvider(IHttpContextAccessor httpContextAccessor) : IContextProvider
 {
-    private readonly IHttpContextAccessor httpContextAccessor;
     private readonly AsyncLocal<Context> asyncLocal = new AsyncLocal<Context>();
 
     public Context Context
@@ -28,10 +27,5 @@ public sealed class ContextProvider : IContextProvider
 
             return httpContextAccessor.HttpContext.Context();
         }
-    }
-
-    public ContextProvider(IHttpContextAccessor httpContextAccessor)
-    {
-        this.httpContextAccessor = httpContextAccessor;
     }
 }

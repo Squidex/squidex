@@ -341,8 +341,9 @@ public class MongoQueryTests
 
         var rendered =
             filter.Render(
-                BsonSerializer.SerializerRegistry.GetSerializer<TestEntity>(),
-                BsonSerializer.SerializerRegistry)
+                new RenderArgs<TestEntity>(
+                    BsonSerializer.SerializerRegistry.GetSerializer<TestEntity>(),
+                    BsonSerializer.SerializerRegistry))
             .ToString();
 
         Assert.Equal(Cleanup(expected, arg), rendered);
@@ -358,9 +359,10 @@ public class MongoQueryTests
             .Invokes((SortDefinition<TestEntity> sortDefinition) =>
             {
                 rendered =
-                   sortDefinition.Render(
-                       BsonSerializer.SerializerRegistry.GetSerializer<TestEntity>(),
-                       BsonSerializer.SerializerRegistry)
+                    sortDefinition.Render(
+                        new RenderArgs<TestEntity>(
+                           BsonSerializer.SerializerRegistry.GetSerializer<TestEntity>(),
+                           BsonSerializer.SerializerRegistry))
                    .ToString();
             });
 

@@ -11,17 +11,8 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
-public sealed class DefaultEventFormatter : IEventFormatter
+public sealed class DefaultEventFormatter(TypeRegistry typeRegistry, IJsonSerializer serializer) : IEventFormatter
 {
-    private readonly IJsonSerializer serializer;
-    private readonly TypeRegistry typeRegistry;
-
-    public DefaultEventFormatter(TypeRegistry typeRegistry, IJsonSerializer serializer)
-    {
-        this.typeRegistry = typeRegistry;
-        this.serializer = serializer;
-    }
-
     public Envelope<IEvent>? ParseIfKnown(StoredEvent storedEvent)
     {
         return ParseCore(storedEvent);

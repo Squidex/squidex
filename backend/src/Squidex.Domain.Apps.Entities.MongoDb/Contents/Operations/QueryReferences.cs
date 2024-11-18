@@ -14,10 +14,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 
-internal sealed class QueryReferences : OperationBase
+internal sealed class QueryReferences(QueryByIds queryByIds) : OperationBase
 {
-    private readonly QueryByIds queryByIds;
-
     public sealed class ReferencedIdsOnly
     {
         [BsonId]
@@ -27,11 +25,6 @@ internal sealed class QueryReferences : OperationBase
         [BsonRequired]
         [BsonElement("rf")]
         public HashSet<DomainId>? ReferencedIds { get; set; }
-    }
-
-    public QueryReferences(QueryByIds queryByIds)
-    {
-        this.queryByIds = queryByIds;
     }
 
     public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,

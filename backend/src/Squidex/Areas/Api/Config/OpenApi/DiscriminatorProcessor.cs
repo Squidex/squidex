@@ -12,15 +12,8 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
 
-public sealed class DiscriminatorProcessor : ISchemaProcessor
+public sealed class DiscriminatorProcessor(TypeRegistry typeRegistry) : ISchemaProcessor
 {
-    private readonly TypeRegistry typeRegistry;
-
-    public DiscriminatorProcessor(TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
-    }
-
     public void Process(SchemaProcessorContext context)
     {
         if (context.Schema.DiscriminatorObject != null)

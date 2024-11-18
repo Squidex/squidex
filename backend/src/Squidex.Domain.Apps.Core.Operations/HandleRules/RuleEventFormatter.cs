@@ -23,15 +23,11 @@ using ValueTaskSupplement;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
-public partial class RuleEventFormatter
+public partial class RuleEventFormatter(IJsonSerializer serializer, IEnumerable<IRuleEventFormatter> formatters, ITemplateEngine templateEngine, IScriptEngine scriptEngine)
 {
     private const string GlobalFallback = "null";
     private static readonly Regex RegexPatternOld = RegexPatternOldFactory();
     private static readonly Regex RegexPatternNew = RegexPatternNewFactory();
-    private readonly IJsonSerializer serializer;
-    private readonly IEnumerable<IRuleEventFormatter> formatters;
-    private readonly ITemplateEngine templateEngine;
-    private readonly IScriptEngine scriptEngine;
 
     private struct TextPart
     {
@@ -68,14 +64,6 @@ public partial class RuleEventFormatter
 
             return result;
         }
-    }
-
-    public RuleEventFormatter(IJsonSerializer serializer, IEnumerable<IRuleEventFormatter> formatters, ITemplateEngine templateEngine, IScriptEngine scriptEngine)
-    {
-        this.serializer = serializer;
-        this.formatters = formatters;
-        this.templateEngine = templateEngine;
-        this.scriptEngine = scriptEngine;
     }
 
     public virtual string ToPayload<T>(T @event) where T : notnull

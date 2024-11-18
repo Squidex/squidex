@@ -17,16 +17,8 @@ using YDotNet.Server.WebSockets;
 
 namespace Squidex.Areas.Api.Controllers.Comments;
 
-public sealed class CommentsController : ApiController
+public sealed class CommentsController(ICommandBus commandBus, ICollaborationService collaboration) : ApiController(commandBus)
 {
-    private readonly ICollaborationService collaboration;
-
-    public CommentsController(ICommandBus commandBus, ICollaborationService collaboration)
-        : base(commandBus)
-    {
-        this.collaboration = collaboration;
-    }
-
     [Route("users/collaboration")]
     [ApiPermission]
     public IActionResult UserDocument()

@@ -9,19 +9,11 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Squidex.Infrastructure.UsageTracking;
 
-public sealed class CachingUsageTracker : IUsageTracker
+public sealed class CachingUsageTracker(IUsageTracker inner, IMemoryCache cache) : IUsageTracker
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
-    private readonly IUsageTracker inner;
-    private readonly IMemoryCache cache;
 
     public string FallbackCategory => inner.FallbackCategory;
-
-    public CachingUsageTracker(IUsageTracker inner, IMemoryCache cache)
-    {
-        this.inner = inner;
-        this.cache = cache;
-    }
 
     public Task DeleteAsync(string key,
         CancellationToken ct = default)

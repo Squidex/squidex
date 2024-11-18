@@ -18,25 +18,15 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class BackupAssets : IBackupHandler
+public sealed class BackupAssets(Rebuilder rebuilder, IAssetFileStore assetFileStore, ITagService tagService) : IBackupHandler
 {
     private const int BatchSize = 100;
     private const string TagsFile = "AssetTags.json";
     private const string TagsAliasFile = "AssetTagsAlias.json";
     private readonly HashSet<DomainId> assetIds = [];
     private readonly HashSet<DomainId> assetFolderIds = [];
-    private readonly Rebuilder rebuilder;
-    private readonly IAssetFileStore assetFileStore;
-    private readonly ITagService tagService;
 
     public string Name { get; } = "Assets";
-
-    public BackupAssets(Rebuilder rebuilder, IAssetFileStore assetFileStore, ITagService tagService)
-    {
-        this.rebuilder = rebuilder;
-        this.assetFileStore = assetFileStore;
-        this.tagService = tagService;
-    }
 
     public Task BackupAsync(BackupContext context,
         CancellationToken ct)

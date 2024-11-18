@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -19,21 +18,10 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 
-internal sealed class QueryInDedicatedCollection : MongoBase<MongoContentEntity>
+internal sealed class QueryInDedicatedCollection(IMongoClient mongoClient, string prefixDatabase, string prefixCollection) : MongoBase<MongoContentEntity>
 {
     private readonly ConcurrentDictionary<(DomainId, DomainId), Task<IMongoCollection<MongoContentEntity>>> collections =
         new ConcurrentDictionary<(DomainId, DomainId), Task<IMongoCollection<MongoContentEntity>>>();
-
-    private readonly IMongoClient mongoClient;
-    private readonly string prefixDatabase;
-    private readonly string prefixCollection;
-
-    public QueryInDedicatedCollection(IMongoClient mongoClient, string prefixDatabase, string prefixCollection)
-    {
-        this.mongoClient = mongoClient;
-        this.prefixDatabase = prefixDatabase;
-        this.prefixCollection = prefixCollection;
-    }
 
     public Task<IMongoCollection<MongoContentEntity>> GetCollectionAsync(DomainId appId, DomainId schemaId)
     {

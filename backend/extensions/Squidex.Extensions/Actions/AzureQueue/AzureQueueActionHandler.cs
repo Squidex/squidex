@@ -14,14 +14,9 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.AzureQueue;
 
-public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction, AzureQueueJob>
+public sealed class AzureQueueActionHandler(RuleEventFormatter formatter) : RuleActionHandler<AzureQueueAction, AzureQueueJob>(formatter)
 {
-    private readonly ClientPool<(string ConnectionString, string QueueName), CloudQueue> clients;
-
-    public AzureQueueActionHandler(RuleEventFormatter formatter)
-        : base(formatter)
-    {
-        clients = new ClientPool<(string ConnectionString, string QueueName), CloudQueue>(key =>
+    private readonly ClientPool<(string ConnectionString, string QueueName), CloudQueue> clients = new ClientPool<(string ConnectionString, string QueueName), CloudQueue>(key =>
         {
             var storageAccount = CloudStorageAccount.Parse(key.ConnectionString);
 
@@ -30,7 +25,6 @@ public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction
 
             return queueRef;
         });
-    }
 
     protected override async Task<(string Description, AzureQueueJob Data)> CreateJobAsync(EnrichedEvent @event, AzureQueueAction action)
     {

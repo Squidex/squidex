@@ -13,16 +13,11 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public sealed class AdminUsersTests : IClassFixture<ClientFixture>
+public sealed class AdminUsersTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
     private readonly string email = $"{Guid.NewGuid()}@squidex.io";
 
-    public ClientFixture _ { get; }
-
-    public AdminUsersTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_user()

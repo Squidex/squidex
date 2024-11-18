@@ -12,10 +12,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Users;
 
-public sealed class DefaultXmlRepository : IXmlRepository
+public sealed class DefaultXmlRepository(ISnapshotStore<DefaultXmlRepository.State> store) : IXmlRepository
 {
-    private readonly ISnapshotStore<State> store;
-
     [CollectionName("Identity_Xml")]
     public sealed class State
     {
@@ -34,11 +32,6 @@ public sealed class DefaultXmlRepository : IXmlRepository
         {
             return XElement.Parse(Xml);
         }
-    }
-
-    public DefaultXmlRepository(ISnapshotStore<State> store)
-    {
-        this.store = store;
     }
 
     public IReadOnlyCollection<XElement> GetAllElements()

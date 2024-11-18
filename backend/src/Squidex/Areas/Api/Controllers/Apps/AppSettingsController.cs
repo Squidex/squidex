@@ -18,13 +18,8 @@ namespace Squidex.Areas.Api.Controllers.Apps;
 /// Update and query apps.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Apps))]
-public sealed class AppSettingsController : ApiController
+public sealed class AppSettingsController(ICommandBus commandBus) : ApiController(commandBus)
 {
-    public AppSettingsController(ICommandBus commandBus)
-        : base(commandBus)
-    {
-    }
-
     /// <summary>
     /// Get the app settings.
     /// </summary>

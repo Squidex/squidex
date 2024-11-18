@@ -11,12 +11,8 @@ namespace Squidex.Infrastructure.Collections;
 
 public class ReadonlyListTests
 {
-    internal sealed class Inherited : ReadonlyList<int>
+    internal sealed class Inherited(IList<int> inner) : ReadonlyList<int>(inner)
     {
-        public Inherited(IList<int> inner)
-            : base(inner)
-        {
-        }
     }
 
     [Fact]

@@ -21,23 +21,12 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes;
 
-public sealed class AppsIndex : IAppsIndex, ICommandMiddleware, IInitializable
+public sealed class AppsIndex(IAppRepository appRepository, IReplicatedCache appCache,
+    IPersistenceFactory<NameReservationState.State> persistenceFactory,
+    IOptions<AppCacheOptions> options) : IAppsIndex, ICommandMiddleware, IInitializable
 {
-    private readonly IAppRepository appRepository;
-    private readonly IReplicatedCache appCache;
-    private readonly AppCacheOptions options;
-    private readonly NameReservationState namesState;
-
-    public AppsIndex(IAppRepository appRepository, IReplicatedCache appCache,
-        IPersistenceFactory<NameReservationState.State> persistenceFactory,
-        IOptions<AppCacheOptions> options)
-    {
-        this.appRepository = appRepository;
-        this.appCache = appCache;
-        this.options = options.Value;
-
-        namesState = new NameReservationState(persistenceFactory, "Apps");
-    }
+    private readonly AppCacheOptions options = options.Value;
+    private readonly NameReservationState namesState = new NameReservationState(persistenceFactory, "Apps");
 
     public Task InitializeAsync(
         CancellationToken ct)

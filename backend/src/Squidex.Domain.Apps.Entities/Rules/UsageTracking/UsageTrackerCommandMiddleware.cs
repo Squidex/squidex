@@ -12,15 +12,8 @@ using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 
-public sealed class UsageTrackerCommandMiddleware : ICommandMiddleware
+public sealed class UsageTrackerCommandMiddleware(IMessageBus messaging) : ICommandMiddleware
 {
-    private readonly IMessageBus messaging;
-
-    public UsageTrackerCommandMiddleware(IMessageBus messaging)
-    {
-        this.messaging = messaging;
-    }
-
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {

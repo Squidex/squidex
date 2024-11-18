@@ -11,14 +11,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class TeamStatisticsTests : IClassFixture<CreatedTeamFixture>
+public class TeamStatisticsTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFixture>
 {
-    public CreatedTeamFixture _ { get; }
-
-    public TeamStatisticsTests(CreatedTeamFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedTeamFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_get_api_calls()

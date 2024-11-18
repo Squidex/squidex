@@ -24,16 +24,8 @@ namespace Squidex.Areas.Api.Controllers.Assets;
 /// Uploads and retrieves assets.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Assets))]
-public sealed class AssetFoldersController : ApiController
+public sealed class AssetFoldersController(ICommandBus commandBus, IAssetQueryService assetQuery) : ApiController(commandBus)
 {
-    private readonly IAssetQueryService assetQuery;
-
-    public AssetFoldersController(ICommandBus commandBus, IAssetQueryService assetQuery)
-        : base(commandBus)
-    {
-        this.assetQuery = assetQuery;
-    }
-
     /// <summary>
     /// Get asset folders.
     /// </summary>

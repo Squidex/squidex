@@ -11,7 +11,7 @@ using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes;
 
-public partial class TranslateTemplates
+public partial class TranslateTemplates(DirectoryInfo folder, TranslationService service)
 {
     private static readonly HashSet<string> TagsToIgnore =
     [
@@ -29,19 +29,10 @@ public partial class TranslateTemplates
         "confirmText",  // Confirm Click
         "message",      // Title Component
     };
-
-    private readonly TranslationService service;
-    private readonly DirectoryInfo folder;
+    private readonly DirectoryInfo folder = Frontend.GetFolder(folder);
     private bool isReplaced;
     private bool isSilent;
     private int total;
-
-    public TranslateTemplates(DirectoryInfo folder, TranslationService service)
-    {
-        this.folder = Frontend.GetFolder(folder);
-
-        this.service = service;
-    }
 
     public void Run(bool reportMissing)
     {

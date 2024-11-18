@@ -18,25 +18,13 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner;
 
-public sealed class DefaultRuleRunnerService : IRuleRunnerService
+public sealed class DefaultRuleRunnerService(
+    IJobService jobService,
+    IEventFormatter eventFormatter,
+    IEventStore eventStore,
+    IRuleService ruleService) : IRuleRunnerService
 {
     private const int MaxSimulatedEvents = 100;
-    private readonly IJobService jobService;
-    private readonly IEventFormatter eventFormatter;
-    private readonly IEventStore eventStore;
-    private readonly IRuleService ruleService;
-
-    public DefaultRuleRunnerService(
-        IJobService jobService,
-        IEventFormatter eventFormatter,
-        IEventStore eventStore,
-        IRuleService ruleService)
-    {
-        this.jobService = jobService;
-        this.eventFormatter = eventFormatter;
-        this.eventStore = eventStore;
-        this.ruleService = ruleService;
-    }
 
     public Task<List<SimulatedRuleEvent>> SimulateAsync(Rule rule,
         CancellationToken ct = default)

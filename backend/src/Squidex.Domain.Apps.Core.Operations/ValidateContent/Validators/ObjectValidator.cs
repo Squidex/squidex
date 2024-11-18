@@ -10,19 +10,9 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-public sealed class ObjectValidator<TValue> : IValidator
+public sealed class ObjectValidator<TValue>(IDictionary<string, (bool IsOptional, IValidator Validator)> fields, bool isPartial, string fieldType) : IValidator
 {
     private static readonly IReadOnlyDictionary<string, TValue> DefaultValue = new Dictionary<string, TValue>();
-    private readonly IDictionary<string, (bool IsOptional, IValidator Validator)> fields;
-    private readonly bool isPartial;
-    private readonly string fieldType;
-
-    public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> fields, bool isPartial, string fieldType)
-    {
-        this.fields = fields;
-        this.fieldType = fieldType;
-        this.isPartial = isPartial;
-    }
 
     public void Validate(object? value, ValidationContext context)
     {

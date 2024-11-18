@@ -13,14 +13,9 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-public class ContentLanguageTests : IClassFixture<ContentFixture>
+public class ContentLanguageTests(ContentFixture fixture) : IClassFixture<ContentFixture>
 {
-    public ContentFixture _ { get; }
-
-    public ContentLanguageTests(ContentFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ContentFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_filter_language()

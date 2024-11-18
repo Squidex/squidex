@@ -13,18 +13,13 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public sealed class AppRolesTests : IClassFixture<CreatedAppFixture>
+public sealed class AppRolesTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
     private readonly string roleName = Guid.NewGuid().ToString();
     private readonly string client = Guid.NewGuid().ToString();
     private readonly string contributor = $"{Guid.NewGuid()}@squidex.io";
 
-    public CreatedAppFixture _ { get; }
-
-    public AppRolesTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_role()

@@ -12,10 +12,8 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Tags;
 
-public sealed class TagService : ITagService
+public sealed class TagService(IPersistenceFactory<TagService.State> persistenceFactory) : ITagService
 {
-    private readonly IPersistenceFactory<State> persistenceFactory;
-
     [CollectionName("Index_Tags")]
     public sealed class State : TagsExport, IOnRead
     {
@@ -218,11 +216,6 @@ public sealed class TagService : ITagService
 
             return false;
         }
-    }
-
-    public TagService(IPersistenceFactory<State> persistenceFactory)
-    {
-        this.persistenceFactory = persistenceFactory;
     }
 
     public async Task RenameTagAsync(DomainId id, string group, string name, string newName,

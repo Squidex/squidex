@@ -18,18 +18,13 @@ using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 
-public sealed class MongoSchemasHash : MongoRepositoryBase<MongoSchemasHashEntity>, ISchemasHash, IEventConsumer, IDeleter
+public sealed class MongoSchemasHash(IMongoDatabase database) : MongoRepositoryBase<MongoSchemasHashEntity>(database), ISchemasHash, IEventConsumer, IDeleter
 {
     public int BatchSize => 1000;
 
     public int BatchDelay => 500;
 
     public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("schema-");
-
-    public MongoSchemasHash(IMongoDatabase database)
-        : base(database)
-    {
-    }
 
     protected override string CollectionName()
     {

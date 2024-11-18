@@ -16,16 +16,8 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Extensions.Actions.Script;
 
-public sealed class ScriptActionHandler : RuleActionHandler<ScriptAction, ScriptJob>
+public sealed class ScriptActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine) : RuleActionHandler<ScriptAction, ScriptJob>(formatter)
 {
-    private readonly IScriptEngine scriptEngine;
-
-    public ScriptActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine)
-        : base(formatter)
-    {
-        this.scriptEngine = scriptEngine;
-    }
-
     protected override Task<(string Description, ScriptJob Data)> CreateJobAsync(EnrichedEvent @event, ScriptAction action)
     {
         var job = new ScriptJob { Script = action.Script, Event = @event };

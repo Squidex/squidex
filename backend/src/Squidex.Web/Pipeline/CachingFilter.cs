@@ -14,15 +14,8 @@ using Microsoft.Net.Http.Headers;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class CachingFilter : IAsyncActionFilter
+public sealed class CachingFilter(CachingManager cachingManager) : IAsyncActionFilter
 {
-    private readonly CachingManager cachingManager;
-
-    public CachingFilter(CachingManager cachingManager)
-    {
-        this.cachingManager = cachingManager;
-    }
-
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         if (IgnoreFilter(context))

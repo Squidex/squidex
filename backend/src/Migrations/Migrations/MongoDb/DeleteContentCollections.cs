@@ -10,15 +10,8 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Migrations.Migrations.MongoDb;
 
-public sealed class DeleteContentCollections : IMigration
+public sealed class DeleteContentCollections(IMongoDatabase database) : IMigration
 {
-    private readonly IMongoDatabase database;
-
-    public DeleteContentCollections(IMongoDatabase database)
-    {
-        this.database = database;
-    }
-
     public async Task UpdateAsync(
         CancellationToken ct)
     {

@@ -14,20 +14,12 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class ContentConverter
+public sealed class ContentConverter(ResolvedComponents components, Schema schema)
 {
     private readonly List<IContentDataConverter> dataConverters = [];
     private readonly List<IContentItemConverter> itemConverters = [];
     private readonly List<IContentFieldConverter> fieldConverters = [];
     private readonly List<IContentValueConverter> valueConverters = [];
-    private readonly ResolvedComponents components;
-    private readonly Schema schema;
-
-    public ContentConverter(ResolvedComponents components, Schema schema)
-    {
-        this.components = components;
-        this.schema = schema;
-    }
 
     public ContentConverter Add(IConverter converter)
     {

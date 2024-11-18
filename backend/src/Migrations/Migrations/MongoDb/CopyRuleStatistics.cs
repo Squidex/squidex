@@ -15,11 +15,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb;
 
-public sealed class CopyRuleStatistics : IMigration
+public sealed class CopyRuleStatistics(IMongoDatabase database, IRuleUsageTracker ruleUsageTracker) : IMigration
 {
-    private readonly IMongoDatabase database;
-    private readonly IRuleUsageTracker ruleUsageTracker;
-
     [BsonIgnoreExtraElements]
     public class Document
     {
@@ -30,12 +27,6 @@ public sealed class CopyRuleStatistics : IMigration
         public int NumFailed { get; private set; }
 
         public int NumSucceeded { get; private set; }
-    }
-
-    public CopyRuleStatistics(IMongoDatabase database, IRuleUsageTracker ruleUsageTracker)
-    {
-        this.database = database;
-        this.ruleUsageTracker = ruleUsageTracker;
     }
 
     public async Task UpdateAsync(

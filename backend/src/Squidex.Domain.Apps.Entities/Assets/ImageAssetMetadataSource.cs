@@ -11,15 +11,8 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class ImageAssetMetadataSource : IAssetMetadataSource
+public sealed class ImageAssetMetadataSource(IAssetThumbnailGenerator assetGenerator) : IAssetMetadataSource
 {
-    private readonly IAssetThumbnailGenerator assetGenerator;
-
-    public ImageAssetMetadataSource(IAssetThumbnailGenerator assetGenerator)
-    {
-        this.assetGenerator = assetGenerator;
-    }
-
     public async Task EnhanceAsync(UploadAssetCommand command,
         CancellationToken ct)
     {

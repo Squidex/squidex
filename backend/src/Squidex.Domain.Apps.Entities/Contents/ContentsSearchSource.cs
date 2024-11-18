@@ -19,25 +19,12 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class ContentsSearchSource : ISearchSource
+public sealed class ContentsSearchSource(
+    IAppProvider appProvider,
+    IContentQueryService contentQuery,
+    ITextIndex contentTextIndexer,
+    IUrlGenerator urlGenerator) : ISearchSource
 {
-    private readonly IAppProvider appProvider;
-    private readonly IContentQueryService contentQuery;
-    private readonly ITextIndex contentTextIndexer;
-    private readonly IUrlGenerator urlGenerator;
-
-    public ContentsSearchSource(
-        IAppProvider appProvider,
-        IContentQueryService contentQuery,
-        ITextIndex contentTextIndexer,
-        IUrlGenerator urlGenerator)
-    {
-        this.appProvider = appProvider;
-        this.contentQuery = contentQuery;
-        this.contentTextIndexer = contentTextIndexer;
-        this.urlGenerator = urlGenerator;
-    }
-
     public async Task<SearchResults> SearchAsync(string query, Context context,
         CancellationToken ct)
     {

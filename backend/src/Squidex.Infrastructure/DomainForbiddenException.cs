@@ -8,12 +8,7 @@
 namespace Squidex.Infrastructure;
 
 [Serializable]
-public class DomainForbiddenException : DomainException
+public class DomainForbiddenException(string message, Exception? inner = null) : DomainException(message, ValidationError, inner)
 {
     private const string ValidationError = "FORBIDDEN";
-
-    public DomainForbiddenException(string message, Exception? inner = null)
-        : base(message, ValidationError, inner)
-    {
-    }
 }

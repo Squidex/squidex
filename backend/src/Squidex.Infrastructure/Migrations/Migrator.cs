@@ -9,22 +9,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Migrations;
 
-public sealed class Migrator
+public sealed class Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath,
+    ILogger<Migrator> log)
 {
-    private readonly IMigrationStatus migrationStatus;
-    private readonly IMigrationPath migrationPath;
-    private readonly ILogger<Migrator> log;
-
     public int LockWaitMs { get; set; } = 500;
-
-    public Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath,
-        ILogger<Migrator> log)
-    {
-        this.migrationStatus = migrationStatus;
-        this.migrationPath = migrationPath;
-
-        this.log = log;
-    }
 
     public async Task MigrateAsync(
         CancellationToken ct = default)

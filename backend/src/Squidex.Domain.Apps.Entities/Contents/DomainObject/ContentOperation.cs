@@ -13,16 +13,11 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public sealed class ContentOperation : OperationContextBase<ContentCommand, WriteContent>
+public sealed class ContentOperation(IServiceProvider serviceProvider, Func<WriteContent> snapshot) : OperationContextBase<ContentCommand, WriteContent>(serviceProvider, snapshot)
 {
     public Schema Schema { get; init; }
 
     public ResolvedComponents Components { get; init; }
-
-    public ContentOperation(IServiceProvider serviceProvider, Func<WriteContent> snapshot)
-        : base(serviceProvider, snapshot)
-    {
-    }
 
     public static async Task<ContentOperation> CreateAsync(IServiceProvider services, ContentCommand command, Func<WriteContent> snapshot)
     {

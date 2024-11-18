@@ -15,15 +15,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public sealed class LuceneQueryVisitor
+public sealed class LuceneQueryVisitor(Func<string, string>? fieldConverter = null)
 {
-    private readonly Func<string, string>? fieldConverter;
-
-    public LuceneQueryVisitor(Func<string, string>? fieldConverter = null)
-    {
-        this.fieldConverter = fieldConverter;
-    }
-
     public BsonDocument Visit(Query query)
     {
         switch (query)

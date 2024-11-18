@@ -10,15 +10,8 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
-public sealed class ScriptContent : IContentEnricherStep
+public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricherStep
 {
-    private readonly IScriptEngine scriptEngine;
-
-    public ScriptContent(IScriptEngine scriptEngine)
-    {
-        this.scriptEngine = scriptEngine;
-    }
-
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {

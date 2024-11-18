@@ -14,10 +14,8 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb;
 
-public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
+public sealed class ConvertDocumentIds(IMongoDatabase databaseDefault, IMongoDatabase databaseContent) : MongoBase<BsonDocument>, IMigration
 {
-    private readonly IMongoDatabase databaseDefault;
-    private readonly IMongoDatabase databaseContent;
     private Scope scope;
 
     private enum Scope
@@ -25,12 +23,6 @@ public sealed class ConvertDocumentIds : MongoBase<BsonDocument>, IMigration
         None,
         Assets,
         Contents
-    }
-
-    public ConvertDocumentIds(IMongoDatabase databaseDefault, IMongoDatabase databaseContent)
-    {
-        this.databaseDefault = databaseDefault;
-        this.databaseContent = databaseContent;
     }
 
     public override string ToString()

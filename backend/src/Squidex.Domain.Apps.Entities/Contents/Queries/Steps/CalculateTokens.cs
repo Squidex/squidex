@@ -10,17 +10,8 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
-public sealed class CalculateTokens : IContentEnricherStep
+public sealed class CalculateTokens(IUrlGenerator urlGenerator, IJsonSerializer serializer) : IContentEnricherStep
 {
-    private readonly IJsonSerializer serializer;
-    private readonly IUrlGenerator urlGenerator;
-
-    public CalculateTokens(IUrlGenerator urlGenerator, IJsonSerializer serializer)
-    {
-        this.serializer = serializer;
-        this.urlGenerator = urlGenerator;
-    }
-
     public Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {

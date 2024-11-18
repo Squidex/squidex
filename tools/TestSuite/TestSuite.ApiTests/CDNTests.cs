@@ -13,14 +13,9 @@ using TestSuite.Model;
 namespace TestSuite.ApiTests;
 
 [Trait("Category", "NotAutomated")]
-public class CDNTests : IClassFixture<ClientCloudFixture>
+public class CDNTests(ClientCloudFixture fixture) : IClassFixture<ClientCloudFixture>
 {
-    public ClientCloudFixture _ { get; }
-
-    public CDNTests(ClientCloudFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientCloudFixture _ { get; } = fixture;
 
     [Fact]
     public void Should_provide_asset_url_from_cdn()

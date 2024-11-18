@@ -13,16 +13,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Extensions.Actions.Comment;
 
-public sealed class CommentActionHandler : RuleActionHandler<CommentAction, CommentCreated>
+public sealed class CommentActionHandler(RuleEventFormatter formatter, ICollaborationService collaboration) : RuleActionHandler<CommentAction, CommentCreated>(formatter)
 {
     private const string Description = "Send a Comment";
-    private readonly ICollaborationService collaboration;
-
-    public CommentActionHandler(RuleEventFormatter formatter, ICollaborationService collaboration)
-        : base(formatter)
-    {
-        this.collaboration = collaboration;
-    }
 
     protected override async Task<(string Description, CommentCreated Data)> CreateJobAsync(EnrichedEvent @event, CommentAction action)
     {

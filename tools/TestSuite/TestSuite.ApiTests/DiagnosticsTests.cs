@@ -11,14 +11,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class DiagnosticsTests : IClassFixture<CreatedAppFixture>
+public class DiagnosticsTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
-    public CreatedAppFixture _ { get; }
-
-    public DiagnosticsTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_gc_dump()

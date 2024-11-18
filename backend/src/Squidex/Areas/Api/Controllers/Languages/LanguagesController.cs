@@ -17,13 +17,8 @@ namespace Squidex.Areas.Api.Controllers.Languages;
 /// Readonly API for supported languages.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Languages))]
-public sealed class LanguagesController : ApiController
+public sealed class LanguagesController(ICommandBus commandBus) : ApiController(commandBus)
 {
-    public LanguagesController(ICommandBus commandBus)
-        : base(commandBus)
-    {
-    }
-
     /// <summary>
     /// Get supported languages.
     /// </summary>

@@ -14,16 +14,11 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.TestHelpers;
 
-public sealed class MyDomainObject : DomainObject<MyDomainState>
+public sealed class MyDomainObject(DomainId id, IPersistenceFactory<MyDomainState> factory) : DomainObject<MyDomainState>(id, factory, A.Dummy<ILogger>())
 {
     public bool RecreateCommand { get; set; }
 
     public bool RecreateEvent { get; set; }
-
-    public MyDomainObject(DomainId id, IPersistenceFactory<MyDomainState> factory)
-       : base(id, factory, A.Dummy<ILogger>())
-    {
-    }
 
     protected override bool IsRecreation(IEvent @event)
     {

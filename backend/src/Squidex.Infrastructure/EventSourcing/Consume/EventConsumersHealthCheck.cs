@@ -9,15 +9,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Squidex.Infrastructure.EventSourcing.Consume;
 
-public sealed class EventConsumersHealthCheck : IHealthCheck
+public sealed class EventConsumersHealthCheck(IEventConsumerManager eventConsumerManager) : IHealthCheck
 {
-    private readonly IEventConsumerManager eventConsumerManager;
-
-    public EventConsumersHealthCheck(IEventConsumerManager eventConsumerManager)
-    {
-        this.eventConsumerManager = eventConsumerManager;
-    }
-
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {

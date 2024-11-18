@@ -10,14 +10,9 @@
 namespace Squidex.Infrastructure.EventSourcing;
 
 [Trait("Category", "Dependencies")]
-public class GetEventStoreTests : EventStoreTests<GetEventStore>, IClassFixture<GetEventStoreFixture>
+public class GetEventStoreTests(GetEventStoreFixture fixture) : EventStoreTests<GetEventStore>, IClassFixture<GetEventStoreFixture>
 {
-    public GetEventStoreFixture _ { get; }
-
-    public GetEventStoreTests(GetEventStoreFixture fixture)
-    {
-        _ = fixture;
-    }
+    public GetEventStoreFixture _ { get; } = fixture;
 
     public override GetEventStore CreateStore()
     {

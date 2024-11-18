@@ -13,12 +13,11 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class TextIndexingProcess : IEventConsumer
+public sealed class TextIndexingProcess(
+    IJsonSerializer serializer,
+    ITextIndex textIndex,
+    ITextIndexerState textIndexerState) : IEventConsumer
 {
-    private readonly IJsonSerializer serializer;
-    private readonly ITextIndex textIndex;
-    private readonly ITextIndexerState textIndexerState;
-
     public int BatchSize => 1000;
 
     public int BatchDelay => 1000;
@@ -32,19 +31,10 @@ public sealed class TextIndexingProcess : IEventConsumer
         get => textIndex;
     }
 
-    private sealed class Updates
+    private sealed class Updates(Dictionary<UniqueContentId, TextContentState> states, IJsonSerializer serializer)
     {
-        private readonly Dictionary<UniqueContentId, TextContentState> currentState;
-        private readonly Dictionary<UniqueContentId, TextContentState> currentUpdates;
+        private readonly Dictionary<UniqueContentId, TextContentState> currentUpdates = [];
         private readonly Dictionary<(UniqueContentId, byte), IndexCommand> commands = [];
-        private readonly IJsonSerializer serializer;
-
-        public Updates(Dictionary<UniqueContentId, TextContentState> states, IJsonSerializer serializer)
-        {
-            currentState = states;
-            currentUpdates = [];
-            this.serializer = serializer;
-        }
 
         public async Task WriteAsync(ITextIndex textIndex, ITextIndexerState textIndexerState)
         {
@@ -116,7 +106,7 @@ public sealed class TextIndexingProcess : IEventConsumer
                     Texts = data.ToTexts(),
                 });
 
-            currentState[state.UniqueContentId] = state;
+            states[state.UniqueContentId] = state;
             currentUpdates[state.UniqueContentId] = state;
         }
 
@@ -124,7 +114,7 @@ public sealed class TextIndexingProcess : IEventConsumer
         {
             var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (currentState.TryGetValue(uniqueId, out var state))
+            if (states.TryGetValue(uniqueId, out var state))
             {
                 switch (state.State)
                 {
@@ -144,7 +134,7 @@ public sealed class TextIndexingProcess : IEventConsumer
         {
             var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (currentState.TryGetValue(uniqueId, out var state))
+            if (states.TryGetValue(uniqueId, out var state))
             {
                 switch (state.State)
                 {
@@ -168,7 +158,7 @@ public sealed class TextIndexingProcess : IEventConsumer
         {
             var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (currentState.TryGetValue(uniqueId, out var state))
+            if (states.TryGetValue(uniqueId, out var state))
             {
                 switch (state.State)
                 {
@@ -202,7 +192,7 @@ public sealed class TextIndexingProcess : IEventConsumer
         {
             var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (currentState.TryGetValue(uniqueId, out var state))
+            if (states.TryGetValue(uniqueId, out var state))
             {
                 switch (state.State)
                 {
@@ -238,7 +228,7 @@ public sealed class TextIndexingProcess : IEventConsumer
         {
             var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (currentState.TryGetValue(uniqueId, out var state))
+            if (states.TryGetValue(uniqueId, out var state))
             {
                 switch (state.State)
                 {
@@ -264,7 +254,7 @@ public sealed class TextIndexingProcess : IEventConsumer
         {
             var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
 
-            if (currentState.TryGetValue(uniqueId, out var state))
+            if (states.TryGetValue(uniqueId, out var state))
             {
                 CoreDelete(@event, uniqueId, 0);
                 CoreDelete(@event, uniqueId, 1);
@@ -329,16 +319,6 @@ public sealed class TextIndexingProcess : IEventConsumer
                 commands[key] = command;
             }
         }
-    }
-
-    public TextIndexingProcess(
-        IJsonSerializer serializer,
-        ITextIndex textIndex,
-        ITextIndexerState textIndexerState)
-    {
-        this.serializer = serializer;
-        this.textIndex = textIndex;
-        this.textIndexerState = textIndexerState;
     }
 
     public async Task ClearAsync()

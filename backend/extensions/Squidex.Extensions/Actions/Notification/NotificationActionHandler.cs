@@ -14,18 +14,9 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Extensions.Actions.Notification;
 
-public sealed class NotificationActionHandler : RuleActionHandler<NotificationAction, CommentCreated>
+public sealed class NotificationActionHandler(RuleEventFormatter formatter, ICollaborationService collaboration, IUserResolver userResolver) : RuleActionHandler<NotificationAction, CommentCreated>(formatter)
 {
     private const string Description = "Send a Notification";
-    private readonly ICollaborationService collaboration;
-    private readonly IUserResolver userResolver;
-
-    public NotificationActionHandler(RuleEventFormatter formatter, ICollaborationService collaboration, IUserResolver userResolver)
-        : base(formatter)
-    {
-        this.collaboration = collaboration;
-        this.userResolver = userResolver;
-    }
 
     protected override async Task<(string Description, CommentCreated Data)> CreateJobAsync(EnrichedEvent @event, NotificationAction action)
     {

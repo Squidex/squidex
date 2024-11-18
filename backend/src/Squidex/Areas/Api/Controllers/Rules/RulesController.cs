@@ -30,32 +30,14 @@ namespace Squidex.Areas.Api.Controllers.Rules;
 /// Update and query information about rules.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Rules))]
-public sealed class RulesController : ApiController
+public sealed class RulesController(ICommandBus commandBus,
+    IAppProvider appProvider,
+    IRuleEventRepository ruleEventsRepository,
+    IRuleQueryService ruleQuery,
+    IRuleRunnerService ruleRunnerService,
+    RuleTypeProvider ruleRegistry,
+    EventJsonSchemaGenerator eventJsonSchemaGenerator) : ApiController(commandBus)
 {
-    private readonly EventJsonSchemaGenerator eventJsonSchemaGenerator;
-    private readonly IAppProvider appProvider;
-    private readonly IRuleEventRepository ruleEventsRepository;
-    private readonly IRuleQueryService ruleQuery;
-    private readonly IRuleRunnerService ruleRunnerService;
-    private readonly RuleTypeProvider ruleRegistry;
-
-    public RulesController(ICommandBus commandBus,
-        IAppProvider appProvider,
-        IRuleEventRepository ruleEventsRepository,
-        IRuleQueryService ruleQuery,
-        IRuleRunnerService ruleRunnerService,
-        RuleTypeProvider ruleRegistry,
-        EventJsonSchemaGenerator eventJsonSchemaGenerator)
-        : base(commandBus)
-    {
-        this.appProvider = appProvider;
-        this.ruleEventsRepository = ruleEventsRepository;
-        this.ruleQuery = ruleQuery;
-        this.ruleRunnerService = ruleRunnerService;
-        this.ruleRegistry = ruleRegistry;
-        this.eventJsonSchemaGenerator = eventJsonSchemaGenerator;
-    }
-
     /// <summary>
     /// Get supported rule actions.
     /// </summary>

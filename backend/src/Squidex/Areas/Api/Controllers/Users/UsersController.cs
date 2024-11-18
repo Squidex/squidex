@@ -20,14 +20,15 @@ namespace Squidex.Areas.Api.Controllers.Users;
 /// Update and query users.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Users))]
-public sealed class UsersController : ApiController
+public sealed class UsersController(
+    ICommandBus commandBus,
+    IHttpClientFactory httpClientFactory,
+    IUserPictureStore userPictureStore,
+    IUserResolver userResolver,
+    IUserService userService,
+    ILogger<UsersController> log) : ApiController(commandBus)
 {
     private static readonly byte[] AvatarBytes;
-    private readonly IHttpClientFactory httpClientFactory;
-    private readonly IUserPictureStore userPictureStore;
-    private readonly IUserService userService;
-    private readonly IUserResolver userResolver;
-    private readonly ILogger<UsersController> log;
 
     static UsersController()
     {
@@ -39,22 +40,6 @@ public sealed class UsersController : ApiController
 
             _ = resourceStream.Read(AvatarBytes, 0, AvatarBytes.Length);
         }
-    }
-
-    public UsersController(
-        ICommandBus commandBus,
-        IHttpClientFactory httpClientFactory,
-        IUserPictureStore userPictureStore,
-        IUserResolver userResolver,
-        IUserService userService,
-        ILogger<UsersController> log)
-        : base(commandBus)
-    {
-        this.httpClientFactory = httpClientFactory;
-        this.userPictureStore = userPictureStore;
-        this.userService = userService;
-        this.userResolver = userResolver;
-        this.log = log;
     }
 
     /// <summary>

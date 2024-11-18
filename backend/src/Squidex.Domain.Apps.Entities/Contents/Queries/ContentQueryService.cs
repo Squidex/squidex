@@ -17,31 +17,16 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public sealed class ContentQueryService : IContentQueryService
+public sealed class ContentQueryService(
+    IAppProvider appProvider,
+    IContentEnricher contentEnricher,
+    IContentRepository contentRepository,
+    IContentLoader contentLoader,
+    IOptions<ContentOptions> options,
+    ContentQueryParser queryParser) : IContentQueryService
 {
     private const string SingletonId = "_schemaId_";
-    private readonly IAppProvider appProvider;
-    private readonly IContentEnricher contentEnricher;
-    private readonly IContentRepository contentRepository;
-    private readonly IContentLoader contentLoader;
-    private readonly ContentQueryParser queryParser;
-    private readonly ContentOptions options;
-
-    public ContentQueryService(
-        IAppProvider appProvider,
-        IContentEnricher contentEnricher,
-        IContentRepository contentRepository,
-        IContentLoader contentLoader,
-        IOptions<ContentOptions> options,
-        ContentQueryParser queryParser)
-    {
-        this.appProvider = appProvider;
-        this.contentEnricher = contentEnricher;
-        this.contentRepository = contentRepository;
-        this.contentLoader = contentLoader;
-        this.options = options.Value;
-        this.queryParser = queryParser;
-    }
+    private readonly ContentOptions options = options.Value;
 
     public async IAsyncEnumerable<EnrichedContent> StreamAsync(Context context, string schemaIdOrName, int skip,
         [EnumeratorCancellation] CancellationToken ct = default)

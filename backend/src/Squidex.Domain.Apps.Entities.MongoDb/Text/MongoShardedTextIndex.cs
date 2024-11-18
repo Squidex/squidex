@@ -13,13 +13,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public sealed class MongoShardedTextIndex<T> : ShardedService<DomainId, MongoTextIndexBase<T>>, ITextIndex, IDeleter where T : class
+public sealed class MongoShardedTextIndex<T>(IShardingStrategy sharding, Func<string, MongoTextIndexBase<T>> factory) : ShardedService<DomainId, MongoTextIndexBase<T>>(sharding, factory), ITextIndex, IDeleter where T : class
 {
-    public MongoShardedTextIndex(IShardingStrategy sharding, Func<string, MongoTextIndexBase<T>> factory)
-        : base(sharding, factory)
-    {
-    }
-
     public async Task ClearAsync(
         CancellationToken ct = default)
     {

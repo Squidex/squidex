@@ -14,15 +14,8 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Extensions.Samples.Middleware;
 
-public sealed class DoubleLinkedContentMiddleware : ICustomCommandMiddleware
+public sealed class DoubleLinkedContentMiddleware(IContentLoader contentLoader) : ICustomCommandMiddleware
 {
-    private readonly IContentLoader contentLoader;
-
-    public DoubleLinkedContentMiddleware(IContentLoader contentLoader)
-    {
-        this.contentLoader = contentLoader;
-    }
-
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {

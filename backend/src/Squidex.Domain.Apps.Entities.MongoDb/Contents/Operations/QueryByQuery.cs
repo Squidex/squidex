@@ -16,15 +16,8 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 
-internal sealed class QueryByQuery : OperationBase
+internal sealed class QueryByQuery(MongoCountCollection countCollection) : OperationBase
 {
-    private readonly MongoCountCollection countCollection;
-
-    public QueryByQuery(MongoCountCollection countCollection)
-    {
-        this.countCollection = countCollection;
-    }
-
     public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
     {
         yield return new CreateIndexModel<MongoContentEntity>(Index

@@ -9,18 +9,8 @@ using Squidex.Log;
 
 namespace Squidex.Config.Startup;
 
-public sealed class LogConfigurationHost : IHostedService
+public sealed class LogConfigurationHost(IConfiguration configuration, ISemanticLog log) : IHostedService
 {
-    private readonly IConfiguration configuration;
-    private readonly ISemanticLog log;
-
-    public LogConfigurationHost(IConfiguration configuration, ISemanticLog log)
-    {
-        this.configuration = configuration;
-
-        this.log = log;
-    }
-
     public Task StartAsync(
         CancellationToken cancellationToken)
     {

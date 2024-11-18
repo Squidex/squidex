@@ -10,15 +10,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 
-public sealed class ConvertTags : IAssetEnricherStep
+public sealed class ConvertTags(ITagService tagService) : IAssetEnricherStep
 {
-    private readonly ITagService tagService;
-
-    public ConvertTags(ITagService tagService)
-    {
-        this.tagService = tagService;
-    }
-
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {

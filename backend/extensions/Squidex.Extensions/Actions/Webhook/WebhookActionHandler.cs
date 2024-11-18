@@ -14,16 +14,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Extensions.Actions.Webhook;
 
-public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, WebhookJob>
+public sealed class WebhookActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory) : RuleActionHandler<WebhookAction, WebhookJob>(formatter)
 {
-    private readonly IHttpClientFactory httpClientFactory;
-
-    public WebhookActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
-        : base(formatter)
-    {
-        this.httpClientFactory = httpClientFactory;
-    }
-
     protected override async Task<(string Description, WebhookJob Data)> CreateJobAsync(EnrichedEvent @event, WebhookAction action)
     {
         var requestUrl = await FormatAsync(action.Url, @event);

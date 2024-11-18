@@ -13,17 +13,8 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Validation;
 
-public sealed class DependencyValidatorsFactory : IValidatorsFactory
+public sealed class DependencyValidatorsFactory(IAssetRepository assetRepository, IContentRepository contentRepository) : IValidatorsFactory
 {
-    private readonly IAssetRepository assetRepository;
-    private readonly IContentRepository contentRepository;
-
-    public DependencyValidatorsFactory(IAssetRepository assetRepository, IContentRepository contentRepository)
-    {
-        this.assetRepository = assetRepository;
-        this.contentRepository = contentRepository;
-    }
-
     public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, ValidatorFactory createFieldValidator)
     {
         if (context.Mode == ValidationMode.Optimized)

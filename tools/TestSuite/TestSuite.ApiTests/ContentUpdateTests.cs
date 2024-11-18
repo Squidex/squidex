@@ -17,14 +17,9 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-public class ContentUpdateTests : IClassFixture<ContentFixture>
+public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentFixture>
 {
-    public ContentFixture _ { get; }
-
-    public ContentUpdateTests(ContentFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ContentFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_return_published_content()

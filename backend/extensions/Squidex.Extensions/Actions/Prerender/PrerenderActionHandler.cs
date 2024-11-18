@@ -13,16 +13,8 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.Prerender;
 
-public sealed class PrerenderActionHandler : RuleActionHandler<PrerenderAction, PrerenderJob>
+public sealed class PrerenderActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory) : RuleActionHandler<PrerenderAction, PrerenderJob>(formatter)
 {
-    private readonly IHttpClientFactory httpClientFactory;
-
-    public PrerenderActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
-        : base(formatter)
-    {
-        this.httpClientFactory = httpClientFactory;
-    }
-
     protected override async Task<(string Description, PrerenderJob Data)> CreateJobAsync(EnrichedEvent @event, PrerenderAction action)
     {
         var url = await FormatAsync(action.Url, @event);

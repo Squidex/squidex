@@ -9,15 +9,8 @@ using Squidex.Assets;
 
 namespace Squidex.Domain.Users;
 
-public sealed class DefaultUserPictureStore : IUserPictureStore
+public sealed class DefaultUserPictureStore(IAssetStore assetStore) : IUserPictureStore
 {
-    private readonly IAssetStore assetStore;
-
-    public DefaultUserPictureStore(IAssetStore assetStore)
-    {
-        this.assetStore = assetStore;
-    }
-
     public Task UploadAsync(string userId, Stream stream,
         CancellationToken ct = default)
     {

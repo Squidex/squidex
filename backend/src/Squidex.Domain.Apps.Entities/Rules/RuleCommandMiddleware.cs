@@ -12,19 +12,9 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-public sealed class RuleCommandMiddleware : AggregateCommandMiddleware<RuleCommandBase, RuleDomainObject>
+public sealed class RuleCommandMiddleware(IDomainObjectFactory domainObjectFactory,
+    IRuleEnricher ruleEnricher, IContextProvider contextProvider) : AggregateCommandMiddleware<RuleCommandBase, RuleDomainObject>(domainObjectFactory)
 {
-    private readonly IRuleEnricher ruleEnricher;
-    private readonly IContextProvider contextProvider;
-
-    public RuleCommandMiddleware(IDomainObjectFactory domainObjectFactory,
-        IRuleEnricher ruleEnricher, IContextProvider contextProvider)
-        : base(domainObjectFactory)
-    {
-        this.ruleEnricher = ruleEnricher;
-        this.contextProvider = contextProvider;
-    }
-
     protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
         CancellationToken ct)
     {

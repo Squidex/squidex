@@ -9,14 +9,12 @@ using System.Diagnostics;
 
 namespace Squidex.Infrastructure;
 
-public readonly struct ValueStopwatch
+public readonly struct ValueStopwatch(long startTime)
 {
     private const long TicksPerMillisecond = 10000;
     private const long TicksPerSecond = TicksPerMillisecond * 1000;
 
     private static readonly double TickFrequency;
-
-    private readonly long startTime;
 
     static ValueStopwatch()
     {
@@ -24,11 +22,6 @@ public readonly struct ValueStopwatch
         {
             TickFrequency = (double)TicksPerSecond / Stopwatch.Frequency;
         }
-    }
-
-    public ValueStopwatch(long startTime)
-    {
-        this.startTime = startTime;
     }
 
     public static ValueStopwatch StartNew()

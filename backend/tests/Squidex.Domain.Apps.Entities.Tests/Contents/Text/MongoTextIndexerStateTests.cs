@@ -14,14 +14,9 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class MongoTextIndexerStateTests : IClassFixture<MongoTextIndexerStateFixture>
+public class MongoTextIndexerStateTests(MongoTextIndexerStateFixture fixture) : IClassFixture<MongoTextIndexerStateFixture>
 {
-    public MongoTextIndexerStateFixture _ { get; set; }
-
-    public MongoTextIndexerStateTests(MongoTextIndexerStateFixture fixture)
-    {
-        _ = fixture;
-    }
+    public MongoTextIndexerStateFixture _ { get; set; } = fixture;
 
     [Fact]
     public async Task Should_add_state()

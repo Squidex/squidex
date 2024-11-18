@@ -12,13 +12,8 @@ using Squidex.Text;
 namespace Squidex.Infrastructure.Validation;
 
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class LocalizedRegularExpressionAttribute : RegularExpressionAttribute
+public sealed class LocalizedRegularExpressionAttribute(string pattern) : RegularExpressionAttribute(pattern)
 {
-    public LocalizedRegularExpressionAttribute(string pattern)
-        : base(pattern)
-    {
-    }
-
     public override string FormatErrorMessage(string name)
     {
         var property = T.Get($"common.{name.ToCamelCase()}", name);

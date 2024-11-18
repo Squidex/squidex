@@ -23,15 +23,8 @@ public class ReferencesFieldTests : IClassFixture<TranslationsFixture>
     private readonly DomainId ref2 = DomainId.NewGuid();
     private readonly IValidatorsFactory factory;
 
-    private sealed class CustomFactory : IValidatorsFactory
+    private sealed class CustomFactory(DomainId schemaId) : IValidatorsFactory
     {
-        private readonly DomainId schemaId;
-
-        public CustomFactory(DomainId schemaId)
-        {
-            this.schemaId = schemaId;
-        }
-
         public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, ValidatorFactory createFieldValidator)
         {
             if (field is IField<ReferencesFieldProperties> references)

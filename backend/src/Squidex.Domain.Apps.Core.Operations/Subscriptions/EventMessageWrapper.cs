@@ -11,20 +11,11 @@ using Squidex.Messaging.Subscriptions;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions;
 
-public sealed class EventMessageWrapper : IPayloadWrapper
+public sealed class EventMessageWrapper(Envelope<AppEvent> @event, IEnumerable<ISubscriptionEventCreator> creators) : IPayloadWrapper
 {
-    private readonly IEnumerable<ISubscriptionEventCreator> creators;
-
-    public Envelope<AppEvent> Event { get; }
+    public Envelope<AppEvent> Event { get; } = @event;
 
     object IPayloadWrapper.Message => Event.Payload;
-
-    public EventMessageWrapper(Envelope<AppEvent> @event, IEnumerable<ISubscriptionEventCreator> creators)
-    {
-        Event = @event;
-
-        this.creators = creators;
-    }
 
     public async ValueTask<object> CreatePayloadAsync()
     {

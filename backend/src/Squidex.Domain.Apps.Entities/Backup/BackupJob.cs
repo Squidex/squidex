@@ -15,38 +15,21 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 
-public sealed class BackupJob : IJobRunner
+public sealed class BackupJob(
+    IBackupArchiveLocation backupArchiveLocation,
+    IBackupArchiveStore backupArchiveStore,
+    IBackupHandlerFactory backupHandlerFactory,
+    IEventFormatter eventFormatter,
+    IEventStore eventStore,
+    IUserResolver userResolver) : IJobRunner
 {
     public const string TaskName = "backup";
     public const string ArgAppId = "appId";
     public const string ArgAppName = "appName";
 
-    private readonly IBackupArchiveLocation backupArchiveLocation;
-    private readonly IBackupArchiveStore backupArchiveStore;
-    private readonly IBackupHandlerFactory backupHandlerFactory;
-    private readonly IEventFormatter eventFormatter;
-    private readonly IEventStore eventStore;
-    private readonly IUserResolver userResolver;
-
     public string Name => TaskName;
 
     public int MaxJobs => 10;
-
-    public BackupJob(
-        IBackupArchiveLocation backupArchiveLocation,
-        IBackupArchiveStore backupArchiveStore,
-        IBackupHandlerFactory backupHandlerFactory,
-        IEventFormatter eventFormatter,
-        IEventStore eventStore,
-        IUserResolver userResolver)
-    {
-        this.backupArchiveLocation = backupArchiveLocation;
-        this.backupArchiveStore = backupArchiveStore;
-        this.backupHandlerFactory = backupHandlerFactory;
-        this.eventFormatter = eventFormatter;
-        this.eventStore = eventStore;
-        this.userResolver = userResolver;
-    }
 
     public static JobRequest BuildRequest(RefToken actor, App app)
     {

@@ -24,17 +24,9 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
 
-public partial class TeamDomainObject : DomainObject<Team>
+public partial class TeamDomainObject(DomainId id, IPersistenceFactory<Team> persistence, ILogger<TeamDomainObject> log,
+    IServiceProvider serviceProvider) : DomainObject<Team>(id, persistence, log)
 {
-    private readonly IServiceProvider serviceProvider;
-
-    public TeamDomainObject(DomainId id, IPersistenceFactory<Team> persistence, ILogger<TeamDomainObject> log,
-        IServiceProvider serviceProvider)
-        : base(id, persistence, log)
-    {
-        this.serviceProvider = serviceProvider;
-    }
-
     protected override bool IsDeleted(Team snapshot)
     {
         return false;

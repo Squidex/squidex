@@ -14,17 +14,9 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
-public sealed class EventEnricher : IEventEnricher
+public sealed class EventEnricher(IMemoryCache userCache, IUserResolver userResolver) : IEventEnricher
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
-    private readonly IMemoryCache userCache;
-    private readonly IUserResolver userResolver;
-
-    public EventEnricher(IMemoryCache userCache, IUserResolver userResolver)
-    {
-        this.userCache = userCache;
-        this.userResolver = userResolver;
-    }
 
     public async Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent>? @event)
     {

@@ -9,19 +9,13 @@ using System.IO.Pipelines;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class UsagePipeWriter : PipeWriter
+public sealed class UsagePipeWriter(PipeWriter inner) : PipeWriter
 {
-    private readonly PipeWriter inner;
     private long bytesWritten;
 
     public long BytesWritten
     {
         get => bytesWritten;
-    }
-
-    public UsagePipeWriter(PipeWriter inner)
-    {
-        this.inner = inner;
     }
 
     public override void Advance(int bytes)

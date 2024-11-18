@@ -11,13 +11,8 @@ using NSwag.Generation.Processors.Contexts;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
 
-public sealed class AcceptQueryAttribute : OpenApiOperationProcessorAttribute
+public sealed class AcceptQueryAttribute(bool supportsSearch) : OpenApiOperationProcessorAttribute(typeof(Processor), supportsSearch)
 {
-    public AcceptQueryAttribute(bool supportsSearch)
-        : base(typeof(Processor), supportsSearch)
-    {
-    }
-
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
     public sealed record Processor(bool SupportsSearch) : IOperationProcessor
 #pragma warning restore SA1313 // Parameter names should begin with lower-case letter

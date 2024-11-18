@@ -16,20 +16,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
-public sealed class ResolveAssets : IContentEnricherStep
+public sealed class ResolveAssets(IUrlGenerator urlGenerator, IAssetQueryService assetQuery, IRequestCache requestCache) : IContentEnricherStep
 {
     private static readonly ILookup<DomainId, EnrichedAsset> EmptyAssets = Enumerable.Empty<EnrichedAsset>().ToLookup(x => x.Id);
-
-    private readonly IUrlGenerator urlGenerator;
-    private readonly IAssetQueryService assetQuery;
-    private readonly IRequestCache requestCache;
-
-    public ResolveAssets(IUrlGenerator urlGenerator, IAssetQueryService assetQuery, IRequestCache requestCache)
-    {
-        this.urlGenerator = urlGenerator;
-        this.assetQuery = assetQuery;
-        this.requestCache = requestCache;
-    }
 
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)

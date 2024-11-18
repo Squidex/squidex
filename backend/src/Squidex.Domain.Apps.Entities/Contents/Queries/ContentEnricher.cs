@@ -12,18 +12,8 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public sealed class ContentEnricher : IContentEnricher
+public sealed class ContentEnricher(IEnumerable<IContentEnricherStep> steps, IAppProvider appProvider) : IContentEnricher
 {
-    private readonly IEnumerable<IContentEnricherStep> steps;
-    private readonly IAppProvider appProvider;
-
-    public ContentEnricher(IEnumerable<IContentEnricherStep> steps, IAppProvider appProvider)
-    {
-        this.steps = steps;
-
-        this.appProvider = appProvider;
-    }
-
     public async Task<EnrichedContent> EnrichAsync(Content content, bool cloneData, Context context,
         CancellationToken ct)
     {

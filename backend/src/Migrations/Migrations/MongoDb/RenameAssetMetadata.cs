@@ -12,15 +12,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb;
 
-public sealed class RenameAssetMetadata : MongoBase<BsonDocument>, IMigration
+public sealed class RenameAssetMetadata(IMongoDatabase database) : MongoBase<BsonDocument>, IMigration
 {
-    private readonly IMongoDatabase database;
-
-    public RenameAssetMetadata(IMongoDatabase database)
-    {
-        this.database = database;
-    }
-
     public async Task UpdateAsync(
         CancellationToken ct)
     {

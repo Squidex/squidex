@@ -10,15 +10,8 @@ using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppUsageDeleter : IDeleter
+public sealed class AppUsageDeleter(IApiUsageTracker apiUsageTracker) : IDeleter
 {
-    private readonly IApiUsageTracker apiUsageTracker;
-
-    public AppUsageDeleter(IApiUsageTracker apiUsageTracker)
-    {
-        this.apiUsageTracker = apiUsageTracker;
-    }
-
     public Task DeleteAppAsync(App app,
         CancellationToken ct)
     {

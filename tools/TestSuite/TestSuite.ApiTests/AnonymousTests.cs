@@ -14,16 +14,11 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class AnonymousTests : IClassFixture<ClientFixture>
+public class AnonymousTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
     private readonly string appName = Guid.NewGuid().ToString();
 
-    public ClientFixture _ { get; }
-
-    public AnonymousTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_app_with_anonymous_read_access()

@@ -18,22 +18,11 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes;
 
-public sealed class SchemasIndex : ICommandMiddleware, ISchemasIndex
+public sealed class SchemasIndex(ISchemaRepository schemaRepository, IReplicatedCache schemaCache,
+    IPersistenceFactory<NameReservationState.State> persistenceFactory,
+    IOptions<SchemaCacheOptions> options) : ICommandMiddleware, ISchemasIndex
 {
-    private readonly ISchemaRepository schemaRepository;
-    private readonly IReplicatedCache schemaCache;
-    private readonly IPersistenceFactory<NameReservationState.State> persistenceFactory;
-    private readonly SchemaCacheOptions options;
-
-    public SchemasIndex(ISchemaRepository schemaRepository, IReplicatedCache schemaCache,
-        IPersistenceFactory<NameReservationState.State> persistenceFactory,
-        IOptions<SchemaCacheOptions> options)
-    {
-        this.schemaRepository = schemaRepository;
-        this.schemaCache = schemaCache;
-        this.persistenceFactory = persistenceFactory;
-        this.options = options.Value;
-    }
+    private readonly SchemaCacheOptions options = options.Value;
 
     public async Task<List<Schema>> GetSchemasAsync(DomainId appId,
         CancellationToken ct = default)

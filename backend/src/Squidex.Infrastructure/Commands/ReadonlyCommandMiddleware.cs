@@ -10,14 +10,9 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Infrastructure.Commands;
 
-public sealed class ReadonlyCommandMiddleware : ICommandMiddleware
+public sealed class ReadonlyCommandMiddleware(IOptions<ReadonlyOptions> options) : ICommandMiddleware
 {
-    private readonly ReadonlyOptions options;
-
-    public ReadonlyCommandMiddleware(IOptions<ReadonlyOptions> options)
-    {
-        this.options = options.Value;
-    }
+    private readonly ReadonlyOptions options = options.Value;
 
     public Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)

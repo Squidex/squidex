@@ -5,16 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions.Common;
-using Jint.Runtime;
-using NodaTime;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
-using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.States;
 using IClock = NodaTime.IClock;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Indexes;

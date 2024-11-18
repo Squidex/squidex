@@ -12,15 +12,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public sealed class CommandFactory<T> : MongoBase<MongoTextIndexEntity<T>> where T : class
+public sealed class CommandFactory<T>(Func<Dictionary<string, string>, T> textBuilder) : MongoBase<MongoTextIndexEntity<T>> where T : class
 {
-    private readonly Func<Dictionary<string, string>, T> textBuilder;
-
-    public CommandFactory(Func<Dictionary<string, string>, T> textBuilder)
-    {
-        this.textBuilder = textBuilder;
-    }
-
     public void CreateCommands(IndexCommand command, List<WriteModel<MongoTextIndexEntity<T>>> writes)
     {
         switch (command)

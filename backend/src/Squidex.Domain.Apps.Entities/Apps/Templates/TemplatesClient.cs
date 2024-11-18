@@ -11,17 +11,10 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 
-public sealed partial class TemplatesClient
+public sealed partial class TemplatesClient(IHttpClientFactory httpClientFactory, IOptions<TemplatesOptions> options)
 {
     private static readonly Regex RegexTemplate = BuildTemplateRegex();
-    private readonly IHttpClientFactory httpClientFactory;
-    private readonly TemplatesOptions options;
-
-    public TemplatesClient(IHttpClientFactory httpClientFactory, IOptions<TemplatesOptions> options)
-    {
-        this.httpClientFactory = httpClientFactory;
-        this.options = options.Value;
-    }
+    private readonly TemplatesOptions options = options.Value;
 
     public async Task<string?> GetRepositoryUrl(string name,
         CancellationToken ct = default)

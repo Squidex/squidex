@@ -12,33 +12,21 @@ using OpenIddict.Abstractions;
 
 namespace Squidex.Domain.Users.InMemory;
 
-public sealed class ImmutableScope
+public sealed class ImmutableScope(string id, OpenIddictScopeDescriptor descriptor)
 {
-    public string Id { get; }
+    public string Id { get; } = id;
 
-    public string? Name { get; }
+    public string? Name { get; } = descriptor.Name;
 
-    public string? Description { get; }
+    public string? Description { get; } = descriptor.Description;
 
-    public string? DisplayName { get; }
+    public string? DisplayName { get; } = descriptor.DisplayName;
 
-    public ImmutableDictionary<CultureInfo, string> Descriptions { get; }
+    public ImmutableDictionary<CultureInfo, string> Descriptions { get; } = descriptor.Descriptions.ToImmutableDictionary();
 
-    public ImmutableDictionary<CultureInfo, string> DisplayNames { get; }
+    public ImmutableDictionary<CultureInfo, string> DisplayNames { get; } = descriptor.DisplayNames.ToImmutableDictionary();
 
-    public ImmutableDictionary<string, JsonElement> Properties { get; }
+    public ImmutableDictionary<string, JsonElement> Properties { get; } = descriptor.Properties.ToImmutableDictionary();
 
-    public ImmutableArray<string> Resources { get; }
-
-    public ImmutableScope(string id, OpenIddictScopeDescriptor descriptor)
-    {
-        Id = id;
-        Description = descriptor.Description;
-        Descriptions = descriptor.Descriptions.ToImmutableDictionary();
-        Name = descriptor.Name;
-        DisplayName = descriptor.DisplayName;
-        DisplayNames = descriptor.DisplayNames.ToImmutableDictionary();
-        Properties = descriptor.Properties.ToImmutableDictionary();
-        Resources = descriptor.Resources.ToImmutableArray();
-    }
+    public ImmutableArray<string> Resources { get; } = descriptor.Resources.ToImmutableArray();
 }

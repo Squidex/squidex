@@ -11,15 +11,8 @@ using Squidex.Infrastructure.States;
 
 namespace Migrations.Migrations;
 
-public sealed class ClearRules : IMigration
+public sealed class ClearRules(IStore<Rule> store) : IMigration
 {
-    private readonly IStore<Rule> store;
-
-    public ClearRules(IStore<Rule> store)
-    {
-        this.store = store;
-    }
-
     public Task UpdateAsync(
         CancellationToken ct)
     {

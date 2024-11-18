@@ -11,15 +11,8 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-public sealed class UniqueObjectValuesValidator : IValidator
+public sealed class UniqueObjectValuesValidator(IEnumerable<string> fields) : IValidator
 {
-    private readonly IEnumerable<string> fields;
-
-    public UniqueObjectValuesValidator(IEnumerable<string> fields)
-    {
-        this.fields = fields;
-    }
-
     public void Validate(object? value, ValidationContext context)
     {
         if (value is IEnumerable<JsonObject> objects && objects.Count() > 1)

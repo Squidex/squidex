@@ -11,10 +11,9 @@ using Squidex.Domain.Apps.Core.Scripting;
 
 namespace Squidex.Web.Scripting;
 
-public sealed class HttpRequestJintExtension : IJintExtension, IScriptDescriptor
+public sealed class HttpRequestJintExtension(IHttpContextAccessor httpContextAccessor) : IJintExtension, IScriptDescriptor
 {
     private delegate RequestInfo? GetRequestDelegate();
-    private readonly IHttpContextAccessor httpContextAccessor;
 
     private sealed class RequestInfo
     {
@@ -25,11 +24,6 @@ public sealed class HttpRequestJintExtension : IJintExtension, IScriptDescriptor
         public string? QueryString { get; set; }
 
         public Dictionary<string, string?[]> Query { get; set; }
-    }
-
-    public HttpRequestJintExtension(IHttpContextAccessor httpContextAccessor)
-    {
-        this.httpContextAccessor = httpContextAccessor;
     }
 
     public void Extend(Engine engine)

@@ -13,15 +13,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations;
 
-public sealed class ConvertEventStore : MongoBase<BsonDocument>, IMigration
+public sealed class ConvertEventStore(IEventStore eventStore) : MongoBase<BsonDocument>, IMigration
 {
-    private readonly IEventStore eventStore;
-
-    public ConvertEventStore(IEventStore eventStore)
-    {
-        this.eventStore = eventStore;
-    }
-
     public async Task UpdateAsync(
         CancellationToken ct)
     {

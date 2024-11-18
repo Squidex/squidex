@@ -13,14 +13,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public sealed class AppLanguagesTests : IClassFixture<ClientFixture>
+public sealed class AppLanguagesTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
-    public ClientFixture _ { get; }
-
-    public AppLanguagesTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_add_language()

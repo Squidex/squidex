@@ -22,23 +22,11 @@ namespace Squidex.Areas.Api.Controllers.Plans;
 /// Update and query plans.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Plans))]
-public sealed class TeamPlansController : ApiController
+public sealed class TeamPlansController(ICommandBus commandBus,
+    IUsageGate appUsageGate,
+    IBillingPlans billingPlans,
+    IBillingManager billingManager) : ApiController(commandBus)
 {
-    private readonly IUsageGate appUsageGate;
-    private readonly IBillingPlans billingPlans;
-    private readonly IBillingManager billingManager;
-
-    public TeamPlansController(ICommandBus commandBus,
-        IUsageGate appUsageGate,
-        IBillingPlans billingPlans,
-        IBillingManager billingManager)
-        : base(commandBus)
-    {
-        this.appUsageGate = appUsageGate;
-        this.billingPlans = billingPlans;
-        this.billingManager = billingManager;
-    }
-
     /// <summary>
     /// Get team plan information.
     /// </summary>

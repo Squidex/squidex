@@ -11,14 +11,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class HistoryTests : IClassFixture<CreatedAppFixture>
+public class HistoryTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
-    public CreatedAppFixture _ { get; }
-
-    public HistoryTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_get_history()

@@ -11,13 +11,8 @@ using Squidex.Text;
 
 namespace Squidex.Infrastructure.Validation;
 
-public sealed class LocalizedCompareAttribute : CompareAttribute
+public sealed class LocalizedCompareAttribute(string otherProperty) : CompareAttribute(otherProperty)
 {
-    public LocalizedCompareAttribute(string otherProperty)
-        : base(otherProperty)
-    {
-    }
-
     public override string FormatErrorMessage(string name)
     {
         var property = T.Get($"common.{name.ToCamelCase()}", name);

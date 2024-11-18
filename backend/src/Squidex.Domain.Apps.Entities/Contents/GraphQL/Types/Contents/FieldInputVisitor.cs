@@ -10,15 +10,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
-internal sealed class FieldInputVisitor : IFieldVisitor<IGraphType?, FieldInfo>
+internal sealed class FieldInputVisitor(Builder builder) : IFieldVisitor<IGraphType?, FieldInfo>
 {
-    private readonly Builder builder;
-
-    public FieldInputVisitor(Builder builder)
-    {
-        this.builder = builder;
-    }
-
     public IGraphType? Visit(IArrayField field, FieldInfo args)
     {
         if (args.Fields.Count == 0)

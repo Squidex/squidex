@@ -15,14 +15,9 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-public class ContentQueryTests : IClassFixture<ContentQueryFixture>
+public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<ContentQueryFixture>
 {
-    public ContentQueryFixture _ { get; }
-
-    public ContentQueryTests(ContentQueryFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ContentQueryFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_query_with_old_fields()
@@ -33,7 +28,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items_0 = await _.Client.DynamicContents(_.SchemaName).GetAsync(context: context);
 
-        Assert.True(items_0.Items.All(x => x.Data.Count == 1));
+        Assert.True(items_0.Items.TrueForAll(x => x.Data.Count == 1));
     }
 
     [Fact]
@@ -45,7 +40,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
 
         var items_0 = await _.Client.DynamicContents(_.SchemaName).GetAsync(context: context);
 
-        Assert.True(items_0.Items.All(x => x.Data.Count == 1));
+        Assert.True(items_0.Items.TrueForAll(x => x.Data.Count == 1));
     }
 
     [Fact]
@@ -149,7 +144,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             return Task.CompletedTask;
         });
 
-        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.OrderBy(x => x).ToArray());
+        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.Order().ToArray());
     }
 
     [Fact]
@@ -163,7 +158,7 @@ public class ContentQueryTests : IClassFixture<ContentQueryFixture>
             return Task.CompletedTask;
         });
 
-        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.OrderBy(x => x).ToArray());
+        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.Order().ToArray());
     }
 
     [Fact]

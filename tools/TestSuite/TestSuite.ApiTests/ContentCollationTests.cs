@@ -15,16 +15,11 @@ namespace TestSuite.ApiTests;
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
-public class ContentCollationTests : IClassFixture<CreatedAppFixture>
+public class ContentCollationTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
 
-    public CreatedAppFixture _ { get; }
-
-    public ContentCollationTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     public sealed class SimpleEntityData
     {

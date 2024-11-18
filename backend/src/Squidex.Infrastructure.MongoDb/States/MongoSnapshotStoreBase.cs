@@ -11,13 +11,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States;
 
-public abstract class MongoSnapshotStoreBase<T, TState> : MongoRepositoryBase<TState>, ISnapshotStore<T> where TState : MongoState<T>, new()
+public abstract class MongoSnapshotStoreBase<T, TState>(IMongoDatabase database) : MongoRepositoryBase<TState>(database), ISnapshotStore<T> where TState : MongoState<T>, new()
 {
-    protected MongoSnapshotStoreBase(IMongoDatabase database)
-        : base(database)
-    {
-    }
-
     protected override string CollectionName()
     {
         var attribute = typeof(T).GetCustomAttributes(true).OfType<CollectionNameAttribute>().FirstOrDefault();

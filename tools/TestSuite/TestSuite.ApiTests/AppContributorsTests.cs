@@ -13,14 +13,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public sealed class AppContributorsTests : IClassFixture<ClientFixture>
+public sealed class AppContributorsTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
-    public ClientFixture _ { get; }
-
-    public AppContributorsTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_not_invite_contributor_if_flag_is_false()

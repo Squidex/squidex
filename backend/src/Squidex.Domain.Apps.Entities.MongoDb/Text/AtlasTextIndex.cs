@@ -19,22 +19,14 @@ using LuceneQueryAnalyzer = Lucene.Net.QueryParsers.Classic.QueryParser;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public sealed class AtlasTextIndex : MongoTextIndexBase<Dictionary<string, string>>
+public sealed class AtlasTextIndex(IMongoDatabase database, IHttpClientFactory atlasClient, IOptions<AtlasOptions> atlasOptions, string shardKey) : MongoTextIndexBase<Dictionary<string, string>>(database, shardKey, new CommandFactory<Dictionary<string, string>>(BuildTexts))
 {
     private static readonly LuceneQueryVisitor QueryVisitor = new LuceneQueryVisitor(AtlasIndexDefinition.GetFieldPath);
     private static readonly LuceneQueryAnalyzer QueryParser =
         new LuceneQueryAnalyzer(LuceneVersion.LUCENE_48, "*",
             new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.EMPTY_SET));
-    private readonly AtlasOptions atlasOptions;
-    private readonly IHttpClientFactory atlasClient;
+    private readonly AtlasOptions atlasOptions = atlasOptions.Value;
     private string index;
-
-    public AtlasTextIndex(IMongoDatabase database, IHttpClientFactory atlasClient, IOptions<AtlasOptions> atlasOptions, string shardKey)
-        : base(database, shardKey, new CommandFactory<Dictionary<string, string>>(BuildTexts))
-    {
-        this.atlasClient = atlasClient;
-        this.atlasOptions = atlasOptions.Value;
-    }
 
     protected override async Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<Dictionary<string, string>>> collection,
         CancellationToken ct)

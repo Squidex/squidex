@@ -13,16 +13,11 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
+public sealed class AppWorkflowsTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
     private readonly string workflowName = Guid.NewGuid().ToString();
 
-    public ClientFixture _ { get; }
-
-    public AppWorkflowsTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_workflow()

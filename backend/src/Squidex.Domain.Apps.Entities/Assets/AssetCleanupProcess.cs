@@ -11,15 +11,9 @@ using tusdotnet.Interfaces;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class AssetCleanupProcess : IBackgroundProcess
+public sealed class AssetCleanupProcess(ITusExpirationStore expirationStore) : IBackgroundProcess
 {
-    private readonly ITusExpirationStore expirationStore;
     private CompletionTimer timer;
-
-    public AssetCleanupProcess(ITusExpirationStore expirationStore)
-    {
-        this.expirationStore = expirationStore;
-    }
 
     public Task StartAsync(
         CancellationToken ct)

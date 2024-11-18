@@ -14,15 +14,9 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Migrations;
 
-public sealed class MigrationPath : IMigrationPath
+public sealed class MigrationPath(IServiceProvider serviceProvider) : IMigrationPath
 {
     private const int CurrentVersion = 27;
-    private readonly IServiceProvider serviceProvider;
-
-    public MigrationPath(IServiceProvider serviceProvider)
-    {
-        this.serviceProvider = serviceProvider;
-    }
 
     public (int Version, IEnumerable<IMigration>? Migrations) GetNext(int version)
     {

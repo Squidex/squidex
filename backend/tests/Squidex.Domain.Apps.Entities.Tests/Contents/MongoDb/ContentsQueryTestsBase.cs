@@ -16,14 +16,9 @@ using F = Squidex.Infrastructure.Queries.ClrFilter;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb;
 
-public abstract class ContentsQueryTestsBase
+public abstract class ContentsQueryTestsBase(ContentsQueryFixture fixture)
 {
-    public ContentsQueryFixture _ { get; }
-
-    protected ContentsQueryTestsBase(ContentsQueryFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ContentsQueryFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_verify_ids()

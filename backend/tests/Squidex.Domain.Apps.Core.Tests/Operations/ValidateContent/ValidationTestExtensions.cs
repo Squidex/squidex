@@ -142,17 +142,9 @@ public static class ValidationTestExtensions
         return context;
     }
 
-    private sealed class ValidatorBuilder
+    private sealed class ValidatorBuilder(IValidatorsFactory? validatorFactory, ValidationContext validationContext)
     {
         private static readonly IValidatorsFactory Default = new DefaultValidatorsFactory();
-        private readonly IValidatorsFactory? validatorFactory;
-        private readonly ValidationContext validationContext;
-
-        public ValidatorBuilder(IValidatorsFactory? validatorFactory, ValidationContext validationContext)
-        {
-            this.validatorFactory = validatorFactory;
-            this.validationContext = validationContext;
-        }
 
         public ContentValidator ContentValidator(PartitionResolver partitionResolver)
         {

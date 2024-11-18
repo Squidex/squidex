@@ -10,18 +10,13 @@
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class AzureTextIndexTests : TextIndexerTestsBase, IClassFixture<AzureTextIndexFixture>
+public class AzureTextIndexTests(AzureTextIndexFixture fixture) : TextIndexerTestsBase, IClassFixture<AzureTextIndexFixture>
 {
     public override bool SupportsGeo => true;
 
     public override int WaitAfterUpdate => 2000;
 
-    public AzureTextIndexFixture _ { get; }
-
-    public AzureTextIndexTests(AzureTextIndexFixture fixture)
-    {
-        _ = fixture;
-    }
+    public AzureTextIndexFixture _ { get; } = fixture;
 
     public override ITextIndex CreateIndex()
     {

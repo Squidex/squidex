@@ -14,16 +14,11 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-public class ContentScriptingTests : IClassFixture<CreatedAppFixture>
+public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
 
-    public CreatedAppFixture _ { get; }
-
-    public ContentScriptingTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_content_with_scripting()

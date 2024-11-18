@@ -23,20 +23,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas;
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Schemas))]
 [ApiModelValidation(true)]
-public class SchemaIndexesController : ApiController
+public class SchemaIndexesController(ICommandBus commandBus, IJobService jobService, IContentRepository contentRepository) : ApiController(commandBus)
 {
-    private readonly ICommandBus commandBus;
-    private readonly IJobService jobService;
-    private readonly IContentRepository contentRepository;
-
-    public SchemaIndexesController(ICommandBus commandBus, IJobService jobService, IContentRepository contentRepository)
-        : base(commandBus)
-    {
-        this.commandBus = commandBus;
-        this.jobService = jobService;
-        this.contentRepository = contentRepository;
-    }
-
     /// <summary>
     /// Gets the schema indexes.
     /// </summary>

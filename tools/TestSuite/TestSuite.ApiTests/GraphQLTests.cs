@@ -18,14 +18,9 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-public sealed class GraphQLTests : IClassFixture<GraphQLFixture>
+public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQLFixture>
 {
-    public GraphQLFixture _ { get; }
-
-    public GraphQLTests(GraphQLFixture fixture)
-    {
-        _ = fixture;
-    }
+    public GraphQLFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_query_assets()

@@ -9,17 +9,9 @@ using Squidex.Domain.Apps.Entities.Rules.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Queries;
 
-public sealed class RuleQueryService : IRuleQueryService
+public sealed class RuleQueryService(IRulesIndex rulesIndex, IRuleEnricher ruleEnricher) : IRuleQueryService
 {
     private static readonly List<EnrichedRule> EmptyResults = [];
-    private readonly IRulesIndex rulesIndex;
-    private readonly IRuleEnricher ruleEnricher;
-
-    public RuleQueryService(IRulesIndex rulesIndex, IRuleEnricher ruleEnricher)
-    {
-        this.rulesIndex = rulesIndex;
-        this.ruleEnricher = ruleEnricher;
-    }
 
     public async Task<IReadOnlyList<EnrichedRule>> QueryAsync(Context context,
         CancellationToken ct = default)

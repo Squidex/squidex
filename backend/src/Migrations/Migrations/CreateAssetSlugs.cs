@@ -12,15 +12,8 @@ using Squidex.Infrastructure.States;
 
 namespace Migrations.Migrations;
 
-public sealed class CreateAssetSlugs : IMigration
+public sealed class CreateAssetSlugs(ISnapshotStore<Asset> stateForAssets) : IMigration
 {
-    private readonly ISnapshotStore<Asset> stateForAssets;
-
-    public CreateAssetSlugs(ISnapshotStore<Asset> stateForAssets)
-    {
-        this.stateForAssets = stateForAssets;
-    }
-
     public async Task UpdateAsync(
         CancellationToken ct)
     {

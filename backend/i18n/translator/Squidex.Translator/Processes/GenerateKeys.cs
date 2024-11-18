@@ -9,19 +9,8 @@ using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes;
 
-public sealed class GenerateKeys
+public sealed class GenerateKeys(DirectoryInfo folder, TranslationService service, string fileName)
 {
-    private readonly TranslationService service;
-    private readonly string fileName;
-    private readonly DirectoryInfo folder;
-
-    public GenerateKeys(DirectoryInfo folder, TranslationService service, string fileName)
-    {
-        this.folder = folder;
-        this.service = service;
-        this.fileName = fileName;
-    }
-
     public void Run()
     {
         var keys = new TranslatedTexts();

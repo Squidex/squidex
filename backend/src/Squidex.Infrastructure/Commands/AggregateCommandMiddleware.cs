@@ -7,16 +7,9 @@
 
 namespace Squidex.Infrastructure.Commands;
 
-public class AggregateCommandMiddleware<TCommand, T1> : ICommandMiddleware
+public class AggregateCommandMiddleware<TCommand, T1>(IDomainObjectFactory domainObjectFactory) : ICommandMiddleware
     where TCommand : IAggregateCommand where T1 : IAggregate
 {
-    private readonly IDomainObjectFactory domainObjectFactory;
-
-    public AggregateCommandMiddleware(IDomainObjectFactory domainObjectFactory)
-    {
-        this.domainObjectFactory = domainObjectFactory;
-    }
-
     public virtual async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {

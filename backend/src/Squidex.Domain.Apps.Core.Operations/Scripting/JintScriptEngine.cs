@@ -23,22 +23,12 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
-public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
+public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOptions> options, IEnumerable<IJintExtension>? extensions = null) : IScriptEngine, IScriptDescriptor
 {
-    private readonly IJintExtension[] extensions;
-    private readonly CacheParser parser;
-    private readonly TimeSpan timeoutScript;
-    private readonly TimeSpan timeoutExecution;
-
-    public JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOptions> options, IEnumerable<IJintExtension>? extensions = null)
-    {
-        parser = new CacheParser(cache);
-
-        timeoutScript = options.Value.TimeoutScript;
-        timeoutExecution = options.Value.TimeoutExecution;
-
-        this.extensions = extensions?.ToArray() ?? [];
-    }
+    private readonly IJintExtension[] extensions = extensions?.ToArray() ?? [];
+    private readonly CacheParser parser = new CacheParser(cache);
+    private readonly TimeSpan timeoutScript = options.Value.TimeoutScript;
+    private readonly TimeSpan timeoutExecution = options.Value.TimeoutExecution;
 
     public async Task<JsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
         CancellationToken ct = default)

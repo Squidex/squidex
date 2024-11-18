@@ -11,13 +11,7 @@ using Squidex.Web.Pipeline;
 namespace Squidex.Web;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-public sealed class ApiCostsAttribute : ServiceFilterAttribute, IApiCostsFeature
+public sealed class ApiCostsAttribute(double costs) : ServiceFilterAttribute(typeof(ApiCostsFilter)), IApiCostsFeature
 {
-    public double Costs { get; }
-
-    public ApiCostsAttribute(double costs)
-        : base(typeof(ApiCostsFilter))
-    {
-        Costs = costs;
-    }
+    public double Costs { get; } = costs;
 }

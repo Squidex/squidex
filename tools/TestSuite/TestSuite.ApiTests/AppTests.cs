@@ -13,14 +13,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public sealed class AppTests : IClassFixture<CreatedAppFixture>
+public sealed class AppTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
-    public CreatedAppFixture _ { get; }
-
-    public AppTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_get_app()

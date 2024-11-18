@@ -9,15 +9,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Commands;
 
-public sealed class LogCommandMiddleware : ICommandMiddleware
+public sealed class LogCommandMiddleware(ILogger<LogCommandMiddleware> log) : ICommandMiddleware
 {
-    private readonly ILogger<LogCommandMiddleware> log;
-
-    public LogCommandMiddleware(ILogger<LogCommandMiddleware> log)
-    {
-        this.log = log;
-    }
-
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {

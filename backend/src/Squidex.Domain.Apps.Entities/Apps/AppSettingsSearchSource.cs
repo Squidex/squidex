@@ -13,15 +13,9 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppSettingsSearchSource : ISearchSource
+public sealed class AppSettingsSearchSource(IUrlGenerator urlGenerator) : ISearchSource
 {
     private const int MaxItems = 3;
-    private readonly IUrlGenerator urlGenerator;
-
-    public AppSettingsSearchSource(IUrlGenerator urlGenerator)
-    {
-        this.urlGenerator = urlGenerator;
-    }
 
     public Task<SearchResults> SearchAsync(string query, Context context,
         CancellationToken ct)

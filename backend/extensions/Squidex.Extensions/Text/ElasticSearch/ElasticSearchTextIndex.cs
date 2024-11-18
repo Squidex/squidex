@@ -15,21 +15,11 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Text.ElasticSearch;
 
-public sealed partial class ElasticSearchTextIndex : ITextIndex, IInitializable
+public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticClient, string indexName, IJsonSerializer jsonSerializer) : ITextIndex, IInitializable
 {
     private static readonly Regex RegexLanguageNormal = BuildLanguageRegexNormal();
     private static readonly Regex RegexLanguageStart = BuildLanguageRegexStart();
-    private readonly IJsonSerializer jsonSerializer;
-    private readonly IElasticSearchClient elasticClient;
     private readonly QueryParser queryParser = new QueryParser(ElasticSearchIndexDefinition.GetFieldPath);
-    private readonly string indexName;
-
-    public ElasticSearchTextIndex(IElasticSearchClient elasticClient, string indexName, IJsonSerializer jsonSerializer)
-    {
-        this.elasticClient = elasticClient;
-        this.indexName = indexName;
-        this.jsonSerializer = jsonSerializer;
-    }
 
     public Task InitializeAsync(
         CancellationToken ct)

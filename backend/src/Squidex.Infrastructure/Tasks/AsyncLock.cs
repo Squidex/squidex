@@ -12,15 +12,8 @@ public sealed class AsyncLock : IDisposable
     private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
     private readonly Disposable disposable;
 
-    private sealed class Disposable : IDisposable
+    private sealed class Disposable(SemaphoreSlim semaphore) : IDisposable
     {
-        private readonly SemaphoreSlim semaphore;
-
-        public Disposable(SemaphoreSlim semaphore)
-        {
-            this.semaphore = semaphore;
-        }
-
         public void Dispose()
         {
             semaphore.Release();

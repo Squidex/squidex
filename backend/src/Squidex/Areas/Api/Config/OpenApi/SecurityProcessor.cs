@@ -12,13 +12,8 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
 
-public sealed class SecurityProcessor : SecurityDefinitionAppender
+public sealed class SecurityProcessor(IUrlGenerator urlGenerator) : SecurityDefinitionAppender(Constants.SecurityDefinition, [Constants.ScopeApi], CreateOAuthSchema(urlGenerator))
 {
-    public SecurityProcessor(IUrlGenerator urlGenerator)
-        : base(Constants.SecurityDefinition, [Constants.ScopeApi], CreateOAuthSchema(urlGenerator))
-    {
-    }
-
     private static OpenApiSecurityScheme CreateOAuthSchema(IUrlGenerator urlGenerator)
     {
         string BuildUrl(string endpoint)

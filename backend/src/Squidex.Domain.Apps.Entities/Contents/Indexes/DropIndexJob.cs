@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Indexes;
 
-public sealed class DropIndexJob : IJobRunner
+public sealed class DropIndexJob(IContentRepository contentRepository) : IJobRunner
 {
     public const string TaskName = "dropIndex";
     public const string ArgAppId = "appId";
@@ -21,14 +21,8 @@ public sealed class DropIndexJob : IJobRunner
     public const string ArgSchemaId = "schemaId";
     public const string ArgSchemaName = "schemaName";
     public const string ArgIndexName = "indexName";
-    private readonly IContentRepository contentRepository;
 
     public string Name => TaskName;
-
-    public DropIndexJob(IContentRepository contentRepository)
-    {
-        this.contentRepository = contentRepository;
-    }
 
     public static JobRequest BuildRequest(RefToken actor, App app, Schema schema, string name)
     {

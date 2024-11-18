@@ -12,10 +12,8 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
-public abstract class RuleActionHandler<TAction, TData> : IRuleActionHandler where TAction : RuleAction
+public abstract class RuleActionHandler<TAction, TData>(RuleEventFormatter formatter) : IRuleActionHandler where TAction : RuleAction
 {
-    private readonly RuleEventFormatter formatter;
-
     Type IRuleActionHandler.ActionType
     {
         get => typeof(TAction);
@@ -24,11 +22,6 @@ public abstract class RuleActionHandler<TAction, TData> : IRuleActionHandler whe
     Type IRuleActionHandler.DataType
     {
         get => typeof(TData);
-    }
-
-    protected RuleActionHandler(RuleEventFormatter formatter)
-    {
-        this.formatter = formatter;
     }
 
     protected virtual string ToJson<T>(T @event) where T : notnull

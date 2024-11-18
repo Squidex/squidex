@@ -11,15 +11,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class ResolveFromPreviousPartitioning : IContentFieldConverter
+public sealed class ResolveFromPreviousPartitioning(LanguagesConfig languages) : IContentFieldConverter
 {
-    private readonly LanguagesConfig languages;
-
-    public ResolveFromPreviousPartitioning(LanguagesConfig languages)
-    {
-        this.languages = languages;
-    }
-
     public ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
     {
         if (field.Partitioning.Equals(Partitioning.Invariant))

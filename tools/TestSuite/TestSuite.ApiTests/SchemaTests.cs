@@ -14,16 +14,11 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class SchemaTests : IClassFixture<CreatedAppFixture>
+public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
 
-    public CreatedAppFixture _ { get; }
-
-    public SchemaTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_schema()

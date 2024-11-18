@@ -17,24 +17,14 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class ContentSchedulerProcess : IBackgroundProcess
+public sealed class ContentSchedulerProcess(
+    IContentRepository contentRepository,
+    ICommandBus commandBus,
+    ILogger<ContentSchedulerProcess> log) : IBackgroundProcess
 {
-    private readonly IContentRepository contentRepository;
-    private readonly ICommandBus commandBus;
-    private readonly ILogger<ContentSchedulerProcess> log;
     private CompletionTimer timer;
 
     public IClock Clock { get; set; } = SystemClock.Instance;
-
-    public ContentSchedulerProcess(
-        IContentRepository contentRepository,
-        ICommandBus commandBus,
-        ILogger<ContentSchedulerProcess> log)
-    {
-        this.commandBus = commandBus;
-        this.contentRepository = contentRepository;
-        this.log = log;
-    }
 
     public Task StartAsync(
         CancellationToken ct)

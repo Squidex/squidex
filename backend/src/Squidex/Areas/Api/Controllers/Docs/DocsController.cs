@@ -11,13 +11,8 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Docs;
 
-public sealed class DocsController : ApiController
+public sealed class DocsController(ICommandBus commandBus) : ApiController(commandBus)
 {
-    public DocsController(ICommandBus commandBus)
-        : base(commandBus)
-    {
-    }
-
     [HttpGet]
     [Route("docs/")]
     public IActionResult Docs()

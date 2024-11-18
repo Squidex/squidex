@@ -10,16 +10,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
-public sealed class EnrichWithWorkflows : IContentEnricherStep
+public sealed class EnrichWithWorkflows(IContentWorkflow contentWorkflow) : IContentEnricherStep
 {
     private const string DefaultColor = StatusColors.Draft;
-
-    private readonly IContentWorkflow contentWorkflow;
-
-    public EnrichWithWorkflows(IContentWorkflow contentWorkflow)
-    {
-        this.contentWorkflow = contentWorkflow;
-    }
 
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)

@@ -18,14 +18,9 @@ using Squidex.Infrastructure.EventSourcing;
 namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb;
 
 [Trait("Category", "Dependencies")]
-public class SchemasHashTests : GivenContext, IClassFixture<SchemasHashFixture>
+public class SchemasHashTests(SchemasHashFixture fixture) : GivenContext, IClassFixture<SchemasHashFixture>
 {
-    public SchemasHashFixture _ { get; }
-
-    public SchemasHashTests(SchemasHashFixture fixture)
-    {
-        _ = fixture;
-    }
+    public SchemasHashFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_compute_cache_independent_from_order()

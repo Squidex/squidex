@@ -14,14 +14,9 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.SignalR;
 
-public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, SignalRJob>
+public sealed class SignalRActionHandler(RuleEventFormatter formatter) : RuleActionHandler<SignalRAction, SignalRJob>(formatter)
 {
-    private readonly ClientPool<(string ConnectionString, string HubName), ServiceManager> clients;
-
-    public SignalRActionHandler(RuleEventFormatter formatter)
-        : base(formatter)
-    {
-        clients = new ClientPool<(string ConnectionString, string HubName), ServiceManager>(key =>
+    private readonly ClientPool<(string ConnectionString, string HubName), ServiceManager> clients = new ClientPool<(string ConnectionString, string HubName), ServiceManager>(key =>
         {
             var serviceManager = new ServiceManagerBuilder()
                 .WithOptions(option =>
@@ -33,7 +28,6 @@ public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, Sign
 
             return serviceManager;
         });
-    }
 
     protected override async Task<(string Description, SignalRJob Data)> CreateJobAsync(EnrichedEvent @event, SignalRAction action)
     {

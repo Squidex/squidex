@@ -20,15 +20,8 @@ using static Parlot.Fluent.Parsers;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class ReferencesFluidExtension : IFluidExtension
+public sealed class ReferencesFluidExtension(IServiceProvider serviceProvider) : IFluidExtension
 {
-    private readonly IServiceProvider serviceProvider;
-
-    public ReferencesFluidExtension(IServiceProvider serviceProvider)
-    {
-        this.serviceProvider = serviceProvider;
-    }
-
     public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
     {
         AddReferenceFilter(options);
