@@ -37,16 +37,16 @@ public static class ResizeServices
                 options.BaseAddress = new Uri(resizerUrl);
             });
 
-            services.AddSingletonAs(c =>
+            services.AddSingletonAs<IAssetThumbnailGenerator>(c =>
                     new RemoteThumbnailGenerator(
                         c.GetRequiredService<IHttpClientFactory>(),
                         c.GetRequiredService<CompositeThumbnailGenerator>()))
-                .As<IAssetThumbnailGenerator>();
+                .AsSelf();
         }
         else
         {
-            services.AddSingletonAs(c => c.GetRequiredService<CompositeThumbnailGenerator>())
-                .As<IAssetThumbnailGenerator>();
+            services.AddSingletonAs<IAssetThumbnailGenerator>(c => c.GetRequiredService<CompositeThumbnailGenerator>())
+                .AsSelf();
         }
     }
 }
