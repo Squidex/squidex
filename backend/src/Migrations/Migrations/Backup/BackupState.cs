@@ -11,7 +11,7 @@ namespace Migrations.Migrations.Backup;
 
 public sealed class BackupState
 {
-    public List<BackupJob> Jobs { get; set;  } = [];
+    public List<BackupJob> Jobs { get; set; } = [];
 
     public JobsState ToJob()
     {

@@ -30,7 +30,8 @@ namespace Squidex.Areas.Api.Controllers.Rules;
 /// Update and query information about rules.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Rules))]
-public sealed class RulesController(ICommandBus commandBus,
+public sealed class RulesController(
+    ICommandBus commandBus,
     IAppProvider appProvider,
     IRuleEventRepository ruleEventsRepository,
     IRuleQueryService ruleQuery,

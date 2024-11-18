@@ -23,7 +23,10 @@ using GraphQLSchema = GraphQL.Types.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
-public sealed class CachingGraphQLResolver(IBackgroundCache cache, ISchemasHash schemasHash, IServiceProvider serviceProvider,
+public sealed class CachingGraphQLResolver(
+    IBackgroundCache cache,
+    ISchemasHash schemasHash,
+    IServiceProvider serviceProvider,
     IOptions<GraphQLOptions> options)
     : IConfigureExecution
 {

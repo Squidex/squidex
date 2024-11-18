@@ -22,7 +22,8 @@ namespace Squidex.Areas.Api.Controllers.Plans;
 /// Update and query plans.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Plans))]
-public sealed class AppPlansController(ICommandBus commandBus,
+public sealed class AppPlansController(
+    ICommandBus commandBus,
     IUsageGate usageGate,
     IBillingPlans billingPlans,
     IBillingManager billingManager)

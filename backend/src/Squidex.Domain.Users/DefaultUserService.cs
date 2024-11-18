@@ -16,8 +16,11 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users;
 
-public sealed class DefaultUserService(UserManager<IdentityUser> userManager, IUserFactory userFactory,
-    IEnumerable<IUserEvents> userEvents, ILogger<DefaultUserService> log)
+public sealed class DefaultUserService(
+    UserManager<IdentityUser> userManager,
+    IUserFactory userFactory,
+    IEnumerable<IUserEvents> userEvents,
+    ILogger<DefaultUserService> log)
     : IUserService
 {
     public async Task<bool> IsEmptyAsync(

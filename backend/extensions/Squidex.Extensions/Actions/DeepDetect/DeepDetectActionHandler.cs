@@ -23,7 +23,9 @@ namespace Squidex.Extensions.Actions.DeepDetect;
 
 #pragma warning disable MA0048 // File name must match type name
 
-internal sealed partial class DeepDetectActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory,
+internal sealed partial class DeepDetectActionHandler(
+    RuleEventFormatter formatter,
+    IHttpClientFactory httpClientFactory,
     IJsonSerializer jsonSerializer,
     IAppProvider appProvider,
     IAssetQueryService assetQuery,

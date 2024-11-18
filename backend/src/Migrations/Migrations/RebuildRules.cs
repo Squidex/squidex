@@ -11,7 +11,8 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Migrations.Migrations;
 
-public sealed class RebuildRules(Rebuilder rebuilder,
+public sealed class RebuildRules(
+    Rebuilder rebuilder,
     IOptions<RebuildOptions> rebuildOptions)
     : IMigration
 {

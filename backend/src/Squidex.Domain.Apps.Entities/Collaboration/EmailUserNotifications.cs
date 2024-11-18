@@ -18,8 +18,11 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Collaboration;
 
-public sealed class EmailUserNotifications(IOptions<EmailUserNotificationOptions> texts, IEmailSender emailSender,
-    IUrlGenerator urlGenerator, ILogger<EmailUserNotifications> log)
+public sealed class EmailUserNotifications(
+    IOptions<EmailUserNotificationOptions> texts,
+    IEmailSender emailSender,
+    IUrlGenerator urlGenerator,
+    ILogger<EmailUserNotifications> log)
     : IUserNotifications
 {
     private readonly EmailUserNotificationOptions texts = texts.Value;

@@ -18,7 +18,9 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes;
 
-public sealed class SchemasIndex(ISchemaRepository schemaRepository, IReplicatedCache schemaCache,
+public sealed class SchemasIndex(
+    ISchemaRepository schemaRepository,
+    IReplicatedCache schemaCache,
     IPersistenceFactory<NameReservationState.State> persistenceFactory,
     IOptions<SchemaCacheOptions> options)
     : ICommandMiddleware, ISchemasIndex

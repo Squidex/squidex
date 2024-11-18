@@ -9,7 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Migrations;
 
-public sealed class Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath,
+public sealed class Migrator(
+    IMigrationStatus migrationStatus,
+    IMigrationPath migrationPath,
     ILogger<Migrator> log)
 {
     public int LockWaitMs { get; set; } = 500;

@@ -16,7 +16,9 @@ using IGenericUrlGenerator = Squidex.Hosting.IUrlGenerator;
 
 namespace Squidex.Web.Services;
 
-public sealed class UrlGenerator(IGenericUrlGenerator urlGenerator, IAssetFileStore assetFileStore,
+public sealed class UrlGenerator(
+    IGenericUrlGenerator urlGenerator,
+    IAssetFileStore assetFileStore,
     IOptions<AssetOptions> assetOptions,
     IOptions<ContentOptions> contentOptions)
     : IUrlGenerator, IHttpImageEndpoint

@@ -14,7 +14,9 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents;
 
-public sealed class ContentOpenApiController(ICommandBus commandBus, IAppProvider appProvider,
+public sealed class ContentOpenApiController(
+    ICommandBus commandBus,
+    IAppProvider appProvider,
     SchemasOpenApiGenerator schemasOpenApiGenerator)
     : ApiController(commandBus)
 {

@@ -11,7 +11,9 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States;
 
-internal sealed class Persistence<T>(DomainId ownerKey, Type ownerType,
+internal sealed class Persistence<T>(
+    DomainId ownerKey,
+    Type ownerType,
     PersistenceMode persistenceMode,
     IEventFormatter eventFormatter,
     IEventStore eventStore,

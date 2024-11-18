@@ -24,7 +24,10 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Teams.DomainObject;
 
-public partial class TeamDomainObject(DomainId id, IPersistenceFactory<Team> persistence, ILogger<TeamDomainObject> log,
+public partial class TeamDomainObject(
+    DomainId id,
+    IPersistenceFactory<Team> persistence,
+    ILogger<TeamDomainObject> log,
     IServiceProvider serviceProvider)
     : DomainObject<Team>(id, persistence, log)
 {

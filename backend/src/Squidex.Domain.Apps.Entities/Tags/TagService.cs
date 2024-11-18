@@ -196,7 +196,7 @@ public sealed class TagService(IPersistenceFactory<TagService.State> persistence
             return name.TrimNonLetterOrDigit().ToLowerInvariant();
         }
 
-        private bool TryGetTag(string name, out (string Id, Tag Info)result, bool useAlias = true)
+        private bool TryGetTag(string name, out (string Id, Tag Info) result, bool useAlias = true)
         {
             result = default!;
 

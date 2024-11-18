@@ -26,7 +26,10 @@ using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 
-public sealed class TemplateCommandMiddleware(TemplatesClient templatesClient, IOptions<TemplatesOptions> templateOptions, IUrlGenerator urlGenerator,
+public sealed class TemplateCommandMiddleware(
+    TemplatesClient templatesClient,
+    IOptions<TemplatesOptions> templateOptions,
+    IUrlGenerator urlGenerator,
     ISemanticLog log)
     : ICommandMiddleware
 {

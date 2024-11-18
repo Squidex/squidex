@@ -15,8 +15,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent;
 
-public sealed class RootContext(App app, Schema schema, DomainId contentId, ResolvedComponents components,
-    IJsonSerializer serializer)
+public sealed class RootContext(App app, Schema schema, DomainId contentId, ResolvedComponents components, IJsonSerializer serializer)
 {
     private readonly ConcurrentBag<ValidationError> errors = [];
     private readonly Scheduler scheduler = new Scheduler();

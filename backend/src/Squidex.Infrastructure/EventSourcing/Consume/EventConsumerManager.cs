@@ -10,7 +10,9 @@ using Squidex.Messaging;
 
 namespace Squidex.Infrastructure.EventSourcing.Consume;
 
-public sealed class EventConsumerManager(IPersistenceFactory<EventConsumerState> persistence, IEnumerable<IEventConsumer> eventConsumers,
+public sealed class EventConsumerManager(
+    IPersistenceFactory<EventConsumerState> persistence,
+    IEnumerable<IEventConsumer> eventConsumers,
     IMessageBus messaging)
     : IEventConsumerManager
 {

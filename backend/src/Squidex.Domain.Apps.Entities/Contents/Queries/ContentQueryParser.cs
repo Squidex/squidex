@@ -24,8 +24,12 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-public class ContentQueryParser(IAppProvider appprovider, ITextIndex textIndex, IOptions<ContentOptions> options,
-    IMemoryCache cache, IJsonSerializer serializer)
+public class ContentQueryParser(
+    IAppProvider appprovider,
+    ITextIndex textIndex,
+    IOptions<ContentOptions> options,
+    IMemoryCache cache,
+    IJsonSerializer serializer)
 {
     private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
     private readonly ContentOptions options = options.Value;

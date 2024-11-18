@@ -207,7 +207,7 @@ public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticC
 
         foreach (var item in hits)
         {
-             ids.Add(DomainId.Create(item["_source"]["contentId"]));
+            ids.Add(DomainId.Create(item["_source"]["contentId"]));
         }
 
         return ids;

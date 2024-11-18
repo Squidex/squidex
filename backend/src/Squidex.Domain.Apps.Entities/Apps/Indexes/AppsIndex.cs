@@ -21,7 +21,9 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes;
 
-public sealed class AppsIndex(IAppRepository appRepository, IReplicatedCache appCache,
+public sealed class AppsIndex(
+    IAppRepository appRepository,
+    IReplicatedCache appCache,
     IPersistenceFactory<NameReservationState.State> persistenceFactory,
     IOptions<AppCacheOptions> options)
     : IAppsIndex, ICommandMiddleware, IInitializable

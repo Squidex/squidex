@@ -19,7 +19,11 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities;
 
-public sealed class AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas, ITeamsIndex indexForTeams,
+public sealed class AppProvider(
+    IAppsIndex indexForApps,
+    IRulesIndex indexForRules,
+    ISchemasIndex indexForSchemas,
+    ITeamsIndex indexForTeams,
     ILocalCache localCache)
     : IAppProvider
 {

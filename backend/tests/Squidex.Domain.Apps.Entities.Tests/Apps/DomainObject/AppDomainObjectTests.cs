@@ -227,10 +227,10 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         await VerifySutAsync(actual, new PlanChangedResult(planIdFree, true));
 
-        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._,  A<App>._, A<string?>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.MustRedirectToPortalAsync(A<string>._, A<App>._, A<string?>._, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._,  A<App>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<App>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -249,7 +249,7 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         A.CallTo(() => billingManager.MustRedirectToPortalAsync(User.Identifier, A<App>._, planIdPaid, CancellationToken))
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._,  A<App>._, A<CancellationToken>._))
+        A.CallTo(() => billingManager.UnsubscribeAsync(A<string>._, A<App>._, A<CancellationToken>._))
             .MustHaveHappened();
     }
 

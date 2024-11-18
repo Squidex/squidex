@@ -72,9 +72,9 @@ public sealed class MongoTextIndexerState(IMongoDatabase database) : MongoReposi
                 writes.Add(
                     new ReplaceOneModel<TextContentState>(
                         Filter.Eq(x => x.UniqueContentId, update.UniqueContentId), update)
-                        {
-                            IsUpsert = true
-                        });
+                    {
+                        IsUpsert = true
+                    });
             }
         }
 

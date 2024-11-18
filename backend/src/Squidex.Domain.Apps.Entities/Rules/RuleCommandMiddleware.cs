@@ -12,8 +12,10 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-public sealed class RuleCommandMiddleware(IDomainObjectFactory domainObjectFactory,
-    IRuleEnricher ruleEnricher, IContextProvider contextProvider)
+public sealed class RuleCommandMiddleware(
+    IDomainObjectFactory domainObjectFactory,
+    IRuleEnricher ruleEnricher,
+    IContextProvider contextProvider)
     : AggregateCommandMiddleware<RuleCommandBase, RuleDomainObject>(domainObjectFactory)
 {
     protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result,

@@ -19,7 +19,9 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-public sealed class RuleEnqueuer(IMemoryCache cache, ILocalCache localCache,
+public sealed class RuleEnqueuer(
+    IMemoryCache cache,
+    ILocalCache localCache,
     IAppProvider appProvider,
     IRuleEventRepository ruleEventRepository,
     IRuleService ruleService,

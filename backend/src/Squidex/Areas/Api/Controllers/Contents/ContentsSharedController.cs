@@ -22,7 +22,8 @@ namespace Squidex.Areas.Api.Controllers.Contents;
 
 [SchemaMustBePublished]
 [ApiExplorerSettings(GroupName = nameof(Contents))]
-public sealed class ContentsSharedController(ICommandBus commandBus,
+public sealed class ContentsSharedController(
+    ICommandBus commandBus,
     IContentQueryService contentQuery,
     IContentWorkflow contentWorkflow)
     : ApiController(commandBus)

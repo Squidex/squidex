@@ -21,7 +21,10 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public sealed partial class AssetFolderDomainObject(DomainId id, IPersistenceFactory<AssetFolder> persistence, ILogger<AssetFolderDomainObject> log,
+public sealed partial class AssetFolderDomainObject(
+    DomainId id,
+    IPersistenceFactory<AssetFolder> persistence,
+    ILogger<AssetFolderDomainObject> log,
     IServiceProvider serviceProvider)
     : DomainObject<AssetFolder>(id, persistence, log)
 {

@@ -14,8 +14,11 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
-public sealed class AppCommandMiddleware(IDomainObjectFactory domainObjectFactory,
-    IAppImageStore appImageStore, IAssetThumbnailGenerator assetGenerator, IContextProvider contextProvider)
+public sealed class AppCommandMiddleware(
+    IDomainObjectFactory domainObjectFactory,
+    IAppImageStore appImageStore,
+    IAssetThumbnailGenerator assetGenerator,
+    IContextProvider contextProvider)
     : AggregateCommandMiddleware<AppCommandBase, AppDomainObject>(domainObjectFactory)
 {
     public override async Task HandleAsync(CommandContext context, NextDelegate next,

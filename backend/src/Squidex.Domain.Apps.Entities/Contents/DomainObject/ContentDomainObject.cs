@@ -24,7 +24,10 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public partial class ContentDomainObject(DomainId id, IPersistenceFactory<WriteContent> persistence, ILogger<ContentDomainObject> log,
+public partial class ContentDomainObject(
+    DomainId id,
+    IPersistenceFactory<WriteContent> persistence,
+    ILogger<ContentDomainObject> log,
     IServiceProvider serviceProvider)
     : DomainObject<WriteContent>(id, persistence, log)
 {
