@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Migrations;
 namespace Migrations.Migrations;
 
 public sealed class RebuildApps(Rebuilder rebuilder,
-    IOptions<RebuildOptions> rebuildOptions) : IMigration
+    IOptions<RebuildOptions> rebuildOptions)
+    : IMigration
 {
     private readonly RebuildOptions rebuildOptions = rebuildOptions.Value;
 

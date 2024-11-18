@@ -31,7 +31,8 @@ public sealed class UsagesController(
     IAppLogStore usageLog,
     IUsageGate usageGate,
     IAssetUsageTracker assetUsageTracker,
-    IUrlGenerator urlGenerator) : ApiController(commandBus)
+    IUrlGenerator urlGenerator)
+    : ApiController(commandBus)
 {
     private readonly IDataProtector dataProtector = dataProtection.CreateProtector("LogToken");
 

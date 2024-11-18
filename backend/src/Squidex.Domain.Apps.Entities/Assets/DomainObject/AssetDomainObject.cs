@@ -22,7 +22,8 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
 public partial class AssetDomainObject(DomainId id, IPersistenceFactory<Asset> persistence, ILogger<AssetDomainObject> log,
-    IServiceProvider serviceProvider) : DomainObject<Asset>(id, persistence, log)
+    IServiceProvider serviceProvider)
+    : DomainObject<Asset>(id, persistence, log)
 {
     protected override bool IsDeleted(Asset snapshot)
     {

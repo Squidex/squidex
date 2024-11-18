@@ -13,7 +13,8 @@ namespace Migrations.Migrations.Backup;
 
 public sealed class ConvertBackup(
     ISnapshotStore<BackupState> stateBackups,
-    ISnapshotStore<JobsState> stateJobs) : IMigration
+    ISnapshotStore<JobsState> stateJobs)
+    : IMigration
 {
     public async Task UpdateAsync(
         CancellationToken ct)

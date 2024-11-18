@@ -18,7 +18,8 @@ internal sealed class Persistence<T>(DomainId ownerKey, Type ownerType,
     IEventStreamNames eventStreamNames,
     ISnapshotStore<T> snapshotStore,
     HandleSnapshot<T>? applyState,
-    HandleEvent? applyEvent) : IPersistence<T>
+    HandleEvent? applyEvent)
+    : IPersistence<T>
 {
     private readonly Lazy<string> streamName = new Lazy<string>(() => eventStreamNames.GetStreamName(ownerType, ownerKey.ToString()!));
     private long versionSnapshot = EtagVersion.Empty;

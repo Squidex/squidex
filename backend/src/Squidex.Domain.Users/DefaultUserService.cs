@@ -17,7 +17,8 @@ using Squidex.Shared.Users;
 namespace Squidex.Domain.Users;
 
 public sealed class DefaultUserService(UserManager<IdentityUser> userManager, IUserFactory userFactory,
-    IEnumerable<IUserEvents> userEvents, ILogger<DefaultUserService> log) : IUserService
+    IEnumerable<IUserEvents> userEvents, ILogger<DefaultUserService> log)
+    : IUserService
 {
     public async Task<bool> IsEmptyAsync(
         CancellationToken ct = default)

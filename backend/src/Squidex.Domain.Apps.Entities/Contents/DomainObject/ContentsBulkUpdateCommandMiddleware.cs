@@ -21,7 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
 public sealed class ContentsBulkUpdateCommandMiddleware(
     IContentQueryService contentQuery,
-    IContextProvider contextProvider) : ICommandMiddleware
+    IContextProvider contextProvider)
+    : ICommandMiddleware
 {
     private sealed record BulkTask(
         BulkUpdateJob BulkJob,

@@ -20,7 +20,8 @@ public sealed class RecursiveDeleter(
     IAssetRepository assetRepository,
     IAssetFolderRepository assetFolderRepository,
     TypeRegistry typeRegistry,
-    ILogger<RecursiveDeleter> log) : IEventConsumer
+    ILogger<RecursiveDeleter> log)
+    : IEventConsumer
 {
     private readonly HashSet<string> consumingTypes =
         [

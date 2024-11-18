@@ -36,7 +36,8 @@ public sealed class RulesController(ICommandBus commandBus,
     IRuleQueryService ruleQuery,
     IRuleRunnerService ruleRunnerService,
     RuleTypeProvider ruleRegistry,
-    EventJsonSchemaGenerator eventJsonSchemaGenerator) : ApiController(commandBus)
+    EventJsonSchemaGenerator eventJsonSchemaGenerator)
+    : ApiController(commandBus)
 {
     /// <summary>
     /// Get supported rule actions.

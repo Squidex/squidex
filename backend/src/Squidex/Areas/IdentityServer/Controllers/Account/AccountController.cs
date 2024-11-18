@@ -23,7 +23,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account;
 public sealed class AccountController(
     DynamicSchemeProvider schemes,
     IUserService userService,
-    IOptions<MyIdentityOptions> identityOptions) : IdentityServerController
+    IOptions<MyIdentityOptions> identityOptions)
+    : IdentityServerController
 {
     private readonly MyIdentityOptions identityOptions = identityOptions.Value;
 

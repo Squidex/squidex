@@ -24,7 +24,8 @@ namespace Squidex.Areas.Api.Controllers.Contents;
 [ApiExplorerSettings(GroupName = nameof(Contents))]
 public sealed class ContentsSharedController(ICommandBus commandBus,
     IContentQueryService contentQuery,
-    IContentWorkflow contentWorkflow) : ApiController(commandBus)
+    IContentWorkflow contentWorkflow)
+    : ApiController(commandBus)
 {
     private static readonly GraphQLHttpMiddlewareOptions GraphQLOptions = new GraphQLHttpMiddlewareOptions
     {

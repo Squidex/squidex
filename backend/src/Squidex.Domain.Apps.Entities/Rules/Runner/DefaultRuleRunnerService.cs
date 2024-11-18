@@ -22,7 +22,8 @@ public sealed class DefaultRuleRunnerService(
     IJobService jobService,
     IEventFormatter eventFormatter,
     IEventStore eventStore,
-    IRuleService ruleService) : IRuleRunnerService
+    IRuleService ruleService)
+    : IRuleRunnerService
 {
     private const int MaxSimulatedEvents = 100;
 

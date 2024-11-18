@@ -13,7 +13,8 @@ public sealed class Store<T>(
     IEventFormatter eventFormatter,
     IEventStore eventStore,
     IEventStreamNames eventStreamNames,
-    ISnapshotStore<T> snapshotStore) : IStore<T>
+    ISnapshotStore<T> snapshotStore)
+    : IStore<T>
 {
     public ISnapshotStore<T> Snapshots => snapshotStore;
 

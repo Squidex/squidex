@@ -17,7 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 public sealed class DefaultAssetFileStore(
     IAssetStore assetStore,
     IAssetRepository assetRepository,
-    IOptions<AssetOptions> options) : IAssetFileStore, IDeleter
+    IOptions<AssetOptions> options)
+    : IAssetFileStore, IDeleter
 {
     private readonly AssetOptions options = options.Value;
 

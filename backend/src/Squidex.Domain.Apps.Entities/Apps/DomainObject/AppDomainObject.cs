@@ -25,7 +25,8 @@ using Squidex.Shared.Users;
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
 public partial class AppDomainObject(DomainId id, IPersistenceFactory<App> persistence, ILogger<AppDomainObject> log,
-    IServiceProvider serviceProvider) : DomainObject<App>(id, persistence, log)
+    IServiceProvider serviceProvider)
+    : DomainObject<App>(id, persistence, log)
 {
     protected override bool IsDeleted(App snapshot)
     {

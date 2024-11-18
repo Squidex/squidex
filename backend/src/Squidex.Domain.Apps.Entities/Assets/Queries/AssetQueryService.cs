@@ -18,7 +18,8 @@ public sealed class AssetQueryService(
     IAssetLoader assetLoader,
     IAssetFolderRepository assetFolderRepository,
     IOptions<AssetOptions> options,
-    AssetQueryParser queryParser) : IAssetQueryService
+    AssetQueryParser queryParser)
+    : IAssetQueryService
 {
     private readonly AssetOptions options = options.Value;
 

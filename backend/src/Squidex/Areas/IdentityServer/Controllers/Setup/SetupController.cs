@@ -27,7 +27,8 @@ public class SetupController(
     IOptions<MyUIOptions> uiOptions,
     IOptions<MyIdentityOptions> identityOptions,
     IUrlGenerator urlGenerator,
-    IUserService userService) : IdentityServerController
+    IUserService userService)
+    : IdentityServerController
 {
     private readonly MyUIOptions uiOptions = uiOptions.Value;
     private readonly MyIdentityOptions identityOptions = identityOptions.Value;

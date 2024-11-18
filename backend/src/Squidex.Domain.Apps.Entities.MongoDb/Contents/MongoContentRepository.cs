@@ -25,7 +25,8 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
 
 public partial class MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, string shardKey,
-    IOptions<ContentOptions> options, ILogger<MongoContentRepository> log) : MongoBase<MongoContentEntity>, IContentRepository, IInitializable
+    IOptions<ContentOptions> options, ILogger<MongoContentRepository> log)
+    : MongoBase<MongoContentEntity>, IContentRepository, IInitializable
 {
     private readonly MongoContentCollection collectionComplete =
             new MongoContentCollection($"States_Contents_All3{shardKey}", database, log,

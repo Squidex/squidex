@@ -23,7 +23,8 @@ public sealed class BackupApps(
     IAppImageStore appImageStore,
     IAppProvider appProvider,
     IAppsIndex appsIndex,
-    IAppUISettings appUISettings) : IBackupHandler
+    IAppUISettings appUISettings)
+    : IBackupHandler
 {
     private const string SettingsFile = "Settings.json";
     private const string AvatarFile = "Avatar.image";

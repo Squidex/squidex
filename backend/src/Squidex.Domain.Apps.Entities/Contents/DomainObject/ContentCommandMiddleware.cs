@@ -16,7 +16,8 @@ public sealed class ContentCommandMiddleware(
     IDomainObjectFactory domainObjectFactory,
     IDomainObjectCache domainObjectCache,
     IContentEnricher contentEnricher,
-    IContextProvider contextProvider) : CachingDomainObjectMiddleware<ContentCommand, ContentDomainObject, WriteContent>(domainObjectFactory, domainObjectCache)
+    IContextProvider contextProvider)
+    : CachingDomainObjectMiddleware<ContentCommand, ContentDomainObject, WriteContent>(domainObjectFactory, domainObjectCache)
 {
     protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
         CancellationToken ct)

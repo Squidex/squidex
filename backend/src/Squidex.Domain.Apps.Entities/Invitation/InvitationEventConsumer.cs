@@ -20,7 +20,8 @@ public sealed class InvitationEventConsumer(
     IAppProvider appProvider,
     IUserNotifications userNotifications,
     IUserResolver userResolver,
-    ILogger<InvitationEventConsumer> log) : IEventConsumer
+    ILogger<InvitationEventConsumer> log)
+    : IEventConsumer
 {
     private static readonly Duration MaxAge = Duration.FromDays(2);
 

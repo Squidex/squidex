@@ -29,7 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 public sealed class ContentChangedTriggerHandler(
     IScriptEngine scriptEngine,
     IContentLoader contentLoader,
-    IContentRepository contentRepository) : IRuleTriggerHandler, ISubscriptionEventCreator
+    IContentRepository contentRepository)
+    : IRuleTriggerHandler, ISubscriptionEventCreator
 {
     public bool CanCreateSnapshotEvents => true;
 

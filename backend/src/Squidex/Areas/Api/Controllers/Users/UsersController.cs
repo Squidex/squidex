@@ -26,7 +26,8 @@ public sealed class UsersController(
     IUserPictureStore userPictureStore,
     IUserResolver userResolver,
     IUserService userService,
-    ILogger<UsersController> log) : ApiController(commandBus)
+    ILogger<UsersController> log)
+    : ApiController(commandBus)
 {
     private static readonly byte[] AvatarBytes;
 

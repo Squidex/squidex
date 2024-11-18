@@ -27,7 +27,8 @@ public sealed class DynamicSchemeProvider(
     IDistributedCache dynamicCache,
     IJsonSerializer jsonSerializer,
     OpenIdConnectPostConfigureOptions configure,
-    IOptions<AuthenticationOptions> options) : AuthenticationSchemeProvider(options), IOptionsMonitor<DynamicOpenIdConnectOptions>
+    IOptions<AuthenticationOptions> options)
+    : AuthenticationSchemeProvider(options), IOptionsMonitor<DynamicOpenIdConnectOptions>
 {
     private static readonly string[] UrlPrefixes = ["signin-", "signout-callback-", "signout-"];
 

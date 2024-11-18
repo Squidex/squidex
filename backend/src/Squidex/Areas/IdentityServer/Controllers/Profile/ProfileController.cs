@@ -29,7 +29,8 @@ public sealed class ProfileController(
     IOptions<MyIdentityOptions> identityOptions,
     IUserPictureStore userPictureStore,
     IUserService userService,
-    IAssetThumbnailGenerator assetGenerator) : IdentityServerController
+    IAssetThumbnailGenerator assetGenerator)
+    : IdentityServerController
 {
     private readonly MyIdentityOptions identityOptions = identityOptions.Value;
 

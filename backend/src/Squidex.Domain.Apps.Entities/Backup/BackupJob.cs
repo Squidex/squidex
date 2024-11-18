@@ -21,7 +21,8 @@ public sealed class BackupJob(
     IBackupHandlerFactory backupHandlerFactory,
     IEventFormatter eventFormatter,
     IEventStore eventStore,
-    IUserResolver userResolver) : IJobRunner
+    IUserResolver userResolver)
+    : IJobRunner
 {
     public const string TaskName = "backup";
     public const string ArgAppId = "appId";

@@ -18,7 +18,8 @@ namespace Squidex.Web.Services;
 
 public sealed class UrlGenerator(IGenericUrlGenerator urlGenerator, IAssetFileStore assetFileStore,
     IOptions<AssetOptions> assetOptions,
-    IOptions<ContentOptions> contentOptions) : IUrlGenerator, IHttpImageEndpoint
+    IOptions<ContentOptions> contentOptions)
+    : IUrlGenerator, IHttpImageEndpoint
 {
     private readonly AssetOptions assetOptions = assetOptions.Value;
     private readonly ContentOptions contentOptions = contentOptions.Value;

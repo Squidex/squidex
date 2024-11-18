@@ -27,7 +27,8 @@ namespace Squidex.Areas.Account.Controllers.Connect;
 public class AuthorizationController(
     IOpenIddictScopeManager scopeManager,
     IOpenIddictApplicationManager applicationManager,
-    IUserService userService) : IdentityServerController
+    IUserService userService)
+    : IdentityServerController
 {
     [HttpPost("connect/token")]
     [Produces("application/json")]

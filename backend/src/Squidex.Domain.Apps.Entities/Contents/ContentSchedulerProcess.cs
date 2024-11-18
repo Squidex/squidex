@@ -20,7 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 public sealed class ContentSchedulerProcess(
     IContentRepository contentRepository,
     ICommandBus commandBus,
-    ILogger<ContentSchedulerProcess> log) : IBackgroundProcess
+    ILogger<ContentSchedulerProcess> log)
+    : IBackgroundProcess
 {
     private CompletionTimer timer;
 

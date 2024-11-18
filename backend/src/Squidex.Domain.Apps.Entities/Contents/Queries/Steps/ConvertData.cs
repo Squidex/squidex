@@ -19,7 +19,8 @@ using Squidex.Infrastructure.Tasks;
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
 public sealed class ConvertData(IUrlGenerator urlGenerator, IJsonSerializer serializer,
-    IAssetRepository assetRepository, IContentRepository contentRepository) : IContentEnricherStep
+    IAssetRepository assetRepository, IContentRepository contentRepository)
+    : IContentEnricherStep
 {
     private readonly ExcludeChangedTypes excludeChangedTypes = new ExcludeChangedTypes(serializer);
 

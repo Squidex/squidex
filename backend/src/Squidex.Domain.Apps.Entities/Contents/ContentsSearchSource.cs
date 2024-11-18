@@ -23,7 +23,8 @@ public sealed class ContentsSearchSource(
     IAppProvider appProvider,
     IContentQueryService contentQuery,
     ITextIndex contentTextIndexer,
-    IUrlGenerator urlGenerator) : ISearchSource
+    IUrlGenerator urlGenerator)
+    : ISearchSource
 {
     public async Task<SearchResults> SearchAsync(string query, Context context,
         CancellationToken ct)

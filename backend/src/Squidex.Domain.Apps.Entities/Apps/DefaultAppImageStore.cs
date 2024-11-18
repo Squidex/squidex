@@ -13,7 +13,8 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Entities.Apps;
 
 public sealed class DefaultAppImageStore(IAssetStore assetStore,
-    IOptions<AssetOptions> options) : IAppImageStore
+    IOptions<AssetOptions> options)
+    : IAppImageStore
 {
     private readonly AssetOptions options = options.Value;
 

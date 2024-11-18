@@ -24,7 +24,8 @@ public sealed class RuleRunnerJob(
     IRuleEventRepository ruleEventRepository,
     IRuleService ruleService,
     IRuleUsageTracker ruleUsageTracker,
-    ILogger<RuleRunnerJob> log) : IJobRunner
+    ILogger<RuleRunnerJob> log)
+    : IJobRunner
 {
     public const string TaskName = "run-rule";
     public const string ArgRuleId = "ruleId";

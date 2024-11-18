@@ -25,7 +25,8 @@ public sealed class RuleEnqueuer(IMemoryCache cache, ILocalCache localCache,
     IRuleService ruleService,
     IRuleUsageTracker ruleUsageTracker,
     IOptions<RuleOptions> options,
-    ILogger<RuleEnqueuer> log) : IEventConsumer, IRuleEnqueuer
+    ILogger<RuleEnqueuer> log)
+    : IEventConsumer, IRuleEnqueuer
 {
     private readonly TimeSpan cacheDuration = options.Value.RulesCacheDuration;
     private readonly int maxExtraEvents = options.Value.MaxEnrichedEvents;

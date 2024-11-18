@@ -29,7 +29,8 @@ public sealed class RuleService(
     IEventEnricher eventEnricher,
     IJsonSerializer serializer,
     ILogger<RuleService> log,
-    TypeRegistry typeRegistry) : IRuleService
+    TypeRegistry typeRegistry)
+    : IRuleService
 {
     private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers = ruleActionHandlers.ToDictionary(x => x.ActionType);
     private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers = ruleTriggerHandlers.ToDictionary(x => x.TriggerType);

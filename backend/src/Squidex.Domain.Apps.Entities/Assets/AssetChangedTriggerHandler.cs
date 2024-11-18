@@ -24,7 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 public sealed class AssetChangedTriggerHandler(
     IScriptEngine scriptEngine,
     IAssetLoader assetLoader,
-    IAssetRepository assetRepository) : IRuleTriggerHandler, ISubscriptionEventCreator
+    IAssetRepository assetRepository)
+    : IRuleTriggerHandler, ISubscriptionEventCreator
 {
     public bool CanCreateSnapshotEvents => true;
 

@@ -23,7 +23,8 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
 public partial class RuleDomainObject(DomainId id, IPersistenceFactory<Rule> persistence, ILogger<RuleDomainObject> log,
-    IServiceProvider serviceProvider) : DomainObject<Rule>(id, persistence, log)
+    IServiceProvider serviceProvider)
+    : DomainObject<Rule>(id, persistence, log)
 {
     protected override bool IsDeleted(Rule snapshot)
     {

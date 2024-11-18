@@ -30,7 +30,8 @@ public sealed class RestoreJob(
     IEventStore eventStore,
     IEventStreamNames eventStreamNames,
     IUserResolver userResolver,
-    ILogger<RestoreJob> log) : IJobRunner
+    ILogger<RestoreJob> log)
+    : IJobRunner
 {
     public const string TaskName = "restore";
     public const string ArgUrl = "url";

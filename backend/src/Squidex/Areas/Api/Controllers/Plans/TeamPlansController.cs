@@ -25,7 +25,8 @@ namespace Squidex.Areas.Api.Controllers.Plans;
 public sealed class TeamPlansController(ICommandBus commandBus,
     IUsageGate appUsageGate,
     IBillingPlans billingPlans,
-    IBillingManager billingManager) : ApiController(commandBus)
+    IBillingManager billingManager)
+    : ApiController(commandBus)
 {
     /// <summary>
     /// Get team plan information.

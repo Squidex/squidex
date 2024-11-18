@@ -31,7 +31,8 @@ public sealed class AssetsController(
     IAssetQueryService assetQuery,
     IAssetUsageTracker assetUsageTracker,
     ITagService tagService,
-    AssetTusRunner assetTusRunner) : ApiController(commandBus)
+    AssetTusRunner assetTusRunner)
+    : ApiController(commandBus)
 {
     /// <summary>
     /// Get assets tags.

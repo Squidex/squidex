@@ -20,7 +20,8 @@ using Squidex.Infrastructure.Security;
 namespace Squidex.Domain.Apps.Entities;
 
 public sealed class AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas, ITeamsIndex indexForTeams,
-    ILocalCache localCache) : IAppProvider
+    ILocalCache localCache)
+    : IAppProvider
 {
     public async Task<(App?, Schema?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
         CancellationToken ct = default)

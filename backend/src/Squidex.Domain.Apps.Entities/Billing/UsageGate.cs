@@ -20,7 +20,8 @@ public sealed partial class UsageGate(
     IApiUsageTracker apiUsageTracker,
     IBillingPlans billingPlans,
     IMessageBus messaging,
-    IUsageTracker usageTracker) : IUsageGate
+    IUsageTracker usageTracker)
+    : IUsageGate
 {
     private static readonly DateOnly SummaryDate = default;
     private readonly IMemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));

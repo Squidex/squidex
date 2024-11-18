@@ -22,7 +22,8 @@ public sealed class AssetCommandMiddleware(
     IAssetFileStore assetFileStore,
     IAssetQueryService assetQuery,
     IContextProvider contextProvider,
-    IEnumerable<IAssetMetadataSource> assetMetadataSources) : CachingDomainObjectMiddleware<AssetCommand, AssetDomainObject, Asset>(domainObjectFactory, domainObjectCache)
+    IEnumerable<IAssetMetadataSource> assetMetadataSources)
+    : CachingDomainObjectMiddleware<AssetCommand, AssetDomainObject, Asset>(domainObjectFactory, domainObjectCache)
 {
     private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources = assetMetadataSources.OrderBy(x => x.Order).ToList();
 

@@ -20,7 +20,8 @@ namespace Squidex.Areas.Api.Controllers.Backups;
 [ApiExplorerSettings(GroupName = nameof(Backups))]
 [Obsolete("Use Jobs endpoint.")]
 public class BackupContentController(ICommandBus commandBus,
-    IJobService jobService) : ApiController(commandBus)
+    IJobService jobService)
+    : ApiController(commandBus)
 {
     /// <summary>
     /// Get the backup content.

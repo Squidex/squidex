@@ -23,7 +23,8 @@ namespace Squidex.Areas.Api.Controllers.Apps;
 public sealed class AppImageController(ICommandBus commandBus,
     IAppImageStore appImageStore,
     IAssetStore assetStore,
-    IAssetThumbnailGenerator assetGenerator) : ApiController(commandBus)
+    IAssetThumbnailGenerator assetGenerator)
+    : ApiController(commandBus)
 {
     /// <summary>
     /// Get the app image.

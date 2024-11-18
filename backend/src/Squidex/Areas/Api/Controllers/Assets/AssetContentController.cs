@@ -31,7 +31,8 @@ public sealed class AssetContentController(
     IAssetQueryService assetQuery,
     IAssetLoader assetLoader,
     IAssetThumbnailGenerator assetGenerator,
-    IOptions<AssetOptions> assetOptions) : ApiController(commandBus)
+    IOptions<AssetOptions> assetOptions)
+    : ApiController(commandBus)
 {
     private readonly AssetOptions assetOptions = assetOptions.Value;
 

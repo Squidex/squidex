@@ -28,7 +28,8 @@ public sealed partial class CommentCollaborationHandler(
     IEventFormatter eventFormatter,
     IUserResolver userResolver,
     IClock clock,
-    ILogger<CommentCollaborationHandler> log) : IDocumentCallback, ICollaborationService
+    ILogger<CommentCollaborationHandler> log)
+    : IDocumentCallback, ICollaborationService
 {
     private static readonly Regex MentionRegex = BuildMentionRegex();
     private IDocumentManager? currentManager;

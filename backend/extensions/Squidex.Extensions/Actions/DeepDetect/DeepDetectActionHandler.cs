@@ -28,7 +28,8 @@ internal sealed partial class DeepDetectActionHandler(RuleEventFormatter formatt
     IAppProvider appProvider,
     IAssetQueryService assetQuery,
     ICommandBus commandBus,
-    IUrlGenerator urlGenerator) : RuleActionHandler<DeepDetectAction, DeepDetectJob>(formatter)
+    IUrlGenerator urlGenerator)
+    : RuleActionHandler<DeepDetectAction, DeepDetectJob>(formatter)
 {
     private const string Description = "Analyze Image";
 

@@ -34,7 +34,8 @@ public static class LuceneSearchDefinitionExtensions
     private sealed class DelegatedPipelineStageDefinition<TInput, TOutput>(
         string operatorName,
         Func<IBsonSerializer<TInput>,
-        RenderedPipelineStageDefinition<TOutput>> renderer) : PipelineStageDefinition<TInput, TOutput>
+        RenderedPipelineStageDefinition<TOutput>> renderer)
+    : PipelineStageDefinition<TInput, TOutput>
     {
         public override string OperatorName { get; } = operatorName;
 

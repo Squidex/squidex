@@ -26,7 +26,8 @@ namespace Squidex.Areas.Api.Controllers.Contents;
 [ApiExplorerSettings(GroupName = nameof(Contents))]
 public sealed class ContentsController(ICommandBus commandBus,
     IContentQueryService contentQuery,
-    IContentWorkflow contentWorkflow) : ApiController(commandBus)
+    IContentWorkflow contentWorkflow)
+    : ApiController(commandBus)
 {
     /// <summary>
     /// Streams contents.

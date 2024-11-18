@@ -23,7 +23,8 @@ public sealed class ContentQueryService(
     IContentRepository contentRepository,
     IContentLoader contentLoader,
     IOptions<ContentOptions> options,
-    ContentQueryParser queryParser) : IContentQueryService
+    ContentQueryParser queryParser)
+    : IContentQueryService
 {
     private const string SingletonId = "_schemaId_";
     private readonly ContentOptions options = options.Value;

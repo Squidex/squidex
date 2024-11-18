@@ -19,7 +19,8 @@ namespace Squidex.Areas.Api.Controllers.Jobs;
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Jobs))]
 public class JobsContentController(ICommandBus commandBus,
-    IJobService jobService) : ApiController(commandBus)
+    IJobService jobService)
+    : ApiController(commandBus)
 {
     /// <summary>
     /// Get the job content.

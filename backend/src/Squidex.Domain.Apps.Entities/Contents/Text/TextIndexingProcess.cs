@@ -16,7 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 public sealed class TextIndexingProcess(
     IJsonSerializer serializer,
     ITextIndex textIndex,
-    ITextIndexerState textIndexerState) : IEventConsumer
+    ITextIndexerState textIndexerState)
+    : IEventConsumer
 {
     public int BatchSize => 1000;
 

@@ -15,7 +15,8 @@ using Squidex.Messaging.Subscriptions;
 namespace Squidex.Domain.Apps.Core.Subscriptions;
 
 public sealed class SubscriptionPublisher(ISubscriptionService subscriptionService,
-    IEnumerable<ISubscriptionEventCreator> subscriptionCreators) : IEventConsumer
+    IEnumerable<ISubscriptionEventCreator> subscriptionCreators)
+    : IEventConsumer
 {
     public string Name => "Subscriptions";
 
